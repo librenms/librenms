@@ -19,7 +19,7 @@ $height   = $vars['height'];
 $title    = $vars['title'];
 $vertical = $vars['vertical'];
 $legend   = $vars['legend'];
-
+$output   = (!empty($vars['output']) ? $vars['output'] : 'default');
 $from = (isset($vars['from']) ? $vars['from'] : time() - 60 * 60 * 24);
 $to   = (isset($vars['to']) ? $vars['to'] : time());
 
@@ -28,7 +28,7 @@ if ($from < 0) {
 }
 
 $period = ($to - $from);
-
+$base64_output = '';
 $prev_from = ($from - $period);
 
 $graphfile = $config['temp_dir'].'/'.strgen();
@@ -132,7 +132,6 @@ if ($error_msg) {
         if ($rrd_options) {
             rrdtool_graph($graphfile, $rrd_options);
             d_echo($rrd_cmd);
-
             if (is_file($graphfile)) {
                 if (!$debug) {
                     set_image_type();
@@ -157,12 +156,32 @@ if ($error_msg) {
                         $trans_colour = imagecolorallocatealpha($dst_im, 0, 0, 0, 127);
                         imagefill($dst_im, 0, 0, $trans_colour);
                         imagecopy($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h);
-                        imagepng($dst_im);
-                        imagedestroy($dst_im);
+                        if ($output === 'base64') {
+                            ob_start();
+                                imagepng($png);
+                                $imagedata = ob_get_contents();
+                                imagedestroy($png);
+                            ob_end_clean();
+                            
+                            $base64_output = base64_encode($imagedata);
+                        } else {
+                            imagepng($dst_im);
+                            imagedestroy($dst_im);
+                        }
                     } else {
-                        $fd = fopen($graphfile, 'r');
-                        fpassthru($fd);
-                        fclose($fd);
+                        if ($output === 'base64') {
+                            $fd = fopen($graphfile, 'r');
+                            ob_start();
+                                fpassthru($fd);
+                                $imagedata = ob_get_contents();
+                                fclose($fd);
+                            ob_end_clean();
+                            $base64_output =  base64_encode($imagedata);
+                        } else {
+                            $fd = fopen($graphfile, 'r');
+                            fpassthru($fd);
+                            fclose($fd);
+                        }
                     }
                 } else {
                     echo `ls -l $graphfile`;

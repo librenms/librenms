@@ -36,6 +36,10 @@ if (isset($options['f'])) {
     $config['noinfluxdb'] = true;
 }
 
+if (isset($options['p'])) {
+    $prometheus = false;
+}
+
 if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
     $influxdb = influxdb_connect();
 } else {

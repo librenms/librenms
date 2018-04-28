@@ -1,29 +1,31 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 // Calculate filters
-$prev = !empty($_POST['period']) && ($_POST['period'] == 'prev');
+$prev = !empty($vars['period']) && ($vars['period'] == 'prev');
 $wheres = array();
 $param = array();
 if (isset($searchPhrase) && !empty($searchPhrase)) {
     $wheres[] = 'bills.bill_name LIKE ?';
     $param[] = "%$searchPhrase%";
 }
-if (!empty($_POST['bill_type'])) {
+if (!empty($vars['bill_type'])) {
     if ($prev) {
         $wheres[] = 'bill_history.bill_type = ?';
     } else {
         $wheres[] = 'bill_type = ?';
     }
-    $param[] = $_POST['bill_type'];
+    $param[] = $vars['bill_type'];
 }
-if (!empty($_POST['state'])) {
-    if ($_POST['state'] === 'under') {
+if (!empty($vars['state'])) {
+    if ($vars['state'] === 'under') {
         if ($prev) {
             $wheres[] = "((bill_history.bill_type = 'cdr' AND bill_history.rate_95th <= bill_history.bill_allowed) OR (bill_history.bill_type = 'quota' AND bill_history.traf_total <= bill_history.bill_allowed))";
         } else {
             $wheres[] = "((bill_type = 'cdr' AND rate_95th <= bill_cdr) OR (bill_type = 'quota' AND total_data <= bill_quota))";
         }
-    } elseif ($_POST['state'] === 'over') {
+    } elseif ($vars['state'] === 'over') {
         if ($prev) {
             $wheres[] = "((bill_history.bill_type = 'cdr' AND bill_history.rate_95th > bill_history.bill_allowed) OR (bill_history.bill_type = 'quota' AND bill_history.traf_total > bill_allowed))";
         } else {
@@ -31,7 +33,7 @@ if (!empty($_POST['state'])) {
         }
     }
 }
- 
+
 if ($prev) {
     $select = "SELECT bills.bill_name, bills.bill_notes, bill_history.*, bill_history.traf_total as total_data, bill_history.traf_in as total_data_in, bill_history.traf_out as total_data_out ";
     $query = 'FROM `bills`
@@ -46,10 +48,10 @@ if ($prev) {
 }
 
 // Permissions check
-if (is_admin() === false && is_read() === false) {
+if (!Auth::user()->hasGlobalRead()) {
     $query  .= ' INNER JOIN `bill_perms` AS `BP` ON `bills`.`bill_id` = `BP`.`bill_id` ';
     $wheres[] = '`BP`.`user_id`=?';
-    $param[] = $_SESSION['user_id'];
+    $param[] = Auth::id();
 }
 
 if (sizeof($wheres) > 0) {
@@ -93,7 +95,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     $url          = generate_url(array('page' => 'bill', 'bill_id' => $bill['bill_id']));
     $used95th     = format_si($bill['rate_95th']).'bps';
     $notes        = $bill['bill_notes'];
-    
+
     if ($prev) {
         $percent = $bill['bill_percent'];
         $overuse = $bill['bill_overuse'];
@@ -109,7 +111,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
             $percent    = round((($bill['rate_95th'] / $bill['bill_allowed']) * 100), 2);
             $overuse    = ($bill['rate_95th'] - $bill['bill_allowed']);
         }
-        
+
         $overuse_formatted    = format_si($overuse).'bps';
         $used                 = $rate_95th;
         $tmp_used             = $bill['rate_95th'];
@@ -128,7 +130,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
             $percent    = round((($bill['total_data'] / ($bill['bill_allowed'])) * 100), 2);
             $overuse    = ($bill['total_data'] - $bill['bill_allowed']);
         }
-        
+
         $overuse_formatted    = format_bytes_billing($overuse);
         $used                 = $total_data;
         $tmp_used             = $bill['total_data'];
@@ -139,18 +141,18 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     $right_background  = $background['right'];
     $left_background   = $background['left'];
     $overuse_formatted = (($overuse <= 0) ? '-' : "<span style='color: #${background['left']}; font-weight: bold;'>$overuse_formatted</span>");
-    
+
     $bill_name  = "<a href='$url'><span style='font-weight: bold;' class='interface'>${bill['bill_name']}</span></a><br />" .
                     strftime('%F', strtotime($datefrom)) . " to " . strftime('%F', strtotime($dateto));
     $bar        = print_percentage_bar(250, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']);
     $actions    = "";
-    
-    if (!$prev && is_admin()) {
+
+    if (!$prev && Auth::user()->hasGlobalAdmin()) {
         $actions .= "<a href='" . generate_url(array('page' => 'bill', 'bill_id' => $bill['bill_id'], 'view' => 'edit')) .
             "'><i class='fa fa-pencil fa-lg icon-theme' title='Edit' aria-hidden='true'></i> Edit</a> ";
     }
     $predicted = format_bytes_billing(getPredictedUsage($bill['bill_day'], $tmp_used));
-    
+
     $response[] = array(
         'bill_name'     => $bill_name,
         'notes'         => $notes,

@@ -13,6 +13,8 @@
  * @author     LibreNMS Contributors
 */
 
+use LibreNMS\Authentication\Auth;
+
 $pagetitle[] = "Ports";
 
 // Set Defaults here
@@ -91,10 +93,10 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
     $output .= "<select name='device_id' id='device_id' class='form-control input-sm'>";
     $output .= "<option value=''>All Devices</option>";
 
-    if ($_SESSION['userlevel'] >= 5) {
+    if (Auth::user()->hasGlobalRead()) {
         $results = dbFetchRows("SELECT `device_id`,`hostname`, `sysName` FROM `devices` ORDER BY `hostname`");
     } else {
-        $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysname` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` ORDER BY `hostname`", array($_SESSION['user_id']));
+        $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysname` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` ORDER BY `hostname`", array(Auth::id()));
     }
     foreach ($results as $data) {
         if ($data['device_id'] == $vars['device_id']) {
@@ -106,8 +108,8 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
         $output .= "<option value='" . $data['device_id'] . "' " . $deviceselected . ">" . $ui_device . "</option>";
     }
 
-    if ($_SESSION['userlevel'] < 5) {
-        $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysName` FROM `ports` AS `I` JOIN `devices` AS `D` ON `D`.`device_id`=`I`.`device_id` JOIN `ports_perms` AS `PP` ON `PP`.`port_id`=`I`.`port_id` WHERE `PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` ORDER BY `hostname`", array($_SESSION['user_id']));
+    if (!Auth::user()->hasGlobalRead()) {
+        $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysName` FROM `ports` AS `I` JOIN `devices` AS `D` ON `D`.`device_id`=`I`.`device_id` JOIN `ports_perms` AS `PP` ON `PP`.`port_id`=`I`.`port_id` WHERE `PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` ORDER BY `hostname`", array(Auth::id()));
     } else {
         $results = array();
     }
@@ -162,11 +164,11 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
     $output .= "<select name='fSpeed' id='ifSpeed' class='form-control input-sm'>";
     $output .= "<option value=''>All Speeds</option>";
 
-    if (is_admin() === true || is_read() === true) {
+    if (Auth::user()->hasGlobalRead()) {
         $sql = "SELECT `ifSpeed` FROM `ports` GROUP BY `ifSpeed` ORDER BY `ifSpeed`";
     } else {
         $sql = "SELECT `ifSpeed` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` GROUP BY `ifSpeed` ORDER BY `ifSpeed`";
-        $param[] = array($_SESSION['user_id'], $_SESSION['user_id']);
+        $param[] = array(Auth::id(), Auth::id());
     }
 
     foreach (dbFetchRows($sql, $param) as $data) {
@@ -186,11 +188,11 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
     $output .= "<select name='ifType' id='ifType' class='form-control input-sm'>";
     $output .= "<option value=''>All Media</option>";
 
-    if (is_admin() === true || is_read() === true) {
+    if (Auth::user()->hasGlobalRead()) {
         $sql = "SELECT `ifType` FROM `ports` GROUP BY `ifType` ORDER BY `ifType`";
     } else {
         $sql = "SELECT `ifType` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` GROUP BY `ifType` ORDER BY `ifType`";
-        $param[] = array($_SESSION['user_id'], $_SESSION['user_id']);
+        $param[] = array(Auth::id(), Auth::id());
     }
 
     foreach (dbFetchRows($sql, $param) as $data) {
@@ -208,11 +210,11 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
     $output .= "<select name='port_descr_type' id='port_descr_type' class='form-control input-sm'>";
     $output .= "<option value=''>All Port Types</option>";
 
-    if (is_admin() === true || is_read() === true) {
+    if (Auth::user()->hasGlobalRead()) {
         $sql = "SELECT `port_descr_type` FROM `ports` GROUP BY `port_descr_type` ORDER BY `port_descr_type`";
     } else {
         $sql = "SELECT `port_descr_type` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` GROUP BY `port_descr_type` ORDER BY `port_descr_type`";
-        $param[] = array($_SESSION['user_id'], $_SESSION['user_id']);
+        $param[] = array(Auth::id(), Auth::id());
     }
     $ports = dbFetchRows($sql, $param);
 
@@ -410,41 +412,41 @@ $ports = dbFetchRows($query, $param);
 
 switch ($vars['sort']) {
     case 'traffic':
-        $ports = array_sort($ports, 'ifOctets_rate', SORT_DESC);
+        $ports = array_sort_by_column($ports, 'ifOctets_rate', SORT_DESC);
         break;
     case 'traffic_in':
-        $ports = array_sort($ports, 'ifInOctets_rate', SORT_DESC);
+        $ports = array_sort_by_column($ports, 'ifInOctets_rate', SORT_DESC);
         break;
     case 'traffic_out':
-        $ports = array_sort($ports, 'ifOutOctets_rate', SORT_DESC);
+        $ports = array_sort_by_column($ports, 'ifOutOctets_rate', SORT_DESC);
         break;
     case 'packets':
-        $ports = array_sort($ports, 'ifUcastPkts_rate', SORT_DESC);
+        $ports = array_sort_by_column($ports, 'ifUcastPkts_rate', SORT_DESC);
         break;
     case 'packets_in':
-        $ports = array_sort($ports, 'ifInUcastOctets_rate', SORT_DESC);
+        $ports = array_sort_by_column($ports, 'ifInUcastOctets_rate', SORT_DESC);
         break;
     case 'packets_out':
-        $ports = array_sort($ports, 'ifOutUcastOctets_rate', SORT_DESC);
+        $ports = array_sort_by_column($ports, 'ifOutUcastOctets_rate', SORT_DESC);
         break;
     case 'errors':
-        $ports = array_sort($ports, 'ifErrors_rate', SORT_DESC);
+        $ports = array_sort_by_column($ports, 'ifErrors_rate', SORT_DESC);
         break;
     case 'speed':
-        $ports = array_sort($ports, 'ifSpeed', SORT_DESC);
+        $ports = array_sort_by_column($ports, 'ifSpeed', SORT_DESC);
         break;
     case 'port':
-        $ports = array_sort($ports, 'ifDescr', SORT_ASC);
+        $ports = array_sort_by_column($ports, 'ifDescr', SORT_ASC);
         break;
     case 'media':
-        $ports = array_sort($ports, 'ifType', SORT_ASC);
+        $ports = array_sort_by_column($ports, 'ifType', SORT_ASC);
         break;
     case 'descr':
-        $ports = array_sort($ports, 'ifAlias', SORT_ASC);
+        $ports = array_sort_by_column($ports, 'ifAlias', SORT_ASC);
         break;
     case 'device':
     default:
-        $ports = array_sort($ports, 'hostname', SORT_ASC);
+        $ports = array_sort_by_column($ports, 'hostname', SORT_ASC);
 }
 
 if (file_exists('pages/ports/' . $format . '.inc.php')) {

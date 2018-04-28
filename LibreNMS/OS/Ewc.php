@@ -28,12 +28,23 @@ namespace LibreNMS\OS;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\OS;
 
 class Ewc extends OS implements
     WirelessApCountDiscovery,
-    WirelessClientsDiscovery
+    WirelessClientsDiscovery,
+    WirelessErrorsDiscovery,
+    WirelessFrequencyDiscovery,
+    WirelessNoiseFloorDiscovery,
+    WirelessRssiDiscovery,
+    WirelessSnrDiscovery,
+    WirelessUtilizationDiscovery
 {
     /**
      * Discover wireless AP count.
@@ -123,6 +134,169 @@ class Ewc extends OS implements
                 'ewc',
                 $name,
                 "SSID: $name"
+            );
+        }
+        return $sensors;
+    }
+
+    /**
+     * Discover wireless bit errors.  This is in total bits. Type is errors.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessErrors()
+    {
+        $oids = snmpwalk_cache_oid($this->getDevice(), 'apPerfRadioPktRetx', array(), 'HIPATH-WIRELESS-HWC-MIB');
+        $ap_interfaces = $this->getCacheByIndex('apName', 'HIPATH-WIRELESS-HWC-MIB');
+
+        $sensors = array();
+        foreach ($oids as $index => $entry) {
+            $name = $ap_interfaces[explode('.', $index)[0]];
+            $sensors[] = new WirelessSensor(
+                'errors',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.4329.15.3.5.2.5.1.18.' . $index,
+                'ewc',
+                $index . 'Retx',
+                "Retransmits ($name radio " . explode('.', $index)[1]. ")"
+            );
+        }
+        return $sensors;
+    }
+
+    /**
+     * Discover wireless frequency.  This is in MHz. Type is frequency.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessFrequency()
+    {
+        $oids = snmpwalk_cache_oid($this->getDevice(), 'apRadioStatusChannel', array(), 'HIPATH-WIRELESS-HWC-MIB');
+        $ap_interfaces = $this->getCacheByIndex('ifName', 'IF-MIB');
+
+        $sensors = array();
+        foreach ($oids as $index => $entry) {
+            $name = $ap_interfaces[$index];
+            $sensors[] = new WirelessSensor(
+                'frequency',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.4329.15.3.5.2.4.1.1.' . $index,
+                'ewc',
+                $index,
+                "Frequency ($name)"
+            );
+        }
+        return $sensors;
+    }
+
+    /**
+     * Discover wireless noise floor.  This is in dBm. Type is noise-floor.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessNoiseFloor()
+    {
+        $oids = snmpwalk_cache_oid($this->getDevice(), 'dot11ExtRadioMaxNfCount', array(), 'HIPATH-WIRELESS-DOT11-EXTNS-MIB');
+        $ap_interfaces = $this->getCacheByIndex('ifName', 'IF-MIB');
+
+        $sensors = array();
+        foreach ($oids as $index => $entry) {
+            $name = $ap_interfaces[$index];
+            $noisefloor = $entry['dot11ExtRadioMaxNfCount'];
+            $sensors[] = new WirelessSensor(
+                'noise-floor',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.4329.15.3.1.4.3.1.32.' . $index,
+                'ewc',
+                $index,
+                "Noise floor ($name)",
+                $noisefloor,
+                1,
+                1,
+                'sum',
+                null,
+                -75
+            );
+        }
+        return $sensors;
+    }
+
+    /**
+     * Discover wireless RSSI (Received Signal Strength Indicator). This is in dBm. Type is rssi
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessRssi()
+    {
+        $oids = snmpwalk_cache_oid($this->getDevice(), 'apPerfRadioCurrentRSS', array(), 'HIPATH-WIRELESS-HWC-MIB');
+        $ap_interfaces = $this->getCacheByIndex('apName', 'HIPATH-WIRELESS-HWC-MIB');
+
+        $sensors = array();
+        foreach ($oids as $index => $entry) {
+            $name = $ap_interfaces[explode('.', $index)[0]];
+            $sensors[] = new WirelessSensor(
+                'rssi',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.4329.15.3.5.2.5.1.9.' . $index,
+                'ewc',
+                $index,
+                "RSS ($name radio " . explode('.', $index)[1]. ")"
+            );
+        }
+        return $sensors;
+    }
+
+    /**
+     * Discover wireless SNR.  This is in dB. Type is snr.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessSnr()
+    {
+        $oids = snmpwalk_cache_oid($this->getDevice(), 'apPerfRadioCurrentSNR', array(), 'HIPATH-WIRELESS-HWC-MIB');
+        $ap_interfaces = $this->getCacheByIndex('apName', 'HIPATH-WIRELESS-HWC-MIB');
+
+        $sensors = array();
+        foreach ($oids as $index => $entry) {
+            $name = $ap_interfaces[explode('.', $index)[0]];
+            $sensors[] = new WirelessSensor(
+                'snr',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.4329.15.3.5.2.5.1.13.' . $index,
+                'ewc',
+                $index,
+                "SNR ($name radio " . explode('.', $index)[1]. ")"
+            );
+        }
+        return $sensors;
+    }
+
+    /**
+     * Discover wireless utilization.  This is in %. Type is utilization.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessUtilization()
+    {
+        $oids = snmpwalk_cache_oid($this->getDevice(), 'apPerfRadioCurrentChannelUtilization', array(), 'HIPATH-WIRELESS-HWC-MIB');
+        $ap_interfaces = $this->getCacheByIndex('apName', 'HIPATH-WIRELESS-HWC-MIB');
+
+        $sensors = array();
+        foreach ($oids as $index => $entry) {
+            $name = $ap_interfaces[explode('.', $index)[0]];
+            $sensors[] = new WirelessSensor(
+                'utilization',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.4329.15.3.5.2.5.1.5.' . $index,
+                'ewc',
+                $index,
+                "Utilization ($name radio " . explode('.', $index)[1]. ")"
             );
         }
         return $sensors;

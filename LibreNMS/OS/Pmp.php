@@ -31,6 +31,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSsrDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\OS;
 
 class Pmp extends OS implements
@@ -38,7 +39,8 @@ class Pmp extends OS implements
     WirelessSnrDiscovery,
     WirelessFrequencyDiscovery,
     WirelessUtilizationDiscovery,
-    WirelessSsrDiscovery
+    WirelessSsrDiscovery,
+    WirelessClientsDiscovery
 {
 
     /**
@@ -137,6 +139,12 @@ class Pmp extends OS implements
     {
         $downlink = '.1.3.6.1.4.1.161.19.3.1.12.1.1.0'; //WHISP-APS-MIB::frUtlLowTotalDownlinkUtilization
         $uplink = '.1.3.6.1.4.1.161.19.3.1.12.1.2.0'; //WHISP-APS-MIB::frUtlLowTotalUplinkUtilization
+
+        // 450M Specific Utilizations
+        $muSectorDownlink = '.1.3.6.1.4.1.161.19.3.1.12.2.29.0'; //WHISP-APS-MIB::frUtlMedMumimoDownlinkSectorUtilization
+        $muDownlink = '.1.3.6.1.4.1.161.19.3.1.12.2.30.0'; //WHISP-APS-MIB::frUtlMedMumimoDownlinkMumimoUtilization
+        $suDownlink = '.1.3.6.1.4.1.161.19.3.1.12.2.31.0'; //WHISP-APS-MIB::frUtlMedMumimoDownlinkSumimoUtilization
+
         return array(
             new WirelessSensor(
                 'utilization',
@@ -154,6 +162,33 @@ class Pmp extends OS implements
                 'pmp-uplink',
                 0,
                 'Uplink Utilization',
+                null
+            ),
+            new WirelessSensor(
+                'utilization',
+                $this->getDeviceId(),
+                $muSectorDownlink,
+                'pmp-450m-sector-downlink',
+                0,
+                'MU-MIMO Downlink Sector utilization',
+                null
+            ),
+            new WirelessSensor(
+                'utilization',
+                $this->getDeviceId(),
+                $muDownlink,
+                'pmp-450m-downlink',
+                0,
+                'MU-MIMO Downlink Utilization',
+                null
+            ),
+            new WirelessSensor(
+                'utilization',
+                $this->getDeviceId(),
+                $suDownlink,
+                'pmp-450m-su-downlink',
+                0,
+                'SU-MIMO Downlink Utilization',
                 null
             )
         );
@@ -225,5 +260,27 @@ class Pmp extends OS implements
         }
 
         return 1;
+    }
+
+    /**
+     * Discover wireless client counts. Type is clients.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessClients()
+    {
+        $registeredSM = '.1.3.6.1.4.1.161.19.3.1.7.1.0'; //WHISP-APS-MIB::regCount.0
+        return array(
+            new WirelessSensor(
+                'clients',
+                $this->getDeviceId(),
+                $registeredSM,
+                'pmp',
+                0,
+                'Client Count',
+                null
+            )
+        );
     }
 }

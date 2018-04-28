@@ -9,9 +9,11 @@
  * @package    LibreNMS
  * @subpackage graphs
  * @link       http://librenms.org
- * @copyright  2017 LibreNMS
+ * @copyright  2018 LibreNMS
  * @author     LibreNMS Contributors
 */
+
+use LibreNMS\Authentication\Auth;
 
 require_once $config['install_dir'] . '/includes/device-groups.inc.php';
 
@@ -38,36 +40,36 @@ $alert_severities = array(
 
 $show_recovered = false;
 
-if (is_numeric($_POST['device_id']) && $_POST['device_id'] > 0) {
-    $where .= ' AND `alerts`.`device_id`=' . $_POST['device_id'];
+if (is_numeric($vars['device_id']) && $vars['device_id'] > 0) {
+    $where .= ' AND `alerts`.`device_id`=' . $vars['device_id'];
 }
 
-if (is_numeric($_POST['acknowledged'])) {
+if (is_numeric($vars['acknowledged'])) {
     // I assume that if we are searching for acknowleged/not, we aren't interested in recovered
-    $where .= " AND `alerts`.`state`" . ($_POST['acknowledged'] ? "=" : "!=") . $alert_states['acknowledged'];
+    $where .= " AND `alerts`.`state`" . ($vars['acknowledged'] ? "=" : "!=") . $alert_states['acknowledged'];
 }
 
-if (is_numeric($_POST['state'])) {
-    $where .= " AND `alerts`.`state`=" . $_POST['state'];
-    if ($_POST['state'] == $alert_states['recovered']) {
+if (is_numeric($vars['state'])) {
+    $where .= " AND `alerts`.`state`=" . $vars['state'];
+    if ($vars['state'] == $alert_states['recovered']) {
         $show_recovered = true;
     }
 }
 
-if (isset($_POST['min_severity'])) {
-    if (is_numeric($_POST['min_severity'])) {
-        $min_severity_id = $_POST['min_severity'];
-    } elseif (!empty($_POST['min_severity'])) {
-        $min_severity_id = $alert_severities[$_POST['min_severity']];
+if (isset($vars['min_severity'])) {
+    if (is_numeric($vars['min_severity'])) {
+        $min_severity_id = $vars['min_severity'];
+    } elseif (!empty($vars['min_severity'])) {
+        $min_severity_id = $alert_severities[$vars['min_severity']];
     }
     if (isset($min_severity_id)) {
         $where .= " AND `alert_rules`.`severity` " . ($min_severity_id > 3 ? "" : ">") . "= " . ($min_severity_id > 3 ? $min_severity_id - 3 : $min_severity_id);
     }
 }
 
-if (is_numeric($_POST['group'])) {
+if (is_numeric($vars['group'])) {
     $where .= " AND devices.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)";
-    $param[] = $_POST['group'];
+    $param[] = $vars['group'];
 }
 
 if (!$show_recovered) {
@@ -75,15 +77,15 @@ if (!$show_recovered) {
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $where .= " AND (`timestamp` LIKE '%$searchPhrase%' OR `rule` LIKE '%$searchPhrase%' OR `name` LIKE '%$searchPhrase%' OR `hostname` LIKE '%$searchPhrase%')";
+    $where .= " AND (`timestamp` LIKE '%$searchPhrase%' OR `rule` LIKE '%$searchPhrase%' OR `name` LIKE '%$searchPhrase%' OR `hostname` LIKE '%$searchPhrase%' OR `sysName` LIKE '%$searchPhrase%')";
 }
 
 $sql = ' FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`';
 
-if (is_admin() === false && is_read() === false) {
+if (!Auth::user()->hasGlobalRead()) {
     $sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
     $where .= ' AND `DP`.`user_id`=?';
-    $param[] = $_SESSION['user_id'];
+    $param[] = Auth::id();
 }
 
 $sql .= "  RIGHT JOIN `alert_rules` ON `alerts`.`rule_id`=`alert_rules`.`id` WHERE $where";
@@ -112,13 +114,13 @@ if ($rowCount != -1) {
 $sql = "SELECT `alerts`.*, `devices`.`hostname`, `devices`.`sysName`, `devices`.`hardware`, `devices`.`location`, `alert_rules`.`rule`, `alert_rules`.`name`, `alert_rules`.`severity` $sql";
 
 $rulei = 0;
-$format = $_POST['format'];
+$format = $vars['format'];
 foreach (dbFetchRows($sql, $param) as $alert) {
     $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', array($alert['rule_id'], $alert['device_id']));
     $fault_detail = alert_details($log);
 
-    $alert_to_ack = '<button type="button" class="btn btn-danger command-ack-alert fa fa-eye" aria-hidden="true" title="Mark as acknowledged" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" name="ack-alert"></button>';
-    $alert_to_nack = '<button type="button" class="btn btn-warning command-ack-alert fa fa-eye-slash" aria-hidden="true" title="Mark as not acknowledged" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" name="ack-alert"></button>';
+    $alert_to_ack = '<button type="button" class="btn btn-danger command-ack-alert fa fa-eye" aria-hidden="true" title="Mark as acknowledged" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" data-alert_state="' . $alert['state'] . '" name="ack-alert"></button>';
+    $alert_to_nack = '<button type="button" class="btn btn-primary command-ack-alert fa fa-eye-slash" aria-hidden="true" title="Mark as not acknowledged" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" data-alert_state="' . $alert['state'] . '" name="ack-alert"></button>';
 
     $ack_ico = $alert_to_ack;
 
@@ -162,7 +164,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     }
 
     if ((int)$alert['state'] === 2) {
-        $severity_ico = '<span class="alert-status label-warning">&nbsp;</span>';
+        $severity_ico = '<span class="alert-status label-primary">&nbsp;</span>';
     }
 
     $proc = dbFetchCell('SELECT proc FROM alerts,alert_rules WHERE alert_rules.id = alerts.rule_id AND alerts.id = ?', array($alert['id']));
@@ -176,6 +178,12 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         }
     }
 
+    if (empty($alert['note'])) {
+        $note_class = 'default';
+    } else {
+        $note_class = 'warning';
+    }
+
     $response[] = array(
         'id' => $rulei++,
         'rule' => '<i title="' . htmlentities($alert['rule']) . '"><a href="' . generate_url(array('page' => 'alert-rules')) . '">' . htmlentities($alert['name']) . '</a></i>',
@@ -187,6 +195,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         'alert_id' => $alert['id'],
         'ack_ico' => $ack_ico,
         'proc' => $has_proc,
+        'notes' => "<button type='button' class='btn btn-$note_class fa fa-sticky-note-o command-alert-note' aria-label='Notes' id='alert-notes' data-alert_id='{$alert['id']}'></button>",
     );
 }
 

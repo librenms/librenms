@@ -21,6 +21,10 @@
  * @package LibreNMS
  * @subpackage Frontpage
  */
+
+use LibreNMS\Authentication\Auth;
+use LibreNMS\Config;
+
 require_once $config['install_dir'] . '/includes/alerts.inc.php';
 require_once $config['install_dir'] . '/includes/device-groups.inc.php';
 
@@ -122,7 +126,7 @@ if ($config['map']['engine'] == 'leaflet') {
         if (!empty($widget_settings['group_radius'])) {
             $group_radius = $widget_settings['group_radius'];
         } else {
-            $group_radius = 80;
+            $group_radius = Config::get('leaflet.group_radius', 80);
         }
         if (empty($widget_settings['status']) && $widget_settings['status'] != '0') {
             $widget_settings['status'] = '0,1';
@@ -165,7 +169,7 @@ var greenMarker = L.AwesomeMarkers.icon({
   });
         ';
         // Checking user permissions
-        if (is_admin() || is_read()) {
+        if (Auth::user()->hasGlobalRead()) {
         // Admin or global read-only - show all devices
             $sql = "SELECT DISTINCT(`device_id`),`devices`.`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng` FROM `devices`
                     LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
@@ -181,7 +185,7 @@ var greenMarker = L.AwesomeMarkers.icon({
                     AND `devices`.`device_id` = `devices_perms`.`device_id`
                     AND `devices_perms`.`user_id` = ? AND `status` IN (".$widget_settings['status'].")
                     ORDER BY `status` ASC, `hostname`";
-            $param[] = $_SESSION['user_id'];
+            $param[] = Auth::id();
         }
         foreach (dbFetchRows($sql, $param) as $map_devices) {
             $icon = 'greenMarker';

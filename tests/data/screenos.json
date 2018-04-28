@@ -1,21 +1,41 @@
 {
-    "processors": {
+    "os": {
         "discovery": {
-            "processors": [
+            "devices": [
                 {
-                    "entPhysicalIndex": "0",
-                    "hrDeviceIndex": "0",
-                    "processor_oid": ".1.3.6.1.4.1.3224.16.1.3.0",
-                    "processor_index": "1",
-                    "processor_type": "screenos",
-                    "processor_usage": "42",
-                    "processor_descr": "Processor",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.3224.1.29",
+                    "sysDescr": "SSG5-Serial version 6.3.0r24.0 (SN: 0000000000000000, Firewall+VPN)",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": "",
+                    "features": null,
+                    "location": null,
+                    "os": "screenos",
+                    "type": "firewall",
+                    "serial": null,
+                    "icon": "screenos.png"
                 }
             ]
         },
-        "poller": "matches discovery"
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.3224.1.29",
+                    "sysDescr": "SSG5-Serial version 6.3.0r24.0 (SN: 0000000000000000, Firewall+VPN)",
+                    "sysContact": "<private>",
+                    "version": "6.3.0r24.0",
+                    "hardware": "SSG5-Serial",
+                    "features": "Firewall+VPN",
+                    "location": "<private>",
+                    "os": "screenos",
+                    "type": "firewall",
+                    "serial": "0000000000000000",
+                    "icon": "screenos.png"
+                }
+            ]
+        }
     },
     "ports": {
         "discovery": {
@@ -132,7 +152,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "PRIVATEDATA01",
+                    "ifDescr": "PRIVATEPORT01",
                     "ifName": "ethernet0/0",
                     "portName": null,
                     "ifIndex": "2",
@@ -238,7 +258,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "PRIVATEDATA02",
+                    "ifDescr": "PRIVATEPORT02",
                     "ifName": "ethernet0/1",
                     "portName": null,
                     "ifIndex": "3",
@@ -344,7 +364,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "ethernet0/2",
+                    "ifDescr": "PRIVATEPORT03",
                     "ifName": "ethernet0/2",
                     "portName": null,
                     "ifIndex": "4",
@@ -450,7 +470,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "DMZ",
+                    "ifDescr": "PRIVATEPORT04",
                     "ifName": "ethernet0/3",
                     "portName": null,
                     "ifIndex": "5",
@@ -662,7 +682,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "LINK 3G OR ISP",
+                    "ifDescr": "PRIVATEPORT05",
                     "ifName": "ethernet0/5",
                     "portName": null,
                     "ifIndex": "7",
@@ -768,7 +788,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "TRUNK 24 SWITCH",
+                    "ifDescr": "PRIVATEPORT06",
                     "ifName": "ethernet0/6",
                     "portName": null,
                     "ifIndex": "8",
@@ -874,7 +894,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "INTERNA",
+                    "ifDescr": "PRIVATEPORT07",
                     "ifName": "ethernet0/6.1",
                     "portName": null,
                     "ifIndex": "9",
@@ -980,7 +1000,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "PRIVATEDATA03",
+                    "ifDescr": "PRIVATEPORT08",
                     "ifName": "ethernet0/6.2",
                     "portName": null,
                     "ifIndex": "10",
@@ -1086,7 +1106,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "WIRELESS",
+                    "ifDescr": "PRIVATEPORT09",
                     "ifName": "ethernet0/6.3",
                     "portName": null,
                     "ifIndex": "11",
@@ -1192,7 +1212,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "PRIVATEDATA04",
+                    "ifDescr": "PRIVATEPORT12",
                     "ifName": "ethernet0/6.4",
                     "portName": null,
                     "ifIndex": "12",
@@ -1298,7 +1318,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "PDV",
+                    "ifDescr": "PRIVATEPORT11",
                     "ifName": "ethernet0/6.5",
                     "portName": null,
                     "ifIndex": "13",
@@ -1404,7 +1424,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "bgroup0",
+                    "ifDescr": "PRIVATEPORT12",
                     "ifName": "bgroup0",
                     "portName": null,
                     "ifIndex": "14",
@@ -1828,7 +1848,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "TUNNEL VPN",
+                    "ifDescr": "PRIVATEPORT13",
                     "ifName": "tunnel.1",
                     "portName": null,
                     "ifIndex": "18",
@@ -2060,7 +2080,7 @@
                     "ifMtu": "1500",
                     "ifType": "modem",
                     "ifAlias": "serial0/0",
-                    "ifPhysAddress": "b0c69a4c6c15",
+                    "ifPhysAddress": "648788001001",
                     "ifHardType": null,
                     "ifLastChange": "0",
                     "ifVlan": "",
@@ -2150,7 +2170,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "PRIVATEDATA01",
+                    "ifDescr": "PRIVATEPORT01",
                     "ifName": "ethernet0/0",
                     "portName": null,
                     "ifIndex": "2",
@@ -2165,10 +2185,10 @@
                     "ifDuplex": null,
                     "ifMtu": "1500",
                     "ifType": "ethernetCsmacd",
-                    "ifAlias": "PRIVATEDATA01",
-                    "ifPhysAddress": "b0c69a4c6c00",
+                    "ifAlias": "PRIVATEPORT01",
+                    "ifPhysAddress": "648788001002",
                     "ifHardType": null,
-                    "ifLastChange": "600",
+                    "ifLastChange": "500",
                     "ifVlan": "",
                     "ifTrunk": null,
                     "ifVrf": "0",
@@ -2256,7 +2276,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "PRIVATEDATA02",
+                    "ifDescr": "PRIVATEPORT02",
                     "ifName": "ethernet0/1",
                     "portName": null,
                     "ifIndex": "3",
@@ -2271,10 +2291,10 @@
                     "ifDuplex": null,
                     "ifMtu": "1500",
                     "ifType": "ethernetCsmacd",
-                    "ifAlias": "PRIVATEDATA02",
-                    "ifPhysAddress": "b0c69a4c6c05",
+                    "ifAlias": "PRIVATEPORT02",
+                    "ifPhysAddress": "648788001003",
                     "ifHardType": null,
-                    "ifLastChange": "600",
+                    "ifLastChange": "500",
                     "ifVlan": "",
                     "ifTrunk": null,
                     "ifVrf": "0",
@@ -2362,7 +2382,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "ethernet0/2",
+                    "ifDescr": "PRIVATEPORT03",
                     "ifName": "ethernet0/2",
                     "portName": null,
                     "ifIndex": "4",
@@ -2377,8 +2397,8 @@
                     "ifDuplex": null,
                     "ifMtu": "1500",
                     "ifType": "ethernetCsmacd",
-                    "ifAlias": "ethernet0/2",
-                    "ifPhysAddress": "b0c69a4c6c06",
+                    "ifAlias": "PRIVATEPORT03",
+                    "ifPhysAddress": "648788001004",
                     "ifHardType": null,
                     "ifLastChange": "0",
                     "ifVlan": "",
@@ -2468,7 +2488,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "DMZ",
+                    "ifDescr": "PRIVATEPORT04",
                     "ifName": "ethernet0/3",
                     "portName": null,
                     "ifIndex": "5",
@@ -2483,8 +2503,8 @@
                     "ifDuplex": null,
                     "ifMtu": "1500",
                     "ifType": "ethernetCsmacd",
-                    "ifAlias": "DMZ",
-                    "ifPhysAddress": "b0c69a4c6c07",
+                    "ifAlias": "PRIVATEPORT04",
+                    "ifPhysAddress": "648788001005",
                     "ifHardType": null,
                     "ifLastChange": "0",
                     "ifVlan": "",
@@ -2590,7 +2610,7 @@
                     "ifMtu": "1500",
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "ethernet0/4",
-                    "ifPhysAddress": "b0c69a4c6c08",
+                    "ifPhysAddress": "648788001006",
                     "ifHardType": null,
                     "ifLastChange": "0",
                     "ifVlan": "",
@@ -2680,7 +2700,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "LINK 3G OR ISP",
+                    "ifDescr": "PRIVATEPORT05",
                     "ifName": "ethernet0/5",
                     "portName": null,
                     "ifIndex": "7",
@@ -2695,8 +2715,8 @@
                     "ifDuplex": null,
                     "ifMtu": "1500",
                     "ifType": "ethernetCsmacd",
-                    "ifAlias": "LINK 3G OR ISP",
-                    "ifPhysAddress": "b0c69a4c6c09",
+                    "ifAlias": "PRIVATEPORT05",
+                    "ifPhysAddress": "648788001007",
                     "ifHardType": null,
                     "ifLastChange": "0",
                     "ifVlan": "",
@@ -2786,7 +2806,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "TRUNK 24 SWITCH",
+                    "ifDescr": "PRIVATEPORT06",
                     "ifName": "ethernet0/6",
                     "portName": null,
                     "ifIndex": "8",
@@ -2801,10 +2821,10 @@
                     "ifDuplex": null,
                     "ifMtu": "1500",
                     "ifType": "ethernetCsmacd",
-                    "ifAlias": "TRUNK 24 SWITCH",
-                    "ifPhysAddress": "b0c69a4c6c0a",
+                    "ifAlias": "PRIVATEPORT06",
+                    "ifPhysAddress": "64878800100a",
                     "ifHardType": null,
-                    "ifLastChange": "600",
+                    "ifLastChange": "500",
                     "ifVlan": "",
                     "ifTrunk": null,
                     "ifVrf": "0",
@@ -2824,11 +2844,11 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
-                    "ifInUcastPkts": "26686698",
+                    "ifInUcastPkts": "42622874",
                     "ifInUcastPkts_prev": "0",
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
-                    "ifOutUcastPkts": "21561817",
+                    "ifOutUcastPkts": "39263070",
                     "ifOutUcastPkts_prev": "0",
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
@@ -2840,11 +2860,11 @@
                     "ifOutErrors_prev": "0",
                     "ifOutErrors_delta": null,
                     "ifOutErrors_rate": null,
-                    "ifInOctets": "8399997857",
+                    "ifInOctets": "30676084988",
                     "ifInOctets_prev": "0",
                     "ifInOctets_delta": null,
                     "ifInOctets_rate": null,
-                    "ifOutOctets": "6204405849",
+                    "ifOutOctets": "22073401121",
                     "ifOutOctets_prev": "0",
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
@@ -2892,7 +2912,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "INTERNA",
+                    "ifDescr": "PRIVATEPORT07",
                     "ifName": "ethernet0/6.1",
                     "portName": null,
                     "ifIndex": "9",
@@ -2907,10 +2927,10 @@
                     "ifDuplex": null,
                     "ifMtu": "1500",
                     "ifType": "propVirtual",
-                    "ifAlias": "INTERNA",
-                    "ifPhysAddress": "b0c69a4c6c0a",
+                    "ifAlias": "PRIVATEPORT07",
+                    "ifPhysAddress": "64878800100a",
                     "ifHardType": null,
-                    "ifLastChange": "600",
+                    "ifLastChange": "500",
                     "ifVlan": "",
                     "ifTrunk": null,
                     "ifVrf": "0",
@@ -2930,11 +2950,11 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
-                    "ifInUcastPkts": "26686698",
+                    "ifInUcastPkts": "42622874",
                     "ifInUcastPkts_prev": "0",
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
-                    "ifOutUcastPkts": "21561817",
+                    "ifOutUcastPkts": "39263070",
                     "ifOutUcastPkts_prev": "0",
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
@@ -2946,11 +2966,11 @@
                     "ifOutErrors_prev": "0",
                     "ifOutErrors_delta": null,
                     "ifOutErrors_rate": null,
-                    "ifInOctets": "8399997857",
+                    "ifInOctets": "30676084988",
                     "ifInOctets_prev": "0",
                     "ifInOctets_delta": null,
                     "ifInOctets_rate": null,
-                    "ifOutOctets": "6204405849",
+                    "ifOutOctets": "22073401121",
                     "ifOutOctets_prev": "0",
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
@@ -2998,7 +3018,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "PRIVATEDATA03",
+                    "ifDescr": "PRIVATEPORT08",
                     "ifName": "ethernet0/6.2",
                     "portName": null,
                     "ifIndex": "10",
@@ -3013,10 +3033,10 @@
                     "ifDuplex": null,
                     "ifMtu": "1500",
                     "ifType": "propVirtual",
-                    "ifAlias": "PRIVATEDATA03",
-                    "ifPhysAddress": "b0c69a4c6c0a",
+                    "ifAlias": "PRIVATEPORT08",
+                    "ifPhysAddress": "64878800100a",
                     "ifHardType": null,
-                    "ifLastChange": "600",
+                    "ifLastChange": "500",
                     "ifVlan": "",
                     "ifTrunk": null,
                     "ifVrf": "0",
@@ -3036,11 +3056,11 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
-                    "ifInUcastPkts": "26686698",
+                    "ifInUcastPkts": "42622874",
                     "ifInUcastPkts_prev": "0",
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
-                    "ifOutUcastPkts": "21561818",
+                    "ifOutUcastPkts": "39263070",
                     "ifOutUcastPkts_prev": "0",
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
@@ -3052,11 +3072,11 @@
                     "ifOutErrors_prev": "0",
                     "ifOutErrors_delta": null,
                     "ifOutErrors_rate": null,
-                    "ifInOctets": "8399997857",
+                    "ifInOctets": "30676084988",
                     "ifInOctets_prev": "0",
                     "ifInOctets_delta": null,
                     "ifInOctets_rate": null,
-                    "ifOutOctets": "6204405933",
+                    "ifOutOctets": "22073401647",
                     "ifOutOctets_prev": "0",
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
@@ -3104,7 +3124,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "WIRELESS",
+                    "ifDescr": "PRIVATEPORT09",
                     "ifName": "ethernet0/6.3",
                     "portName": null,
                     "ifIndex": "11",
@@ -3119,10 +3139,10 @@
                     "ifDuplex": null,
                     "ifMtu": "1500",
                     "ifType": "propVirtual",
-                    "ifAlias": "WIRELESS",
-                    "ifPhysAddress": "b0c69a4c6c0a",
+                    "ifAlias": "PRIVATEPORT09",
+                    "ifPhysAddress": "64878800100a",
                     "ifHardType": null,
-                    "ifLastChange": "600",
+                    "ifLastChange": "500",
                     "ifVlan": "",
                     "ifTrunk": null,
                     "ifVrf": "0",
@@ -3142,11 +3162,11 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
-                    "ifInUcastPkts": "26686698",
+                    "ifInUcastPkts": "42622874",
                     "ifInUcastPkts_prev": "0",
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
-                    "ifOutUcastPkts": "21561822",
+                    "ifOutUcastPkts": "39263081",
                     "ifOutUcastPkts_prev": "0",
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
@@ -3158,11 +3178,11 @@
                     "ifOutErrors_prev": "0",
                     "ifOutErrors_delta": null,
                     "ifOutErrors_rate": null,
-                    "ifInOctets": "8399997857",
+                    "ifInOctets": "30676084988",
                     "ifInOctets_prev": "0",
                     "ifInOctets_delta": null,
                     "ifInOctets_rate": null,
-                    "ifOutOctets": "6204405933",
+                    "ifOutOctets": "22073401647",
                     "ifOutOctets_prev": "0",
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
@@ -3210,7 +3230,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "PRIVATEDATA04",
+                    "ifDescr": "PRIVATEPORT12",
                     "ifName": "ethernet0/6.4",
                     "portName": null,
                     "ifIndex": "12",
@@ -3225,10 +3245,10 @@
                     "ifDuplex": null,
                     "ifMtu": "1500",
                     "ifType": "propVirtual",
-                    "ifAlias": "PRIVATEDATA04",
-                    "ifPhysAddress": "b0c69a4c6c0a",
+                    "ifAlias": "PRIVATEPORT12",
+                    "ifPhysAddress": "64878800100a",
                     "ifHardType": null,
-                    "ifLastChange": "600",
+                    "ifLastChange": "500",
                     "ifVlan": "",
                     "ifTrunk": null,
                     "ifVrf": "0",
@@ -3248,11 +3268,11 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
-                    "ifInUcastPkts": "26686698",
+                    "ifInUcastPkts": "42622874",
                     "ifInUcastPkts_prev": "0",
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
-                    "ifOutUcastPkts": "21561822",
+                    "ifOutUcastPkts": "39263081",
                     "ifOutUcastPkts_prev": "0",
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
@@ -3264,11 +3284,11 @@
                     "ifOutErrors_prev": "0",
                     "ifOutErrors_delta": null,
                     "ifOutErrors_rate": null,
-                    "ifInOctets": "8399997857",
+                    "ifInOctets": "30676084988",
                     "ifInOctets_prev": "0",
                     "ifInOctets_delta": null,
                     "ifInOctets_rate": null,
-                    "ifOutOctets": "6204405933",
+                    "ifOutOctets": "22073401647",
                     "ifOutOctets_prev": "0",
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
@@ -3316,7 +3336,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "PDV",
+                    "ifDescr": "PRIVATEPORT11",
                     "ifName": "ethernet0/6.5",
                     "portName": null,
                     "ifIndex": "13",
@@ -3331,10 +3351,10 @@
                     "ifDuplex": null,
                     "ifMtu": "1500",
                     "ifType": "propVirtual",
-                    "ifAlias": "PDV",
-                    "ifPhysAddress": "b0c69a4c6c0a",
+                    "ifAlias": "PRIVATEPORT11",
+                    "ifPhysAddress": "64878800100a",
                     "ifHardType": null,
-                    "ifLastChange": "600",
+                    "ifLastChange": "500",
                     "ifVlan": "",
                     "ifTrunk": null,
                     "ifVrf": "0",
@@ -3354,11 +3374,11 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
-                    "ifInUcastPkts": "26686698",
+                    "ifInUcastPkts": "42622874",
                     "ifInUcastPkts_prev": "0",
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
-                    "ifOutUcastPkts": "21561822",
+                    "ifOutUcastPkts": "39263081",
                     "ifOutUcastPkts_prev": "0",
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
@@ -3370,11 +3390,11 @@
                     "ifOutErrors_prev": "0",
                     "ifOutErrors_delta": null,
                     "ifOutErrors_rate": null,
-                    "ifInOctets": "8399997857",
+                    "ifInOctets": "30676084988",
                     "ifInOctets_prev": "0",
                     "ifInOctets_delta": null,
                     "ifInOctets_rate": null,
-                    "ifOutOctets": "6204405933",
+                    "ifOutOctets": "22073401647",
                     "ifOutOctets_prev": "0",
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
@@ -3422,7 +3442,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "bgroup0",
+                    "ifDescr": "PRIVATEPORT12",
                     "ifName": "bgroup0",
                     "portName": null,
                     "ifIndex": "14",
@@ -3437,10 +3457,10 @@
                     "ifDuplex": null,
                     "ifMtu": "1500",
                     "ifType": "propVirtual",
-                    "ifAlias": "bgroup0",
-                    "ifPhysAddress": "b0c69a4c6c0b",
+                    "ifAlias": "PRIVATEPORT12",
+                    "ifPhysAddress": "64878800100b",
                     "ifHardType": null,
-                    "ifLastChange": "600",
+                    "ifLastChange": "500",
                     "ifVlan": "",
                     "ifTrunk": null,
                     "ifVrf": "0",
@@ -3460,11 +3480,11 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
-                    "ifInUcastPkts": "20123619",
+                    "ifInUcastPkts": "19699667",
                     "ifInUcastPkts_prev": "0",
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
-                    "ifOutUcastPkts": "27727287",
+                    "ifOutUcastPkts": "23319534",
                     "ifOutUcastPkts_prev": "0",
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
@@ -3476,11 +3496,11 @@
                     "ifOutErrors_prev": "0",
                     "ifOutErrors_delta": null,
                     "ifOutErrors_rate": null,
-                    "ifInOctets": "6076112394",
+                    "ifInOctets": "2412489386",
                     "ifInOctets_prev": "0",
                     "ifInOctets_delta": null,
                     "ifInOctets_rate": null,
-                    "ifOutOctets": "9811458711",
+                    "ifOutOctets": "11469372788",
                     "ifOutOctets_prev": "0",
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
@@ -3544,7 +3564,7 @@
                     "ifMtu": "1500",
                     "ifType": "propVirtual",
                     "ifAlias": "bgroup1",
-                    "ifPhysAddress": "b0c69a4c6c0c",
+                    "ifPhysAddress": "64878800100c",
                     "ifHardType": null,
                     "ifLastChange": "0",
                     "ifVlan": "",
@@ -3650,7 +3670,7 @@
                     "ifMtu": "1500",
                     "ifType": "propVirtual",
                     "ifAlias": "bgroup2",
-                    "ifPhysAddress": "b0c69a4c6c0d",
+                    "ifPhysAddress": "64878800100d",
                     "ifHardType": null,
                     "ifLastChange": "0",
                     "ifVlan": "",
@@ -3756,7 +3776,7 @@
                     "ifMtu": "1500",
                     "ifType": "propVirtual",
                     "ifAlias": "bgroup3",
-                    "ifPhysAddress": "b0c69a4c6c0e",
+                    "ifPhysAddress": "64878800100e",
                     "ifHardType": null,
                     "ifLastChange": "0",
                     "ifVlan": "",
@@ -3846,7 +3866,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "TUNNEL VPN",
+                    "ifDescr": "PRIVATEPORT13",
                     "ifName": "tunnel.1",
                     "portName": null,
                     "ifIndex": "18",
@@ -3861,7 +3881,7 @@
                     "ifDuplex": null,
                     "ifMtu": "1500",
                     "ifType": "tunnel",
-                    "ifAlias": "TUNNEL VPN",
+                    "ifAlias": "PRIVATEPORT13",
                     "ifPhysAddress": "000000000000",
                     "ifHardType": null,
                     "ifLastChange": "0",
@@ -3968,7 +3988,7 @@
                     "ifMtu": "1500",
                     "ifType": "propVirtual",
                     "ifAlias": "vlan1",
-                    "ifPhysAddress": "b0c69a4c6c0f",
+                    "ifPhysAddress": "64878800100f",
                     "ifHardType": null,
                     "ifLastChange": "0",
                     "ifVlan": "",
@@ -4055,281 +4075,19 @@
             ]
         }
     },
-    "os": {
+    "processors": {
         "discovery": {
-            "devices": [
+            "processors": [
                 {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.3224.1.29",
-                    "sysDescr": "SSG5-Serial version 6.3.0r23.0 (SN: 0000000000000000, Firewall VPN)",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": "",
-                    "features": null,
-                    "location": null,
-                    "os": "screenos",
-                    "type": "firewall",
-                    "serial": null,
-                    "icon": "screenos.png"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.3224.1.29",
-                    "sysDescr": "SSG5-Serial version 6.3.0r23.0 (SN: 0000000000000000, Firewall VPN)",
-                    "sysContact": "<private>",
-                    "version": "6.3.0r23.0",
-                    "hardware": "SSG5-Serial",
-                    "features": "Firewall VPN",
-                    "location": "<private>",
-                    "os": "screenos",
-                    "type": "firewall",
-                    "serial": "0000000000000000",
-                    "icon": "screenos.png"
-                }
-            ]
-        }
-    },
-    "arp-table": {
-        "discovery": {
-            "ipv4_mac": [
-                {
-                    "mac_address": "f84f57019726",
-                    "ipv4_address": "10.23.118.1",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "0060ef22108d",
-                    "ipv4_address": "10.23.118.122",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "0060ef22111b",
-                    "ipv4_address": "10.23.118.123",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "0008d501bfc2",
-                    "ipv4_address": "10.23.118.162",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "fc0a814478c8",
-                    "ipv4_address": "10.23.118.163",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "fc0a81447560",
-                    "ipv4_address": "10.23.118.166",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "4083deb77d5e",
-                    "ipv4_address": "10.23.118.167",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "4083deb77df1",
-                    "ipv4_address": "10.23.118.176",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "4083de670b95",
-                    "ipv4_address": "10.23.118.177",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "4083de6707b9",
-                    "ipv4_address": "10.23.118.178",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "4083de670641",
-                    "ipv4_address": "10.23.118.179",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "00074d40cb63",
-                    "ipv4_address": "10.23.118.19",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "0026738abd1c",
-                    "ipv4_address": "10.23.118.24",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "00005e000101",
-                    "ipv4_address": "10.23.118.251",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "9c8e99e9b52a",
-                    "ipv4_address": "10.23.118.30",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "9c8e99da220b",
-                    "ipv4_address": "10.23.118.31",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "4487fcbbeb1c",
-                    "ipv4_address": "10.23.118.32",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "00224d7edb34",
-                    "ipv4_address": "10.23.118.33",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "9c456302cd0c",
-                    "ipv4_address": "10.23.118.4",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "0060ef2200bc",
-                    "ipv4_address": "10.23.118.44",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "0cf5a4d1ca52",
-                    "ipv4_address": "10.23.118.5",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "18a9056bc97d",
-                    "ipv4_address": "10.23.118.55",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f84f57019913",
-                    "ipv4_address": "10.23.118.6",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "5ca48a867fe3",
-                    "ipv4_address": "10.23.118.7",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "00224da0d2a9",
-                    "ipv4_address": "10.23.118.8",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "0060ef221105",
-                    "ipv4_address": "10.23.119.101",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "0060ef22108c",
-                    "ipv4_address": "10.23.119.102",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "0060ef2200c9",
-                    "ipv4_address": "10.23.119.103",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "94de80f6441b",
-                    "ipv4_address": "10.23.119.104",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "0060ef22010c",
-                    "ipv4_address": "10.23.119.105",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "0060ef22109f",
-                    "ipv4_address": "10.23.119.106",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "0060ef221083",
-                    "ipv4_address": "10.23.119.107",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "0060ef221103",
-                    "ipv4_address": "10.23.119.111",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "d017c2d088c2",
-                    "ipv4_address": "10.23.119.112",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "0060ef22010e",
-                    "ipv4_address": "10.23.119.113",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "0060ef221085",
-                    "ipv4_address": "10.23.119.114",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "0060ef22109e",
-                    "ipv4_address": "10.23.119.115",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "0060ef221092",
-                    "ipv4_address": "10.23.119.116",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "0060ef22108f",
-                    "ipv4_address": "10.23.119.118",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "0060ef221095",
-                    "ipv4_address": "10.23.119.119",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "0060ef22109d",
-                    "ipv4_address": "10.23.119.122",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "c860005fe4e5",
-                    "ipv4_address": "10.23.119.123",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "4083de670fbe",
-                    "ipv4_address": "10.23.119.130",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "0060ef22108a",
-                    "ipv4_address": "10.23.119.131",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "94de80f41cda",
-                    "ipv4_address": "10.23.119.132",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "94de80f6429b",
-                    "ipv4_address": "10.23.119.133",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "94de80f41e4a",
-                    "ipv4_address": "10.23.119.134",
-                    "context_name": ""
+                    "entPhysicalIndex": "0",
+                    "hrDeviceIndex": "0",
+                    "processor_oid": ".1.3.6.1.4.1.3224.16.1.3.0",
+                    "processor_index": "1",
+                    "processor_type": "screenos",
+                    "processor_usage": "1",
+                    "processor_descr": "Processor",
+                    "processor_precision": "1",
+                    "processor_perc_warn": "75"
                 }
             ]
         },

@@ -23,6 +23,8 @@
  * @subpackage Search
  */
 
+use LibreNMS\Authentication\Auth;
+
 print_optionbar_start(28);
 ?>
 <form method="post" action="" class="form-inline" role="form">
@@ -74,10 +76,10 @@ $full_query = "";
 $query = 'SELECT packages.name FROM packages,devices ';
 $param = array();
 
-if (is_admin() === false && is_read() === false) {
+if (!Auth::user()->hasGlobalRead()) {
     $query .= " LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`";
     $sql_where .= " AND `DP`.`user_id`=?";
-    $param[] = $_SESSION['user_id'];
+    $param[] = Auth::id();
 }
 
 $query .= " WHERE packages.device_id = devices.device_id AND packages.name LIKE '%".mres($_POST['package'])."%' $sql_where GROUP BY packages.name";

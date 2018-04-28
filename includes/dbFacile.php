@@ -17,6 +17,7 @@
  * 3. Oh, and dbFetchAll() is now dbFetchRows()
  */
 
+use LibreNMS\Config;
 use LibreNMS\Exceptions\DatabaseConnectException;
 
 function dbIsConnected()
@@ -33,18 +34,18 @@ function dbIsConnected()
  * Connect to the database.
  * Will use global $config variables if they are not sent: db_host, db_user, db_pass, db_name, db_port, db_socket
  *
- * @param string $host
- * @param string $user
- * @param string $password
- * @param string $database
- * @param string $port
- * @param string $socket
+ * @param string $db_host
+ * @param string $db_user
+ * @param string $db_pass
+ * @param string $db_name
+ * @param string $db_port
+ * @param string $db_socket
  * @return mysqli
  * @throws DatabaseConnectException
  */
-function dbConnect($host = null, $user = '', $password = '', $database = '', $port = null, $socket = null)
+function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '', $db_port = null, $db_socket = null)
 {
-    global $config, $database_link;
+    global $database_link;
 
     if (dbIsConnected()) {
         return $database_link;
@@ -54,32 +55,43 @@ function dbConnect($host = null, $user = '', $password = '', $database = '', $po
         throw new DatabaseConnectException("mysqli extension not loaded!");
     }
 
-    $host = empty($host) ? $config['db_host'] : $host;
-    $user = empty($user) ? $config['db_user'] : $user;
-    $password = empty($password) ? $config['db_pass'] : $password;
-    $database = empty($database) ? $config['db_name'] : $database;
-    $port = empty($port) ? $config['db_port'] : $port;
-    $socket = empty($socket) ? $config['db_socket'] : $socket;
+    if (is_null($db_host)) {
+        $db_config = Config::getDatabaseSettings();
+        extract($db_config);
+        /** @var string $db_host */
+        /** @var string $db_port */
+        /** @var string $db_socket */
+        /** @var string $db_name */
+        /** @var string $db_user */
+        /** @var string $db_pass */
+    }
 
-    $database_link = mysqli_connect('p:' . $host, $user, $password, null, $port, $socket);
+    if (empty($db_socket)) {
+        $db_socket = null;
+    }
+    if (!is_numeric($db_port)) {
+        $db_port = null;
+    }
+
+    $database_link = mysqli_connect('p:' . $db_host, $db_user, $db_pass, null, $db_port, $db_socket);
     mysqli_options($database_link, MYSQLI_OPT_LOCAL_INFILE, false);
     if ($database_link === false) {
         $error = mysqli_connect_error();
         if ($error == 'No such file or directory') {
-            $error = 'Could not connect to ' . $host;
+            $error = 'Could not connect to ' . $db_host;
         }
         throw new DatabaseConnectException($error);
     }
 
-    $database_db = mysqli_select_db($database_link, $config['db_name']);
+    $database_db = mysqli_select_db($database_link, $db_name);
     if (!$database_db) {
-        $db_create_sql = "CREATE DATABASE " . $config['db_name'] . " CHARACTER SET utf8 COLLATE utf8_unicode_ci";
+        $db_create_sql = "CREATE DATABASE $db_name CHARACTER SET utf8 COLLATE utf8_unicode_ci";
         mysqli_query($database_link, $db_create_sql);
-        $database_db = mysqli_select_db($database_link, $database);
+        $database_db = mysqli_select_db($database_link, $db_name);
     }
 
     if (!$database_db) {
-        throw new DatabaseConnectException("Could not select database: $database. " . mysqli_error($database_link));
+        throw new DatabaseConnectException("Could not select database: $db_name. " . mysqli_error($database_link));
     }
 
     dbQuery("SET NAMES 'utf8'");
@@ -101,6 +113,7 @@ function dbQuery($sql, $parameters = array())
     $fullSql = dbMakeQuery($sql, $parameters);
     if ($debug) {
         if (php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR'])) {
+            $fullSql = str_replace(PHP_EOL, '', $fullSql);
             if (preg_match('/(INSERT INTO `alert_log`).*(details)/i', $fullSql)) {
                 echo "\nINSERT INTO `alert_log` entry masked due to binary data\n";
             } else {
@@ -116,7 +129,9 @@ function dbQuery($sql, $parameters = array())
         $mysql_error = mysqli_error($database_link);
         if (isset($config['mysql_log_level']) && ((in_array($config['mysql_log_level'], array('INFO', 'ERROR')) && !preg_match('/Duplicate entry/', $mysql_error)) || in_array($config['mysql_log_level'], array('DEBUG')))) {
             if (!empty($mysql_error)) {
-                logfile(date($config['dateformat']['compact']) . " MySQL Error: $mysql_error ($fullSql)");
+                $error_msg =  "MySQL Error: $mysql_error ($fullSql)";
+                c_echo("%R$error_msg%n\n", isCli() || $debug);
+                logfile(date($config['dateformat']['compact']) . ' ' . $error_msg);
             }
         }
     }
@@ -674,4 +689,61 @@ function recordDbStatistic($stat, $start_time)
     }
 
     return $runtime;
+}
+
+/**
+ * Synchronize a relationship to a list of related ids
+ *
+ * @param string $table
+ * @param string $target_column column name for the target
+ * @param int $target column target id
+ * @param string $list_column related column names
+ * @param array $list list of related ids
+ * @return array [$inserted, $deleted]
+ */
+function dbSyncRelationship($table, $target_column = null, $target = null, $list_column = null, $list = null)
+{
+    $inserted = 0;
+
+    $delete_query = "`$target_column`=? AND `$list_column`";
+    $delete_params = [$target];
+    if (!empty($list)) {
+        $delete_query .= ' NOT IN ' . dbGenPlaceholders(count($list));
+        $delete_params = array_merge($delete_params, $list);
+    }
+    $deleted = (int)dbDelete($table, $delete_query, $delete_params);
+
+    $db_list = dbFetchColumn("SELECT `$list_column` FROM `$table` WHERE `$target_column`=?", [$target]);
+    foreach ($list as $item) {
+        if (!in_array($item, $db_list)) {
+            dbInsert([$target_column => $target, $list_column => $item], $table);
+            $inserted++;
+        }
+    }
+
+    return [$inserted, $deleted];
+}
+
+/**
+ * Synchronize a relationship to a list of relations
+ *
+ * @param string $table
+ * @param array $relationships array of relationship pairs with columns as keys and ids as values
+ * @return array [$inserted, $deleted]
+ */
+function dbSyncRelationships($table, $relationships = array())
+{
+    $changed = [[0, 0]];
+    list($target_column, $list_column) = array_keys(reset($relationships));
+
+    $grouped = [];
+    foreach ($relationships as $relationship) {
+        $grouped[$relationship[$target_column]][] = $relationship[$list_column];
+    }
+
+    foreach ($grouped as $target => $list) {
+        $changed[] = dbSyncRelationship($table, $target_column, $target, $list_column, $list);
+    }
+
+    return [array_sum(array_column($changed, 0)), array_sum(array_column($changed, 1))];
 }

@@ -12,6 +12,7 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Authentication\Auth;
 use LibreNMS\Config;
 
 require_once 'includes/modal/delete_poller.inc.php';
@@ -44,7 +45,7 @@ foreach (dbFetchRows($query) as $poller) {
     }
 
     $actions = "";
-    if (is_admin() && $old > ($step * 2)) {
+    if (Auth::user()->hasGlobalAdmin() && $old > ($step * 2)) {
         // missed 2 polls show delete button
         $actions .= "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-id='{$poller['id']}' name='delete-poller'><i class='fa fa-trash' aria-hidden='true'></i></button>";
     }

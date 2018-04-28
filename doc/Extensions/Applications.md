@@ -9,6 +9,7 @@ Different applications support a variety of ways to collect data: by direct conn
 1. [BIND9/named](#bind9-aka-named) - SNMP extend, Agent
 1. [C.H.I.P.](#chip) - SNMP extend
 1. [DHCP Stats](#dhcp-stats) - SNMP extend
+1. [Entropy](#entropy) - SNMP extend
 1. [EXIM Stats](#exim-stats) - SNMP extend
 1. [Fail2ban](#fail2ban) - SNMP extend
 1. [FreeBSD NFS Client](#freebsd-nfs-client) - SNMP extend
@@ -20,10 +21,10 @@ Different applications support a variety of ways to collect data: by direct conn
 1. [Memcached](#memcached) - SNMP extend
 1. [Munin](#munin) - Agent
 1. [MySQL](#mysql) - SNMP extend, Agent
-1. [NGINX](#nginx) - Agent
-1. [NFS-server](#nfs-server) - SNMP extend
+1. [NGINX](#nginx) - SNMP extend, Agent
+1. [NFS Server](#nfs-server) - SNMP extend
 1. [NTP Client](#ntp-client) - SNMP extend
-1. [NTP Server](#ntp-server) - SNMP extend
+1. [NTP Server/NTPD](#ntp-server-aka-ntpd) - SNMP extend
 1. [Nvidia GPU](#nvidia-gpu) - SNMP extend
 1. [Open Grid Scheduler](#opengridscheduler) - SNMP extend
 1. [OS Updates](#os-updates) - SNMP extend
@@ -40,7 +41,7 @@ Different applications support a variety of ways to collect data: by direct conn
 1. [SMART](#smart) - SNMP extend
 1. [Squid](#squid) - SNMP proxy
 1. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
-1. [Unbound](#unbound) - Agent
+1. [Unbound](#unbound) - SNMP extend, Agent
 1. [UPS-nut](#ups-nut) - SNMP extend
 1. [UPS-apcups](#ups-apcups) - SNMP extend
 1. [ZFS](#zfs) - SNMP extend
@@ -59,7 +60,7 @@ wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/apach
 2. Make the script executable (chmod +x /etc/snmp/apache-stats.py)
 
 3. Verify it is working by running /etc/snmp/apache-stats.py
-(In some cases urlgrabber needs to be installed, in Debian it can be achieved by: apt-get install python-urlgrabber)
+In some cases urlgrabber and pycurl needs to be installed, in Debian this can be achieved by: apt-get install python-urlgrabber python-pycurl . Make sure to remove /tmp/apache-snmp afterwards.
 
 4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
@@ -67,6 +68,11 @@ extend apache /etc/snmp/apache-stats.py
 ```
 
 5. Restart snmpd on your host
+
+6. Test by running
+```
+snmpwalk <various options depending on your setup> localhost NET-SNMP-EXTEND-MIB::nsExtendOutput2Table
+```
 
 ##### Agent
 [Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `apache` script to `/usr/lib/check_mk_agent/local/`
@@ -102,9 +108,9 @@ options {
 
 6: The script for this also requires the Perl module File::ReadBackwards. On FreeBSD this is available as p5-File-ReadBackwards and on linux as perl-File-ReadBackwards in CentOS/Redhat and libfile-readbackwards-perl Debian/Ubuntu. If it is not available, it can be installed by `cpan -i File::ReadBackwards`.
 
-7: You may possible need to configure the agent/extend script as well.
+7: You may possibly need to configure the agent/extend script as well.
 
-The config file's path defaults to the same path as the script, but with .config appended. So if the script is located at `/etc/snmp/bind`, the config file will be `/etc/snmp/bind.config`. Alternatively you can also specific a config via `-c $file`.
+The config file's path defaults to the same path as the script, but with .config appended. So if the script is located at `/etc/snmp/bind`, the config file will be `/etc/snmp/bind.config`. Alternatively you can also specify a config via `-c $file`.
 
 Anything starting with a # is comment. The format for variables is $variable=$value. Empty lines are ignored. Spaces and tabes at either the start or end of a line are ignored.
 
@@ -180,6 +186,25 @@ wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp-status.sh -
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
 extend dhcpstats /etc/snmp/dhcp-status.sh
+```
+
+4. Restart snmpd on your host
+
+
+### Entropy
+A small shell script that checks your system's available random entropy.
+
+##### SNMP Extend
+1. Download the script onto the desired host (the host must be added to LibreNMS devices)
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/entropy.sh -O /etc/snmp/entropy.sh
+```
+
+2. Make the script executable (chmod +x /etc/snmp/entropy.sh)
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend entropy /etc/snmp/entropy.sh
 ```
 
 4. Restart snmpd on your host
@@ -503,7 +528,7 @@ extend nginx /etc/snmp/nginx-stats
 ##### Agent
 [Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `nginx` script to `/usr/lib/check_mk_agent/local/`
 
-##### NFS-server
+### NFS Server
 Export the NFS stats from as server.
 
 ##### SNMP Extend
@@ -533,7 +558,7 @@ extend ntp-client /etc/snmp/ntp-client.sh
 
 4. Restart snmpd on your host
 
-### NTP Server (NTPD)
+### NTP Server aka NTPD
 A shell script that gets stats from ntp server (ntpd).
 
 ##### SNMP Extend
@@ -807,6 +832,7 @@ Anything starting with a # is comment. The format for variables is $variable=$va
 #This is a comment
 cache=/var/cache/smart
 smartctl=/usr/bin/env smartctl
+useSN=1
 ada0
 ada1
 ```
@@ -815,6 +841,8 @@ The variables are as below.
 ```
 cache = The path to the cache file to use. Default: /var/cache/smart
 smartctl = The path to use for smartctl. Default: /usr/bin/env smartctl
+useSN = If set to 1, it will use the disks SN for reporting instead of the device name.
+        1 is the default. 0 will use the device name.
 ```
 
 If you want to guess at the configuration, call it with -g and it will print out what it thinks
@@ -835,6 +863,10 @@ and modify your snmpd.conf file accordingly:
 ```
 extend smart /usr/bin/sudo /etc/snmp/smart
 ``` 
+
+If you set useSN to 1, it is worth noting that you will loose history(not able to access it from the web interface) for that device each time you change it. You will also need to run camcontrol or the like on said server to figure out what device actually corresponds with that serial number.
+
+Also if the system you are using uses non-static device naming based on bus information, it may be worthwhile just using the SN as the device ID is going to be irrelevant in that case.
 
 ### Squid
 
@@ -902,10 +934,7 @@ remote-control:
 
 Restart your unbound after changing the configuration, verify it is working by running 'unbound-control stats'.
 
-##### Agent
-[Install the agent](#agent-setup) on this device if it isn't already and copy the `unbound.sh` script to `/usr/lib/check_mk_agent/local/`
-
-##### SNMP Extend
+##### Option 1: SNMP Extend (Preferred and easiest method)
 
 1: Copy the shell script, unbound, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/unbound -O /etc/snmp/unbound)
 
@@ -918,6 +947,8 @@ extend unbound /etc/snmp/unbound
 
 4: Restart snmpd.
 
+##### Option 2: Agent
+[Install the agent](#agent-setup) on this device if it isn't already and copy the `unbound.sh` script to `/usr/lib/check_mk_agent/local/`
 
 ### UPS-nut
 A small shell script that exports nut ups status.
@@ -975,19 +1006,26 @@ extend sdfsinfo /etc/snmp/sdfsinfo
 
 ### ZFS
 
-###### SNMP Extend
-1. Copy the perl script to the desired host (the host must be added to LibreNMS devices)
+##### SNMP Extend
+
+The installation steps are:
+
+1. Copy the polling script to the desired host (the host must be added to LibreNMS devices)
+2. Make the script executable
+3. Edit snmpd.conf to include ZFS stats
+
+###### FreeBSD
 ```
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs-freebsd -O /etc/snmp/zfs-freebsd
+chmod +x /etc/snmp/zfs-freebsd
+echo "extend zfs /etc/snmp/zfs-freebsd" >> /etc/snmp/snmpd.conf
 ```
 
-2. Make the script executable (chmod +x /etc/snmp/zfs-freebsd)
-
-3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+###### Linux
 ```
-extend zfs /etc/snmp/zfs-freebsd
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs-linux -O /etc/snmp/zfs-linux
+chmod +x /etc/snmp/zfs-linux
+echo "extend zfs /etc/snmp/zfs-linux" >> /etc/snmp/snmpd.conf
 ```
 
-4. Restart snmpd on your host
-
-At this time, only FreeBSD is support. Linux support is eventually planned.
+Now restart snmpd and you're all set.

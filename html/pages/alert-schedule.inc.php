@@ -12,9 +12,11 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Authentication\Auth;
+
 $pagetitle[] = 'Alert Schedule';
 $no_refresh  = true;
-if (is_admin() !== false) {
+if (Auth::user()->hasGlobalAdmin()) {
     include_once 'includes/modal/alert_schedule.inc.php';
     include_once 'includes/modal/remove_alert_schedule.inc.php';
 
@@ -65,7 +67,7 @@ var grid = $("#alert-schedule").bootgrid({
             } else if (row.status == "0") {
                 response = '<span class="label label-warning">Set</span>';
             }
-            
+
             return response;
         }
     },

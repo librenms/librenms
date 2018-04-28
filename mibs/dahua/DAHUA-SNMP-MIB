@@ -1,0 +1,1108 @@
+
+-- File Name : DAHUA-SNMP-MIB
+-- Date      : 2014-01-07 15:27:57
+-- Author    : NetWork Team(feng_chengxiang@dahuatech.com)
+
+--
+-- Dahua enterprise MIB tree
+--
+
+DAHUA-SNMP-MIB    DEFINITIONS ::= BEGIN
+    IMPORTS
+        TEXTUAL-CONVENTION, DisplayString, TruthValue, RowStatus
+            FROM SNMPv2-TC 
+        OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY, Integer32, Opaque, enterprises, TimeTicks, IpAddress
+            FROM SNMPv2-SMI;
+             
+
+                
+        device  MODULE-IDENTITY
+                LAST-UPDATED    "201405101112Z"
+                ORGANIZATION    "Organization"
+                CONTACT-INFO    "
+                        Author       :  NetWork Team
+                        Phone        :  
+                        Email        :  feng_chengxiang@dahuatech.com
+                        Address      :  NO.1187 BinAn Road,Binjiang District, Hangzhou,P.R.China
+                        Postalcode   :  310053"
+                        
+                DESCRIPTION             "add OID: recordConfig , recordPlanInfo , recordMainStreamInfoTable, recordExtraStreamInfoTable, physicalVolumeTotal, physicalVolumeFree,
+                                                        recordEvent, recordMainStreamEvent, recordExtraStreamEvent, snmpStatusEvent, snmpStatus, physicalVolumeThreshold"
+                REVISION                "201404281112Z"
+                DESCRIPTION             "add OID: cpuUsage, lastestEvent, storageInfo, physicalVolume, raidVolume, storageFailureEvent,
+                                                        storageFailureEvent, storageLowSpaceEvent, storageInOutEvent, storageSMARTAbnormityEvent"
+                
+                REVISION                "201402141112Z"
+                DESCRIPTION     " add OID : dahuaSnmpTrap, videoMotionEvent, videoBlindEvent, videoLossEvent, localAlarmEvent, action, currentTime"     
+                
+                REVISION                "201401071427Z"
+                DESCRIPTION             "This file defines the private Dahua SNMP MIB extensions for all the device."
+                
+                
+                        ::=  {  dahua  2    }
+
+    org OBJECT IDENTIFIER ::=  {  iso  3  }
+    dod OBJECT IDENTIFIER ::=  {  org  6  }
+    internet OBJECT IDENTIFIER ::=  {  dod  1  }
+    private OBJECT IDENTIFIER ::=  {  internet  4  }
+    enterprises OBJECT IDENTIFIER ::=  {  private  1  }  
+    dahua OBJECT IDENTIFIER ::=  {  enterprises  1004849 } 
+    
+    systemInfo                          OBJECT IDENTIFIER ::=  {  device  1  }
+                versionInfo                     OBJECT IDENTIFIER ::=  {  systemInfo  1  }
+                productInfo                                             OBJECT IDENTIFIER ::=  {  systemInfo  2  }
+                
+        networkInfo                                                     OBJECT IDENTIFIER ::=  {  device  2  }
+                networkPort                                             OBJECT IDENTIFIER ::=  {  networkInfo  1  }
+                tcpIpInfo                                               OBJECT IDENTIFIER ::=  {  networkInfo  2  }
+                
+        configInfo                                                      OBJECT IDENTIFIER ::=  {  device  3  }
+                encodeConfig                                            OBJECT IDENTIFIER ::=  {  configInfo  1  }
+                eventConfig                                                     OBJECT IDENTIFIER ::=  {  configInfo  2  }
+                        videoDetectConfig                                       OBJECT IDENTIFIER ::=  {  eventConfig  1  }
+                        alarmConfig                                                     OBJECT IDENTIFIER ::=  {  eventConfig  2  }
+                        exceptionConfig                                         OBJECT IDENTIFIER ::=  {  eventConfig  3  }
+                recordConfig                                            OBJECT IDENTIFIER ::=  {  configInfo  3  }
+                        recordPlanInfo                                          OBJECT IDENTIFIER ::=  {  recordConfig  1  }
+                
+        storageInfo                                                     OBJECT IDENTIFIER ::=  {  device  4  }
+        
+        products                                                        OBJECT IDENTIFIER ::=  {  device  10  }
+                dvr                                                             OBJECT IDENTIFIER ::=  {  products  1  }
+                nvr                                                             OBJECT IDENTIFIER ::=  {  products  2  }
+                ipc                                                             OBJECT IDENTIFIER ::=  {  products  3  }
+    notification                        OBJECT IDENTIFIER ::=  {  device  11  }
+                multiMediaEvent                                 OBJECT IDENTIFIER ::=  {  notification  11 }
+                alarmEvent                                              OBJECT IDENTIFIER ::=  {  notification  12 }
+                storageEvent                                    OBJECT IDENTIFIER ::=  {  notification  13 }
+                recordEvent                                             OBJECT IDENTIFIER ::=  {  notification  14 }
+        dahuaSnmpTrap                                           OBJECT IDENTIFIER ::=  {  device  12  }
+        
+        -- systemInfo 
+                -- versionInfo
+                        -- softwareRevision
+                        -- hardwareRevision
+                -- productInfo
+                -- cpuUsage
+                -- lastestEvent
+                
+        --configInfo
+                -- encodeConfig
+                        --mainStreamInfo
+                                --RegularStreamInfoTable
+                                --mdStreamInfoTable
+                                --alarmStreamInfoTable
+                        --extraStreamInfo
+                                --extra1StreamInfoTable
+                                --extra2StreamInfoTable
+                                --extra3StreamInfoTable
+                                
+                
+    softwareRevision             OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The software version"
+        ::=  {  versionInfo  1  }
+        
+    hardwareRevision             OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The hardware version"
+        ::=  {  versionInfo  2  }
+        
+                --productInfo
+        videoChannel                    OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The number of video channel."
+        ::=  {  productInfo  1  }
+                
+        alarmInput                              OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The number of alarm input."
+        ::=  {  productInfo  2  }
+                
+        alarmOutput                             OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The number of alarm output."
+        ::=  {  productInfo  3  }
+                
+        serialNumber                    OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The device serial number."
+        ::=  {  productInfo  4  }
+                
+        systemVersion                   OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The system Version of device."
+        ::=  {  productInfo  5  }
+                
+        deviceType                              OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The device mode."
+        ::=  {  productInfo  6  }
+        deviceClass                             OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The device class."
+        ::=  {  productInfo  7  }
+                
+        deviceStatus                    OBJECT-TYPE
+        SYNTAX              INTEGER{bad(0), good(1)}
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Status of device is bad(0) or good(1)."
+        ::=  {  productInfo  8  }
+                
+        machineName                             OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The name of the device."
+        ::=  {  productInfo  9  }
+                
+        cpuUsage                                        OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Usage of the CPU."
+        ::=  {  systemInfo  3  }
+                
+        lastestEvent            OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The type of the lastest event."
+        ::=  {  systemInfo  4  }
+        encodeNo                        OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The number of  encode channels which are available."
+        ::=  {  systemInfo  5  }
+                
+        -- networkInfo
+                -- networkPort
+                
+        tcpPort                                 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "TCP port."
+        ::=  {  networkPort  1  }
+                
+        udpPort                                 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "UDP port."
+        ::=  {  networkPort  2  }
+                
+        httpPort                                OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "HTTP port."
+        ::=  {  networkPort  3  }
+                
+        rtspPort                                OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "RTSP port."
+        ::=  {  networkPort  4  }
+        maxConnectNum                   OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The number of max connect."
+        ::=  {  networkPort  5  }
+                
+        httpsPort                               OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "HTTPS port."
+        ::=  {  networkPort  6  }       
+                
+        -- tcpIpInfo
+        
+        getIpmode                                       OBJECT-TYPE
+        SYNTAX              INTEGER{static(0), DHCP(1)}
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The mode of getting IP, value: 0=static, 1=DHCP."
+        ::=  {  tcpIpInfo  1  }
+        
+        macAddr                                 OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The address of MAC."
+        ::=  {  tcpIpInfo  2  }
+                
+        ipVersion                               OBJECT-TYPE
+        SYNTAX              INTEGER{IPv4(0), IPv6(1)}
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The version of IP, value: 0=IPv4, 1=IPv6."
+        ::=  {  tcpIpInfo  3  }
+                
+        subnetMast                                      OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The infomation of subnet mast."
+        ::=  {  tcpIpInfo  4  }
+                
+        defaultGateway                  OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The infomation of default gateway."
+        ::=  {  tcpIpInfo  5  }
+                
+        preferredDns                            OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The infomation of the preferred DNS service address."
+        ::=  {  tcpIpInfo  6  }
+                
+        alternateDns                    OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The infomation of the alternate DNS service address."
+        ::=  {  tcpIpInfo  7  }
+           
+        ipAddr                                  OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The address of IP."
+        ::=  {  tcpIpInfo  8 }
+
+        --configInfo
+                -- encodeConfig
+                        --mainStreamInfo
+                                --RegularStreamInfoTable
+                                        -- regularChannelNo
+                                        -- regularCompression
+                                        -- regularFPS
+                                        -- regularResolution
+                                --mdStreamInfoTable
+                                        -- mdChannelNo
+                                        -- mdCompression
+                                        -- mdFPS
+                                        -- mdResolution
+                                --alarmStreamInfoTable
+                                        -- alarmChannelNo
+                                        -- alarmCompression
+                                        -- alarmFPS
+                                        -- alarmResolution
+                        --extraStreamInfo
+                                --extra1StreamInfoTable
+                                --extra2StreamInfoTable
+                                --extra3StreamInfoTable
+                        
+        mainStreamInfo                                                  OBJECT IDENTIFIER ::=  {  encodeConfig  1  }
+        extraStreamInfo                                                 OBJECT IDENTIFIER ::=  {  encodeConfig  2  }
+        
+        --mainStreamInfo 
+                -- regularStreamInfoTable
+                        -- regularStreamInfoTableEntry
+                                -- regularChannelNo
+                                -- regularCompression
+                                -- regularFPS
+                                -- regularResolution
+                        
+        regularStreamInfoTable   OBJECT-TYPE    
+                SYNTAX           SEQUENCE OF regularStreamInfoTableEntry 
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "infomation of the main stream channel"
+                ::=  {  mainStreamInfo  1  }  
+        
+    regularStreamInfoTableEntry   OBJECT-TYPE
+                SYNTAX           regularStreamInfoTableEntry
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "infomation of the main stream channel list"
+                INDEX            {  regularChannelNo  }
+                ::=  {  regularStreamInfoTable  1  }
+        regularStreamInfoTableEntry ::= SEQUENCE {
+                regularChannelNo                        INTEGER,
+                        regularCompression                              DisplayString,
+                        regularFPS                                              INTEGER,
+                        regularResolution                               DisplayString,
+                }               
+        
+        regularChannelNo             OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The number of main channel."
+        ::=  {  regularStreamInfoTableEntry  1  }
+                
+                                        
+        regularCompression      OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The compression mode of the main channel which stream-type is the regular."
+        ::=  {  regularStreamInfoTableEntry  2  }
+                
+        regularFPS                      OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "compression mode of the main channel which stream-type is the move-detection"
+        ::=  {  regularStreamInfoTableEntry  3  }
+                
+        regularResolution       OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "compression mode of the main channel which stream-type is the alarm"
+        ::=  {  regularStreamInfoTableEntry  4  }
+                
+        --mainStreamInfo        
+                -- mdStreamInfoTable
+                        -- mdStreamInfoTableEntry
+                                -- mdChannelNo
+                                -- mdCompression
+                                -- mdFPS
+                                -- mdResolution
+                        
+        mdStreamInfoTable        OBJECT-TYPE    
+                SYNTAX           SEQUENCE OF mdStreamInfoTableEntry 
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "infomation of the main stream channel"
+                ::=  {  mainStreamInfo  2  }  
+        
+    mdStreamInfoTableEntry   OBJECT-TYPE
+                SYNTAX           mdStreamInfoTableEntry
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "infomation of the main stream channel list"
+                INDEX            {  mdChannelNo  }
+                ::=  {  mdStreamInfoTable  1  }
+        
+        mdStreamInfoTableEntry ::= SEQUENCE {
+                mdChannelNo                             INTEGER,
+                        mdCompression                           DisplayString,
+                        mdFPS                                           INTEGER,
+                        mdResolution                            DisplayString,
+                }               
+        
+        mdChannelNo             OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The number of main channel."
+        ::=  {  mdStreamInfoTableEntry  1  }
+                
+                                        
+        mdCompression      OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The compression mode of the main channel which stream-type is the regular."
+        ::=  {  mdStreamInfoTableEntry  2  }
+                
+        mdFPS                   OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "compression mode of the main channel which stream-type is the move-detection"
+        ::=  {  mdStreamInfoTableEntry  3  }
+                
+        mdResolution                    OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "compression mode of the main channel which stream-type is the alarm"
+        ::=  {  mdStreamInfoTableEntry  4  }
+        
+        --mainStreamInfo
+                -- alarmStreamInfoTable
+                        -- alarmStreamInfoTableEntry
+                                -- alarmChannelNo
+                                -- alarmCompression
+                                -- alarmFPS
+                                -- alarmResolution
+                        
+        alarmStreamInfoTable     OBJECT-TYPE    
+                SYNTAX           SEQUENCE OF alarmStreamInfoTableEntry 
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "infomation of the main stream channel"
+                ::=  {  mainStreamInfo  3  }  
+        
+    alarmStreamInfoTableEntry   OBJECT-TYPE
+                SYNTAX           alarmStreamInfoTableEntry
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "infomation of the main stream channel list"
+                INDEX            {  alarmChannelNo  }
+                ::=  {  alarmStreamInfoTable  1  }
+                        
+
+        alarmStreamInfoTableEntry ::= SEQUENCE {
+                alarmChannelNo                          INTEGER,
+                        alarmCompression                                DisplayString,
+                        alarmFPS                                                INTEGER,
+                        alarmResolution                         DisplayString,
+                }               
+        
+        alarmChannelNo             OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The number of main channel."
+        ::=  {  alarmStreamInfoTableEntry  1  }
+                
+                                        
+        alarmCompression      OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The compression mode of the main channel which stream-type is the regular."
+        ::=  {  alarmStreamInfoTableEntry  2  }
+                
+        alarmFPS                        OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "compression mode of the main channel which stream-type is the move-detection"
+        ::=  {  alarmStreamInfoTableEntry  3  }
+                
+        alarmResolution                 OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "compression mode of the main channel which stream-type is the alarm"
+        ::=  {  alarmStreamInfoTableEntry  4  }
+        
+                
+        -- extraStreamInfo
+                -- extra1StreamInfoTable
+                        -- extra1ChannelNo
+                        -- extra1Compression
+                        -- extra1FPS
+                        -- extra1Resolution
+                -- extra2StreamInfoTable
+                
+                -- extra3StreamInfoTable
+                
+        extra1StreamInfoTable    OBJECT-TYPE    
+                SYNTAX           SEQUENCE OF extra1StreamInfoEntry 
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "infomation of the extra stream channel"
+                ::=  {  extraStreamInfo  1  }  
+        
+    extra1StreamInfoEntry   OBJECT-TYPE
+                SYNTAX           extra1StreamInfoEntry
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "infomation of the main stream channel list"
+                INDEX            {  extra1ChannelNo  }
+                ::=  {  extra1StreamInfoTable  1  }
+        
+        extra1StreamInfoEntry ::= SEQUENCE {
+                extra1ChannelNo                                 INTEGER,                        
+                        extra1Compression                                       DisplayString,
+                        extra1FPS                                                       INTEGER,        
+                        extra1Resolution                                        DisplayString,
+                }       
+        
+        extra1ChannelNo             OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "extra channel number"
+        ::=  {  extra1StreamInfoEntry  1  }
+                
+        extra1Compression             OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "compression mode of the extra channel which stream-type is the first-extra"
+        ::=  {  extra1StreamInfoEntry  2  }                             
+        
+        extra1FPS               OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "FPS of the extra channel which stream-type is the first-extra"
+        ::=  {  extra1StreamInfoEntry  3  }
+        
+        extra1Resolution        OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          write-only
+        STATUS              current
+        DESCRIPTION         "resolution type of the extra channel which stream-type is the first-extra"
+        ::=  {  extra1StreamInfoEntry  4  }
+
+        -- extra2StreamInfoTable
+                -- extra2ChannelNo
+                -- extra2Compression
+                -- extra2FPS
+                -- extra2Resolution
+                
+        -- extra2StreamInfoTable         OBJECT-TYPE    
+        --      SYNTAX           SEQUENCE OF extra2StreamInfoEntry 
+        --      ACCESS           not-accessible
+        --      STATUS           current
+        --      DESCRIPTION      "infomation of the extra stream channel"
+        --      ::=  {  extraStreamInfo  2  }  
+        
+    -- extra2StreamInfoEntry   OBJECT-TYPE
+    --          SYNTAX           extra2StreamInfoEntry
+    --          ACCESS           not-accessible
+    --          STATUS           current
+    --          DESCRIPTION      "infomation of the main stream channel list"
+    --          INDEX            {  extra2ChannelNo  }
+    --          ::=  {  extra2StreamInfoTable  1  }
+        
+        -- extra2StreamInfoEntry ::= SEQUENCE {
+    --          extra2ChannelNo                                 INTEGER,                        
+        --              extra2Compression                                       DisplayString,
+        --              extra2FPS                                                       INTEGER,        
+        --              extra2Resolution                                        DisplayString,
+    --          }       
+        
+        -- extra2ChannelNo             OBJECT-TYPE
+    --    SYNTAX              INTEGER
+    --    MAX-ACCESS          read-only
+    --    STATUS              current
+    --    DESCRIPTION         "extra channel number"
+    --    ::=  {  extra2StreamInfoEntry  1  }
+                
+        -- extra2Compression             OBJECT-TYPE
+    --    SYNTAX              DisplayString
+    --    MAX-ACCESS          read-write
+    --    STATUS              current
+    --    DESCRIPTION         "compression mode of the extra channel which stream-type is the first-extra"
+    --    ::=  {  extra2StreamInfoEntry  2  }                           
+        
+        -- extra2FPS                    OBJECT-TYPE
+    --    SYNTAX              INTEGER
+    --    MAX-ACCESS          read-write
+    --    STATUS              current
+    --    DESCRIPTION         "FPS of the extra channel which stream-type is the first-extra"
+    --    ::=  {  extra2StreamInfoEntry  3  }
+        
+        -- extra2Resolution             OBJECT-TYPE
+    --    SYNTAX              DisplayString
+    --    MAX-ACCESS          write-only
+    --    STATUS              current
+    --    DESCRIPTION         "resolution type of the extra channel which stream-type is the first-extra"
+    --    ::=  {  extra2StreamInfoEntry  4  }
+
+       
+        -- extra3StreamInfoTable
+                -- extra3ChannelNo
+                -- extra3Compression
+                -- extra3FPS
+                -- extra3Resolution
+                
+        -- extra3StreamInfoTable         OBJECT-TYPE    
+        --      SYNTAX           SEQUENCE OF extra3StreamInfoEntry 
+        --      ACCESS           not-accessible
+        --      STATUS           current
+        --      DESCRIPTION      "infomation of the extra stream channel"
+        --      ::=  {  extraStreamInfo  3  }  
+        
+    -- extra3StreamInfoEntry   OBJECT-TYPE
+    --          SYNTAX           extra3StreamInfoEntry
+    --          ACCESS           not-accessible
+    --          STATUS           current
+    --          DESCRIPTION      "infomation of the main stream channel list"
+    --          INDEX            {  extra3ChannelNo  }
+    --          ::=  {  extra3StreamInfoTable  1  }
+        
+        -- extra3StreamInfoEntry ::= SEQUENCE {
+    --          extra3ChannelNo                                 INTEGER,                        
+        --              extra3Compression                                       DisplayString,
+        --              extra3FPS                                                       INTEGER,        
+        --              extra3Resolution                                        DisplayString,
+    --          }       
+        
+        -- extra3ChannelNo             OBJECT-TYPE
+    --    SYNTAX              INTEGER
+    --    MAX-ACCESS          read-only
+    --    STATUS              current
+    --    DESCRIPTION         "extra channel number"
+    --    ::=  {  extra3StreamInfoEntry  1  }
+                
+        -- extra3Compression             OBJECT-TYPE
+    --    SYNTAX              DisplayString
+    --    MAX-ACCESS          read-write
+    --    STATUS              current
+    --    DESCRIPTION         "compression mode of the extra channel which stream-type is the first-extra"
+    --    ::=  {  extra3StreamInfoEntry  2  }                           
+        
+        -- extra3FPS                    OBJECT-TYPE
+    --    SYNTAX              INTEGER
+    --    MAX-ACCESS          read-write
+    --    STATUS              current
+    --    DESCRIPTION         "FPS of the extra channel which stream-type is the first-extra"
+    --    ::=  {  extra3StreamInfoEntry  3  }
+        
+        -- extra3Resolution             OBJECT-TYPE
+    --    SYNTAX              DisplayString
+    --    MAX-ACCESS          write-only
+    --    STATUS              current
+    --    DESCRIPTION         "resolution type of the extra channel which stream-type is the first-extra"
+    --    ::=  {  extra3StreamInfoEntry  4  }
+                
+                
+        
+        --eventConfig
+                --videoDetectConfig     
+                        --videoMotionInfoTable
+                        --videoLossInfoTable
+                        --videoBlindInfoTable
+                --alarmConfig
+                        --localAlarmInfoTable
+                        --networkAlarmInfoTable
+                --exceptionConfig       
+        
+        videoMotionInfoTable     OBJECT-TYPE    
+                SYNTAX           SEQUENCE OF videoMotionInfoEntry 
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "infomation of the extra stream channel"
+                ::=  {  videoDetectConfig  1  }  
+        
+    videoMotionInfoEntry   OBJECT-TYPE
+                SYNTAX           videoMotionInfoEntry
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "infomation of the main stream channel list"
+                INDEX            {  videoMotionIndex  }
+                ::=  {  videoMotionInfoTable  1  }
+        
+        videoMotionInfoEntry ::= SEQUENCE {
+                videoMotionIndex                                INTEGER,                        
+                        
+                }       
+        videoMotionIndex        OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         ""
+        ::=  {  videoMotionInfoEntry  1  }      
+                
+        videoLossInfoTable       OBJECT-TYPE    
+                SYNTAX           SEQUENCE OF videoLossInfoEntry 
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "infomation of the extra stream channel"
+                ::=  {  videoDetectConfig  2  }  
+        
+    videoLossInfoEntry   OBJECT-TYPE
+                SYNTAX           videoLossInfoEntry
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "infomation of the main stream channel list"
+                INDEX            {  videoLossIndex  }
+                ::=  {  videoLossInfoTable  1  }
+        
+        videoLossInfoEntry ::= SEQUENCE {
+                videoLossIndex                                  INTEGER,                        
+                        
+                }       
+        videoLossIndex        OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         ""
+        ::=  {  videoLossInfoEntry  1  }
+                
+        videoBlindInfoTable      OBJECT-TYPE    
+                SYNTAX           SEQUENCE OF videoBlindInfoEntry 
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "infomation of the extra stream channel"
+                ::=  {  videoDetectConfig  3  }  
+        
+    videoBlindInfoEntry   OBJECT-TYPE
+                SYNTAX           videoBlindInfoEntry
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "infomation of the main stream channel list"
+                INDEX            {  videoBlindIndex  }
+                ::=  {  videoBlindInfoTable  1  }
+        
+        videoBlindInfoEntry ::= SEQUENCE {
+                videoBlindIndex                                 INTEGER,                        
+                        
+                }       
+        videoBlindIndex        OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         ""
+        ::=  {  videoBlindInfoEntry  1  }
+                
+        --alarmConfig
+                        --localAlarmInfoTable
+                        --networkAlarmInfoTable
+        
+        localAlarmInfoTable      OBJECT-TYPE    
+                SYNTAX           SEQUENCE OF localAlarmInfoEntry 
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "infomation of the extra stream channel"
+                ::=  {  alarmConfig  1  }  
+        
+    localAlarmInfoEntry   OBJECT-TYPE
+                SYNTAX           localAlarmInfoEntry
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "infomation of the main stream channel list"
+                INDEX            {  localAlarmIndex  }
+                ::=  {  localAlarmInfoTable  1  }
+        
+        localAlarmInfoEntry ::= SEQUENCE {
+                localAlarmIndex                                 INTEGER,                        
+                }       
+        localAlarmIndex        OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         ""
+        ::=  {  localAlarmInfoEntry  1  }
+        
+        networkAlarmInfoTable    OBJECT-TYPE    
+                SYNTAX           SEQUENCE OF networkAlarmInfoEntry 
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "infomation of the extra stream channel"
+                ::=  {  alarmConfig  2  }  
+        
+    networkAlarmInfoEntry   OBJECT-TYPE
+                SYNTAX           networkAlarmInfoEntry
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "infomation of the main stream channel list"
+                INDEX            {  networkAlarmIndex  }
+                ::=  {  networkAlarmInfoTable  1  }
+        
+        networkAlarmInfoEntry ::= SEQUENCE {
+                networkAlarmIndex                                       INTEGER,                        
+                }       
+        networkAlarmIndex        OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         ""
+        ::=  {  networkAlarmInfoEntry  1  }     
+        
+        
+        --recordPlanInfo
+                --recordMainStream
+                --recordExtraStream
+        recordMainStreamInfoTable        OBJECT-TYPE    
+                SYNTAX           SEQUENCE OF recordMainStreamInfoEntry 
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "infomation of the extra stream channel"
+                ::=  {  recordPlanInfo  1  }    
+                
+        recordMainStreamInfoEntry   OBJECT-TYPE
+                SYNTAX           recordMainStreamInfoEntry
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "config infomation of the main stream record channel list"
+                INDEX            {  recordMainChannelIndex  }
+                ::=  {  recordMainStreamInfoTable  1  } 
+        recordMainStreamInfoEntry ::= SEQUENCE {
+                recordMainChannelIndex                          INTEGER,
+        --              recordMainChannelType                                   INTEGER(ALL{0..6})
+                }
+                        
+        recordMainChannelIndex  OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         ""
+        ::=  {  recordMainStreamInfoEntry  1  }
+                
+        -- recordMainChannelType  OBJECT-TYPE
+    --    SYNTAX              INTEGER{regular(0),md(1),alarm(2),regularAndMd(3),regularAndAlarm(4),mdAndAlarm(5), all(6)}
+    --    MAX-ACCESS          read-write
+    --    STATUS              current
+    --    DESCRIPTION         ""
+    --    ::=  {  recordMainStreamInfoEntry  2  }
+                
+        -- recordExtraStreamInfoTable    OBJECT-TYPE    
+        --      SYNTAX           SEQUENCE OF recordExtraStreamInfoEntry 
+        --      ACCESS           not-accessible
+        --      STATUS           current
+        --      DESCRIPTION      "infomation of the extra stream channel"
+        --      ::=  {  recordPlanInfo  2  }    
+                
+        -- recordExtraStreamInfoEntry   OBJECT-TYPE
+    --          SYNTAX           recordExtraStreamInfoEntry
+    --          ACCESS           not-accessible
+    --          STATUS           current
+    --          DESCRIPTION      "config infomation of the main stream record channel list"
+    --          INDEX            {  recordExtraChannelIndex  }
+    --          ::=  {  recordExtraStreamInfoTable  1  }        
+        -- recordExtraStreamInfoEntry ::= SEQUENCE {
+    --          recordExtraChannelIndex                         INTEGER,
+        --              recordExtraChannelType                                  INTEGER(ALL{0})
+    --          }
+                        
+        -- recordExtraChannelIndex  OBJECT-TYPE
+    --    SYNTAX              INTEGER
+    --    MAX-ACCESS          read-write
+    --    STATUS              current
+    --    DESCRIPTION         ""
+    --    ::=  {  recordExtraStreamInfoEntry  1  }
+                
+        -- recordExtraChannelType  OBJECT-TYPE
+    --    SYNTAX              INTEGER{all(0)}
+    --    MAX-ACCESS          read-write
+    --    STATUS              current
+    --    DESCRIPTION         ""
+    --    ::=  {  recordExtraStreamInfoEntry  2  }
+                
+        -- storageInfo
+                --physicalVolume
+                --raidVolume
+                --
+                
+        
+        physicalVolumeInfoTable  OBJECT-TYPE    
+                SYNTAX           SEQUENCE OF physicalVolumeInfoEntry 
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "infomation of the extra stream channel"
+                ::=  {  storageInfo  1  }  
+        
+    physicalVolumeInfoEntry   OBJECT-TYPE
+                SYNTAX           physicalVolumeInfoEntry
+                ACCESS           not-accessible
+                STATUS           current
+                DESCRIPTION      "infomation of the main stream channel list"
+                INDEX            {  physicalVolumeIndex  }
+                ::=  {  physicalVolumeInfoTable  1  }
+        
+        physicalVolumeInfoEntry ::= SEQUENCE {
+                physicalVolumeIndex                                     INTEGER,
+                        physicNo                                                                INTEGER,
+                        logicNo                                                                 INTEGER,
+                        physicalVolumeName                                              DisplayString,
+                        physicalVolumeStatus                                    DisplayString,
+                        --physicalVolumeUsedPercent                             INTEGER(ALL{0..100}),
+                        --physicalVolumeTotal                                           Counter64,
+                        --physicalVolumeFree                                            Counter64,
+                }
+                        
+        physicalVolumeIndex        OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         ""
+        ::=  {  physicalVolumeInfoEntry  1  }
+                
+        physicNo        OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         ""
+        ::=  {  physicalVolumeInfoEntry  2  }
+                
+        logicNo        OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         ""
+        ::=  {  physicalVolumeInfoEntry  3  }
+                
+        physicalVolumeName        OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         ""
+        ::=  {  physicalVolumeInfoEntry  4  }
+
+        physicalVolumeStatus        OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         ""
+        ::=  {  physicalVolumeInfoEntry  5  }
+        
+        --physicalVolumeUsedPercent     OBJECT-TYPE
+    --    SYNTAX              INTEGER(ALL{0..100})
+    --    MAX-ACCESS          read-only
+    --    STATUS              current
+    --    DESCRIPTION         ""
+    --    ::=  {  physicalVolumeInfoEntry  6  }
+                
+        --physicalVolumeTotal   OBJECT-TYPE
+    --    SYNTAX              Counter64
+    --    MAX-ACCESS          read-only
+    --    STATUS              current
+    --    DESCRIPTION         ""
+    --    ::=  {  physicalVolumeInfoEntry  7  }
+        --physicalVolumeFree            OBJECT-TYPE
+    --    SYNTAX              Counter64
+    --    MAX-ACCESS          read-only
+    --    STATUS              current
+    --    DESCRIPTION         ""
+    --    ::=  {  physicalVolumeInfoEntry  8  }
+                
+        --raidVolumeInfoTable    OBJECT-TYPE    
+        --      SYNTAX           SEQUENCE OF raidVolumeInfoEntry 
+        --      ACCESS           not-accessible
+        --      STATUS           current
+        --      DESCRIPTION      "infomation of the extra stream channel"
+        --      ::=  {  storageInfo  2  }  
+        
+    -- raidVolumeInfoEntry   OBJECT-TYPE
+    --          SYNTAX           raidVolumeInfoEntry
+    --          ACCESS           not-accessible
+    --          STATUS           current
+    --          DESCRIPTION      "infomation of the main stream channel list"
+    --          INDEX            {  raidVolumeIndex  }
+    --          ::=  {  raidVolumeInfoTable  1  }
+        
+        -- raidVolumeInfoEntry ::= SEQUENCE {
+    --          raidVolumeIndex                                 INTEGER,                        
+    --          }       
+        -- raidVolumeIndex        OBJECT-TYPE
+    --    SYNTAX              INTEGER
+    --    MAX-ACCESS          read-write
+    --    STATUS              current
+    --    DESCRIPTION         ""
+    --    ::=  {  raidVolumeInfoEntry  1  }
+        
+        --notification
+                
+                
+        snmpStatusEvent NOTIFICATION-TYPE
+                OBJECTS { snmpStatus }
+                STATUS  current
+                DESCRIPTION
+                        "A snmp work status Event."
+                ::= { notification 2 }  
+        
+        videoMotionEvent NOTIFICATION-TYPE
+                OBJECTS {action, currentTime, videoMotionIndex}
+                STATUS  current
+                DESCRIPTION
+                        "video motion Event."
+                ::= { multiMediaEvent 1 }       
+                
+        videoBlindEvent NOTIFICATION-TYPE
+                OBJECTS {action, currentTime, videoBlindIndex}
+                STATUS  current
+                DESCRIPTION
+                        "video motion Event."
+                ::= { multiMediaEvent 2 }               
+                
+        videoLossEvent NOTIFICATION-TYPE
+                OBJECTS {action, currentTime, videoLossIndex}
+                STATUS  current
+                DESCRIPTION
+                        "video motion Event."
+                ::= { multiMediaEvent 3 } 
+        
+        localAlarmEvent NOTIFICATION-TYPE
+                OBJECTS {action, currentTime, localAlarmIndex}
+                STATUS  current
+                DESCRIPTION
+                        "video motion Event."
+                ::= { alarmEvent 1 }
+        
+        storageFailureEvent NOTIFICATION-TYPE
+                OBJECTS {action, currentTime, logicNo}
+                STATUS  current
+                DESCRIPTION
+                        "storage failure Event."
+                ::= { storageEvent 1 }
+                
+        storageLowSpaceEvent NOTIFICATION-TYPE
+                OBJECTS {action, currentTime, logicNo}
+                STATUS  current
+                DESCRIPTION
+                        "storage full Event. if all storages are full, logicNo= 0 ."
+                ::= { storageEvent 2 }
+
+        storageInOutEvent NOTIFICATION-TYPE
+                OBJECTS {action, currentTime, logicNo}
+                STATUS  current
+                DESCRIPTION
+                        "storage in-out Event."
+                ::= { storageEvent 3 }
+                
+        storageSMARTAbnormityEvent NOTIFICATION-TYPE
+                OBJECTS {action, currentTime, logicNo}
+                STATUS  current
+                DESCRIPTION
+                        "storage SMART abnormity Event."
+                ::= { storageEvent 4 }
+        
+        recordMainStreamEvent NOTIFICATION-TYPE
+                OBJECTS {action, currentTime, recordMainChannelIndex}
+                STATUS  current
+                DESCRIPTION
+                        "record MainStream Event."
+                ::= { recordEvent 1 }
+                
+        recordExtraStreamEvent NOTIFICATION-TYPE
+                OBJECTS {action, currentTime, recordExtraChannelIndex}
+                STATUS  current
+                DESCRIPTION
+                        "record ExtraStream Event."
+                ::= { recordEvent 2 }
+        action                                  OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          accessible-for-notify
+        STATUS              current
+        DESCRIPTION         "trap info "
+        ::=  {  dahuaSnmpTrap  1  }
+        currentTime                             OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          accessible-for-notify
+        STATUS              current
+        DESCRIPTION         "trap info "
+        ::=  {  dahuaSnmpTrap  2  }
+                
+        snmpStatus                      OBJECT-TYPE
+        SYNTAX              INTEGER{start(0), stop(1)}
+        MAX-ACCESS          accessible-for-notify
+        STATUS              current
+        DESCRIPTION         "Status of snmp is start(0) or stop(1)."
+        ::=  {  dahuaSnmpTrap  3  }
+                
+        physicalVolumeThreshold                         OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          accessible-for-notify
+        STATUS              current
+        DESCRIPTION         ""
+        ::=  {  dahuaSnmpTrap  4  }     
+END

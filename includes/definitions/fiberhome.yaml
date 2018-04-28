@@ -11,7 +11,7 @@ discovery_modules:
     entity-physical: 0
     ports: 0
     ports-stack: 0
-    mempools: 0
+    wireless: 0
     discovery-protocols: 0
     storage: 0
     ucd-diskio: 0
@@ -25,7 +25,6 @@ poller_modules:
     ntp: 0
     ospf: 0
     ports: 0
-    sensors: 0
     services: 0
     storage: 0
     stp: 0

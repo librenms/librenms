@@ -200,6 +200,14 @@ __Note__: Currently ACK notifications are not transported to PagerDuty, This is 
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
+> You can configure these options within the WebUI now, please avoid setting these options within config.php
+
+If you want to change the [notification sounds](https://pushover.net/api#sounds) then add it in config options as:
+
+```php
+sound_critical=falling
+```
+
 Enabling Pushover support is fairly easy, there are only two required parameters.
 
 Firstly you need to create a new Application (called LibreNMS, for example) in your account on the Pushover website (https://pushover.net/apps)
@@ -458,4 +466,25 @@ LibreNMS will create issues for warning and critical level alerts however only t
 $config['alert']['transports']['gitlab']['host'] = 'http://gitlab.host.tld';
 $config['alert']['transports']['gitlab']['project_id'] = '1';
 $config['alert']['transports']['gitlab']['key'] = 'AbCdEf12345';
+```
+
+## Philips Hue
+
+Want to spice up your noc life? LibreNMS will flash all lights connected to your philips hue bridge whenever an alert is triggered. 
+
+To setup, go to the you http://`your-bridge-ip`/debug/clip.html
+
+- Update the "URL:" field to `/api`
+- Paste this in the "Message Body" {"devicetype":"librenms"}
+- Press the round button on your `philips Hue Bridge`
+- Click on `POST`
+- In the `Command Response` You should see output with your username. Copy this without the quotes
+
+
+More Info: [Philips Hue Documentation](https://www.developers.meethue.com/documentation/getting-started)
+
+```php
+$config['alert']['transports']['hue']['bridge'] = 'http://bridge.example.com';
+$config['alert']['transports']['hue']['user'] = 'af89jauaf98aj34r';
+$config['alert']['transports']['hue']['duration'] = 'lselect';
 ```

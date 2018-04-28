@@ -96,7 +96,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         $search = ldap_search(
             $this->ldap_connection,
             Config::get('auth_ad_base_dn'),
-            get_auth_ad_user_filter($username),
+            ActiveDirectoryAuthorizer::userFilter($username),
             array('samaccountname')
         );
         $entries = ldap_get_entries($this->ldap_connection, $search);
@@ -127,7 +127,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         $search = ldap_search(
             $this->ldap_connection,
             Config::get('auth_ad_base_dn'),
-            get_auth_ad_user_filter($username),
+            ActiveDirectoryAuthorizer::userFilter($username),
             array('memberOf')
         );
         $entries = ldap_get_entries($this->ldap_connection, $search);
@@ -159,7 +159,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         $search = ldap_search(
             $this->ldap_connection,
             Config::get('auth_ad_base_dn'),
-            get_auth_ad_user_filter($username),
+            ActiveDirectoryAuthorizer::userFilter($username),
             $attributes
         );
         $entries = ldap_get_entries($this->ldap_connection, $search);
@@ -180,7 +180,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         $ldap_groups = $this->getGroupList();
 
         foreach ($ldap_groups as $ldap_group) {
-            $search_filter = "(memberOf=$ldap_group)";
+            $search_filter = "(&(memberOf:1.2.840.113556.1.4.1941:=$ldap_group)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))";
             if (Config::get('auth_ad_user_filter')) {
                 $search_filter = "(&{" . Config::get('auth_ad_user_filter') . $search_filter . ")";
             }
@@ -223,7 +223,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         $result = ldap_search(
             $this->ldap_connection,
             Config::get('auth_ad_base_dn'),
-            get_auth_ad_user_filter($username),
+            ActiveDirectoryAuthorizer::userFilter($username),
             $attributes
         );
         $entries = ldap_get_entries($this->ldap_connection, $result);
@@ -267,7 +267,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         $result = ldap_search(
             $this->ldap_connection,
             Config::get('auth_ad_base_dn'),
-            get_auth_ad_group_filter($samaccountname),
+            ActiveDirectoryAuthorizer::groupFilter($samaccountname),
             $attributes
         );
         $entries = ldap_get_entries($this->ldap_connection, $result);

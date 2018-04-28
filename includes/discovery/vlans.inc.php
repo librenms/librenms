@@ -1,6 +1,8 @@
 <?php
 
 // Pre-cache the existing state of VLANs for this device from the database
+use LibreNMS\Config;
+
 $vlans_db_raw = dbFetchRows('SELECT * FROM `vlans` WHERE `device_id` = ?', array($device['device_id']));
 foreach ($vlans_db_raw as $vlan_db) {
     $vlans_db[$vlan_db['vlan_domain']][$vlan_db['vlan_vlan']] = $vlan_db;
@@ -23,10 +25,8 @@ foreach ($tmp_base_indexes as $index => $array) {
 }
 $index_to_base = array_flip($base_to_index);
 
-if ($device['os'] === 'junos') {
-    require 'includes/discovery/vlans/junos.inc.php';
-} elseif ($device['os'] === 'avaya-ers') {
-    require 'includes/discovery/vlans/avaya-ers.inc.php';
+if (file_exists(Config::get('install_dir') . "/includes/discovery/vlans/{$device['os']}.inc.php")) {
+    include Config::get('install_dir') . "/includes/discovery/vlans/{$device['os']}.inc.php";
 }
 
 if (empty($device['vlans']) === true) {

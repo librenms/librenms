@@ -145,9 +145,7 @@ function check_lint($passthru = false, $command_only = false)
 
     // matches a substring of the relative path, leading / is treated as absolute path
     $lint_excludes = array('vendor/');
-    if (defined('HHVM_VERSION') || version_compare(PHP_VERSION, '5.6', '<')) {
-        $lint_excludes[] = 'lib/influxdb-php/';
-    }
+
 
     $lint_exclude = build_excludes('--exclude ', $lint_excludes);
     $lint_cmd = "$parallel_lint_bin $lint_exclude ./";
@@ -186,16 +184,7 @@ function check_style($passthru = false, $command_only = false)
 {
     $phpcs_bin = check_exec('phpcs');
 
-    // matches a substring of the full path
-    $cs_excludes = array(
-        '/vendor/',
-        '/lib/',
-        '/html/plugins/',
-        '/config.php',
-    );
-
-    $cs_exclude = build_excludes('--ignore=', $cs_excludes);
-    $cs_cmd = "$phpcs_bin -n -p --colors --extensions=php --standard=PSR2 $cs_exclude ./";
+    $cs_cmd = "$phpcs_bin -n -p --colors --extensions=php --standard=misc/phpcs_librenms.xml ./";
 
     if ($command_only) {
         echo $cs_cmd . PHP_EOL;

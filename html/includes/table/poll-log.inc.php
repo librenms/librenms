@@ -1,24 +1,26 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 $sql = ' FROM `devices` AS D ';
 
-if (is_admin() === false) {
+if (!Auth::user()->hasGlobalAdmin()) {
     $sql .= ", devices_perms AS P ";
 }
 
 $sql .= " LEFT JOIN `poller_groups` ON `D`.`poller_group`=`poller_groups`.`id`";
 
-if (is_admin() === false) {
-    $sql .= " WHERE D.device_id = P.device_id AND P.user_id = '".$_SESSION['user_id']."' AND D.ignore = '0'";
+if (!Auth::user()->hasGlobalAdmin()) {
+    $sql .= " WHERE D.device_id = P.device_id AND P.user_id = '".Auth::id()."' AND D.ignore = '0'";
 } else {
     $sql .= ' WHERE 1';
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (hostname LIKE '%$searchPhrase%' OR last_polled LIKE '%$searchPhrase%' OR last_polled_timetaken LIKE '%$searchPhrase%')";
+    $sql .= " AND (hostname LIKE '%$searchPhrase%' OR sysName LIKE '%$searchPhrase%' OR last_polled LIKE '%$searchPhrase%' OR last_polled_timetaken LIKE '%$searchPhrase%')";
 }
 
-if ($_POST['type'] == "unpolled") {
+if ($vars['type'] == "unpolled") {
     $sql .= " AND `last_polled` <= DATE_ADD(NOW(), INTERVAL - 15 minute)";
 }
 

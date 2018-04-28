@@ -11,9 +11,11 @@
  * @package    LibreNMS
  * @subpackage webui
  * @link       http://librenms.org
- * @copyright  2017 LibreNMS
+ * @copyright  2018 LibreNMS
  * @author     LibreNMS Contributors
 */
+
+use LibreNMS\Authentication\Auth;
 
 $graph_type = 'storage_usage';
 
@@ -21,10 +23,10 @@ $where = 1;
 
 $sql = ' FROM `storage` AS `S` LEFT JOIN `devices` AS `D` ON `S`.`device_id` = `D`.`device_id`';
 
-if (is_admin() === false && is_read() === false) {
+if (!Auth::user()->hasGlobalRead()) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `S`.`device_id` = `DP`.`device_id`';
     $where  .= ' AND `DP`.`user_id`=?';
-    $param[] = $_SESSION['user_id'];
+    $param[] = Auth::id();
 }
 
 $sql .= " WHERE $where";
@@ -84,7 +86,7 @@ foreach (dbFetchRows($sql, $param) as $drive) {
         'storage_used'  => $bar_link,
         'storage_perc'  => $perc.'%',
     );
-    if ($_POST['view'] == 'graphs') {
+    if ($vars['view'] == 'graphs') {
         $graph_array['height'] = '100';
         $graph_array['width']  = '216';
         $graph_array['to']     = $config['time']['now'];

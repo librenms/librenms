@@ -21,14 +21,18 @@
  * @package LibreNMS
  * @subpackage Alerts
  */
+
+use LibreNMS\Authentication\Auth;
+
 header('Content-type: text/plain');
 
-if (is_admin() === false) {
+if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
-$ok = '';
-$error = '';
+$status = 'error';
+$template_id = 0;
+
 $name = mres($_POST['name']);
 if (!empty($name)) {
     if (is_numeric($_REQUEST['template_id']) && $_REQUEST['rule_id']) {
@@ -44,39 +48,41 @@ if (!empty($name)) {
             $_REQUEST['rule_id'] .= ",";
         }
         if (dbUpdate(array('rule_id' => mres($_REQUEST['rule_id']), 'name' => $name), "alert_templates", "id = ?", array($_REQUEST['template_id'])) >= 0) {
-            $ok = "Updated template and rule id mapping";
+            $message = "Updated template and rule id mapping";
         } else {
-            $error ="Failed to update the template and rule id mapping";
+            $message ="Failed to update the template and rule id mapping";
         }
     } elseif ($_REQUEST['template'] && is_numeric($_REQUEST['template_id'])) {
         //Update template-text
 
         if (dbUpdate(array('template' => $_REQUEST['template'], 'name' => $name, 'title' => $_REQUEST['title'], 'title_rec' => $_REQUEST['title_rec']), "alert_templates", "id = ?", array($_REQUEST['template_id'])) >= 0) {
-            $ok = "Updated template";
+            $status = 'ok';
+            $message = "Alert template updated";
         } else {
-            $error = "Failed to update the template";
+            $message = "Failed to update the template";
         }
     } elseif ($_REQUEST['template']) {
         //Create new template
 
         if ($name != 'Default Alert Template') {
-            if (dbInsert(array('template' => $_REQUEST['template'], 'name' => $name, 'title' => $_REQUEST['title'], 'title_rec' => $_REQUEST['title_rec']), "alert_templates")) {
-                $ok = "Alert template has been created.";
+            $template_id = dbInsert(array('template' => $_REQUEST['template'], 'name' => $name, 'title' => $_REQUEST['title'], 'title_rec' => $_REQUEST['title_rec']), "alert_templates");
+            if ($template_id != false) {
+                $status = 'ok';
+                $message = "Alert template has been created.";
             } else {
-                $error = "Could not create alert template";
+                $message = "Could not create alert template";
             }
         } else {
-            $error = "This template name is reserved!";
+            $message = "This template name is reserved!";
         }
     } else {
-        $error = "We could not work out what you wanted to do!";
+        $message = "We could not work out what you wanted to do!";
     }
 } else {
-    $error = "You haven't given your template a name, it feels sad :( - $name";
+    $message = "You haven't given your template a name, it feels sad :( - $name";
 }
 
-if (!empty($ok)) {
-    die("$ok");
-} else {
-    die("ERROR: $error");
-}
+$response = array('status' => $status, 'message' => $message, 'newid' => $template_id);
+
+header('Content-Type: application/json');
+echo _json_encode($response);

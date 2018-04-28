@@ -856,6 +856,27 @@ function rewrite_ironware_hardware($hardware)
         'snCer2048FX'                            => 'NetIron CER 2048F + 2x10G',
         'snCer2048CX'                            => 'NetIron CER 2048C + 2x10G',
         'snTI2X24Router'                         => 'Stackable TurboIron-X24',
+        'snBrocadeMLXe4Router'                   => 'NetIron MLXe-4',
+        'snBrocadeMLXe8Router'                   => 'NetIron MLXe-8',
+        'snBrocadeMLXe16Router'                  => 'NetIron MLXe-16',
+        'snBrocadeMLXe32Router'                  => 'NetIron MLXe-32',
+        'snICX643024Switch'                      => 'Brocade ICX 6430 24-port Switch',
+        'snICX643048Switch'                      => 'Brocade ICX 6430 48-port Switch',
+        'snICX645024Switch'                      => 'Brocade ICX 6450 24-port Switch',
+        'snICX645048Switch'                      => 'Brocade ICX 6450 48-port Switch',
+        'snICX661024Switch'                      => 'Brocade ICX 6610 24-port Switch',
+        'snICX661048Switch'                      => 'Brocade ICX 6610 48-port Switch',
+        'snICX665064Switch'                      => 'Brocade ICX 6650 64-port Switch',
+        'snICX725024Switch'                      => 'Brocade ICX 7250 24-port Switch',
+        'snICX725048Switch'                      => 'Brocade ICX 7250 48-port Switch',
+        'snICX745024Switch'                      => 'Brocade ICX 7450 24-port Switch',
+        'snICX745048Switch'                      => 'Brocade ICX 7450 48-port Switch',
+        'snFastIronStackICX6430Switch'           => 'Brocade ICX 6430 Switch stack',
+        'snFastIronStackICX6450Switch'           => 'Brocade ICX 6450 Switch stack',
+        'snFastIronStackICX6610Switch'           => 'Brocade ICX 6610 Switch stack',
+        'snFastIronStackICX7250Switch'           => 'Brocade ICX 7250 Switch stack',
+        'snFastIronStackICX7450Switch'           => 'Brocade ICX 7450 Switch stack',
+        'snFastIronStackICX7750Switch'           => 'Brocade ICX 7750 Switch stack',
     );
 
     $hardware = array_str_replace($rewrite_ironware_hardware, $hardware);
@@ -959,6 +980,7 @@ function rewrite_junos_hardware($hardware)
         'jnxProductName'               => '',
         'jnxProductQFX510048S6Q'       => 'QFX5100-48S6Q',
         'jnxProductQFX511048S4Q'       => 'QFX5110-48S4Q',
+        'jnxProductQFX510096S8Q'       => 'QFX5100-96S8Q',
     );
 
 

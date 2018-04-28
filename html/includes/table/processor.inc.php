@@ -11,17 +11,19 @@
  * @package    LibreNMS
  * @subpackage webui
  * @link       http://librenms.org
- * @copyright  2017 LibreNMS
+ * @copyright  2018 LibreNMS
  * @author     LibreNMS Contributors
 */
+
+use LibreNMS\Authentication\Auth;
 
 $graph_type = 'processor_usage';
 $where      = 1;
 $sql        = ' FROM `processors` AS `P` LEFT JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id`';
-if (is_admin() === false && is_read() === false) {
+if (!Auth::user()->hasGlobalRead()) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `P`.`device_id` = `DP`.`device_id`';
     $where  .= ' AND `DP`.`user_id`=?';
-    $param[] = $_SESSION['user_id'];
+    $param[] = Auth::id();
 }
 
 $sql .= " WHERE $where";
@@ -72,7 +74,7 @@ foreach (dbFetchRows($sql, $param) as $processor) {
         'graph'           => $mini_graph,
         'processor_usage' => $bar_link,
     );
-    if ($_POST['view'] == 'graphs') {
+    if ($vars['view'] == 'graphs') {
         $graph_array['height'] = '100';
         $graph_array['width']  = '216';
         $graph_array['to']     = $config['time']['now'];

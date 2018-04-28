@@ -101,12 +101,12 @@ data, you must use a variant to store your test data (-v).
 
 ### Add initial detection
 1. Add device to LibreNMS. It is generic and device_id = 42
-2. Run `./scripts/collect-snmp-data.php -h 42 -m os`, initial snmprec will be created
+2. Run `./scripts/collect-snmp-data.php -h 42`, initial snmprec will be created
 3. [Add initial detection](Initial-Detection.md) for `example-os`
 4. Run discovery to make sure it detects properly `./discovery.php -h 42`
 5. Add any additional os items like version, hardware, features, or serial.
-6. If there is additional snmp data required, run `./scripts/collect-snmp-data.php -h 42 -m os`
-7. Run `./scripts/save-test-data.php -o example-os -m os` to update the dumped database data.
+6. If there is additional snmp data required, run `./scripts/collect-snmp-data.php -h 42`
+7. Run `./scripts/save-test-data.php -o example-os` to update the dumped database data.
 7. Review data. If you modified the snmprec or code (don't modify json manually) run `./scripts/save-test-data.php -o example-os -m os`
 8. Run `./scripts/pre-commit.php --db --snmpsim`
 9. If the tests succeed submit a pull request

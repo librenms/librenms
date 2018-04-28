@@ -60,6 +60,9 @@ function nicecase($item)
         case 'dbm':
             return 'dBm';
 
+        case 'entropy':
+            return 'Random entropy';
+
         case 'mysql':
             return ' MySQL';
 
@@ -446,7 +449,7 @@ function bill_permitted($bill_id)
 {
     global $permissions;
 
-    if ($_SESSION['userlevel'] >= '5') {
+    if (Auth::user()->hasGlobalRead()) {
         $allowed = true;
     } elseif ($permissions['bill'][$bill_id]) {
         $allowed = true;
@@ -466,7 +469,7 @@ function port_permitted($port_id, $device_id = null)
         $device_id = get_device_id_by_port_id($port_id);
     }
 
-    if ($_SESSION['userlevel'] >= '5') {
+    if (Auth::user()->hasGlobalRead()) {
         $allowed = true;
     } elseif (device_permitted($device_id)) {
         $allowed = true;
@@ -489,7 +492,7 @@ function application_permitted($app_id, $device_id = null)
             $device_id = get_device_id_by_app_id($app_id);
         }
 
-        if ($_SESSION['userlevel'] >= '5') {
+        if (Auth::user()->hasGlobalRead()) {
             $allowed = true;
         } elseif (device_permitted($device_id)) {
             $allowed = true;
@@ -510,7 +513,7 @@ function device_permitted($device_id)
 {
     global $permissions;
 
-    if ($_SESSION['userlevel'] >= '5') {
+    if (Auth::user()->hasGlobalRead()) {
         $allowed = true;
     } elseif ($permissions['device'][$device_id]) {
         $allowed = true;
@@ -825,10 +828,10 @@ function getlocations()
     $locations = array();
 
     // Fetch regular locations
-    if ($_SESSION['userlevel'] >= '5') {
+    if (Auth::user()->hasGlobalRead()) {
         $rows = dbFetchRows('SELECT location FROM devices AS D GROUP BY location ORDER BY location');
     } else {
-        $rows = dbFetchRows('SELECT location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? GROUP BY location ORDER BY location', array($_SESSION['user_id']));
+        $rows = dbFetchRows('SELECT location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? GROUP BY location ORDER BY location', array(Auth::id()));
     }
 
     foreach ($rows as $row) {
@@ -1000,50 +1003,6 @@ function generate_pagination($count, $limit, $page, $links = 2)
     $return .= '</ul>';
     return ($return);
 }//end generate_pagination()
-
-
-function is_admin()
-{
-    if ($_SESSION['userlevel'] >= '10') {
-        $allowed = true;
-    } else {
-        $allowed = false;
-    }
-
-    return $allowed;
-}//end is_admin()
-
-
-function is_read()
-{
-    if ($_SESSION['userlevel'] == '5') {
-        $allowed = true;
-    } else {
-        $allowed = false;
-    }
-
-    return $allowed;
-}//end is_read()
-
-function is_demo_user()
-{
-
-    if ($_SESSION['userlevel'] == 11) {
-        return true;
-    } else {
-        return false;
-    }
-}// end is_demo_user();
-
-function is_normal_user()
-{
-
-    if (is_admin() === false && is_read() === false && is_demo_user() === false) {
-        return true;
-    } else {
-        return false;
-    }
-}// end is_normal_user()
 
 function demo_account()
 {
@@ -1578,20 +1537,30 @@ function get_postgres_databases($device_id)
     return array();
 }
 
-// takes the device array and app_id
+/**
+ * Get all disks (disk serial numbers) from the collected
+ * rrd files.
+ *
+ * @param array $device device for which we get the rrd's
+ * @param int   $app_id application id on the device
+ * @return array list of disks
+ */
 function get_disks_with_smart($device, $app_id)
 {
-    $all_disks = get_disks($device['device_id']);
     $disks = array();
-    $all_disks_int = 0;
-    while (isset($all_disks[$all_disks_int])) {
-        $disk = $all_disks[$all_disks_int]['diskio_descr'];
-        $rrd_filename = rrd_name($device['hostname'], array('app', 'smart', $app_id, $disk));
-        if (rrdtool_check_rrd_exists($rrd_filename)) {
-            $disks[] = $disk;
+
+    $pattern = sprintf('%s/%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', 'smart', $app_id);
+
+    foreach (glob($pattern) as $rrd) {
+        $filename = basename($rrd, '.rrd');
+
+        list(,,, $disk) = explode("-", $filename, 4);
+
+        if ($disk) {
+            array_push($disks, $disk);
         }
-        $all_disks_int++;
     }
+
     return $disks;
 }
 
@@ -1610,11 +1579,11 @@ function get_dashboards($user_id = null)
     $default = get_user_pref('dashboard');
     $dashboards = dbFetchRows(
         "SELECT * FROM `dashboards` WHERE dashboards.access > 0 || dashboards.user_id = ?",
-        array(is_null($user_id) ? $_SESSION['user_id'] : $user_id)
+        array(is_null($user_id) ? Auth::id() : $user_id)
     );
 
     $usernames = array(
-        $_SESSION['user_id'] => $_SESSION['username']
+        Auth::id() => Auth::user()->username
     );
 
     $result = array();
@@ -1632,30 +1601,6 @@ function get_dashboards($user_id = null)
     }
 
     return $result;
-}
-
-/**
- * Generate javascript to fill in a select box from an ajax list
- *
- * @param string $list_type type of list look in html/includes/list/
- * @param string $selector jquery selector for the target select element
- * @param int $selected the id of the item to mark as selected
- * @return string the javascript (not including <script> tags)
- */
-function generate_fill_select_js($list_type, $selector, $selected = null)
-{
-    return '$(document).ready(function() {
-    $select = $("' . $selector . '")
-    $.getJSON(\'ajax_list.php?id=' . $list_type . '\', function(data){
-        $.each(data, function(index,item) {
-            if (item.id == "' . $selected . '") {
-                $select.append("<option value=" + item.id + " selected>" + item.value + "</option>");
-            } else {
-                $select.append("<option value=" + item.id + ">" + item.value + "</option>");
-            }
-        });
-    });
-});';
 }
 
 /**
@@ -1705,7 +1650,7 @@ function get_zfs_pools($device_id)
  * Returns the sysname of a device with a html line break prepended.
  * if the device has an empty sysname it will return device's hostname instead
  * And finally if the device has no hostname it will return an empty string
- * @param device array
+ * @param array device
  * @return string
  */
 function get_device_name($device)

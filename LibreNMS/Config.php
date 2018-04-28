@@ -28,58 +28,59 @@ namespace LibreNMS;
 class Config
 {
     /**
-     * Load the user config from config.php
+     * Load the config, if the database connected, pull in database settings.
      *
-     * @param string $install_dir
-     * @return array
+     * return &array
      */
-    public static function &load($install_dir = null)
+    public static function &load()
     {
         global $config;
 
-        if (empty($install_dir)) {
-            $install_dir = __DIR__ . '/../';
+        self::loadFiles();
+
+        // Make sure the database is connected
+        if (dbIsConnected()) {
+            // pull in the database config settings
+            self::mergeDb();
+
+            // load graph types from the database
+            self::loadGraphsFromDb();
         }
-        $install_dir = realpath($install_dir);
+
+        // Process $config to tidy up
+        self::processConfig();
+
+        return $config;
+    }
+
+    /**
+     * Load the user config from config.php, defaults.inc.php and definitions.inc.php, etc.
+     * Erases existing config.
+     *
+     * @return array
+     */
+    private static function &loadFiles()
+    {
+        global $config;
+
+        $config = []; // start fresh
+
+        $install_dir = realpath(__DIR__ . '/../');
         $config['install_dir'] = $install_dir;
 
         // load defaults
         require $install_dir . '/includes/defaults.inc.php';
         require $install_dir . '/includes/definitions.inc.php';
 
+        // import standard settings
+        $macros = json_decode(file_get_contents($install_dir . '/misc/macros.json'), true);
+        self::set('alert.macros.rule', $macros);
+
         // variable definitions (remove me)
         require $install_dir . '/includes/vmware_guestid.inc.php';
 
         // Load user config
         include $install_dir . '/config.php';
-
-        return $config;
-    }
-
-    /**
-     * Load Config from the database
-     *
-     * @throws Exceptions\DatabaseConnectException
-     */
-    public static function &loadFromDatabase()
-    {
-        global $config;
-
-        if (empty($config)) {
-            self::load();
-        }
-
-        // Make sure the database is connected
-        dbConnect();
-
-        // pull in the database config settings
-        self::mergeDb();
-
-        // load graph types from the database
-        self::loadGraphsFromDb();
-
-        // Process $config to tidy up
-        self::processConfig();
 
         return $config;
     }
@@ -364,18 +365,25 @@ class Config
             ini_set('session.cookie_secure', 1);
         }
 
+        // If we're on SSL, let's properly detect it
+        if (isset($_SERVER['HTTPS'])) {
+            self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
+        }
+
+        // Define some variables if they aren't set by user definition in config.php
+        self::setDefault('html_dir', '%s/html', ['install_dir']);
+        self::setDefault('rrd_dir', '%s/rrd', ['install_dir']);
+        self::setDefault('mib_dir', '%s/mibs', ['install_dir']);
+        self::setDefault('log_dir', '%s/logs', ['install_dir']);
+        self::setDefault('log_file', '%s/%s.log', ['log_dir', 'project_id']);
+        self::setDefault('plugin_dir', '%s/plugins', ['html_dir']);
+//        self::setDefault('email_from', '"%s" <%s@' . php_uname('n') . '>', ['project_name', 'email_user']);  // FIXME email_from set because alerting config
+
         // deprecated variables
-        if (self::has('rrdgraph_real_95th')) {
-            self::set('rrdgraph_real_percentile', self::get('rrdgraph_real_95th'));
-        }
+        self::deprecatedVariable('rrdgraph_real_95th', 'rrdgraph_real_percentile');
+        self::deprecatedVariable('fping_options.millisec', 'fping_options.interval');
+        self::deprecatedVariable('discovery_modules.cisco-vrf', 'discovery_modules.vrf');
 
-        if (self::has('fping_options.millisec')) {
-            self::set('fping_options.interval', self::get('fping_options.millisec'));
-        }
-
-        if (self::has('discovery_modules.cisco-vrf')) {
-            self::set('discovery_modules.vrf', self::get('discovery_modules.cisco-vrf'));
-        }
 
         // make sure we have full path to binaries in case PATH isn't set
         foreach (array('fping', 'fping6', 'snmpgetnext', 'rrdtool') as $bin) {
@@ -383,5 +391,76 @@ class Config
                 self::set($bin, locate_binary($bin), true, $bin, "Path to $bin", 'external', 'paths');
             }
         }
+    }
+
+    /**
+     * Set default values for defaults that depend on other settings, if they are not already loaded
+     *
+     * @param string $key
+     * @param string $value value to set to key or vsprintf() format string for values below
+     * @param array $format_values array of keys to send to vsprintf()
+     */
+    private static function setDefault($key, $value, $format_values = [])
+    {
+        if (!self::has($key)) {
+            if (is_string($value)) {
+                $format_values = array_map('self::get', $format_values);
+                self::set($key, vsprintf($value, $format_values));
+            } else {
+                self::set($key, $value);
+            }
+        }
+    }
+
+    /**
+     * Copy data from old variables to new ones.
+     *
+     * @param $old
+     * @param $new
+     */
+    private static function deprecatedVariable($old, $new)
+    {
+        if (self::has($old)) {
+            d_echo("Copied deprecated config $old to $new\n");
+            self::set($new, self::get($old));
+        }
+    }
+
+    /**
+     * Get just the database connection settings from config.php
+     *
+     * @return array (keys: db_host, db_port, db_name, db_user, db_pass, db_socket)
+     */
+    public static function getDatabaseSettings()
+    {
+        // Do not access global $config in this function!
+
+        $keys = $config = [
+            'db_host' => '',
+            'db_port' => '',
+            'db_name' => '',
+            'db_user' => '',
+            'db_pass' => '',
+            'db_socket' => '',
+        ];
+
+        if (is_file(__DIR__ . '/../config.php')) {
+            include __DIR__ . '/../config.php';
+        }
+
+        // Check for testing database
+        if (getenv('DBTEST')) {
+            if (isset($config['test_db_name'])) {
+                $config['db_name'] = $config['test_db_name'];
+            }
+            if (isset($config['test_db_user'])) {
+                $config['db_user'] = $config['test_db_user'];
+            }
+            if (isset($config['test_db_pass'])) {
+                $config['db_pass'] = $config['test_db_pass'];
+            }
+        }
+
+        return array_intersect_key($config, $keys); // return only the db settings
     }
 }

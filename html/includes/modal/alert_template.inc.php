@@ -11,7 +11,9 @@
  * the source code distribution for details.
  */
 
-if (is_admin() === false) {
+use LibreNMS\Authentication\Auth;
+
+if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
@@ -208,7 +210,6 @@ $('#value').keypress(function (e) {
 });
 
 $('div').on('click', 'button#reset-default', function(e) {
-    console.log('zart');
     e.preventDefault();
     var template_id = $("#template_id").val();
     var template = '%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: {if %name}%name{else}%rule{/if}\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}';
@@ -222,14 +223,24 @@ function alertTemplateAjaxOps(template, name, template_id, title, title_rec)
         type: "POST",
         url: "ajax_form.php",
         data: { type: "alert-templates", template: template, name: name, template_id: template_id, title: title, title_rec: title_rec},
-        dataType: "html",
-        success: function(msg){
-            if(msg.indexOf("ERROR:") <= -1) {
-                $("#message").html('<div class="alert alert-info">'+msg+'</div>');
+        dataType: "json",
+        success: function(output){
+            if(output.status == 'ok') {
+                toastr.success(output.message);
                 $("#alert-template").modal('hide');
-                setTimeout(function() {
-                    location.reload(1);
-                }, 1000);
+
+                if(template_id != null && template_id != '') {
+                    $('#templatetable tbody tr').each(function (i, row) {
+                        if ($(row).children().eq(0).text() == template_id) {
+                            $(row).children().eq(1).text(name);
+                            // We found our match so stop looping through the table
+                            return false;
+                        }
+                    });
+                } else {
+                    var newrow = [{id: output.newid, templatename:name}];
+                    $('#templatetable').bootgrid("append", newrow);
+                }
             } else {
                 $("#error").html('<div class="alert alert-danger">'+msg+'</div>');
             }
