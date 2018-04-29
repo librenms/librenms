@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\DatabaseConnectException;
+use Request;
 
 include_once __DIR__ . '/../../includes/dbFacile.php';
 
@@ -55,7 +56,10 @@ class AppServiceProvider extends ServiceProvider
             }
 
             if (config('app.debug') && class_exists(\Barryvdh\Debugbar\ServiceProvider::class)) {
-                $this->app->register(\Barryvdh\Debugbar\ServiceProvider::class);
+                // disable debugbar for api routes
+                if (!Request::is('api/*')) {
+                    $this->app->register(\Barryvdh\Debugbar\ServiceProvider::class);
+                }
             }
         }
     }

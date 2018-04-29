@@ -23,16 +23,16 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $query = '';
 $where = [];
 $params = [];
 
-if (!Auth::user()->hasGlobalRead()) {
+if (!LegacyAuth::user()->hasGlobalRead()) {
     $query .= ' LEFT JOIN `devices_perms` USING (`device_id`)';
     $where = '`devices_perms`.`user_id`=?';
-    $params[] = Auth::id();
+    $params[] = LegacyAuth::id();
 }
 
 if (!empty($_REQUEST['search'])) {

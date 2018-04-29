@@ -13,12 +13,12 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $no_refresh = true;
 $param = array();
 
-if ($vars['action'] == 'expunge' && Auth::user()->hasGlobalAdmin()) {
+if ($vars['action'] == 'expunge' && LegacyAuth::user()->hasGlobalAdmin()) {
     dbQuery('TRUNCATE TABLE `eventlog`');
     print_message('Event log truncated');
 }

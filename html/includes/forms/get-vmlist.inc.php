@@ -16,15 +16,15 @@
  * @author     Aldemir Akpinar <aldemir.akpinar@gmail.com>
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $vm_query = "SELECT v.vmwVmDisplayName AS vmname, v.vmwVmState AS powerstat, v.device_id AS deviceid, d.hostname AS physicalsrv, d.sysname AS sysname, v.vmwVmGuestOS AS os, v.vmwVmMemSize AS memory, v.vmwVmCpus AS cpu FROM vminfo AS v LEFT JOIN devices AS d ON v.device_id = d.device_id";
 
 $param = [];
-if (!Auth::user()->hasGlobalRead()) {
+if (!LegacyAuth::user()->hasGlobalRead()) {
     $vm_query .= ' LEFT JOIN devices_perms AS DP ON d.device_id = DP.device_id';
     $uidwhere = ' AND DP.user_id = ?';
-    $uid = [Auth::id()];
+    $uid = [LegacyAuth::id()];
 } else {
     $uidwhere = '';
     $uid = [];

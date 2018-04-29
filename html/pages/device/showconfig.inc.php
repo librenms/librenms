@@ -1,11 +1,11 @@
 <?php
 
 // FIXME svn stuff still using optc etc, won't work, needs updating!
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use Symfony\Component\Process\Process;
 
-if (Auth::user()->hasGlobalAdmin()) {
+if (LegacyAuth::user()->hasGlobalAdmin()) {
     if (!is_array(Config::get('rancid_configs'))) {
         Config::set('rancid_configs', array(Config::get('rancid_configs')));
     }
@@ -154,7 +154,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         $oxidized_hostname = $device['hostname'];
         // fetch info about the node and then a list of versions for that node
         $node_info = json_decode(file_get_contents(Config::get('oxidized')['url'].'/node/show/'.$oxidized_hostname.'?format=json'), true);
-        
+
         // Try other hostname format if Oxidized request failed
         if (! $node_info) {
             // Adjust hostname based on whether domain was already in it or not

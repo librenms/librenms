@@ -11,7 +11,7 @@
  *
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $links = 1;
 
@@ -52,7 +52,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
             graph [bgcolor=transparent];
 ';
 
-    if (!Auth::check()) {
+    if (!LegacyAuth::check()) {
         $map .= "\"Not authenticated\" [fontsize=20 fillcolor=\"lightblue\", URL=\"/\" shape=box3d]\n";
     } else {
         $loc_count = 1;
@@ -222,7 +222,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
     }
     echo $img;
 } else {
-    if (Auth::check()) {
+    if (LegacyAuth::check()) {
         // FIXME level 10 only?
         echo '<center>
                   <object width=1200 height=1000 data="'. $config['base_url'] . '/map.php?format=svg" type="image/svg+xml"></object>

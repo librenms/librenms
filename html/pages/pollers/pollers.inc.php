@@ -12,13 +12,12 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
 use LibreNMS\Config;
 
 require_once 'includes/modal/delete_poller.inc.php';
 
 ?>
-<br />
+    <br />
 
 <?php
 $query = 'SELECT *,UNIX_TIMESTAMP(NOW()) AS `now`, UNIX_TIMESTAMP(`last_polled`) AS `then` FROM `pollers` ORDER BY poller_name';
@@ -51,7 +50,7 @@ if (count($rows) !== 0) {
         }
 
         $actions = "";
-        if (Auth::user()->hasGlobalAdmin() && $old > ($step * 2)) {
+        if (\Auth::user()->hasGlobalAdmin() && $old > ($step * 2)) {
             // missed 2 polls show delete button
             $actions .= "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-id='{$poller['id']}' data-pollertype='delete-poller' name='delete-poller'><i class='fa fa-trash' aria-hidden='true'></i></button>";
         }
@@ -109,7 +108,7 @@ if (count($rows) !== 0) {
         }
 
         $actions = "";
-        if (Auth::user()->hasGlobalAdmin() && $old > ($step * 2)) {
+        if (\Auth::user()->hasGlobalAdmin() && $old > ($step * 2)) {
             // missed 2 polls show delete button
             $actions .= "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-id='{$poller['id']}' data-pollertype='delete-cluster-poller' name='delete-cluster-poller'><i class='fa fa-trash' aria-hidden='true'></i></button>";
         }
@@ -153,7 +152,7 @@ if (count($rows) !== 0) {
             $first_row = false;
         }
     }
-        echo '
+    echo '
         </table>
         <small>
           Worker seconds indicates the maximum polling throughput a node can achieve in perfect conditions. If the consumed is close to the maximum, consider adding more threads, or better tuning your groups.<br>

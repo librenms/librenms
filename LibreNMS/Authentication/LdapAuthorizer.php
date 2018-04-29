@@ -53,21 +53,6 @@ class LdapAuthorizer extends AuthorizerBase
         throw new AuthenticationException();
     }
 
-
-    public function reauthenticate($sess_id, $token)
-    {
-        $sess_id = clean($sess_id);
-        $token = clean($token);
-
-        list($username, $hash) = explode('|', $token);
-
-        if (!$this->userExists($username, true)) {
-            throw new AuthenticationException();
-        }
-
-        return $this->checkRememberMe($sess_id, $token);
-    }
-
     public function userExists($username, $throw_exception = false)
     {
         try {
