@@ -12,7 +12,7 @@ if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
 
 $order_by = '';
 if (isset($_REQUEST['sort']) && is_array($_REQUEST['sort'])) {
-    foreach($_REQUEST['sort'] as $key=> $value) {
+    foreach ($_REQUEST['sort'] as $key => $value) {
         if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
             $order_by .= " t.$key $value";
         } else {
