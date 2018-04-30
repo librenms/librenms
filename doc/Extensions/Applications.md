@@ -15,6 +15,8 @@ When using the snmp extend method, the application discovery module will pick up
 2. Click on the *Modules* tab and enable the `applications` module.
 3. This will be automatically saved, and you should get a green confirmation pop-up message.
 
+![Enable-application-module](/img/Enable_application_module.png)
+
 After you have enabled the application module, it would be wise to then also enable which applications you want to monitor, in the rare case where LibreNMS does not automatically detect it.
 
 **Note**: Only do this if an application was not auto-discovered by LibreNMS during discovery and polling.
@@ -25,12 +27,11 @@ After you have enabled the application module, it would be wise to then also ena
 2. Click on the *Applications* tab and select the applications you want to monitor.
 3. This will also be automatically saved, and you should get a green confirmation pop-up message.
 
+![Enable-applications](/img/Enable_applications.png)
+
 ##### Agent
 
 The unix-agent does not have a discovery module, only a poller module. That poller module is always disabled by default. It needs to be manually enabled if using the agent. Some applications will be automatically enabled by the unix-agent poller module. It is better to ensure that your application is enabled for monitoring. You can check by following the steps under the `SNMP Extend` heading.
-
-#### TODO: Maybe for the sake of thoroughness we could add an image? I have made screenshots, but cannot upload them, not sure how.
-
 
 1. [Apache](#apache) - SNMP extend, Agent
 1. [BIND9/named](#bind9-aka-named) - SNMP extend, Agent
