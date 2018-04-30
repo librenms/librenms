@@ -11,20 +11,19 @@
  * the source code distribution for details.
  */
 
-$pwr_board = snmpwalk_array_num($device, '.1.3.6.1.4.1.9.9.719.1.9.14');
+$pwr = snmp_get($device, '.1.3.6.1.4.1.9.9.719.1.9.14.1.4.1', '-Oqv');
 
 /*
 * False == OID not found - this is not an error.
 * null  == timeout or something else that caused an error.
 */
-if (is_null($pwr_board)) {
-    echo "Error\n";
-} else {
+
+if (!empty($pwr)) {
     $index = 1;
 
     // Board Input Power
     $oid = '.1.3.6.1.4.1.9.9.719.1.9.14.1.4';
     $description = "MB Input Power";
-    d_echo($oid." - ".$description." - ".$pwr_board[$oid][$index]."\n");
-    discover_sensor($valid['sensor'], 'power', $device, $oid.".".$index, 'mb-input-power', 'cimc', $description, '1', '1', null, null, null, null, $temp_board[$oid][$index]);
+    d_echo($oid." - ".$description." - ".$pwr."\n");
+    discover_sensor($valid['sensor'], 'power', $device, $oid.".".$index, 'mb-input-power', 'cimc', $description, '1', '1', null, null, null, null, $pwr);
 }
