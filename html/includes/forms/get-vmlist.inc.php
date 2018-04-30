@@ -5,12 +5,29 @@ if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
     #This is a bit ugly
     $vm_query = "SELECT * FROM (".$vm_query;
     $vm_query .= " ) as t WHERE t.vmname LIKE ? OR t.physicalsrv LIKE ? OR t.os LIKE ? ";
-    $vm_query .= " ORDER BY t.vmname";
     $count_query = "SELECT COUNT(*) FROM (" . $vm_query . " ) as t WHERE t.vmname LIKE ? OR t.physicalsrv LIKE ? OR t.os LIKE ? ";
 } else {
-    $vm_query .= " ORDER BY vmname";
     $count_query = "SELECT COUNT(*) FROM vminfo ";
 }
+
+$order_by = '';
+if (isset($_REQUEST['sort']) && is_array($_REQUEST['sort'])) {
+    foreach($_REQUEST['sort'] as $key=> $value) {
+        if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
+            $order_by .= " t.$key $value";
+        } else {
+            $order_by .= " $key $value";
+        }
+    }
+} else {
+    if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
+        $order_by = " t.vmname";
+    } else {
+        $order_by = " vmname";
+    }
+}
+
+$vm_query .= " ORDER BY " . $order_by;
 
 if (is_numeric($_POST['rowCount']) && is_numeric($_POST['current'])) {
     $rowcount = $_POST['rowCount'];
