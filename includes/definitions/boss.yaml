@@ -15,3 +15,5 @@ discovery:
           - 'ERS'
           - 'Virtual Services Platform 7024XLS'
           - 'Virtual Services Platform 7024XT'
+good_if:
+    - 'Virtual Services Platform'
