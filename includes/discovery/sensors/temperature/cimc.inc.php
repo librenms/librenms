@@ -52,7 +52,7 @@ if (is_null($temp_board) || is_null($temp_mem) || is_null($temp_cpu)) {
         $base_oid = '1.3.6.1.4.1.9.9.719.1.9.44.1.13';
         $oid = '.'.$base_oid.'.'.$index;
         d_echo($oid." - ".$description." - IO Hub: ".$temp_board[$base_oid][$index]."\n");
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'ioh-'.$index, 'cimc', $description." - IO Hub", '1', '1', null, null, null, null, $temp_baord[$base_oid][$index]);
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'ioh-'.$index, 'cimc', $description." - IO Hub", '1', '1', null, null, null, null, $temp_board[$base_oid][$index]);
     }
 
     // Memory Temperatures
@@ -64,7 +64,7 @@ if (is_null($temp_board) || is_null($temp_mem) || is_null($temp_cpu)) {
         $base_oid = '1.3.6.1.4.1.9.9.719.1.30.12.1.6';
         $oid = '.'.$base_oid.'.'.$index;
         d_echo($oid." - ".$description." - ".$temp_mem[$base_oid][$index]."\n");
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'mem-'.$index, 'cimc', $description, '1', '1', null, null, 40, null, $temp_board[$base_oid][$index]);
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'mem-'.$index, 'cimc', $description, '1', '1', null, null, 40, null, $temp_mem[$base_oid][$index]);
     }
 
     // CPU Temperatures
@@ -73,9 +73,9 @@ if (is_null($temp_board) || is_null($temp_mem) || is_null($temp_cpu)) {
         $description = $regexp_result[1]." - ".$regexp_result[2];
 
         // CPU Temperature
-        $oid = '1.3.6.1.4.1.9.9.719.1.41.2.1.10';
+        $base_oid = '1.3.6.1.4.1.9.9.719.1.41.2.1.10';
         $oid = '.'.$base_oid.'.'.$index;
         d_echo($oid." - ".$description." - ".$temp_cpu[$base_oid][$index]."\n");
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'cpu-'.$index, 'cimc', $description, '1', '1', null, null, 40, null, $temp_board[$base_oid][$index]);
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'cpu-'.$index, 'cimc', $description, '1', '1', null, null, 40, null, $temp_cpu[$base_oid][$index]);
     }
 }
