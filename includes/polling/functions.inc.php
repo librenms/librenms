@@ -775,7 +775,7 @@ function json_app_get($device, $extend, $min_version = 1)
         return $parsed_json;
     }
 
-    if ( $parsed_json['error'] != 0) {
+    if ($parsed_json['error'] != 0) {
         throw new JsonAppPollingFailedException("Script returned exception: {$parsed_json['errorString']}", $output, $parsed_json, $parsed_json['error']);
     }
 
