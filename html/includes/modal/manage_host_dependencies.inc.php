@@ -66,7 +66,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
 </div>
 
 <script>
-function changeParents(e, evttype) 
+function changeParents(e, evttype)
 {
     e.preventDefault();
     if (evttype == 'select' && e.params.data.id == 0) {
@@ -75,7 +75,7 @@ function changeParents(e, evttype)
     }
 
     var cur_option = $('#manavailableparents').select2('data');
-    // So that we'll see all devices. 
+    // So that we'll see all devices.
     var device_id = 0;
     var parent_ids = [];
     // This is needed to remove the None option if it is with another parent id
@@ -92,7 +92,7 @@ function changeParents(e, evttype)
 
     $.ajax({
         type: 'POST',
-        url: 'ajax_form.php',
+        url: 'ajax/form',
         data: { type: "get-host-dependencies", "parent_ids": parent_ids, "viewtype": "fromparent" },
         dataType: "json",
         success: function(output) {
@@ -132,7 +132,7 @@ $('#manage-dependencies').on('show.bs.modal', function() {
     var device_id = 0;
     $.ajax({
         type: 'POST',
-        url: 'ajax_form.php',
+        url: 'ajax/form',
         data: { type: "get-host-dependencies", "viewtype": 'fromparent', "parent_ids": 0},
         dataType: "json",
         success: function(output) {
@@ -184,7 +184,7 @@ $('#manhostdep-save').click('', function(event) {
 
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/form',
             data: { type: "save-host-dependency", device_ids: device_ids, parent_ids: parent_id },
             dataType: "json",
             success: function(output) {
@@ -208,7 +208,7 @@ $('#manhostdep-save').click('', function(event) {
         }
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/form',
             data: { type: "delete-host-dependency", parent_ids: parent_id },
             dataType: "json",
             success: function(output) {

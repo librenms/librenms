@@ -93,12 +93,3 @@ foreach (dbFetchRows($sql, $param) as $customer) {
         'port_descr_notes'   => $graph_data[3],
     );
 }
-
-$output = array(
-    'current'  => $current,
-    'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
-);
-
-echo _json_encode($output);

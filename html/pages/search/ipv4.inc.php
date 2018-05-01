@@ -89,7 +89,7 @@ if ($_POST['interface'] == 'Vlan%') {
             address: '<?php echo mres($_POST['address']); ?>'
         };
     },
-    url: "ajax_table.php"
+    url: "ajax/table"
 });
 
 </script>

@@ -259,11 +259,3 @@ foreach (dbFetchRows($sql, $param) as $device) {
         'actions' => $actions,
     );
 }//end foreach
-
-$output = array(
-    'current' => $current,
-    'rowCount' => $rowCount,
-    'rows' => $response,
-    'total' => $total,
-);
-echo _json_encode($output);

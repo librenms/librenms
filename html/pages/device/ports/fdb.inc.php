@@ -23,7 +23,7 @@ var grid = $("#ports-fdb").bootgrid({
             device_id: "<?php echo $device['device_id']; ?>"
         };
     },
-    url: "ajax_table.php"
+    url: "ajax/table"
 });
 </script>
 

@@ -61,7 +61,7 @@ $('#edit-dependency').on('show.bs.modal', function() {
 
     $.ajax({
         type: 'POST',
-        url: 'ajax_form.php',
+        url: 'ajax/form',
         data: { type: "get-host-dependencies", "device_id": device_id },
         dataType: "json",
         success: function(output) {
@@ -101,7 +101,7 @@ $('#hostdep-save').click('', function(event) {
     $("#modal_hostname").text();
     $.ajax({
         type: 'POST',
-        url: 'ajax_form.php',
+        url: 'ajax/form',
         data: { type: "save-host-dependency", device_ids: device_ids, parent_ids: parent_ids },
         dataType: "json",
         success: function(output) {

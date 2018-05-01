@@ -43,7 +43,7 @@ $("[name='btn-update-notes']").on('click', function(event) {
     var notes = $("#port-notes").val();
     $.ajax({
         type: 'POST',
-        url: 'ajax_form.php',
+        url: 'ajax/form',
         data: { type: "update-port-notes", notes: notes, port_id_notes: port_id_notes, device_id: device_id },
         dataType: "html",
         success: function(data){

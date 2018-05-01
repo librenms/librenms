@@ -40,12 +40,12 @@ ini_set('display_startup_errors', 1);
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
 
-require_once $install_dir . '/includes/common.php';
+//require_once $install_dir . '/includes/common.php';
 
 # composer autoload
-if (!is_file($install_dir . '/vendor/autoload.php')) {
-    c_echo("%RError: Missing dependencies%n, run: %B./scripts/composer_wrapper.php install --no-dev%n\n\n");
-}
+//if (!is_file($install_dir . '/vendor/autoload.php')) {
+//    c_echo("%RError: Missing dependencies%n, run: %B./scripts/composer_wrapper.php install --no-dev%n\n\n");
+//}
 require_once $install_dir . '/vendor/autoload.php';
 
 if (!function_exists('module_selected')) {

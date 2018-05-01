@@ -45,7 +45,7 @@ var syslog_grid = $("#syslog").bootgrid({
             from: "'.mres($vars['from']).'",
         };
     },
-    url: "ajax_table.php"
+    url: "ajax/table"
 });
 
 </script>

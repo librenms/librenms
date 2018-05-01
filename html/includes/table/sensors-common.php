@@ -148,11 +148,3 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
         );
     } //end if
 }//end foreach
-
-$output = array(
-    'current'  => $current,
-    'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $count,
-);
-echo _json_encode($output);

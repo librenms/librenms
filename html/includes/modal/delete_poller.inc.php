@@ -63,7 +63,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             var id = $("#id").val();
             $.ajax({
                 type: 'POST',
-                url: 'ajax_form.php',
+                url: 'ajax/form',
                 data: {type: "delete-poller", id: id},
                 success: function (result) {
                     if (result.status == 0) {

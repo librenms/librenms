@@ -61,11 +61,3 @@ foreach (dbFetchRows($sql, array()) as $device) {
         'last_polled_timetaken' => $device['last_polled_timetaken'],
     );
 }
-
-$output = array(
-    'current'  => $current,
-    'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
-);
-echo _json_encode($output);

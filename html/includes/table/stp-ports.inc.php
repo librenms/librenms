@@ -47,11 +47,3 @@ foreach (dbFetchRows($sql, array($device_id)) as $stp_ports_db) {
         'forwardTransitions' => $stp_ports_db['forwardTransitions']
     );
 }
-
-$output = array(
-    'current'  => $current,
-    'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
-);
-echo _json_encode($output);

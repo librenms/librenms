@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Authentication\Auth;
+include_once base_path('includes/billing.php');
 
 // Calculate filters
 $prev = !empty($vars['period']) && ($vars['period'] == 'prev');
@@ -169,6 +170,3 @@ foreach (dbFetchRows($sql, $param) as $bill) {
         'actions'       => $actions
     );
 }
-
-$output = array('current' => $current, 'rowCount' => $rowCount, 'rows' => $response, 'total' => $total);
-echo _json_encode($output);

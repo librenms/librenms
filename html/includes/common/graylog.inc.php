@@ -131,7 +131,7 @@ $tmp_output .= '
                 range: "' . (isset($_POST['range']) ? mres($_POST['range']) : '')  . '"
             };
         },
-        url: "ajax_table.php",
+        url: "ajax/table",
     });
 </script>
 

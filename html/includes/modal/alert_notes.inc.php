@@ -33,7 +33,7 @@
         var alert_id = $("#alert_id").val();
         $.ajax({
             type: "POST",
-            url: "ajax_form.php",
+            url: "ajax/form",
             data: { type: "alert-notes", alert_id: alert_id, sub_type: 'get_note'},
             dataType: "json",
             success: function (data) {
@@ -47,7 +47,7 @@
         var note = $("#note").val();
         $.ajax({
             type: "POST",
-            url: "ajax_form.php",
+            url: "ajax/form",
             data: { type: "alert-notes", alert_id: alert_id, sub_type: 'set_note', note: note},
             dataType: "json",
             success: function (data) {

@@ -1,8 +1,8 @@
 <?php
 /**
- * groups.inc.php
+ * Bill.php
  *
- * List groups
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,38 +23,24 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\Authentication\Auth;
+namespace App\Models;
 
-if (!Auth::user()->hasGlobalRead()) {
-    return [];
+class Bill extends BaseModel
+{
+    public $timestamps = false;
+    protected $primaryKey = 'bill_id';
+
+    // ---- Query scopes ----
+
+    public function scopeHasAccess($query, User $user)
+    {
+        return $this->hasBillAccess($query, $user);
+    }
+
+    // ---- Define Relationships ----
+
+    public function device()
+    {
+        return $this->belongsTo('App\Models\Device', 'device_id', 'device_id');
+    }
 }
-
-$query = '';
-$params = [];
-
-if (!empty($_REQUEST['search'])) {
-    $query .= ' WHERE `name` LIKE ?';
-    $params[] = '%' . mres($_REQUEST['search']) . '%';
-}
-
-
-$total = dbFetchCell("SELECT COUNT(*) FROM `device_groups` $query", $params);
-$more = false;
-
-if (!empty($_REQUEST['limit'])) {
-    $limit = (int) $_REQUEST['limit'];
-    $page = isset($_REQUEST['page']) ? (int) $_REQUEST['page'] : 1;
-    $offset = ($page - 1) * $limit;
-
-    $query .= " LIMIT $offset, $limit";
-} else {
-    $offset = 0;
-}
-
-
-$sql = "SELECT `id`, `name` AS `text` FROM `device_groups` $query";
-$groups = dbFetchRows($sql, $params);
-
-$more = ($offset + count($groups)) < $total;
-
-return [$groups, $more];

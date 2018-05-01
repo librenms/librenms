@@ -81,11 +81,3 @@ foreach (dbFetchRows($sql, $params) as $peer) {
         'links'          => "<a href='https://peeringdb.com/asn/{$peer['remote_asn']}' target='_blank'><i class='fa fa-database'></i></a>",
     );
 }
-
-$output = array(
-    'current'  => $current,
-    'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
-);
-echo _json_encode($output);

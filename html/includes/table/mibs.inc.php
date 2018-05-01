@@ -71,11 +71,3 @@ foreach (dbFetchRows($sql) as $mib) {
     }
     $response[] = $mibrow;
 }
-
-$output = array(
-    'current'  => $current,
-    'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
-);
-echo _json_encode($output);

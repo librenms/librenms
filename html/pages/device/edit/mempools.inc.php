@@ -40,7 +40,7 @@
                 device_id: <?php echo $device['device_id']; ?>,
             };
         },
-        url: "ajax_table.php",
+        url: "ajax/table",
         formatters: {
             "perc_update": function(column,row) {
                 return "<div class='form-group'><input type='text' class='form-control input-sm mempool' data-device_id='<?php echo $device['device_id']; ?>' data-mempool_id='"+row.mempool_id+"' value='"+row.mempool_perc_warn+"'></div>";
@@ -58,7 +58,7 @@
             var $this = $(this);
             $.ajax({
                 type: 'POST',
-                url: 'ajax_form.php',
+                url: 'ajax/form',
                 data: {type: "mempool-update", device_id: device_id, data: data, mempool_id: mempool_id},
                 dataType: "json",
                 success: function (data) {

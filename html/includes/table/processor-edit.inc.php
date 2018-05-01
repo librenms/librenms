@@ -43,6 +43,3 @@ foreach (dbFetchRows($sql, $param) as $drive) {
         'processor_perc' => $perc . "%",
         'processor_perc_warn' => $perc_warn);
 }
-
-$output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$total);
-echo _json_encode($output);

@@ -69,7 +69,7 @@ $sql .= " GROUP BY `device_id`, `port_id`, `mac_address`, `vlan`, `hostname`, `i
 $sql .= " `ifAdminStatus`, `ifDescr`, `ifOperStatus`, `ifInErrors`, `ifOutErrors`";
 
 // Get most likely endpoint port_id, used to add a visual marker for this element
-// in the list 
+// in the list
 if (isset($vars['searchby']) && !empty($vars['searchPhrase']) && $vars['searchby'] != 'vlan') {
     $countsql .= " ORDER BY `C`.`portCount` ASC LIMIT 1";
     foreach (dbFetchRows($select . $sql . $countsql, $param) as $entry) {
@@ -121,11 +121,3 @@ foreach (dbFetchRows($select . $sql, $param) as $entry) {
 
     unset($ignore);
 }//end foreach
-
-$output = array(
-    'current'  => $current,
-    'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
-);
-echo _json_encode($output);

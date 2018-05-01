@@ -74,11 +74,3 @@ foreach (dbFetchRows($sql, $param) as $port) {
         'ifSpeed'          => '<div class="form-group has-feedback"><input type="text" pattern="[0-9]*" inputmode="numeric" class="form-control input-sm" id="if-speed" name="if-speed" data-device_id="'.$port['device_id'].'" data-port_id="'.$port['port_id'].'" data-ifName="'.$port['ifName'].'" value="'.$port['ifSpeed'].'"><span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span></div>',
     );
 }//end foreach
-
-$output = array(
-    'current'  => $current,
-    'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
-);
-echo _json_encode($output);

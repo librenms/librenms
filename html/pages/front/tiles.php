@@ -261,7 +261,7 @@ if (strpos($dash_config, 'globe') !== false) {
         if (dashboard_id > 0) {
             $.ajax({
                 type: 'POST',
-                url: 'ajax_form.php',
+                url: 'ajax/form',
                 data: {
                     type: "update-dashboard-config",
                     data: s,
@@ -275,7 +275,8 @@ if (strpos($dash_config, 'globe') !== false) {
                         $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
                     }
                 },
-                error: function () {
+                error: function (data) {
+                    console.log(data);
                     $("#message").html('<div class="alert alert-info">An error occurred.</div>');
                 }
             });
@@ -352,7 +353,7 @@ if (strpos($dash_config, 'globe') !== false) {
             if (dashboard_id > 0) {
                 $.ajax({
                     type: 'POST',
-                    url: 'ajax_form.php',
+                    url: 'ajax/form',
                     data: {
                         type: "update-dashboard-config",
                         sub_type: 'remove-all',
@@ -380,7 +381,7 @@ if (strpos($dash_config, 'globe') !== false) {
             if (dashboard_id > 0) {
                 $.ajax({
                     type: 'POST',
-                    url: 'ajax_form.php',
+                    url: 'ajax/form',
                     data: {
                         type: "update-dashboard-config",
                         sub_type: 'add',
@@ -408,7 +409,7 @@ if (strpos($dash_config, 'globe') !== false) {
             var widget_id = $(this).data('widget-id');
             $.ajax({
                 type: 'POST',
-                url: 'ajax_form.php',
+                url: 'ajax/form',
                 data: {type: "update-dashboard-config", sub_type: 'remove', widget_id: widget_id, dashboard_id: dashboard_id},
                 dataType: "json",
                 success: function (data) {
@@ -458,7 +459,7 @@ if (strpos($dash_config, 'globe') !== false) {
     function dashboard_delete(data) {
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/form',
             data: {type: 'delete-dashboard', dashboard_id: $(data).data('dashboard')},
             dataType: "json",
             success: function (data) {
@@ -489,7 +490,7 @@ if (strpos($dash_config, 'globe') !== false) {
         if (dashboard_id > 0) {
             $.ajax({
                 type: 'POST',
-                url: 'ajax_form.php',
+                url: 'ajax/form',
                 data: {
                     type: 'edit-dashboard',
                     dashboard_name: data['dashboard_name'],
@@ -518,7 +519,7 @@ if (strpos($dash_config, 'globe') !== false) {
         }
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/form',
             data: {type: 'add-dashboard', dashboard_name: data['dashboard_name']},
             dataType: "json",
             success: function (data) {
@@ -578,7 +579,7 @@ if (strpos($dash_config, 'globe') !== false) {
         if( widget_id > 0 && widget_settings != {} ) {
             $.ajax({
                 type: 'POST',
-                url: 'ajax_form.php',
+                url: 'ajax/form',
                 data: {type: 'widget-settings', id: widget_id, settings: widget_settings},
                 dataType: "json",
                 success: function (data) {
@@ -605,7 +606,7 @@ if (strpos($dash_config, 'globe') !== false) {
         }
         $.ajax({
             type: 'POST',
-            url: 'ajax_dash.php',
+            url: 'ajax/dash',
             data: {type: data_type, id: id, dimensions: {x:$("#widget_body_"+id).innerWidth()-50, y:$("#widget_body_"+id).innerHeight()-50}, settings:settings},
             dataType: "json",
             success: function (data) {

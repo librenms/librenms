@@ -23,7 +23,7 @@ var grid = $("#port-fdb").bootgrid({
             port_id: "<?php echo $port['port_id']; ?>"
         };
     },
-    url: "ajax_table.php"
+    url: "ajax/table"
 });
 </script>
 

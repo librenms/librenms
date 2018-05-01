@@ -4,12 +4,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
@@ -184,7 +184,7 @@ function '.$unique_id.'() {
     datumTokenizer: Bloodhound.tokenizers.obj.whitespace("name"),
     queryTokenizer: Bloodhound.tokenizers.whitespace,
     remote: {
-      url: "ajax_search.php?search=%QUERY&type=device",
+      url: "ajax/search?search=%QUERY&type=device",
         filter: function (output) {
             return $.map(output, function (item) {
                 return {
@@ -225,7 +225,7 @@ function '.$unique_id.'() {
     datumTokenizer: Bloodhound.tokenizers.obj.whitespace("port_id"),
     queryTokenizer: Bloodhound.tokenizers.whitespace,
     remote: {
-      url: "ajax_search.php?search=%QUERY&type=ports",
+      url: "ajax/search?search=%QUERY&type=ports",
         filter: function (output) {
             return $.map(output, function (item) {
                 return {
@@ -262,7 +262,7 @@ function '.$unique_id.'() {
     datumTokenizer: Bloodhound.tokenizers.obj.whitespace("app_id"),
     queryTokenizer: Bloodhound.tokenizers.whitespace,
     remote: {
-      url: "ajax_search.php?search=%QUERY&type=applications",
+      url: "ajax/search?search=%QUERY&type=applications",
         filter: function (output) {
             return $.map(output, function (item) {
                 return {
@@ -298,7 +298,7 @@ function '.$unique_id.'() {
     datumTokenizer: Bloodhound.tokenizers.obj.whitespace("munin"),
     queryTokenizer: Bloodhound.tokenizers.whitespace,
     remote: {
-      url: "ajax_search.php?search=%QUERY&type=munin",
+      url: "ajax/search?search=%QUERY&type=munin",
         filter: function (output) {
             return $.map(output, function (item) {
                 return {
@@ -336,7 +336,7 @@ function '.$unique_id.'() {
     datumTokenizer: Bloodhound.tokenizers.obj.whitespace("munin"),
     queryTokenizer: Bloodhound.tokenizers.whitespace,
     remote: {
-      url: "ajax_search.php?search=%QUERY&type=bill",
+      url: "ajax/search?search=%QUERY&type=bill",
         filter: function (output) {
             return $.map(output, function (item) {
                 return {

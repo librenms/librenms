@@ -238,7 +238,7 @@ if ($updated && $update_message) {
         var device_id = $(this).data("device_id");
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/form',
             data: { type: "rediscover-device", device_id: device_id },
             dataType: "json",
             success: function(data){

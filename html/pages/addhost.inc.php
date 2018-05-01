@@ -323,7 +323,7 @@ if ($config['distributed_poller'] === true) {
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('text'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         remote: {
-            url: "ajax_ossuggest.php?term=%QUERY",
+            url: "ajax/ossuggest?term=%QUERY",
             filter: function (output) {
                 return $.map(output, function (item) {
                     return {

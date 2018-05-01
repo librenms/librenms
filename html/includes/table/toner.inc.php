@@ -96,11 +96,3 @@ foreach (dbFetchRows($sql, $param) as $toner) {
         }
     }
 }
-
-$output = array(
-    'current'  => $current,
-    'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $count,
-);
-echo _json_encode($output);

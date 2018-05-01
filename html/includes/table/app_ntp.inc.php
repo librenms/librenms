@@ -98,11 +98,3 @@ foreach ($components as $devid => $comp) {
 if ($count == 0) {
     $response = array();
 }
-
-$output = array(
-    'current'  => $current,
-    'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $count,
-);
-echo _json_encode($output);

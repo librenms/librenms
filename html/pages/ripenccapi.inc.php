@@ -39,7 +39,7 @@ $pagetitle[] = 'RIPE NCC - API Tools';
         var query_param = $("#input-parameter").val();
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/form',
             data: {
                 type: "query-ripenccapi",
                 data_param: data_param,

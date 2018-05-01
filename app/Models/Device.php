@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use LibreNMS\Util\IP;
+
 class Device extends BaseModel
 {
     public $timestamps = false;
@@ -24,6 +26,21 @@ class Device extends BaseModel
     }
 
     // ---- Helper Functions ----
+
+    /**
+     * Get the display name of this device (hostname) unless force_ip_to_sysname is set
+     * and hostname is an IP and sysName is set
+     *
+     * @return string
+     */
+    public function displayName()
+    {
+        if (\LibreNMS\Config::get('force_ip_to_sysname') && $this->sysName && IP::isValid($this->hostname)) {
+            return $this->sysName;
+        }
+
+        return $this->hostname;
+    }
 
     /**
      * @return string
@@ -155,9 +172,14 @@ class Device extends BaseModel
         return $this->hasMany('App\Models\Application', 'device_id');
     }
 
-    public function bgppeers()
+    public function bgpPeers()
     {
         return $this->hasMany('App\Models\BgpPeer', 'device_id');
+    }
+
+    public function bills()
+    {
+        return $this->hasMany('App\Models\Bill', 'device_id');
     }
 
     public function cefSwitching()
@@ -172,12 +194,17 @@ class Device extends BaseModel
 
     public function eventlogs()
     {
-        return $this->hasMany('App\Models\General\Eventlog', 'host', 'device_id');
+        return $this->hasMany('App\Models\Eventlog', 'device_id', 'device_id');
     }
 
     public function groups()
     {
         return $this->belongsToMany('App\Models\DeviceGroup', 'device_group_device', 'device_id', 'device_group_id');
+    }
+
+    public function muninPlugins()
+    {
+        return $this->hasMany('App\Models\MuninPlugin', 'device_id');
     }
 
     public function ospfInstances()

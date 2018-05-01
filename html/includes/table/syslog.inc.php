@@ -92,11 +92,3 @@ foreach (dbFetchRows($sql, $param) as $syslog) {
         'priority'   => generate_priority_status($syslog['priority']),
     );
 }
-
-$output = array(
-    'current'  => $current,
-    'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
-);
-echo _json_encode($output);

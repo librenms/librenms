@@ -58,11 +58,3 @@ foreach ($COMPONENTS[$device_id] as $ID => $AVP) {
         'ignore' => '<input type="checkbox" class="ignore-check" name="ign_'.$ID.'"'.($AVP['ignore'] ? 'checked' : '').'>',
     );
 }//end foreach
-
-$output = array(
-    'current'  => $current,
-    'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => count($COMPONENTS[$device_id]),
-);
-echo _json_encode($output);

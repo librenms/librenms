@@ -183,7 +183,7 @@ echo('
     var device_id = $(this).data("device_id");
     $.ajax({
       type: 'POST',
-      url: 'ajax_form.php',
+      url: 'ajax/form',
       data: { type: "poller-module-update", poller_module: poller_module, device_id: device_id, state: state},
       dataType: "html",
       success: function(data){
@@ -214,7 +214,7 @@ echo('
     var device_id = $(this).data("device_id");
     $.ajax({
       type: 'POST',
-      url: 'ajax_form.php',
+      url: 'ajax/form',
       data: { type: "discovery-module-update", discovery_module: discovery_module, device_id: device_id, state: state},
       dataType: "html",
       success: function(data){

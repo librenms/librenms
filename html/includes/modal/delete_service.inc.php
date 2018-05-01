@@ -51,7 +51,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             var service_id = $("#service_id").val();
             $.ajax({
                 type: 'POST',
-                url: 'ajax_form.php',
+                url: 'ajax/form',
                 data: {type: "delete-service", service_id: service_id},
                 success: function (result) {
                     if (result.status == 0) {

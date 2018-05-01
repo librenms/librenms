@@ -14,10 +14,11 @@
 
 use LibreNMS\Authentication\Auth;
 
-if (isset($widget_settings['mode_select']) && $widget_settings['mode_select'] !== '') {
+if ($directpage == "yes") {
+    $mode = get_user_pref('availability_map_view', 0);
+    $selected_group = get_user_pref('availability_map_group', 0);
+} elseif (isset($widget_settings['mode_select']) && $widget_settings['mode_select'] !== '') {
     $mode = $widget_settings['mode_select'];
-} elseif (isset($_SESSION["map_view"]) && is_numeric($_SESSION["map_view"])) {
-    $mode = $_SESSION["map_view"];
 } else {
     $mode = 0;
 }
@@ -168,7 +169,7 @@ if (defined('SHOW_SETTINGS')) {
         // Only show devices if mode is 0 or 2 (Only Devices or both)
         if ($config['webui']['availability_map_use_device_groups'] != 0) {
             $device_group = 'SELECT `D`.`device_id` FROM `device_group_device` AS `D` WHERE `device_group_id` = ?';
-            $param = array($_SESSION['group_view']);
+            $param = [$selected_group];
             $devices = dbFetchRows($device_group, $param);
             foreach ($devices as $in_dev) {
                 $in_devices[] = $in_dev['device_id'];
@@ -320,9 +321,11 @@ if (defined('SHOW_SETTINGS')) {
 
     if ($directpage == "yes") {
         $temp_header[] = '
-        <div class="page-availability-title-left">
-            <span class="page-availability-title">Availability map for</span>
-            <select id="mode" class="page-availability-report-select" name="mode">';
+        <div class="row">
+        <div class="col-md-8">
+        <span class="form-inline">
+            <label for="mode"><strong>Availability map for</strong></label>
+            <select id="mode" class="form-control" name="mode">';
 
         if ($config['show_services'] == 0) {
             $temp_header[] = '<option value="0" selected>only devices</option>';
@@ -336,37 +339,26 @@ if (defined('SHOW_SETTINGS')) {
                 $temp_header[] = '<option value="' . $mode_select . '" ' . $selected . '>' . $option . '</option>';
             }
         }
-
-        $temp_header[] =
-            '</select>
-        </div>
-        <div class="page-availability-title-right">';
+        $temp_header[] = '</select></span>';
 
         if (($config['webui']['availability_map_use_device_groups'] != 0) && ($mode == 0 || $mode == 2)) {
-            $sql = 'SELECT `G`.`id`, `G`.`name` FROM `device_groups` AS `G`';
-            $dev_groups = dbFetchRows($sql);
-
-            if ($_SESSION['group_view'] == 0) {
-                $selected = 'selected';
-            } else {
-                $selected = '';
-            }
+            $dev_groups = dbFetchRows('SELECT `G`.`id`, `G`.`name` FROM `device_groups` AS `G`');
 
             $temp_header[] = '
-            <span class="page-availability-title">Device group</span>
-            <select id="group" class="page-availability-report-select" name="group">
-                <option value="0" ' . $selected . '>show all devices</option>';
+            <span class="form-inline">
+            <label for="mode"><strong>Device group</strong></label>
+            <select id="group" class="form-control" name="group">
+                <option value="0" ' . ($selected_group == 0 ? 'selected' : '') . '>show all devices</option>';
 
             foreach ($dev_groups as $dev_group) {
-                if ($_SESSION['group_view'] == $dev_group['id']) {
-                    $selected = 'selected';
-                } else {
-                    $selected = '';
-                }
-                $temp_header[] = '<option value="' . $dev_group['id'] . '" ' . $selected . '>' . $dev_group['name'] . '</option>';
+                $temp_header[] = '<option value="' . $dev_group['id'] . '" ' . ($selected_group == $dev_group['id'] ? 'selected' : '') . '>' . $dev_group['name'] . '</option>';
             }
-            $temp_header[] = '</select>';
+            $temp_header[] = '</select></span>';
         }
+
+        $temp_header[] =
+            '</div>
+        <div class="col-md-4">';
     }
 
     if ($directpage == "yes") {
@@ -404,7 +396,7 @@ if (defined('SHOW_SETTINGS')) {
             </div>';
     }
 
-    $temp_header[] = '</div>';
+    $temp_header[] = '</div></div>';
     $temp_header[] = '<br style="clear:both;">';
 
     $common_output = array_merge($temp_header, $temp_output);

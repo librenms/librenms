@@ -446,7 +446,7 @@ if ($format == "graph") {
                     group: '<?php echo mres($vars['group']); ?>',
                 };
             },
-            url: "ajax_table.php"
+            url: "ajax/table"
         });
 
         <?php

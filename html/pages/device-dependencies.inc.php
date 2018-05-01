@@ -55,7 +55,7 @@ var grid = $("#hostdeps").bootgrid({
             format: "mainpage"
         };
     },
-    url: "ajax_form.php",
+    url: "ajax/form",
     templates: {
         header: '<div id="{{ctx.id}}" class="{{css.header}}"> \
                     <div class="row"> \
@@ -149,7 +149,7 @@ $(document).ready(function() {
 
     $.ajax({
         type: "POST",
-        url: 'ajax_form.php',
+        url: 'ajax/form',
         data: {type: 'get-host-dependencies', "viewtype": 'fulllist' },
         dataType: "json",
         success: function(output) {

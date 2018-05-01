@@ -201,12 +201,3 @@ foreach (dbFetchRows($query, $param) as $port) {
         'actions' => $actions,
     );
 }
-
-$output = array(
-    'current' => $current,
-    'rowCount' => $rowCount,
-    'rows' => $response,
-    'total' => $total,
-);
-
-echo _json_encode($output);

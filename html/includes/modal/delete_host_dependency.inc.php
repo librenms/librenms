@@ -52,7 +52,7 @@ $('#hostdep-removal').click('', function(event) {
     $("#modal_hostname").text();
     $.ajax({
         type: 'POST',
-        url: 'ajax_form.php',
+        url: 'ajax/form',
         data: { type: "delete-host-dependency", device_id: device_id },
         dataType: "json",
         success: function(output) {

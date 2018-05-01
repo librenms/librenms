@@ -16,6 +16,7 @@
 use LibreNMS\Authentication\Auth;
 
 $where = '1';
+$param = [];
 
 if (is_numeric($vars['device'])) {
     $where .= ' AND E.host = ?';
@@ -88,11 +89,3 @@ foreach (dbFetchRows($sql, $param) as $eventlog) {
         'username' => $eventlog['username'],
     );
 }
-
-$output = array(
-    'current' => $current,
-    'rowCount' => $rowCount,
-    'rows' => $response,
-    'total' => $total,
-);
-echo _json_encode($output);

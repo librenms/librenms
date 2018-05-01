@@ -99,12 +99,4 @@ if (isset($vars['device_id'])) {
             'neOpState'  => $opstate,
         );
     }
-
-    $output = array(
-        'current'  => $current,
-        'rowCount' => $rowCount,
-        'rows'     => $response,
-        'total'    => $total,
-    );
-    echo _json_encode($output);
 }

@@ -60,7 +60,7 @@ $(function() {
     datumTokenizer: Bloodhound.tokenizers.obj.whitespace("name"),
     queryTokenizer: Bloodhound.tokenizers.whitespace,
     remote: {
-      url: "ajax_search.php?search=%QUERY&type=iftype",
+      url: "ajax/search?search=%QUERY&type=iftype",
         filter: function (output) {
             return $.map(output, function (item) {
                 return {

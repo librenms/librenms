@@ -121,7 +121,7 @@ $('#create-group').on('show.bs.modal', function (event) {
     if (group_id > 0) {
         $.ajax({
             type: "POST",
-            url: "ajax_form.php",
+            url: "ajax/form",
             data: {type: "parse-device-group", group_id: group_id},
             dataType: "json",
             success: function (output) {
@@ -141,7 +141,7 @@ var suggestions = new Bloodhound({
   datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
   queryTokenizer: Bloodhound.tokenizers.whitespace,
   remote: {
-      url: "ajax_rulesuggest.php?device_id=-1&term=%QUERY",
+      url: "ajax/rulesuggest?term=%QUERY",
         filter: function (output) {
             return $.map(output, function (item) {
                 return {
@@ -197,7 +197,7 @@ $('#group-submit').click('', function(e) {
     e.preventDefault();
     $.ajax({
         type: "POST",
-        url: "ajax_form.php",
+        url: "ajax/form",
         data: $('form.group-form').serialize(),
         success: function(msg){
             if(msg.indexOf("ERROR:") <= -1) {

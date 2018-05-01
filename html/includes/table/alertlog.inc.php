@@ -93,11 +93,3 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
         'status' => "<i class='alert-status " . $status . "'></i>"
     );
 }//end foreach
-
-$output = array(
-    'current' => $current,
-    'rowCount' => $rowCount,
-    'rows' => $response,
-    'total' => $total,
-);
-echo _json_encode($output);

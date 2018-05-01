@@ -48,7 +48,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                     </div>
                     <div class="form-group">
                         <label for="recurring" class="col-sm-4 control-label">Recurring <strong class="text-danger">*</strong>: </label>
-                        <div class="col-sm-8"> 
+                        <div class="col-sm-8">
                             <label class="radio-inline">
                                 <input type="radio" id="recurring0" name="recurring" value="0" checked="checked"/> No
                             </label>
@@ -164,7 +164,7 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
     if (schedule_id > 0) {
         $.ajax({
             type: "POST",
-            url: "ajax_form.php",
+            url: "ajax/form",
             data: { type: "schedule-maintenance", sub_type: "parse-maintenance", schedule_id: schedule_id },
             dataType: "json",
             success: function(output) {
@@ -177,11 +177,11 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
                 $('#notes').val(output['notes']);
                 if (output['recurring'] == 0){
                     $('#start').val(output['start']);
-                    $('#end').val(output['end']);                    
+                    $('#end').val(output['end']);
 
                     $('#norecurringgroup').show();
                     $('#recurringgroup').hide();
-                    
+
                     $('#start_recurring_dt').val('');
                     $('#end_recurring_dt').val('');
                     $('#start_recurring_hr').val('');
@@ -189,13 +189,13 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
                     $("#recurring0").prop("checked", true);
                     $('#recurring_day').prop('checked', false);
                 }else{
-                    
+
                     $('#start_recurring_dt').val(output['start_recurring_dt']);
                     $('#end_recurring_dt').val(output['end_recurring_dt']);
                     $('#start_recurring_hr').val(output['start_recurring_hr']);
                     $('#end_recurring_hr').val(output['end_recurring_hr']);
                     $("#recurring1").prop("checked", true);
-                    
+
                     var recdayupd = output['recurring_day'];
                     if (recdayupd != ''){
                         var arrayrecdayupd = recdayupd.split(',');
@@ -203,12 +203,12 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
                             $("input[name='recurring_day[]'][value="+checkedday+"]").prop('checked', true);
                         });
                     }else{
-                        $('#recurring_day').prop('checked', false);                        
+                        $('#recurring_day').prop('checked', false);
                     }
-                    
+
                     $('#norecurringgroup').hide();
                     $('#recurringgroup').show();
-                    
+
                     $('#start').val('');
                     $('#end').val('');
                 }
@@ -219,7 +219,7 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
 });
 
 $('#sched-form input[name=recurring]').on('change', function() {
-    var isrecurring = $('input[name=recurring]:checked', '#sched-form').val(); 
+    var isrecurring = $('input[name=recurring]:checked', '#sched-form').val();
     if (isrecurring == 1){
         $('#norecurringgroup').hide();
         $('#recurringgroup').show();
@@ -234,7 +234,7 @@ $('#sched-submit').click('', function(e) {
     e.preventDefault();
     $.ajax({
         type: "POST",
-        url: "ajax_form.php",
+        url: "ajax/form",
         data: $('form.schedule-maintenance-form').serialize(),
         dataType: "json",
         success: function(data){
@@ -263,7 +263,7 @@ var map_devices = new Bloodhound({
   datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
   queryTokenizer: Bloodhound.tokenizers.whitespace,
   remote: {
-      url: "ajax_search.php?search=%QUERY&type=device&map=1",
+      url: "ajax/search?search=%QUERY&type=device&map=1",
         filter: function (output) {
             return $.map(output, function (item) {
                 return {
@@ -278,7 +278,7 @@ var map_groups = new Bloodhound({
   datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
   queryTokenizer: Bloodhound.tokenizers.whitespace,
   remote: {
-      url: "ajax_search.php?search=%QUERY&type=group&map=1",
+      url: "ajax/search?search=%QUERY&type=group&map=1",
         filter: function (output) {
             return $.map(output, function (item) {
                 return {

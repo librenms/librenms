@@ -386,7 +386,7 @@
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         remote: {
-            url: "ajax_search.php?search=%QUERY&type=device",
+            url: "ajax/search?search=%QUERY&type=device",
             filter: function (devices) {
                 return $.map(devices, function (device) {
                     return {
@@ -409,7 +409,7 @@
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         remote: {
-            url: "ajax_search.php?search=%QUERY&type=ports",
+            url: "ajax/search?search=%QUERY&type=ports",
             filter: function (ports) {
                 return $.map(ports, function (port) {
                     return {
@@ -429,7 +429,7 @@
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         remote: {
-            url: "ajax_search.php?search=%QUERY&type=bgp",
+            url: "ajax/search?search=%QUERY&type=bgp",
             filter: function (bgp_sessions) {
                 return $.map(bgp_sessions, function (bgp) {
                     return {

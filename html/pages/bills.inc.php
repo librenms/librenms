@@ -182,7 +182,7 @@ include 'includes/modal/new_bill.inc.php';
                period: $('select#period').val()
            };
        },
-       url: "ajax_table.php"
+       url: "ajax/table"
     }).on("loaded.rs.jquery.bootgrid", function() {
     });
     $('#table-filters select').on('change', function() { grid.bootgrid('reload'); });

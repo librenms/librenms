@@ -52,7 +52,7 @@ $('#device-group-removal').click('', function(event) {
     var group_id = $("#group_id").val();
     $.ajax({
         type: 'POST',
-        url: 'ajax_form.php',
+        url: 'ajax/form',
         data: { type: "delete-device-group", group_id: group_id },
         dataType: "html",
         success: function(msg) {

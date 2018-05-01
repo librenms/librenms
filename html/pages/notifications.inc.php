@@ -205,7 +205,7 @@ $(function() {
     }
     $.ajax({
       type: 'POST',
-      url: 'ajax_form.php',
+      url: 'ajax/form',
       data: {type: 'notifications', title: notif.notif_title, body: notif.notif_body, action: 'create'},
       dataType: "json",
       success: function (data) {
@@ -226,7 +226,7 @@ $(function() {
     var notif = $(this).parent().parent().attr('id');
     $.ajax({
       type: 'POST',
-      url: 'ajax_form.php',
+      url: 'ajax/form',
       data: {type: 'notifications', notification_id: notif, action: 'read'},
       dataType: "json",
       success: function (data) {
@@ -256,7 +256,7 @@ $(function() {
     $(this).attr("disabled", true);
     $.ajax({
       type: 'POST',
-      url: 'ajax_form.php',
+      url: 'ajax/form',
       data: {type: 'notifications', action: 'read-all-notif'},
       dataType: "json",
       success: function (data) {
@@ -274,7 +274,7 @@ $(function() {
     var notif = $(this).parent().parent().attr('id');
     $.ajax({
       type: 'POST',
-      url: 'ajax_form.php',
+      url: 'ajax/form',
       data: {type: 'notifications', notification_id: notif, action: 'stick'},
       dataType: "json",
       success: function (data) {
@@ -293,7 +293,7 @@ $(function() {
     var notif = $(this).parent().parent().attr('id');
     $.ajax({
       type: 'POST',
-      url: 'ajax_form.php',
+      url: 'ajax/form',
       data: {type: 'notifications', notification_id: notif, action: 'unstick'},
       dataType: "json",
       success: function (data) {

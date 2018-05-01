@@ -41,11 +41,3 @@ foreach (dbFetchRows($sql) as $asn) {
         'action' => "<a class='btn btn-sm btn-primary' href='" . generate_url(array('page' => 'peering', 'section' => 'ix-list', 'asn' => $asn['bgpLocalAs'])) . "' role='button'>Show connectd IXes</a>",
     );
 }
-
-$output = array(
-    'current'  => $current,
-    'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
-);
-echo _json_encode($output);

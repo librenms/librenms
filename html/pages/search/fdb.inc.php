@@ -102,7 +102,7 @@ echo '"'.$_POST['searchPhrase'].'"+';
             searchPhrase: '<?php echo mres($_POST['searchPhrase']); ?>'
         };
     },
-    url: "ajax_table.php"
+    url: "ajax/table"
 });
 
 </script>

@@ -38,7 +38,7 @@ var grid = $("#poll-log").bootgrid({
             type: "<?php echo $type;?>"
         };
     },
-    url: "ajax_table.php"
+    url: "ajax/table"
 });
 
 </script>

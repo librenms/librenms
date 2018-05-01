@@ -235,7 +235,7 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
             device_id: \'' . $device['device_id'] . '\'
         }
     },
-    url: "ajax_table.php",
+    url: "ajax/table",
     rowCount: [50, 100, 250, -1],
 
 }).on("loaded.rs.jquery.bootgrid", function() {
@@ -268,7 +268,7 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
             var state = $(this).data("state");
             $.ajax({
                 type: "POST",
-                url: "ajax_form.php",
+                url: "ajax/form",
                 dataType: "json",
                 data: { type: "ack-alert", alert_id: alert_id, state: state, ack_msg: ack_msg },
                 success: function (data) {

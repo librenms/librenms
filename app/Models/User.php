@@ -16,6 +16,17 @@ class User extends Authenticatable
     // ---- Helper Functions ----
 
     /**
+     * Test if this user has global admin access
+     * these users have a level of 10 or 11 (demo).
+     *
+     * @return boolean
+     */
+    public function hasGlobalAdmin()
+    {
+        return $this->level >= 10;
+    }
+
+    /**
      * Test if this user has global read access
      * these users have a level of 5, 10 or 11 (demo).
      *
@@ -23,17 +34,17 @@ class User extends Authenticatable
      */
     public function hasGlobalRead()
     {
-        return $this->isAdmin() || $this->level == 5;
+        return $this->hasGlobalAdmin() || $this->level == 5;
     }
 
     /**
-     * Test if the User is an admin or demo.
+     * Test if the User is an admin (but not demo user)
      *
      * @return boolean
      */
     public function isAdmin()
     {
-        return $this->level >= 10;
+        return $this->level == 10;
     }
 
     /**
@@ -73,6 +84,11 @@ class User extends Authenticatable
     public function dashboards()
     {
         return $this->hasMany('App\Models\Dashboard', 'user_id');
+    }
+
+    public function preferences()
+    {
+        return $this->hasMany('App\Models\UserPref', 'user_id');
     }
 
     public function widgets()

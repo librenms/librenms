@@ -59,6 +59,12 @@
         "ext-posix": "Allows for additional validation tests"
     },
     "autoload": {
+        "files": [
+            "includes/common.php",
+            "includes/functions.php",
+            "html/includes/functions.inc.php",
+            "includes/rewrites.php"
+        ],
         "psr-4": {
             "App\\": "app",
             "LibreNMS\\": "LibreNMS",

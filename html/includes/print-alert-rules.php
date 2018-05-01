@@ -244,7 +244,7 @@ $('#ack-alert').click('', function(e) {
     var alert_id = $(this).data("alert_id");
     $.ajax({
         type: "POST",
-            url: "ajax_form.php",
+            url: "ajax/form",
             data: { type: "ack-alert", alert_id: alert_id },
             success: function(msg){
                 $("#message").html('<div class="alert alert-info">'+msg+'</div>');
@@ -270,7 +270,7 @@ $('input[name="alert-rule"]').on('switchChange.bootstrapSwitch',  function(event
     var orig_class = $(this).data("orig_class");
     $.ajax({
         type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/form',
             data: { type: "update-alert-rule", alert_id: alert_id, state: state },
             dataType: "html",
             success: function(msg) {

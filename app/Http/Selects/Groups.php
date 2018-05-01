@@ -1,8 +1,8 @@
 <?php
 /**
- * devices_groups.inc.php
+ * Groups.php
  *
- * List devices and groups in one
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,17 +23,22 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-list($devices, $d_more) = include 'devices.inc.php';
-list($groups, $g_more) = include 'groups.inc.php';
+namespace App\Http\Selects;
 
-$groups = array_map(function ($group) {
-    $group['id'] = 'g' . $group['id'];
-    return $group;
-}, $groups);
+use App\Models\DeviceGroup;
 
-$data = [
-    ['text' => 'Devices', 'children' => $devices],
-    ['text' => 'Groups', 'children' => $groups]
-];
+class Groups extends BaseSelect
+{
+    protected $searchFields = ['name'];
+    protected $selectFields = ['id', 'name as text'];
 
-return [$data, $d_more || $g_more];
+    /**
+     * Get the base query for this object
+     *
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
+     */
+    protected function baseQuery()
+    {
+        return DeviceGroup::hasAccess($this->request->user());
+    }
+}

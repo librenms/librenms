@@ -11,7 +11,7 @@ function getInterfaceList(sel)
                 var index = ajax.length;
                 ajax[index] = new sack();
 
-                ajax[index].requestFile = 'ajax_listports.php?device_id='+deviceId;    // Specifying which file to get
+                ajax[index].requestFile = 'ajax/listports?device_id='+deviceId;    // Specifying which file to get
                 ajax[index].onCompletion = function() { createInterfaces(index) };       // Specify function that will be executed after file has been found
                 ajax[index].runAJAX();          // Execute AJAX function
         }
@@ -20,6 +20,7 @@ function getInterfaceList(sel)
 function createInterfaces(index)
 {
         var obj = document.getElementById('port_id');
+        console.log(ajax[index].response);
         eval(ajax[index].response);     // Executing the response from Ajax as Javascript code
 }
 

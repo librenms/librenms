@@ -54,7 +54,7 @@ echo '</ul>';
         var device_id = $this.data("device_id");
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/form',
             data: {type: "application-update", application: application, device_id: device_id, state: state},
             success: function(result){
                 if (result.status == 0) {

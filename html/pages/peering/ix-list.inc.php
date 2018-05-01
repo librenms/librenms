@@ -52,6 +52,6 @@ $asn = $vars['asn'];
                 asn:         '<?php echo $asn; ?>',
             };
         },
-        url: "ajax_table.php"
+        url: "ajax/table"
     });
 </script>

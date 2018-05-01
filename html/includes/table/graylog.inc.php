@@ -94,6 +94,3 @@ if (empty($messages['total_results'])) {
 } else {
     $total = $messages['total_results'];
 }
-
-$output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$total);
-echo _json_encode($output);

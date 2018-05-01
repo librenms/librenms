@@ -32,7 +32,6 @@ use Settings;
 class DeviceGroup extends BaseModel
 {
     public $timestamps = false;
-    protected $appends = ['patternSql'];
     protected $fillable = ['name', 'desc', 'pattern', 'params'];
     protected $casts = ['params' => 'array'];
 

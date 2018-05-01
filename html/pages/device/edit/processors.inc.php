@@ -40,7 +40,7 @@
                 device_id: <?php echo $device['device_id']; ?>,
             };
         },
-        url: "ajax_table.php",
+        url: "ajax/table",
         formatters: {
             "perc_update": function(column,row) {
                 return "<div class='form-group'><input type='text' class='form-control input-sm processor' data-device_id='<?php echo $device['device_id']; ?>' data-processor_id='"+row.processor_id+"' value='"+row.processor_perc_warn+"'></div>";
@@ -58,7 +58,7 @@
             var $this = $(this);
             $.ajax({
                 type: 'POST',
-                url: 'ajax_form.php',
+                url: 'ajax/form',
                 data: {type: "processor-update", device_id: device_id, data: data, processor_id: processor_id},
                 dataType: "json",
                 success: function (data) {

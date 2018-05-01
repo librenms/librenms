@@ -58,9 +58,9 @@ class Auth
     {
         return new UserProxy;
     }
-    
+
     public static function id()
     {
-        return $_SESSION['user_id'];
+        return isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
     }
 }

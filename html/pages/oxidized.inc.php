@@ -68,7 +68,7 @@ $pagetitle[] = 'Oxidized';
         var search_in_conf_textbox = $("#input-parameter").val();
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/form',
             data: {
                 type: "search-oxidized-config",
                 search_in_conf_textbox: search_in_conf_textbox
@@ -91,7 +91,7 @@ $pagetitle[] = 'Oxidized';
     $("[name='btn-reload-nodes']").on('click', function (event) {
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/form',
             data: { type: "reload-oxidized-nodes-list" },
             dataType: "json",
             success: function (data) {

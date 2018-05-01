@@ -35,7 +35,7 @@
         var ifName = $this.data('ifname');
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/form',
             data: {type: "update-ifalias", descr: descr, ifName: ifName, port_id: port_id, device_id: device_id},
             dataType: "json",
             success: function (data) {
@@ -76,7 +76,7 @@
         var ifName = $this.data('ifname');
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/form',
             data: {type: "update-ifspeed", speed: speed, ifName: ifName, port_id: port_id, device_id: device_id},
             dataType: "json",
             success: function (data) {
@@ -168,7 +168,7 @@
                 event.preventDefault();
                 $.ajax({
                     type: "POST",
-                    url: "ajax_form.php",
+                    url: "ajax/form",
                     data: $('form#ignoreport').serialize(),
                     dataType: "json",
                     success: function(data){
@@ -198,7 +198,7 @@
                 device_id: "<?php echo $device['device_id']; ?>"
             };
         },
-        url: "ajax_table.php"
+        url: "ajax/table"
     }).on("loaded.rs.jquery.bootgrid", function() {
         $("[name='override_config']").bootstrapSwitch('offColor','danger');
         $('input[name="override_config"]').on('switchChange.bootstrapSwitch',  function(event, state) {

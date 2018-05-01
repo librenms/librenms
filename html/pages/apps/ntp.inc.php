@@ -101,6 +101,6 @@ print_optionbar_end();
                 graph: '<?php echo $vars['graph']; ?>',
             };
         },
-        url: "ajax_table.php",
+        url: "ajax/table",
     });
 </script>

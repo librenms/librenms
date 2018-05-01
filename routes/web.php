@@ -30,8 +30,17 @@ Route::get('/laravel', function () {
     return view('laravel');
 });
 
-Route::post('/ajax/set_resolution', 'AjaxController@setResolution');
-
+Route::group(['prefix' => 'ajax'], function () {
+    Route::post('set_resolution', 'AjaxController@setResolution');
+    Route::post('dash', 'AjaxController@dash');
+    Route::post('table', 'AjaxController@table');
+    Route::post('form', 'AjaxController@form');
+    Route::get('select', 'AjaxController@select');
+    Route::post('listports', 'AjaxController@listPorts');
+    Route::get('ossuggest', 'AjaxController@osSuggest');
+    Route::get('rulesuggest', 'AjaxController@ruleSuggest');
+    Route::get('search', 'AjaxController@search');
+});
 
 // Debugbar routes need to be here because of catch-all
 if (config('app.env') !== 'production' && config('app.debug')) {

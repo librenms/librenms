@@ -198,11 +198,3 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         'notes' => "<button type='button' class='btn btn-$note_class fa fa-sticky-note-o command-alert-note' aria-label='Notes' id='alert-notes' data-alert_id='{$alert['id']}'></button>",
     );
 }
-
-$output = array(
-    'current' => $current,
-    'rowCount' => $rowCount,
-    'rows' => $response,
-    'total' => $total,
-);
-echo _json_encode($output);

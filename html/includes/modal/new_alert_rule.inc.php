@@ -189,7 +189,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $('#builder_json').val(JSON.stringify(result_json));
                 $.ajax({
                     type: "POST",
-                    url: "ajax_form.php",
+                    url: "ajax/form",
                     data: $('form.alerts-form').serializeArray(),
                     dataType: "json",
                     success: function (data) {
@@ -250,7 +250,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             if (rule_id >= 0) {
                 $.ajax({
                     type: "POST",
-                    url: "ajax_form.php",
+                    url: "ajax/form",
                     data: { type: "parse-alert-rule", alert_id: rule_id },
                     dataType: "json",
                     success: function (data) {
@@ -344,11 +344,11 @@ if (Auth::user()->hasGlobalAdmin()) {
             width: '100%',
             placeholder: "Devices or Groups",
             ajax: {
-                url: 'ajax_list.php',
+                url: 'ajax/select',
                 delay: 250,
                 data: function (params) {
                     return {
-                        type: 'devices_groups',
+                        type: 'devices-groups',
                         search: params.term
                     };
                 }

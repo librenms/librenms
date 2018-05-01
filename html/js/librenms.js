@@ -5,7 +5,7 @@ function override_config(event, state, tmp_this) {
     var device_id = $this.data('device_id');
     $.ajax({
         type: 'POST',
-        url: 'ajax_form.php',
+        url: 'ajax/form',
         data: { type: 'override-config', device_id: device_id, attrib: attrib, state: state },
         dataType: 'json',
         success: function(data) {
@@ -40,7 +40,7 @@ $(document).ready(function() {
         var value = $this.val();
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/form',
             data: { type: 'override-config', device_id: device_id, attrib: attrib, state: value },
             dataType: 'json',
             success: function(data) {
@@ -65,7 +65,7 @@ $(document).ready(function() {
         var config_id = $this.data("config_id");
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/form',
             data: {type: "update-config-item", config_id: config_id, config_value: state},
             dataType: "json",
             success: function (data) {
@@ -90,7 +90,7 @@ $(document).ready(function() {
         if ($this[0].checkValidity()) {
             $.ajax({
                 type: 'POST',
-                url: 'ajax_form.php',
+                url: 'ajax/form',
                 data: {type: "update-config-item", config_id: config_id, config_value: config_value},
                 dataType: "json",
                 success: function (data) {
@@ -115,7 +115,7 @@ $(document).ready(function() {
         var config_value = $this.val();
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/form',
             data: {type: "update-config-item", config_id: config_id, config_value: config_value},
             dataType: "json",
             success: function (data) {
@@ -228,8 +228,9 @@ $(document).on("click", '.collapse-neighbors', function(event)
 
 //availability-map mode change
 $(document).on("change", '#mode', function() {
-    $.post('ajax_mapview.php',
+    $.post('ajax/form',
         {
+            type: 'availability-map-mode',
             map_view: $(this).val()
         },
         function(data) {
@@ -240,8 +241,9 @@ $(document).on("change", '#mode', function() {
 
 //availability-map device group
 $(document).on("change", '#group', function() {
-    $.post('ajax_mapview.php',
+    $.post('ajax/form',
         {
+            type: 'availability-map-mode',
             group_view: $(this).val()
         },
         function(data){

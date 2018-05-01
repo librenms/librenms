@@ -91,10 +91,38 @@ abstract class BaseModel extends Model
             $table = $this->getTable();
         }
 
-        return $query->join('ports_perms', 'ports_perms.port_id', "$table.port_id")
-            ->join('devices_perms', 'devices_perms.device_id', "$table.device_id")
+        return $query
+            ->leftJoin('ports_perms', 'ports_perms.port_id', "$table.port_id")
+            ->leftJoin('devices_perms', 'devices_perms.device_id', "$table.device_id")
             ->where(function ($query) use ($user) {
                 $query->where('ports_perms.user_id', $user->user_id)
+                    ->orWhere('devices_perms.user_id', $user->user_id);
+            });
+    }
+
+    /**
+     * Helper function to determine if user has access based on bill permissions
+     *
+     * @param Builder $query
+     * @param User $user
+     * @param string $table
+     * @return Builder
+     */
+    protected function hasBillAccess($query, User $user, $table = null)
+    {
+        if ($user->hasGlobalRead()) {
+            return $query;
+        }
+
+        if (is_null($table)) {
+            $table = $this->getTable();
+        }
+
+        return $query
+            ->leftJoin('bill_perms', 'bill_perms.bill_id', "$table.bill_id")
+            ->leftJoin('devices_perms', 'devices_perms.device_id', "$table.device_id")
+            ->where(function ($query) use ($user) {
+                $query->where('bill_perms.user_id', $user->user_id)
                     ->orWhere('devices_perms.user_id', $user->user_id);
             });
     }

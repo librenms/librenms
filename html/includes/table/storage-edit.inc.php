@@ -44,6 +44,3 @@ foreach (dbFetchRows($sql, $param) as $drive) {
         'storage_perc' => $perc . "%",
         'storage_perc_warn' => $perc_warn);
 }
-
-$output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$total);
-echo _json_encode($output);

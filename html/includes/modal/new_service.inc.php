@@ -103,7 +103,7 @@ $('#create-service').on('show.bs.modal', function (e) {
     $('#service_id').val(service_id);
     $.ajax({
         type: "POST",
-        url: "ajax_form.php",
+        url: "ajax/form",
         data: { type: "parse-service", service_id: service_id },
         dataType: "json",
         success: function(output) {
@@ -121,7 +121,7 @@ $('#service-submit').click('', function(e) {
     e.preventDefault();
     $.ajax({
         type: "POST",
-        url: "ajax_form.php",
+        url: "ajax/form",
         data: $('form.service-form').serialize(),
         success: function(result){
             if (result.status == 0) {

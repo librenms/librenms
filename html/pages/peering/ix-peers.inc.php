@@ -50,7 +50,7 @@ $status = $vars['status'];
         ajax: true,
         rowCount: [50, 100, 250, -1],
         templates: {
-            header: 
+            header:
                 "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
                 "<div class=\"col-sm-6 actionBar\"><span class=\"pull-left\">"+
                 "<form method=\"post\" action=\"\" class=\"form-inline\" role=\"form\">"+
@@ -73,6 +73,6 @@ $status = $vars['status'];
                 status:      '<?php echo $status; ?>',
             };
         },
-        url: "ajax_table.php"
+        url: "ajax/table"
     });
 </script>

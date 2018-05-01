@@ -104,7 +104,7 @@ $('#newThread').on('click', function(e){
     var form = $('#alert-reset');
     $.ajax({
         type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/form',
             data: form.serialize(),
       dataType: "html",
       success: function(data){
@@ -137,7 +137,7 @@ $( ".sensor" ).bind('blur keyup',function(e) {
     var $this = $(this);
     $.ajax({
         type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/form',
             data: { type: "<?php echo $ajax_prefix; ?>-update", device_id: device_id, data: data, sensor_id: sensor_id , value_type: value_type},
             dataType: "html",
             success: function(data){
@@ -169,7 +169,7 @@ $('input[name="alert-status"]').on('switchChange.bootstrapSwitch',  function(eve
     var sensor_id = $(this).data("sensor_id");
     $.ajax({
         type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/form',
             data: { type: "<?php echo $ajax_prefix; ?>-alert-update", device_id: device_id, sensor_id: sensor_id, state: state},
             dataType: "html",
             success: function(data){
@@ -186,7 +186,7 @@ $("[name='remove-custom']").on('click', function(event) {
     var sensor_id = $(this).data("sensor_id");
     $.ajax({
         type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/form',
             data: { type: "<?php echo $ajax_prefix; ?>-alert-update", sensor_id: sensor_id, sub_type: "remove-custom" },
             dataType: "html",
             success: function(data){

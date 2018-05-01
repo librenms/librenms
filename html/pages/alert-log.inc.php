@@ -93,7 +93,7 @@ if (isset($_POST['device_id'])) {
                 state: '<?php echo htmlspecialchars($_POST['state']); ?>'
             };
         },
-        url: "ajax_table.php"
+        url: "ajax/table"
     }).on("loaded.rs.jquery.bootgrid", function () {
 
         var results = $("div.infos").text().split(" ");
@@ -131,7 +131,7 @@ if (isset($_POST['device_id'])) {
         allowClear: true,
         placeholder: "All Devices",
         ajax: {
-            url: 'ajax_list.php',
+            url: 'ajax/select',
             delay: 250,
             data: function (params) {
                 return {

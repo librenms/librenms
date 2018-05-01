@@ -1975,23 +1975,6 @@ label {
   color:#D9534F;
 }
 
-.page-availability-title-left {
-  width:40%;
-  float:left;
-  height:40px;
-}
-
-.page-availability-title-right {
-  width:60%;
-  float:left;
-  text-align:right;
-}
-
-.page-availability-title {
-  font-size:18px;
-  font-weight: bold;
-}
-
 .page-availability-report-select {
   font-size:16px;
   border:none;
