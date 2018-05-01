@@ -956,7 +956,7 @@ function send_mail($emails, $subject, $message, $html = false)
                 "verify_peer_name"=>false,
                 "timeout" => 1200,
                 ),
-				);
+                );
             preg_match_all('/ alt=\"(.*?)\"/', $mail->Body, $match);
             $countcheck = 0;
             $newcidhtml = $mail->Body;
