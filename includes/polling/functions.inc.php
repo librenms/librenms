@@ -696,27 +696,28 @@ function convert_to_celsius($value)
 /**
  * This is to make it easier polling apps. Also to help standardize around JSON.
  *
- * Keys on the json should be:
- *  data        - Required. The array of data returned from the snmp extend script
- *  version     - Required. The version of the snmp extend script. Should be numeric and at least 1.
- *  error       - Optional. Error code from the snmp extend script. Should be > 0 (0 will be ignored and negatives are reserved)
- *  errorString - Optional. Text to describe the error.
+ * The required keys for the returned JSON are as below.
+ *  version     - The version of the snmp extend script. Should be numeric and at least 1.
+ *  error       - Error code from the snmp extend script. Should be > 0 (0 will be ignored and negatives are reserved)
+ *  errorString - Text to describe the error.
  *
  * If the app returns an error, an exception will be raised.
  * Positive numbers will be errors returned by the extend script.
  *
  * Possible parsing related errors:
- * -1  : Failed to fetch data from the device
- * -2  : Returned version is less than the min version or non-numeric.
- * -11 : Could not decode the JSON.
- * -12 : Empty JSON parsed, meaning blank JSON was returned.
- * -13 : Valid json, but not a JSON app. Missing required keys
+ * -2  : Failed to fetch data from the device
+ * -3  : Returned version is less than the min version or non-numeric.
+ * -4  : Valid json, but not a JSON app. Missing required keys
+ * -5 : Could not decode the JSON.
+ * -6 : Empty JSON parsed, meaning blank JSON was returned.
+ * -7 : Valid json, but not a JSON app. Missing required keys
  *
  * Error checking may also be done via checking the exception JsonAppPollingFailedException.
  * The error value can be accessed via JsonAppPollingFailedException::getCode()
  * The output can be accessed via JsonAppPollingFailedException::getOutput()
+ * The parsed JSON can be access via JsonAppPollingFailedException::getParsedJson(). This may return a empty arry.
  *
- * If the error is less than -10, you can assume it is a legacy snmp extend script.
+ * If the error is less than -1, you can assume it is a legacy snmp extend script.
  *
  * @param array $device
  * @param string $extend the extend name. For example, if 'zfs' is passed it will be converted to 'nsExtendOutputFull.3.122.102.115'.
@@ -731,7 +732,7 @@ function json_app_get($device, $extend, $min_version = 1)
 
     // make sure we actually get something back
     if (empty($output)) {
-        throw new JsonAppPollingFailedException("Empty return from snmp_get.", $output, -1);
+        throw new JsonAppPollingFailedException("Empty return from snmp_get.", $output, [], -2);
     }
 
     //  turn the JSON into a array
@@ -739,25 +740,43 @@ function json_app_get($device, $extend, $min_version = 1)
 
     // improper JSON or something else was returned. Populate the variable with an error.
     if (json_last_error() !== JSON_ERROR_NONE) {
-        throw new JsonAppPollingFailedException("Invalid JSON", $output, -11);
+        throw new JsonAppPollingFailedException("Invalid JSON", $output, [], -5);
     }
 
     // There no keys in the array, meaning '{}' was was returned
     if (empty($parsed_json)) {
-        throw new JsonAppPollingFailedException("Blank JSON returned.", $output, -12);
+        throw new JsonAppPollingFailedException("Blank JSON returned.", $output, $parsed_json, -6);
     }
 
-    // It is a legacy JSON app extend, meaning these are not set
-    if (!isset($parsed_json['data'], $parsed_json['version'])) {
-        throw new JsonAppPollingFailedException("Legacy script, missing required keys.", $output, -13);
+    // version and variable checking vary depending on if min verion is 0(legacy(ZFS basically)) or +1
+    if ($min_version >= 1) {
+        // It is a legacy JSON app extend, meaning these are not set
+        if (!isset($parsed_json['error'], $parsed_json['errorString'], $parsed_json['version'])) {
+            throw new JsonAppPollingFailedException("Legacy script, missing one or more required keys.", $output, $parsed_json, -7);
+        }
+
+        if ($parsed_json['version'] < $min_version) {
+            throw new JsonAppPollingFailedException("Script,'".$parsed_json['version']."', older than required version of '$min_version'", $output, $parsed_json, -3);
+        }
+    } else {
+        // If the version 0 is set, it is legacy, make sure these are all set.
+        if (!isset($parsed_json['error'])) {
+            $parsed_json['error']=0;
+        }
+
+        if (!isset($parsed_json['errorString'])) {
+            $parsed_json['errorString']='';
+        }
+
+        if (!isset($parsed_json['version'])) {
+            $parsed_json['version']=0;
+        }
+
+        return $parsed_json;
     }
 
-    if ($parsed_json['version'] < $min_version) {
-        throw new JsonAppPollingFailedException("Script older than required version of $min_version", $output, 2);
-    }
-
-    if (isset($parsed_json['error']) && $parsed_json['error'] > 0) {
-        throw new JsonAppPollingFailedException("Script returned exception: {$parsed_json['errorString']}", $output, $parsed_json['error']);
+    if ( $parsed_json['error'] != 0) {
+        throw new JsonAppPollingFailedException("Script returned exception: {$parsed_json['errorString']}", $output, $parsed_json, $parsed_json['error']);
     }
 
     return $parsed_json;

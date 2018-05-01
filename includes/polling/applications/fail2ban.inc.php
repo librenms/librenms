@@ -9,7 +9,7 @@ $app_id = $app['app_id'];
 echo $name;
 
 try {
-    $f2b = json_app_get($device, $name)['data'];
+    $f2b = json_app_get($device, $name);
 } catch (JsonAppPollingFailedException $e) {
     if ($e->getCode() < -10) {
         // Legacy script, build compatible array
@@ -26,8 +26,8 @@ try {
             }
         }
     } else {
-        echo PHP_EOL . $name . ': ' . $e->getMessage() . PHP_EOL;
-        update_application($app, $e->getMessage(), []); // Set empty metrics and error message
+        echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
+        update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message
         return;
     }
 }
