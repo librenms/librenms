@@ -229,7 +229,7 @@ class Config
      * @param string $group webui group (only set when initially created)
      * @param string $sub_group webui subgroup (only set when initially created)
      */
-    public static function set($key, $value, $persist = false, $default = '', $descr = '', $group = '', $sub_group = '')
+    public static function set($key, $value, $persist = false, $default = null, $descr = null, $group = null, $sub_group = null)
     {
         global $config;
 
@@ -243,11 +243,14 @@ class Config
                         'config_descr' => $descr,
                         'config_group' => $group,
                         'config_sub_group' => $sub_group,
-                    ])->filter()->toArray();
+                    ])->filter(function ($value) {
+                        return !is_null($value);
+                    })->toArray();
 
                     \App\Models\Config::updateOrCreate(['config_name' => $key], $config_array);
                 } catch (QueryException $e) {
                     // possibly table config doesn't exist yet
+                    d_echo((string)$e);
                 }
             } else {
                 $res = dbUpdate(array('config_value' => $value), 'config', '`config_name`=?', array($key));
