@@ -950,28 +950,23 @@ function send_mail($emails, $subject, $message, $html = false)
         if ($html) {
             $mail->isHTML(true);
             //Addding functionality to support cid embedded graphs
-				$arrContextOptions=array(
-				    "ssl"=>array(
-				        "verify_peer"=>false,
-				        "verify_peer_name"=>false,
-				        "timeout" => 1200,
-				    ),
+            $arrContextOptions=array(
+                "ssl"=>array(
+                "verify_peer"=>false,
+                "verify_peer_name"=>false,
+                "timeout" => 1200,
+                ),
 				);
-
-				preg_match_all('/ alt=\"(.*?)\"/', $mail->Body, $match);
-
-				$countcheck = 0;
-				$newcidhtml = $mail->Body;
-				foreach ($match[1] as $item) {
-
-				$newcidhtml=preg_replace("/\bembedimage\b/i", $countcheck, $newcidhtml, 1);
-
-				            $image = file_get_contents($item, false, stream_context_create($arrContextOptions));
-				            $mail->addStringEmbeddedImage($image, $countcheck, 'graph.png', 'base64', 'image/png');
-				$countcheck++;
-				                }
-
-				$mail->Body = $newcidhtml;
+            preg_match_all('/ alt=\"(.*?)\"/', $mail->Body, $match);
+            $countcheck = 0;
+            $newcidhtml = $mail->Body;
+            foreach ($match[1] as $item) {
+                $newcidhtml=preg_replace("/\bembedimage\b/i", $countcheck, $newcidhtml, 1);
+                $image = file_get_contents($item, false, stream_context_create($arrContextOptions));
+                $mail->addStringEmbeddedImage($image, $countcheck, 'graph.png', 'base64', 'image/png');
+                $countcheck++;
+            }
+            $mail->Body = $newcidhtml;
         }
         switch (strtolower(trim($config['email_backend']))) {
             case 'sendmail':
