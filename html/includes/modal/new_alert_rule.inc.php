@@ -109,6 +109,12 @@ if (Auth::user()->hasGlobalAdmin()) {
                                 <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
                             </div>
                         </div>
+                        <div class="form-group" title="Restricts this alert rule to specified contacts.">
+                            <label for="contacts" class="col-sm-3 col-md-2 control-label">Contact: </label>
+                            <div class="col-sm-9 col-md-10">
+                                <select id="contacts" name="contacts" class="form-control" multiple="multiple"></select>
+                            </div>
+                        </div>
                         <div class='form-group' title="A link to some documentation on how to handle this alert. This will be included in notifications.">
                             <label for='proc' class='col-sm-3 col-md-2 control-label'>Procedure URL: </label>
                             <div class='col-sm-9 col-md-10'>
@@ -123,8 +129,6 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                     </form>
-
-
                 </div>
             </div>
         </div>
@@ -274,6 +278,11 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $maps.empty();
                 $maps.val(null).trigger('change');
                 setRuleDevice() // pre-populate device in the maps if this is a per-device rule
+                
+                var $contacts = $("#contacts");
+                $contacts.empty();
+                $contacts.val(null).trigger('change');
+                $("#transport-choice").val("email");
             }
         });
 
@@ -293,6 +302,15 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $.each(rule.maps, function(index, value) {
                     var option = new Option(value.text, value.id, true, true);
                     $maps.append(option).trigger('change')
+                });
+            }
+            var $contacts = $("#contacts");
+            $contacts.empty();
+            $contacts.val(null).trigger('change');
+            if(rule.contacts != null) {
+                $.each(rule.contacts, function(index, value) {
+                    var option = new Option(value.text, value.id, true, true);
+                    $contacts.append(option).trigger("change");
                 });
             }
 
@@ -351,6 +369,21 @@ if (Auth::user()->hasGlobalAdmin()) {
                         type: 'devices_groups',
                         search: params.term
                     };
+                }
+            }
+        });
+
+        $("#contacts").select2({
+            width: "100%",
+            placeholder: "Contact Name",
+            ajax: {
+                url: 'ajax_list.php',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        type: "contacts",
+                        search: params.term
+                    }
                 }
             }
         });

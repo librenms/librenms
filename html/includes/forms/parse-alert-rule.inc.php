@@ -19,7 +19,6 @@ if (!Auth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
-
 $alert_id = $_POST['alert_id'];
 $template_id = $_POST['template_id'];
 
@@ -36,6 +35,16 @@ if (is_numeric($alert_id) && $alert_id > 0) {
     $groups = dbFetchRows('SELECT `group_id`, `name` FROM `alert_group_map` LEFT JOIN `device_groups` ON `device_groups`.`id`=`alert_group_map`.`group_id` WHERE `rule_id`=?', [$alert_id]);
     foreach ($groups as $group) {
         $maps[] = ['id' => 'g' . $group['group_id'], 'text' => $group['name']];
+    }
+
+    $contacts = [];
+    $members = dbFetchRows('SELECT `contact_or_group_id`, `contact_name`, `transport_type` FROM `alert_contact_map` LEFT JOIN `alert_contacts` ON `contact_or_group_id` = `contact_id` WHERE `contact_type`="single" AND `rule_id`=?', [$alert_id]);
+
+    foreach ($members as $member) {
+        $contacts[] = [
+            'id' => $member['contact_or_group_id'],
+            'text' => ucfirst($member['transport_type']).": ".$member['contact_name']
+        ];
     }
 } elseif (is_numeric($template_id) && $template_id >= 0) {
     $tmp_rules = get_rules_from_json();
@@ -55,6 +64,7 @@ if (is_array($rule)) {
     echo json_encode([
         'extra'    => isset($rule['extra']) ? json_decode($rule['extra']) : null,
         'maps'     => $maps,
+        'contacts' => $contacts,
         'name'     => $rule['name'],
         'proc'     => $rule['proc'],
         'builder'  => $builder,
