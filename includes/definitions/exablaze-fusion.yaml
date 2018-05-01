@@ -1,0 +1,26 @@
+os: exablaze-fusion
+text: 'Exablaze Fusion'
+type: network
+icon: exablaze
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.43296.
+mib_dir: exablaze
+poller_modules:
+    ipmi: false
+    processors: false
+    mempools: false
+    storage: false
+    ospf: false
+    ucd-diskio: false
+    wireless: false
+    applications: false
+
+discovery_modules:
+    processors: false
+    mempools: false
+    storage: false
+    ospf: false
+    ucd-diskio: false
+    cisco-vrf-lite: false
+    wireless: false
