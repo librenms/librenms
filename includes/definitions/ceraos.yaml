@@ -4,7 +4,7 @@ type: wireless
 icon: ceragon
 over:
     - { graph: device_bits, text: Traffic }
-    - { graph: device_ceraos_RxLevel, text: 'Rx Level' }
+    - { graph: device_wireless_power, text: 'Wireless Power' }
     - { graph: device_ping_perf, text: 'Ping Times' }
 discovery:
     - sysObjectID:
