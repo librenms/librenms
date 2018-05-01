@@ -68,7 +68,7 @@ class Programs extends BaseValidation
             return;
         }
 
-        if (str_contains($output, '::1 is unreachable')) {
+        if (str_contains($output, '::1 is unreachable') || str_contains($output, 'Address family not supported')) {
             $validator->warn("IPv6 is disabled on your server, you will not be able to add IPv6 devices.");
             return;
         }
