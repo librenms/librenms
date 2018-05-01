@@ -250,7 +250,10 @@ class Config
                     \App\Models\Config::updateOrCreate(['config_name' => $key], $config_array);
                 } catch (QueryException $e) {
                     // possibly table config doesn't exist yet
-                    d_echo((string)$e);
+                    global $debug;
+                    if ($debug) {
+                        echo $e;
+                    }
                 }
             } else {
                 $res = dbUpdate(array('config_value' => $value), 'config', '`config_name`=?', array($key));
