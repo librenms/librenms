@@ -17,7 +17,7 @@ use LibreNMS\Authentication\Auth;
 
 if (Auth::user()->hasGlobalAdmin()) {
     ?>
-
+<!--Modal for adding or updating an alert contact -->
     <div class="modal fade" id="edit-alert-contact" tabindex="-1" role="dialog"
          aria-labelledby="Edit-contact" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -98,9 +98,36 @@ if (Auth::user()->hasGlobalAdmin()) {
             </div>
         </div>
     </div>
+<!-- Modal end for adding or updating an alert contact-->
+
+<!--Modal for deleting an alert contact -->
+    <div class="modal fade" id="delete-alert-contact" tabindex="-1" role="dialog"
+         aria-labelledby="Delete" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h5 class="modal-title" id="Delete">Confirm Contact Delete</h5>
+                </div>
+                <div class="modal-body">
+                    <p>If you would like to remove this alert contact then please click Delete.</p>
+                </div>
+                <div class="modal-footer">
+                    <form role="form" class="remove_contact_form">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger danger" id="remove-alert-contact" data-target="remove-alert-contact">Delete</button>
+                        <input type="hidden" name="contact_id" id="delete_contact_id" value="">
+                        <input type="hidden" name="confirm" id="confirm" value="yes">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<!--Modal end for deleting an alert contact -->
 
     <script>
-        
+        // Scripts related to editing/updating alert contact
+
         // Display different form on selection 
         $("#transport-choice").change(function (){
             $(".transport").hide();
@@ -139,6 +166,39 @@ if (Auth::user()->hasGlobalAdmin()) {
                     }
                 });
             }
+        });
+
+        // Scripts related to deleting an alert contact
+        $("#delete-alert-contact").on("show.bs.modal", function(event) {
+            contact_id = $(event.relatedTarget).data("contact_id");
+            $("#delete_contact_id").val(contact_id);
+        });
+
+        $("#remove-alert-contact").click('', function(event) {
+            event.preventDefault();
+            var contact_id = $("#delete_contact_id").val();
+            $.ajax({
+                type: "POST",
+                url: "ajax_form.php",
+                data: { type: "delete-alert-contact", contact_id: contact_id },
+                dataType: "json",
+                success: function(data) {
+                    if (data.status == 'ok') {
+                        toastr.success(data.message);
+                        setTimeout(function () {
+                            $("#delete-alert-contact").modal("hide");
+                            window.location.reload();
+                        }, 500)
+                    } else {
+                        $("#message").html("<div class='alert alert-info'>"+data.message+"</div>");
+                        $("#delete-alert-contact").modal("hide");
+                    }
+                },
+                error: function() {
+                    $("#message").html("<div class='alert alert-info'>The alert contact could not be deleted.</div>");
+                    $("#delete-alert-contact").modal("hide");
+                }
+            });
         });
 
     </script>
