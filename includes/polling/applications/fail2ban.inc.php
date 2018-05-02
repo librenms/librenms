@@ -11,7 +11,7 @@ echo $name;
 try {
     $f2b = json_app_get($device, $name);
 } catch (JsonAppPollingFailedException $e) {
-    if ($e->getCode() < -10) {
+    if ($e->getCode() == -5) {
         // Legacy script, build compatible array
         $legacy = explode("\n", $e->getOutput());
         $f2b = [
