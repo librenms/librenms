@@ -175,6 +175,22 @@ $dot3_oids = [
     'dot3StatsDuplexStatus',
 ];
 
+// Query known ports and mapping table in order of discovery to make sure
+// the latest discoverd/polled port is in the mapping tables.
+$ports_mapped = get_ports_mapped($device['device_id'], true);
+$ports = $ports_mapped['ports'];
+
+//
+// Rename any old RRD files still named after the previous ifIndex based naming schema.
+foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
+    foreach (array ('', '-adsl', '-dot3') as $suffix) {
+        $old_rrd_name = "port-$ifIndex$suffix";
+        $new_rrd_name = getPortRrdName($port_id, ltrim($suffix, '-'));
+
+        rrd_file_rename($device, $old_rrd_name, $new_rrd_name);
+    }
+}
+
 echo 'Caching Oids: ';
 $port_stats = array();
 $data       = array();
@@ -183,29 +199,53 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
     require_once 'ports/f5.inc.php';
 } else {
     if ($config['polling']['selected_ports'] === true || $config['os'][$device['os']]['polling']['selected_ports'] === true || $device['attribs']['selected_ports'] == 'true') {
-        echo('Select ports polling');
-        $lports = dbFetchRows("SELECT * FROM `ports` where `device_id` = ? AND `deleted` = 0 AND `disabled` = 0", array($device['device_id']));
-        foreach ($lports as $lport) {
-            if (is_port_valid($lport, $device)) {
-                $i = $lport['ifIndex'];
-                $base_oids = implode(".$i ", $table_base_oids) . ".$i";
+        echo 'Selected ports polling ';
+
+        foreach ($ports as $port_id => $port) {
+            $ifIndex = $port['ifIndex'];
+            if ($port['deleted'] || $port['disabled']) {
+                d_echo(" $ifIndex: skipped\n");
+                $ports[$port_id]['skipped'] = true;
+                continue;
+            }
+
+            if (is_port_valid($port, $device)) {
+                $base_oids = implode(".$ifIndex ", $table_base_oids) . ".$ifIndex";
                 $data = snmp_get_multi($device, $base_oids, '-OQUst', 'IF-MIB', null, $data);
-                if ($lport['ifAdminStatus_prev'] === 'down' && $data[$i]['ifAdminStatus'] === 'down') {
-                    echo 'port is still admin down';
-                } elseif ($lport['ifOperStatus_prev'] === 'down' && $data[$i]['ifOperStatus'] === 'down') {
-                    echo 'port is still down';
+
+                $admin_down = $port['ifAdminStatus_prev'] === 'down' && $data[$ifIndex]['ifAdminStatus'] === 'down';
+                $oper_down = $port['ifOperStatus_prev'] === 'down' && $data[$ifIndex]['ifOperStatus'] === 'down';
+
+                if ($admin_down || $oper_down) {
+                    if ($admin_down) {
+                        d_echo(" port $ifIndex is still admin down\n");
+                    } else {
+                        d_echo(" port $ifIndex is still down\n");
+                    }
+                    $ports[$port_id]['skipped'] = true;
+
+                    // minimum data update
+                    if ($port['ifAdminStatus'] != $data[$ifIndex]['ifAdminStatus'] || $port['ifOperStatus'] != $data[$ifIndex]['ifOperStatus']) {
+                        $data_update = [
+                            'ifOperStatus' => $data[$ifIndex]['ifOperStatus'],
+                            'ifAdminStatus' => $data[$ifIndex]['ifAdminStatus'],
+                        ];
+                        dbUpdate($data_update, 'ports', '`port_id` = ?', array($port_id));
+                    }
                 } else {
-                    echo 'valid';
-                    if (is_numeric($data[$i]['ifHighSpeed']) && $data[$i]['ifHighSpeed'] > 0) {
+                    d_echo(" $ifIndex: valid\n");
+                    if (is_numeric($data[$ifIndex]['ifHighSpeed']) && $data[$ifIndex]['ifHighSpeed'] > 0) {
                         $full_oids = array_merge($hc_oids, $shared_oids);
                     } else {
                         $full_oids = array_merge($nonhc_oids, $shared_oids);
                     }
-                    $oids       = implode(".$i ", $full_oids) . ".$i";
-                    $extra_oids = implode(".$i ", $dot3_oids) . ".$i";
+                    $oids       = implode(".$ifIndex ", $full_oids) . ".$ifIndex";
+                    $extra_oids = implode(".$ifIndex ", $dot3_oids) . ".$ifIndex";
                     unset($full_oids);
-                    if (is_array($data[$i])) {
-                        $port_stats[$i] = $data[$i];
+
+                    // start with already fetched data
+                    if (is_array($data[$ifIndex])) {
+                        $port_stats[$ifIndex] = $data[$ifIndex];
                     }
                     $port_stats = snmp_get_multi($device, $oids, '-OQUst', 'IF-MIB', null, $port_stats);
                     $port_stats = snmp_get_multi($device, $extra_oids, '-OQUst', 'EtherLike-MIB', null, $port_stats);
@@ -214,6 +254,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
         }
         unset($data);
     } else {
+        echo 'Full ports polling ';
         // For devices that are on the bad_ifXentry list, try fetching ifAlias to have nice interface descriptions.
 
         if (!in_array(strtolower($device['hardware']), array_map('strtolower', (array)Config::getOsSetting($device['os'], 'bad_ifXEntry', [])))) {
@@ -353,24 +394,7 @@ if ($device['port_association_mode']) {
     $port_association_mode = get_port_assoc_mode_name($device['port_association_mode']);
 }
 
-// Query known ports and mapping table in order of discovery to make sure
-// the latest discoverd/polled port is in the mapping tables.
-$ports_mapped = get_ports_mapped($device['device_id'], true);
-$ports = $ports_mapped['ports'];
-
-//
-// Rename any old RRD files still named after the previous ifIndex based naming schema.
-foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
-    foreach (array ('', '-adsl', '-dot3') as $suffix) {
-        $old_rrd_name = "port-$ifIndex$suffix";
-        $new_rrd_name = getPortRrdName($port_id, ltrim($suffix, '-'));
-
-        rrd_file_rename($device, $old_rrd_name, $new_rrd_name);
-    }
-}
-
-
-$ports_found = array ();
+$ports_found = [];
 // New interface detection
 foreach ($port_stats as $ifIndex => $port) {
     // Store ifIndex in port entry and prefetch ifName as we'll need it multiple times
@@ -381,7 +405,7 @@ foreach ($port_stats as $ifIndex => $port) {
     $port_id = get_port_id($ports_mapped, $port, $port_association_mode);
 
     if (is_port_valid($port, $device)) {
-        echo 'valid';
+        d_echo(' valid');
 
         // Port newly discovered?
         if (! $ports[$port_id]) {
@@ -410,7 +434,7 @@ foreach ($port_stats as $ifIndex => $port) {
                 continue;
             }
 
-            $port_id         = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex, 'ifName' => $ifName), 'ports');
+            $port_id = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex, 'ifName' => $ifName), 'ports');
             dbInsert(array('port_id' => $port_id), 'ports_statistics');
             $ports[$port_id] = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', array($port_id));
             echo 'Adding: '.$ifName.'('.$ifIndex.')('.$port_id.')';
@@ -437,8 +461,8 @@ foreach ($port_stats as $ifIndex => $port) {
 
     /* Build a list of all ports, identified by their port_id, found within this poller run. */
         $ports_found[] = $port_id;
-    } // Port vanished (mark as deleted)
-    else {
+    } // Port vanished (mark as deleted) (except when skipped by selective port polling)
+    elseif(empty($ports[$port_id]['skipped'])) {
         if ($ports[$port_id]['deleted'] != '1') {
             dbUpdate(array('deleted' => '1'), 'ports', '`port_id` = ?', array($port_id));
             $ports[$port_id]['deleted'] = '1';
@@ -457,7 +481,13 @@ foreach ($ports as $port) {
 
     /* We don't care for disabled ports, go on */
     if ($port['disabled'] == 1) {
-        echo "$port_info_string disabled.\n";
+        echo "{$port_info_string}disabled.\n";
+        continue;
+    }
+
+    // We don't care for skipped selective polling ports, go on
+    if (!empty($port['skipped'])) {
+        echo "{$port_info_string}skipped.\n";
         continue;
     }
 
@@ -468,7 +498,7 @@ foreach ($ports as $port) {
     if (! in_array($port_id, $ports_found)) {
         if ($port['deleted'] != '1') {
             dbUpdate(array('deleted' => '1'), 'ports', '`device_id` = ? AND `port_id` = ?', array($device['device_id'], $port_id));
-            echo "$port_info_string deleted.\n";
+            echo "{$port_info_string}deleted.\n";
         }
         continue;
     }
@@ -579,7 +609,7 @@ foreach ($ports as $port) {
         }
 
         // FIXME use $q_bridge_mib[$this_port['ifIndex']] to see if it is a trunk (>1 array count)
-        echo 'VLAN == '.$this_port['ifVlan'];
+        echo "VLAN = {$this_port['ifVlan']} ";
 
         // When devices do not provide ifDescr data, populate with ifName data if available
         if ($this_port['ifDescr'] == '' || $this_port['ifDescr'] == null) {
