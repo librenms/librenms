@@ -131,9 +131,49 @@ if (Auth::user()->hasGlobalAdmin()) {
         // Display different form on selection 
         $("#transport-choice").change(function (){
             $(".transport").hide();
-            $("#" + $(this).val()).show();
-        
+            $("#" + $(this).val()).show().find("input:text").val("");
+         
         });
+
+        $("#edit-alert-contact").on("show.bs.modal", function(e) {
+            // Get contact id of clicked element
+            var contact_id = $(e.relatedTarget).data("contact_id");
+            $("#contact_id").val(contact_id);
+            if(contact_id > 0) {
+                $.ajax({
+                    type: "POST",
+                    url: "ajax_form.php",
+                    data: { type: "show-alert-contact", contact_id: contact_id },
+                    success: function (data) {
+                        loadContact(data); 
+                    },
+                    error: function () {
+                        toastr.error("Failed to process alert contact");
+                    }
+                });
+            
+            } else {
+            // Resetting to default
+                $("#name").val("");
+                $("#transport-choice").val("email-form");
+                $(".transport").hide();
+                $("#" + $("#transport-choice").val()).show().find("input:text").val("");
+            }
+        });
+
+        function loadContact(contact) {
+            $("#name").val(contact.name);
+            $("#transport-choice").val(contact.type+"-form");
+
+            $(".transport").hide();
+            $("#" + $("#transport-choice").val()).show().find("input:text").val("");
+     
+            // Populate the field values
+            contact.details.forEach(function(config) {
+                $("#" + config.name).val(config.value);
+            });
+
+        }
 
         // Save alert contact
         $("#btn-save").on("click", function (e) {
@@ -142,7 +182,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             //Combine form data (general and contact specific)
             data = $("form.contacts-form").serializeArray();
             data = data.concat($("#" + $("#transport-choice").val()).serializeArray());
-            
+            console.log(data);
             if (data !== null) {
                 //post data to ajax form
                 $.ajax({
@@ -169,11 +209,14 @@ if (Auth::user()->hasGlobalAdmin()) {
         });
 
         // Scripts related to deleting an alert contact
+
+        // Populate contact id value
         $("#delete-alert-contact").on("show.bs.modal", function(event) {
             contact_id = $(event.relatedTarget).data("contact_id");
             $("#delete_contact_id").val(contact_id);
         });
 
+        // Delete the alert contact
         $("#remove-alert-contact").click('', function(event) {
             event.preventDefault();
             var contact_id = $("#delete_contact_id").val();

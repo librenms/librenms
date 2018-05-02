@@ -55,22 +55,36 @@ if (empty($name)) {
     $status = 'error';
     $message = 'Missing transport information';
 } else {
-    // Insert into alert-contacts
+    $details = array(
+        'contact_name' => $name,
+        'transport_type' => $transport_type,
+        'transport_config' => $transport_config
+    );
+
+    // Add the transport id if the config is other
     if ($transport_config == 'other') {
-        // Insert the transport id associated with contact
-        $contact_id = dbInsert(array(
-            'contact_name' => $name,
-            'transport_type' => $transport_type,
-            'transport_config' => $transport_config,
+        $details = array_merge($details, array(
             'transport_id' => $transport_id
-        ), 'alert_contacts');
+        ));
+    }
+    
+    if (is_numeric($contact_id) && $contact_id > 0) {
+
+        // Check if there have been changes to the transport type
+        $sql  = 'SELECT `transport_type` FROM `alert_contacts` WHERE `contact_id`=? LIMIT 1';
+        $type = dbFetchCell($sql, [$contact_id]);
+        if ($type != $transport_type) {
+            // No change to the transport type and therefore configuration fields
+            $transportChange = true;
+        }
+
+        // Update the fields
+        dbUpdate($details, 'alert_contacts', 'contact_id=?', [$contact_id]);
+        $update = true;
+
     } else {
-        // If no transport mapping, keep the value to be NULL
-        $contact_id = dbInsert(array(
-            'contact_name' => $name,
-            'transport_type' => $transport_type,
-            'transport_config' => $transport_config
-        ), 'alert_contacts');
+        // Insert the new alert contact
+        $contact_id = dbInsert($details, 'alert_contacts');
     }
 
     if ($contact_id) {
@@ -102,13 +116,34 @@ if (empty($name)) {
         $config_type = 'contact';
 
         if ($contact_config) {
+        
+            // We will want to insert new values into the alert_config db if there has 
+            // been a transport type change
+            if ($transportChange) {
+                $update = false; 
+                $where = 'config_type="contact" and contact_or_transport_id=?';
+                dbDelete('alert_configs', $where, [$contact_id]);
+            }
+
             foreach ($contact_config as $name => $value) {
-                dbInsert(array(
-                    'contact_or_transport_id' => $contact_id,
-                    'config_type' => $config_type,
-                    'config_name' => $name,
+                $detail = array(
                     'config_value' => $value
-                ), 'alert_configs');
+                );
+
+                if ($update) {
+                    //Update the values
+                    $where = 'config_type = "contact" and contact_or_transport_id=? and config_name=?';
+                    $params = array($contact_id, $name);
+                    dbUpdate($detail, 'alert_configs', $where, $params); 
+                } else {
+                    //Insert the values
+                    $detail = array_merge($detail, array(
+                        'contact_or_transport_id' => $contact_id,
+                        'config_type' => $config_type,
+                        'config_name' => $name
+                    ));
+                    dbInsert($detail, 'alert_configs');
+                }
             }
             
             $status = 'ok';
@@ -116,7 +151,7 @@ if (empty($name)) {
         }
     } else {
         $status = 'error';
-        $message = 'Failed to add alert contact';
+        $message = 'Failed to add update contact';
     }
 }
 
