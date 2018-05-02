@@ -1,3 +1,75 @@
+## 1.39
+*(2018-04-27)*
+
+#### Features
+* Added random entropy support for applications ([#8555](https://github.com/librenms/librenms/issues/8555))
+* Added Prometheus PushGateway metric support ([#8437](https://github.com/librenms/librenms/issues/8437))
+* Added random entropy monitoring ([#8555](https://github.com/librenms/librenms/pull/8555))
+* Added support for syslog Oxidized notification for Hauwei VRP devices ([#8562](https://github.com/librenms/librenms/pull/8562))
+
+#### Bugfixes
+* Fixed ePMP gps state ([#8575](https://github.com/librenms/librenms/issues/8575))
+* Use email_user variable as from name for emails ([#8550](https://github.com/librenms/librenms/pull/8550))
+* Apply divisor / multiplier to high / low values ([#8427](https://github.com/librenms/librenms/pull/8427)) 
+
+#### Documentation
+* Remove clause of CLA ([#8596](https://github.com/librenms/librenms/issues/8596))
+* Updated Oxidized.md to show use of arrays ([#8547](https://github.com/librenms/librenms/issues/8547))
+
+#### Refactoring
+* Updated the oxidized script ([#8572](https://github.com/librenms/librenms/issues/8572))
+* Allow _perc and _current columns to be string for alert rules ([#8532](https://github.com/librenms/librenms/issues/8532))
+* Restrict storage discovery walks to OS ([#8528](https://github.com/librenms/librenms/pull/8528))
+* Refactor Database and Config init ([#8527](https://github.com/librenms/librenms/pull/8527))
+* Use snmp.version config to allow users to set versions available ([#8512](https://github.com/librenms/librenms/pull/8512))
+* Exclude modules from json test data when empty ([#8533](https://github.com/librenms/librenms/pull/8533))
+* Update include files for disco/poller to be dynamic ([#8597](https://github.com/librenms/librenms/pull/8597))
+* Refactored the oxidized notify script ([#8572](https://github.com/librenms/librenms/pull/8572))
+#### Devices
+* BDCOM use alternative MIBS ([#8610](https://github.com/librenms/librenms/issues/8610))
+* Fixed polling for state sensor on ict-pdu ([#8558](https://github.com/librenms/librenms/issues/8558))
+* Added detection for AeroHive AP130 Wireless. ([#8543](https://github.com/librenms/librenms/issues/8543))
+* Added WTI-MPC OS and mib ([#8492](https://github.com/librenms/librenms/issues/8492))
+* Added Dell Rack PDU support ([#8498](https://github.com/librenms/librenms/pull/8498))
+* Added AeroHive Wireless + sensors support ([#8500](https://github.com/librenms/librenms/pull/8500)) ([#8520](https://github.com/librenms/librenms/pull/8520))
+* Added detection for 2N Helio IP devices ([#8490](https://github.com/librenms/librenms/pull/8490))
+* Added additional wireless stats + CPU detection for Ruckus Wireless devices ([#8503](https://github.com/librenms/librenms/pull/8503)) ([#8529](https://github.com/librenms/librenms/pull/8529))
+* Added Last Mile CTM support ([#8478](https://github.com/librenms/librenms/pull/8478))
+* Added basic Ubiquiti LTU airFiber support ([#8521](https://github.com/librenms/librenms/pull/8521))
+* Added Tegile support (OS and Storage) ([#8464](https://github.com/librenms/librenms/pull/8464))
+* Improved DCN support ([#8531](https://github.com/librenms/librenms/pull/8531))
+* Updated Buffalo OS detection ([#8536](https://github.com/librenms/librenms/pull/8536))
+* Added additional wireless support for PMP devices ([#8537](https://github.com/librenms/librenms/pull/8537))
+* Added support for Dahua NVR ([#8542](https://github.com/librenms/librenms/pull/8542)) ([#8570](https://github.com/librenms/librenms/pull/8570))
+* Updated sensors and added more support for FiberHome OS ([#8549](https://github.com/librenms/librenms/pull/8549)) ([#8569](https://github.com/librenms/librenms/pull/8569))
+* Updated Cyberpower sensors and os support ([#8551](https://github.com/librenms/librenms/pull/8551))
+* Added Mempools and Process support for ArubaOS ([#8548](https://github.com/librenms/librenms/pull/8548))
+* Added additional sensor support for FiberHome devices ([#8561](https://github.com/librenms/librenms/pull/8561))
+* Added detection for IBM DPI devices ([#8541](https://github.com/librenms/librenms/pull/8541))
+* Avaya Avaya ERS and VSP to Extreme VOSS and BOSS ([#8469](https://github.com/librenms/librenms/pull/8469))
+* Added detection for HWG Poseidon 4002 ([#8593](https://github.com/librenms/librenms/pull/8593))
+* Rewrite state sensors to walk entire table for TIMOS ([#8588](https://github.com/librenms/librenms/pull/8588))
+* Added detection for CoreOS devices ([#8574](https://github.com/librenms/librenms/pull/8574))
+* Added detection for Red Lion Sixnet devices ([#8576](https://github.com/librenms/librenms/pull/8576))
+
+#### WebUI
+* Update Buffalo logo to new style and svg ([#8539](https://github.com/librenms/librenms/issues/8539))
+* Use toastr for alert templates operational messages ([#8499]https://github.com/librenms/librenms/pull/8499) 
+* Improved FDB search page ([#8251](https://github.com/librenms/librenms/pull/8251))
+* Updated Mikrotik logo ([#8584](https://github.com/librenms/librenms/pull/8584))
+* Updated FiberHome logo ([#8601](https://github.com/librenms/librenms/pull/8601)) 
+* Updated TPLink logo ([#8613](https://github.com/librenms/librenms/pull/8613))
+* Added a 3rd graph to unbound application ([#8616](https://github.com/librenms/librenms/pull/8616))
+
+#### Alerting
+* Improved VictorOps messages ([#8502](https://github.com/librenms/librenms/pull/8502))
+* Added support for ack notes + alert notes ([#8433](https://github.com/librenms/librenms/pull/8433))
+
+#### API
+* Added lat/lng to device(s) API calls ([#8515](https://github.com/librenms/librenms/pull/8515))
+* Added support for returning images as base64 ([#8535](https://github.com/librenms/librenms/pull/8535))
+---
+
 ## 1.38
 *(2018-03-29)*
 
