@@ -50,5 +50,3 @@ if (is_array($contact)) {
         'message' => 'ERROR: No alert contact found'
     ]));
 }
-
-

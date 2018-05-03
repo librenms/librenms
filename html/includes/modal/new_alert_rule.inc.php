@@ -112,7 +112,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <div class="form-group" title="Restricts this alert rule to specified contacts.">
                             <label for="contacts" class="col-sm-3 col-md-2 control-label">Contact: </label>
                             <div class="col-sm-9 col-md-10">
-                                <select id="contacts" name="contacts" class="form-control" multiple="multiple"></select>
+                                <select id="contacts" name="contacts[]" class="form-control" multiple="multiple"></select>
                             </div>
                         </div>
                         <div class='form-group' title="A link to some documentation on how to handle this alert. This will be included in notifications.">

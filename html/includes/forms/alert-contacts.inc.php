@@ -69,7 +69,6 @@ if (empty($name)) {
     }
     
     if (is_numeric($contact_id) && $contact_id > 0) {
-
         // Check if there have been changes to the transport type
         $sql  = 'SELECT `transport_type` FROM `alert_contacts` WHERE `contact_id`=? LIMIT 1';
         $type = dbFetchCell($sql, [$contact_id]);
@@ -81,7 +80,6 @@ if (empty($name)) {
         // Update the fields
         dbUpdate($details, 'alert_contacts', 'contact_id=?', [$contact_id]);
         $update = true;
-
     } else {
         // Insert the new alert contact
         $contact_id = dbInsert($details, 'alert_contacts');
@@ -116,11 +114,10 @@ if (empty($name)) {
         $config_type = 'contact';
 
         if ($contact_config) {
-        
-            // We will want to insert new values into the alert_config db if there has 
+            // We will want to insert new values into the alert_config db if there has
             // been a transport type change
             if ($transportChange) {
-                $update = false; 
+                $update = false;
                 $where = 'config_type="contact" and contact_or_transport_id=?';
                 dbDelete('alert_configs', $where, [$contact_id]);
             }
@@ -134,7 +131,7 @@ if (empty($name)) {
                     //Update the values
                     $where = 'config_type = "contact" and contact_or_transport_id=? and config_name=?';
                     $params = array($contact_id, $name);
-                    dbUpdate($detail, 'alert_configs', $where, $params); 
+                    dbUpdate($detail, 'alert_configs', $where, $params);
                 } else {
                     //Insert the values
                     $detail = array_merge($detail, array(
