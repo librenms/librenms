@@ -17,13 +17,24 @@ class Ciscospark implements Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        $token  = $opts['token'];
-        $roomId = $opts['roomid'];
-        $text   = strip_tags($obj['msg']);
-        $data   = array(
-            'roomId' => $roomId,
-            'text' => $text
-        );
+        if ($opts['alert']['notDefault'] == true) {
+            $sql = "SELECT `config_name`, `config_value` FROM `alert_configs` WHERE `config_type`='contact'AND `contact_or_transport_id`=? ";
+            $details = dbFetchKeyValue($sql, [$opts['alert']['contact_id']]);
+            $text = strip_tags($obj['msg']);
+            $data = array (
+                'roomId' => $details['room-id'],
+                'text' => $text
+            );
+            $token = $details['api-token'];
+        } else {
+            $token  = $opts['token'];
+            $roomId = $opts['roomid'];
+            $text   = strip_tags($obj['msg']);
+            $data   = array(
+                'roomId' => $roomId,
+                'text' => $text
+            );
+        }
         $curl   = curl_init();
         set_curl_proxy($curl);
         curl_setopt($curl, CURLOPT_URL, 'https://api.ciscospark.com/v1/messages');
@@ -41,7 +52,6 @@ class Ciscospark implements Transport
             var_dump("Cisco Spark returned Error, retry later");
             return false;
         }
-
         return true;
     }
 }

@@ -30,6 +30,17 @@ class Mail implements Transport
     public function deliverAlert($obj, $opts)
     {
         global $config;
+        if ($opts['alert']['notDefault'] == true) {
+            $sql = "SELECT `config_value` AS `email` FROM `alert_configs` WHERE `config_type`='contact' AND `config_name`='email' AND`contact_or_transport_id`=?";
+            $email = dbFetchCell($sql, [$opts['alert']['contact_id']]);
+            if ($email) {
+                // Check if query successfull
+                $obj['contacts'] = $email;
+            } else {
+                echo("Transport not successful, reverting back to default transport.\r\n");
+            }
+        }
+
         return send_mail($obj['contacts'], $obj['title'], $obj['msg'], ($config['email_html'] == 'true') ? true : false);
     }
 }

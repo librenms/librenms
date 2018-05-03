@@ -874,34 +874,72 @@ function ExtTransports($obj)
 {
     global $config;
     $tmp = false;
-    // To keep scrutinizer from naging because it doesnt understand eval
-    foreach ($config['alert']['transports'] as $transport => $opts) {
-        if (is_array($opts)) {
-            $opts = array_filter($opts);
-        }
-        $class  = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport);
-        if (($opts === true || !empty($opts)) && $opts != false && class_exists($class)) {
-            $obj['transport'] = $transport;
-            $msg        = FormatAlertTpl($obj);
-            $obj['msg'] = $msg;
-            echo $transport.' => ';
-            $instance = new $class;
-            $tmp = $instance->deliverAlert($obj, $opts);
-            $prefix = array( 0=>"recovery", 1=>$obj['severity']." alert", 2=>"acknowledgment" );
-            $prefix[3] = &$prefix[0];
-            $prefix[4] = &$prefix[0];
-            if ($tmp === true) {
-                echo 'OK';
-                log_event('Issued ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], 'alert', 1);
-            } elseif ($tmp === false) {
-                echo 'ERROR';
-                log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, 5);
+    
+    // If alert contact mapping exists, override the default transports
+    $contacts = GetAlertContacts($obj['alert_id']);
+    if ($contacts) {
+        foreach ($contacts as $contact) {
+            if ($contact['type'] == 'email') {
+                $class = 'LibreNMS\\Alert\\Transport\\Mail';
             } else {
-                echo "ERROR: $tmp\r\n";
-                log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $tmp, $obj['device_id'], 'error', 5);
+                $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($contact['type']);
             }
+            if (class_exists($class)) {
+                $obj['transport'] = $contact['type'];
+                $msg = FormatAlertTpl($obj);
+                $obj['msg'] = $msg;
+                echo $obj['transport'].' => ';
+                $instance = new $class;
+                // Set flag to indicate non default transports
+                $opts['alert']['notDefault'] = true;
+                $opts['alert']['contact_id'] = $contact['id'];
+                $tmp = $instance->deliverAlert($obj, $opts);
+                $prefix = array( 0=>"recovery", 1=>$obj['severity']." alert", 2=>"acknowledgment" );
+                $prefix[3] = &$prefix[0];
+                $prefix[4] = &$prefix[0];
+                if ($tmp === true) {
+                    echo 'OK';
+                    log_event('Issued ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], 'alert', 1);
+                } elseif ($tmp === false) {
+                    echo 'ERROR';
+                    log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, 5);
+                } else {
+                    echo "ERROR: $tmp\r\n";
+                    log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $tmp, $obj['device_id'], 'error', 5);
+                }
+            }
+            echo '; ';
         }
-        echo '; ';
+    } else {
+        // To keep scrutinizer from naging because it doesnt understand eval
+        foreach ($config['alert']['transports'] as $transport => $opts) {
+            if (is_array($opts)) {
+                $opts = array_filter($opts);
+            }
+            $class  = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport);
+            if (($opts === true || !empty($opts)) && $opts != false && class_exists($class)) {
+                $obj['transport'] = $transport;
+                $msg        = FormatAlertTpl($obj);
+                $obj['msg'] = $msg;
+                echo $transport.' => ';
+                $instance = new $class;
+                $tmp = $instance->deliverAlert($obj, $opts);
+                $prefix = array( 0=>"recovery", 1=>$obj['severity']." alert", 2=>"acknowledgment" );
+                $prefix[3] = &$prefix[0];
+                $prefix[4] = &$prefix[0];
+                if ($tmp === true) {
+                    echo 'OK';
+                    log_event('Issued ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], 'alert', 1);
+                } elseif ($tmp === false) {
+                    echo 'ERROR';
+                    log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, 5);
+                } else {
+                    echo "ERROR: $tmp\r\n";
+                    log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $tmp, $obj['device_id'], 'error', 5);
+                }
+            }
+            echo '; ';
+        }
     }
 }//end ExtTransports()
 
@@ -926,3 +964,27 @@ function IsParentDown($device)
 
     return false;
 } //end IsParentDown()
+
+
+/**
+ * Return rule id from alert id
+ * @param $rule_id
+ * @return $alert_id
+ */
+function GetRuleId($alert_id)
+{
+    $query = "SELECT `rule_id` FROM `alerts` WHERE `id`=?";
+    return dbFetchCell($query, [$alert_id]);
+}
+
+/**
+ * Get alert contacts
+ * @param $alert_id
+ * @return array $contact_id $transport_type
+ */
+function GetAlertContacts($alert_id)
+{
+    $query = "SELECT `contact_or_group_id` AS `id`, `transport_type` AS `type` FROM `alert_contact_map` LEFT JOIN `alert_contacts` ON `contact_id`=`contact_or_group_id` WHERE `contact_type`='single' AND `rule_id`=?";
+    $rule_id = GetRuleId($alert_id);
+    return dbFetchRows($query, [$rule_id]);
+}
