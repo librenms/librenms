@@ -963,7 +963,12 @@ function send_mail($emails, $subject, $message, $html = false)
             foreach ($match[1] as $item) {
                 $newcidhtml=preg_replace("/\bembedimage\b/i", $countcheck, $newcidhtml, 1);
                 $image = file_get_contents($item, false, stream_context_create($arrContextOptions));
-                $mail->addStringEmbeddedImage($image, $countcheck, 'graph.png', 'base64', 'image/png');
+                if ($config['webui']['graph_type'] == 'svg') {
+                    $mail->addStringEmbeddedImage($image, $countcheck, 'graph.svg', 'base64', 'image/svg+xml');
+                }
+                else {
+                    $mail->addStringEmbeddedImage($image, $countcheck, 'graph.png', 'base64', 'image/png');
+                }
                 $countcheck++;
             }
             $mail->Body = $newcidhtml;
