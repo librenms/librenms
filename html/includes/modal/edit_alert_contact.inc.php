@@ -40,15 +40,15 @@ if (Auth::user()->hasGlobalAdmin()) {
                             <label for='transport-choice' class='col-sm-3 col-md-2 control-label'>Transport type: </label>
                             <div class="col-sm-3">
                                 <select name='transport-choice' id='transport-choice' class='form-control'>
-                                    <option value="email-form" selected>Email</option>
+                                    <option value="mail-form" selected>Mail</option>
                                     <option value="ciscospark-form">Cisco Spark</option>
                                     <!--Insert more transport type options here has support is added -->
                                 </select>
                             </div>
                         </div>
                     </form>
-                    <form method="post" role="form" id="email-form" class="form-horizontal transport">
-                        <input type="hidden" name="transport-type" id="transport-type" value="email">
+                    <form method="post" role="form" id="mail-form" class="form-horizontal transport">
+                        <input type="hidden" name="transport-type" id="transport-type" value="mail">
                         <div class="form-group" title="The configuration for this transport">
                             <label for="transport-type" class="col-sm-3 col-md-2 control-label">Transport config: </label>
                             <div class="col-sm-3">
@@ -91,7 +91,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                     </form>
                     <div class="col-sm-12 text-center">
                         <button type="button" class="btn btn-success" id="btn-save" name="save-contact">
-                        Save Rule
+                        Save Contact
                         </button>
                     </div>
                 </div>
@@ -155,7 +155,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             } else {
             // Resetting to default
                 $("#name").val("");
-                $("#transport-choice").val("email-form");
+                $("#transport-choice").val("mail-form");
                 $(".transport").hide();
                 $("#" + $("#transport-choice").val()).show().find("input:text").val("");
             }

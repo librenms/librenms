@@ -879,11 +879,7 @@ function ExtTransports($obj)
     $contacts = GetAlertContacts($obj['alert_id']);
     if ($contacts) {
         foreach ($contacts as $contact) {
-            if ($contact['type'] == 'email') {
-                $class = 'LibreNMS\\Alert\\Transport\\Mail';
-            } else {
-                $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($contact['type']);
-            }
+            $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($contact['type']);
             if (class_exists($class)) {
                 $obj['transport'] = $contact['type'];
                 $msg = FormatAlertTpl($obj);

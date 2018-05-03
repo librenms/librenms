@@ -87,7 +87,7 @@ if (empty($name)) {
 
     if ($contact_id) {
         // Grab config values
-        if ($transport_type == 'email') {
+        if ($transport_type == 'mail') {
             if ($_POST['email']) {
                 $contact_config = array(
                     'email' => $_POST['email']
