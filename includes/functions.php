@@ -965,8 +965,7 @@ function send_mail($emails, $subject, $message, $html = false)
                 $image = file_get_contents($item, false, stream_context_create($arrContextOptions));
                 if ($config['webui']['graph_type'] == 'svg') {
                     $mail->addStringEmbeddedImage($image, $countcheck, 'graph.svg', 'base64', 'image/svg+xml');
-                }
-                else {
+                } else {
                     $mail->addStringEmbeddedImage($image, $countcheck, 'graph.png', 'base64', 'image/png');
                 }
                 $countcheck++;
