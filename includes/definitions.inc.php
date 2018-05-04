@@ -514,6 +514,28 @@ $config['graph_types']['device']['xirrus_stations']['section'] = 'wireless';
 $config['graph_types']['device']['xirrus_stations']['order']   = '0';
 $config['graph_types']['device']['xirrus_stations']['descr']   = 'Associated Stations';
 
+// Blue Coat SGOS
+// Client Connections
+$config['graph_types']['device']['bluecoat_http_client_connections']['section'] = 'network';
+$config['graph_types']['device']['bluecoat_http_client_connections']['order']    = '0';
+$config['graph_types']['device']['bluecoat_http_client_connections']['descr']    = 'HTTP Client Connections';
+// Server Connections
+$config['graph_types']['device']['bluecoat_http_server_connections']['section'] = 'network';
+$config['graph_types']['device']['bluecoat_http_server_connections']['order']    = '0';
+$config['graph_types']['device']['bluecoat_http_server_connections']['descr']    = 'HTTP Server Connections';
+// Client Connections Active
+$config['graph_types']['device']['bluecoat_http_client_connections_active']['section']  = 'network';
+$config['graph_types']['device']['bluecoat_http_client_connections_active']['order']    = '0';
+$config['graph_types']['device']['bluecoat_http_client_connections_active']['descr']    = 'HTTP Client Connections Active';
+// Client Connections Idle
+$config['graph_types']['device']['bluecoat_http_client_connections_idle']['section']  = 'network';
+$config['graph_types']['device']['bluecoat_http_client_connections_idle']['order']    = '0';
+$config['graph_types']['device']['bluecoat_http_client_connections_idle']['descr']    = 'HTTP Client Connections Idle';
+// Server Connections Idle
+$config['graph_types']['device']['bluecoat_http_server_connections_idle']['section']  = 'network';
+$config['graph_types']['device']['bluecoat_http_server_connections_idle']['order']    = '0';
+$config['graph_types']['device']['bluecoat_http_server_connections_idle']['descr']    = 'HTTP Server Connections Idle';
+// HTTP Requests
 $config['graph_types']['device']['sgos_average_requests']['section']  = 'network';
 $config['graph_types']['device']['sgos_average_requests']['order']    = '0';
 $config['graph_types']['device']['sgos_average_requests']['descr']    = 'Average HTTP Requests';
