@@ -25,4 +25,3 @@ class FortiWlc extends OS implements
         );
     }
 }
-
