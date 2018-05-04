@@ -17,4 +17,3 @@ $graph_min = 0;
 $unit_text = 'Idle Connections';
 
 require 'includes/graphs/generic_simplex.inc.php';
-
