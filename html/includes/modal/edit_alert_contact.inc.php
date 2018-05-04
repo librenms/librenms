@@ -182,7 +182,6 @@ if (Auth::user()->hasGlobalAdmin()) {
             //Combine form data (general and contact specific)
             data = $("form.contacts-form").serializeArray();
             data = data.concat($("#" + $("#transport-choice").val()).serializeArray());
-            console.log(data);
             if (data !== null) {
                 //post data to ajax form
                 $.ajax({

@@ -145,6 +145,10 @@ if (empty($name)) {
             
             $status = 'ok';
             $message = 'Updated alert contacts';
+        } else {
+            // If no config info provided, we will have to delete the entry in the alert_contacts tbl
+            $where = '`contact_id`=?';
+            dbDelete('alert_contacts', $where, [$contact_id]);
         }
     } else {
         $status = 'error';
