@@ -880,10 +880,6 @@ foreach ($ports as $port) {
 
         // Update Database
         if (count($port['update'])) {
-            if ($port_id == 2666) {
-                var_dump($port['update'], $port['skipped']);
-            }
-
             $updated = dbUpdate($port['update'], 'ports', '`port_id` = ?', array($port_id));
             // do we want to do something else with this?
             if (!empty($port['update_extended'])) {
