@@ -200,18 +200,32 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
     if ($config['polling']['selected_ports'] === true || $config['os'][$device['os']]['polling']['selected_ports'] === true || $device['attribs']['selected_ports'] == 'true') {
         echo 'Selected ports polling ';
 
-        foreach ($ports as $port_id => $port) {
+        // remove the deleted and disabled ports and mark them skipped
+        $polled_ports = array_filter($ports, function ($port) use ($ports) {
+            $ports[$port['ifIndex']]['skipped'] = true;
+            return $port['deleted'] || $port['disabled'];
+        });
+
+        // if less than 5 ports or less than 10% of the total ports are skipped, walk the base oids instead of get
+        $polled_port_count = count($polled_ports);
+        $total_port_count = count($ports);
+        $walk_base = $total_port_count - $polled_port_count < 5 || $polled_port_count / $total_port_count > 0.9 ;
+
+        foreach ($table_base_oids as $oid) {
+            $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB');
+        }
+
+        foreach ($polled_ports as $port_id => $port) {
             $ifIndex = $port['ifIndex'];
-            if ($port['deleted'] || $port['disabled']) {
-                d_echo(" $ifIndex: skipped\n");
-                $ports[$port_id]['skipped'] = true;
-                continue;
-            }
 
             if (is_port_valid($port, $device)) {
-                $base_oids = implode(".$ifIndex ", $table_base_oids) . ".$ifIndex";
-                $port_stats = snmp_get_multi($device, $base_oids, '-OQUst', 'IF-MIB', null, $port_stats);
+                if (!$walk_base) {
+                    // we didn't walk,so snmpget the base oids
+                    $base_oids = implode(".$ifIndex ", $table_base_oids) . ".$ifIndex";
+                    $port_stats = snmp_get_multi($device, $base_oids, '-OQUst', 'IF-MIB', null, $port_stats);
+                }
 
+                // if admin down or operator down since the last poll, skip polling this port
                 $admin_down = $port['ifAdminStatus_prev'] === 'down' && $port_stats[$ifIndex]['ifAdminStatus'] === 'down';
                 $oper_down = $port['ifOperStatus_prev'] === 'down' && $port_stats[$ifIndex]['ifOperStatus'] === 'down';
 
