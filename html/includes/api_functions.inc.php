@@ -1014,7 +1014,7 @@ function list_alerts()
     $sql = '';
     if (isset($router['id']) && $router['id'] > 0) {
         $alert_id = mres($router['id']);
-        $sql      = 'AND id=?';
+        $sql      = 'AND `A`.id=?';
         array_push($param, $alert_id);
     }
 
