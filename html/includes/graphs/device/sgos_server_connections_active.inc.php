@@ -18,4 +18,3 @@ $scale_min = '0';
 $unit_text = 'Active Conn';
 
 require 'includes/graphs/generic_simplex.inc.php';
-
