@@ -53,16 +53,12 @@ discovery_modules:
     arp-table: 0
 ```
 
-### Per Port Polling
+### Port Polling
 See also: [Per port polling - experimental](../../Support/Performance.md#per-port-polling-experimental)
 
-You can opt to have the snmp collection poll only active ports (skipping deleted and ignored ports) by enabling the selected ports option.
-This option will restrict polling to only enabled/allowed ports. The poller module will by default select the best counter type (32bit or 64bit),
-for devices with their implementation of ifXEntry, you can choose to force high capacity counter usage.
-
-```php
-$config['os']['pmp']['polling']['selective_ports'] = true; # Use selective port polling for this OS
-$config['os']['pmp']['polling']['force_hc'] = true; # Force use of High Capacity counters
+```yaml
+polling:
+    force_hc: true # force ifXTable even if the device does not properly report ifHighSpeed
 ```
 
 ### Storage Settings
