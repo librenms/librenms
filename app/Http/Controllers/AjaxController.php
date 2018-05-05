@@ -522,4 +522,26 @@ class AjaxController extends Controller
 
         return response()->json([]);
     }
+
+    public function stream()
+    {
+        ini_set('zlib.output_compression', 0);
+        ini_set('output_buffering', 0);
+        return response()->stream(function () {
+            $string_length = 4096;
+            echo 'Begin test with an ' . $string_length . ' character string...<br />' . "\r\n";
+
+            // For 3 seconds, repeat the string.
+            for ($i = 0; $i < 3; $i++) {
+                $string = str_repeat('.', $string_length);
+                echo $string . '<br />' . "\r\n";
+                echo $i . '<br />' . "\r\n";
+                ob_flush();
+                flush();
+                sleep(1);
+            }
+
+            echo 'End test.<br />' . "\r\n";
+        }, 200, ['Content-type: text/plain', 'X-Accel-Buffering: no', 'Cache-Control: no-cache, must-revalidate']);
+    }
 }

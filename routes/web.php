@@ -40,6 +40,7 @@ Route::group(['prefix' => 'ajax'], function () {
     Route::get('ossuggest', 'AjaxController@osSuggest');
     Route::get('rulesuggest', 'AjaxController@ruleSuggest');
     Route::get('search', 'AjaxController@search');
+    Route::get('stream', 'AjaxController@stream');
 });
 
 // Debugbar routes need to be here because of catch-all
