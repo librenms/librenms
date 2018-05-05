@@ -713,7 +713,6 @@ foreach ($ports as $port) {
         if (!empty($port['skipped'])) {
             echo " $port_id skipped.\n";
         } else {
-            var_dump($port['skipped']);
             // End parse ifAlias
             // Update IF-MIB metrics
             $_stat_oids = array_merge($stat_oids_db, $stat_oids_db_extended);
