@@ -461,7 +461,7 @@ foreach ($port_stats as $ifIndex => $port) {
     /* Build a list of all ports, identified by their port_id, found within this poller run. */
         $ports_found[] = $port_id;
     } // Port vanished (mark as deleted) (except when skipped by selective port polling)
-    elseif(empty($ports[$port_id]['skipped'])) {
+    elseif (empty($ports[$port_id]['skipped'])) {
         if ($ports[$port_id]['deleted'] != '1') {
             dbUpdate(array('deleted' => '1'), 'ports', '`port_id` = ?', array($port_id));
             $ports[$port_id]['deleted'] = '1';
@@ -778,8 +778,7 @@ foreach ($ports as $port) {
                 $saturation_threshold = ($this_port['ifSpeed'] * ($config['alerts']['port_util_perc'] / 100));
                 echo 'IN: ' . $port['stats']['ifInBits_rate'] . ' OUT: ' . $port['stats']['ifOutBits_rate'] . ' THRESH: ' . $saturation_threshold;
                 if (($port['stats']['ifInBits_rate'] >= $saturation_threshold || $port['stats']['ifOutBits_rate'] >= $saturation_threshold) && $saturation_threshold > 0) {
-                    log_event('Port reached saturation threshold: ' . formatRates($port['stats']['ifInBits_rate']) . '/' . formatRates($port['stats']['ifOutBits_rate']) . ' - ifspeed: ' . formatRates($this_port['stats']['ifSpeed']),
-                        $device, 'interface', 4, $port['port_id']);
+                    log_event('Port reached saturation threshold: ' . formatRates($port['stats']['ifInBits_rate']) . '/' . formatRates($port['stats']['ifOutBits_rate']) . ' - ifspeed: ' . formatRates($this_port['stats']['ifSpeed']), $device, 'interface', 4, $port['port_id']);
                 }
             }
 
