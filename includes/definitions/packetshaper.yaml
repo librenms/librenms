@@ -1,6 +1,12 @@
 os: packetshaper
-text: 'Blue Coat Packetshaper'
+text: 'Blue Coat PacketShaper'
 type: network
+ifname: 1
+icon: bluecoat
+mib_dir:
+    - bluecoat
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
 discovery:
-    - sysDescr:
-        - PacketShaper
+    - sysObjectID:
+        - .1.3.6.1.4.1.14501.11.1.1

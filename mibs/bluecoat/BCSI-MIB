@@ -1,0 +1,19 @@
+BCSI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, enterprises
+		FROM SNMPv2-SMI;
+
+-- Blue Coat's private MIB
+
+bcsi MODULE-IDENTITY
+	LAST-UPDATED "201308161500Z"
+	ORGANIZATION "Blue Coat Systems, Inc."
+	CONTACT-INFO
+		"support@bluecoat.com
+		http://www.bluecoat.com"
+	DESCRIPTION
+		"The root MIB module for Blue Coat Systems."
+	::= { enterprises 14501 }
+
+END
