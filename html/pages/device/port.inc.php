@@ -105,7 +105,7 @@ if (count($components) > 0) {
 }
 
 // If enabled via config, display the Plugin Link
-if($config['enable_ports_plugins'] > 0) {
+if ($config['enable_ports_plugins'] > 0) {
     $menu_options['plugins'] = 'Plugins';
 }
 
