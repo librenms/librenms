@@ -104,6 +104,11 @@ if (count($components) > 0) {
     $menu_options['cbqos'] = 'CBQoS';
 }
 
+// If enabled via config, display the Plugin Link
+if($config['enable_ports_plugins'] > 0) {
+    $menu_options['plugins'] = 'Plugins';
+}
+
 $sep = '';
 foreach ($menu_options as $option => $text) {
     echo $sep;
