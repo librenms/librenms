@@ -23,5 +23,4 @@
     $data = snmp_getnext_multi($device, 'entPhysicalDescr entPhysicalSoftwareRev entPhysicalSerialNum', '-OQUs', 'ENTITY-MIB');
     $hardware = $data['entPhysicalDescr'];
     $serial = $data['entPhysicalSerialNum'];
-    $version2 = $data['entPhysicalSoftwareRev'];
-    $version = preg_replace('/^Cumulus Linux /', '', $version2);
+    $version = preg_replace('/^Cumulus Linux /', '', $data['entPhysicalSoftwareRev']);
