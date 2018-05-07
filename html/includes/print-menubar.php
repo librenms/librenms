@@ -214,7 +214,9 @@ if (Auth::user()->hasGlobalAdmin()) {
     }
 
     echo '<li><a href="'.generate_url(array('page'=>'device-dependencies')).'"><i class="fa fa-group fa-fw fa-lg"></i> Device Dependencies</a></li>';
-    if ($config['show_allvm_list']) {
+
+    $vm_count = dbFetchCell('SELECT COUNT(id) from `vminfo`');
+    if ($vm_count > 0) {
         echo '<li><a href="'.generate_url(array('page'=>'vminfo')).'"><i class="fa fa-cog fa-fw fa-lg"></i> Virtual Machines</a></li>';
     }
 
