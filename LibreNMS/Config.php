@@ -477,7 +477,10 @@ class Config
     private static function deprecatedVariable($old, $new)
     {
         if (self::has($old)) {
-            d_echo("Copied deprecated config $old to $new\n");
+            global $debug;
+            if ($debug) {
+                echo "Copied deprecated config $old to $new\n";
+            }
             self::set($new, self::get($old));
         }
     }
