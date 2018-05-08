@@ -77,7 +77,7 @@ function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '',
         throw new DatabaseConnectException("Database configuration not configured");
     }
 
-    $database_link = mysqli_connect('p:' . $db_host, $db_user, $db_pass, null, $db_port, $db_socket);
+    $database_link = @mysqli_connect('p:' . $db_host, $db_user, $db_pass, null, $db_port, $db_socket);
     mysqli_options($database_link, MYSQLI_OPT_LOCAL_INFILE, false);
     if ($database_link === false) {
         $error = mysqli_connect_error();
