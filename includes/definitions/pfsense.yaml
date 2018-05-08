@@ -9,5 +9,3 @@ over:
 discovery:
     - sysDescr:
         - pfSense
-mib_dir:
-    - pfsense
