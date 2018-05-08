@@ -2,6 +2,11 @@
 
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Exceptions\JsonAppPollingFailedException;
+use LibreNMS\Exceptions\JsonAppParsingFailedException;
+use LibreNMS\Exceptions\JsonAppBlankJsonException;
+use LibreNMS\Exceptions\JsonAppMissingKeysException;
+use LibreNMS\Exceptions\JsonAppWrongVersionException;
+use LibreNMS\Exceptions\JsonAppExtendErroredException;
 
 function bulk_sensor_snmpget($device, $sensors)
 {
@@ -732,7 +737,7 @@ function json_app_get($device, $extend, $min_version = 1)
 
     // make sure we actually get something back
     if (empty($output)) {
-        throw new JsonAppPollingFailedException("Empty return from snmp_get.", $output, [], -2);
+        throw new JsonAppPollingFailedException("Empty return from snmp_get.", -2);
     }
 
     //  turn the JSON into a array
@@ -740,43 +745,25 @@ function json_app_get($device, $extend, $min_version = 1)
 
     // improper JSON or something else was returned. Populate the variable with an error.
     if (json_last_error() !== JSON_ERROR_NONE) {
-        throw new JsonAppPollingFailedException("Invalid JSON", $output, [], -5);
+        throw new JsonAppParsingFailedException("Invalid JSON", $output, -5);
     }
 
     // There no keys in the array, meaning '{}' was was returned
     if (empty($parsed_json)) {
-        throw new JsonAppPollingFailedException("Blank JSON returned.", $output, $parsed_json, -6);
+        throw new JsonAppBlankJsonException("Blank JSON returned.", $output, -6);
     }
 
-    // version and variable checking vary depending on if min verion is 0(legacy(ZFS basically)) or +1
-    if ($min_version >= 1) {
-        // It is a legacy JSON app extend, meaning these are not set
-        if (!isset($parsed_json['error'], $parsed_json['errorString'], $parsed_json['version'])) {
-            throw new JsonAppPollingFailedException("Legacy script, missing one or more required keys.", $output, $parsed_json, -7);
-        }
+    // It is a legacy JSON app extend, meaning these are not set
+    if (!isset($parsed_json['error'], $parsed_json['error'], $parsed_json['errorString'], $parsed_json['version'])) {
+        throw new JsonAppMissingKeysException("Legacy script, missing one or more required keys.", $output, $parsed_json, -7);
+    }
 
-        if ($parsed_json['version'] < $min_version) {
-            throw new JsonAppPollingFailedException("Script,'".$parsed_json['version']."', older than required version of '$min_version'", $output, $parsed_json, -3);
-        }
-    } else {
-        // If the version 0 is set, it is legacy, make sure these are all set.
-        if (!isset($parsed_json['error'])) {
-            $parsed_json['error']=0;
-        }
-
-        if (!isset($parsed_json['errorString'])) {
-            $parsed_json['errorString']='';
-        }
-
-        if (!isset($parsed_json['version'])) {
-            $parsed_json['version']=0;
-        }
-
-        return $parsed_json;
+    if ($parsed_json['version'] < $min_version) {
+        throw new JsonAppWrongVersionException("Script,'".$parsed_json['version']."', older than required version of '$min_version'", $output, $parsed_json, -3);
     }
 
     if ($parsed_json['error'] != 0) {
-        throw new JsonAppPollingFailedException("Script returned exception: {$parsed_json['errorString']}", $output, $parsed_json, $parsed_json['error']);
+        throw new JsonAppExtendErroredException("Script returned exception: {$parsed_json['errorString']}", $output, $parsed_json, $parsed_json['error']);
     }
 
     return $parsed_json;
