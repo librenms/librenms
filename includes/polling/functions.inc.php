@@ -705,22 +705,30 @@ function convert_to_celsius($value)
  *  version     - The version of the snmp extend script. Should be numeric and at least 1.
  *  error       - Error code from the snmp extend script. Should be > 0 (0 will be ignored and negatives are reserved)
  *  errorString - Text to describe the error.
+ *  data        - An key with an array with the data to be used.
  *
  * If the app returns an error, an exception will be raised.
  * Positive numbers will be errors returned by the extend script.
  *
  * Possible parsing related errors:
- * -2  : Failed to fetch data from the device
- * -3  : Returned version is less than the min version or non-numeric.
- * -4  : Valid json, but not a JSON app. Missing required keys
- * -5 : Could not decode the JSON.
- * -6 : Empty JSON parsed, meaning blank JSON was returned.
- * -7 : Valid json, but not a JSON app. Missing required keys
+ * -2 : Failed to fetch data from the device
+ * -3 : Could not decode the JSON.
+ * -4 : Empty JSON parsed, meaning blank JSON was returned.
+ * -5 : Valid json, but missing required keys
+ * -6 : Returned version is less than the min version.
  *
- * Error checking may also be done via checking the exception JsonAppPollingFailedException.
- * The error value can be accessed via JsonAppPollingFailedException::getCode()
- * The output can be accessed via JsonAppPollingFailedException::getOutput()
- * The parsed JSON can be access via JsonAppPollingFailedException::getParsedJson(). This may return a empty arry.
+ * Error checking may also be done via checking the exceptions listed below.
+ *   JsonAppPollingFailedException, -2 : Empty return from SNMP.
+ *   JsonAppParsingFailedException, -3 : Could not parse the JSON.
+ *   JsonAppBlankJsonException, -4     : Blank JSON.
+ *   JsonAppMissingKeysException, -5   : Missing required keys.
+ *   JsonAppWrongVersionException , -6 : Older version than supported.
+ *   JsonAppExtendErroredException     : Polling and parsing was good, but the returned data has an error set.
+ *                                       This may be checked via $e->getParsedJson() and then checking the
+ *                                       keys error and errorString.
+ * The error value can be accessed via $e->getCode()
+ * The output can be accessed via $->getOutput() Only returned for code -3 or lower.
+ * The parsed JSON can be access via $e->getParsedJson()
  *
  * If the error is less than -1, you can assume it is a legacy snmp extend script.
  *
@@ -745,21 +753,21 @@ function json_app_get($device, $extend, $min_version = 1)
 
     // improper JSON or something else was returned. Populate the variable with an error.
     if (json_last_error() !== JSON_ERROR_NONE) {
-        throw new JsonAppParsingFailedException("Invalid JSON", $output, -5);
+        throw new JsonAppParsingFailedException("Invalid JSON", $output, -3);
     }
 
     // There no keys in the array, meaning '{}' was was returned
     if (empty($parsed_json)) {
-        throw new JsonAppBlankJsonException("Blank JSON returned.", $output, -6);
+        throw new JsonAppBlankJsonException("Blank JSON returned.", $output, -4);
     }
 
     // It is a legacy JSON app extend, meaning these are not set
     if (!isset($parsed_json['error'], $parsed_json['error'], $parsed_json['errorString'], $parsed_json['version'])) {
-        throw new JsonAppMissingKeysException("Legacy script, missing one or more required keys.", $output, $parsed_json, -7);
+        throw new JsonAppMissingKeysException("Legacy script or extend error, missing one or more required keys.", $output, $parsed_json, -5);
     }
 
     if ($parsed_json['version'] < $min_version) {
-        throw new JsonAppWrongVersionException("Script,'".$parsed_json['version']."', older than required version of '$min_version'", $output, $parsed_json, -3);
+        throw new JsonAppWrongVersionException("Script,'".$parsed_json['version']."', older than required version of '$min_version'", $output, $parsed_json, -6);
     }
 
     if ($parsed_json['error'] != 0) {
