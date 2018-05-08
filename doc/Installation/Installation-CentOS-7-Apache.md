@@ -99,6 +99,12 @@ Install the policy tool for SELinux:
     semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/rrd(/.*)?'
     semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/rrd(/.*)?'
     restorecon -RFvv /opt/librenms/rrd/
+    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/storage(/.*)?'
+    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/storage(/.*)?'
+    restorecon -RFvv /opt/librenms/storage/
+    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/bootstrap/cache(/.*)?'
+    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/bootstrap/cache(/.*)?'
+    restorecon -RFvv /opt/librenms/bootstrap/cache/
     setsebool -P httpd_can_sendmail=1
 
 ##### Allow fping

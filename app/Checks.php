@@ -38,33 +38,68 @@ class Checks
     public static function preBoot()
     {
         // check file/folder permissions
-        $check = [
+        $check_folders = [
             self::basePath('bootstrap/cache'),
             self::basePath('storage'),
             self::basePath('logs'),
-            self::basePath('logs/librenms.log')
         ];
-        foreach ($check as $path) {
-            if (file_exists($path) && !is_writable($path)) {
-                // load .env, it isn't loaded
-                $dotenv = new Dotenv(__DIR__ . '/../');
-                $dotenv->load();
 
-                $user = env('LIBRENMS_USER', 'librenms');
-                $group = env('LIBRENMS_GROUP', $user);
+        $check_files = [
+            self::basePath('logs/librenms.log'), // This file is important because Laravel needs to be able to write to it
+        ];
 
-                $dirs = 'rrd/ logs/ storage/ bootstrap/cache/';
-                self::printMessage(
-                    "Error: $path is not writable! Run these commands to fix:",
-                    [
-                        "cd " . self::basePath(),
-                        "chown -R $user:$group $dirs",
-                        "setfacl -R -m g::rwx $dirs",
-                        "setfacl -d -m g::rwx $dirs"
-                    ],
-                    true
-                );
+        // check that each is writable
+        $check_folders = array_filter($check_folders, function ($path) {
+            return !is_writable($path);
+        });
+
+        $check_files = array_filter($check_files, function ($path) {
+            return file_exists($path) xor is_writable($path);
+        });
+
+        if (!empty($check_folders) || !empty($check_files)) {
+            // only operate on parent directories, not files
+            $check = array_unique(array_merge($check_folders, array_map('dirname', $check_files)));
+
+            // load .env, it isn't loaded
+            $dotenv = new Dotenv(__DIR__ . '/../');
+            $dotenv->load();
+
+            $user = env('LIBRENMS_USER', 'librenms');
+            $group = env('LIBRENMS_GROUP', $user);
+
+            // build chown message
+            $dirs = implode(' ', $check);
+            $chown_commands =                 [
+                "chown -R $user:$group $dirs",
+                "setfacl -R -m g::rwx $dirs",
+                "setfacl -d -m g::rwx $dirs",
+            ];
+
+            //check for missing directories
+            $missing = array_filter($check, 'file_exists');
+            if (!empty($missing)) {
+                array_unshift($chown_commands, 'mkdir -p ' . implode(' ', $missing));
             }
+
+            self::printMessage(
+                "Error: $dirs not writable! Run these commands as root to fix:",
+                $chown_commands
+            );
+
+            // build SELinux output
+            $selinux_commands = [];
+            foreach ($check as $dir) {
+                $selinux_commands[] = "semanage fcontext -a -t httpd_sys_content_t '$dir(/.*)?'";
+                $selinux_commands[] = "semanage fcontext -a -t httpd_sys_rw_content_t '$dir(/.*)?'";
+                $selinux_commands[] = "restorecon -RFvv $dir";
+            }
+
+            self::printMessage(
+                "If using SELinux you may also need:",
+                $selinux_commands,
+                true
+            );
         }
     }
 
@@ -131,11 +166,7 @@ class Checks
 
     private static function basePath($path = '')
     {
-        if (function_exists('base_path')) {
-            return base_path($path);
-        }
-
-        $base_dir = realpath(__DIR__ . '..');
+        $base_dir = realpath(__DIR__ . '/..');
         return "$base_dir/$path";
     }
 }
