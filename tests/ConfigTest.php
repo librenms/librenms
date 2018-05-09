@@ -26,6 +26,7 @@
 namespace LibreNMS\Tests;
 
 use LibreNMS\Config;
+use LibreNMS\DB\Eloquent;
 
 class ConfigTest extends TestCase
 {
@@ -122,23 +123,25 @@ class ConfigTest extends TestCase
     public function testSetPersist()
     {
         if (getenv('DBTEST')) {
-            dbConnect();
-            dbBeginTransaction();
+            Eloquent::boot();
+            Eloquent::DB()->beginTransaction();
         } else {
             $this->markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
         }
 
         $key = 'testing.persist';
 
-        dbDelete('config', '`config_name`=?', array($key)); // FIXME dbInsert breaks transactions
-        $this->assertNull(dbFetchCell('SELECT `config_value` FROM `config` WHERE `config_name`=?', array($key)), "$key should not be set, clean database");
+        $query = Eloquent::DB()->table('config')->where('config_name', $key);
+
+        $query->delete();
+        $this->assertFalse($query->exists(), "$key should not be set, clean database");
         Config::set($key, 'one', true);
-        $this->assertEquals('one', dbFetchCell('SELECT `config_value` FROM `config` WHERE `config_name`=?', array($key)));
+        $this->assertEquals('one', $query->value('config_value'));
         Config::set($key, 'two', true);
-        $this->assertEquals('two', dbFetchCell('SELECT `config_value` FROM `config` WHERE `config_name`=?', array($key)));
+        $this->assertEquals('two', $query->value('config_value'));
 
         if (getenv('DBTEST')) {
-            dbRollbackTransaction();
+            Eloquent::DB()->rollBack();
         }
     }
 
