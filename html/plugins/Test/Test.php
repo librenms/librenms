@@ -5,7 +5,7 @@ namespace LibreNMS\Plugins;
 class Test
 {
 
-    public function menu()
+    public static function menu()
     {
         echo '<li><a href="plugin/p=Test">Test</a></li>';
     }//end menu()
