@@ -1,53 +1,76 @@
 <?php
-
 use LibreNMS\RRD\RrdDefinition;
 
-//NET-SNMP-EXTEND-MIB::nsExtendOutputFull."powerwall"
-$name = 'powerwall';
+# This is the name that will appear in .Apps. for the host. It will also be the RRD file name
+$name = 'powerwall';		
+
 $app_id = $app['app_id'];
+$options = '-O qv';
+$mib = 'NET-SNMP-EXTEND-MIB';
 
-$solaroid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.5.115.111.108.97.114.1';
-$solar = snmp_get($device, $solaroid, '-Oqv');
-//$solar = str_replace('"', '', $solar);
+# This is the OID that corresponds to the extend command in snmpd, found with snmptranslate
+$oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.112.111.119.101.114.119.97.108.108';
 
-$loadoid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.4.108.111.97.100.1';
-$load = snmp_get($device, $loadoid, '-Oqv');
-//$load = str_replace('"', '', $load);
+$powerwall = snmp_walk($device, $oid, $options, $mib);
 
-$batteryoid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.98.97.116.116.101.114.121.1';
-$battery = snmp_get($device, $batteryoid, '-Oqv');
-//$battery = str_replace('"', '', $battery);
+list(
 
-$gridoid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.4.103.114.105.100.1';
-$grid = snmp_get($device, $gridoid, '-Oqv');
-//$grid = str_replace('"', '', $grid);
+$battery_charge, 
+$solar_power, 
+$load_power,
+$battery_power,
+$site_power,
+$solar_exported,
+$load_imported,
+$battery_imported,
+$battery_exported,
+$site_imported,
+$site_exported,
 
-$chargeoid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.6.99.104.97.114.103.101.1';
-$charge = snmp_get($device, $chargeoid, '-Oqv');
-//$charge = str_replace('"', '', $charge);
+) = explode("\n", $powerwall);
 
-
-echo ' '.$name;
-
-
-$rrd_name = array('app', $name, $app_id);
-$rrd_def = RrdDefinition::make()
-    ->addDataset('solar', 'GAUGE')
-    ->addDataset('load', 'GAUGE')
-    ->addDataset('battery', 'GAUGE')
-    ->addDataset('grid', 'GAUGE')
-    ->addDataset('charge', 'GAUGE', 0, 100);
-
-$fields = array(
-    'solar' => $solar,
-    'load' => $load,
-    'grid' => $battery,
-    'battery' => $grid,
-    'charge' => $charge,
+$rrd_name = array(
+    'app',
+    $name,
+    $app_id
 );
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
-data_update($device, 'app', $tags, $fields);
-update_application($app, $name, $fields);
+$rrd_def = RrdDefinition::make()
 
+    ->addDataset('battery-charge', 'GAUGE', 0)
+    ->addDataset('solar-power', 'GAUGE' )
+    ->addDataset('load-power', 'GAUGE', 0)
+    ->addDataset('battery-power', 'GAUGE')
+    ->addDataset('site-power', 'GAUGE' )
+    ->addDataset('solar-exported', 'GAUGE' )
+    ->addDataset('load-imported', 'GAUGE' )
+    ->addDataset('battery-imported', 'GAUGE' )
+    ->addDataset('battery-exported', 'GAUGE' )
+    ->addDataset('site-imported', 'GAUGE' )
+    ->addDataset('site-exported', 'GAUGE' )
+;
+
+$fields = array(
+	'battery-charge' => $battery_charge,
+	'solar-power' => $solar_power,
+	'load-power' => $load_power,
+        'battery-power' => $battery_power,
+	'site-power' => $site_power,
+	'solar-exported' => $solar_exported,
+	'load-imported' => $load_imported,
+	'battery-imported' => $battery_imported,
+	'battery-exported' => $battery_exported,
+	'site-imported' => $site_imported,
+	'site-exported' => $site_exported,
+
+);
+
+$tags = array(
+    'name' => $name,
+    'app_id' => $app_id,
+    'rrd_def' => $rrd_def,
+    'rrd_name' => $rrd_name
+);
+data_update($device, 'app', $tags, $fields);
+update_application($app, $powerwall, $fields);
 
