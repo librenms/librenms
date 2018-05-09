@@ -20,7 +20,7 @@
  * @author     https://github.com/theherodied/
  */
 
-    $data = snmp_getnext_multi($device, 'entPhysicalDescr entPhysicalSoftwareRev entPhysicalSerialNum', '-OQUs', 'ENTITY-MIB');
-    $hardware = $data['entPhysicalDescr'];
-    $serial = $data['entPhysicalSerialNum'];
-    $version = preg_replace('/^Cumulus Linux /', '', $data['entPhysicalSoftwareRev']);
+$data = snmp_getnext_multi($device, 'entPhysicalDescr entPhysicalSoftwareRev entPhysicalSerialNum', '-OQUs', 'ENTITY-MIB');
+$hardware = $data['entPhysicalDescr'];
+$serial = $data['entPhysicalSerialNum'];
+$version = preg_replace('/^Cumulus Linux /', '', $data['entPhysicalSoftwareRev']);
