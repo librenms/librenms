@@ -103,7 +103,8 @@ $snmpsim_port = $snmpsim->getPort();
 
 if (!$snmpsim->isRunning()) {
     echo "Failed to start snmpsim, make sure it is installed, working, and there are no bad snmprec files.\n";
-    exit;
+    echo "Run ./scripts/save-test-data.php --snmpsim to see the log output\n";
+    exit(1);
 }
 
 
