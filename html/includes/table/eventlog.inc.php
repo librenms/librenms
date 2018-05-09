@@ -13,6 +13,8 @@
  * @author     LibreNMS Contributors
 */
 
+use LibreNMS\Authentication\Auth;
+
 $where = '1';
 
 if (is_numeric($vars['device'])) {
@@ -30,11 +32,11 @@ if ($vars['string']) {
     $param[] = '%' . $vars['string'] . '%';
 }
 
-if ($_SESSION['userlevel'] >= '5') {
+if (Auth::user()->hasGlobalRead()) {
     $sql = " FROM `eventlog` AS E LEFT JOIN `devices` AS `D` ON `E`.`host`=`D`.`device_id` WHERE $where";
 } else {
     $sql = " FROM `eventlog` AS E, devices_perms AS P WHERE $where AND E.host = P.device_id AND P.user_id = ?";
-    $param[] = $_SESSION['user_id'];
+    $param[] = Auth::id();
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {

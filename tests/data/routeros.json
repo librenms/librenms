@@ -4252,7 +4252,7 @@
                     "os": "routeros",
                     "type": "network",
                     "serial": null,
-                    "icon": "routeros.svg"
+                    "icon": "mikrotik.svg"
                 }
             ]
         },
@@ -4270,9 +4270,21 @@
                     "os": "routeros",
                     "type": "network",
                     "serial": "71B1060EE89D",
-                    "icon": "routeros.svg"
+                    "icon": "mikrotik.svg"
                 }
             ]
         }
+    },
+    "bgp-peers": {
+        "discovery": {
+            "devices": [
+                {
+                    "bgpLocalAs": null
+                }
+            ],
+            "bgpPeers": [],
+            "bgpPeers_cbgp": []
+        },
+        "poller": "matches discovery"
     }
 }

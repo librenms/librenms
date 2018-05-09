@@ -24,8 +24,9 @@
  */
 
 use LibreNMS\Alerting\QueryBuilderParser;
+use LibreNMS\Authentication\Auth;
 
-if (!is_admin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     echo("Insufficient Privileges");
     exit();
 }

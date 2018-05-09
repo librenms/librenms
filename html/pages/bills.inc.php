@@ -1,9 +1,11 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 $no_refresh = true;
 
 if ($_POST['addbill'] == 'yes') {
-    if ($_SESSION['userlevel'] < 10) {
+    if (!Auth::user()->hasGlobalAdmin()) {
         include 'includes/error-no-perm.inc.php';
         exit;
     }
@@ -114,7 +116,7 @@ include 'includes/modal/new_bill.inc.php';
     <div id="{{ctx.id}}" class="{{css.header}}">
         <div class="row">
             <div class="col-sm-4">
-            <?php if ($_SESSION['userlevel'] >= 10) {  ?>
+            <?php if (Auth::user()->hasGlobalAdmin()) {  ?>
                 <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#create-bill"><i class="fa fa-plus"></i> Create Bill</button>
             <?php } ?>
             </div>

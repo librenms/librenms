@@ -12,7 +12,9 @@
  * the source code distribution for details.
  */
 
-if (is_admin() === false) {
+use LibreNMS\Authentication\Auth;
+
+if (!Auth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
@@ -98,8 +100,8 @@ if ($sub_type == 'new-maintenance') {
         }
         
         // recurring = 0 => empty no reccurency values to be sure.
-        $start_recurring_dt = '0000-00-00';
-        $end_recurring_dt = null;
+        $start_recurring_dt = '1970-01-02';
+        $end_recurring_dt = '1970-01-02';
         $start_recurring_hr = '00:00:00';
         $end_recurring_hr = '00:00:00';
         $recurring_day = null;

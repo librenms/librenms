@@ -22,7 +22,10 @@
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-if (is_admin() !== false) {
+
+use LibreNMS\Authentication\Auth;
+
+if (Auth::user()->hasGlobalAdmin()) {
     ?>
 
     <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">

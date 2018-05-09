@@ -27,6 +27,7 @@ alerts:
     - { Field: state, Type: int(11), 'Null': false, Extra: '' }
     - { Field: alerted, Type: int(11), 'Null': false, Extra: '' }
     - { Field: open, Type: int(11), 'Null': false, Extra: '' }
+    - { Field: note, Type: text, 'Null': true, Extra: '' }
     - { Field: timestamp, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }

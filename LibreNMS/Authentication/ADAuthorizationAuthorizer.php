@@ -96,7 +96,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         $search = ldap_search(
             $this->ldap_connection,
             Config::get('auth_ad_base_dn'),
-            get_auth_ad_user_filter($username),
+            ActiveDirectoryAuthorizer::userFilter($username),
             array('samaccountname')
         );
         $entries = ldap_get_entries($this->ldap_connection, $search);
@@ -127,7 +127,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         $search = ldap_search(
             $this->ldap_connection,
             Config::get('auth_ad_base_dn'),
-            get_auth_ad_user_filter($username),
+            ActiveDirectoryAuthorizer::userFilter($username),
             array('memberOf')
         );
         $entries = ldap_get_entries($this->ldap_connection, $search);
@@ -159,7 +159,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         $search = ldap_search(
             $this->ldap_connection,
             Config::get('auth_ad_base_dn'),
-            get_auth_ad_user_filter($username),
+            ActiveDirectoryAuthorizer::userFilter($username),
             $attributes
         );
         $entries = ldap_get_entries($this->ldap_connection, $search);
@@ -223,7 +223,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         $result = ldap_search(
             $this->ldap_connection,
             Config::get('auth_ad_base_dn'),
-            get_auth_ad_user_filter($username),
+            ActiveDirectoryAuthorizer::userFilter($username),
             $attributes
         );
         $entries = ldap_get_entries($this->ldap_connection, $result);
@@ -267,7 +267,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         $result = ldap_search(
             $this->ldap_connection,
             Config::get('auth_ad_base_dn'),
-            get_auth_ad_group_filter($samaccountname),
+            ActiveDirectoryAuthorizer::groupFilter($samaccountname),
             $attributes
         );
         $entries = ldap_get_entries($this->ldap_connection, $result);

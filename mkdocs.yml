@@ -78,9 +78,10 @@ pages:
       - Extensions/Proxmox.md
       - Storing Metrics:
           - Intro: Extensions/Metric-Storage.md
-          - Extensions/metrics/InfluxDB.md
           - Extensions/metrics/Graphite.md
+          - Extensions/metrics/InfluxDB.md
           - Extensions/metrics/OpenTSDB.md
+          - Extensions/metrics/Prometheus.md
       - Extensions/Smokeping.md
       - Extensions/Weathermap.md
   - 7. API:

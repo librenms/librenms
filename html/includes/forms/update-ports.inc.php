@@ -1,7 +1,10 @@
 <?php
+
+use LibreNMS\Authentication\Auth;
+
 header('Content-type: application/json');
 
-if (is_admin() === false) {
+if (!Auth::user()->hasGlobalAdmin()) {
     $response = array(
         'status'  => 'error',
         'message' => 'Need to be admin',

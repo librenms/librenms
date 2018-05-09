@@ -324,6 +324,7 @@ class WirelessSensor extends Sensor
             153 => 5765,
             157 => 5785,
             161 => 5805,
+            165 => 5825,
         );
 
         return $channels[$channel];

@@ -22,15 +22,15 @@ function authToken(\Slim\Route $route)
     $token = $app->request->headers->get('X-Auth-Token');
     if (!empty($token)
         && ($user_id = dbFetchCell('SELECT `AT`.`user_id` FROM `api_tokens` AS AT WHERE `AT`.`token_hash`=? && `AT`.`disabled`=0', array($token)))
-        && ($username = Auth::get()->getUser($user_id))
+        && ($user = Auth::get()->getUser($user_id))
     ) {
         // Fake session so the standard auth/permissions checks work
         $_SESSION = array(
-            'username' => $username['username'],
-            'user_id' => $username['user_id'],
-            'userlevel' => $username['level']
+            'username' => $user['username'],
+            'user_id' => $user['user_id'],
+            'userlevel' => $user['level']
         );
-        $permissions = permissions_cache($_SESSION['user_id']);
+        $permissions = permissions_cache(Auth::id());
 
         return;
     }
@@ -109,14 +109,14 @@ function check_port_permission($port_id, $device_id)
 
 function check_is_admin()
 {
-    if (!is_admin()) {
+    if (!Auth::user()->hasGlobalAdmin()) {
         api_error(403, 'Insufficient privileges');
     }
 }
 
 function check_is_read()
 {
-    if (!is_admin() && !is_read()) {
+    if (!Auth::user()->hasGlobalRead()) {
         api_error(403, 'Insufficient privileges');
     }
 }
@@ -140,6 +140,7 @@ function get_graph_by_port_hostname()
     $vars         = array();
     $vars['port'] = urldecode($router['ifname']);
     $vars['type'] = $router['type'] ?: 'port_bits';
+    $vars['output'] = $_GET['output'] ?: 'display';
     if (!empty($_GET['from'])) {
         $vars['from'] = $_GET['from'];
     }
@@ -164,6 +165,9 @@ function get_graph_by_port_hostname()
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
     rrdtool_close();
+    if ($vars['output'] === 'base64') {
+        api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
+    }
 }
 
 
@@ -212,6 +216,7 @@ function get_graph_generic_by_hostname()
     $sensor_id    = $router['sensor_id'] ?: null;
     $vars         = array();
     $vars['type'] = $router['type'] ?: 'device_uptime';
+    $vars['output'] = $_GET['output'] ?: 'display';
     if (isset($sensor_id)) {
         $vars['id']   = $sensor_id;
         if (str_contains($vars['type'], '_wireless')) {
@@ -244,6 +249,10 @@ function get_graph_generic_by_hostname()
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
     rrdtool_close();
+
+    if ($vars['output'] === 'base64') {
+        api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
+    }
 }
 
 
@@ -304,8 +313,8 @@ function list_devices()
         $order = 'd.`'.$order.'` ASC';
     }
 
-    $select = " d.*, GROUP_CONCAT(dd.device_id) AS dependency_parent_id, GROUP_CONCAT(dd.hostname) AS dependency_parent_hostname ";
-    $join = " LEFT JOIN `device_relationships` AS dr ON dr.`child_device_id` = d.`device_id` LEFT JOIN `devices` AS dd ON dr.`parent_device_id` = dd.`device_id` ";
+    $select = " d.*, GROUP_CONCAT(dd.device_id) AS dependency_parent_id, GROUP_CONCAT(dd.hostname) AS dependency_parent_hostname, `lat`, `lng` ";
+    $join = " LEFT JOIN `device_relationships` AS dr ON dr.`child_device_id` = d.`device_id` LEFT JOIN `devices` AS dd ON dr.`parent_device_id` = dd.`device_id` LEFT JOIN `locations` ON `locations`.`location` = `d`.`location`";
 
     if ($type == 'all' || empty($type)) {
         $sql = '1';
@@ -342,9 +351,9 @@ function list_devices()
     }
 
 
-    if (!is_admin() && !is_read()) {
+    if (!Auth::user()->hasGlobalRead()) {
         $sql .= " AND `device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-        $param[] = $_SESSION['user_id'];
+        $param[] = Auth::id();
     }
     $devices = array();
     $dev_query = "SELECT $select FROM `devices` AS d $join WHERE $sql GROUP BY d.`hostname` ORDER BY $order";
@@ -572,9 +581,9 @@ function list_cbgp()
         $sql        = " AND `devices`.`device_id` = ?";
         $sql_params[] = $device_id;
     }
-    if (!is_admin() && !is_read()) {
+    if (!Auth::user()->hasGlobalRead()) {
         $sql .= " AND `bgpPeers_cbgp`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-        $sql_params[] = $_SESSION['user_id'];
+        $sql_params[] = Auth::id();
     }
 
     $bgp_counters = array();
@@ -628,6 +637,7 @@ function get_graph_by_portgroup()
     $group  = $router['group'] ?: '';
     $id     = $router['id'] ?: '';
     $vars   = array();
+    $vars['output'] = $_GET['output'] ?: 'display';
     if (!empty($_GET['from'])) {
         $vars['from'] = $_GET['from'];
     }
@@ -662,6 +672,9 @@ function get_graph_by_portgroup()
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
     rrdtool_close();
+    if ($vars['output'] === 'base64') {
+        api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
+    }
 }
 
 
@@ -871,7 +884,7 @@ function get_port_graphs()
     $params = array($device_id);
     if (!device_permitted($device_id)) {
         $sql = 'AND `port_id` IN (select `port_id` from `ports_perms` where `user_id` = ?)';
-        array_push($params, $_SESSION['user_id']);
+        array_push($params, Auth::id());
     }
 
     $ports       = dbFetchRows("SELECT $columns FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' $sql ORDER BY `ifIndex` ASC", $params);
@@ -941,10 +954,10 @@ function get_all_ports()
     validate_column_list($columns, 'ports');
     $params = array();
     $sql = '';
-    if (!is_read() && !is_admin()) {
+    if (!Auth::user()->hasGlobalRead()) {
         $sql = ' AND (device_id IN (SELECT device_id FROM devices_perms WHERE user_id = ?) OR port_id IN (SELECT port_id FROM ports_perms WHERE user_id = ?))';
-        array_push($params, $_SESSION['user_id']);
-        array_push($params, $_SESSION['user_id']);
+        array_push($params, Auth::id());
+        array_push($params, Auth::id());
     }
     $ports = dbFetchRows("SELECT $columns FROM `ports` WHERE `deleted` = 0 $sql", $params);
 
@@ -1001,7 +1014,7 @@ function list_alerts()
     $sql = '';
     if (isset($router['id']) && $router['id'] > 0) {
         $alert_id = mres($router['id']);
-        $sql      = 'AND id=?';
+        $sql      = 'AND `A`.id=?';
         array_push($param, $alert_id);
     }
 
@@ -1270,9 +1283,9 @@ function list_bills()
     } else {
         $sql = '1';
     }
-    if (!is_admin() && !is_read()) {
+    if (!Auth::user()->hasGlobalRead()) {
         $sql    .= ' AND `bill_id` IN (SELECT `bill_id` FROM `bill_perms` WHERE `user_id` = ?)';
-        $param[] = $_SESSION['user_id'];
+        $param[] = Auth::id();
     }
 
     if ($period === 'previous') {
@@ -1328,7 +1341,7 @@ function get_bill_graph()
     $bill_id = mres($router['bill_id']);
     $graph_type = $router['graph_type'];
 
-    if (!is_admin() && !is_read()) {
+    if (!Auth::user()->hasGlobalRead()) {
         check_bill_permission($bill_id);
     }
 
@@ -1354,7 +1367,7 @@ function get_bill_graphdata()
     $bill_id = mres($router['bill_id']);
     $graph_type = $router['graph_type'];
 
-    if (!is_admin() && !is_read()) {
+    if (!Auth::user()->hasGlobalRead()) {
         check_bill_permission($bill_id);
     }
 
@@ -1382,7 +1395,7 @@ function get_bill_history()
     $router = $app->router()->getCurrentRoute()->getParams();
     $bill_id = mres($router['bill_id']);
 
-    if (!is_admin() && !is_read()) {
+    if (!Auth::user()->hasGlobalRead()) {
         check_bill_permission($bill_id);
     }
 
@@ -1404,7 +1417,7 @@ function get_bill_history_graph()
     $bill_hist_id = mres($router['bill_hist_id']);
     $graph_type = $router['graph_type'];
 
-    if (!is_admin() && !is_read()) {
+    if (!Auth::user()->hasGlobalRead()) {
         check_bill_permission($bill_id);
     }
 
@@ -1448,7 +1461,7 @@ function get_bill_history_graphdata()
     $bill_hist_id = mres($router['bill_hist_id']);
     $graph_type = $router['graph_type'];
 
-    if (!is_admin() && !is_read()) {
+    if (!Auth::user()->hasGlobalRead()) {
         check_bill_permission($bill_id);
     }
 
@@ -1777,9 +1790,9 @@ function list_vrf()
         $sql        = "  AND `vrfs`.`vrf_name`=?";
         $sql_params = array($vrfname);
     }
-    if (!is_admin() && !is_read()) {
+    if (!Auth::user()->hasGlobalRead()) {
         $sql .= " AND `vrfs`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-        $sql_params[] = $_SESSION['user_id'];
+        $sql_params[] = Auth::id();
     }
 
     $vrfs       = array();
@@ -1850,9 +1863,9 @@ function list_vlans()
         $sql        = " AND `devices`.`device_id` = ?";
         $sql_params[] = $device_id;
     }
-    if (!is_admin() && !is_read()) {
+    if (!Auth::user()->hasGlobalRead()) {
         $sql .= " AND `vlans`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-        $sql_params[] = $_SESSION['user_id'];
+        $sql_params[] = Auth::id();
     }
 
     $vlans       = array();

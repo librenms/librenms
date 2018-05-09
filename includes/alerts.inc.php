@@ -229,7 +229,7 @@ function RunRules($device_id)
                 c_echo('Status: %bNOCHG');
             } else {
                 if (dbInsert(array('state' => 0, 'device_id' => $device_id, 'rule_id' => $rule['id']), 'alert_log')) {
-                    if (!dbUpdate(array('state' => 0, 'open' => 1), 'alerts', 'device_id = ? && rule_id = ?', array($device_id,$rule['id']))) {
+                    if (!dbUpdate(array('state' => 0, 'open' => 1, 'note' => ''), 'alerts', 'device_id = ? && rule_id = ?', array($device_id,$rule['id']))) {
                         dbInsert(array('state' => 0, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0), 'alerts');
                     }
                     c_echo(PHP_EOL . 'Status: %gOK');
@@ -738,7 +738,7 @@ function loadAlerts($where)
     $alerts = [];
     foreach (dbFetchRows("SELECT alerts.id, alerts.device_id, alerts.rule_id, alerts.state FROM alerts WHERE $where") as $alert_status) {
         $alert = dbFetchRow(
-            'SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1',
+            'SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name,alert_rules.builder FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1',
             array($alert_status['device_id'], $alert_status['rule_id'])
         );
 

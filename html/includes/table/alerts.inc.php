@@ -13,6 +13,8 @@
  * @author     LibreNMS Contributors
 */
 
+use LibreNMS\Authentication\Auth;
+
 require_once $config['install_dir'] . '/includes/device-groups.inc.php';
 
 $where = ' `devices`.`disabled` = 0';
@@ -80,10 +82,10 @@ if (isset($searchPhrase) && !empty($searchPhrase)) {
 
 $sql = ' FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`';
 
-if (is_admin() === false && is_read() === false) {
+if (!Auth::user()->hasGlobalRead()) {
     $sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
     $where .= ' AND `DP`.`user_id`=?';
-    $param[] = $_SESSION['user_id'];
+    $param[] = Auth::id();
 }
 
 $sql .= "  RIGHT JOIN `alert_rules` ON `alerts`.`rule_id`=`alert_rules`.`id` WHERE $where";
@@ -117,8 +119,8 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', array($alert['rule_id'], $alert['device_id']));
     $fault_detail = alert_details($log);
 
-    $alert_to_ack = '<button type="button" class="btn btn-danger command-ack-alert fa fa-eye" aria-hidden="true" title="Mark as acknowledged" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" name="ack-alert"></button>';
-    $alert_to_nack = '<button type="button" class="btn btn-warning command-ack-alert fa fa-eye-slash" aria-hidden="true" title="Mark as not acknowledged" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" name="ack-alert"></button>';
+    $alert_to_ack = '<button type="button" class="btn btn-danger command-ack-alert fa fa-eye" aria-hidden="true" title="Mark as acknowledged" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" data-alert_state="' . $alert['state'] . '" name="ack-alert"></button>';
+    $alert_to_nack = '<button type="button" class="btn btn-primary command-ack-alert fa fa-eye-slash" aria-hidden="true" title="Mark as not acknowledged" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" data-alert_state="' . $alert['state'] . '" name="ack-alert"></button>';
 
     $ack_ico = $alert_to_ack;
 
@@ -162,7 +164,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     }
 
     if ((int)$alert['state'] === 2) {
-        $severity_ico = '<span class="alert-status label-warning">&nbsp;</span>';
+        $severity_ico = '<span class="alert-status label-primary">&nbsp;</span>';
     }
 
     $proc = dbFetchCell('SELECT proc FROM alerts,alert_rules WHERE alert_rules.id = alerts.rule_id AND alerts.id = ?', array($alert['id']));
@@ -176,6 +178,12 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         }
     }
 
+    if (empty($alert['note'])) {
+        $note_class = 'default';
+    } else {
+        $note_class = 'warning';
+    }
+
     $response[] = array(
         'id' => $rulei++,
         'rule' => '<i title="' . htmlentities($alert['rule']) . '"><a href="' . generate_url(array('page' => 'alert-rules')) . '">' . htmlentities($alert['name']) . '</a></i>',
@@ -187,6 +195,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         'alert_id' => $alert['id'],
         'ack_ico' => $ack_ico,
         'proc' => $has_proc,
+        'notes' => "<button type='button' class='btn btn-$note_class fa fa-sticky-note-o command-alert-note' aria-label='Notes' id='alert-notes' data-alert_id='{$alert['id']}'></button>",
     );
 }
 

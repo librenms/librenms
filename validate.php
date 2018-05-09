@@ -141,13 +141,12 @@ if (!file_exists(Config::get('install_dir').'/config.php')) {
 try {
     dbConnect();
 
-    // pull in the database config settings
-    Config::loadFromDatabase();
-
     $validator->ok('Database connection successful', null, 'database');
 } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
     $validator->fail('Error connecting to your database. '.$e->getMessage(), null, 'database');
 }
+
+Config::load();
 
 $precheck_complete = true; // disable shutdown function
 print_header($validator->getVersions());

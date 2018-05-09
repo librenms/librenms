@@ -1,4 +1,7 @@
 <?php
+
+use LibreNMS\Authentication\Auth;
+
 $pagetitle[] = 'About';
 $git_log = `git log -10`;
 ?>
@@ -44,29 +47,30 @@ along with this program.  If not, see <a href="http://www.gnu.org/licenses/">htt
     <h3>Statistics</h3>
 
 <?php
-$stat_devices    = dbFetchCell('SELECT COUNT(device_id) FROM `devices`');
-$stat_ports      = dbFetchCell('SELECT COUNT(port_id) FROM `ports`');
-$stat_syslog     = dbFetchCell('SELECT COUNT(seq) FROM `syslog`');
-$stat_events     = dbFetchCell('SELECT COUNT(event_id) FROM `eventlog`');
-$stat_apps       = dbFetchCell('SELECT COUNT(app_id) FROM `applications`');
-$stat_services   = dbFetchCell('SELECT COUNT(service_id) FROM `services`');
-$stat_storage    = dbFetchCell('SELECT COUNT(storage_id) FROM `storage`');
-$stat_diskio     = dbFetchCell('SELECT COUNT(diskio_id) FROM `ucd_diskio`');
-$stat_processors = dbFetchCell('SELECT COUNT(processor_id) FROM `processors`');
-$stat_memory     = dbFetchCell('SELECT COUNT(mempool_id) FROM `mempools`');
-$stat_sensors    = dbFetchCell('SELECT COUNT(sensor_id) FROM `sensors`');
-$stat_toner      = dbFetchCell('SELECT COUNT(toner_id) FROM `toner`');
-$stat_hrdev      = dbFetchCell('SELECT COUNT(hrDevice_id) FROM `hrDevice`');
-$stat_entphys    = dbFetchCell('SELECT COUNT(entPhysical_id) FROM `entPhysical`');
+$stat_devices    = dbFetchCell('SELECT COUNT(*) FROM `devices`');
+$stat_ports      = dbFetchCell('SELECT COUNT(*) FROM `ports`');
+$stat_syslog     = dbFetchCell('SELECT COUNT(*) FROM `syslog`');
+$stat_events     = dbFetchCell('SELECT COUNT(*) FROM `eventlog`');
+$stat_apps       = dbFetchCell('SELECT COUNT(*) FROM `applications`');
+$stat_services   = dbFetchCell('SELECT COUNT(*) FROM `services`');
+$stat_storage    = dbFetchCell('SELECT COUNT(*) FROM `storage`');
+$stat_diskio     = dbFetchCell('SELECT COUNT(*) FROM `ucd_diskio`');
+$stat_processors = dbFetchCell('SELECT COUNT(*) FROM `processors`');
+$stat_memory     = dbFetchCell('SELECT COUNT(*) FROM `mempools`');
+$stat_sensors    = dbFetchCell('SELECT COUNT(*) FROM `sensors`');
+$stat_wireless   = dbFetchCell('SELECT COUNT(*) FROM `wireless_sensors`');
+$stat_toner      = dbFetchCell('SELECT COUNT(*) FROM `toner`');
+$stat_hrdev      = dbFetchCell('SELECT COUNT(*) FROM `hrDevice`');
+$stat_entphys    = dbFetchCell('SELECT COUNT(*) FROM `entPhysical`');
 
-$stat_ipv4_addy = dbFetchCell('SELECT COUNT(ipv4_address_id) FROM `ipv4_addresses`');
-$stat_ipv4_nets = dbFetchCell('SELECT COUNT(ipv4_network_id) FROM `ipv4_networks`');
-$stat_ipv6_addy = dbFetchCell('SELECT COUNT(ipv6_address_id) FROM `ipv6_addresses`');
-$stat_ipv6_nets = dbFetchCell('SELECT COUNT(ipv6_network_id) FROM `ipv6_networks`');
+$stat_ipv4_addy = dbFetchCell('SELECT COUNT(*) FROM `ipv4_addresses`');
+$stat_ipv4_nets = dbFetchCell('SELECT COUNT(*) FROM `ipv4_networks`');
+$stat_ipv6_addy = dbFetchCell('SELECT COUNT(*) FROM `ipv6_addresses`');
+$stat_ipv6_nets = dbFetchCell('SELECT COUNT(*) FROM `ipv6_networks`');
 
-$stat_pw    = dbFetchCell('SELECT COUNT(pseudowire_id) FROM `pseudowires`');
-$stat_vrf   = dbFetchCell('SELECT COUNT(vrf_id) FROM `vrfs`');
-$stat_vlans = dbFetchCell('SELECT COUNT(vlan_id) FROM `vlans`');
+$stat_pw    = dbFetchCell('SELECT COUNT(*) FROM `pseudowires`');
+$stat_vrf   = dbFetchCell('SELECT COUNT(*) FROM `vrfs`');
+$stat_vlans = dbFetchCell('SELECT COUNT(*) FROM `vlans`');
 
 $callback_status = dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'enabled'");
 if ($callback_status == 1) {
@@ -86,7 +90,7 @@ echo "
     <table class='table table-condensed'>
       <tr>";
 
-if (is_admin() === true) {
+if (Auth::user()->hasGlobalAdmin()) {
     echo "        <td colspan='4'><span class='bg-danger'>$callback</span><br />
           Online stats: <a href='https://stats.librenms.org/'>stats.librenms.org</a></td>
         <tr>
@@ -135,7 +139,11 @@ echo "
       </tr>
       <tr>
         <td><i class='fa fa-fw fa-dashboard fa-lg icon-theme'  aria-hidden='true'></i> <b>Sensors</b></td><td class='text-right'>$stat_sensors</td>
+        <td><i class='fa fa-fw fa-wifi fa-lg icon-theme'  aria-hidden='true'></i> <b>Wireless Sensors</b></td><td class='text-right'>$stat_wireless</td>
+      </tr>
+      <tr>
         <td><i class='fa fa-fw fa-print fa-lg icon-theme'  aria-hidden='true'></i> <b>Toner</b></td><td class='text-right'>$stat_toner</td>
+        <td></td>
       </tr>
     </table>
 </div>
@@ -180,7 +188,7 @@ echo "
       <a href="http://www.librenms.org/">Web site</a> |
       <a href="https://docs.librenms.org/">Docs</a> |
       <a href="https://github.com/librenms/">GitHub</a> |
-      <a href="https://github.com/librenms/librenms/issues">Bug tracker</a> |
+      <a href="https://community.librenms.org/c/help">Bug tracker</a> |
       <a href="https://community.librenms.org">Community Forum</a> |
       <a href="http://twitter.com/librenms">Twitter</a> |
       <a href="http://www.librenms.org/changelog.html">Changelog</a> |

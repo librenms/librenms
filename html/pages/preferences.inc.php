@@ -10,15 +10,15 @@ $pagetitle[] = 'Preferences';
 echo '<h2>User Preferences</h2>';
 echo '<hr>';
 
-if ($_SESSION['userlevel'] == 11) {
+if (Auth::user()->isDemoUser()) {
     demo_account();
 } else {
     if ($_POST['action'] == 'changepass') {
-        if (Auth::get()->authenticate($_SESSION['username'], $_POST['old_pass'])) {
+        if (Auth::get()->authenticate(Auth::user()->username, $_POST['old_pass'])) {
             if ($_POST['new_pass'] == '' || $_POST['new_pass2'] == '') {
                 $changepass_message = 'Password must not be blank.';
             } elseif ($_POST['new_pass'] == $_POST['new_pass2']) {
-                Auth::get()->changePassword($_SESSION['username'], $_POST['new_pass']);
+                Auth::get()->changePassword(Auth::user()->username, $_POST['new_pass']);
                 $changepass_message = 'Password Changed.';
             } else {
                 $changepass_message = "Passwords don't match.";
@@ -36,7 +36,7 @@ if ($_SESSION['userlevel'] == 11) {
 
     include 'includes/update-preferences-password.inc.php';
 
-    if (Auth::get()->canUpdatePasswords($_SESSION['username'])) {
+    if (Auth::get()->canUpdatePasswords(Auth::user()->username)) {
         echo '<h3>Change Password</h3>';
         echo '<hr>';
         echo "<div class='well'>";
@@ -110,7 +110,7 @@ if ($_SESSION['userlevel'] == 11) {
   </div>
 </div>";
                 if ($twofactor['counter'] !== false) {
-                    $twofactor['uri']   = 'otpauth://hotp/'.$_SESSION['username'].'?issuer=LibreNMS&counter='.$twofactor['counter'].'&secret='.$twofactor['key'];
+                    $twofactor['uri']   = 'otpauth://hotp/'.Auth::user()->username.'?issuer=LibreNMS&counter='.$twofactor['counter'].'&secret='.$twofactor['key'];
                     $twofactor['text'] .= "<div class='form-group'>
   <label for='twofactorcounter' class='col-sm-2 control-label'>Counter</label>
   <div class='col-sm-4'>
@@ -118,7 +118,7 @@ if ($_SESSION['userlevel'] == 11) {
   </div>
 </div>";
                 } else {
-                    $twofactor['uri'] = 'otpauth://totp/'.$_SESSION['username'].'?issuer=LibreNMS&secret='.$twofactor['key'];
+                    $twofactor['uri'] = 'otpauth://totp/'.Auth::user()->username.'?issuer=LibreNMS&secret='.$twofactor['key'];
                 }
 
                 echo '<div id="twofactorqrcontainer">
@@ -208,16 +208,12 @@ echo "
 echo "<h3>Device Permissions</h3>";
 echo "<hr>";
 echo "<div style='background-color: #e5e5e5; border: solid #e5e5e5 10px;  margin-bottom:10px;'>";
-if ($_SESSION['userlevel'] == '10') {
+if (Auth::user()->hasGlobalAdmin()) {
     echo "<strong class='blue'>Global Administrative Access</strong>";
-}
-
-if ($_SESSION['userlevel'] == '5') {
+} elseif (Auth::user()->hasGlobalRead()) {
     echo "<strong class='green'>Global Viewing Access</strong>";
-}
-
-if ($_SESSION['userlevel'] == '1') {
-    foreach (dbFetchRows('SELECT * FROM `devices_perms` AS P, `devices` AS D WHERE `user_id` = ? AND P.device_id = D.device_id', array($_SESSION['user_id'])) as $perm) {
+} else {
+    foreach (dbFetchRows('SELECT * FROM `devices_perms` AS P, `devices` AS D WHERE `user_id` = ? AND P.device_id = D.device_id', array(Auth::id())) as $perm) {
     // FIXME generatedevicelink?
         echo "<a href='device/device=".$perm['device_id']."'>".$perm['hostname'].'</a><br />';
         $dev_access = 1;

@@ -118,8 +118,8 @@ If you have devices which you do not wish to appear in Oxidized then you can edi
 It's also possible to exclude certain device types and OS' from being output via the API. This is currently only possible via config.php:
 
 ```php
-$config['oxidized']['ignore_types'] = array('server');
-$config['oxidized']['ignore_os'] = array('linux');
+$config['oxidized']['ignore_types'] = array('server','power');
+$config['oxidized']['ignore_os'] = array('linux','windows');
 ```
 
 ### Trigger configuration backups

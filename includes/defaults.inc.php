@@ -88,7 +88,7 @@ if (isset($_SERVER['SERVER_NAME']) && isset($_SERVER['SERVER_PORT'])) {
 }
 
 $config['project_home']   = 'http://www.librenms.org/';
-$config['project_issues'] = 'https://github.com/librenms/librenms/issues';
+$config['project_issues'] = 'https://community.librenms.org/c/help';
 $config['github_api']   = 'https://api.github.com/repos/librenms/librenms/';
 $config['site_style']     = 'light';
 // Options are dark or light
@@ -157,7 +157,7 @@ $config['snmp']['transports'] = array(
     'tcp6',
 );
 
-$config['snmp']['version'] = 'v2c';
+$config['snmp']['version'] = ['v2c', 'v3', 'v1'];
 // Default version to use
 // SNMPv1/2c default settings
 $config['snmp']['community'][0] = 'public';
@@ -932,6 +932,9 @@ $config['ignore_unmapable_port'] = false;
 // InfluxDB default configuration
 $config['influxdb']['timeout']      = 0;
 $config['influxdb']['verifySSL']    = false;
+
+// Prometheus Push Default configuration
+$config['prometheus']['job']        = 'librenms';
 
 // Xirrus - Disable station/client polling if true as it may take a long time on larger/heavily used APs.
 $config['xirrus_disable_stations']  = false;

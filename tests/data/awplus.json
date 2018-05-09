@@ -10099,7 +10099,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.1.1.7.1.10.1",
                     "sensor_index": "atEnvMonv2FanIndex.1.10.1",
-                    "sensor_type": "FanState",
+                    "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray B 1 Int",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10114,7 +10114,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanState"
+                    "state_name": "AtFanState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10122,7 +10122,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.1.1.7.1.10.2",
                     "sensor_index": "atEnvMonv2FanIndex.1.10.2",
-                    "sensor_type": "FanState",
+                    "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray B 1 Ext",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10137,7 +10137,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanState"
+                    "state_name": "AtFanState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10145,7 +10145,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.1.1.7.1.10.3",
                     "sensor_index": "atEnvMonv2FanIndex.1.10.3",
-                    "sensor_type": "FanState",
+                    "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray B 2 Int",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10160,7 +10160,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanState"
+                    "state_name": "AtFanState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10168,7 +10168,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.1.1.7.1.10.4",
                     "sensor_index": "atEnvMonv2FanIndex.1.10.4",
-                    "sensor_type": "FanState",
+                    "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray B 2 Ext",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10183,7 +10183,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanState"
+                    "state_name": "AtFanState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10191,7 +10191,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.1.1.7.1.9.1",
                     "sensor_index": "atEnvMonv2FanIndex.1.9.1",
-                    "sensor_type": "FanState",
+                    "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray A 1 Int",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10206,7 +10206,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanState"
+                    "state_name": "AtFanState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10214,7 +10214,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.1.1.7.1.9.2",
                     "sensor_index": "atEnvMonv2FanIndex.1.9.2",
-                    "sensor_type": "FanState",
+                    "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray A 1 Ext",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10229,7 +10229,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanState"
+                    "state_name": "AtFanState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10237,7 +10237,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.1.1.7.1.9.3",
                     "sensor_index": "atEnvMonv2FanIndex.1.9.3",
-                    "sensor_type": "FanState",
+                    "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray A 2 Int",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10252,7 +10252,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanState"
+                    "state_name": "AtFanState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10260,7 +10260,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.1.1.7.1.9.4",
                     "sensor_index": "atEnvMonv2FanIndex.1.9.4",
-                    "sensor_type": "FanState",
+                    "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray A 2 Ext",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10275,7 +10275,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanState"
+                    "state_name": "AtFanState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10283,7 +10283,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.1.1.7.2.10.1",
                     "sensor_index": "atEnvMonv2FanIndex.2.10.1",
-                    "sensor_type": "FanState",
+                    "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray B 1 Int",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10298,7 +10298,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanState"
+                    "state_name": "AtFanState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10306,7 +10306,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.1.1.7.2.10.2",
                     "sensor_index": "atEnvMonv2FanIndex.2.10.2",
-                    "sensor_type": "FanState",
+                    "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray B 1 Ext",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10321,7 +10321,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanState"
+                    "state_name": "AtFanState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10329,7 +10329,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.1.1.7.2.10.3",
                     "sensor_index": "atEnvMonv2FanIndex.2.10.3",
-                    "sensor_type": "FanState",
+                    "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray B 2 Int",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10344,7 +10344,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanState"
+                    "state_name": "AtFanState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10352,7 +10352,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.1.1.7.2.10.4",
                     "sensor_index": "atEnvMonv2FanIndex.2.10.4",
-                    "sensor_type": "FanState",
+                    "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray B 2 Ext",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10367,7 +10367,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanState"
+                    "state_name": "AtFanState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10375,7 +10375,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.1.1.7.2.9.1",
                     "sensor_index": "atEnvMonv2FanIndex.2.9.1",
-                    "sensor_type": "FanState",
+                    "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray A 1 Int",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10390,7 +10390,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanState"
+                    "state_name": "AtFanState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10398,7 +10398,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.1.1.7.2.9.2",
                     "sensor_index": "atEnvMonv2FanIndex.2.9.2",
-                    "sensor_type": "FanState",
+                    "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray A 1 Ext",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10413,7 +10413,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanState"
+                    "state_name": "AtFanState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10421,7 +10421,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.1.1.7.2.9.3",
                     "sensor_index": "atEnvMonv2FanIndex.2.9.3",
-                    "sensor_type": "FanState",
+                    "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray A 2 Int",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10436,7 +10436,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanState"
+                    "state_name": "AtFanState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10444,7 +10444,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.1.1.7.2.9.4",
                     "sensor_index": "atEnvMonv2FanIndex.2.9.4",
-                    "sensor_type": "FanState",
+                    "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray A 2 Ext",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10459,7 +10459,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanState"
+                    "state_name": "AtFanState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10467,7 +10467,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.4.2.1.6.1.1.2",
                     "sensor_index": "atEnvMonv2PsbSensorIndex.1.1.2",
-                    "sensor_type": "PowerSupplyState",
+                    "sensor_type": "AtPowerSupplyState",
                     "sensor_descr": "Fan/Temperature Fault",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10482,7 +10482,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "PowerSupplyState"
+                    "state_name": "AtPowerSupplyState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10490,7 +10490,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.4.2.1.6.1.1.3",
                     "sensor_index": "atEnvMonv2PsbSensorIndex.1.1.3",
-                    "sensor_type": "PowerSupplyState",
+                    "sensor_type": "AtPowerSupplyState",
                     "sensor_descr": "PSU Power Output",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10505,7 +10505,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "PowerSupplyState"
+                    "state_name": "AtPowerSupplyState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10513,7 +10513,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.4.2.1.6.1.1.4",
                     "sensor_index": "atEnvMonv2PsbSensorIndex.1.1.4",
-                    "sensor_type": "PowerSupplyState",
+                    "sensor_type": "AtPowerSupplyState",
                     "sensor_descr": "PSU Power Input",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10528,7 +10528,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "PowerSupplyState"
+                    "state_name": "AtPowerSupplyState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10536,7 +10536,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.4.2.1.6.2.1.2",
                     "sensor_index": "atEnvMonv2PsbSensorIndex.2.1.2",
-                    "sensor_type": "PowerSupplyState",
+                    "sensor_type": "AtPowerSupplyState",
                     "sensor_descr": "Fan/Temperature Fault",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10551,7 +10551,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "PowerSupplyState"
+                    "state_name": "AtPowerSupplyState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10559,7 +10559,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.4.2.1.6.2.1.3",
                     "sensor_index": "atEnvMonv2PsbSensorIndex.2.1.3",
-                    "sensor_type": "PowerSupplyState",
+                    "sensor_type": "AtPowerSupplyState",
                     "sensor_descr": "PSU Power Output",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10574,7 +10574,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "PowerSupplyState"
+                    "state_name": "AtPowerSupplyState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10582,7 +10582,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.4.2.1.6.2.1.4",
                     "sensor_index": "atEnvMonv2PsbSensorIndex.2.1.4",
-                    "sensor_type": "PowerSupplyState",
+                    "sensor_type": "AtPowerSupplyState",
                     "sensor_descr": "PSU Power Input",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10597,7 +10597,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "PowerSupplyState"
+                    "state_name": "AtPowerSupplyState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10605,7 +10605,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.1.5.10",
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.10",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Fan Tray B 2",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10620,7 +10620,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10628,7 +10628,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.1.5.11",
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.11",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Near Switch",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10643,7 +10643,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10651,7 +10651,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.1.5.12",
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.12",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Front Left",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10666,7 +10666,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10674,7 +10674,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.1.5.13",
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.13",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Front Mid",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10689,7 +10689,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10697,7 +10697,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.1.5.14",
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.14",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Front Right",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10712,7 +10712,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10720,7 +10720,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.1.5.15",
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.15",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Console",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10735,7 +10735,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10743,7 +10743,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.1.5.6",
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.6",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Internal",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10758,7 +10758,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10766,7 +10766,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.1.5.7",
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.7",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Fan Tray A 1",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10781,7 +10781,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10789,7 +10789,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.1.5.8",
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.8",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Fan Tray A 2",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10804,7 +10804,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10812,7 +10812,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.1.5.9",
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.9",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Fan Tray B 1",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10827,7 +10827,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10835,7 +10835,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.1.6.1",
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.6.1",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: XEM Front",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10850,7 +10850,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10858,7 +10858,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.1.6.2",
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.6.2",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: XEM Rear",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10873,7 +10873,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10881,7 +10881,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.1.7.1",
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.7.1",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: XEM Front",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10896,7 +10896,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10904,7 +10904,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.1.7.2",
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.7.2",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: XEM Rear",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10919,7 +10919,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10927,7 +10927,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.2.5.10",
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.10",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Fan Tray B 2",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10942,7 +10942,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10950,7 +10950,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.2.5.11",
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.11",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Near Switch",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10965,7 +10965,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10973,7 +10973,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.2.5.12",
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.12",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Front Left",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -10988,7 +10988,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -10996,7 +10996,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.2.5.13",
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.13",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Front Mid",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -11011,7 +11011,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -11019,7 +11019,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.2.5.14",
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.14",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Front Right",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -11034,7 +11034,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -11042,7 +11042,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.2.5.15",
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.15",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Console",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -11057,7 +11057,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -11065,7 +11065,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.2.5.6",
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.6",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Internal",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -11080,7 +11080,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -11088,7 +11088,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.2.5.7",
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.7",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Fan Tray A 1",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -11103,7 +11103,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -11111,7 +11111,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.2.5.8",
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.8",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Fan Tray A 2",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -11126,7 +11126,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -11134,7 +11134,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.2.5.9",
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.9",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Fan Tray B 1",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -11149,7 +11149,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -11157,7 +11157,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.2.6.1",
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.6.1",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: XEM Front",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -11172,7 +11172,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -11180,7 +11180,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.2.6.2",
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.6.2",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: XEM Rear",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -11195,7 +11195,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -11203,7 +11203,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.2.7.1",
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.7.1",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: XEM Front",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -11218,7 +11218,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -11226,7 +11226,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.2.7.2",
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.7.2",
-                    "sensor_type": "TemperatureState",
+                    "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: XEM Rear",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -11241,7 +11241,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "TemperatureState"
+                    "state_name": "AtTemperatureState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -11249,7 +11249,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.2.1.8.1.5.1",
                     "sensor_index": "atEnvMonv2VoltageIndex.1.5.1",
-                    "sensor_type": "VoltageState",
+                    "sensor_type": "AtVoltageState",
                     "sensor_descr": "Voltage: 2.5V",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -11264,7 +11264,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "VoltageState"
+                    "state_name": "AtVoltageState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -11272,7 +11272,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.2.1.8.1.5.2",
                     "sensor_index": "atEnvMonv2VoltageIndex.1.5.2",
-                    "sensor_type": "VoltageState",
+                    "sensor_type": "AtVoltageState",
                     "sensor_descr": "Voltage: Battery",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -11287,7 +11287,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "VoltageState"
+                    "state_name": "AtVoltageState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -11295,7 +11295,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.2.1.8.1.5.3",
                     "sensor_index": "atEnvMonv2VoltageIndex.1.5.3",
-                    "sensor_type": "VoltageState",
+                    "sensor_type": "AtVoltageState",
                     "sensor_descr": "Voltage: 3.3V",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -11310,7 +11310,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "VoltageState"
+                    "state_name": "AtVoltageState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -11318,7 +11318,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.2.1.8.1.5.4",
                     "sensor_index": "atEnvMonv2VoltageIndex.1.5.4",
-                    "sensor_type": "VoltageState",
+                    "sensor_type": "AtVoltageState",
                     "sensor_descr": "Voltage: 12V",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -11333,7 +11333,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "VoltageState"
+                    "state_name": "AtVoltageState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -11341,7 +11341,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.2.1.8.1.5.5",
                     "sensor_index": "atEnvMonv2VoltageIndex.1.5.5",
-                    "sensor_type": "VoltageState",
+                    "sensor_type": "AtVoltageState",
                     "sensor_descr": "Voltage: 1V",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -11356,7 +11356,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "VoltageState"
+                    "state_name": "AtVoltageState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -11364,7 +11364,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.2.1.8.2.5.1",
                     "sensor_index": "atEnvMonv2VoltageIndex.2.5.1",
-                    "sensor_type": "VoltageState",
+                    "sensor_type": "AtVoltageState",
                     "sensor_descr": "Voltage: 2.5V",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -11379,7 +11379,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "VoltageState"
+                    "state_name": "AtVoltageState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -11387,7 +11387,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.2.1.8.2.5.2",
                     "sensor_index": "atEnvMonv2VoltageIndex.2.5.2",
-                    "sensor_type": "VoltageState",
+                    "sensor_type": "AtVoltageState",
                     "sensor_descr": "Voltage: Battery",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -11402,7 +11402,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "VoltageState"
+                    "state_name": "AtVoltageState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -11410,7 +11410,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.2.1.8.2.5.3",
                     "sensor_index": "atEnvMonv2VoltageIndex.2.5.3",
-                    "sensor_type": "VoltageState",
+                    "sensor_type": "AtVoltageState",
                     "sensor_descr": "Voltage: 3.3V",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -11425,7 +11425,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "VoltageState"
+                    "state_name": "AtVoltageState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -11433,7 +11433,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.2.1.8.2.5.4",
                     "sensor_index": "atEnvMonv2VoltageIndex.2.5.4",
-                    "sensor_type": "VoltageState",
+                    "sensor_type": "AtVoltageState",
                     "sensor_descr": "Voltage: 12V",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -11448,7 +11448,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "VoltageState"
+                    "state_name": "AtVoltageState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -11456,7 +11456,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.207.8.4.4.3.12.2.1.8.2.5.5",
                     "sensor_index": "atEnvMonv2VoltageIndex.2.5.5",
-                    "sensor_type": "VoltageState",
+                    "sensor_type": "AtVoltageState",
                     "sensor_descr": "Voltage: 1V",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
@@ -11471,7 +11471,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "VoltageState"
+                    "state_name": "AtVoltageState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -12128,9 +12128,9 @@
                     "sensor_divisor": "1000",
                     "sensor_multiplier": "1",
                     "sensor_current": "2.487",
-                    "sensor_limit": "2.86005",
+                    "sensor_limit": "2.865",
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": "2.11395",
+                    "sensor_limit_low": "2.344",
                     "sensor_limit_low_warn": null,
                     "sensor_alert": "1",
                     "sensor_custom": "No",
@@ -12151,9 +12151,9 @@
                     "sensor_divisor": "1000",
                     "sensor_multiplier": "1",
                     "sensor_current": "3.164",
-                    "sensor_limit": "3.6386",
+                    "sensor_limit": "3.586",
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": "2.6894",
+                    "sensor_limit_low": "2.7",
                     "sensor_limit_low_warn": null,
                     "sensor_alert": "1",
                     "sensor_custom": "No",
@@ -12174,9 +12174,9 @@
                     "sensor_divisor": "1000",
                     "sensor_multiplier": "1",
                     "sensor_current": "3.317",
-                    "sensor_limit": "3.81455",
+                    "sensor_limit": "3.627",
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": "2.81945",
+                    "sensor_limit_low": "2.973",
                     "sensor_limit_low_warn": null,
                     "sensor_alert": "1",
                     "sensor_custom": "No",
@@ -12197,9 +12197,9 @@
                     "sensor_divisor": "1000",
                     "sensor_multiplier": "1",
                     "sensor_current": "12.125",
-                    "sensor_limit": "13.9438",
+                    "sensor_limit": "13.188",
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": "10.3062",
+                    "sensor_limit_low": "10.813",
                     "sensor_limit_low_warn": null,
                     "sensor_alert": "1",
                     "sensor_custom": "No",
@@ -12220,9 +12220,9 @@
                     "sensor_divisor": "1000",
                     "sensor_multiplier": "1",
                     "sensor_current": "0.998",
-                    "sensor_limit": "1.1477",
+                    "sensor_limit": "1.097",
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": "0.8483",
+                    "sensor_limit_low": "0.9",
                     "sensor_limit_low_warn": null,
                     "sensor_alert": "1",
                     "sensor_custom": "No",
@@ -12243,9 +12243,9 @@
                     "sensor_divisor": "1000",
                     "sensor_multiplier": "1",
                     "sensor_current": "2.5",
-                    "sensor_limit": "2.875",
+                    "sensor_limit": "2.865",
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": "2.125",
+                    "sensor_limit_low": "2.344",
                     "sensor_limit_low_warn": null,
                     "sensor_alert": "1",
                     "sensor_custom": "No",
@@ -12266,9 +12266,9 @@
                     "sensor_divisor": "1000",
                     "sensor_multiplier": "1",
                     "sensor_current": "3.136",
-                    "sensor_limit": "3.6064",
+                    "sensor_limit": "3.586",
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": "2.6656",
+                    "sensor_limit_low": "2.7",
                     "sensor_limit_low_warn": null,
                     "sensor_alert": "1",
                     "sensor_custom": "No",
@@ -12289,9 +12289,9 @@
                     "sensor_divisor": "1000",
                     "sensor_multiplier": "1",
                     "sensor_current": "3.317",
-                    "sensor_limit": "3.81455",
+                    "sensor_limit": "3.627",
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": "2.81945",
+                    "sensor_limit_low": "2.973",
                     "sensor_limit_low_warn": null,
                     "sensor_alert": "1",
                     "sensor_custom": "No",
@@ -12312,9 +12312,9 @@
                     "sensor_divisor": "1000",
                     "sensor_multiplier": "1",
                     "sensor_current": "12.125",
-                    "sensor_limit": "13.9438",
+                    "sensor_limit": "13.188",
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": "10.3062",
+                    "sensor_limit_low": "10.813",
                     "sensor_limit_low_warn": null,
                     "sensor_alert": "1",
                     "sensor_custom": "No",
@@ -12335,9 +12335,9 @@
                     "sensor_divisor": "1000",
                     "sensor_multiplier": "1",
                     "sensor_current": "0.998",
-                    "sensor_limit": "1.1477",
+                    "sensor_limit": "1.097",
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": "0.8483",
+                    "sensor_limit_low": "0.9",
                     "sensor_limit_low_warn": null,
                     "sensor_alert": "1",
                     "sensor_custom": "No",
@@ -12350,91 +12350,91 @@
             ],
             "state_indexes": [
                 {
-                    "state_name": "FanState",
+                    "state_name": "AtFanState",
                     "state_descr": "null",
                     "state_draw_graph": "0",
                     "state_value": "-1",
                     "state_generic_value": "3"
                 },
                 {
-                    "state_name": "FanState",
+                    "state_name": "AtFanState",
                     "state_descr": "failed",
                     "state_draw_graph": "0",
                     "state_value": "1",
                     "state_generic_value": "2"
                 },
                 {
-                    "state_name": "FanState",
+                    "state_name": "AtFanState",
                     "state_descr": "good",
                     "state_draw_graph": "0",
                     "state_value": "2",
                     "state_generic_value": "0"
                 },
                 {
-                    "state_name": "PowerSupplyState",
+                    "state_name": "AtPowerSupplyState",
                     "state_descr": "null",
                     "state_draw_graph": "0",
                     "state_value": "-1",
                     "state_generic_value": "3"
                 },
                 {
-                    "state_name": "PowerSupplyState",
+                    "state_name": "AtPowerSupplyState",
                     "state_descr": "failed",
                     "state_draw_graph": "0",
                     "state_value": "1",
                     "state_generic_value": "2"
                 },
                 {
-                    "state_name": "PowerSupplyState",
+                    "state_name": "AtPowerSupplyState",
                     "state_descr": "good",
                     "state_draw_graph": "0",
                     "state_value": "2",
                     "state_generic_value": "0"
                 },
                 {
-                    "state_name": "PowerSupplyState",
+                    "state_name": "AtPowerSupplyState",
                     "state_descr": "notPowered",
                     "state_draw_graph": "0",
                     "state_value": "3",
                     "state_generic_value": "3"
                 },
                 {
-                    "state_name": "TemperatureState",
+                    "state_name": "AtTemperatureState",
                     "state_descr": "null",
                     "state_draw_graph": "0",
                     "state_value": "-1",
                     "state_generic_value": "3"
                 },
                 {
-                    "state_name": "TemperatureState",
+                    "state_name": "AtTemperatureState",
                     "state_descr": "outOfRange",
                     "state_draw_graph": "0",
                     "state_value": "1",
                     "state_generic_value": "2"
                 },
                 {
-                    "state_name": "TemperatureState",
+                    "state_name": "AtTemperatureState",
                     "state_descr": "inRange",
                     "state_draw_graph": "0",
                     "state_value": "2",
                     "state_generic_value": "0"
                 },
                 {
-                    "state_name": "VoltageState",
+                    "state_name": "AtVoltageState",
                     "state_descr": "null",
                     "state_draw_graph": "0",
                     "state_value": "-1",
                     "state_generic_value": "3"
                 },
                 {
-                    "state_name": "VoltageState",
+                    "state_name": "AtVoltageState",
                     "state_descr": "outOfRange",
                     "state_draw_graph": "0",
                     "state_value": "1",
                     "state_generic_value": "2"
                 },
                 {
-                    "state_name": "VoltageState",
+                    "state_name": "AtVoltageState",
                     "state_descr": "inRange",
                     "state_draw_graph": "0",
                     "state_value": "2",
@@ -12532,31 +12532,12 @@
             ]
         }
     },
-    "bgp-peers": {
-        "discovery": {
-            "devices": [
-                {
-                    "bgpLocalAs": "0"
-                }
-            ],
-            "bgpPeers": [],
-            "bgpPeers_cbgp": []
-        },
-        "poller": "matches discovery"
-    },
-    "wireless": {
-        "discovery": {
-            "wireless_sensors": []
-        },
-        "poller": "matches discovery"
-    },
     "applications": {
         "poller": {
             "applications": [
                 {
                     "app_type": "ntp",
                     "app_state": "UNKNOWN",
-                    "app_id": NULL,
                     "discovered": "0",
                     "app_state_prev": null,
                     "app_status": "",
@@ -12564,6 +12545,356 @@
                 }
             ],
             "application_metrics": []
+    "vlans": {
+        "discovery": {
+            "vlans": [
+                {
+                    "vlan_vlan": "1",
+                    "vlan_domain": "1",
+                    "vlan_name": "Link",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": "2",
+                    "vlan_domain": "1",
+                    "vlan_name": "Link",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": "4",
+                    "vlan_domain": "1",
+                    "vlan_name": "Link",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": "20",
+                    "vlan_domain": "1",
+                    "vlan_name": "Link",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": "99",
+                    "vlan_domain": "1",
+                    "vlan_name": "unused-ports",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": "100",
+                    "vlan_domain": "1",
+                    "vlan_name": "MC-SRC",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": "105",
+                    "vlan_domain": "1",
+                    "vlan_name": "Link",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": "3620",
+                    "vlan_domain": "1",
+                    "vlan_name": "IPTV-SRC",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                }
+            ],
+            "ports_vlans": [
+                {
+                    "vlan": "1",
+                    "baseport": "1",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "0"
+                },
+                {
+                    "vlan": "1",
+                    "baseport": "2",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "0"
+                },
+                {
+                    "vlan": "1",
+                    "baseport": "3",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "0"
+                },
+                {
+                    "vlan": "1",
+                    "baseport": "4",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "0"
+                },
+                {
+                    "vlan": "1",
+                    "baseport": "6",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "1"
+                },
+                {
+                    "vlan": "1",
+                    "baseport": "11",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "1"
+                },
+                {
+                    "vlan": "1",
+                    "baseport": "12",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "1"
+                },
+                {
+                    "vlan": "1",
+                    "baseport": "13",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "1"
+                },
+                {
+                    "vlan": "1",
+                    "baseport": "17",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "0"
+                },
+                {
+                    "vlan": "1",
+                    "baseport": "18",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "0"
+                },
+                {
+                    "vlan": "1",
+                    "baseport": "19",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "0"
+                },
+                {
+                    "vlan": "1",
+                    "baseport": "20",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "0"
+                },
+                {
+                    "vlan": "1",
+                    "baseport": "21",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "1"
+                },
+                {
+                    "vlan": "1",
+                    "baseport": "22",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "1"
+                },
+                {
+                    "vlan": "1",
+                    "baseport": "24",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "1"
+                },
+                {
+                    "vlan": "1",
+                    "baseport": "25",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "1"
+                },
+                {
+                    "vlan": "1",
+                    "baseport": "26",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "1"
+                },
+                {
+                    "vlan": "1",
+                    "baseport": "27",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "1"
+                },
+                {
+                    "vlan": "1",
+                    "baseport": "28",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "1"
+                },
+                {
+                    "vlan": "1",
+                    "baseport": "30",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "1"
+                },
+                {
+                    "vlan": "1",
+                    "baseport": "33",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "0"
+                },
+                {
+                    "vlan": "1",
+                    "baseport": "35",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "1"
+                },
+                {
+                    "vlan": "2",
+                    "baseport": "5",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "1"
+                },
+                {
+                    "vlan": "2",
+                    "baseport": "13",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "0"
+                },
+                {
+                    "vlan": "4",
+                    "baseport": "14",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "0"
+                },
+                {
+                    "vlan": "4",
+                    "baseport": "29",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "0"
+                },
+                {
+                    "vlan": "20",
+                    "baseport": "11",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "0"
+                },
+                {
+                    "vlan": "20",
+                    "baseport": "12",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "0"
+                },
+                {
+                    "vlan": "20",
+                    "baseport": "27",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "0"
+                },
+                {
+                    "vlan": "20",
+                    "baseport": "35",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "0"
+                },
+                {
+                    "vlan": "100",
+                    "baseport": "7",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "1"
+                },
+                {
+                    "vlan": "100",
+                    "baseport": "23",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "1"
+                },
+                {
+                    "vlan": "100",
+                    "baseport": "34",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "1"
+                },
+                {
+                    "vlan": "105",
+                    "baseport": "9",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "1"
+                },
+                {
+                    "vlan": "105",
+                    "baseport": "10",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "1"
+                },
+                {
+                    "vlan": "3620",
+                    "baseport": "8",
+                    "priority": "0",
+                    "state": "unknown",
+                    "cost": "0",
+                    "untagged": "1"
+                }
+            ]
         }
     }
 }

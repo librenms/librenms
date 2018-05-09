@@ -1,13 +1,15 @@
 <?php
 
-if ($_SESSION['userlevel'] < 10) {
+use LibreNMS\Authentication\Auth;
+
+if (!Auth::user()->hasGlobalAdmin()) {
     require 'includes/error-no-perm.inc.php';
     exit;
 }
 
 $pagetitle[] = "Delete device";
 
-if ($_SESSION['userlevel'] == 11) {
+if (Auth::user()->isDemoUser()) {
     demo_account();
 } else {
     if (is_numeric($_REQUEST['id'])) {

@@ -15,6 +15,8 @@
  * @author     LibreNMS Contributors
 */
 
+use LibreNMS\Authentication\Auth;
+
 $graph_type = 'toner_usage';
 
 $sql = 'SELECT * FROM `toner` AS S, `devices` AS D WHERE S.device_id = D.device_id';
@@ -24,7 +26,7 @@ if (!empty($searchPhrase)) {
 }
 
 $count_sql = "SELECT COUNT(`toner_id`) FROM `toner`";
-$param[] = $_SESSION['user_id'];
+$param[] = Auth::id();
 
 $count     = dbFetchCell($count_sql, $param);
 if (empty($count)) {

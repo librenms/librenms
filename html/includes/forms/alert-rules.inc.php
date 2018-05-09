@@ -2,7 +2,7 @@
 /**
  * alert-rules.inc.php
  *
- * LibreNMS alert-rules.inc.php for processor
+ * LibreNMS alert-rules.inc.php
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,10 +24,11 @@
  */
 
 use LibreNMS\Alerting\QueryBuilderParser;
+use LibreNMS\Authentication\Auth;
 
 header('Content-type: application/json');
 
-if (is_admin() === false) {
+if (!Auth::user()->hasGlobalAdmin()) {
     die(json_encode([
         'status' => 'error',
         'message' => 'ERROR: You need to be admin',
@@ -148,7 +149,6 @@ if (is_numeric($rule_id) && $rule_id > 0) {
     dbSyncRelationship('alert_device_map', 'rule_id', $rule_id, 'device_id', $devices);
     dbSyncRelationship('alert_group_map', 'rule_id', $rule_id, 'group_id', $groups);
 }
-
 
 die(json_encode([
     'status'       => $status,

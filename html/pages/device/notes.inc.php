@@ -9,13 +9,15 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
- 
+
+use LibreNMS\Authentication\Auth;
+
 $data = dbFetchRow("SELECT `notes` FROM `devices` WHERE device_id = ?", array(
     $device['device_id']
 ));
 
 $disabled = '';
-if (is_admin() === false) {
+if (!Auth::user()->hasGlobalAdmin()) {
     $disabled = 'disabled';
 }
 
