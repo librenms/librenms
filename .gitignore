@@ -9,6 +9,7 @@
 !/.github/
 !/.codeclimate.yml
 !/.mention-bot
+!/.env.example
 
 # Others #
 ##########
@@ -25,7 +26,9 @@ nbproject
 patches
 !/lib/yaml
 /vendor
+/node_modules
 composer.phar
+_ide_helper.php
 
 # Docs #
 ########
