@@ -15,7 +15,7 @@ $rrd_filename = rrd_name($device['hostname'], array('app', 'powerwall', $app['ap
 $rrd_list=array();
 if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_list[]=array(
-	'colour' => 'ffcc00',
+        'colour' => 'ffcc00',
         'filename' => $rrd_filename,
         'descr'    => 'Solar Power',
         'ds'       => 'solar-power',
@@ -38,7 +38,6 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
         'descr'    => 'Grid Supply',
         'ds'       => 'site-power',
     );
-
 } else {
     d_echo('RRD "'.$rrd_filename.'" not found');
 }
