@@ -28,6 +28,7 @@ before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y snmp fping
   - mysql -e 'CREATE DATABASE librenms_phpunit_78hunjuybybh;'
+  - cp tests/config/config.test.php config.php
 
 install:
   - composer install --prefer-dist --no-interaction

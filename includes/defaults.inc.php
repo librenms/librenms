@@ -947,7 +947,7 @@ $config['graphite']['port']         = 2003;
 // HTTP and HTTPS, but they will be insecure. Setting this to $_SERVER["HTTPS"]
 // will send secure cookies when the site is being accessed over HTTPS, and
 // send insecure cookies when the site is being accessed over HTTP.
-$config['secure_cookies'] = $_SERVER["HTTPS"];
+$config['secure_cookies'] = isset($_SERVER["HTTPS"]) ? $_SERVER["HTTPS"] : false;
 
 // API config
 $config['api']['cors']['enabled'] = false;
