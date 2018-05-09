@@ -1,7 +1,11 @@
 <?php
 
-// OACOMMON-MIB::netspireDeviceModelName
-$hardware = snmp_get($device, "1.3.6.1.4.1.1732.2.1.41.0", "-OQv");
+$oids = array('netspireDeviceModelName.0', 'netSpireDeviceDeviceSerialNo.0');
 
-// OACOMMON-MIB::netSpireDeviceDeviceSerialNo
-$serial = preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "1.3.6.1.4.1.1732.2.1.11.0", "-OQv"));
+$data = snmp_get_multi_oid($device, $oids, '-OUQs', 'OACOMMON-MIB', 'openaccess');
+
+$hardware = $data[$oids[0]];
+$serial = $data[$oids[1]];
+
+unset($data);
+unset($oids);
