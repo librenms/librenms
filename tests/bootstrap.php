@@ -51,8 +51,8 @@ ini_set('display_errors', 1);
 
 update_os_cache(true); // Force update of OS Cache
 
+$snmpsim = new Snmpsim('127.1.6.2', 1162, null);
 if (getenv('SNMPSIM')) {
-    $snmpsim = new Snmpsim('127.1.6.2');
     $snmpsim->fork();
 
     // make PHP hold on a reference to $snmpsim so it doesn't get destructed

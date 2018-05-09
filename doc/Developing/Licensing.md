@@ -72,12 +72,11 @@ project.
     - Include its name, source URL, copyright notice, and license in `doc/General/Credits.md`
 
 - To add a php dependency, please use composer
-    - Add the dependency `composer require --update-no-dev slim/slim`
-    - Add the files and commit `composer commit` or `git add -f vendor/ composer.json; git commit`
+    - Add the dependency `composer require slim/slim`
 
     - Updating php dependencies
-        - Update dependencies `composer update --no-dev`
-        - Add the files and commit `composer commit` or `git add -f vendor/; git commit`
+        - Update dependencies `FORCE=1 php56 ./scripts/composer_wrapper.php update`
+        - Commit the updated composer.lock file
 
 - To add a javascript dependency
     - Where possible please include minimized libraries in the html/js/ folder.
