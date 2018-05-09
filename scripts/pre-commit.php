@@ -32,7 +32,7 @@ Running $filename without options runs all checks.
   -o, --os        Specific OS to run tests on. Implies --unit, --db, --snmpsim
   -m, --module    Specific Module to run tests on. Implies --unit, --db, --snmpsim
   -f, --fail-fast Quit when any failure is encountered
-  -p, --passthru  Display output from checks as it comes
+  -q, --quiet     Hide output unless there is an error
       --db        Run unit tests that require a database
       --snmpsim   Use snmpsim for unit tests
   -c, --commands  Print commands only, no checks
@@ -41,7 +41,7 @@ Running $filename without options runs all checks.
 }
 
 // set up some variables
-$passthru = check_opt($options, 'p', 'passthru');
+$passthru = !check_opt($options, 'q', 'quiet');
 $command_only = check_opt($options, 'c', 'commands');
 $fail_fast = check_opt($options, 'f', 'fail-fast');
 $return = 0;
@@ -303,36 +303,6 @@ function build_excludes($exclude_string, $excludes)
 }
 
 /**
- * Find an executable
- *
- * @param string|array $execs executable names to find
- * @return string the path to the executable, or '' if it is not found
- * @throws Exception Could not find the Executable
- */
-function find_exec($execs)
-{
-    foreach ((array)$execs as $exec) {
-        // check vendor bin first
-        $vendor_bin_dir = './vendor/bin/';
-        if (is_executable($vendor_bin_dir . $exec)) {
-            return $vendor_bin_dir . $exec;
-        }
-
-        // check path
-        $path_exec = shell_exec("which $exec 2> /dev/null");
-        if (!empty($path_exec)) {
-            return trim($path_exec);
-        }
-
-        // check the cwd
-        if (is_executable('./' . $exec)) {
-            return './' . $exec;
-        }
-    }
-    throw new Exception('Executable not found');
-}
-
-/**
  * Check for an executable and return the path to it
  * If it does not exist, run composer update.
  * If composer isn't installed, print error and exit.
@@ -342,15 +312,20 @@ function find_exec($execs)
  */
 function check_exec($exec)
 {
-    try {
-        return find_exec($exec);
-    } catch (Exception $e) {
-        try {
-            shell_exec("scripts/composer_wrapper.php install");
-            return find_exec($exec);
-        } catch (Exception $ce) {
-            echo "\nCould not find $exec. Please install composer.\nYou can find more info at http://docs.librenms.org/Developing/Validating-Code/\n";
-            exit(1);
-        }
+    $path = "vendor/bin/$exec";
+
+    if (is_executable($path)) {
+        return $path;
     }
+
+    echo "Running composer install to install developer dependencies.\n";
+    passthru("scripts/composer_wrapper.php install");
+
+    if (is_executable($path)) {
+        return $path;
+    }
+
+    echo "\nRunning installing deps with composer failed.\n You should try running './scripts/composer_wrapper.php install' by hand\n";
+    echo "You can find more info at http://docs.librenms.org/Developing/Validating-Code/\n";
+    exit(1);
 }
