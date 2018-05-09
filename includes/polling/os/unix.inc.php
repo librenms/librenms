@@ -125,7 +125,7 @@ if ($device['os'] == "linux" || $device['os'] == "endian" || $device['os'] == "p
     $features = str_replace("(", "", $features);
     $features = str_replace(")", "", $features);
     list(,,$hardware) = explode("$features", $device['sysDescr']);
-} elseif ($device['os'] == "openbsd" || $device['os'] == "solaris" || $device['os'] == "opensolaris") {
+} elseif ($device['os'] == "solaris" || $device['os'] == "opensolaris") {
     list(,,$version,$features,$hardware) = explode(" ", $device['sysDescr']);
     $features = str_replace("(", "", $features);
     $features = str_replace(")", "", $features);
