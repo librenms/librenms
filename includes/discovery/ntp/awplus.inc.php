@@ -1,8 +1,8 @@
 <?php
 /*
- * LibreNMS module to capture statistics from the CISCO-NTP-MIB
+ * LibreNMS module to capture statistics from the AT-NTP-MIB
  *
- * Copyright (c) 2016 Aaron Daniels <aaron@daniels.id.au>
+ * Copyright (c) 2018 Matt Read <matt.read@alliedtelesis.co.nz>
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -26,15 +26,15 @@ $tblComponents = array();
 
 // Let's gather some data..
 // For Reference:
-//      http://www.oidview.com/mibs/9/CISCO-NTP-MIB.html
-//      http://www.cisco.com/c/en/us/support/docs/availability/high-availability/19643-ntpm.html
-$cntpPeersVarEntry = snmpwalk_array_num($device, '.1.3.6.1.4.1.9.9.168.1.2.1.1', 2);
+//      https://github.com/librenms/librenms/blob/master/mibs/awplus/AT-NTP-MIB
+//      https://www.alliedtelesis.com/documents/network-time-protocol-ntp-feature-overview-and-configuration-guide
+$atNtpAssociationEntry = snmpwalk_group($device, 'atNtpAssociationEntry', 'AT-NTP-MIB');
 
 /*
  * False == no object found - this is not an error, no objects exist
  * null  == timeout or something else that caused an error, there may be objects but we couldn't get it.
  */
-if (is_null($cntpPeersVarEntry)) {
+if (is_null($atNtpAssociationEntry)) {
     // We have to error here or we will end up deleting all our components.
     echo "Error\n";
 } else {
@@ -42,13 +42,13 @@ if (is_null($cntpPeersVarEntry)) {
     d_echo("Objects Found:\n");
 
     // Let's grab the index for each NTP peer
-    foreach ($cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][2] as $index => $value) {
+    foreach ($atNtpAssociationEntry as $index => $value) {
         $result = array();
         $result['UID'] = (string)$index;    // This is cast as a string so it can be compared with the database value.
-        $result['peer'] = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][3][$index];
-        $result['port'] = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][4][$index];
-        $result['stratum'] = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][9][$index];
-        $result['peerref'] = IP::fromHexString($cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][15][$index], true);
+        $result['peer'] = $atNtpAssociationEntry[$index]['atNtpAssociationPeerAddr'];
+        $result['port'] = '123'; // awplus only supports default NTP Port.
+        $result['stratum'] = $atNtpAssociationEntry[$index]['atNtpAssociationStratum'];
+        $result['peerref'] = $atNtpAssociationEntry[$index]['atNtpAssociationRefClkAddr'];
         $result['label'] = $result['peer'].":".$result['port'];
 
         // Set the status, 16 = Bad
