@@ -37,10 +37,24 @@ class Checks
 {
     public static function preBoot()
     {
+        // check php extensions
+        $missing = self::missingPhpExtensions();
+
+        if (!empty($missing)) {
+            self::printMessage(
+                "Missing PHP extensions.  Please install and enable them on your LibreNMS server.",
+                $missing,
+                true
+            );
+        }
+
         // check file/folder permissions
         $check_folders = [
             self::basePath('bootstrap/cache'),
             self::basePath('storage'),
+            self::basePath('storage/framework/sessions'),
+            self::basePath('storage/framework/views'),
+            self::basePath('storage/framework/cache'),
             self::basePath('logs'),
         ];
 
@@ -76,14 +90,28 @@ class Checks
                 "setfacl -d -m g::rwx $dirs",
             ];
 
+            $current_groups = explode(' ', trim(exec('groups')));
+            if (!in_array($group, $current_groups)) {
+                $current_user = trim(exec('whoami'));
+                $chown_commands[] = "usermod -a -G $group $current_user";
+            }
+
+
             //check for missing directories
-            $missing = array_filter($check, 'file_exists');
+            $missing = array_filter($check, function ($file) {
+                return !file_exists($file);
+            });
+
             if (!empty($missing)) {
                 array_unshift($chown_commands, 'mkdir -p ' . implode(' ', $missing));
             }
 
+            $short_dirs = implode(', ', array_map(function ($dir) {
+                return str_replace(self::basePath(), '', $dir);
+            }, $check));
+
             self::printMessage(
-                "Error: $dirs not writable! Run these commands as root to fix:",
+                "Error: $short_dirs not writable! Run these commands as root on your LibreNMS server to fix:",
                 $chown_commands
             );
 
@@ -154,7 +182,10 @@ class Checks
             $message = implode(PHP_EOL, $content);
         } else {
             $format = "<h3 style='color: firebrick;'>%s</h3><p>%s</p>";
-            $message = implode('<br />', $content);
+            $message = '';
+            foreach ($content as $line) {
+                $message .= "<p style='margin:0.5em'>$line</p>\n";
+            }
         }
 
         printf($format, $title, $message);
@@ -168,5 +199,14 @@ class Checks
     {
         $base_dir = realpath(__DIR__ . '/..');
         return "$base_dir/$path";
+    }
+
+    private static function missingPhpExtensions()
+    {
+        $required_modules = ['mysqli', 'mbstring', 'pcre', 'curl', 'session', 'xml', 'gd'];
+
+        return array_filter($required_modules, function ($module) {
+            return !extension_loaded($module);
+        });
     }
 }
