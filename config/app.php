@@ -64,7 +64,7 @@ return [
     |
     */
 
-    'timezone' => null, // set to null to avoid setting timezone
+    'timezone' => ini_get('date.timezone'), // use existing timezone
 
     /*
     |--------------------------------------------------------------------------
