@@ -1,11 +1,14 @@
 <?php
 
-$oids = array('netspireDeviceModelName.0', 'netSpireDeviceDeviceSerialNo.0');
+$oids = array (
+    'hardware' => 'netspireDeviceModelName.0',
+    'serial'   => 'netSpireDeviceDeviceSerialNo.0'
+);
 
-$data = snmp_get_multi_oid($device, $oids, '-OUQs', 'OACOMMON-MIB', 'openaccess');
+$data = snmp_get_multi_oid($device, $oids, '-OUQs', 'OACOMMON-MIB');
 
-$hardware = $data[$oids[0]];
-$serial = $data[$oids[1]];
+foreach ($oids as $var => $oid) {
+    $$var = $data[$oid];
+}
 
-unset($data);
-unset($oids);
+unset($data, $oids);
