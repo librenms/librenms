@@ -131,14 +131,17 @@ class ComposerHelper
 
             // quote strings with spaces
             if (strpos($value, ' ') !== false) {
-                $value = "\"$value\"";
+                $line = "$key=\"" . $value . "\"\n";
+            } else {
+                $line = "$key=" . $value . PHP_EOL;
             }
 
             if (strpos($content, "$key=") !== false) {
                 // only replace ones that aren't already set for safety and uncomment
-                $content = preg_replace("/#?$key=\n/", "$key=$value\n", $content);
+                // escape $ in the replacement
+                $content = preg_replace("/#?$key=\n/", addcslashes($line, '$'), $content);
             } else {
-                $content .= "$key=$value\n";
+                $content .= $line;
             }
         }
 
