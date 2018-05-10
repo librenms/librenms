@@ -2,6 +2,9 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
+list(,,$version,$features,$hardware) = explode(" ", $device['sysDescr']);
+$features = str_replace(['(', ')'], '', $features);
+
 $oids = snmp_get_multi($device, 'pfStateCount.0 pfStateSearches.0 pfStateInserts.0 pfStateRemovals.0', '-OQUs', 'OPENBSD-PF-MIB');
 
 $states = $oids[0]['pfStateCount'];
