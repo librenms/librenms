@@ -201,7 +201,7 @@ class Checks
         return "$base_dir/$path";
     }
 
-    public static function missingPhpExtensions()
+    private static function missingPhpExtensions()
     {
         $required_modules = ['mysqli', 'mbstring', 'pcre', 'curl', 'session', 'xml', 'gd'];
 
