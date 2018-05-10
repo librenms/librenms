@@ -26,20 +26,21 @@ if (Config::get('enable_vrfs')) {
                 $rds = str_replace('.1.3.6.1.4.1.9.9.711.1.1.1.1.2.', '', $rds);
 
                 $vpnmib = 'CISCO-VRF-MIB';
-                // No descrs_oid given, does not exist for CISCO-VRF-MIB
+                // No descr_oid given, does not exist for CISCO-VRF-MIB
+                $descr_oid = null;
                 $ports_oid = '.1.3.6.1.4.1.9.9.711.1.2.1.1.2';
             } else {
                 $vpnmib = 'MPLS-VPN-MIB';
                 $rds    = str_replace('.1.3.6.1.3.118.1.2.2.1.3.', '', $rds);
 
-                $descrs_oid = '.1.3.6.1.3.118.1.2.2.1.2';
+                $descr_oid = '.1.3.6.1.3.118.1.2.2.1.2';
                 $ports_oid  = '.1.3.6.1.3.118.1.2.1.1.2';
             }
         } else {
             $vpnmib = 'MPLS-L3VPN-STD-MIB';
             $rds    = str_replace('.1.3.6.1.2.1.10.166.11.1.2.2.1.4.', '', $rds);
 
-            $descrs_oid = '.1.3.6.1.2.1.10.166.11.1.2.2.1.3';
+            $descr_oid = '.1.3.6.1.2.1.10.166.11.1.2.2.1.3';
             $ports_oid  = '.1.3.6.1.2.1.10.166.11.1.2.1.1.2';
         }
 
@@ -48,9 +49,9 @@ if (Config::get('enable_vrfs')) {
 
         $rds = trim($rds);
 
-        if ($vpnmib != 'CISCO-VRF-MIB') {
-            $descrs = snmp_walk($device, $descrs_oid, '-Osqn', $vpnmib, null);
-            $descrs = trim(str_replace("$descrs_oid.", '', $descrs));
+        if ($descr_oid) {
+            $descrs = snmp_walk($device, $descr_oid, '-Osqn', $vpnmib, null);
+            $descrs = trim(str_replace("$descr_oid.", '', $descrs));
             $descr_table = array();
             foreach (explode("\n", $descrs) as $descr) {
                 $t = explode(' ', $descr, 2);
@@ -75,7 +76,7 @@ if (Config::get('enable_vrfs')) {
         }
 
         foreach (explode("\n", $rds) as $oid) {
-            if ($vpnmib == 'CISCO-VRF-MIB' && strpos($oid, 'Platform_iVRF')) {
+            if (empty($descr_oid) && strpos($oid, 'Platform_iVRF')) {
                 // Skip since it is an internal service and not a VRF
                 continue;
             }
@@ -99,7 +100,7 @@ if (Config::get('enable_vrfs')) {
                     $vrf_rd[0] = hexdec($vrf_rd[0]); // Convert first object to decimal
                     $vrf_rd[1] = hexdec($vrf_rd[1]); // Convert second object to deciamal
                     $vrf_rd = implode(':', $vrf_rd); // Combine back into string, delimiter by colon
-                } elseif ($vpnmib == 'CISCO-VRF-MIB') {
+                } elseif (empty($descr_oid)) {
                     // Move rd to vrf_name and remove rd (no way to grab these values with CISCO-VRF-MIB)
                     $vrf_name = $vrf_rd;
                     unset($vrf_rd);
