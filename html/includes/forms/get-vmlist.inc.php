@@ -3,9 +3,8 @@ $vm_query = "SELECT a.vmwVmDisplayName AS vmname, a.vmwVmState AS powerstat, a.d
 
 if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
     #This is a bit ugly
-    $vm_query = "SELECT * FROM (".$vm_query;
-    $vm_query .= " ) as t WHERE t.vmname LIKE ? OR t.physicalsrv LIKE ? OR t.os LIKE ? ";
-    $count_query = "SELECT COUNT(*) FROM (" . $vm_query . " ) as t WHERE t.vmname LIKE ? OR t.physicalsrv LIKE ? OR t.os LIKE ? ";
+    $vm_query .= " WHERE vmname LIKE ? OR physicalsrv LIKE ? OR os LIKE ? OR sysname LIKE ?";
+    $count_query = "SELECT COUNT(a.vmwVmDisplayName AS vmname, b.hostname AS physicalsrv, b.sysname AS sysname, a.vmwVmGuestOS AS os, a.vmwVmMemSize AS memory, a.vmwVmCpus AS cpu) FROM vminfo AS a  LEFT JOIN devices AS b ON  a.device_id = b.device_id WHERE vmname LIKE ? OR physicalsrv LIKE ? OR os LIKE ?  OR sysname LIKE ?";
 } else {
     $count_query = "SELECT COUNT(*) FROM vminfo ";
 }
@@ -13,18 +12,10 @@ if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
 $order_by = '';
 if (isset($_REQUEST['sort']) && is_array($_REQUEST['sort'])) {
     foreach ($_REQUEST['sort'] as $key => $value) {
-        if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
-            $order_by .= " t.$key $value";
-        } else {
-            $order_by .= " $key $value";
-        }
+        $order_by .= " $key $value";
     }
 } else {
-    if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
-        $order_by = " t.vmname";
-    } else {
-        $order_by = " vmname";
-    }
+    $order_by = " vmname";
 }
 
 $vm_query .= " ORDER BY " . $order_by;
@@ -37,7 +28,7 @@ if (is_numeric($_POST['rowCount']) && is_numeric($_POST['current'])) {
 
 if (!empty($_POST['searchPhrase'])) {
     $searchphrase = '%'.mres($_POST['searchPhrase']).'%';
-    $vm_arr = dbFetchRows($vm_query, array($searchphrase, $searchphrase, $searchphrase));
+    $vm_arr = dbFetchRows($vm_query, array($searchphrase, $searchphrase, $searchphrase, $searchphrase));
 } else {
     $vm_arr = dbFetchRows($vm_query);
 }
