@@ -1,0 +1,40 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.9.1.896",
+                    "sysDescr": "Cisco IOS Software, s72033_rp Software (s72033_rp-IPSERVICES-M), Version 15.1(2)SY11, RELEASE SOFTWARE (fc3)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2017 by Cisco Systems, Inc.\r\nCompiled Fri 21-Jul-17 06:12 by prod_rel_te+",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": "",
+                    "features": null,
+                    "location": null,
+                    "os": "ios",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "cisco.svg"
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.9.1.896",
+                    "sysDescr": "Cisco IOS Software, s72033_rp Software (s72033_rp-IPSERVICES-M), Version 15.1(2)SY11, RELEASE SOFTWARE (fc3)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2017 by Cisco Systems, Inc.\r\nCompiled Fri 21-Jul-17 06:12 by prod_rel_te+",
+                    "sysContact": "<private>",
+                    "version": "15.1(2)SY11",
+                    "hardware": "catalyst65xxVirtualSwitch",
+                    "features": "IPSERVICES",
+                    "location": "<private>",
+                    "os": "ios",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "cisco.svg"
+                }
+            ]
+        }
+    }
+}
