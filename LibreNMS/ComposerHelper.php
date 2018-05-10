@@ -129,6 +129,11 @@ class ComposerHelper
                 continue;
             }
 
+            // quote strings with spaces
+            if (strpos($value, ' ') !== false) {
+                $value = "\"$value\"";
+            }
+
             if (strpos($content, "$key=") !== false) {
                 // only replace ones that aren't already set for safety and uncomment
                 $content = preg_replace("/#?$key=\n/", "$key=$value\n", $content);
