@@ -136,7 +136,8 @@ class ComposerHelper
 
             if (strpos($content, "$key=") !== false) {
                 // only replace ones that aren't already set for safety and uncomment
-                $content = preg_replace("/#?$key=\n/", "$key=$value\n", $content);
+                // escape $ in the replacement
+                $content = preg_replace("/#?$key=\n/", addcslashes("$key=$value\n", '$'), $content);
             } else {
                 $content .= "$key=$value\n";
             }
