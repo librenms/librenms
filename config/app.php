@@ -64,7 +64,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => null, // set to null to avoid setting timezone
 
     /*
     |--------------------------------------------------------------------------
