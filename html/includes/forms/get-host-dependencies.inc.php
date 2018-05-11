@@ -21,17 +21,24 @@ if (!Auth::user()->hasGlobalAdmin()) {
         if ($_POST['viewtype'] == 'fulllist') {
             $count_query = "SELECT count(device_id) from devices";
 
-            $deps_query = "SELECT  a.device_id as id, a.hostname as hostname, a.sysName as sysName, GROUP_CONCAT(b.hostname) as parents, GROUP_CONCAT(b.device_id) as parentid FROM devices as a LEFT JOIN device_relationships a1 ON a.device_id=a1.child_device_id LEFT JOIN devices b ON b.device_id=a1.parent_device_id GROUP BY a.device_id, a.hostname, a.sysName";
+            $deps_query = "SELECT a.device_id as id, a.hostname as hostname, a.sysName as sysName, GROUP_CONCAT(b.hostname) as parents, GROUP_CONCAT(b.device_id) as parentid FROM devices as a LEFT JOIN device_relationships a1 ON a.device_id=a1.child_device_id LEFT JOIN devices b ON b.device_id=a1.parent_device_id GROUP BY a.device_id, a.hostname, a.sysName";
 
             if (isset($_POST['format'])) {
                 if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
                     #This is a bit ugly
-                    $deps_query = "SELECT * FROM (".$deps_query;
-                    $deps_query .= " ) as t WHERE t.hostname LIKE ? OR t.parents LIKE ? OR t.sysname LIKE ? ";
-                    $deps_query .= " ORDER BY t.hostname";
-                } else {
-                    $deps_query .= " ORDER BY a.hostname";
+                    $deps_query .= " WHERE a.hostname LIKE ? OR parents LIKE ? OR a.sysName LIKE ? ";
                 }
+
+                $order_by = '';
+                if (isset($_POST['sort']) && is_array($_REQUEST['sort'])) {
+                    foreach ($_REQUEST['sort'] as $key => $value) {
+                        $order_by .= " $key $value";
+                    }
+                } else {
+                    $order_by = " a.hostname";
+                }
+
+                $deps_query .= " ORDER BY " . $order_by;
 
                 if (is_numeric($_POST['rowCount']) && is_numeric($_POST['current'])) {
                     $rows = $_POST['rowCount'];
