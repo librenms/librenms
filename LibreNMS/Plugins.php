@@ -90,9 +90,9 @@ class Plugins
         if (!empty(self::$plugins[$hook])) {
             foreach (self::$plugins[$hook] as $name) {
                 if (!is_array($params)) {
-                    call_user_func(array($name, $hook));
+                    @call_user_func(array($name, $hook));
                 } else {
-                    call_user_func_array(array($name, $hook), $params);
+                    @call_user_func_array(array($name, $hook), $params);
                 }
             }
         }
