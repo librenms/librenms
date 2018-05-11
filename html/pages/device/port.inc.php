@@ -104,8 +104,8 @@ if (count($components) > 0) {
     $menu_options['cbqos'] = 'CBQoS';
 }
 
-// If enabled via config, display the Plugin Link
-if ($config['enable_ports_plugins'] > 0) {
+if (LibreNMS\Plugins::count_hook('port_container')) {
+    // Checking if any plugin implements the port_container. If yes, allow to display the menu_option
     $menu_options['plugins'] = 'Plugins';
 }
 
