@@ -99,7 +99,7 @@ ini_set('display_errors', 1);
 if (!module_selected('nodb', $init_modules)) {
     // Connect to database
     try {
-        \LibreNMS\DB\Eloquent::boot();
+        // \LibreNMS\DB\Eloquent::boot();
 
         dbConnect();
     } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
