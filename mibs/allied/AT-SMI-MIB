@@ -1,7 +1,7 @@
 -- ============================================================================
 -- AT-SMI.MIB, Allied Telesis enterprise MIB: Structure of Management Information
 --
--- Copyright (c) 2014 by Allied Telesis, Inc.
+-- Copyright (c) 2006 by Allied Telesis, Inc.
 -- All rights reserved.
 --
 -- ============================================================================
@@ -16,25 +16,22 @@
 
 
         alliedTelesis MODULE-IDENTITY
-            LAST-UPDATED "201409300000Z"
+            LAST-UPDATED "201006150015Z"
             ORGANIZATION
                 "Allied Telesis, Inc."
             CONTACT-INFO
                 "  http://www.alliedtelesis.com"
             DESCRIPTION
                 "The Structure of Management Information for Allied Telesis enterprise."
-            REVISION "201409300000Z"
-            DESCRIPTION
-                "Merged object IDs from ATKK-WLAN-SMI-MIB for Wireless Products."
-            REVISION "201006150015Z"
-            DESCRIPTION
-                "MIB revision history dates in descriptions updated."
-            REVISION "200802280000Z"
-            DESCRIPTION
-                "Standardized the file head."
             REVISION "200606140000Z"
             DESCRIPTION
                 "Initial version of this MIB module."
+            REVISION "200802280000Z"
+            DESCRIPTION
+                "Standardized the file head."
+            REVISION "201006150015Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
             ::= { enterprises 207 }
 
 
@@ -68,18 +65,10 @@
             ::= { alliedTelesis 1 }
 
 
-        wirelesslan OBJECT-IDENTITY
-            STATUS current
-            DESCRIPTION
-                "subtree beneath which wireless lan product MIB object ids are assigned."
-            ::= { products 13 }
-
-
         mibObject OBJECT-IDENTITY
             STATUS current
             DESCRIPTION
-                "mibObject is the root OBJECT IDENTIFIER from which brouterMib and
-                wirelessLanmMIB are built."
+                "mibObject is the root OBJECT IDENTIFIER from which brouterMib is built."
             ::= { alliedTelesis 8 }
 
 
@@ -88,20 +77,6 @@
             DESCRIPTION
                 "subtree beneath which atRouter object ids are assigned."
             ::= { mibObject 4 }
-
-
-        wirelessLanmMIB OBJECT-IDENTITY
-            STATUS current
-            DESCRIPTION
-                "subtree beneath which object ids for wlanAccess and uwc are assigned."
-            ::= { mibObject 42 }
-
-
-        atUWC OBJECT-IDENTITY
-            STATUS current
-            DESCRIPTION
-                "subtree beneath which wlanSwitch object ids are assigned."
-            ::= { wirelessLanmMIB 8 }
 
 
         atRouter OBJECT-IDENTITY

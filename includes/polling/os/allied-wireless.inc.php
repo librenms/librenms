@@ -10,3 +10,5 @@ list($a,$b,$c) = explode(' ', $device['sysDescr']);
     $hardware = $a;
     $version = $c;
 
+$data_array = array();
+$data_array = snmpwalk_cache_multi_oid($device, '.1.3.6.1.4.1.207', $data_array);
