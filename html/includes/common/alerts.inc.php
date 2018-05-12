@@ -174,9 +174,9 @@ if (defined('SHOW_SETTINGS')) {
             $title = "Acknowledged $title";
         }
     }
-    
+
     if (is_numeric($delayed)) {
-       $title = "Delayed $title";
+        $title = "Delayed $title";
     }
 
     if (is_numeric($group)) {

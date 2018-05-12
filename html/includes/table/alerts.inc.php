@@ -50,7 +50,7 @@ if (is_numeric($vars['acknowledged'])) {
 }
 
 if (is_numeric($vars['delayed'])) {
-   $where .= " AND `alerts`.`alerted`=" . $alert_states['alerted']; 
+    $where .= " AND `alerts`.`alerted`=" . $alert_states['alerted'];
 }
 
 if (is_numeric($vars['state'])) {
