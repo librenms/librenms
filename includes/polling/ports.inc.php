@@ -4,175 +4,190 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $data_oids = array(
-    'ifName',
-    'ifDescr',
-    'ifAlias',
-    'ifAdminStatus',
-    'ifOperStatus',
-    'ifMtu',
-    'ifSpeed',
-    'ifHighSpeed',
-    'ifType',
-    'ifPhysAddress',
-    'ifPromiscuousMode',
-    'ifConnectorPresent',
-    'ifDuplex',
-    'ifTrunk',
-    'ifVlan',
-);
+        'ifName',
+        'ifDescr',
+        'ifAlias',
+        'ifAdminStatus',
+        'ifOperStatus',
+        'ifMtu',
+        'ifSpeed',
+        'ifHighSpeed',
+        'ifType',
+        'ifPhysAddress',
+        'ifPromiscuousMode',
+        'ifConnectorPresent',
+        'ifDuplex',
+        'ifTrunk',
+        'ifVlan',
+        );
 
 $stat_oids = array(
-    'ifInErrors',
-    'ifOutErrors',
-    'ifInUcastPkts',
-    'ifOutUcastPkts',
-    'ifInNUcastPkts',
-    'ifOutNUcastPkts',
-    'ifHCInMulticastPkts',
-    'ifHCInBroadcastPkts',
-    'ifHCOutMulticastPkts',
-    'ifHCOutBroadcastPkts',
-    'ifInOctets',
-    'ifOutOctets',
-    'ifHCInOctets',
-    'ifHCOutOctets',
-    'ifInDiscards',
-    'ifOutDiscards',
-    'ifInUnknownProtos',
-    'ifInBroadcastPkts',
-    'ifOutBroadcastPkts',
-    'ifInMulticastPkts',
-    'ifOutMulticastPkts',
-);
+        'ifInErrors',
+        'ifOutErrors',
+        'ifInUcastPkts',
+        'ifOutUcastPkts',
+        'ifInNUcastPkts',
+        'ifOutNUcastPkts',
+        'ifHCInMulticastPkts',
+        'ifHCInBroadcastPkts',
+        'ifHCOutMulticastPkts',
+        'ifHCOutBroadcastPkts',
+        'ifInOctets',
+        'ifOutOctets',
+        'ifHCInOctets',
+        'ifHCOutOctets',
+        'ifInDiscards',
+        'ifOutDiscards',
+        'ifInUnknownProtos',
+        'ifInBroadcastPkts',
+        'ifOutBroadcastPkts',
+        'ifInMulticastPkts',
+        'ifOutMulticastPkts',
+        );
 
 $stat_oids_db = array(
-    'ifInOctets',
-    'ifOutOctets',
-    'ifInErrors',
-    'ifOutErrors',
-    'ifInUcastPkts',
-    'ifOutUcastPkts',
-);
+        'ifInOctets',
+        'ifOutOctets',
+        'ifInErrors',
+        'ifOutErrors',
+        'ifInUcastPkts',
+        'ifOutUcastPkts',
+        );
 
 $stat_oids_db_extended = array(
-    'ifInNUcastPkts',
-    'ifOutNUcastPkts',
-    'ifInDiscards',
-    'ifOutDiscards',
-    'ifInUnknownProtos',
-    'ifInBroadcastPkts',
-    'ifOutBroadcastPkts',
-    'ifInMulticastPkts',
-    'ifOutMulticastPkts',
-);
+        'ifInNUcastPkts',
+        'ifOutNUcastPkts',
+        'ifInDiscards',
+        'ifOutDiscards',
+        'ifInUnknownProtos',
+        'ifInBroadcastPkts',
+        'ifOutBroadcastPkts',
+        'ifInMulticastPkts',
+        'ifOutMulticastPkts',
+        );
 
 $cisco_oids = array(
-    'locIfHardType',
-    'locIfInRunts',
-    'locIfInGiants',
-    'locIfInCRC',
-    'locIfInFrame',
-    'locIfInOverrun',
-    'locIfInIgnored',
-    'locIfInAbort',
-    'locIfCollisions',
-    'locIfInputQueueDrops',
-    'locIfOutputQueueDrops',
-);
+        'locIfHardType',
+        'locIfInRunts',
+        'locIfInGiants',
+        'locIfInCRC',
+        'locIfInFrame',
+        'locIfInOverrun',
+        'locIfInIgnored',
+        'locIfInAbort',
+        'locIfCollisions',
+        'locIfInputQueueDrops',
+        'locIfOutputQueueDrops',
+        );
 
 $pagp_oids = array(
-    'pagpOperationMode',
-);
+        'pagpOperationMode',
+        );
 
 $pagp_extended_oids = array(
-    'pagpPortState',
-    'pagpPartnerDeviceId',
-    'pagpPartnerLearnMethod',
-    'pagpPartnerIfIndex',
-    'pagpPartnerGroupIfIndex',
-    'pagpPartnerDeviceName',
-    'pagpEthcOperationMode',
-    'pagpDeviceId',
-    'pagpGroupIfIndex',
-);
+        'pagpPortState',
+        'pagpPartnerDeviceId',
+        'pagpPartnerLearnMethod',
+        'pagpPartnerIfIndex',
+        'pagpPartnerGroupIfIndex',
+        'pagpPartnerDeviceName',
+        'pagpEthcOperationMode',
+        'pagpDeviceId',
+        'pagpGroupIfIndex',
+        );
 
 $ifmib_oids = array(
-    'ifDescr',
-    'ifAdminStatus',
-    'ifOperStatus',
-    'ifLastChange',
-    'ifType',
-    'ifPhysAddress',
-    'ifMtu',
-    'ifInErrors',
-    'ifOutErrors',
-    'ifInDiscards',
-    'ifOutDiscards',
-);
+        'ifDescr',
+        'ifAdminStatus',
+        'ifOperStatus',
+        'ifLastChange',
+        'ifType',
+        'ifPhysAddress',
+        'ifMtu',
+        'ifInErrors',
+        'ifOutErrors',
+        'ifInDiscards',
+        'ifOutDiscards',
+        );
 
 $table_base_oids = array(
-    'ifName',
-    'ifAlias',
-    'ifDescr',
-    'ifHighSpeed',
-    'ifOperStatus',
-    'ifAdminStatus',
-);
+        'ifName',
+        'ifAlias',
+        'ifDescr',
+        'ifHighSpeed',
+        'ifOperStatus',
+        'ifAdminStatus',
+        );
 
 $hc_mappings = array(
-    'ifHCInOctets' => 'ifInOctets',
-    'ifHCOutOctets' => 'ifOutOctets',
-    'ifHCInUcastPkts' => 'ifInUcastPkts',
-    'ifHCOutUcastPkts' => 'ifOutUcastPkts',
-    'ifHCInBroadcastPkts' => 'ifInBroadcastPkts',
-    'ifHCOutBroadcastPkts' => 'ifOutBroadcastPkts',
-    'ifHCInMulticastPkts' => 'ifInMulticastPkts',
-    'ifHCOutMulticastPkts' => 'ifOutMulticastPkts',
-);
+        'ifHCInOctets' => 'ifInOctets',
+        'ifHCOutOctets' => 'ifOutOctets',
+        'ifHCInUcastPkts' => 'ifInUcastPkts',
+        'ifHCOutUcastPkts' => 'ifOutUcastPkts',
+        'ifHCInBroadcastPkts' => 'ifInBroadcastPkts',
+        'ifHCOutBroadcastPkts' => 'ifOutBroadcastPkts',
+        'ifHCInMulticastPkts' => 'ifInMulticastPkts',
+        'ifHCOutMulticastPkts' => 'ifOutMulticastPkts',
+        );
 
 $hc_oids = array(
-    'ifInMulticastPkts',
-    'ifInBroadcastPkts',
-    'ifOutMulticastPkts',
-    'ifOutBroadcastPkts',
-    'ifHCInOctets',
-    'ifHCInUcastPkts',
-    'ifHCInMulticastPkts',
-    'ifHCInBroadcastPkts',
-    'ifHCOutOctets',
-    'ifHCOutUcastPkts',
-    'ifHCOutMulticastPkts',
-    'ifHCOutBroadcastPkts',
-    'ifPromiscuousMode',
-    'ifConnectorPresent',
-);
+        'ifInMulticastPkts',
+        'ifInBroadcastPkts',
+        'ifOutMulticastPkts',
+        'ifOutBroadcastPkts',
+        'ifHCInOctets',
+        'ifHCInUcastPkts',
+        'ifHCInMulticastPkts',
+        'ifHCInBroadcastPkts',
+        'ifHCOutOctets',
+        'ifHCOutUcastPkts',
+        'ifHCOutMulticastPkts',
+        'ifHCOutBroadcastPkts',
+        'ifPromiscuousMode',
+        'ifConnectorPresent',
+        );
 
 $nonhc_oids = array(
-    'ifSpeed',
-    'ifInOctets',
-    'ifInUcastPkts',
-    'ifInUnknownProtos',
-    'ifOutOctets',
-    'ifOutUcastPkts',
-);
+        'ifSpeed',
+        'ifInOctets',
+        'ifInUcastPkts',
+        'ifInUnknownProtos',
+        'ifOutOctets',
+        'ifOutUcastPkts',
+        );
 
 $shared_oids = array(
-    'ifInErrors',
-    'ifOutErrors',
-    'ifInNUcastPkts',
-    'ifOutNUcastPkts',
-    'ifInDiscards',
-    'ifOutDiscards',
-    'ifPhysAddress',
-    'ifLastChange',
-    'ifType',
-    'ifMtu',
-);
+        'ifInErrors',
+        'ifOutErrors',
+        'ifInNUcastPkts',
+        'ifOutNUcastPkts',
+        'ifInDiscards',
+        'ifOutDiscards',
+        'ifPhysAddress',
+        'ifLastChange',
+        'ifType',
+        'ifMtu',
+        );
+
+
+$vrp_poe_oids = array(
+        'hwPoePortName',
+        'hwPoePortEnable',
+        'hwPoePortPriority',
+        'hwPoePortMaximumPower',
+        'hwPoePortPowerOnStatus',
+        'hwPoePortPowerStatus',
+        'hwPoePortPdClass',
+        'hwPoePortReferencePower',
+        'hwPoePortConsumingPower',
+        'hwPoePortPeakPower',
+        'hwPoePortAveragePower',
+        );
 
 $dot3_oids = [
-    'dot3StatsIndex',
+'dot3StatsIndex',
     'dot3StatsDuplexStatus',
-];
+    ];
 
 echo 'Caching Oids: ';
 $port_stats = array();
@@ -222,7 +237,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
         $hc_test = array_slice($port_stats, 0, 1);
         // If the device doesn't have ifXentry data, fetch ifEntry instead.
         if ((!isset($hc_test[0]['ifHCInOctets']) && !is_numeric($hc_test[0]['ifHCInOctets'])) ||
-            ((!isset($hc_test[0]['ifHighSpeed']) && !is_numeric($hc_test[0]['ifHighSpeed'])))) {
+                ((!isset($hc_test[0]['ifHighSpeed']) && !is_numeric($hc_test[0]['ifHighSpeed'])))) {
             $port_stats = snmpwalk_cache_oid($device, 'ifEntry', $port_stats, 'IF-MIB', null, '-OQUst');
         } else {
             // For devices with ifXentry data, only specific ifEntry keys are fetched to reduce SNMP load
@@ -271,11 +286,43 @@ if ($device['adsl_count'] > '0') {
     $port_stats = snmpwalk_cache_oid($device, '.1.3.6.1.2.1.10.94.1.1.7.1.5', $port_stats, 'ADSL-LINE-MIB');
     $port_stats = snmpwalk_cache_oid($device, '.1.3.6.1.2.1.10.94.1.1.7.1.6', $port_stats, 'ADSL-LINE-MIB');
     $port_stats = snmpwalk_cache_oid($device, '.1.3.6.1.2.1.10.94.1.1.7.1.7', $port_stats, 'ADSL-LINE-MIB');
-}//end if
-
+}
+//end if
 if ($config['enable_ports_poe']) {
-    $port_stats = snmpwalk_cache_oid($device, 'pethPsePortEntry', $port_stats, 'POWER-ETHERNET-MIB');
-    $port_stats = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', $port_stats, 'CISCO-POWER-ETHERNET-EXT-MIB');
+    // Code by OS device
+
+    if ($device['os'] == 'procurve') {
+        $port_stats_poe = snmpwalk_cache_oid($device, 'pethPsePortEntry', array(), 'POWER-ETHERNET-MIB');
+    }
+
+    if ($device['os'] == 'ios') {
+        $port_stats_poe = snmpwalk_cache_oid($device, 'pethPsePortEntry', array(), 'POWER-ETHERNET-MIB');
+        $port_stats_poe = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', $port_stats_poe, 'CISCO-POWER-ETHERNET-EXT-MIB');
+        $port_ent_to_if = snmpwalk_cache_oid($device, 'portIfIndex', array(), 'CISCO-STACK-MIB');
+        foreach ($port_ent_to_if as $p_index => $p_stats) {
+            if ($p_stats[portIfIndex] > 0) {
+                $port_stats[$p_stats[portIfIndex]]['portIfIndex_rev'] = $p_index;
+            }
+            $port_stats[$p_stats]['portIfIndex'] = $p_index;
+        }
+        $entPhysicalAlias = snmpwalk_cache_oid($device, 'entPhysicalAlias', array(), 'ENTITY-MIB');
+        foreach ($entPhysicalAlias as $p_index => $p_stats) {
+            if ($p_stats[entPhysicalAlias] > 0) {
+                $port_stats[$p_stats[entPhysicalAlias]]['entPhysicalAlias_rev'] = $p_index;
+            }
+        }
+        foreach ($port_stats_poe as $p_index => $p_stats) {
+            echo 'Processing '. $p_index . "\n";
+            if ($port_ent_to_if[$p_index] && $port_ent_to_if[$p_index][portIfIndex] && $port_stats[$port_ent_to_if[$p_index][portIfIndex]]) {
+                //echo '    OK\n';
+                $port_stats[$port_ent_to_if[$p_index][portIfIndex]]=$port_stats[$port_ent_to_if[$p_index][portIfIndex]]+$p_stats;
+            }
+        }
+    }
+    if ($device['os'] == 'vrp') {
+        echo 'HwPoePortEntry' ;
+        $port_stats = snmpwalk_cache_oid($device, 'HwPoePortEntry', $port_stats, 'HUAWEI-POE-MIB');
+    }
 }
 
 if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
@@ -303,7 +350,9 @@ if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
 $polled = time();
 
 // End Building SNMP Cache Array
-d_echo($port_stats);
+
+//d_echo('d_echo($port_stats) : ');
+//d_echo($port_stats);
 
 // By default libreNMS uses the ifIndex to associate ports on devices with ports discoverd/polled
 // before and stored in the database. On Linux boxes this is a problem as ifIndexes may be
@@ -344,31 +393,29 @@ foreach ($port_stats as $ifIndex => $port) {
     $port_id = get_port_id($ports_mapped, $port, $port_association_mode);
 
     if (is_port_valid($port, $device)) {
-        echo 'valid';
-
         // Port newly discovered?
         if (! $ports[$port_id]) {
             /**
-              * When using the ifName or ifDescr as means to map discovered ports to
-              * known ports in the DB (think of port association mode) it's possible
-              * that we're facing the problem that the ifName or ifDescr polled from
-              * the device is unset or an empty string (like when querying some ubnt
-              * devices...). If this happends we have no way to map this port to any
-              * port found in the database. As reported this situation may occur for
-              * the time of one poll and might resolve automagically before the next
-              * poller run happens. Without this special case this would lead to new
-              * ports added to the database each time this situation occurs. To give
-              * the user the choice between »a lot of new ports« and »some poll runs
-              * are missed but ports stay stable« the 'ignore_unmapable_port' option
-              * has been added to configure this behaviour. To skip the port in this
-              * loop is sufficient as the next loop is looping only over ports found
-              * in the database and "maps back". As we did not add a new port to the
-              * DB here, there's no port to be mapped to.
-              *
-              * I'm using the in_array() check here, as I'm not sure if an "ifIndex"
-              * can be legally set to 0, which would yield True when checking if the
-              * value is empty().
-              */
+             * When using the ifName or ifDescr as means to map discovered ports to
+             * known ports in the DB (think of port association mode) it's possible
+             * that we're facing the problem that the ifName or ifDescr polled from
+             * the device is unset or an empty string (like when querying some ubnt
+             * devices...). If this happends we have no way to map this port to any
+             * port found in the database. As reported this situation may occur for
+             * the time of one poll and might resolve automagically before the next
+             * poller run happens. Without this special case this would lead to new
+             * ports added to the database each time this situation occurs. To give
+             * the user the choice between »a lot of new ports« and »some poll runs
+             * are missed but ports stay stable« the 'ignore_unmapable_port' option
+             * has been added to configure this behaviour. To skip the port in this
+             * loop is sufficient as the next loop is looping only over ports found
+             * in the database and "maps back". As we did not add a new port to the
+             * DB here, there's no port to be mapped to.
+             *
+             * I'm using the in_array() check here, as I'm not sure if an "ifIndex"
+             * can be legally set to 0, which would yield True when checking if the
+             * value is empty().
+             */
             if ($config['ignore_unmapable_port'] === true and in_array($port[$port_association_mode], array ('', null))) {
                 continue;
             }
@@ -376,7 +423,7 @@ foreach ($port_stats as $ifIndex => $port) {
             $port_id         = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex, 'ifName' => $ifName), 'ports');
             dbInsert(array('port_id' => $port_id), 'ports_statistics');
             $ports[$port_id] = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', array($port_id));
-            echo 'Adding: '.$ifName.'('.$ifIndex.')('.$port_id.')';
+            echo ('Adding: '.$ifName.'('.$ifIndex.')('.$port_id.')');
             // print_r($ports);
         } // Port re-discovered after previous deletion?
         elseif ($ports[$port_id]['deleted'] == 1) {
@@ -389,16 +436,16 @@ foreach ($port_stats as $ifIndex => $port) {
         }
 
         /** Assure stable bidirectional port mapping between DB and polled data
-          *
-          * Store the *current* ifIndex in the port info array containing all port information
-          * fetched from the database, as this is the only means we have to map ports_stats we
-          * just polled from the device to a port in $ports. All code below an includeed below
-          * will and has to map a port using it's ifIndex.
-          */
+         *
+         * Store the *current* ifIndex in the port info array containing all port information
+         * fetched from the database, as this is the only means we have to map ports_stats we
+         * just polled from the device to a port in $ports. All code below an includeed below
+         * will and has to map a port using it's ifIndex.
+         */
         $ports[$port_id]['ifIndex'] = $ifIndex;
         $port_stats[$ifIndex]['port_id'] = $port_id;
 
-    /* Build a list of all ports, identified by their port_id, found within this poller run. */
+        /* Build a list of all ports, identified by their port_id, found within this poller run. */
         $ports_found[] = $port_id;
     } // Port vanished (mark as deleted)
     else {
@@ -590,8 +637,8 @@ foreach ($ports as $port) {
                 $port_tune = $attribs['ifName_tune:'.$port['ifName']];
                 $device_tune = $attribs['override_rrdtool_tune'];
                 if ($port_tune == "true" ||
-                    ($device_tune == "true" && $port_tune != 'false') ||
-                    ($config['rrdtool_tune'] == "true" && $port_tune != 'false' && $device_tune != 'false')) {
+                        ($device_tune == "true" && $port_tune != 'false') ||
+                        ($config['rrdtool_tune'] == "true" && $port_tune != 'false' && $device_tune != 'false')) {
                     if ($oid == 'ifSpeed') {
                         $tune_port = true;
                     }
@@ -623,12 +670,12 @@ foreach ($ports as $port) {
         // Parse description (usually ifAlias) if config option set
         if (isset($config['port_descr_parser']) && is_file($config['install_dir'].'/'.$config['port_descr_parser'])) {
             $port_attribs = array(
-                'type',
-                'descr',
-                'circuit',
-                'speed',
-                'notes',
-            );
+                    'type',
+                    'descr',
+                    'circuit',
+                    'speed',
+                    'notes',
+                    );
 
             include $config['install_dir'].'/'.$config['port_descr_parser'];
 
@@ -701,9 +748,9 @@ foreach ($ports as $port) {
             $port['stats']['ifOutBits_perc'] = round(($port['stats']['ifOutBits_rate'] / $this_port['ifSpeed'] * 100));
         }
 
-        echo 'bps('.formatRates($port['stats']['ifInBits_rate']).'/'.formatRates($port['stats']['ifOutBits_rate']).')';
-        echo 'bytes('.formatStorage($port['stats']['ifInOctets_diff']).'/'.formatStorage($port['stats']['ifOutOctets_diff']).')';
-        echo 'pkts('.format_si($port['stats']['ifInUcastPkts_rate']).'pps/'.format_si($port['stats']['ifOutUcastPkts_rate']).'pps)';
+        echo "bps(" . formatRates($port['stats']['ifInBits_rate']) . "/" . formatRates($port['stats']['ifOutBits_rate']) . ")";
+        echo "bytes(" . formatStorage($port['stats']['ifInOctets_diff']) . "/" . formatStorage($port['stats']['ifOutOctets_diff']) . ")";
+        echo "pkts(" . format_si($port['stats']['ifInUcastPkts_rate']) . "pps/" . format_si($port['stats']['ifOutUcastPkts_rate']) . "pps)";
 
         // Port utilisation % threshold alerting. // FIXME allow setting threshold per-port. probably 90% of ports we don't care about.
         if ($config['alerts']['port_util_alert'] && $port['ignore'] == '0') {
@@ -737,22 +784,22 @@ foreach ($ports as $port) {
             ->addDataset('OUTMULTICASTPKTS', 'DERIVE', 0, 12500000000);
 
         $fields = array(
-            'INOCTETS'         => $this_port['ifInOctets'],
-            'OUTOCTETS'        => $this_port['ifOutOctets'],
-            'INERRORS'         => $this_port['ifInErrors'],
-            'OUTERRORS'        => $this_port['ifOutErrors'],
-            'INUCASTPKTS'      => $this_port['ifInUcastPkts'],
-            'OUTUCASTPKTS'     => $this_port['ifOutUcastPkts'],
-            'INNUCASTPKTS'     => $this_port['ifInNUcastPkts'],
-            'OUTNUCASTPKTS'    => $this_port['ifOutNUcastPkts'],
-            'INDISCARDS'       => $this_port['ifInDiscards'],
-            'OUTDISCARDS'      => $this_port['ifOutDiscards'],
-            'INUNKNOWNPROTOS'  => $this_port['ifInUnknownProtos'],
-            'INBROADCASTPKTS'  => $this_port['ifInBroadcastPkts'],
-            'OUTBROADCASTPKTS' => $this_port['ifOutBroadcastPkts'],
-            'INMULTICASTPKTS'  => $this_port['ifInMulticastPkts'],
-            'OUTMULTICASTPKTS' => $this_port['ifOutMulticastPkts'],
-        );
+                'INOCTETS'         => $this_port['ifInOctets'],
+                'OUTOCTETS'        => $this_port['ifOutOctets'],
+                'INERRORS'         => $this_port['ifInErrors'],
+                'OUTERRORS'        => $this_port['ifOutErrors'],
+                'INUCASTPKTS'      => $this_port['ifInUcastPkts'],
+                'OUTUCASTPKTS'     => $this_port['ifOutUcastPkts'],
+                'INNUCASTPKTS'     => $this_port['ifInNUcastPkts'],
+                'OUTNUCASTPKTS'    => $this_port['ifOutNUcastPkts'],
+                'INDISCARDS'       => $this_port['ifInDiscards'],
+                'OUTDISCARDS'      => $this_port['ifOutDiscards'],
+                'INUNKNOWNPROTOS'  => $this_port['ifInUnknownProtos'],
+                'INBROADCASTPKTS'  => $this_port['ifInBroadcastPkts'],
+                'OUTBROADCASTPKTS' => $this_port['ifOutBroadcastPkts'],
+                'INMULTICASTPKTS'  => $this_port['ifInMulticastPkts'],
+                'OUTMULTICASTPKTS' => $this_port['ifOutMulticastPkts'],
+                );
 
         if ($tune_port === true) {
             rrdtool_tune('port', $rrdfile, $this_port['ifSpeed']);
