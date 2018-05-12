@@ -1,0 +1,250 @@
+-- *****************************************************************
+-- Meru Networks Enterprise Specific MIB
+--
+-- Copyright (c) 2005 by Meru Networks
+-- All rights reserved
+--
+-- *****************************************************************
+
+MERU-CONFIG-PACKETCAPTURE-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE, 
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY,
+    enterprises, 
+    Counter32, 
+    Counter64, 
+    Gauge32, 
+    TimeTicks, 
+    IpAddress, 
+    Integer32
+        FROM SNMPv2-SMI
+    Ipv6Address
+        FROM IPV6-TC
+    TEXTUAL-CONVENTION, 
+    TimeInterval, 
+    TimeStamp,
+    DateAndTime, 
+    TruthValue, 
+    DisplayString, 
+    MacAddress, 
+    RowStatus
+        FROM SNMPv2-TC
+    mwConfiguration
+        FROM MERU-SMI
+    MwlEnableDisableOption,
+    MwlEncapsulationType,
+    MwlPacketCaptureMode,
+    MwlRxTxOption,
+    MwlRateLimitMode,
+    MwlOnOffSwitch
+        FROM MERU-TC;
+
+  mwConfigPacketCapture  MODULE-IDENTITY
+    LAST-UPDATED "200506050000Z"
+    ORGANIZATION "Meru Networks"
+    CONTACT-INFO "support@merunetworks.com"
+    DESCRIPTION
+        "This MIB defines all the managed objects used to manage the Meru WLAN 
+         Packet Capture Configuration infrastructure"
+    ::= { mwConfiguration 17 } 
+  
+    
+  
+  mwPacketCaptureProfileTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwPacketCaptureProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Packet Capture "
+    ::= { mwConfigPacketCapture 1 }
+
+  mwPacketCaptureProfileEntry  OBJECT-TYPE
+    SYNTAX MwPacketCaptureProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Packet Capture "
+    INDEX {  mwPacketCaptureProfileTableIndex  }
+    ::= { mwPacketCaptureProfileTable 1 }
+
+  MwPacketCaptureProfileEntry  ::=  SEQUENCE { 
+       mwPacketCaptureProfileTableIndex                            Integer32, 
+       mwPacketCaptureProfileName                                  DisplayString(SIZE (1..32)),
+       mwPacketCaptureProfileStatus                                MwlEnableDisableOption,
+       mwPacketCaptureProfileApList                                DisplayString(SIZE (0..1000)),
+       mwPacketCaptureProfileFilter                                DisplayString(SIZE (0..32)),
+       mwPacketCaptureProfileUDPPort                               Unsigned32,
+       mwPacketCaptureProfileRateLimiting                          MwlOnOffSwitch,
+       mwPacketCaptureProfileEncapsulation                         MwlEncapsulationType,
+       mwPacketCaptureProfileDestinationIp                         IpAddress,
+       mwPacketCaptureProfileRateLimitMode                         MwlRateLimitMode,
+       mwPacketCaptureProfileInterfaceList                         DisplayString(SIZE (1..32)),
+       mwPacketCaptureProfileDestinationMac                        MacAddress,
+       mwPacketCaptureProfileTokenBucketRate                       Unsigned32,
+       mwPacketCaptureProfileTokenBucketSize                       Unsigned32,
+       mwPacketCaptureProfileConnectivityMode                      MwlPacketCaptureMode,
+       mwPacketCaptureProfileCaptureSiblingFrames                  MwlOnOffSwitch,
+       mwPacketCaptureProfilePacketTruncationLength                Unsigned32,
+       mwPacketCaptureProfileRxTx                                  MwlRxTxOption,
+       mwPacketCaptureProfileRowStatus                             RowStatus 
+  }
+   
+   
+  mwPacketCaptureProfileTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwPacketCaptureProfileEntry 1 }
+
+  mwPacketCaptureProfileName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Profile Name"
+    ::= { mwPacketCaptureProfileEntry    2 }
+
+  mwPacketCaptureProfileStatus  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Enable/Disable"
+    ::= { mwPacketCaptureProfileEntry    3 }
+
+  mwPacketCaptureProfileConnectivityMode  OBJECT-TYPE
+    SYNTAX MwlPacketCaptureMode
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes L2/L3 Mode"
+    ::= { mwPacketCaptureProfileEntry    4 }
+
+  mwPacketCaptureProfileDestinationIp  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Destination IP Address"
+    ::= { mwPacketCaptureProfileEntry    5 }
+
+  mwPacketCaptureProfileUDPPort  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes UDP Destination Port"
+    ::= { mwPacketCaptureProfileEntry    6 }
+
+  mwPacketCaptureProfileDestinationMac  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Destination MAC for L2 Mode"
+    ::= { mwPacketCaptureProfileEntry    7 }
+
+  mwPacketCaptureProfileRxTx  OBJECT-TYPE
+    SYNTAX MwlRxTxOption
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rx only/Tx only/Both"
+    ::= { mwPacketCaptureProfileEntry    8 }
+
+  mwPacketCaptureProfileRateLimitMode  OBJECT-TYPE
+    SYNTAX MwlRateLimitMode
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rate Limiting per station or cumulative"
+    ::= { mwPacketCaptureProfileEntry    9 }
+
+  mwPacketCaptureProfileTokenBucketRate  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Token Bucket Rate"
+    ::= { mwPacketCaptureProfileEntry   10 }
+
+  mwPacketCaptureProfileTokenBucketSize  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Token Bucket Size"
+    ::= { mwPacketCaptureProfileEntry   11 }
+
+  mwPacketCaptureProfileApList  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..1000))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Selection (ID)"
+    ::= { mwPacketCaptureProfileEntry   12 }
+
+  mwPacketCaptureProfileFilter  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Extended Filter String"
+    ::= { mwPacketCaptureProfileEntry   13 }
+
+  mwPacketCaptureProfileInterfaceList  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Index"
+    ::= { mwPacketCaptureProfileEntry   14 }
+
+  mwPacketCaptureProfilePacketTruncationLength  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Packet Truncation Length"
+    ::= { mwPacketCaptureProfileEntry   15 }
+
+  mwPacketCaptureProfileRateLimiting  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rate Limiting"
+    ::= { mwPacketCaptureProfileEntry   16 }
+
+  mwPacketCaptureProfileCaptureSiblingFrames  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Capture Sibling Frames"
+    ::= { mwPacketCaptureProfileEntry   17 }
+
+  mwPacketCaptureProfileEncapsulation  OBJECT-TYPE
+    SYNTAX MwlEncapsulationType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Encapsulation"
+    ::= { mwPacketCaptureProfileEntry   18 }
+
+  mwPacketCaptureProfileRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwPacketCaptureProfileEntry 19 }
+
+  
+END
+   
