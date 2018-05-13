@@ -1044,7 +1044,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
                     $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
                     $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
-                    
+
                     $limits = ['low_limit', 'low_warn_limit', 'warn_limit', 'high_limit'];
                     foreach ($limits as $limit) {
                         if (is_numeric($data[$limit])) {
@@ -1392,12 +1392,12 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
 }
 
 /**
- * Try to find a port by ifDescr, ifName, or MAC
+ * Try to find a port by ifDescr, ifName, ifAlias, or MAC
  *
- * @param string $description matched against ifDescr and ifName
- * @param string $identifier matched against ifDescr and ifName
+ * @param string $description matched against ifDescr, ifName, and ifAlias
+ * @param string $identifier matched against ifDescr, ifName, and ifAlias
  * @param int $device_id restrict search to ports on a specific device
- * @param string $mac_address check against ifPysAddress (should be in lowercase hexadecimal)
+ * @param string $mac_address check against ifPhysAddress (should be in lowercase hexadecimal)
  * @return int
  */
 function find_port_id($description, $identifier = '', $device_id = 0, $mac_address = null)
@@ -1411,10 +1411,15 @@ function find_port_id($description, $identifier = '', $device_id = 0, $mac_addre
 
     if ($device_id) {
         if ($description) {
+            // order is important here, the standard says this is ifDescr, which some mfg confuse with ifName
             $statements[] = "SELECT `port_id` FROM `ports` WHERE `device_id`=? AND (`ifDescr`=? OR `ifName`=?)";
-
             $params[] = $device_id;
             $params[] = $description;
+            $params[] = $description;
+
+            // we check ifAlias last because this is a user editable field, but some bad LLDP implementations use it
+            $statements[] = "SELECT `port_id` FROM `ports` WHERE `device_id`=? AND `ifAlias`=?";
+            $params[] = $device_id;
             $params[] = $description;
         }
 

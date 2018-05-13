@@ -233,16 +233,15 @@ syscontact Your Name <your@email.address>
 
 #Distro Detection
 extend .1.3.6.1.4.1.2021.7890.1 distro /usr/bin/distro
+
+#Hardware Detection (uncomment to enable)
+#extend .1.3.6.1.4.1.2021.7890.2 hardware '/bin/cat /sys/devices/virtual/dmi/id/product_name'
+#extend .1.3.6.1.4.1.2021.7890.3 manufacturer '/bin/cat /sys/devices/virtual/dmi/id/sys_vendor'
+#extend .1.3.6.1.4.1.2021.7890.4 serial '/bin/cat /sys/devices/virtual/dmi/id/product_serial'
 ```
 
-If you have 'dmidecode' installed on your host, you can add the following lines for additional hardware detection.
+**NOTE**: On some systems the snmpd is running as its own user, which means it can't read `/sys/devices/virtual/dmi/id/product_serial` which is mode 0400. One solution is to `chmod 444 /sys/devices/virtual/dmi/id/product_serial` in `/etc/rc.local` or equivalent.
 
-**NOTE**: On some systems the snmpd is running as an own user, making dmidecode unable to read out `/dev/mem` and thus showing multiple errors. Either add the snmp user to the `kmem` group or remove these lines again.
-```
-extend .1.3.6.1.4.1.2021.7890.2 hardware '/usr/sbin/dmidecode -s system-product-name'
-extend .1.3.6.1.4.1.2021.7890.3 manufacturer '/usr/sbin/dmidecode -s system-manufacturer'
-extend .1.3.6.1.4.1.2021.7890.4 serial '/usr/sbin/dmidecode -s system-serial-number'
-```
 The LibreNMS server include a copy of this example here:
 
 ```

@@ -16,7 +16,7 @@ We utilise [Readmegen](https://github.com/fojuth/readmegen) to automatically pop
 Install `readmegen` using `composer`:
 
 ```bash
-./composer.phar update
+./scripts/composer_wrapper.php install
 ```
 
 You can now create the update change log by running (201608 was our last release):

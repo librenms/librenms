@@ -9,27 +9,27 @@ Currently we have support for the following health metrics along with the values
 | Class                           | Measurement                 |
 | ------------------------------- | --------------------------- |
 | airflow                         | cfm                         |
+| ber                             | ratio                       |
 | charge                          | %                           |
+| chromatic_disperision           | ps/nm                       |
 | cooling                         | W                           |
 | current                         | A                           |
 | dbm                             | dBm                         |
+| delay                           | s                           |
+| eer                             | eer                         |
 | fanspeed                        | rpm                         |
 | frequency                       | Hz                          |
 | humidity                        | %                           |
 | load                            | %                           |
 | power                           | W                           |
 | pressure                        | kPa                         |
+| quality_factor                  | dB                          |
 | runtime                         | Min                         |
 | signal                          | dBm                         |
 | snr                             | SNR                         |
 | state                           | #                           |
 | temperature                     | C                           |
 | voltage                         | V                           |
-| delay                           | s                           |
-| quality_factor                  | dB                          |
-| chromatic_disperision           | ps/nm                       |
-| ber                             | ratio                       |
-| eer                             | eer                         |
 | waterflow                       | l/m                         |
 
 #### Simple health discovery

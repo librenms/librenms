@@ -53,6 +53,13 @@ toner:
     toner:
         excluded_fields: [device_id, toner_id]
         order_by: toner_oid, toner_index
+vlans:
+    vlans:
+        excluded_fields: [vlan_id, device_id]
+        order_by: vlan_domain, vlan_vlan
+    ports_vlans:
+        excluded_fields: [port_vlan_id, device_id, port_id]
+        order_by: vlan, baseport
 wireless:
     wireless_sensors:
         excluded_fields: [device_id, sensor_id, access_point_id, lastupdate]
