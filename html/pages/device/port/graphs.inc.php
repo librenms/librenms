@@ -61,7 +61,7 @@ if (rrdtool_check_rrd_exists(get_port_rrdfile_path($device['hostname'], $port['p
                 <h3 class="panel-title">Ethernet Errors</h3>
             </div>';
         $graph_type = 'port_etherlike';
-
+        
         echo '<div class="panel-body">';
             include 'includes/print-interface-graphs.inc.php';
         echo '</div></div>';
