@@ -15,6 +15,10 @@ if ($device['os'] == 'edgecos') {
     d_echo('EdgeCore Memory:');
 
 
+    if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.1.')) { //ECS4610
+        $temp_mibs = 'ECS4610-50T-MIB';
+    };
+
     if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.24.')) { //ECS4510
         $temp_mibs = 'ECS4510-MIB';
     };
