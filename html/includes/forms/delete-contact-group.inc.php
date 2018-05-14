@@ -32,6 +32,7 @@ if (!is_numeric($_POST['group_id'])) {
 } else {
     if (dbDelete('alert_contact_groups', '`contact_group_id` = ?', [$_POST['group_id']])) {
         dbDelete('contact_group_contact', '`contact_group_id`=?', [$_POST['group_id']]);
+        dbDelete('alert_contact_map', '`contact_type`="group" AND `contact_or_group_id`=?', [$_POST['group_id']]);
         $message = 'Alert contact group has been deleted';
     } else {
         $message = 'ERROR: Alert contact group has not been deleted';

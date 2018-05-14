@@ -46,6 +46,14 @@ if (is_numeric($alert_id) && $alert_id > 0) {
             'text' => ucfirst($member['transport_type']).": ".$member['contact_name']
         ];
     }
+
+    $c_groups = dbFetchRows('SELECT `contact_or_group_id`, `contact_group_name` FROM `alert_contact_map` LEFT JOIN `alert_contact_groups` ON `contact_or_group_id`=`contact_group_id` WHERE `contact_type`="group" AND `rule_id`=?', [$alert_id]);
+    foreach ($c_groups as $group) {
+        $contacts[] = [
+            'id' => 'g'.$group['contact_or_group_id'],
+            'text' => 'Group: '.$group['contact_group_name']
+        ];
+    }
 } elseif (is_numeric($template_id) && $template_id >= 0) {
     $tmp_rules = get_rules_from_json();
     $rule = $tmp_rules[$template_id];

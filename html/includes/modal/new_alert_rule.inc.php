@@ -200,7 +200,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                         if (data.status == 'ok') {
                             toastr.success(data.message);
                             $('#create-alert').modal('hide');
-                            window.location.reload(); // FIXME: reload table
+                            //window.location.reload(); // FIXME: reload table
                         } else {
                             toastr.error(data.message);
                         }
@@ -375,13 +375,13 @@ if (Auth::user()->hasGlobalAdmin()) {
 
         $("#contacts").select2({
             width: "100%",
-            placeholder: "Contact Name",
+            placeholder: "Contact/Group Name",
             ajax: {
                 url: 'ajax_list.php',
                 delay: 250,
                 data: function(params) {
                     return {
-                        type: "contacts",
+                        type: "contact_groups",
                         search: params.term
                     }
                 }

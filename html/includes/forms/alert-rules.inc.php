@@ -149,37 +149,55 @@ if (is_numeric($rule_id) && $rule_id > 0) {
     dbSyncRelationship('alert_device_map', 'rule_id', $rule_id, 'device_id', $devices);
     dbSyncRelationship('alert_group_map', 'rule_id', $rule_id, 'group_id', $groups);
 
-    // Update contacts - can't use dbSyncRelationship
-    $sql = "SELECT `contact_or_group_id` FROM `alert_contact_map` WHERE `contact_type`='single' AND `rule_id`=?";
-    $contacts = dbFetchColumn($sql, [$rule_id]);
-    $targets = [];
-    foreach ((array)$_POST['contacts'] as $target) {
-        $targets[] = (int)$target;
+    //Update contact groups and contacts - can't use dbSyncRelationship
+    $contacts = [];
+    $groups = [];
+    foreach ((array)$_POST['contacts'] as $item) {
+        if (starts_with($item, 'g')) {
+            $groups[] = (int)substr($item, 1);
+        } else {
+            $contacts[] = (int)$item;
+        }
     }
-    if (empty($targets)) {
-        // If no mappings given, delete all mappings
-        $where = "`contact_type`='single' AND `rule_id`=?";
-        dbDelete('alert_contact_map', $where, [$rule_id]);
-    } else {
-        foreach ($targets as $target) {
-            $key = array_search($target, $contacts);
-            if ($key === false) {
-                //Insert into db if mapping does not exist
-                dbInsert(array(
-                    'rule_id' => $rule_id,
-                    'contact_or_group_id' => $target,
-                    'contact_type' => 'single'
-                ), 'alert_contact_map');
-            } else {
-                // Remove from contacts so we don't iterate through it again
-                unset($contacts[$key]);
-            }
-        }
-        foreach ($contacts as $contact) {
-            //These ones we want to delete from the db
-            $where = "`contact_type`='single' AND `rule_id`=? AND `contact_or_group_id`=?";
-            dbDelete('alert_contact_map', $where, [$rule_id, $contact]);
-        }
+    
+    // Fetch contact/group mappings already in db
+    $sql = "SELECT `contact_or_group_id` FROM `alert_contact_map` WHERE `contact_type`='single' AND `rule_id`=?";
+    $db_contacts = dbFetchColumn($sql, [$rule_id]);
+    $sql = "SELECT `contact_or_group_id` FROM `alert_contact_map` WHERE `contact_type`='group' AND `rule_id`=?";
+    $db_groups = dbFetchColumn($sql, [$rule_id]);
+
+    // Compare arrays to get add and removed contacts/groups
+    $c_add = array_diff($contacts, $db_contacts);
+    $c_del = array_diff($db_contacts, $contacts);
+    $g_add = array_diff($groups, $db_groups);
+    $g_del = array_diff($db_groups, $groups);
+
+    // Insert any new mappings
+    $insert = [];
+    foreach ($c_add as $contact_id) {
+        $insert[] = array (
+            'contact_or_group_id' => $contact_id,
+            'contact_type' => 'single',
+            'rule_id' => $rule_id
+        );
+    }
+    foreach ($g_add as $group_id) {
+        $insert[] = array(
+            'contact_or_group_id' => $group_id,
+            'contact_type' => 'group',
+            'rule_id' => $rule_id
+        );
+    }
+    if (!empty($insert)) {
+        $res = dbBulkInsert($insert, 'alert_contact_map');
+    }
+
+    // Remove old mappings
+    if (!empty($c_del)) {
+        dbDelete('alert_contact_map', 'contact_type="single" AND contact_or_group_id IN (?)', array(implode(',', $c_del)));
+    }
+    if (!empty($g_del)) {
+        dbDelete('alert_contact_map', 'contact_type="group" AND contact_or_group_id IN (?)', array(implode(',', $g_del)));
     }
 }
 
