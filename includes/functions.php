@@ -915,7 +915,8 @@ function parse_email($emails)
                 $result[$out[2][0]] = $out[1][0];
             } else {
                 if (strpos($email, "@")) {
-                    $result[$email] = null;
+                    $from_name = Config::get('email_user');
+                    $result[$email] = $from_name;
                 }
             }
         }
@@ -934,9 +935,6 @@ function send_mail($emails, $subject, $message, $html = false)
         $mail->Hostname = php_uname('n');
 
         foreach (parse_email($config['email_from']) as $from => $from_name) {
-            if (empty($from_name)) {
-                $from_name = Config::get('email_user');
-            }
             $mail->setFrom($from, $from_name);
         }
         foreach ($emails as $email => $email_name) {
