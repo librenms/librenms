@@ -289,39 +289,41 @@ if ($device['adsl_count'] > '0') {
 
 if ($config['enable_ports_poe']) {
     // Code by OS device
-    if ($device['os'] == 'procurve') {
-        // Not tested
-        $port_stats_poe = snmpwalk_cache_oid($device, 'pethPsePortEntry', array(), 'POWER-ETHERNET-MIB');
-    }
 
     if ($device['os'] == 'ios') {
-        $port_stats_poe = snmpwalk_cache_oid($device, 'pethPsePortEntry', array(), 'POWER-ETHERNET-MIB');
-        $port_stats_poe = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', $port_stats_poe, 'CISCO-POWER-ETHERNET-EXT-MIB');
+        echo 'cpeExtPsePortEntry';
+        //$port_stats_poe = snmpwalk_cache_oid($device, 'pethPsePortEntry', array(), 'POWER-ETHERNET-MIB');
+        $port_stats_poe = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', array(), 'CISCO-POWER-ETHERNET-EXT-MIB');
         $port_ent_to_if = snmpwalk_cache_oid($device, 'portIfIndex', array(), 'CISCO-STACK-MIB');
-        foreach ($port_ent_to_if as $p_index => $p_stats) {
-            if ($p_stats[portIfIndex] > 0) {
-                $port_stats[$p_stats[portIfIndex]]['portIfIndex_rev'] = $p_index;
-            }
-            $port_stats[$p_stats]['portIfIndex'] = $p_index;
-        }
-        $entPhysicalAlias = snmpwalk_cache_oid($device, 'entPhysicalAlias', array(), 'ENTITY-MIB');
-        foreach ($entPhysicalAlias as $p_index => $p_stats) {
-            if ($p_stats[entPhysicalAlias] > 0) {
-                $port_stats[$p_stats[entPhysicalAlias]]['entPhysicalAlias_rev'] = $p_index;
-            }
-        }
-        foreach ($port_stats_poe as $p_index => $p_stats) {
-            echo 'Processing '. $p_index . "\n";
-            if ($port_ent_to_if[$p_index] && $port_ent_to_if[$p_index][portIfIndex] && $port_stats[$port_ent_to_if[$p_index][portIfIndex]]) {
-                //echo '    OK\n';
-                $port_stats[$port_ent_to_if[$p_index][portIfIndex]]=$port_stats[$port_ent_to_if[$p_index][portIfIndex]]+$p_stats;
-            }
-        }
-    }
 
-    if ($device['os'] == 'vrp') {
+        //foreach ($port_ent_to_if as $p_index => $p_stats) {
+        //    if ($p_stats[portIfIndex] > 0) {
+        //        $port_stats[$p_stats[portIfIndex]]['portIfIndex_rev'] = $p_index;
+        //    }
+        //    $port_stats[$p_stats]['portIfIndex'] = $p_index;
+        //}
+
+        //$entPhysicalAlias = snmpwalk_cache_oid($device, 'entPhysicalAlias', array(), 'ENTITY-MIB');
+        //foreach ($entPhysicalAlias as $p_index => $p_stats) {
+        //    if ($p_stats[entPhysicalAlias] > 0) {
+        //        $port_stats[$p_stats[entPhysicalAlias]]['entPhysicalAlias_rev'] = $p_index;
+        //    }
+        //}
+
+        foreach ($port_stats_poe as $p_index => $p_stats) {
+            //We replace the ENTITY EntIndex by the IfIndex using the portIfIndex table (stored in $port_ent_to_if).
+            //Result is merged into $port_stats 
+            if ($port_ent_to_if[$p_index] && $port_ent_to_if[$p_index]['portIfIndex'] && $port_stats[$port_ent_to_if[$p_index]['portIfIndex']]) {
+                $port_stats[$port_ent_to_if[$p_index]['portIfIndex']]=$port_stats[$port_ent_to_if[$p_index]['portIfIndex']]+$p_stats;
+            }
+        }
+    } elseif  ($device['os'] == 'vrp') {
         echo 'HwPoePortEntry' ;
         $port_stats = snmpwalk_cache_oid($device, 'HwPoePortEntry', $port_stats, 'HUAWEI-POE-MIB');
+    } else {
+        //Any other device, generic polling
+        $port_stats = snmpwalk_cache_oid($device, 'pethPsePortEntry', $port_stats, 'POWER-ETHERNET-MIB');
+        $port_stats = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', $port_stats, 'CISCO-POWER-ETHERNET-EXT-MIB');
     }
 }
 
