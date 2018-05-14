@@ -2,7 +2,7 @@
 
 namespace LibreNMS\Exceptions;
 
-class JsonAppPollingFailedException extends \Exception
+class JsonAppPollingFailedException extends \JsonAppException
 {
 
 }

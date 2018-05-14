@@ -4,7 +4,7 @@ namespace LibreNMS\Exceptions;
 
 use Throwable;
 
-class JsonAppMissingKeysException extends \Exception
+class JsonAppMissingKeysException extends \JsonAppException
 {
     private $output;
     private $parsed_json;
