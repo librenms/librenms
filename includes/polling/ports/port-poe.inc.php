@@ -2,15 +2,16 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
+$rrd_name = getPortRrdName($port_id, 'poe');
+$rrd_def = RrdDefinition::make()
+    ->addDataset('PortPwrAllocated', 'GAUGE', 0)
+    ->addDataset('PortPwrAvailable', 'GAUGE', 0)
+    ->addDataset('PortConsumption', 'GAUGE', 0)
+    ->addDataset('PortMaxPwrDrawn', 'GAUGE', 0);
+
 if (($device['os'] == 'vrp')) {
     //Tested against Huawei 5720 access switches
     if (isset($this_port['hwPoePortEnable'])) {
-        $rrd_name = getPortRrdName($port_id, 'poe');
-        $rrd_def = RrdDefinition::make()
-            ->addDataset('PortPwrAllocated', 'GAUGE', 0)
-            ->addDataset('PortPwrAvailable', 'GAUGE', 0)
-            ->addDataset('PortConsumption', 'GAUGE', 0)
-            ->addDataset('PortMaxPwrDrawn', 'GAUGE', 0);
         $upd = "$polled:".$this_port['hwPoePortReferencePower'].':'.$this_port['hwPoePortMaximumPower'].':'.$this_port['hwPoePortConsumingPower'].':'.$this_port['hwPoePortPeakPower'];
 
         $fields = array(
@@ -28,13 +29,6 @@ if (($device['os'] == 'vrp')) {
     // Code for Cisco IOS, tested on 2960X
     if (isset($this_port['cpeExtPsePortPwrAllocated'])) {
         // if we have cpeExtPsePortPwrAllocated, we have the complete array so we can populate the RRD
-        $rrd_name = getPortRrdName($port_id, 'poe');
-        $rrd_def = RrdDefinition::make()
-            ->addDataset('PortPwrAllocated', 'GAUGE', 0)
-            ->addDataset('PortPwrAvailable', 'GAUGE', 0)
-            ->addDataset('PortConsumption', 'GAUGE', 0)
-            ->addDataset('PortMaxPwrDrawn', 'GAUGE', 0);
-
         $upd = "$polled:".$port['cpeExtPsePortPwrAllocated'].':'.$port['cpeExtPsePortPwrAvailable'].':'.
             $port['cpeExtPsePortPwrConsumption'].':'.$port['cpeExtPsePortMaxPwrDrawn'];
         echo "$this_port[cpeExtPsePortPwrAllocated],$this_port[cpeExtPsePortPwrAvailable],$this_port[cpeExtPsePortPwrConsumption],$this_port[cpeExtPsePortMaxPwrDrawn]\n";
@@ -52,13 +46,6 @@ if (($device['os'] == 'vrp')) {
 } else {
     //This is the legacy code, to be tested against devices
     if ($this_port['dot3StatsIndex'] && $port['ifType'] == 'ethernetCsmacd') {
-        $rrd_name = getPortRrdName($port_id, 'poe');
-        $rrd_def = RrdDefinition::make()
-            ->addDataset('PortPwrAllocated', 'GAUGE', 0)
-            ->addDataset('PortPwrAvailable', 'GAUGE', 0)
-            ->addDataset('PortConsumption', 'GAUGE', 0)
-            ->addDataset('PortMaxPwrDrawn', 'GAUGE', 0);
-
         $upd = "$polled:".$port['cpeExtPsePortPwrAllocated'].':'.$port['cpeExtPsePortPwrAvailable'].':'.
             $port['cpeExtPsePortPwrConsumption'].':'.$port['cpeExtPsePortMaxPwrDrawn'];
 
