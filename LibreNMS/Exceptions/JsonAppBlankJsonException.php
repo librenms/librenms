@@ -4,7 +4,7 @@ namespace LibreNMS\Exceptions;
 
 use Throwable;
 
-class JsonAppBlankJsonException extends \Exception
+class JsonAppBlankJsonException extends JsonAppException
 {
     private $output;
 
