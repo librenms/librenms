@@ -283,12 +283,12 @@ if ($config['enable_ports_poe']) {
 
         foreach ($port_stats_poe as $p_index => $p_stats) {
             //We replace the ENTITY EntIndex by the IfIndex using the portIfIndex table (stored in $port_ent_to_if).
-            //Result is merged into $port_stats 
+            //Result is merged into $port_stats
             if ($port_ent_to_if[$p_index] && $port_ent_to_if[$p_index]['portIfIndex'] && $port_stats[$port_ent_to_if[$p_index]['portIfIndex']]) {
                 $port_stats[$port_ent_to_if[$p_index]['portIfIndex']]=$port_stats[$port_ent_to_if[$p_index]['portIfIndex']]+$p_stats;
             }
         }
-    } elseif  ($device['os'] == 'vrp') {
+    } elseif ($device['os'] == 'vrp') {
         echo 'HwPoePortEntry' ;
         $port_stats = snmpwalk_cache_oid($device, 'HwPoePortEntry', $port_stats, 'HUAWEI-POE-MIB');
     } else {
