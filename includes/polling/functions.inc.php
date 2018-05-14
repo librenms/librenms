@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppPollingFailedException;
 use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\Exceptions\JsonAppBlankJsonException;
@@ -729,6 +730,8 @@ function convert_to_celsius($value)
  * The error value can be accessed via $e->getCode()
  * The output can be accessed via $->getOutput() Only returned for code -3 or lower.
  * The parsed JSON can be access via $e->getParsedJson()
+ *
+ * All of the exceptions extend JsonAppException.
  *
  * If the error is less than -1, you can assume it is a legacy snmp extend script.
  *
