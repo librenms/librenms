@@ -26,18 +26,15 @@ if (!Auth::user()->hasGlobalAdmin()) {
 $status = 'ok';
 $message = '';
 
-if (!is_numeric($_POST['contact_id'])) {
+if (!is_numeric($_POST['group_id'])) {
     $status = 'error';
-    $message = 'ERROR: No contact selected';
+    $message = 'ERROR: No contact group selected';
 } else {
-    if (dbDelete('alert_contacts', '`contact_id` = ?', [$_POST['contact_id']])) {
-        dbDelete('alert_configs', '`contact_id` = ?', [$_POST['contact_id']]);
-        dbDelete('alert_contact_map', '`contact_type` = "single" AND `contact_or_group_id` = ?', [$_POST['contact_id']]);
-        dbDelete('contact_group_contact', '`contact_id`=?', [$_POST['contact_id']]);
-
-        $message = 'Alert contact has been deleted';
+    if (dbDelete('alert_contact_groups', '`contact_group_id` = ?', [$_POST['group_id']])) {
+        dbDelete('contact_group_contact', '`contact_group_id`=?', [$_POST['group_id']]);
+        $message = 'Alert contact group has been deleted';
     } else {
-        $message = 'ERROR: Alert contact has not been deleted';
+        $message = 'ERROR: Alert contact group has not been deleted';
     }
 }
 

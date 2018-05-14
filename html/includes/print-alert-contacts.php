@@ -13,6 +13,7 @@ $no_refresh = true;
 <?php
 
 require_once 'includes/modal/edit_alert_contact.inc.php';
+require_once 'includes/modal/edit_contact_group.inc.php';
 
 ?>
 
@@ -25,12 +26,10 @@ require_once 'includes/modal/edit_alert_contact.inc.php';
     <th>Details</th>
     <th style="width:86px;">Action</th>
     </tr>
-    <td colspan="6">
+    <td colspan="5">
 <?php
 if (Auth::user()->hasGlobalAdmin()) {
     echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#edit-alert-contact'><i class='fa fa-plus'></i> Create alert contact</button>";
-    echo "<i> - OR - </i>";
-    echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#edit-contact-group' disabled><i class='fa fa-plus'></i> Create contact group</button>";
 }
 
 echo "</td>";
@@ -59,9 +58,55 @@ foreach (dbFetchRows($query) as $contact) {
         echo "<div class='btn-group btn-group-sm' role='group'>";
         echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-target='#edit-alert-contact' data-contact_id='".$contact['id']."' name='edit-alert-rule' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
         echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-toggle='modal' data-target='#delete-alert-contact' data-contact_id='".$contact['id']."' name='delete-alert-contact' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+        echo "</div>";
     }
     echo "</td>";
     echo "</tr>\r\n";
+}
+?>
+    </table>
+</div>
+<div class="table-responsive">
+    <table class="table table-hover table-condensed">
+    <tr>
+    <th>#</th>
+    <th>Contact Group</th>
+    <th>Size</th>
+    <th>Members</th>
+    <th style="width:86px;">Action</th>
+    </tr>
+    <td colspan="5">
+<?php
+if (Auth::user()->hasGlobalAdmin()) {
+    echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#edit-contact-group'><i class='fa fa-plus'></i> Create contact group</button>";
+}
+echo "</td>";
+
+//Iterate through alert groups
+$query = "SELECT `contact_group_id` AS `id`, `contact_group_name` AS `name` FROM `alert_contact_groups`";
+foreach (dbFetchRows($query) as $group) {
+    echo "<tr>";
+    echo "<td><i>#".((int)$group['id'])."</i></td>";
+    echo "<td>".$group['name']."</td>";
+
+    //List out the members of each group
+    $query = "SELECT `transport_type`, `contact_name` FROM `contact_group_contact` AS `a` LEFT JOIN `alert_contacts` AS `b` ON `a`.`contact_id`=`b`.`contact_id` WHERE `contact_group_id`=?";
+    $members = dbFetchRows($query, [$group['id']]);
+    echo "<td>".sizeof($members)."</td>";
+    echo "<td class='col-sm-5'>";
+    foreach ($members as $member) {
+        echo "<i>".ucfirst($member['transport_type']).": ".$member['contact_name']."<br /></i>";
+    }
+    echo "</td>";
+    echo "<td>";
+    if (Auth::user()->hasGlobalAdmin()) {
+        echo "<div class='btn-group btn-group-sm' role='group'>";
+        echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-target='#edit-contact-group' data-group_id='".$group['id']."' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
+        echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-toggle='modal' data-target='#delete-contact-group' data-group_id='".$group['id']."' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+        echo "</div>";
+    }
+    echo "</td>";
+    echo "</tr>";
 }
 ?>
     </table>
