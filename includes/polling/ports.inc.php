@@ -174,20 +174,6 @@ $dot3_oids = [
     'dot3StatsDuplexStatus',
 ];
 
-$vrp_poe_oids = array(
-    'hwPoePortName',
-    'hwPoePortEnable',
-    'hwPoePortPriority',
-    'hwPoePortMaximumPower',
-    'hwPoePortPowerOnStatus',
-    'hwPoePortPowerStatus',
-    'hwPoePortPdClass',
-    'hwPoePortReferencePower',
-    'hwPoePortConsumingPower',
-    'hwPoePortPeakPower',
-    'hwPoePortAveragePower',
-);
-
 echo 'Caching Oids: ';
 $port_stats = array();
 $data       = array();
