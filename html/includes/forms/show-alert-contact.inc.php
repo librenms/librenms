@@ -27,7 +27,7 @@ if (is_numeric($contact_id) && $contact_id > 0) {
     $contact = dbFetchRow('SELECT * FROM `alert_contacts` WHERE `contact_id` =? LIMIT 1', [$contact_id]);
 
     $details = [];
-    $configs = dbFetchRows('SELECT `config_name` AS `name`, `config_value` AS `value` FROM `alert_configs` WHERE `config_type` = "contact" and `contact_or_transport_id`=?', [$contact_id]);
+    $configs = dbFetchRows('SELECT `config_name` AS `name`, `config_value` AS `value` FROM `alert_configs` WHERE `contact_id`=?', [$contact_id]);
     // Get alert contact configuration details
     foreach ($configs as $detail) {
         $details[] = [
@@ -41,7 +41,6 @@ if (is_array($contact)) {
     die(json_encode([
         'name' => $contact['contact_name'],
         'type' => $contact['transport_type'],
-        'config' => $contact['transport_config'],
         'details' => $details
     ]));
 } else {

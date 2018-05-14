@@ -34,9 +34,9 @@ if (!is_numeric($_POST['contact_id'])) {
     $status = 'error';
     $message = 'ERROR: No contact selected';
 } else {
-    if (dbDelete('alert_contacts', '`contact_id` = ?', array($_POST['contact_id']))) {
-        dbDelete('alert_configs', '`config_type` = "contact" and `contact_or_transport_id` = ?', [$_POST['contact_id']]);
-        dbDelete('alert_contact_map', '`contact_type` = "contact" and `contact_or_group_id` = ?', [$_POST['contact_id']]);
+    if (dbDelete('alert_contacts', '`contact_id` = ?', [$_POST['contact_id']])) {
+        dbDelete('alert_configs', '`contact_id` = ?', [$_POST['contact_id']]);
+        dbDelete('alert_contact_map', '`contact_type` = "single" AND `contact_or_group_id` = ?', [$_POST['contact_id']]);
     
         $message = 'Alert contact has been deleted';
     } else {

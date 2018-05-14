@@ -2,7 +2,7 @@
 /**
  * alert-contacts.inc.php
  *
- * LibreNMS alert-contactsinc.php for processor
+ * LibreNMS alert-contacts.inc.php for processor
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,40 +40,25 @@ $message = '';
 $contact_id          = mres($_POST['contact_id']);
 $name                = mres($_POST['name']);
 $transport_type      = mres($_POST['transport-type']);
-$transport_config    = mres($_POST['transport-config']);
-
-// If the transport config is not a default/none config, set the value to other
-if ($transport_config != 'default' && $transport_config != 'none') {
-    // Should probably search for the transport id and set it here
-    $transport_config = 'other';
-}
 
 if (empty($name)) {
     $status = 'error';
     $message = 'No contact name provided';
-} elseif (empty($transport_type) || empty($transport_config)) {
+} elseif (empty($transport_type)) {
     $status = 'error';
     $message = 'Missing transport information';
 } else {
     $details = array(
         'contact_name' => $name,
-        'transport_type' => $transport_type,
-        'transport_config' => $transport_config
+        'transport_type' => $transport_type
     );
 
-    // Add the transport id if the config is other
-    if ($transport_config == 'other') {
-        $details = array_merge($details, array(
-            'transport_id' => $transport_id
-        ));
-    }
-    
     if (is_numeric($contact_id) && $contact_id > 0) {
         // Check if there have been changes to the transport type
         $sql  = 'SELECT `transport_type` FROM `alert_contacts` WHERE `contact_id`=? LIMIT 1';
         $type = dbFetchCell($sql, [$contact_id]);
         if ($type != $transport_type) {
-            // No change to the transport type and therefore configuration fields
+            // Change to the transport type and therefore configuration fields
             $transportChange = true;
         }
 
@@ -110,15 +95,14 @@ if (empty($name)) {
             $status = 'error';
             $message = 'No transport type provided';
         }
-        //Insert into alert-configs
-        $config_type = 'contact';
 
+        //Insert into alert-configs
         if ($contact_config) {
             // We will want to insert new values into the alert_config db if there has
             // been a transport type change
             if ($transportChange) {
                 $update = false;
-                $where = 'config_type="contact" and contact_or_transport_id=?';
+                $where = 'contact_id=?';
                 dbDelete('alert_configs', $where, [$contact_id]);
             }
 
@@ -129,14 +113,13 @@ if (empty($name)) {
 
                 if ($update) {
                     //Update the values
-                    $where = 'config_type = "contact" and contact_or_transport_id=? and config_name=?';
+                    $where = 'contact_id=?  and config_name=?';
                     $params = array($contact_id, $name);
                     dbUpdate($detail, 'alert_configs', $where, $params);
                 } else {
                     //Insert the values
                     $detail = array_merge($detail, array(
-                        'contact_or_transport_id' => $contact_id,
-                        'config_type' => $config_type,
+                        'contact_id' => $contact_id,
                         'config_name' => $name
                     ));
                     dbInsert($detail, 'alert_configs');
@@ -152,7 +135,7 @@ if (empty($name)) {
         }
     } else {
         $status = 'error';
-        $message = 'Failed to add update contact';
+        $message = 'Failed to update contact';
     }
 }
 

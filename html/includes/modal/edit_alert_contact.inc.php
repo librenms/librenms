@@ -49,15 +49,6 @@ if (Auth::user()->hasGlobalAdmin()) {
                     </form>
                     <form method="post" role="form" id="mail-form" class="form-horizontal transport">
                         <input type="hidden" name="transport-type" id="transport-type" value="mail">
-                        <div class="form-group" title="The configuration for this transport">
-                            <label for="transport-type" class="col-sm-3 col-md-2 control-label">Transport config: </label>
-                            <div class="col-sm-3">
-                                <select name="transport-config" id="transport-config" class="form-control">
-                                    <option selected value="default">Default</option>
-                                    <!--Can only have default or other option -->
-                                </select>
-                            </div>
-                        </div>
                         <div class="form-group" title="Email for contact">
                             <label for="email" class="col-sm-3 col-md-2 control-label">Email: </label>
                             <div class="col-sm-9 col-md-10">
@@ -67,15 +58,6 @@ if (Auth::user()->hasGlobalAdmin()) {
                     </form>
                     <form method="post" role="form" id="ciscospark-form" class="form-horizontal transport" style="display:none">
                         <input type="hidden" name="transport-type" id="transport-type" value="ciscospark">
-                        <div class="form-group" title="The configuration for this transport">
-                            <label for="transport-type" class="col-sm-3 col-md-2 control-label">Transport config: </label>
-                            <div class="col-sm-3">    
-                                <select name="transport-config" id="transport-config" class="form-control">
-                                    <option selected value="none">None</option>
-                                    <!--Can only have none option -->
-                                </select>
-                            </div>
-                        </div>
                         <div class="form-group">
                             <label for="api-token" class="col-sm-3 col-md-2 control-label">API Token: </label>
                             <div class="col-sm-9 col-md-10">
