@@ -66,9 +66,8 @@ if (bill_permitted($bill_id)) {
         $vars['view'] = 'quick';
     }
 
-    function print_port_list()
+    function print_port_list($ports)
     {
-        global $ports;
         echo '<div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Billed Ports</h3>
@@ -150,7 +149,7 @@ if ($vars['view'] == 'edit' && Auth::user()->hasGlobalAdmin()) {
 
 <div class="row">
 <div class="col-lg-6 col-lg-push-6">
-    <?php print_port_list() ?>
+    <?php print_port_list($ports) ?>
 </div>
 <div class="col-lg-6 col-lg-pull-6">
 <div class="panel panel-default">
