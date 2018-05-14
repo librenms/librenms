@@ -508,7 +508,7 @@ echo -n "foobar.value " $(date +%s) #Populate a value, here unix-timestamp
 
 
 ### MySQL
-##### Agent
+#### Agent
 [Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `mysql` script to `/usr/lib/check_mk_agent/local/`
 
 The MySQL script requires PHP-CLI and the PHP MySQL extension, so please verify those are installed.
@@ -547,6 +547,7 @@ $mysql_user = 'root';
 $mysql_pass = 'toor';
 $mysql_host = 'localhost';
 $mysql_port = 3306;
+```
 
 4: Edit your snmpd.conf file and add:
 ```
