@@ -4,7 +4,7 @@ namespace LibreNMS\Exceptions;
 
 use Throwable;
 
-class JsonAppWrongVersionException extends \JsonAppException
+class JsonAppWrongVersionException extends JsonAppException
 {
     private $output;
     private $parsed_json;
