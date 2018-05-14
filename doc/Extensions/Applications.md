@@ -5,6 +5,8 @@ You can use Application support to graph performance statistics of many applicat
 
 Different applications support a variety of ways to collect data: 1) by direct connection to the application, 2) snmpd extend, or 3) [the agent](Agent-Setup.md). The monitoring of applications could be added before or after the hosts have been added to LibreNMS.
 
+If multiple methods of collection are listed you only need to enable one.
+
 ##### SNMP Extend
 
 When using the snmp extend method, the application discovery module will pick up which applications you have set up for monitoring automatically, even if the device is already in LibreNMS. The application discovery module is enabled by default for most \*nix operating systems, but in some cases you will need to manually enable the application discovery module. 
@@ -506,7 +508,7 @@ echo -n "foobar.value " $(date +%s) #Populate a value, here unix-timestamp
 
 
 ### MySQL
-##### Agent
+#### Agent
 [Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `mysql` script to `/usr/lib/check_mk_agent/local/`
 
 The MySQL script requires PHP-CLI and the PHP MySQL extension, so please verify those are installed.
@@ -531,31 +533,32 @@ $mysql_host = 'localhost';
 $mysql_port = 3306;
 ```
 
+Verify it is working by running `/usr/lib/check_mk_agent/local/mysql`
+
 #### SNMP extend
 1: Copy the mysql script to the desired host. `wget https://github.com/librenms/librenms-agent/raw/master/snmp/mysql -O /etc/snmp/mysql `
 
 2: Run `chmod +x /etc/snmp/mysql`
 
-3: Make sure you set hostname, user, and pass are properly set in `/etc/snmp/mysql.cnf`
+3: Unlike most other scripts, the MySQL script requires a configuration file `mysql.cnf` in `/etc/snmp/` with following content:
+```php
+<?php
+$mysql_user = 'root';
+$mysql_pass = 'toor';
+$mysql_host = 'localhost';
+$mysql_port = 3306;
+```
 
 4: Edit your snmpd.conf file and add:
 ```
 extend mysql /etc/snmp/mysql
 ```
 
-4: Restart snmpd.
+5: Restart snmpd.
 
-5: Install the PHP CLI language and your MySQL module of choice for PHP.
+6: Install the PHP CLI language and your MySQL module of choice for PHP.
 
 The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
-
-#### Agent
-[Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `mysql` script to `/usr/lib/check_mk_agent/local/`
-
-Make sure you set hostname, user, and pass are properly set in `/usr/lib/check_mk_agent/local/mysql.cnf`
-
-Verify it is working by running `/usr/lib/check_mk_agent/local/mysql`
-
 
 ### NGINX
 NGINX is a free, open-source, high-performance HTTP server: https://www.nginx.org/
