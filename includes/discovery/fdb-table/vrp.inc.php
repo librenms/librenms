@@ -17,7 +17,7 @@
 $fdbPort_table = snmpwalk_group($device, 'hwDynFdbPort', 'HUAWEI-L2MAM-MIB');
 
 if (!empty($fdbPort_table)) {
-    echo 'HUAWEI-L2MAM-MIB:';
+    echo 'HUAWEI-L2MAM-MIB:'.PHP_EOL;
     $data_oid = 'hwDynFdbPort';
     // Collect data and populate $insert
     foreach ($fdbPort_table as $mac => $data) {
