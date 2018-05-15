@@ -36,5 +36,3 @@ if (!empty($fdbPort_table)) {
         }
     }
 }
-
-echo 'HUAWEI-L2MAM-MIB:';
