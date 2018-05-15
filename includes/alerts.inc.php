@@ -879,30 +879,18 @@ function ExtTransports($obj)
     $contacts = GetAlertContacts($obj['alert_id']);
     if ($contacts) {
         foreach ($contacts as $contact) {
-            $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($contact['type']);
+            $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($contact['transport_type']);
             if (class_exists($class)) {
-                $obj['transport'] = $contact['type'];
+                $obj['transport'] = $contact['transport_type'];
                 $msg = FormatAlertTpl($obj);
                 $obj['msg'] = $msg;
                 echo $obj['transport'].' => ';
                 $instance = new $class;
                 // Set flag to indicate non default transports
                 $opts['alert']['notDefault'] = true;
-                $opts['alert']['contact_id'] = $contact['id'];
+                $opts['alert']['contact_id'] = $contact['contact_id'];
                 $tmp = $instance->deliverAlert($obj, $opts);
-                $prefix = array( 0=>"recovery", 1=>$obj['severity']." alert", 2=>"acknowledgment" );
-                $prefix[3] = &$prefix[0];
-                $prefix[4] = &$prefix[0];
-                if ($tmp === true) {
-                    echo 'OK';
-                    log_event('Issued ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], 'alert', 1);
-                } elseif ($tmp === false) {
-                    echo 'ERROR';
-                    log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, 5);
-                } else {
-                    echo "ERROR: $tmp\r\n";
-                    log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $tmp, $obj['device_id'], 'error', 5);
-                }
+                AlertLog($tmp, $obj, $obj['transport']);
             }
             echo '; ';
         }
@@ -920,24 +908,32 @@ function ExtTransports($obj)
                 echo $transport.' => ';
                 $instance = new $class;
                 $tmp = $instance->deliverAlert($obj, $opts);
-                $prefix = array( 0=>"recovery", 1=>$obj['severity']." alert", 2=>"acknowledgment" );
-                $prefix[3] = &$prefix[0];
-                $prefix[4] = &$prefix[0];
-                if ($tmp === true) {
-                    echo 'OK';
-                    log_event('Issued ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], 'alert', 1);
-                } elseif ($tmp === false) {
-                    echo 'ERROR';
-                    log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, 5);
-                } else {
-                    echo "ERROR: $tmp\r\n";
-                    log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $tmp, $obj['device_id'], 'error', 5);
-                }
+                AlertLog($tmp, $obj, $transport);
             }
             echo '; ';
         }
     }
 }//end ExtTransports()
+
+// Log alert event
+function AlertLog($result, $obj, $transport)
+{
+    $prefix = array( 0=>"recovery", 1=>$obj['severity']." alert", 2=>"acknowledgment" );
+    $prefix[3] = &$prefix[0];
+    $prefix[4] = &$prefix[0];
+    if ($result === true) {
+        echo 'OK';
+        log_event('Issued ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], 'alert', 1);
+    } elseif ($result === false) {
+        echo 'ERROR';
+        log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, 5);
+    } else {
+        echo "ERROR: $result\r\n";
+        log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $result, $obj['device_id'], 'error', 5);
+    }
+    return;
+}//end AlertLog()
+
 
 /**
  * Check if a device's all parent are down
@@ -974,13 +970,14 @@ function GetRuleId($alert_id)
 }
 
 /**
- * Get alert contacts
+ * Get alert contacts (includes contact groups)
  * @param $alert_id
  * @return array $contact_id $transport_type
  */
 function GetAlertContacts($alert_id)
 {
-    $query = "SELECT `contact_or_group_id` AS `id`, `transport_type` AS `type` FROM `alert_contact_map` LEFT JOIN `alert_contacts` ON `contact_id`=`contact_or_group_id` WHERE `contact_type`='single' AND `rule_id`=?";
+    // Query for list of contact ids
+    $query = "SELECT b.contact_id, b.transport_type FROM alert_contact_map AS a LEFT JOIN alert_contacts AS b ON b.contact_id=a.contact_or_group_id WHERE a.contact_type='single' AND a.rule_id=? UNION DISTINCT SELECT d.contact_id, d.transport_type FROM alert_contact_map AS a LEFT JOIN alert_contact_groups AS b ON a.contact_or_group_id=b.contact_group_id LEFT JOIN contact_group_contact AS c ON b.contact_group_id=c.contact_group_id LEFT JOIN alert_contacts AS d ON c.contact_id=d.contact_id WHERE a.contact_type='group' AND a.rule_id=?;";
     $rule_id = GetRuleId($alert_id);
-    return dbFetchRows($query, [$rule_id]);
+    return dbFetchRows($query, [$rule_id, $rule_id]);
 }

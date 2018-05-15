@@ -31,13 +31,13 @@ class Mail implements Transport
     {
         global $config;
         if ($opts['alert']['notDefault'] == true) {
-            $sql = "SELECT `config_value` AS `email` FROM `alert_configs` WHERE `config_type`='contact' AND `config_name`='email' AND`contact_or_transport_id`=?";
+            $sql = "SELECT `config_value` AS `email` FROM `alert_configs` WHERE `config_name`='email' AND`contact_id`=?";
             $email = dbFetchCell($sql, [$opts['alert']['contact_id']]);
             if ($email) {
                 // Check if query successfull
                 $obj['contacts'] = $email;
             } else {
-                echo("Transport not successful, reverting back to default transport.\r\n");
+                echo("Transport not successful, using default transport.\r\n");
             }
         }
 
