@@ -20,18 +20,17 @@ try {
             'jails' => []
         ]
     ];
-    
+
     foreach ($legacy as $jail_data) {
         list($jail, $banned) = explode(" ", $jail_data);
         if (isset($jail) && isset($banned)) {
             $f2b['data']['jails'][$jail] = $banned;
         }
     }
-
 } catch (JsonAppException $e) {
     echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
     update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message
-    return;    
+    return;
 }
 
 $f2b = $f2b[data];
