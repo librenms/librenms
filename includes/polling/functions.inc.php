@@ -765,7 +765,7 @@ function json_app_get($device, $extend, $min_version = 1)
     }
 
     // It is a legacy JSON app extend, meaning these are not set
-    if (!isset($parsed_json['error'], $parsed_json['error'], $parsed_json['errorString'], $parsed_json['version'])) {
+    if (!isset($parsed_json['error'], $parsed_json['data'], $parsed_json['errorString'], $parsed_json['version'])) {
         throw new JsonAppMissingKeysException("Legacy script or extend error, missing one or more required keys.", $output, $parsed_json, -5);
     }
 
