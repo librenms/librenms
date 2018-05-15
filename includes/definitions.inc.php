@@ -518,6 +518,21 @@ $config['graph_types']['device']['sgos_average_requests']['section']  = 'network
 $config['graph_types']['device']['sgos_average_requests']['order']    = '0';
 $config['graph_types']['device']['sgos_average_requests']['descr']    = 'Average HTTP Requests';
 
+// SRX Flow Sessions
+$config['graph_types']['device']['junos_jsrx_spu_sessions']['section']  = 'network';
+$config['graph_types']['device']['junos_jsrx_spu_sessions']['order']    = '0';
+$config['graph_types']['device']['junos_jsrx_spu_sessions']['descr']    = 'Flow Sessions';
+
+// SRX SPU CPU
+$config['graph_types']['device']['junos_jsrx_spu_cpu']['section']  = 'network';
+$config['graph_types']['device']['junos_jsrx_spu_cpu']['order']    = '0';
+$config['graph_types']['device']['junos_jsrx_spu_cpu']['descr']    = 'SPU CPU';
+
+// SRX SPU Memory
+$config['graph_types']['device']['junos_jsrx_spu_mem']['section']  = 'network';
+$config['graph_types']['device']['junos_jsrx_spu_mem']['order']    = '0';
+$config['graph_types']['device']['junos_jsrx_spu_mem']['descr']    = 'SPU Memory';
+
 //riverbed specific graphs
 $config['graph_types']['device']['riverbed_connections']['section'] = 'network';
 $config['graph_types']['device']['riverbed_connections']['order'] = 0;
