@@ -4,7 +4,9 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use LibreNMS\Exceptions\DatabaseConnectException;
 
 class Handler extends ExceptionHandler
 {
@@ -44,6 +46,26 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if ($exception instanceof QueryException) {
+            // connect exception, convert to our standard connection exception
+            if (config('app.debug')) {
+                // get message form PDO exception, it doesn't contain the query
+                $message = $exception->getMessage();
+            } else {
+                $message = $exception->getPrevious()->getMessage();
+            }
+
+            if (in_array($exception->getCode(), [1044, 1045, 2002])) {
+                throw new DatabaseConnectException($message, $exception->getCode(), $exception);
+            }
+            return response('Unhandled MySQL Error [' . $exception->getCode() . "] $message");
+        }
+
+        // emulate Laravel 5.5 renderable exceptions
+        if (method_exists($exception, 'render')) {
+            return $exception->render($request);
+        }
+
         return parent::render($request, $exception);
     }
 
