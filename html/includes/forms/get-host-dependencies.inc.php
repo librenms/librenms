@@ -19,10 +19,17 @@ if (!Auth::user()->hasGlobalAdmin()) {
 } else {
     if (isset($_POST['viewtype'])) {
         if ($_POST['viewtype'] == 'fulllist') {
-            $count_query = "SELECT count(device_id) from devices";
 
             $deps_query = "SELECT a.device_id as id, a.hostname as hostname, a.sysName as sysName, GROUP_CONCAT(b.hostname) as parent, GROUP_CONCAT(b.device_id) as parentid FROM devices as a LEFT JOIN device_relationships a1 ON a.device_id=a1.child_device_id LEFT JOIN devices b ON b.device_id = a1.parent_device_id  GROUP BY a.device_id, a.hostname, a.sysName";
 
+            if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
+                $deps_query .= " HAVING parent LIKE ? OR hostname LIKE ? OR sysName LIKE ? ";
+                $count_query = "SELECT COUNT(*) FROM (" . $deps_query . ") AS rowcount";
+            } else {
+                $count_query = "SELECT COUNT(device_id) AS rowcount FROM devices";
+            }
+
+            // if format is set we're trying to pull the Bootgrid table data
             if (isset($_POST['format'])) {
                 $order_by = '';
                 if (isset($_POST['sort']) && is_array($_REQUEST['sort'])) {
@@ -31,10 +38,6 @@ if (!Auth::user()->hasGlobalAdmin()) {
                     }
                 } else {
                     $order_by = " a.hostname";
-                }
-
-                if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
-                    $deps_query .= " HAVING parent LIKE ? OR hostname LIKE ? OR sysName LIKE ? ";
                 }
 
                 $deps_query .= " ORDER BY " . $order_by;
@@ -48,20 +51,18 @@ if (!Auth::user()->hasGlobalAdmin()) {
                 $deps_query .= " ORDER BY a.hostname";
             }
 
-            syslog(LOG_INFO, $searchphrase);
-            syslog(LOG_INFO, $deps_query);
+
+
             if (isset($_POST['format']) && !empty($_POST['searchPhrase'])) {
                 $searchphrase = '%'.mres($_POST['searchPhrase']).'%';
-                $device_deps = dbFetchRows($deps_query, array($searchphrase, $searchphrase, $searchphrase));
+                $search_arr = array($searchphrase, $searchphrase, $searchphrase);
+                $device_deps = dbFetchRows($deps_query, $search_arr);
+                $rec_count = dbFetchCell($count_query, $search_arr);
             } else {
                 $device_deps = dbFetchRows($deps_query);
-            }
-
-            if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
-                $rec_count = count($device_deps);
-            } else {
                 $rec_count = dbFetchCell($count_query);
             }
+
 
             if (isset($_POST['format'])) {
                 $res_arr = array();
