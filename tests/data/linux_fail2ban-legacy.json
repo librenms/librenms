@@ -39,7 +39,7 @@
                 },
                 {
                     "metric": "total",
-                    "value": "816",
+                    "value": "0",
                     "value_prev": null,
                     "app_type": "fail2ban"
                 },
