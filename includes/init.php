@@ -105,10 +105,11 @@ if (!module_selected('nodb', $init_modules)) {
     } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
         if (isCli()) {
             echo 'MySQL Error: ' . $e->getMessage() . PHP_EOL;
+            exit(2);
         } else {
-            echo "<h2>MySQL Error</h2><p>" . $e->getMessage() . "</p>";
+            // punt to the Laravel error handler
+            throw $e;
         }
-        exit(2);
     }
 }
 
