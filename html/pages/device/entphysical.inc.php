@@ -1,10 +1,8 @@
 <?php
 
 
-function printEntPhysical($ent, $level, $class)
+function printEntPhysical($device, $ent, $level, $class)
 {
-    global $device;
-
     $ents = dbFetchRows('SELECT * FROM `entPhysical` WHERE device_id = ? AND entPhysicalContainedIn = ? ORDER BY entPhysicalContainedIn,entPhysicalIndex', array($device['device_id'], $ent));
 
     foreach ($ents as $ent) {
@@ -108,7 +106,7 @@ function printEntPhysical($ent, $level, $class)
         $count = dbFetchCell("SELECT COUNT(*) FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND entPhysicalContainedIn = '".$ent['entPhysicalIndex']."'");
         if ($count) {
             echo '<ul>';
-            printEntPhysical($ent['entPhysicalIndex'], ($level + 1), '');
+            printEntPhysical($device, $ent['entPhysicalIndex'], ($level + 1), '');
             echo '</ul>';
         }
 
@@ -125,7 +123,7 @@ echo "<div style='float: right;'>
 echo "<div style='clear: both;'><UL CLASS='mktree' id='enttree'>";
 $level                   = '0';
 $ent['entPhysicalIndex'] = '0';
-printEntPhysical($ent['entPhysicalIndex'], $level, 'liOpen');
+printEntPhysical($device, $ent['entPhysicalIndex'], $level, 'liOpen');
 echo '</ul></div>';
 
 $pagetitle = 'Inventory';

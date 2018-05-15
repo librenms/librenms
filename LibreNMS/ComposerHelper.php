@@ -25,11 +25,27 @@
 
 namespace LibreNMS;
 
-use Composer\Script\Event;
 use Composer\Installer\PackageEvent;
+use Composer\Script\Event;
 
 class ComposerHelper
 {
+    public static function postRootPackageInstall(Event $event)
+    {
+        if (!file_exists('.env')) {
+            self::setPermissions();
+            self::populateEnv();
+        }
+    }
+
+    public static function postInstall(Event $event)
+    {
+        if (!file_exists('.env')) {
+            self::setPermissions();
+            self::populateEnv();
+        }
+    }
+
     public static function preUpdate(Event $event)
     {
         if (!getenv('FORCE')) {
@@ -53,6 +69,91 @@ class ComposerHelper
 
             self::exec($cmds);
         }
+    }
+
+
+    /**
+     * Initially populate .env file
+     */
+    private static function populateEnv()
+    {
+        if (!file_exists('.env')) {
+            copy('.env.example', '.env');
+            self::exec('php artisan key:generate');
+
+            $config = [
+                'db_host' => '',
+                'db_port' => '',
+                'db_name' => '',
+                'db_user' => '',
+                'db_pass' => '',
+                'db_socket' => '',
+                'base_url' => '',
+                'user' => '',
+                'group' => '',
+            ];
+
+            @include 'config.php';
+
+            self::setEnv([
+                'NODE_ID'        => uniqid(),
+                'DB_HOST'        => $config['db_host'],
+                'DB_PORT'        => $config['db_port'],
+                'DB_USERNAME'    => $config['db_user'],
+                'DB_PASSWORD'    => $config['db_pass'],
+                'DB_DATABASE'    => $config['db_name'],
+                'DB_SOCKET'      => $config['db_socket'],
+                'APP_URL'        => $config['base_url'],
+                'LIBRENMS_USER'  => $config['user'],
+                'LIBRENMS_GROUP' => $config['group'],
+            ]);
+        }
+    }
+
+    /**
+     * Set a setting in .env file
+     *
+     * @param array $settings KEY => value list of settings
+     * @param string $file
+     */
+    private static function setEnv($settings, $file = '.env')
+    {
+        $content = file_get_contents($file);
+        if (substr($content, -1) !== "\n") {
+            $content .= PHP_EOL;
+        }
+
+        foreach ($settings as $key => $value) {
+            // only add non-empty settings
+            if (empty($value)) {
+                continue;
+            }
+
+            // quote strings with spaces
+            if (strpos($value, ' ') !== false) {
+                $value = "\"$value\"";
+            }
+
+            if (strpos($content, "$key=") !== false) {
+                // only replace ones that aren't already set for safety and uncomment
+                // escape $ in the replacement
+                $content = preg_replace("/#?$key=\n/", addcslashes("$key=$value\n", '$'), $content);
+            } else {
+                $content .= "$key=$value\n";
+            }
+        }
+
+        file_put_contents($file, $content);
+    }
+
+    private static function setPermissions()
+    {
+        $permissions_cmds = [
+            'setfacl -R -m g::rwx rrd/ logs/ storage/ bootstrap/cache/',
+            'setfacl -d -m g::rwx rrd/ logs/ storage/ bootstrap/cache/',
+        ];
+
+        self::exec($permissions_cmds);
     }
 
     /**

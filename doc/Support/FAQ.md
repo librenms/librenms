@@ -98,11 +98,11 @@ You will then have a two options in the footer of the website - Show SQL Debug a
 
 #### <a name="faq11"> How do I debug the discovery process?</a>
 
-Please see the [Discovery Support](http://docs.librenms.org/Support/Discovery Support) document for further details.
+Please see the [Discovery Support](http://docs.librenms.org/Support/Discovery Support/) document for further details.
 
 #### <a name="faq12"> How do I debug the poller process?</a>
 
-Please see the [Poller Support](http://docs.librenms.org/Support/Poller Support) document for further details.
+Please see the [Poller Support](http://docs.librenms.org/Support/Poller Support/) document for further details.
 
 #### <a name="faq14"> Why do I get a lot apache or rrdtool zombies in my process list?</a>
 
