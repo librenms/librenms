@@ -15,18 +15,19 @@ try {
     // Legacy script, build compatible array
     $legacy = explode("\n", $e->getOutput());
     $f2b = [
-        'total' => array_shift($legacy), // total was first line in legacy app
-        'jails' => []
+        'data' => [
+            'total' => array_shift($legacy), // total was first line in legacy app
+            'jails' => []
+        ]
     ];
     
     foreach ($legacy as $jail_data) {
         list($jail, $banned) = explode(" ", $jail_data);
         if (isset($jail) && isset($banned)) {
-            $f2b['jails'][$jail] = $banned;
+            $f2b['data']['jails'][$jail] = $banned;
         }
     }
 
-    $f2b[data]=$f2b;
 } catch (JsonAppException $e) {
     echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
     update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message
