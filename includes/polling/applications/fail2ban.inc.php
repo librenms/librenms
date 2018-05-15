@@ -1,6 +1,7 @@
 <?php
 
-use LibreNMS\Exceptions\JsonAppPollingFailedException;
+use LibreNMS\Exceptions\JsonAppParsingFailedException;
+use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'fail2ban';
@@ -10,33 +11,29 @@ echo $name;
 
 try {
     $f2b = json_app_get($device, $name);
-} catch (JsonAppPollingFailedException $e) {
-    if ($e->getCode() == -5) {
-        // Legacy script, build compatible array
-        $legacy = explode("\n", $e->getOutput());
-        $f2b = [
-            'total' => array_shift($legacy), // total was first line in legacy app
-            'jails' => []
-        ];
-
-        foreach ($legacy as $jail_data) {
-            list($jail, $banned) = explode(" ", $jail_data);
-            if (isset($jail) && isset($banned)) {
-                $f2b['jails'][$jail] = $banned;
-            }
+} catch (JsonAppParsingFailedException $e) {
+    // Legacy script, build compatible array
+    $legacy = explode("\n", $e->getOutput());
+    $f2b = [
+        'total' => array_shift($legacy), // total was first line in legacy app
+        'jails' => []
+    ];
+    
+    foreach ($legacy as $jail_data) {
+        list($jail, $banned) = explode(" ", $jail_data);
+        if (isset($jail) && isset($banned)) {
+            $f2b['jails'][$jail] = $banned;
         }
-    } else {
-        echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
-        update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message
-        return;
     }
+
+    $f2b[data]=$f2b;
+} catch (JsonAppException $e) {
+    echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
+    update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message
+    return;    
 }
 
-$output = [
-    'data' => $f2b,
-    'version' => 1,
-];
-//echo bin2hex(json_encode($output)) . PHP_EOL;
+$f2b = $f2b[data];
 
 $metrics = [];
 
