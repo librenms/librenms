@@ -7,11 +7,11 @@ Different applications support a variety of ways to collect data: 1) by direct c
 
 If multiple methods of collection are listed you only need to enable one.
 
-##### SNMP Extend
+### SNMP Extend
 
 When using the snmp extend method, the application discovery module will pick up which applications you have set up for monitoring automatically, even if the device is already in LibreNMS. The application discovery module is enabled by default for most \*nix operating systems, but in some cases you will need to manually enable the application discovery module. 
 
-###### Enable the application discovery module
+### Enable the application discovery module
 
 1. Edit the device for which you want to add this support
 2. Click on the *Modules* tab and enable the `applications` module.
@@ -23,7 +23,7 @@ After you have enabled the application module, it would be wise to then also ena
 
 **Note**: Only do this if an application was not auto-discovered by LibreNMS during discovery and polling.
 
-###### Enable the application(s) to be discovered
+### Enable the application(s) to be discovered
 
 1. Go to the device you have just enabled the application module for.
 2. Click on the *Applications* tab and select the applications you want to monitor.
@@ -31,7 +31,7 @@ After you have enabled the application module, it would be wise to then also ena
 
 ![Enable-applications](/img/Enable_applications.png)
 
-##### Agent
+### Agent
 
 The unix-agent does not have a discovery module, only a poller module. That poller module is always disabled by default. It needs to be manually enabled if using the agent. Some applications will be automatically enabled by the unix-agent poller module. It is better to ensure that your application is enabled for monitoring. You can check by following the steps under the `SNMP Extend` heading.
 
