@@ -39,6 +39,7 @@ $alert_severities = array(
 //if( defined('SHOW_SETTINGS') || empty($widget_settings) ) {
 if (defined('SHOW_SETTINGS')) {
     $current_acknowledged = isset($widget_settings['acknowledged']) ? $widget_settings['acknowledged'] : '';
+    $current_fired =  isset($widget_settings['fired']) ? $widget_settings['fired'] : '';
     $current_severity = isset($widget_settings['severity']) ? $widget_settings['severity'] : '';
     $current_state = isset($widget_settings['state']) ? $widget_settings['state'] : '';
     $current_group = isset($widget_settings['group']) ? $widget_settings['group'] : '';
@@ -56,6 +57,20 @@ if (defined('SHOW_SETTINGS')) {
     $common_output[] = '<option value=""' . ($current_acknowledged == '' ? ' selected' : ' ') . '>not filtered</option>';
     $common_output[] = '<option value="1"' . ($current_acknowledged == '1' ? ' selected' : ' ') . '>show only acknowledged</option>';
     $common_output[] = '<option value="0"' . ($current_acknowledged == '0' ? ' selected' : ' ') . '>hide acknowledged</option>';
+
+    $common_output[] = '
+      </select>
+    </div>
+  </div>
+  <div class="form-group row">
+    <div class="col-sm-4">
+      <label for="fired" class="control-label">Show only Fired alerts: </label>
+    </div>
+    <div class="col-sm-8">
+      <select class="form-control" name="fired">';
+
+    $common_output[] = '<option value=""' . ($current_fired == '' ? ' selected' : ' ') . '>not filtered</option>';
+    $common_output[] = '<option value="1"' . ($current_fired == '1' ? ' selected' : ' ') . '>show only Fired alerts</option>';
 
     $common_output[] = '
       </select>
@@ -136,6 +151,7 @@ if (defined('SHOW_SETTINGS')) {
 } else {
     $device_id = $device['device_id'];
     $acknowledged = $widget_settings['acknowledged'];
+    $fired = $widget_settings['fired'];
     $state = $widget_settings['state'];
     $min_severity = $widget_settings['min_severity'];
     $group = $widget_settings['group'];
@@ -157,6 +173,10 @@ if (defined('SHOW_SETTINGS')) {
         } elseif ($acknowledged == '1') {
             $title = "Acknowledged $title";
         }
+    }
+
+    if (is_numeric($fired)) {
+        $title = "Fired $title";
     }
 
     if (is_numeric($group)) {
@@ -216,6 +236,9 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
 
     if (is_numeric($acknowledged)) {
         $common_output[] = "acknowledged: '$acknowledged',\n";
+    }
+    if (is_numeric($fired)) {
+        $common_output[] = "fired: '$fired',\n";
     }
     if (isset($state) && $state != '') {
         $common_output[] = "state: '$state',\n";
