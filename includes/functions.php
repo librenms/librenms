@@ -915,7 +915,8 @@ function parse_email($emails)
                 $result[$out[2][0]] = $out[1][0];
             } else {
                 if (strpos($email, "@")) {
-                    $result[$email] = null;
+                    $from_name = Config::get('email_user');
+                    $result[$email] = $from_name;
                 }
             }
         }
@@ -934,9 +935,6 @@ function send_mail($emails, $subject, $message, $html = false)
         $mail->Hostname = php_uname('n');
 
         foreach (parse_email($config['email_from']) as $from => $from_name) {
-            if (empty($from_name)) {
-                $from_name = Config::get('email_user');
-            }
             $mail->setFrom($from, $from_name);
         }
         foreach ($emails as $email => $email_name) {
@@ -2415,29 +2413,6 @@ function return_num($entry)
         preg_match('/-?\d*\.?\d+/', $entry, $num_response);
         return $num_response[0];
     }
-}
-
-/**
- * Locate the actual path of a binary
- *
- * @param $binary
- * @return mixed
- */
-function locate_binary($binary)
-{
-    if (!str_contains($binary, '/')) {
-        $output = `whereis -b $binary`;
-        $list = trim(substr($output, strpos($output, ':') + 1));
-        $targets = explode(' ', $list);
-
-        foreach ($targets as $target) {
-            if (is_executable($target)) {
-                return $target;
-            }
-        }
-    }
-
-    return $binary;
 }
 
 /**

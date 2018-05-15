@@ -63,14 +63,26 @@ class User extends BaseValidation
         // Let's test the user configured if we have it
         if (Config::has('user')) {
             $dir = Config::get('install_dir');
-
-            $find_result = rtrim(`find $dir \! -user $lnms_username -o \! -group $lnms_groupname &> /dev/null`);
+            $find_result = rtrim(`find $dir \! -user $lnms_username -o \! -group $lnms_groupname 2> /dev/null`);
             if (!empty($find_result)) {
-                // Ignore the two logs that may be created by the
-                $files = array_diff(explode(PHP_EOL, $find_result), array(
+                // Ignore files created by the webserver
+                $ignore_files = array(
                     "$dir/logs/error_log",
                     "$dir/logs/access_log",
-                ));
+                    "$dir/bootstrap/cache/",
+                    "$dir/storage/framework/cache/",
+                    "$dir/storage/framework/sessions/",
+                    "$dir/storage/framework/views/",
+                    "$dir/storage/debugbar/",
+                );
+
+                $files = array_filter(explode(PHP_EOL, $find_result), function ($file) use ($ignore_files) {
+                    if (starts_with($file, $ignore_files)) {
+                        return false;
+                    }
+
+                    return true;
+                });
 
                 if (!empty($files)) {
                     $result = ValidationResult::fail(
@@ -88,14 +100,20 @@ class User extends BaseValidation
         }
 
         // check permissions
-        $rrd_dir = Config::get('rrd_dir');
-        if (!check_file_permissions($rrd_dir, '660')) {
-            $validator->fail("The rrd folder has improper permissions.", "chmod ug+rw $rrd_dir");
-        }
+        $folders = [
+            'rrd' => Config::get('rrd_dir'),
+            'log' => Config::get('log_dir'),
+            'bootstrap' => "$dir/bootstrap/cache/",
+            'storage' => "$dir/storage/",
+            'cache' => "$dir/storage/framework/cache/",
+            'sessions' => "$dir/storage/framework/sessions/",
+            'views' => "$dir/storage/framework/views/",
+        ];
 
-        $log_dir = Config::get('log_dir');
-        if (!check_file_permissions($log_dir, '660')) {
-            $validator->fail("The log folder has improper permissions.", "chmod ug+rw $log_dir");
+        foreach ($folders as $name => $folder) {
+            if (!check_file_permissions($folder, '660')) {
+                $validator->fail("The $name folder has improper permissions.", "chmod ug+rw $folder");
+            }
         }
     }
 }

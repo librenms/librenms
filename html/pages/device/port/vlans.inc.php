@@ -18,7 +18,7 @@ foreach ($vlans as $vlan) {
     echo '<tr bgcolor="'.$row_colour.'">';
 
     echo '<td width=100 class=list-large> Vlan '.$vlan['vlan'].'</td>';
-    echo '<td width=200 class=box-desc>'.$vlan['vlan_descr'].'</td>';
+    echo '<td width=200 class=box-desc>'.$vlan['vlan_name'].'</td>';
 
     if ($vlan['state'] == 'blocking') {
         $class = 'red';

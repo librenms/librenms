@@ -164,7 +164,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanState"
+                    "state_name": "fanState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -187,7 +187,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanState"
+                    "state_name": "fanState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -210,7 +210,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanState"
+                    "state_name": "fanState"
                 },
                 {
                     "sensor_deleted": "0",
@@ -284,14 +284,14 @@
             ],
             "state_indexes": [
                 {
-                    "state_name": "FanState",
+                    "state_name": "fanState",
                     "state_descr": "Normal",
                     "state_draw_graph": "0",
                     "state_value": "1",
                     "state_generic_value": "0"
                 },
                 {
-                    "state_name": "FanState",
+                    "state_name": "fanState",
                     "state_descr": "Failed",
                     "state_draw_graph": "0",
                     "state_value": "2",
