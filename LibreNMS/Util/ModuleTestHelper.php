@@ -658,7 +658,7 @@ class ModuleTestHelper
 
                 // build joins
                 $join = '';
-                $select = ["$table.*"];
+                $select = ["`$table`.*"];
                 foreach ($info['joins'] as $join_info) {
                     if (isset($join_info['custom'])) {
                         $join .= ' ' . $join_info['custom'];
