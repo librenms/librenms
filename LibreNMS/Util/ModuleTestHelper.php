@@ -668,7 +668,9 @@ class ModuleTestHelper
                         $join .= " LEFT JOIN `$right` ON (`$left`.`$lkey` = `$right`.`$rkey`)";
 
                         if (isset($join_info['select'])) {
-                            $select[] = "`$right`.`{$join_info['select']}`";
+                            foreach ((array)$join_info['select'] as $field) {
+                                $select[] = "`$right`.`$field`";
+                            }
                         }
                     }
                 }
