@@ -2,7 +2,7 @@
 updateComment: true
 #
 # # Use a custom string, or set to false to disable
-before: "✨ Awesome work on this PR so far! ✨ Unfortunately, the [ build]() is fcurrently failing. Here's the output:"
+before: "✨ Awesome work on this PR so far! ✨ Unfortunately, the [ build]() is currently failing. Here's the output:"
 #
 # # Use a custom string, or set to false to disable
 after: "We're sure you can fix it! If you need help, please just ask :)"
