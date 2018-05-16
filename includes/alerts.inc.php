@@ -477,6 +477,10 @@ function DescribeAlert($alert)
     $obj         = array();
     $i           = 0;
     $device      = dbFetchRow('SELECT hostname, sysName, sysDescr, hardware, version, location, purpose, notes, uptime FROM devices WHERE device_id = ?', array($alert['device_id']));
+    $attribs     = get_dev_attribs($alert['device_id']);
+    if (can_ping_device($attribs)) {
+        $ping_stats = dbFetchRow('SELECT `timestamp`, `loss`, `min`, `max`, `avg` FROM `device_perf` WHERE `device_id` = ? ORDER BY `timestamp` LIMIT 1', [$alert['device_id']]);
+    }
     $tpl         = dbFetchRow('SELECT `template`,`title`,`title_rec` FROM `alert_templates` JOIN `alert_template_map` ON `alert_template_map`.`alert_templates_id`=`alert_templates`.`id` WHERE `alert_template_map`.`alert_rule_id`=?', array($alert['rule_id']));
     if (!$tpl) {
         $tpl = dbFetchRow("SELECT `template`,`title`,`title_rec` FROM `alert_templates`  WHERE `name`='Default Alert Template'");
@@ -484,8 +488,8 @@ function DescribeAlert($alert)
     $default_tpl = "%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: {if %name}%name{else}%rule{/if}\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}";
     $obj['hostname']     = $device['hostname'];
     $obj['sysName']      = $device['sysName'];
-    $obj['sysDescr']      = $device['sysDescr'];
-    $obj['hardware']      = $device['hardware'];
+    $obj['sysDescr']     = $device['sysDescr'];
+    $obj['hardware']     = $device['hardware'];
     $obj['version']      = $device['version'];
     $obj['location']     = $device['location'];
     $obj['uptime']       = $device['uptime'];
@@ -493,7 +497,15 @@ function DescribeAlert($alert)
     $obj['uptime_long']  = formatUptime($device['uptime']);
     $obj['description']  = $device['purpose'];
     $obj['notes']        = $device['notes'];
+    $obj['alert_notes']  = $alert['note'];
     $obj['device_id']    = $alert['device_id'];
+    if (can_ping_device($attribs)) {
+        $obj['ping_timestamp'] = $ping_stats['template'];
+        $obj['ping_loss']      = $ping_stats['loss'];
+        $obj['ping_min']       = $ping_stats['min'];
+        $obj['ping_max']       = $ping_stats['max'];
+        $obj['ping_avg']       = $ping_stats['avg'];
+    }
     $extra               = $alert['details'];
     if (!isset($tpl['template'])) {
         $obj['template'] = $default_tpl;
@@ -736,7 +748,7 @@ function RunFollowUp()
 function loadAlerts($where)
 {
     $alerts = [];
-    foreach (dbFetchRows("SELECT alerts.id, alerts.device_id, alerts.rule_id, alerts.state FROM alerts WHERE $where") as $alert_status) {
+    foreach (dbFetchRows("SELECT alerts.id, alerts.device_id, alerts.rule_id, alerts.state, alerts.note FROM alerts WHERE $where") as $alert_status) {
         $alert = dbFetchRow(
             'SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name,alert_rules.builder FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1',
             array($alert_status['device_id'], $alert_status['rule_id'])
