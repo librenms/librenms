@@ -17,6 +17,13 @@ bgp-peers:
         excluded_fields: [device_id, bgpPeer_id]
     bgpPeers_cbgp:
         excluded_fields: [device_id]
+fdb-table:
+    ports_fdb:
+        excluded_fields: [device_id, ports_fdb_id, port_id, vlan_id]
+        joins:
+            - { left: ports_fdb.port_id, right: ports.port_id, select: ifIndex }
+            - { left: ports_fdb.vlan_id, right: vlans.vlan_id, select: 'vlan_vlan AS vlan' }
+        order_by: ports.ifIndex, vlans.vlan_vlan, ports_fdb.mac_address
 mempools:
     mempools:
         excluded_fields: [device_id, mempool_id]

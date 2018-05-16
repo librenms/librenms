@@ -50,9 +50,10 @@ class ModuleTestHelper
 
     // Definitions
     // ignore these when dumping all modules
-    private $exclude_from_all = ['arp-table'];
+    private $exclude_from_all = ['arp-table', 'fdb-table'];
     private $module_deps = [
         'arp-table' => ['ports', 'arp-table'],
+        'fdb-table' => ['ports', 'vlans', 'fdb-table'],
         'vlans' => ['ports', 'vlans'],
     ];
 
@@ -652,11 +653,12 @@ class ModuleTestHelper
         foreach ($modules as $module) {
             foreach ($module_dump_info[$module] as $table => $info) {
                 // check for custom where
-                $where = isset($info['custom_where']) ? $info['custom_where'] : "WHERE `device_id`=?";
+                $where = isset($info['custom_where']) ? $info['custom_where'] : "WHERE `$table`.`device_id`=?";
                 $params = array($device_id);
 
                 // build joins
                 $join = '';
+                $select = ["$table.*"];
                 foreach ($info['joins'] as $join_info) {
                     if (isset($join_info['custom'])) {
                         $join .= ' ' . $join_info['custom'];
@@ -664,6 +666,10 @@ class ModuleTestHelper
                         list($left, $lkey) = explode('.', $join_info['left']);
                         list($right, $rkey) = explode('.', $join_info['right']);
                         $join .= " LEFT JOIN `$right` ON (`$left`.`$lkey` = `$right`.`$rkey`)";
+
+                        if (isset($join_info['select'])) {
+                            $select[] = "$right.{$join_info['select']}";
+                        }
                     }
                 }
 
@@ -673,7 +679,8 @@ class ModuleTestHelper
                     $order_by = '';
                 }
 
-                $rows = dbFetchRows("SELECT * FROM `$table` $join $where $order_by", $params);
+                $fields = implode(', ', $select);
+                $rows = dbFetchRows("SELECT $fields FROM `$table` $join $where $order_by", $params);
 
                 // remove unwanted fields
                 if (isset($info['included_fields'])) {
