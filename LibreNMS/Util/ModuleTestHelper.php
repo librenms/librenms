@@ -55,6 +55,7 @@ class ModuleTestHelper
         'arp-table' => ['ports', 'arp-table'],
         'fdb-table' => ['ports', 'vlans', 'fdb-table'],
         'vlans' => ['ports', 'vlans'],
+        'vrf' => ['ports', 'vrf'],
     ];
 
 
