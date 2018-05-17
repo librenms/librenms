@@ -143,7 +143,7 @@ Install the policy tool for SELinux:
     setsebool -P httpd_execmem 1
 
 ##### Allow fping
-Create the file http_fping.tt with the following contents:
+Create the file http_fping.tt with the following contents. You can create this file anywhere, as it is a throw-away file. The last step in this install procedure will install the module in the proper location.
 ```
 module http_fping 1.0;
 
