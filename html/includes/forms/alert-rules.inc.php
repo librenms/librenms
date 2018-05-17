@@ -194,14 +194,17 @@ if (is_numeric($rule_id) && $rule_id > 0) {
 
     // Remove old mappings
     if (!empty($c_del)) {
-        dbDelete('alert_contact_map', 'contact_type="single" AND contact_or_group_id IN (?)', array(implode(',', $c_del)));
+        dbDelete('alert_contact_map', 'contact_type="single" AND contact_or_group_id IN (?)', array(array(implode(',', $c_del))));
     }
     if (!empty($g_del)) {
-        dbDelete('alert_contact_map', 'contact_type="group" AND contact_or_group_id IN (?)', array(implode(',', $g_del)));
+        $test = dbDelete('alert_contact_map', 'contact_type="group" AND contact_or_group_id IN (?)', array(array(implode(',', $g_del))));
     }
 }
 
 die(json_encode([
+    'c_del' => $c_del,
+    'g_del' => $g_del,
+    'res' => $test,
     'status'       => $status,
     'message'      => $message,
 ]));

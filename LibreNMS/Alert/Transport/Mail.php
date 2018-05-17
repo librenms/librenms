@@ -43,4 +43,18 @@ class Mail implements Transport
 
         return send_mail($obj['contacts'], $obj['title'], $obj['msg'], ($config['email_html'] == 'true') ? true : false);
     }
+
+    public function configTemplate()
+    {
+        return [
+            [
+                'title' => 'Email',
+                'name' => 'email',
+                'descr' => 'Email address of contact',
+                'type'  => 'text',
+                'required' => true,
+                'pattern' => '[a-zA-Z0-9_\-\.\+]+@\[a-zA-Z0-9_\-\.]+\.[a-zA-Z]{2,18}'
+            ]
+        ];
+    }
 }

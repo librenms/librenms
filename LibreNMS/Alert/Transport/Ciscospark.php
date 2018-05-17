@@ -69,4 +69,26 @@ class Ciscospark implements Transport
         }
         return true;
     }
+
+    public function configTemplate()
+    {
+        return [
+            [
+                'title' => 'API Token',
+                'name' => 'api-token',
+                'descr' => 'CiscoSpark API Token',
+                'type' => 'text',
+                'required' => true,
+                'pattern' => '[a-zA-Z0-9]'
+            ],
+            [
+                'title' => 'RoomID',
+                'name' => 'room-id',
+                'descr' => 'CiscoSpark Room ID',
+                'type' => 'text',
+                'required' => true,
+                'pattern' => '[a-zA-Z0-9\-]'
+            ]
+        ];
+    }
 }

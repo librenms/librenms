@@ -14,9 +14,10 @@
  */
 
 use LibreNMS\Authentication\Auth;
+use LibreNMS\Config;
 
 if (Auth::user()->hasGlobalAdmin()) {
-    ?>
+?>
 <!--Modal for adding or updating an alert contact -->
     <div class="modal fade" id="edit-alert-contact" tabindex="-1" role="dialog"
          aria-labelledby="Edit-contact" aria-hidden="true">
@@ -42,35 +43,43 @@ if (Auth::user()->hasGlobalAdmin()) {
                                 <select name='transport-choice' id='transport-choice' class='form-control'>
                                     <option value="mail-form" selected>Mail</option>
                                     <option value="ciscospark-form">Cisco Spark</option>
-                                    <!--Insert more transport type options here has support is added -->
+                                    <!--Insert more transport type options here has support is added. Value should be: [transport_name]-form -->
                                 </select>
                             </div>
                         </div>
                     </form>
-                    <form method="post" role="form" id="mail-form" class="form-horizontal transport">
-                        <input type="hidden" name="transport-type" id="transport-type" value="mail">
-                        <div class="form-group" title="Email for contact">
-                            <label for="email" class="col-sm-3 col-md-2 control-label">Email: </label>
-                            <div class="col-sm-9 col-md-10">
-                                <input type="text" id="email" name="email" class="form-control" required>
-                            </div>
-                        </div>
-                    </form>
-                    <form method="post" role="form" id="ciscospark-form" class="form-horizontal transport" style="display:none">
-                        <input type="hidden" name="transport-type" id="transport-type" value="ciscospark">
-                        <div class="form-group">
-                            <label for="api-token" class="col-sm-3 col-md-2 control-label">API Token: </label>
-                            <div class="col-sm-9 col-md-10">
-                                <input type="text" id="api-token" name="api-token" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="room-id" class="col-sm-3 col-md-2 control-label">RoomID: </label>
-                            <div class="col-sm-9 col-md-10">
-                                <input type="text" id="room-id" name="room-id" class="form-control" required>
-                            </div>
-                        </div>
-                    </form>
+<?php
+$transports = Config::get('alert.transports');
+// Dynamically create transport forms
+foreach (array_keys($transports) as $transport) {
+    $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($transport);
+    
+    if (!method_exists($class, 'configTemplate')) {
+        // Skip to next transport since support has not been added
+        continue;
+    }
+    
+    echo '<form method="post" role="form" id="'.strtolower($transport).'-form" class="form-horizontal transport">';
+    echo '<input type="hidden" name="transport-type" id="transport-type" value="'.strtolower($transport).'">';
+   
+    $tmp = call_user_func($class.'::configTemplate');
+
+    foreach($tmp as $item) {
+        echo '<div class="form-group" title="'.$item['descr'].'">';
+        echo '<label for="'.$item['name'].'" class="col-sm-3 col-md-2 control-label">'.$item['title'].': </label>';
+        echo '<div class="col-sm-9 col-md-10">';
+        echo '<input type="'.$item['type'].'" id="'.$item['name'].'" name="'.$item['name'].'" class="form-control" ';
+        if ($item['required']) {
+            echo 'required>';
+        } else {
+            echo '>';
+        }
+        echo '</div>';
+        echo '</div>';
+    }
+    echo '</form>';
+}
+?>
                     <div class="col-sm-12 text-center">
                         <button type="button" class="btn btn-success" id="btn-save" name="save-contact">
                         Save Contact
@@ -149,7 +158,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
             $(".transport").hide();
             $("#" + $("#transport-choice").val()).show().find("input:text").val("");
-     
+            
             // Populate the field values
             contact.details.forEach(function(config) {
                 $("#" + config.name).val(config.value);
