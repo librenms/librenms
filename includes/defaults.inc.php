@@ -262,10 +262,10 @@ $config['graph_colours']['mixed']   = array(
     '008C00',
     '4096EE',
     '73880A',
-    '91B13C',
     'D01F3C',
     '36393D',
     'FF0084',
+    '91B13C',
 );
 $config['graph_colours']['oranges'] = array(
     'E43C00',
