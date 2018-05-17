@@ -825,29 +825,29 @@ function list_available_health_graphs()
                 'name' => 'device_'.$graph['sensor_class'],
             );
         }
+        $device = \App\Models\Device::find($device_id);
 
-        $processor = dbFetchRows('SELECT * FROM `processors` WHERE device_id = ?', array($device_id));
-        if (count($processor) > 0) {
-            array_push($graphs, array(
-                'desc' => 'Processors',
-                'name' => 'device_processor'
-            ));
-        }
-
-        $storage = dbFetchRows('SELECT * FROM `storage` WHERE device_id = ? ORDER BY storage_descr', array($device_id));
-        if (count($storage) > 0) {
-            array_push($graphs, array(
-                'desc' => 'Storage',
-                'name' => 'device_storage'
-            ));
-        }
-
-        $mempool = dbFetchRows('SELECT * FROM `mempools` WHERE device_id = ?', array($device_id));
-        if (count($mempool) > 0) {
-            array_push($graphs, array(
-                'desc' => 'Memory Pools',
-                'name' => 'device_mempool'
-            ));
+        if ($device) {
+            if ($device->processors()->count() > 0) {
+                array_push($graphs, array(
+                    'desc' => 'Processors',
+                    'name' => 'device_processor'
+                ));
+            }
+    
+            if ($device->storage()->count() > 0) {
+                array_push($graphs, array(
+                    'desc' => 'Storage',
+                    'name' => 'device_storage'
+                ));
+            }
+    
+            if ($device->mempools()->count() > 0) {
+                array_push($graphs, array(
+                    'desc' => 'Memory Pools',
+                    'name' => 'device_mempool'
+                ));
+            }
         }
     }
 
