@@ -174,7 +174,7 @@ Now head to the web installer and follow the on-screen instructions.
 
     http://librenms.example.com/install.php
 
-The web installer will prompt you to create a `config.php` file in your librenms install location. Please remember to set the permissions on config.php after you copied the on-screen contents to the file. Run:
+The web installer might prompt you to create a `config.php` file in your librenms install location manually, copying the content displayed on-screen to the file. If you have to do this, please remember to set the permissions on config.php after you copied the on-screen contents to the file. Run:
 
     chown librenms:librenms /opt/librenms/config.php
 
