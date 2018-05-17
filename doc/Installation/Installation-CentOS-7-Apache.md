@@ -138,11 +138,8 @@ Then run these commands
 
 #### Configure snmpd
 
-Create a backup of your old snmpd.conf that shipped with your CentOS install.
-
-    cp /etc/snmp/snmpd.conf /etc/snmp/snmpd.bak
-    
-Now copy the example snmpd.conf from the LibreNMS install.
+  
+Copy the example snmpd.conf from the LibreNMS install.
 
     cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
 
