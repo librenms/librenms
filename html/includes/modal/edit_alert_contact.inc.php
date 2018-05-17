@@ -64,7 +64,7 @@ foreach (array_keys($transports) as $transport) {
    
     $tmp = call_user_func($class.'::configTemplate');
 
-    foreach($tmp as $item) {
+    foreach ($tmp as $item) {
         echo '<div class="form-group" title="'.$item['descr'].'">';
         echo '<label for="'.$item['name'].'" class="col-sm-3 col-md-2 control-label">'.$item['title'].': </label>';
         echo '<div class="col-sm-9 col-md-10">';
