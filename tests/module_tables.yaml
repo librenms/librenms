@@ -4,7 +4,7 @@ applications:
     application_metrics:
         excluded_fields: [app_id]
         joins:
-            - { custom: 'INNER JOIN (SELECT app_id, app_type FROM applications WHERE `device_id`=?) I USING (app_id)' }
+            - { custom: 'INNER JOIN (SELECT app_id, app_type FROM applications WHERE `device_id`=?) I USING (app_id)', select: ['app_type'] }
         custom_where: ''
 arp-table:
     ipv4_mac:
@@ -17,6 +17,13 @@ bgp-peers:
         excluded_fields: [device_id, bgpPeer_id]
     bgpPeers_cbgp:
         excluded_fields: [device_id]
+fdb-table:
+    ports_fdb:
+        excluded_fields: [device_id, ports_fdb_id, port_id, vlan_id]
+        joins:
+            - { left: ports_fdb.port_id, right: ports.port_id, select: ifIndex }
+            - { left: ports_fdb.vlan_id, right: vlans.vlan_id, select: vlan_vlan }
+        order_by: ports.ifIndex, vlans.vlan_vlan, ports_fdb.mac_address
 mempools:
     mempools:
         excluded_fields: [device_id, mempool_id]
@@ -60,6 +67,12 @@ vlans:
     ports_vlans:
         excluded_fields: [port_vlan_id, device_id, port_id]
         order_by: vlan, baseport
+vrf:
+    vrfs:
+        excluded_fields: [vrf_id, device_id]
+    ports:
+        included_fields: [ifIndex, ifVrf]
+        custom_where: device_id=? AND ifVrf!=0
 wireless:
     wireless_sensors:
         excluded_fields: [device_id, sensor_id, access_point_id, lastupdate]
