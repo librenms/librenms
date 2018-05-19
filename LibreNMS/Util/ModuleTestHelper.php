@@ -674,7 +674,7 @@ class ModuleTestHelper
                     }
 
                     // build selects
-                    $select = array_merge($select, isset($join_info['select']) ? $join_info['select'] : $default_select);
+                    $select = array_merge($select, isset($join_info['select']) ? (array)$join_info['select'] : $default_select);
                 }
 
                 if (isset($info['order_by'])) {
