@@ -220,6 +220,11 @@ class Device extends BaseModel
         return $this->hasMany('App\Models\Storage', 'device_id');
     }
 
+    public function mempools()
+    {
+        return $this->hasMany('App\Models\Mempool', 'device_id');
+    }
+
     public function syslogs()
     {
         return $this->hasMany('App\Models\General\Syslog', 'device_id', 'device_id');
