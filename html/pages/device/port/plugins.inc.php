@@ -14,4 +14,3 @@ $pagetitle[] = 'Plugins';
 <hr>
 <?php
     LibreNMS\Plugins::call('port_container', $device, $port);
-?>
