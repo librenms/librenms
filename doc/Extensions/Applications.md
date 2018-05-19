@@ -932,7 +932,7 @@ it should be. This will result in a usable config, but may miss some less common
 
 If you have a large number of more than one or two disks on a system, you should consider adding this to cron. Also make sure the cache file is some place it can be written to.
 ```
- */3 * * * * /etc/snmp/smart -u
+ */3 * * * * root /etc/snmp/smart -u
 ```
 
 6. If your snmp agent runs as user "snmp", edit your sudo users (usually `visudo`) and add at the bottom:
