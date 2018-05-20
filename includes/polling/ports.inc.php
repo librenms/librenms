@@ -290,7 +290,18 @@ if ($config['enable_ports_poe']) {
         }
     } elseif ($device['os'] == 'vrp') {
         echo 'HwPoePortEntry' ;
-        $port_stats = snmpwalk_cache_oid($device, 'HwPoePortEntry', $port_stats, 'HUAWEI-POE-MIB');
+
+        $vrp_poe_oids = array(
+            'hwPoePortReferencePower',
+            'hwPoePortMaximumPower',
+            'hwPoePortConsumingPower',
+            'hwPoePortPeakPower',
+            'hwPoePortEnable',
+        );
+
+        foreach ($vrp_poe_oids as $oid) {
+            $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'HUAWEI-POE-MIB');
+        }
     } else {
         //Any other device, generic polling
         $port_stats = snmpwalk_cache_oid($device, 'pethPsePortEntry', $port_stats, 'POWER-ETHERNET-MIB');
