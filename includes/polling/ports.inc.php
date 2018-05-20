@@ -300,7 +300,7 @@ if ($config['enable_ports_poe']) {
         );
 
         foreach ($vrp_poe_oids as $oid) {
-            $port_stats = snmpwalk_cache_oid($device,  $oid, $port_stats, 'HUAWEI-POE-MIB');
+            $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'HUAWEI-POE-MIB');
         }
     } else {
         //Any other device, generic polling
