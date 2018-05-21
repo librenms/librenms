@@ -531,7 +531,18 @@ if (empty($config_groups['alert.transports.pagerduty']['config_value']) === fals
                         <div class="col-sm-8">
                             <button class="btn btn-success btn-xs" type="button" name="new_config" id="new_config_item" data-toggle="modal" data-target="#new-config-slack">Add Slack URL</button>
                         </div>
-        </div>
+      <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+<a data-toggle="collapse" data-parent="#accordion" href="#discord_transport_expand"><i class="fa fa-caret-down"></i> Discord transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="discord" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="discord_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="col-sm-8">
+                            <button class="btn btn-success btn-xs" type="button" name="new_config" id="new_config_item" data-toggle="modal" data-target="#new-config-discord">Add Discord URL</button>
+                        </div>
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
@@ -544,8 +555,19 @@ if (empty($config_groups['alert.transports.pagerduty']['config_value']) === fals
                         <div class="col-sm-8">
                             <button class="btn btn-success btn-xs" type="button" name="new_config" id="new_config_item" data-toggle="modal" data-target="#new-config-discord">Add Discord URL</button>
                         </div>
+      <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+<a data-toggle="collapse" data-parent="#accordion" href="#discord_transport_expand"><i class="fa fa-caret-down"></i> Discord transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="discord" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="discord_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="col-sm-8">
+                            <button class="btn btn-success btn-xs" type="button" name="new_config" id="new_config_item" data-toggle="modal" data-target="#new-config-discord">Add Discord URL</button>
+                        </div>
                     </div>';
-
                     $slack_urls = get_config_like_name('alert.transports.slack.%.url');
 foreach ($slack_urls as $slack_url) {
     unset($upd_slack_extra);
@@ -605,7 +627,21 @@ foreach ($slack_urls as $slack_url) {
                 </div>
             </div>
         </div>
-                  $discord_urls = get_config_like_name('alert.transports.discord.%.url');
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#rocket_transport_expand"><i class="fa fa-caret-down"></i> Rocket.chat transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="rocket" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="rocket_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="col-sm-8">
+                            <button class="btn btn-success btn-xs" type="button" name="new_config" id="new_config_item" data-toggle="modal" data-target="#new-config-rocket">Add rocket URL</button>
+                        </div>
+                    </div>';
+                    $discord_urls = get_config_like_name('alert.transports.discord.%.url');
 foreach ($discord_urls as $discord_url) {
     unset($upd_discord_extra);
     $new_discord_extra = array();
@@ -664,6 +700,7 @@ foreach ($discord_urls as $discord_url) {
                 </div>
             </div>
         </div>
+
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
@@ -1821,6 +1858,42 @@ echo '
         });
     });// End Add Slack config
 
+   // Add Discord config
+    discordIndex = 0;
+    $("button#submit-discord").click(function(){
+        var config_value = $('#discord_value').val();
+        var config_extra = $('#discord_extra').val();
+        $.ajax({
+            type: "POST",
+            url: "ajax_form.php",
+            data: {type: "config-item", action: 'add-discord', config_group: "alerting", config_sub_group: "transports", config_extra: config_extra, config_value: config_value},
+            dataType: "json",
+            success: function(data){
+                if (data.status == 'ok') {
+                    discordIndex++;
+                    var $template = $('#discord_url_template'),
+                        $clone    = $template
+                            .clone()
+                            .removeClass('hide')
+                            .attr('id',data.config_id)
+                            .attr('discord-url-index', discordIndex)
+                            .insertBefore($template);
+                        $clone.find('[name="global-config-input"]').attr('data-config_id',data.config_id);
+                        $clone.find('[name="del-discord-call"]').attr('data-config_id',data.config_id);
+                        $clone.find('[name="global-config-input"]').attr('value', config_value);
+                        $clone.find('[name="global-config-textarea"]').val(config_extra);
+                        $clone.find('[name="global-config-textarea"]').attr('data-config_id',data.config_id);
+                    $("#new-config-discord").modal('hide');
+                } else {
+                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                }
+            },
+            error: function(){
+                $("#message").html('<div class="alert alert-danger">Error creating config item</div>');
+            }
+        });
+    });// End Add Discord config
+
     // Add RocketChat config
     rocketIndex = 0;
     $("button#submit-rocket").click(function(){
@@ -1856,42 +1929,6 @@ echo '
             }
         });
     });// End Add Slack config
-
-    // Add Discord config
-    discordIndex = 0;
-    $("button#submit-discord").click(function(){
-        var config_value = $('#discord_value').val();
-        var config_extra = $('#discord_extra').val();
-        $.ajax({
-            type: "POST",
-            url: "ajax_form.php",
-            data: {type: "config-item", action: 'add-discord', config_group: "alerting", config_sub_group: "transports", config_extra: config_extra, config_value: config_value},
-            dataType: "json",
-            success: function(data){
-                if (data.status == 'ok') {
-                    discordIndex++;
-                    var $template = $('#discord_url_template'),
-                        $clone    = $template
-                            .clone()
-                            .removeClass('hide')
-                            .attr('id',data.config_id)
-                            .attr('discord-url-index', discordIndex)
-                            .insertBefore($template);
-                        $clone.find('[name="global-config-input"]').attr('data-config_id',data.config_id);
-                        $clone.find('[name="del-discord-call"]').attr('data-config_id',data.config_id);
-                        $clone.find('[name="global-config-input"]').attr('value', config_value);
-                        $clone.find('[name="global-config-textarea"]').val(config_extra);
-                        $clone.find('[name="global-config-textarea"]').attr('data-config_id',data.config_id);
-                    $("#new-config-discord").modal('hide');
-                } else {
-                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-                }
-            },
-            error: function(){
-                $("#message").html('<div class="alert alert-danger">Error creating config item</div>');
-            }
-        });
-    });// End Add Discord config
 
     // Add Hipchat config
     hipchatIndex = 0;
