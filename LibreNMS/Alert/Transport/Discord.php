@@ -22,7 +22,7 @@
  * @copyright  2018 Ryan Finney
  * @author     https://github.com/theherodied/
  * @contributer f0o, sdef2
- * Thanks to F0o <f0o@devilcode.org> for creating the Discord transport which is the majority of this code.
+ * Thanks to F0o <f0o@devilcode.org> for creating the Slack transport which is the majority of this code.
  * Thanks to sdef2 for figuring out the differences needed to make Discord work.
  */
 namespace LibreNMS\Alert\Transport;
