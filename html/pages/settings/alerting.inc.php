@@ -534,31 +534,7 @@ if (empty($config_groups['alert.transports.pagerduty']['config_value']) === fals
       <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-<a data-toggle="collapse" data-parent="#accordion" href="#discord_transport_expand"><i class="fa fa-caret-down"></i> Discord transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="discord" class="btn btn-primary btn-xs pull-right">Test transport</button>
-                </h4>
-            </div>
-            <div id="discord_transport_expand" class="panel-collapse collapse">
-                <div class="panel-body">
-                    <div class="form-group">
-                        <div class="col-sm-8">
-                            <button class="btn btn-success btn-xs" type="button" name="new_config" id="new_config_item" data-toggle="modal" data-target="#new-config-discord">Add Discord URL</button>
-                        </div>
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h4 class="panel-title">
                     <a data-toggle="collapse" data-parent="#accordion" href="#discord_transport_expand"><i class="fa fa-caret-down"></i> Discord transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="discord" class="btn btn-primary btn-xs pull-right">Test transport</button>
-                </h4>
-            </div>
-            <div id="discord_transport_expand" class="panel-collapse collapse">
-                <div class="panel-body">
-                    <div class="form-group">
-                        <div class="col-sm-8">
-                            <button class="btn btn-success btn-xs" type="button" name="new_config" id="new_config_item" data-toggle="modal" data-target="#new-config-discord">Add Discord URL</button>
-                        </div>
-      <div class="panel panel-default">
-            <div class="panel-heading">
-                <h4 class="panel-title">
-<a data-toggle="collapse" data-parent="#accordion" href="#discord_transport_expand"><i class="fa fa-caret-down"></i> Discord transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="discord" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="discord_transport_expand" class="panel-collapse collapse">
