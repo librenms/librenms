@@ -32,9 +32,8 @@ specify a different variant of the os, this will be tested completely separate f
 one variant, please do not specify one.
 
 ## Running tests
-**Note:** To run tests, ensure you have:
-- Composer installed. `apt install composer` if not. 
-- Executed `./composer.phar install` from your LibreNMS root directory. This will read composer.json and install any dependencies required. 
+
+**Note:** To run tests, ensure you have executed "./scripts/composer_wrapper.php install" from your LibreNMS root directory. This will read composer.json and install any dependencies required. 
 
 After you have saved your test data, you should run `./scripts/pre-commit.php -p -u` verify they pass.
 
