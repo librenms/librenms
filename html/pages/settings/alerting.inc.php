@@ -531,6 +531,10 @@ if (empty($config_groups['alert.transports.pagerduty']['config_value']) === fals
                         <div class="col-sm-8">
                             <button class="btn btn-success btn-xs" type="button" name="new_config" id="new_config_item" data-toggle="modal" data-target="#new-config-slack">Add Slack URL</button>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
       <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
