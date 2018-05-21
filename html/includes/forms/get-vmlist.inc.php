@@ -11,19 +11,32 @@
  * @author     Aldemir Akpinar <aldemir.akpinar@gmail.com>
  */
 
-$vm_query = "SELECT a.vmwVmDisplayName AS vmname, a.vmwVmState AS powerstat, a.device_id AS deviceid, b.hostname AS physicalsrv, b.sysname AS sysname, a.vmwVmGuestOS AS os, a.vmwVmMemSize AS memory, a.vmwVmCpus AS cpu FROM vminfo AS a  LEFT JOIN devices AS b ON  a.device_id = b.device_id";
+use LibreNMS\Authentication\Auth;
 
-if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
-    #This is a bit ugly
-    $vm_query .= " WHERE a.vmwVmDisplayName LIKE ? OR b.hostname LIKE ? OR a.vmwVmGuestOS LIKE ? OR b.sysname LIKE ?";
-    $count_query = "SELECT COUNT(a.vmwVmDisplayName) FROM vminfo AS a LEFT JOIN devices AS b ON  a.device_id = b.device_id WHERE a.vmwVmDisplayName LIKE ? OR b.hostname LIKE ? OR a.vmwVmGuestOS LIKE ? OR b.sysname LIKE ?";
+$vm_query = "SELECT v.vmwVmDisplayName AS vmname, v.vmwVmState AS powerstat, v.device_id AS deviceid, d.hostname AS physicalsrv, d.sysname AS sysname, v.vmwVmGuestOS AS os, v.vmwVmMemSize AS memory, v.vmwVmCpus AS cpu FROM vminfo AS v LEFT JOIN devices AS d ON v.device_id = d.device_id";
+
+$param = [];
+if (!Auth::user()->hasGlobalRead()) {
+    $vm_query .= ' LEFT JOIN devices_perms AS DP ON d.device_id = DP.device_id';
+    $uidwhere = ' AND DP.user_id = ?';
+    $uid = [Auth::id()];
+} else {
+    $uidwhere = '';
+    $uid = [];
+}
+
+if (isset($vars['searchPhrase']) && !empty($vars['searchPhrase'])) {
+    $vm_query .= " WHERE v.vmwVmDisplayName LIKE ? OR d.hostname LIKE ? OR v.vmwVmGuestOS LIKE ? OR d.sysname LIKE ?" . $uidwhere;
+    $count_query = "SELECT COUNT(v.vmwVmDisplayName) FROM vminfo AS v LEFT JOIN devices AS d ON  v.device_id = d.device_id WHERE v.vmwVmDisplayName LIKE ? OR d.hostname LIKE ? OR v.vmwVmGuestOS LIKE ? OR d.sysname LIKE ?" . $uidwhere;
+    $searchphrase = '%' . $vars['searchPhrase'] . '%';
+    array_push($param, $searchphrase, $searchphrase, $searchphrase, $searchphrase, $uid);
 } else {
     $count_query = "SELECT COUNT(*) FROM vminfo ";
 }
 
 $order_by = '';
-if (isset($_REQUEST['sort']) && is_array($_REQUEST['sort'])) {
-    foreach ($_REQUEST['sort'] as $key => $value) {
+if (isset($vars['sort']) && is_array($vars['sort'])) {
+    foreach ($vars['sort'] as $key => $value) {
         $order_by .= " $key $value";
     }
 } else {
@@ -32,30 +45,23 @@ if (isset($_REQUEST['sort']) && is_array($_REQUEST['sort'])) {
 
 $vm_query .= " ORDER BY " . $order_by;
 
-if (is_numeric($_POST['rowCount']) && is_numeric($_POST['current'])) {
-    $rowcount = $_POST['rowCount'];
-    $current = $_POST['current'];
+if (is_numeric($vars['rowCount']) && is_numeric($vars['current'])) {
+    $rowcount = $vars['rowCount'];
+    $current = $vars['current'];
     $vm_query .= " LIMIT ".$rowcount * ($current - 1).", ".$rowcount;
 }
 
-if (!empty($_POST['searchPhrase'])) {
-    $searchphrase = '%'.mres($_POST['searchPhrase']).'%';
-    $vm_arr = dbFetchRows($vm_query, array($searchphrase, $searchphrase, $searchphrase, $searchphrase));
-    $rec_count = dbFetchCell($count_query, array($searchphrase, $searchphrase, $searchphrase, $searchphrase));
+
+if (isset($vars['searchPhrase']) && !empty($vars['searchPhrase'])) {
+    $vm_arr = dbFetchRows($vm_query, $param);
+    $rec_count = dbFetchCell($count_query, $param);
 } else {
     $vm_arr = dbFetchRows($vm_query);
     $rec_count = dbFetchCell($count_query);
 }
 
-foreach ($vm_arr as $k => $v) {
-    if (device_permitted($v['deviceid']) === false) {
-        unset($vm_arr[$k]);
-        $rec_count--;
-    }
-}
-
-
-$status = array('current' => $current, 'rowCount' => $rowcount, 'rows' => $vm_arr, 'total' => $rec_count);
+$status = ['current' => $current, 'rowCount' => $rowcount, 'rows' => $vm_arr, 'total' => $rec_count];
 
 header('Content-Type: application/json');
 echo _json_encode($status);
+
