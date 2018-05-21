@@ -69,4 +69,3 @@ $status = ['current' => $current, 'rowCount' => $rowcount, 'rows' => $vm_arr, 't
 
 header('Content-Type: application/json');
 echo _json_encode($status);
-
