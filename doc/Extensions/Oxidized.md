@@ -105,7 +105,7 @@ $config['oxidized']['maps']['ip']['sysname'][] = array('regex' => '/^my.node/', 
 $config['oxidized']['maps']['ip']['sysname'][] = array('match' => 'my-other.node', 'ip' => '192.168.1.20');
 ```
 
-This allows extending the configuration further by providing a completely flexible model for custom flags and settings, for example, below shows the ability to add an ssh_proxy configuration with a host to your Oxidized configuration:
+This allows extending the configuration further by providing a completely flexible model for custom flags and settings, for example, below shows the ability to add an ssh_proxy host within Oxidized simply by adding the below to your configuration:
 
 ```php
 $config['oxidized']['maps']['ssh_proxy']['sysname'][] = array('regex' => '/^my.node/', 'ssh_proxy' => 'my-ssh-gateway.node');
