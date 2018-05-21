@@ -125,7 +125,7 @@ Running an install of LibreNMS in /opt/librenms
 
 `config.php`
 ```php
-$config['distributed_poller_name']           = file_get_contents('/etc/hostname');
+$config['distributed_poller_name']           = php_uname('n');
 $config['distributed_poller_group']          = '0';
 $config['distributed_poller_memcached_host'] = "example.com";
 $config['distributed_poller_memcached_port'] = 11211;
@@ -149,7 +149,7 @@ Running an install of LibreNMS in /opt/librenms
 
 `config.php`
 ```php
-$config['distributed_poller_name']           = file_get_contents('/etc/hostname');
+$config['distributed_poller_name']           = php_uname('n');
 $config['distributed_poller_group']          = '0';
 $config['distributed_poller_memcached_host'] = "example.com";
 $config['distributed_poller_memcached_port'] = 11211;
@@ -171,7 +171,7 @@ Running an install of LibreNMS in /opt/librenms
 
 `config.php`
 ```php
-$config['distributed_poller_name']           = file_get_contents('/etc/hostname');
+$config['distributed_poller_name']           = php_uname('n');
 $config['distributed_poller_group']          = '2,3';
 $config['distributed_poller_memcached_host'] = "example.com";
 $config['distributed_poller_memcached_port'] = 11211;

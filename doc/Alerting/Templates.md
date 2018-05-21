@@ -21,14 +21,24 @@ Placeholders are special variables that if used within the template will be repl
 
 `The device %hostname has been up for %uptime seconds` would result in the following `The device localhost has been up for 30344 seconds`.
 
+- Device ID: `%device_id`
 - Hostname of the Device: `%hostname`
 - sysName of the Device: `%sysName`
+- sysDescr of the Device: `%sysDescr`
+- hardware of the Device: `%hardware`
+- Software version of the Device: `%version` 
 - location of the Device: `%location`
 - uptime of the Device (in seconds): `%uptime`
 - short uptime of the Device (28d 22h 30m 7s): `%uptime_short`
 - long uptime of the Device (28 days, 22h 30m 7s): `%uptime_long`
 - description (purpose db field) of the Device: `%description`
 - notes of the Device: `%notes`
+- notes of the alert: `%alert_notes`
+- ping timestamp (if icmp enabled): `%ping_timestamp`
+- ping loss (if icmp enabled): `%ping_loss`
+- ping min (if icmp enabled): `%ping_min`
+- ping max (if icmp enabled): `%ping_max`
+- ping avg (if icmp enabled): `%ping_avg`
 - Title for the Alert: `%title`
 - Time Elapsed, Only available on recovery (`%state == 0`): `%elapsed`
 - Alert-ID: `%id`
@@ -40,6 +50,7 @@ Placeholders are special variables that if used within the template will be repl
 - Rule-Name: `%name`
 - Timestamp: `%timestamp`
 - Transport name: `%transport`
+
 - Contacts, must be iterated in a foreach, `%key` holds email and `%value` holds name: `%contacts`
 
 Placeholders can be used within the subjects for templates as well although %faults is most likely going to be worthless.

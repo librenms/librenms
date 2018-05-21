@@ -1,14 +1,10 @@
 <?php
 
-if ($config['enable_inventory']) {
-    // Cisco
-    if ($device['os'] == 'ios') {
-        include 'includes/polling/entity-physical/ios.inc.php';
-    }
+use LibreNMS\Config;
 
-    // Cisco CIMC
-    if ($device['os'] == 'cimc') {
-        include 'includes/polling/entity-physical/cimc.inc.php';
+if ($config['enable_inventory']) {
+    if (file_exists(Config::get('install_dir') . "/includes/polling/entity-physical/{$device['os']}.inc.php")) {
+        include Config::get('install_dir') . "/includes/polling/entity-physical/{$device['os']}.inc.php";
     }
 
     // Update State

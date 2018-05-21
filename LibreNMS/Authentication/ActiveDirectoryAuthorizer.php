@@ -273,7 +273,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
             'user_id' => $this->getUseridFromSid($this->sidFromLdap($entry['objectsid'][0])),
             'username' => $entry['samaccountname'][0],
             'realname' => $entry['displayname'][0],
-            'email' => $entry['mail'][0],
+            'email' => isset($entry['mail'][0]) ? $entry['mail'][0] : null,
             'descr' => '',
             'level' => $this->getUserlevel($entry['samaccountname'][0]),
             'can_modify_passwd' => 0,

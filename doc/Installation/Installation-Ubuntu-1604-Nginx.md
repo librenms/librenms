@@ -5,7 +5,8 @@ source: Installation/Installation-Ubuntu-1604-Nginx.md
 
 ## Install Required Packages ##
 
-    apt install composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.0-cli php7.0-curl php7.0-fpm php7.0-gd php7.0-mcrypt php7.0-mysql php7.0-snmp php7.0-xml php7.0-zip python-memcache python-mysqldb rrdtool snmp snmpd whois
+    apt install acl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.0-cli php7.0-curl php7.0-fpm php7.0-gd php7.0-mbstring php7.0-mcrypt php7.0-mysql php7.0-snmp php7.0-xml php7.0-zip python-memcache python-mysqldb rrdtool snmp snmpd whois
+
 
 #### Add librenms user
 
@@ -116,14 +117,18 @@ LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large an
 ### Set permissions
 
     chown -R librenms:librenms /opt/librenms
-    setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs
-    setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs
+    setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
+    setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
 
 ## Web installer ##
 
 Now head to the web installer and follow the on-screen instructions.
 
     http://librenms.example.com/install.php
+
+The web installer might prompt you to create a `config.php` file in your librenms install location manually, copying the content displayed on-screen to the file. If you have to do this, please remember to set the permissions on config.php after you copied the on-screen contents to the file. Run:
+
+    chown librenms:librenms /opt/librenms/config.php
 
 ### Final steps
 

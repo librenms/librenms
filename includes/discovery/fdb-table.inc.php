@@ -16,12 +16,14 @@ foreach ($sql_result as $entry) {
     $existing_fdbs[(int)$entry['vlan_id']][$entry['mac_address']] = $entry;
 }
 
-$insert = array(); // populate $insert with database entries
+$insert = []; // populate $insert with database entries
 if (file_exists(Config::get('install_dir') . "/includes/discovery/fdb-table/{$device['os']}.inc.php")) {
     require Config::get('install_dir') . "/includes/discovery/fdb-table/{$device['os']}.inc.php";
 } elseif ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
     include Config::get('install_dir') . '/includes/discovery/fdb-table/ios.inc.php';
-} else {
+}
+
+if (empty($insert)) {
     // Check generic Q-BRIDGE-MIB and BRIDGE-MIB
     include Config::get('install_dir') . '/includes/discovery/fdb-table/bridge.inc.php';
 }

@@ -30,9 +30,11 @@
 use LibreNMS\Authentication\Auth;
 use LibreNMS\Config;
 
-global $config;
+global $config, $permissions, $vars;
 
 error_reporting(E_ERROR|E_PARSE|E_CORE_ERROR|E_COMPILE_ERROR);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
 
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
@@ -97,19 +99,24 @@ ini_set('display_errors', 1);
 if (!module_selected('nodb', $init_modules)) {
     // Connect to database
     try {
+        // \LibreNMS\DB\Eloquent::boot();
+
         dbConnect();
     } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
         if (isCli()) {
             echo 'MySQL Error: ' . $e->getMessage() . PHP_EOL;
+            exit(2);
         } else {
-            echo "<h2>MySQL Error</h2><p>" . $e->getMessage() . "</p>";
+            // punt to the Laravel error handler
+            throw $e;
         }
-        exit(2);
     }
 }
 
-// try to load from database, otherwise, just process config
-Config::load();
+// Load config if not already loaded (which is the case if inside Laravel)
+if (!Config::has('install_dir')) {
+    Config::load();
+}
 
 // set display_errors back
 ini_set('display_errors', $display_bak);

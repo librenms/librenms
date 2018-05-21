@@ -1,355 +1,355 @@
 [
   {
-    "rule": "%macros.device_down = \"1\"",
+    "rule": "macros.device_down = \"1\"",
     "name": "Devices up/down",
     "default": true
   },
   {
-    "rule": "%devices.uptime < \"300\" && %macros.device = \"1\"",
+    "rule": "devices.uptime < \"300\" && macros.device = \"1\"",
     "name": "Device rebooted",
     "extra": "{\"count\": 1}",
     "default": true
   },
   {
-    "rule": "%bgpPeers.bgpPeerState != \"established\" && %macros.device_up = \"1\"",
+    "rule": "bgpPeers.bgpPeerState != \"established\" && macros.device_up = \"1\"",
     "name": "BGP Session down",
     "extra": "{\"count\": 1}",
     "default": true
   },
   {
-    "rule": "%bgpPeers.bgpPeerFsmEstablishedTime < \"300\" && %bgpPeers.bgpPeerState = \"established\" && %macros.device_up = \"1\"",
+    "rule": "bgpPeers.bgpPeerFsmEstablishedTime < \"300\" && bgpPeers.bgpPeerState = \"established\" && macros.device_up = \"1\"",
     "name": "BGP Session established",
     "extra": "{\"count\": 1}",
     "default": true
   },
   {
-    "rule": "%macros.port_down = \"1\"",
+    "rule": "macros.port_down = \"1\"",
     "name": "Port status up/down",
     "extra": "{\"count\": 1}",
     "default": true
   },
   {
-    "rule": "%macros.port_usage_perc >= \"80\" && %macros.port_up = \"1\" && %macros.port = \"1\"",
+    "rule": "macros.port_usage_perc >= \"80\" && macros.port_up = \"1\"",
     "name": "Port utilisation over threshold",
     "default": true
   },
   {
-    "rule": "%sensors.sensor_current > %sensors.sensor_limit && %sensors.sensor_alert = \"1\" && %macros.device_up = \"1\"",
+    "rule": "sensors.sensor_current > sensors.sensor_limit && sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
     "name": "Sensor over limit - Check Device Health Settings",
     "default": true
   },
   {
-    "rule": "%sensors.sensor_current < %sensors.sensor_limit_low && %sensors.sensor_alert = \"1\" && %macros.device_up = \"1\"",
+    "rule": "sensors.sensor_current < sensors.sensor_limit_low && sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
     "name": "Sensor under limit - Check Device Health Settings",
     "default": true
   },
   {
-    "rule": "%services.service_status != \"0\" && %macros.device_up = \"1\"",
+    "rule": "services.service_status != \"0\" && macros.device_up = \"1\"",
     "name": "Service up/down",
     "default": true
   },
   {
-    "rule": "%wireless_sensors.sensor_current >= %wireless_sensors.sensor_limit && %wireless_sensors.sensor_alert = \"1\" && %macros.device_up = \"1\"",
+    "rule": "wireless_sensors.sensor_current >= wireless_sensors.sensor_limit && wireless_sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
     "name": "Wireless Sensor over limit",
     "default": true
   },
   {
-    "rule": "%wireless_sensors.sensor_current <= %wireless_sensors.sensor_limit_low && %wireless_sensors.sensor_alert = \"1\" && %macros.device_up = \"1\"",
+    "rule": "wireless_sensors.sensor_current <= wireless_sensors.sensor_limit_low && wireless_sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
     "name": "Wireless Sensor under limit",
     "default": true
   },
   {
-    "rule": "%macros.state_sensor_critical",
+    "rule": "macros.state_sensor_critical",
     "name": "State Sensor Critical",
     "default": true
   },
   {
-    "rule": "%macros.state_sensor_warning",
+    "rule": "macros.state_sensor_warning",
     "name": "State Sensor Warning",
     "default": false
   },
   {
-    "rule": "%macros.bill_quota_over_quota >= \"75\"",
+    "rule": "macros.bill_quota_over_quota >= \"75\"",
     "name": "Quota bills over 75% used"
   },
   {
-    "rule": "%macros.bill_cdr_over_quota >= \"75\"",
+    "rule": "macros.bill_cdr_over_quota >= \"75\"",
     "name": "CDR bills over 75% used"
   },
   {
-    "rule": "%ipsec_tunnels.tunnel_status != \"active\" && %macros.device_up = \"1\"",
+    "rule": "ipsec_tunnels.tunnel_status != \"active\" && macros.device_up = \"1\"",
     "name": "IPSec tunnels down"
   },
   {
-    "rule": "%pollers.time_taken >= \"250\"",
-    "name": "Poller is taking too long"
+    "rule": "devices.last_polled_timetaken >= 290",
+    "name": "Device took too long to poll"
   },
   {
-    "rule": "%macros.device_up = \"1\" && %devices.os = \"asa\" && %ciscoASA.data > \"5000\"",
+    "rule": "macros.device_up = \"1\" && devices.os = \"asa\" && ciscoASA.data > \"5000\"",
     "name": "Cisco ASA connections over 5000"
   },
   {
-    "rule": "%processors.processor_usage > \"85\" && %macros.device_up = \"1\"",
+    "rule": "processors.processor_usage > \"85\" && macros.device_up = \"1\"",
     "name": "Processor usage over 85%"
   },
   {
-    "rule": "%sensors.sensor_descr = \"Primary Unit.*\" && %sensors.sensor_current = \"10\" && %sensors.sensor_prev = \"9\"",
+    "rule": "sensors.sensor_descr = \"Primary Unit.*\" && sensors.sensor_current = \"10\" && sensors.sensor_prev = \"9\"",
     "name": "Cisco ASA Primary unit changed to standby"
   },
   {
-    "rule": "%ports.ifOperStatus = \"down\" && %ports.ifOperStatus_prev = \"up\" && %macros.device_up = \"1\"",
+    "rule": "ports.ifOperStatus = \"down\" && ports.ifOperStatus_prev = \"up\" && macros.device_up = \"1\"",
     "name": "Port status change from up to down"
   },
   {
-    "rule": "%ports.ifOutErrors_rate >= \"100\" || %ports.ifInErrors_rate >= \"100\"",
+    "rule": "ports.ifOutErrors_rate >= \"100\" || ports.ifInErrors_rate >= \"100\"",
     "name": "Interface Errors Rate greater than 100"
   },
   {
-    "rule": "%eventlog.type = \"discovery\" && %eventlog.message ~ \"@autodiscovered@\" && %eventlog.datetime >= %macros.past_60m",
+    "rule": "eventlog.type = \"discovery\" && eventlog.message ~ \"@autodiscovered@\" && eventlog.datetime >= macros.past_60m",
     "name": "Device discovered within the last 60 minutes"
   },
   {
-    "rule": "%wireless_sensors.sensor_class = 'clients' && %wireless_sensors.sensor_current >= %wireless_sensors.sensor_limit && %wireless_sensors.sensor_alert = \"1\" && %macros.device_up = \"1\"",
+    "rule": "wireless_sensors.sensor_class = 'clients' && wireless_sensors.sensor_current >= wireless_sensors.sensor_limit && wireless_sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
     "name": "Too many wireless clients"
   },
   {
-    "rule": "%syslog.timestamp >= %macros.past_5m && %syslog.msg ~ \"@authentication failure@\"",
+    "rule": "syslog.timestamp >= macros.past_5m && syslog.msg ~ \"@authentication failure@\"",
     "name": "Syslog, Authentication failure on Device"
   },
   {
-    "rule": "%services.service_status = \"1\"",
+    "rule": "services.service_status = \"1\"",
     "name": "Service warning"
   },
   {
-    "rule": "%services.service_status = \"2\"",
+    "rule": "services.service_status = \"2\"",
     "name": "Service critical"
   },
   {
-    "rule": "%syslog.timestamp >= %macros.past_5m && %syslog.priority ~ \"alert\"",
+    "rule": "syslog.timestamp >= macros.past_5m && syslog.priority ~ \"alert\"",
     "name": "Syslog, received Alert Priority Message"
   },
   {
-    "rule": "%syslog.timestamp >= %macros.past_5m && %syslog.priority ~ \"emergency\"",
+    "rule": "syslog.timestamp >= macros.past_5m && syslog.priority ~ \"emergency\"",
     "name": "Syslog, received Emergency Priority Message"
   },
   {
-    "rule": "%syslog.timestamp = %macros.past_5m && %syslog.msg ~ \"@arp table is full@\"",
+    "rule": "syslog.timestamp = macros.past_5m && syslog.msg ~ \"@arp table is full@\"",
     "name": "Syslog, ARP table is full check on device "
   },
   {
-    "rule": "%sensors.sensor_type = \"upsAdvBatteryReplaceIndicator\" && %sensors.sensor_current = \"2\"",
+    "rule": "sensors.sensor_type = \"upsAdvBatteryReplaceIndicator\" && sensors.sensor_current = \"2\"",
     "name": "APC UPS Battery Needs Replacement"
   },
   {
-    "rule": "%sensors.sensor_current = \"3\" && %sensors.sensor_type = \"upsBasicOutputStatus\"",
+    "rule": "sensors.sensor_current = \"3\" && sensors.sensor_type = \"upsBasicOutputStatus\"",
     "name": "APC UPS Switched to Battery Power"
   },
   {
-    "rule": "%sensors.sensor_current = \"10\" && %sensors.sensor_type = \"upsBasicOutputStatus\"",
+    "rule": "sensors.sensor_current = \"10\" && sensors.sensor_type = \"upsBasicOutputStatus\"",
     "name": "APC UPS in Hardware Failure Bypass Mode"
   },
   {
-    "rule": "%sensors.sensor_current = \"16\" && %sensors.sensor_type = \"upsBasicOutputStatus\"",
+    "rule": "sensors.sensor_current = \"16\" && sensors.sensor_type = \"upsBasicOutputStatus\"",
     "name": "APC UPS in Emergency Static Bypass Mode"
   },
   {
-    "rule": "%sensors.sensor_current = \"12\" && %sensors.sensor_type = \"upsBasicOutputStatus\"",
+    "rule": "sensors.sensor_current = \"12\" && sensors.sensor_type = \"upsBasicOutputStatus\"",
     "name": "APC UPS in Smart Trim Mode"
   },
   {
-    "rule": "%sensors.sensor_oid ~ \".1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.[2-5]\" && %sensors.sensor_current = \"2\"",
+    "rule": "sensors.sensor_oid ~ \".1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.[2-5]\" && sensors.sensor_current = \"2\"",
     "name": "HP Procurve Bad Power Supply"
   },
   {
-    "rule": "%sensors.sensor_oid = \".1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.1\" && %sensors.sensor_current = \"2\"",
+    "rule": "sensors.sensor_oid = \".1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.1\" && sensors.sensor_current = \"2\"",
     "name": "HP Procurve Fan Fault"
   },
   {
-    "rule": "%sensors.sensor_current > %sensors.sensor_limit && %sensors.sensor_alert = \"1\" && %macros.device_up = \"1\" && %macros.sensor_port_link = \"1\"",
+    "rule": "sensors.sensor_current > sensors.sensor_limit && sensors.sensor_alert = \"1\" && macros.device_up = \"1\" && macros.sensor_port_link = \"1\"",
     "name": "Sensor over limit with linked port"
   },
   {
-    "rule": "%sensors.sensor_current < %sensors.sensor_limit_low && %sensors.sensor_alert = \"1\" && %macros.device_up = \"1\" && %macros.sensor_port_link = \"1\"",
+    "rule": "sensors.sensor_current < sensors.sensor_limit_low && sensors.sensor_alert = \"1\" && macros.device_up = \"1\" && macros.sensor_port_link = \"1\"",
     "name": "Sensor under limit with linked port"
   },
   {
-    "rule": "%sensors.sensor_current = \"4\" && %sensors.sensor_type = \"upsOutputSourceState\"",
+    "rule": "sensors.sensor_current = \"4\" && sensors.sensor_type = \"upsOutputSourceState\"",
     "name": "UPS is running on the bypass"
   },
   {
-    "rule": "%sensors.sensor_current = \"5\" && %sensors.sensor_type = \"upsOutputSourceState\"",
+    "rule": "sensors.sensor_current = \"5\" && sensors.sensor_type = \"upsOutputSourceState\"",
     "name": "UPS is running on the battery"
   },
   {
-    "rule": "%sensors.sensor_current = \"3\" && %sensors.sensor_type = \"upsBatteryStatusState\"",
+    "rule": "sensors.sensor_current = \"3\" && sensors.sensor_type = \"upsBatteryStatusState\"",
     "name": "UPS has a low battery"
   },
   {
-    "rule": "%sensors.sensor_current = \"4\" && %sensors.sensor_type = \"upsBatteryStatusState\"",
+    "rule": "sensors.sensor_current = \"4\" && sensors.sensor_type = \"upsBatteryStatusState\"",
     "name": "UPS has a depleted battery"
   },
   {
-    "rule": "%sensors.sensor_descr ~ \"Percentage load\" && %sensors.sensor_current >= \"90\" && %sensors.sensor_type = \"rfc1628\"",
+    "rule": "sensors.sensor_descr ~ \"Percentage load\" && sensors.sensor_current >= \"90\" && sensors.sensor_type = \"rfc1628\"",
     "name": "UPS has a heavy load"
   },
   {
-  "rule": "%sensors.sensor_current ~ \"[3-4]\" && %sensors.sensor_oid = \".1.3.6.1.4.1.232.3.2.5.1.1.37.\"",
+  "rule": "sensors.sensor_current ~ \"[3-4]\" && sensors.sensor_oid = \".1.3.6.1.4.1.232.3.2.5.1.1.37.\"",
     "name": "HPE iLo Server drive degraded/failure"
   },
   {
-    "rule": "%sensors.sensor_current ~ \"[3-4]\" && %sensors.sensor_oid = \".1.3.6.1.4.1.232.6.2.9.3.1.4.\"",
+    "rule": "sensors.sensor_current ~ \"[3-4]\" && sensors.sensor_oid = \".1.3.6.1.4.1.232.6.2.9.3.1.4.\"",
     "name": "HPE iLo Server Power Supply degraded/failure"
   },
   {
-   "rule": "%sensors.sensor_current ~ \"[3-4]\" && %sensors.sensor_oid = \".1.3.6.1.4.1.232.6.2.6.7.1.9.\"",
+   "rule": "sensors.sensor_current ~ \"[3-4]\" && sensors.sensor_oid = \".1.3.6.1.4.1.232.6.2.6.7.1.9.\"",
     "name": "HPE iLo Server Fan degraded/failure"
   },
   {
-   "rule": "%sensors.sensor_current ~ \"[3-4]\" && %sensors.sensor_oid = \".1.3.6.1.4.1.232.1.2.2.1.1.6.\"",
+   "rule": "sensors.sensor_current ~ \"[3-4]\" && sensors.sensor_oid = \".1.3.6.1.4.1.232.1.2.2.1.1.6.\"",
     "name": "HPE iLo Server CPU degraded/failure"
   },
   {
-   "rule": "%sensors.sensor_current ~ \"[3-4]\" && %sensors.sensor_oid = \".1.3.6.1.4.1.232.6.2.14.13.1.20.\"",
+   "rule": "sensors.sensor_current ~ \"[3-4]\" && sensors.sensor_oid = \".1.3.6.1.4.1.232.6.2.14.13.1.20.\"",
     "name": "HPE iLo Server Memory degraded/failure"
   },
   {
-    "rule": "%applications.app_type = \"os-updates\" && %applications.app_status >= \"10\"",
+    "rule": "applications.app_type = \"os-updates\" && applications.app_status >= \"10\"",
     "name": "Applications OS-Updates, New Updates Available"
   },
   {
-    "rule": "%devices.os = \"hpblmos\" && %sensors.sensor_type = \"hpblmos_psustate\" && %sensors.sensor_current = \"[3-4]\"",
+    "rule": "devices.os = \"hpblmos\" && sensors.sensor_type = \"hpblmos_psustate\" && sensors.sensor_current = \"[3-4]\"",
     "name": "HPE BladeSystem has a bad power supply"
   },
   {
-    "rule": "%devices.os = \"hpblmos\" && %sensors.sensor_type = \"hpblmos_fanstate\" && %sensors.sensor_current = \"[3-4]\"",
+    "rule": "devices.os = \"hpblmos\" && sensors.sensor_type = \"hpblmos_fanstate\" && sensors.sensor_current = \"[3-4]\"",
     "name": "HPE BladeSystem has a bad fan"
   },
   {
-    "rule": "%devices.os = \"axiscam\" && %sensors.sensor_type = \"tempSensorStatusState\" && %sensors.sensor_current = \"2\"",
+    "rule": "devices.os = \"axiscam\" && sensors.sensor_type = \"tempSensorStatusState\" && sensors.sensor_current = \"2\"",
     "name": "AXIS camera has a failed temperature sensor"
   },
   {
-    "rule": "%devices.os = \"rittal-lcp\" && %sensors.sensor_type = \"cmcIIIUnitStatus\" && %sensors.sensor_current = \"2\"",
+    "rule": "devices.os = \"rittal-lcp\" && sensors.sensor_type = \"cmcIIIUnitStatus\" && sensors.sensor_current = \"2\"",
     "name": "RITTAL LCP has a failed status"
   },
   {
-    "rule": "%devices.os = \"rittal-lcp\" && %sensors.sensor_type = \"cmcIIIUnitStatus\" && %sensors.sensor_current = \"3\"",
+    "rule": "devices.os = \"rittal-lcp\" && sensors.sensor_type = \"cmcIIIUnitStatus\" && sensors.sensor_current = \"3\"",
     "name": "RITTAL LCP has an overloaded status"
   },
   {
-    "rule": "%devices.os = \"dsm\" && %sensors.sensor_type = \"systemStatusState\" && %sensors.sensor_current = \"2\"",
+    "rule": "devices.os = \"dsm\" && sensors.sensor_type = \"systemStatusState\" && sensors.sensor_current = \"2\"",
     "name": "Synology NAS has a failed status"
   },
   {
-    "rule": "%devices.os = \"dsm\" && %sensors.sensor_type = \"powerStatusState\" && %sensors.sensor_current = \"2\"",
+    "rule": "devices.os = \"dsm\" && sensors.sensor_type = \"powerStatusState\" && sensors.sensor_current = \"2\"",
     "name": "Synology NAS has a failed power status"
   },
   {
-    "rule": "%devices.os = \"dsm\" && %sensors.sensor_type = \"systemFanStatusState\" && %sensors.sensor_current = \"2\"",
+    "rule": "devices.os = \"dsm\" && sensors.sensor_type = \"systemFanStatusState\" && sensors.sensor_current = \"2\"",
     "name": "Synology NAS has a failed fan status"
   },
   {
-  "rule": "%devices.os = \"dsm\" && %sensors.sensor_type = \"cpuFanStatusState\" && %sensors.sensor_current = \"2\"",
+  "rule": "devices.os = \"dsm\" && sensors.sensor_type = \"cpuFanStatusState\" && sensors.sensor_current = \"2\"",
   "name": "Synology NAS has a failed CPU fan status"
   },
   {
-  "rule": "%devices.os = \"dsm\" && %sensors.sensor_type = \"upgradeAvailableState\" && %sensors.sensor_current = \"1\"",
+  "rule": "devices.os = \"dsm\" && sensors.sensor_type = \"upgradeAvailableState\" && sensors.sensor_current = \"1\"",
   "name": "Synology NAS has a new upgrade available"
   },
   {
-  "rule": "%devices.os = \"dsm\" && %sensors.sensor_type = \"raidStatusState\" && %sensors.sensor_current = \"[11-12]\"",
+  "rule": "devices.os = \"dsm\" && sensors.sensor_type = \"raidStatusState\" && sensors.sensor_current = \"[11-12]\"",
   "name": "Synology NAS has a bad RAID status"
   },
   {
-  "rule": "%devices.os = \"dsm\" && %sensors.sensor_type = \"diskStatusState\" && %sensors.sensor_current = \"[4-5]\"",
+  "rule": "devices.os = \"dsm\" && sensors.sensor_type = \"diskStatusState\" && sensors.sensor_current = \"[4-5]\"",
   "name": "Synology NAS has a bad disk status"
   },
   {
-  "rule": "%devices.os = \"f5\" && %sensors.sensor_type = \"sysChassisPowerSupplyStatus\" && %sensors.sensor_current = \"0\"",
+  "rule": "devices.os = \"f5\" && sensors.sensor_type = \"sysChassisPowerSupplyStatus\" && sensors.sensor_current = \"0\"",
   "name": "F5 appliance has a bad power supply"
   },
   {
-  "rule": "%devices.os = \"f5\" && %sensors.sensor_type = \"sysChassisFanStatus\" && %sensors.sensor_current = \"0\"",
+  "rule": "devices.os = \"f5\" && sensors.sensor_type = \"sysChassisFanStatus\" && sensors.sensor_current = \"0\"",
   "name": "F5 appliance has a bad fan"
   },
   {
-  "rule": "%devices.os = \"nxos\" && %sensors.sensor_type = \"cefcFanTrayOperStatus\" && %sensors.sensor_current = \"[3-4]\"",
+  "rule": "devices.os = \"nxos\" && sensors.sensor_type = \"cefcFanTrayOperStatus\" && sensors.sensor_current = \"[3-4]\"",
   "name": "Cisco NX-OS device has a bad fan"
   },
   {
-    "rule": "%devices.os = \"panos\" & %sensors.sensor_type = \"panSysHAState\" && %sensors.sensor_current = \"1\" && %sensors.sensor_prev = \"2\"",
+    "rule": "devices.os = \"panos\" & sensors.sensor_type = \"panSysHAState\" && sensors.sensor_current = \"1\" && sensors.sensor_prev = \"2\"",
     "name": "Palo Alto Networks passive firewall changed to active"
   },
   {
-    "rule": "%sensors.sensor_current ~ \"[2|6]\" && %sensors.sensor_oid = \".1.3.6.1.4.1.674.10893.1.20.130.15.1.4.1\"",
+    "rule": "sensors.sensor_current ~ \"[2|6]\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10893.1.20.130.15.1.4.1\"",
     "name": "Dell Server Raid Battery Failed/Degraded"
   },
   {
-    "rule": "%sensors.sensor_current = \"2\" && %sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.1.1100.32.1.5\"",
+    "rule": "sensors.sensor_current = \"2\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.1.1100.32.1.5\"",
     "name": "Dell Server CPU Status Critical"
   },
   {
-    "rule": "%sensors.sensor_current ~ \"[2|6]\" && %sensors.sensor_oid = \".1.3.6.1.4.1.674.10893.1.20.130.1.1.5\"",
+    "rule": "sensors.sensor_current ~ \"[2|6]\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10893.1.20.130.1.1.5\"",
     "name": "Dell Server Disk Controller State Failed/Degraded"
   },
   {
-    "rule": "%sensors.sensor_current ~ \"[2|5]\" && %sensors.sensor_oid = \".1.3.6.1.4.1.674.10893.1.20.130.4.1.4\"",
+    "rule": "sensors.sensor_current ~ \"[2|5]\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10893.1.20.130.4.1.4\"",
     "name": "Dell Server Disk Array State Failed/Degraded"
   },
   {
-    "rule": "%sensors.sensor_current ~ \"[5|6]\" && %sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.1.600.12.1.5\"",
+    "rule": "sensors.sensor_current ~ \"[5|6]\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.1.600.12.1.5\"",
     "name": "Dell Server PSU State Critical/NonRecvoverable"
   },
   {
-    "rule": "%sensors.sensor_current ~ \"[2|6]\" && %sensors.sensor_oid = \".1.3.6.1.4.1.674.10893.1.20.140.1.1.4\"",
+    "rule": "sensors.sensor_current ~ \"[2|6]\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10893.1.20.140.1.1.4\"",
     "name": "Dell Server Virtual Disk Failed/Degraded"
   },
   {
-    "rule": "%sensors.sensor_current = \"2\" && %sensors.sensor_oid = \".1.3.6.1.4.1.25506.8.35.9.1.1.1.2\"",
+    "rule": "sensors.sensor_current = \"2\" && sensors.sensor_oid = \".1.3.6.1.4.1.25506.8.35.9.1.1.1.2\"",
     "name": "Comware Fan Status failed"
   },
   {
-    "rule": "%sensors.sensor_current = \"2\" && %sensors.sensor_oid = \".1.3.6.1.4.1.25506.8.35.9.1.2.1.2\"",
+    "rule": "sensors.sensor_current = \"2\" && sensors.sensor_oid = \".1.3.6.1.4.1.25506.8.35.9.1.2.1.2\"",
     "name": "Comware PSU status failed"
   },
   {
-    "rule": "%sensors.sensor_current = \"9\" && %sensors.sensor_oid = \".1.3.6.1.4.1.9.9.13.1.4.1.3\"",
+    "rule": "sensors.sensor_current = \"9\" && sensors.sensor_oid = \".1.3.6.1.4.1.9.9.13.1.4.1.3\"",
     "name": "Cisco Fan Status failed "
   },
   {
-    "rule": "%sensors.sensor_current = \"8\" && %sensors.sensor_oid = \".1.3.6.1.4.1.9.9.13.1.5.1.3\"",
+    "rule": "sensors.sensor_current = \"8\" && sensors.sensor_oid = \".1.3.6.1.4.1.9.9.13.1.5.1.3\"",
     "name": "Cisco PSU status failed"
   },
   {
-    "rule": "%sensors.sensor_current = \"3\" && %sensors.sensor_oid = \".1.3.6.1.4.1.4413.1.1.43.1.15.1.2.1\"",
+    "rule": "sensors.sensor_current = \"3\" && sensors.sensor_oid = \".1.3.6.1.4.1.4413.1.1.43.1.15.1.2.1\"",
     "name": "UBNT EdgeSwitch Chassis state failed"
   },
   {
-    "rule": "%sensors.sensor_current ~ \"[3|4]\" && %sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4\"",
+    "rule": "sensors.sensor_current ~ \"[3|4]\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4\"",
     "name": "Dell iDRAC Virtual Disk Failed/Degraded"
   },
   {
-    "rule": "%sensors.sensor_current ~ \"5\" && %sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.5.4.1100.30.1.5\"",
+    "rule": "sensors.sensor_current ~ \"5\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.5.4.1100.30.1.5\"",
     "name": "Dell iDRAC Processor Status Critical"
   },
   {
-   "rule": "%sensors.sensor_current ~ \"5\" && %sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.5.4.1100.50.1.5\"",
+   "rule": "sensors.sensor_current ~ \"5\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.5.4.1100.50.1.5\"",
    "name": "Dell iDRAC Memory Status Critical"
    },
    {
-   "rule": "%sensors.sensor_current ~ \"10\" && %sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.5.4.600.20.1.5\"",
+   "rule": "sensors.sensor_current ~ \"10\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.5.4.600.20.1.5\"",
    "name": "Dell iDRAC Voltage Probe Status Failed"
    },
    {
-   "rule": "%sensors.sensor_current ~ \"10\" && %sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.5.4.600.30.1.5\"",
+   "rule": "sensors.sensor_current ~ \"10\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.5.4.600.30.1.5\"",
    "name": "Dell iDRAC Amperage Probe Status Failed"
    },
    {
-   "rule": "%sensors.sensor_current ~ \"10\" && %sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.5.4.600.50.1.5\"",
+   "rule": "sensors.sensor_current ~ \"10\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.5.4.600.50.1.5\"",
    "name": "Dell iDRAC Battery Status Failed"
    },
   {
-   "rule": "%sensors.sensor_current ~ \"[5|6]\" && %sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.2.2.1\"",
+   "rule": "sensors.sensor_current ~ \"[5|6]\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.2.2.1\"",
    "name": "Dell iDRAC Global System Status Critical/NonRecoverable"
    }
 

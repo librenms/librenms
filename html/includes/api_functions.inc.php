@@ -825,6 +825,30 @@ function list_available_health_graphs()
                 'name' => 'device_'.$graph['sensor_class'],
             );
         }
+        $device = \App\Models\Device::find($device_id);
+
+        if ($device) {
+            if ($device->processors()->count() > 0) {
+                array_push($graphs, array(
+                    'desc' => 'Processors',
+                    'name' => 'device_processor'
+                ));
+            }
+    
+            if ($device->storage()->count() > 0) {
+                array_push($graphs, array(
+                    'desc' => 'Storage',
+                    'name' => 'device_storage'
+                ));
+            }
+    
+            if ($device->mempools()->count() > 0) {
+                array_push($graphs, array(
+                    'desc' => 'Memory Pools',
+                    'name' => 'device_mempool'
+                ));
+            }
+        }
     }
 
     return api_success($graphs, 'graphs');
@@ -1014,7 +1038,7 @@ function list_alerts()
     $sql = '';
     if (isset($router['id']) && $router['id'] > 0) {
         $alert_id = mres($router['id']);
-        $sql      = 'AND id=?';
+        $sql      = 'AND `A`.id=?';
         array_push($param, $alert_id);
     }
 
@@ -2119,4 +2143,15 @@ function add_service_for_host()
     } else {
         api_error(500, 'Failed to add the service');
     }
+}
+
+/**
+ * Display Librenms Instance Info
+ */
+function server_info()
+{
+    $versions = version_info();
+    api_success([
+        $versions
+    ], 'system');
 }

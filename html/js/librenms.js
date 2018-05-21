@@ -148,7 +148,7 @@ function submitCustomRange(frmdata) {
 
 function updateResolution(refresh)
 {
-    $.post('ajax_setresolution.php',
+    $.post('ajax/set_resolution',
         {
             width: $(window).width(),
             height:$(window).height()

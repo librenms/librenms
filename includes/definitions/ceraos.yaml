@@ -4,7 +4,7 @@ type: wireless
 icon: ceragon
 over:
     - { graph: device_bits, text: Traffic }
-    - { graph: device_ceraos_RxLevel, text: 'Rx Level' }
+    - { graph: device_wireless_power, text: 'Wireless Power' }
     - { graph: device_ping_perf, text: 'Ping Times' }
 discovery:
     - sysObjectID:
@@ -25,7 +25,6 @@ poller_modules:
     storage: 0
     ucd-diskio: 0
     ucd-mib: 0
-    wireless: 0
 discovery_modules:
     ports-stack: 0
     entity-physical: 0
@@ -42,5 +41,4 @@ discovery_modules:
     ucd-diskio: 0
     services: 0
     ntp: 0
-    wireless: 0
     charge: 0

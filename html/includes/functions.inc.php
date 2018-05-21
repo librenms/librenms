@@ -1575,7 +1575,6 @@ function get_disks_with_smart($device, $app_id)
  */
 function get_dashboards($user_id = null)
 {
-    global $authorizer;
     $default = get_user_pref('dashboard');
     $dashboards = dbFetchRows(
         "SELECT * FROM `dashboards` WHERE dashboards.access > 0 || dashboards.user_id = ?",
@@ -1650,7 +1649,7 @@ function get_zfs_pools($device_id)
  * Returns the sysname of a device with a html line break prepended.
  * if the device has an empty sysname it will return device's hostname instead
  * And finally if the device has no hostname it will return an empty string
- * @param device array
+ * @param array device
  * @return string
  */
 function get_device_name($device)

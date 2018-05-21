@@ -50,9 +50,12 @@ class ModuleTestHelper
 
     // Definitions
     // ignore these when dumping all modules
-    private $exclude_from_all = ['arp-table'];
+    private $exclude_from_all = ['arp-table', 'fdb-table'];
     private $module_deps = [
         'arp-table' => ['ports', 'arp-table'],
+        'fdb-table' => ['ports', 'vlans', 'fdb-table'],
+        'vlans' => ['ports', 'vlans'],
+        'vrf' => ['ports', 'vrf'],
     ];
 
 
@@ -137,7 +140,7 @@ class ModuleTestHelper
 
         $device = device_by_id_cache($device_id, true);
 
-        $snmprec_data = array();
+        $snmprec_data = [];
         foreach ($snmp_oids as $oid_data) {
             $this->qPrint(" " . $oid_data['oid']);
 
@@ -190,21 +193,21 @@ class ModuleTestHelper
         preg_match_all($snmp_query_regex, $collection_output, $snmp_matches);
 
         // extract mibs and group with oids
-        $snmp_oids = array(
-            'sysDescr.0_get' => array('oid' => 'sysDescr.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'),
-            'sysObjectID.0_get' => array('oid' => 'sysObjectID.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'),
-        );
+        $snmp_oids = [
+            'sysDescr.0_get' => ['oid' => 'sysDescr.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'],
+            'sysObjectID.0_get' => ['oid' => 'sysObjectID.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'],
+        ];
         foreach ($snmp_matches[0] as $index => $line) {
             preg_match('/-m \+?([a-zA-Z0-9:\-]+)/', $line, $mib_matches);
             $mib = $mib_matches[1];
             $method = $snmp_matches[1][$index];
             $oids = explode(' ', trim($snmp_matches[2][$index]));
             foreach ($oids as $oid) {
-                $snmp_oids["{$oid}_$method"] = array(
+                $snmp_oids["{$oid}_$method"] = [
                     'oid' => $oid,
                     'mib' => $mib,
                     'method' => $method,
-                );
+                ];
             }
         }
 
@@ -224,9 +227,9 @@ class ModuleTestHelper
      * @param array $modules
      * @return array
      */
-    public static function findOsWithData($modules = array())
+    public static function findOsWithData($modules = [])
     {
-        $os_list = array();
+        $os_list = [];
 
         foreach (glob(Config::get('install_dir') . "/tests/data/*.json") as $file) {
             $base_name = basename($file, '.json');
@@ -245,11 +248,11 @@ class ModuleTestHelper
                 continue;  // no test data for selected modules
             }
 
-            $os_list[$base_name] = array(
+            $os_list[$base_name] = [
                 $os,
                 $variant,
                 $valid_modules,
-            );
+            ];
         }
 
         return $os_list;
@@ -286,7 +289,7 @@ class ModuleTestHelper
     private function resolveModuleDependencies($modules)
     {
         // generate a full list of modules
-        $full_list = array();
+        $full_list = [];
         foreach ($modules as $module) {
             // only allow valid modules
             if (!(Config::has("poller_modules.$module") || Config::has("discovery_modules.$module"))) {
@@ -306,10 +309,10 @@ class ModuleTestHelper
     private function getArgs()
     {
         if (empty($this->modules)) {
-            return array();
+            return [];
         }
 
-        return array('m' => implode(',', $this->modules));
+        return ['m' => implode(',', $this->modules)];
     }
 
     private function qPrint($var)
@@ -327,7 +330,7 @@ class ModuleTestHelper
 
     private function convertSnmpToSnmprec($snmp_data)
     {
-        $result = array();
+        $result = [];
         foreach (explode(PHP_EOL, $snmp_data) as $line) {
             if (empty($line)) {
                 continue;
@@ -381,7 +384,7 @@ class ModuleTestHelper
 
     private function getSnmprecType($text)
     {
-        $snmpTypes = array(
+        $snmpTypes = [
             'STRING' => '4',
             'OID' => '6',
             'Hex-STRING' => '4x',
@@ -398,7 +401,7 @@ class ModuleTestHelper
             'Opaque' => '68',
             'Counter64' => '70',
             'Network Address' => '4'
-        );
+        ];
 
         return $snmpTypes[$text];
     }
@@ -408,10 +411,10 @@ class ModuleTestHelper
         if (is_file($this->snmprec_file)) {
             $existing_data = $this->indexSnmprec(explode(PHP_EOL, file_get_contents($this->snmprec_file)));
         } else {
-            $existing_data = array();
+            $existing_data = [];
         }
 
-        $new_data = array();
+        $new_data = [];
         foreach ($data as $part) {
             $new_data = array_merge($new_data, $this->indexSnmprec($part));
         }
@@ -426,7 +429,7 @@ class ModuleTestHelper
         }
 
         // put data in the proper order for snmpsim
-        uksort($results, array($this, 'compareOid'));
+        uksort($results, [$this, 'compareOid']);
 
         $output = implode(PHP_EOL, $results) . PHP_EOL;
 
@@ -441,7 +444,7 @@ class ModuleTestHelper
 
     private function indexSnmprec(array $snmprec_data)
     {
-        $result = array();
+        $result = [];
 
         foreach ($snmprec_data as $line) {
             if (!empty($line)) {
@@ -455,11 +458,11 @@ class ModuleTestHelper
 
     private function cleanSnmprecData(&$data)
     {
-        $private_oid = array(
+        $private_oid = [
             '1.3.6.1.2.1.1.6.0',
             '1.3.6.1.2.1.1.4.0',
             '1.3.6.1.2.1.1.5.0',
-        );
+        ];
 
         foreach ($private_oid as $oid) {
             if (isset($data[$oid])) {
@@ -494,7 +497,7 @@ class ModuleTestHelper
 
         // Add the test device
         try {
-            Config::set('snmp.community', array($this->file_name));
+            Config::set('snmp.community', [$this->file_name]);
             $device_id = addHost($snmpsim->getIp(), 'v2c', $snmpsim->getPort());
             $this->qPrint("Added device: $device_id\n");
         } catch (\Exception $e) {
@@ -505,7 +508,7 @@ class ModuleTestHelper
         // Populate the device variable
         $device = device_by_id_cache($device_id, true);
 
-        $data = array();  // array to hold dumped data
+        $data = [];  // array to hold dumped data
 
         // Run discovery
         $save_debug = $debug;
@@ -583,10 +586,10 @@ class ModuleTestHelper
                     continue;
                 }
                 if ($module_data['discovery'] == $module_data['poller']) {
-                    $existing_data[$module] = array(
+                    $existing_data[$module] = [
                         'discovery' => $module_data['discovery'],
                         'poller' => 'matches discovery',
-                    );
+                    ];
                 } else {
                     $existing_data[$module] = $module_data;
                 }
@@ -639,7 +642,7 @@ class ModuleTestHelper
      */
     public function dumpDb($device_id, $modules, $key = null)
     {
-        $data = array();
+        $data = [];
         $module_dump_info = $this->getTableData();
 
         // don't dump some modules by default unless they are manually listed
@@ -651,19 +654,27 @@ class ModuleTestHelper
         foreach ($modules as $module) {
             foreach ($module_dump_info[$module] as $table => $info) {
                 // check for custom where
-                $where = isset($info['custom_where']) ? $info['custom_where'] : "WHERE `device_id`=?";
-                $params = array($device_id);
+                $where = isset($info['custom_where']) ? $info['custom_where'] : "WHERE `$table`.`device_id`=?";
+                $params = [$device_id];
 
                 // build joins
                 $join = '';
+                $select = ["`$table`.*"];
                 foreach ($info['joins'] as $join_info) {
                     if (isset($join_info['custom'])) {
                         $join .= ' ' . $join_info['custom'];
+
+                        $default_select = [];
                     } else {
                         list($left, $lkey) = explode('.', $join_info['left']);
                         list($right, $rkey) = explode('.', $join_info['right']);
                         $join .= " LEFT JOIN `$right` ON (`$left`.`$lkey` = `$right`.`$rkey`)";
+
+                        $default_select = ["`$right`.*"];
                     }
+
+                    // build selects
+                    $select = array_merge($select, isset($join_info['select']) ? (array)$join_info['select'] : $default_select);
                 }
 
                 if (isset($info['order_by'])) {
@@ -672,7 +683,8 @@ class ModuleTestHelper
                     $order_by = '';
                 }
 
-                $rows = dbFetchRows("SELECT * FROM `$table` $join $where $order_by", $params);
+                $fields = implode(', ', $select);
+                $rows = dbFetchRows("SELECT $fields FROM `$table` $join $where $order_by", $params);
 
                 // remove unwanted fields
                 if (isset($info['included_fields'])) {
@@ -686,7 +698,7 @@ class ModuleTestHelper
                         return array_diff_key($row, $keys);
                     }, $rows);
                 }
-                
+
                 if (isset($key)) {
                     $data[$module][$key][$table] = $rows;
                 } else {

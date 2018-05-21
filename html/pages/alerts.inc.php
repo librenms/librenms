@@ -23,6 +23,7 @@ $page_title = 'Alerts';
 
     <?php
     $device['device_id'] = '-1';
+    require_once 'includes/modal/alert_notes.inc.php';
     require_once 'includes/common/alerts.inc.php';
     echo implode('', $common_output);
     unset($device['device_id']);
