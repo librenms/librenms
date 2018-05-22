@@ -16,3 +16,16 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+
+Route::resource('devices', 'Api\\Device\\DeviceController', [ 'except' => [
+    'create',
+    'edit'
+]]);
+
+Route::get('devices/{id}/health', 'Api\\Device\\DeviceHealthController@show')->name('device.health.show');
+
+Route::resource('ports', 'Api\\PortController', [ 'only' => [
+    'index',
+    'show'
+]]);
