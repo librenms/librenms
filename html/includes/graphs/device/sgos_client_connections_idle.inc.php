@@ -4,7 +4,7 @@ $rrd_filename = rrd_name($device['hostname'], 'sgos_client_connections_idle');
 
 require 'includes/graphs/common.inc.php';
 
-$ds = 'client_conn_idle';
+$ds = 'client_idle';
 
 $colour_area = '9999cc';
 $colour_line = 'ff0000';
