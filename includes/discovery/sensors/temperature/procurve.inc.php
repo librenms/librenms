@@ -15,7 +15,7 @@ if (!empty($entphydata)) {
                     'temperature',
                     $device,
                     $cur_oid . $tempindex,
-                    'temp-' . $tempindex,
+                    'hpicfXcvrTemp.' . $tempindex,
                     'procurve',
                     $index['entPhysicalName'],
                     '1',
@@ -53,4 +53,3 @@ foreach ($pre_cache['procurve_hpicfXcvrInfoTable'] as $index => $entry) {
         }
     }
 }
-
