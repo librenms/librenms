@@ -78,22 +78,43 @@ To do so, edit the option in Global Settings>External Settings>Oxidized Integrat
 $config['oxidized']['reload_nodes'] = true;
 
 ```
+### Creating overrides
 
-### Working with groups
+To return an override to Oxidized you can do this by providing the override key, followed by matching a lookup for a host (or hosts), and finally by defining the overriding value itself. LibreNMS does not check for the validity of these attributes but will deliver them to Oxidized as defined.
 
-To return a group to Oxidized you can do this by matching a regex for either `hostname`, `sysname`, `os` or `location`. The order is `hostname` is matched first, if nothing is found then `sysname` is tried, then `os`, and finally `location` is attempted.
-The first match found will be used. To match on the device hostnames or sysnames that contain 'lon-sw' or if the location contains 'London' then you would place the following within config.php:
+Matching of hosts can be done using `hostname`, `sysname`, `os` or `location` and including either a 'match' key and value, or a 'regex' key and value. The order is `hostname` is matched first, if nothing is found then `sysname` is tried, then `os`, and finally `location` is attempted.
+
+To match on the device hostnames or sysnames that contain 'lon-sw' or if the location contains 'London' then you would place the following within config.php:
 
 ```php
-$config['oxidized']['group']['hostname'][] = array('regex' => '/^lon-sw/', 'group' => 'london-switches');
-$config['oxidized']['group']['sysname'][] = array('regex' => '/^lon-sw/', 'group' => 'london-switches');
-$config['oxidized']['group']['location'][] = array('regex' => '/london/', 'group' => 'london-switches');
+$config['oxidized']['maps']['group']['hostname'][] = array('regex' => '/^lon-sw/', 'group' => 'london-switches');
+$config['oxidized']['maps']['group']['sysname'][] = array('regex' => '/^lon-sw/', 'group' => 'london-switches');
+$config['oxidized']['maps']['group']['location'][] = array('regex' => '/london/', 'group' => 'london-switches');
 ```
 
 To match on a device os of edgeos then please use the following:
 
 ```php
-$config['oxidized']['group']['os'][] = array('match' => 'edgeos', 'group' => 'wireless');
+$config['oxidized']['maps']['group']['os'][] = array('match' => 'edgeos', 'group' => 'wireless');
+```
+
+To override the IP Oxidized uses to poll the device, you can add the following within config.php:
+
+```php
+$config['oxidized']['maps']['ip']['sysname'][] = array('regex' => '/^my.node/', 'ip' => '192.168.1.10');
+$config['oxidized']['maps']['ip']['sysname'][] = array('match' => 'my-other.node', 'ip' => '192.168.1.20');
+```
+
+This allows extending the configuration further by providing a completely flexible model for custom flags and settings, for example, below shows the ability to add an ssh_proxy host within Oxidized simply by adding the below to your configuration:
+
+```php
+$config['oxidized']['maps']['ssh_proxy']['sysname'][] = array('regex' => '/^my.node/', 'ssh_proxy' => 'my-ssh-gateway.node');
+```
+
+Or of course, any custom value that could be needed or wanted can be applied, for example, setting a "myAttribute" to "Super cool value" for any configured and enabled "routeros" device.
+
+```php
+$config['oxidized']['maps']['myAttribute']['os'][] = array('match' => 'routeros', 'myAttribute' => 'Super cool value');
 ```
 
 Verify the return of groups by querying the API:
