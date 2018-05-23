@@ -146,16 +146,17 @@ class Device extends BaseModel
     public function allDeviceSensors()
     {
         $sensors = $this->sensors()->select('sensor_class')->distinct()->get()->toArray();
+
         if ($this->processors()->count() > 0) {
-            $sensors[] = [ "sensor_class" => "processor"];
+            $sensors[] = ["sensor_class" => "processor"];
         }
 
         if ($this->storage()->count() > 0) {
-            $sensors[] = [ "sensor_class" => "storage"];
+            $sensors[] = ["sensor_class" => "storage"];
         }
 
-        if ($this->mempool()->count() > 0) {
-            $sensors[] = [ "sensor_class" => "mempool"];
+        if ($this->mempools()->count() > 0) {
+            $sensors[] = ["sensor_class" => "mempool"];
         }
         return $sensors;
         
@@ -263,4 +264,22 @@ class Device extends BaseModel
     {
         return $this->hasMany('App\Models\WirelessSensor', 'device_id');
     }
+
+    public function deviceGraphs()
+    {
+        return $this->hasMany('App\Models\DeviceGraph', 'device_id');
+    }
+
+    // Get All IPv4 address for this device through the App\Models\Port
+    public function ipv4()
+    {
+        return $this->hasManyThrough('App\Models\IP\IPv4Address', 'App\Models\Port', 'device_id', 'port_id');
+    }
+
+    // Get All IPv6 address for this device through the App\Models\Port
+    public function ipv6()
+    {
+        return $this->hasManyThrough('App\Models\IP\IPv6Address', 'App\Models\Port', 'device_id', 'port_id');
+    }
+
 }

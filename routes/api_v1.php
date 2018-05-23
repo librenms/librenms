@@ -22,12 +22,24 @@ Route::namespace('Api')->group(function() {
     ]]);
     
     Route::prefix('devices/{device}')->group(function() {
-        Route::get('health', 'Device\\DeviceHealthController@index')->name('device.health.index');
-        Route::get('health/{class}', 'Device\\DeviceHealthController@show')->name('device.health.sensor.show');
+        Route::get('graphs', 'Device\\DeviceGraphController@index')->name('device.graph.index');
+        Route::get('addresses', 'Device\\DeviceAddressController@index')->name('device.address.index');
 
-        Route::get('wireless', 'Device\\DeviceWirelessController@index')->name('device.wireless.index');
-        Route::get('wireless/{class}', 'Device\\DeviceWirelessController@show')->name('device.wireless.show');
+        Route::resource('ports', 'Device\\DevicePortController', [ 'only' => [
+            'index',
+            'show'
+        ]]);
 
+        Route::resource('health', 'Device\\DeviceHealthController', [ 'only' => [
+            'index',
+            'show'
+        ]]);
+
+        Route::resource('wireless', 'Device\\DeviceWirelessController', [ 'only' => [
+            'index',
+            'show'
+        ]]);
+        
         Route::resource('ports', 'Device\\DevicePortController', [ 'only' => [
             'index',
             'show'

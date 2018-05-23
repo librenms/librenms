@@ -117,11 +117,11 @@ class Port extends BaseModel
 
     public function ipv4()
     {
-        return $this->hasMany('App\Models\General\IPv4', 'port_id');
+        return $this->hasMany('App\Models\IP\IPv4Address', 'port_id');
     }
 
     public function ipv6()
     {
-        return $this->hasMany('App\Models\General\IPv6', 'port_id');
+        return $this->hasMany('App\Models\IP\IPv6Address', 'port_id');
     }
 }

@@ -29,17 +29,16 @@ class DeviceHealthController extends ApiController
      */
     public function index(Device $device)
     {
-        // TODO: Make model method that gathers processors, mem, storage, and states in a single method
         return $this->objectResponse($device->sensors()->deviceSensors());
     }
 
     /**
-     * @api {get} /devices/:id/health/:sensor_class Get all sensors for a Health Class
+     * @api {get} /devices/:id/health/:class Get all sensors for a Health Class
      * @apiName Get_All_Sensors_For_Class
      * @apiGroup Device Get all health sensors for a health sensor
      *
      * @apiParam {Number} id Id of the Device
-     * @apiParam {String} sensor_class The class name of the sensor (gathered from the Get_Device_Health method)
+     * @apiParam {String} class The class name of the sensor (gathered from the Get_Device_Health method)
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -75,8 +74,8 @@ class DeviceHealthController extends ApiController
      *     }
      *
      */
-    public function show(Device $device, $sensor_class)
+    public function show(Device $device, $class)
     {
-        return $this->objectResponse($device->sensors()->where('sensor_class', $sensor_class)->get());
+        return $this->objectResponse($device->sensors()->where('sensor_class', $class)->get());
     }
 }
