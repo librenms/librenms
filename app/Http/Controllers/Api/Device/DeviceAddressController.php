@@ -11,7 +11,8 @@ class DeviceAddressController extends ApiController
     /**
      * @api {get} /devices/:id/addresses Get all addresses for a device
      * @apiName Get_Device_Addresses
-     * @apiGroup Device Get all available ipv4 / ipv6 addresses
+     * @apiGroup Device
+     * @apiVersion  1.0.0
      *
      * @apiParam {Number} id Id of the Device
      *
@@ -47,6 +48,11 @@ class DeviceAddressController extends ApiController
      *          }
      *     }
      *
+     * @apiErrorExample {json} Error-Response:
+     *      HTTP/1.1 404 Not-Found
+     *      {
+     *          "status": "Item not Found"
+     *      }
      */
     public function index(Device $device)
     {

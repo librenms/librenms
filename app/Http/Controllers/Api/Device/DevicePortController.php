@@ -12,9 +12,10 @@ class DevicePortController extends ApiController
     /**
      * @api {get} /devices/:id/ports Get device ports
      * @apiName Get_Device_Ports
-     * @apiGroup Device Get all ports for a device
+     * @apiGroup Device Ports
+     * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id Id of the Device
+     * @apiParam {Number} id ID or Hostname of the Device
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -106,10 +107,11 @@ class DevicePortController extends ApiController
     /**
      * @api {get} /devices/:id/ports/:port_id Get individual Port for a device
      * @apiName Get_Port
-     * @apiGroup Device Get an individual port
+     * @apiGroup Device Ports
+     * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id Id of the device
-     * @apiParam {Number} port_id Id of the Port
+     * @apiParam {Number} id ID or Hostname of the device
+     * @apiParam {Number} port_id ID of the Port
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -191,9 +193,59 @@ class DevicePortController extends ApiController
      *          }
      *     }
      *
+     * @apiErrorExample {json} Error-Response:
+     *      HTTP/1.1 404 Not-Found
+     *      {
+     *          "status": "Item not Found"
+     *      }
      */
     public function show(Device $device, Port $port)
     {
         return $this->objectResponse($port);
+    }
+
+    /**
+     * @api {get} /devices/:id/ports/stack Get ports stack for Device
+     * @apiName Get_Ports_Stack
+     * @apiDescription Get a list of port mappings for a device. This is useful for showing physical ports that are in a virtual port-channel.
+     * @apiGroup Device Ports
+     * @apiVersion  1.0.0
+     *
+     * @apiParam {Number} id ID or Hostname of the device
+     * @apiParam {Boolean} [valid_mappings=true] Optional Filter the result by only showing valid mappings ("0" values not shown).
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *          "data":
+     *          [
+     *              {
+     *                "device_id": "3742",
+     *                "port_id_high": "1001000",
+     *                "port_id_low": "51001",
+     *                "ifStackStatus": "active"
+     *              },
+     *              {
+     *                "device_id": "3742",
+     *                "port_id_high": "1001000",
+     *                "port_id_low": "52001",
+     *                "ifStackStatus": "active"
+     *              }
+     *          ]
+     *      }
+     *
+     * @apiErrorExample {json} Error-Response:
+     *      HTTP/1.1 404 Not-Found
+     *      {
+     *          "status": "Item not Found"
+     *      }
+     */
+    public function stack(Device $device)
+    {
+        $input = (request()->input('valid_mappings') != null ? strtolower(request()->input('valid_mappings')) == 'true' : false);
+        if ($input) {
+            return $this->objectResponse($device->portStack()->isActive()->validMappings()->orderBy('port_id_high', 'asc')->get());    
+        }
+        return $this->objectResponse($device->portStack()->isActive()->orderBy('port_id_high', 'asc')->get());
     }
 }

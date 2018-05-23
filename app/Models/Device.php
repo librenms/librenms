@@ -159,7 +159,6 @@ class Device extends BaseModel
             $sensors[] = ["sensor_class" => "mempool"];
         }
         return $sensors;
-        
     }
 
     // ---- Define Relationships ----
@@ -212,6 +211,11 @@ class Device extends BaseModel
     public function ports()
     {
         return $this->hasMany('App\Models\Port', 'device_id', 'device_id');
+    }
+
+    public function portStack()
+    {
+        return $this->hasMany('App\Models\PortStack', 'device_id', 'device_id');
     }
 
     public function processors()
@@ -281,5 +285,4 @@ class Device extends BaseModel
     {
         return $this->hasManyThrough('App\Models\IP\IPv6Address', 'App\Models\Port', 'device_id', 'port_id');
     }
-
 }

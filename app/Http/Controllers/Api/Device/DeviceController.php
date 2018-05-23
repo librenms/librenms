@@ -12,7 +12,8 @@ class DeviceController extends ApiController
     /**
      * @api {get} /devices Get All Devices
      * @apiName Get_Devices
-     * @apiGroup Device Get a list of all devices in librenms
+     * @apiGroup Device
+     * @apiVersion  1.0.0
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -88,9 +89,10 @@ class DeviceController extends ApiController
     /**
      * @api {get} /devices/:id Get individual Device
      * @apiName Get_Device
-     * @apiGroup Device Get an individual device
+     * @apiGroup Device
+     * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id Id of the Device
+     * @apiParam {Number} id ID or Hostname of the Device
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -147,6 +149,12 @@ class DeviceController extends ApiController
      *         }
      *     }
      *
+     * @apiErrorExample {json} Error-Response:
+     *      HTTP/1.1 404 Not-Found
+     *      {
+     *          "status": "Item not Found"
+     *      }
+     *
      */
     public function show(Device $device)
     {
@@ -156,7 +164,8 @@ class DeviceController extends ApiController
     /**
      * @api {post} /devices Create a new Device
      * @apiName Create_Device
-     * @apiGroup Device Create a new device
+     * @apiGroup Device
+     * @apiVersion  1.0.0
      *
      * @apiParam {String} hostname The hostname of the new device
      * @apiParam {Number} port="161" The SNMP port to use
@@ -177,7 +186,7 @@ class DeviceController extends ApiController
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
      *     {
-     *          "data": 
+     *          "data":
      *          {
      *             "device_id": 1,
      *             "hostname": "localhost",
@@ -228,7 +237,6 @@ class DeviceController extends ApiController
      *             "port_association_mode": "1"
      *         }
      *     }
-     *
      */
     public function store(Request $request)
     {
@@ -282,7 +290,6 @@ class DeviceController extends ApiController
             // TODO: Add host method
             // $device_id = addHost($hostname, $snmpver, $port, $transport, $poller_group, $force_add, 'ifIndex', $additional);
             // return $this->objectResponse(Device::find($device_id));
-
         } catch (Exception $e) {
             $this->errorResponse(500, $e->getMessage());
         }
@@ -299,20 +306,30 @@ class DeviceController extends ApiController
      */
     public function update(Device $device)
     {
-
+        // 
     }
 
     /**
-     * Delete Device
-     * Delete device by ID.
+     * @api {delete} /devices/:id Delete device
+     * @apiName Delete_Device
+     * @apiGroup Device
+     * @apiVersion  1.0.0
      *
-     * @method DELETE
-     * @param App\Models\Device $device Device loaded from route model binding
+     * @apiParam {Number} id ID or Hostname of the Device
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *          "data":
+     *          {
+     *              "message": "Removed device test.example.org
+     *          }
+     *     }
+     *
      */
     public function destroy(Device $device)
     {
+        // TODO: properly delete device
         $device->destroy();
         return $this->messageResponse("Removed device $device->hostname");
     }

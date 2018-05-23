@@ -29,12 +29,11 @@ class RouteServiceProvider extends ServiceProvider
 
 
         // Bind Device to ID or hostname
-        Route::bind('device', function($device) {
+        Route::bind('device', function ($device) {
             if (is_numeric($device)) {
                 return \App\Models\Device::findOrFail($device);
-            }
-            else {
-                return \App\Models\Device::where('hostname',$device)->firstOrFail();
+            } else {
+                return \App\Models\Device::where('hostname', $device)->firstOrFail();
             }
         });
     }

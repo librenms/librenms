@@ -11,7 +11,8 @@ class DeviceHealthController extends ApiController
     /**
      * @api {get} /devices/:id/health Get Health Sensors
      * @apiName Get_Device_Health
-     * @apiGroup Device Get all health sensors for a device
+     * @apiGroup Device Health
+     * @apiVersion  1.0.0
      *
      * @apiParam {Number} id Id of the Device
      *
@@ -35,9 +36,10 @@ class DeviceHealthController extends ApiController
     /**
      * @api {get} /devices/:id/health/:class Get all sensors for a Health Class
      * @apiName Get_All_Sensors_For_Class
-     * @apiGroup Device Get all health sensors for a health sensor
+     * @apiGroup Device Health
+     * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id Id of the Device
+     * @apiParam {Number} id ID or Hostname of the Device
      * @apiParam {String} class The class name of the sensor (gathered from the Get_Device_Health method)
      *
      * @apiSuccessExample Success-Response:
@@ -73,6 +75,11 @@ class DeviceHealthController extends ApiController
      *          ]
      *     }
      *
+     * @apiErrorExample {json} Error-Response:
+     *      HTTP/1.1 404 Not-Found
+     *      {
+     *          "status": "Item not Found"
+     *      }
      */
     public function show(Device $device, $class)
     {

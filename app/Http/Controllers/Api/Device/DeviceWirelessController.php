@@ -11,9 +11,10 @@ class DeviceWirelessController extends ApiController
     /**
      * @api {get} /devices/:id/wireless Get Wireless Sensors
      * @apiName Get_Device_Wireless
-     * @apiGroup Device Get all wirelesss sensors for a device
+     * @apiGroup Device Wireless
+     * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id Id of the Device
+     * @apiParam {Number} id ID or Hostname of the Device
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -39,12 +40,13 @@ class DeviceWirelessController extends ApiController
     }
 
     /**
-     * @api {get} /devices/:id/wireless/:sensor_class Get all wireless sensors for a Wireless Class
+     * @api {get} /devices/:id/wireless/:class Get all wireless sensors for a Wireless Class
      * @apiName Get_All_Wireless_Sensors_For_Class
-     * @apiGroup Device Get all sensors for a wireless sensor
+     * @apiGroup Device Wireless
+     * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id Id of the Device
-     * @apiParam {String} sensor_class The class name of the sensor (gathered from the Get_Device_Wireless method)
+     * @apiParam {Number} id ID or Hostname of the Device
+     * @apiParam {String} class The class name of the sensor (gathered from the Get_Device_Wireless method)
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -79,6 +81,11 @@ class DeviceWirelessController extends ApiController
      *          ]
      *     }
      *
+     * @apiErrorExample {json} Error-Response:
+     *      HTTP/1.1 404 Not-Found
+     *      {
+     *          "status": "Item not Found"
+     *      }
      */
     public function show(Device $device, $class)
     {

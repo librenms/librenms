@@ -10,7 +10,8 @@ class PortController extends ApiController
     /**
      * @api {get} /ports Get All Ports
      * @apiName Get_Ports
-     * @apiGroup Port Get a list of all ports in LibreNMS
+     * @apiGroup Port
+     * @apiVersion  1.0.0
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -111,7 +112,8 @@ class PortController extends ApiController
     /**
      * @api {get} /devices/:id Get individual Port
      * @apiName Get_Port
-     * @apiGroup Device Get an individual port
+     * @apiGroup Port
+     * @apiVersion  1.0.0
      *
      * @apiParam {Number} id Id of the Port
      *

@@ -11,9 +11,11 @@ class DeviceGraphController extends ApiController
     /**
      * @api {get} /devices/:id/graphs Get Generic graphs
      * @apiName Get_Device_Graphs
-     * @apiGroup Device Get all available graph information
+     * @apiDescription Get a list of available graphs for a device, this does not include ports.
+     * @apiGroup Device
+     * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id Id of the Device
+     * @apiParam {Number} id ID or Hostname of the Device
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -59,6 +61,11 @@ class DeviceGraphController extends ApiController
      *          ]
      *     }
      *
+     * @apiErrorExample {json} Error-Response:
+     *      HTTP/1.1 404 Not-Found
+     *      {
+     *          "status": "Item not Found"
+     *      }
      */
     public function index(Device $device)
     {
