@@ -1237,7 +1237,11 @@ function list_oxidized()
         $params = array($hostname);
     }
 
-    foreach (dbFetchRows("SELECT hostname,sysname,os,location,INET6_NTOA(ip) AS ip FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `disabled`='0' AND `ignore` = 0 AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os)) $sql", $params) as $device) {
+    foreach (dbFetchRows("SELECT hostname,sysname,os,location,ip AS ip FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `disabled`='0' AND `ignore` = 0 AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os)) $sql", $params) as $device) {
+
+        // Convert from packed value to human value
+        $device['ip'] = inet6_ntop($device['ip']);
+
         // Pre-populate the group with the default
         if ($config['oxidized']['group_support'] === true && !empty($config['oxidized']['default_group'])) {
             $device['group'] = $config['oxidized']['default_group'];
@@ -1247,13 +1251,14 @@ function list_oxidized()
             if ($maps_column == "group" && (!isset($config['oxidized']['group_support']) or $config['oxidized']['group_support'] !== true)) {
                 continue;
             }
+            
             foreach ($maps as $field_type => $fields) {
                 foreach ($fields as $field) {
-                    if(isset($field['regex']) && preg_match($field['regex'].'i', $device[$field_type])) {
+                    if (isset($field['regex']) && preg_match($field['regex'].'i', $device[$field_type])) {
                         $device[$maps_column] = $field[$maps_column];
                         break;
                     }
-                    elseif(isset($field['match']) && $field['match'] == $device[$field_type]) {
+                    elseif (isset($field['match']) && $field['match'] == $device[$field_type]) {
                         $device[$maps_column] = $field[$maps_column];
                         break;
                     }
