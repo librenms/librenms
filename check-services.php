@@ -64,7 +64,11 @@ if ($options['h']) {
 $sql = 'SELECT * FROM `devices` AS D, `services` AS S WHERE S.device_id = D.device_id ' . $where . ' ORDER by D.device_id DESC';
 
 foreach (dbFetchRows($sql) as $service) {
-    // Run the polling function
-    poll_service($service);
+    // Run the polling function only if the associated device is up
+    if ($service['status'] === "1") {
+        poll_service($service);
+    } else {
+        d_echo("\nNagios Service - ".$service['service_id']."\nSkipping service check because device ".$service['device_id']." is down.\n");
+    }
 } //end foreach
 rrdtool_close();
