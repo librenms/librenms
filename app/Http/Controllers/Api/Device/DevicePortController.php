@@ -1,16 +1,20 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Device;
 
+use App\Models\Device;
 use App\Models\Port;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Api\ApiController;
 
-class PortController extends ApiController
+class DevicePortController extends ApiController
 {
     /**
-     * @api {get} /ports Get All Ports
-     * @apiName Get_Ports
-     * @apiGroup Port Get a list of all ports in LibreNMS
+     * @api {get} /devices/:id/ports Get device ports
+     * @apiName Get_Device_Ports
+     * @apiGroup Device Get all ports for a device
+     *
+     * @apiParam {Number} id Id of the Device
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -91,29 +95,21 @@ class PortController extends ApiController
      *                  "poll_period": "299"
      *              }
      *          ],
-     *          "current_page": 1,
-     *          "from": 1,
-     *          "last_page": 1,
-     *          "next_page_url": null,
-     *          "path": "http://example.org/api/v1/ports",
-     *          "per_page": 15,
-     *          "prev_page_url": null,
-     *          "to": 10,
-     *          "total": 10
      *     }
      *
      */
-    public function index()
+    public function index(Device $device)
     {
-        return $this->paginateResponse(new Port);
+        return $this->objectResponse($device->ports()->get());
     }
 
     /**
-     * @api {get} /devices/:id Get individual Port
+     * @api {get} /devices/:id/ports/:port_id Get individual Port for a device
      * @apiName Get_Port
      * @apiGroup Device Get an individual port
      *
-     * @apiParam {Number} id Id of the Port
+     * @apiParam {Number} id Id of the device
+     * @apiParam {Number} port_id Id of the Port
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -196,11 +192,8 @@ class PortController extends ApiController
      *     }
      *
      */
-
-    public function show(Port $port)
+    public function show(Device $device, Port $port)
     {
-        // TODO: Eager Load address information
-        // $port->load('ipv4');
         return $this->objectResponse($port);
     }
 }

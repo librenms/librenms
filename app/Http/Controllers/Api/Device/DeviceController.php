@@ -13,7 +13,7 @@ class DeviceController extends ApiController
      * @api {get} /devices Get All Devices
      * @apiName Get_Devices
      * @apiGroup Device Get a list of all devices in librenms
-     * 
+     *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
      *     {
@@ -78,24 +78,24 @@ class DeviceController extends ApiController
      *          "to": 10,
      *          "total": 10
      *     }
-     * 
+     *
      */
     public function index()
     {
-        return $this->paginate_response(new Device);
+        return $this->paginateResponse(new Device);
     }
 
     /**
      * @api {get} /devices/:id Get individual Device
      * @apiName Get_Device
      * @apiGroup Device Get an individual device
-     * 
+     *
      * @apiParam {Number} id Id of the Device
-     * 
+     *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
      *     {
-     *          "data": 
+     *          "data":
      *          {
      *             "device_id": 1,
      *             "hostname": "localhost",
@@ -146,18 +146,18 @@ class DeviceController extends ApiController
      *             "port_association_mode": "1"
      *         }
      *     }
-     * 
+     *
      */
     public function show(Device $device)
     {
-        return $this->object_response($device);
+        return $this->objectResponse($device);
     }
 
     /**
      * @api {post} /devices Create a new Device
      * @apiName Create_Device
      * @apiGroup Device Create a new device
-     * 
+     *
      * @apiParam {String} hostname The hostname of the new device
      * @apiParam {Number} port="161" The SNMP port to use
      * @apiParam {String="v1,v2c,v3"} version="v2c" The SNMP version
@@ -173,7 +173,7 @@ class DeviceController extends ApiController
      * @apiParam {String} v3.authalgo
      * @apiParam {String} v3.cryptopass
      * @apiParam {String} v3.cryptoalgo
-     * 
+     *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
      *     {
@@ -228,7 +228,7 @@ class DeviceController extends ApiController
      *             "port_association_mode": "1"
      *         }
      *     }
-     * 
+     *
      */
     public function store(Request $request)
     {
@@ -276,25 +276,25 @@ class DeviceController extends ApiController
             array_push(Config::get('snmp.v3'), $v3);
             $snmpver = 'v3';
         } else {
-            $this->error_response(400, 'You haven\'t specified an SNMP version to use');
+            $this->errorResponse(400, 'You haven\'t specified an SNMP version to use');
         }
         try {
             // TODO: Add host method
             // $device_id = addHost($hostname, $snmpver, $port, $transport, $poller_group, $force_add, 'ifIndex', $additional);
-            // return $this->object_response(Device::find($device_id));
+            // return $this->objectResponse(Device::find($device_id));
 
         } catch (Exception $e) {
-            $this->error_response(500, $e->getMessage());
+            $this->errorResponse(500, $e->getMessage());
         }
     }
 
     /**
      * Update device
      * Update a device by ID
-     * 
+     *
      * @method PUT
      * @param App\Models\Device $device Device loaded from route model binding
-     * 
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function update(Device $device)
@@ -305,15 +305,15 @@ class DeviceController extends ApiController
     /**
      * Delete Device
      * Delete device by ID.
-     * 
+     *
      * @method DELETE
      * @param App\Models\Device $device Device loaded from route model binding
-     * 
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Device $device)
     {
         $device->destroy();
-        return $this->message_response("Removed device $device->hostname");
+        return $this->messageResponse("Removed device $device->hostname");
     }
 }

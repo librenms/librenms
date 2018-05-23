@@ -60,7 +60,11 @@ class Handler extends ExceptionHandler
             }
             return response('Unhandled MySQL Error [' . $exception->getCode() . "] $message");
         }
-
+        
+        // Handle JSON requests where model not found
+        if ($exception instanceof \Illuminate\Database\Eloquent\ModelNotFoundException && $request->wantsJson()) {
+            return response()->json(['status' => 'Item not found'], 404);
+        }
         // emulate Laravel 5.5 renderable exceptions
         if (method_exists($exception, 'render')) {
             return $exception->render($request);

@@ -51,6 +51,11 @@ class Sensor extends BaseModel
         return collect(self::$icons)->get($this->sensor_class, 'heartbeat');
     }
 
+
+    public function scopeDeviceSensors($query)
+    {
+        return $query->select('sensor_class')->distinct()->get();
+    }
     // ---- Query Scopes ----
 
     public function scopeHasAccess($query, User $user)

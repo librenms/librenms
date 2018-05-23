@@ -143,6 +143,24 @@ class Device extends BaseModel
         return $this->hasDeviceAccess($query, $user);
     }
 
+    public function allDeviceSensors()
+    {
+        $sensors = $this->sensors()->select('sensor_class')->distinct()->get()->toArray();
+        if ($this->processors()->count() > 0) {
+            $sensors[] = [ "sensor_class" => "processor"];
+        }
+
+        if ($this->storage()->count() > 0) {
+            $sensors[] = [ "sensor_class" => "storage"];
+        }
+
+        if ($this->mempool()->count() > 0) {
+            $sensors[] = [ "sensor_class" => "mempool"];
+        }
+        return $sensors;
+        
+    }
+
     // ---- Define Relationships ----
 
     public function alerts()
@@ -218,6 +236,11 @@ class Device extends BaseModel
     public function storage()
     {
         return $this->hasMany('App\Models\Storage', 'device_id');
+    }
+
+    public function wirelessSensors()
+    {
+        return $this->hasMany('App\Models\WirelessSensor', 'device_id');
     }
 
     public function syslogs()
