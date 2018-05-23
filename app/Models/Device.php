@@ -238,9 +238,9 @@ class Device extends BaseModel
         return $this->hasMany('App\Models\Storage', 'device_id');
     }
 
-    public function wirelessSensors()
+    public function mempools()
     {
-        return $this->hasMany('App\Models\WirelessSensor', 'device_id');
+        return $this->hasMany('App\Models\Mempool', 'device_id');
     }
 
     public function syslogs()
@@ -257,5 +257,10 @@ class Device extends BaseModel
     public function vrfs()
     {
         return $this->hasMany('App\Models\Vrf', 'device_id');
+    }
+
+    public function wirelessSensors()
+    {
+        return $this->hasMany('App\Models\WirelessSensor', 'device_id');
     }
 }

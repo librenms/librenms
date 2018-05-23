@@ -90,22 +90,21 @@ class Mimosa extends OS implements
 
         // ptp radios
         $polar = $this->getCacheByIndex('mimosaPolarization', 'MIMOSA-NETWORKS-BFIVE-MIB');
-        $freq = $this->getCacheByIndex('mimosaCenterFreq', 'MIMOSA-NETWORKS-BFIVE-MIB');
+        $bfiveFreq = $this->getCacheByIndex('mimosaCenterFreq', 'MIMOSA-NETWORKS-BFIVE-MIB');
 
         // both chains should be the same frequency, make sure
-        $freq = array_flip($freq);
-        if (count($freq) == 1) {
+        if (count($bfiveFreq) == 1) {
             $descr = 'Frequency';
         } else {
-            $descr = 'Frequency: $s Chain';
+            $descr = 'Frequency: %s Chain';
         }
 
-        foreach ($freq as $index => $frequency) {
+        foreach ($bfiveFreq as $index => $frequency) {
             $sensors[] = new WirelessSensor(
                 'frequency',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.43356.2.1.2.6.1.1.6.' . $index,
-                'mimosa',
+                'mimosa-ptp',
                 $index,
                 sprintf($descr, $this->getPolarization($polar[$index])),
                 $frequency
@@ -183,19 +182,23 @@ class Mimosa extends OS implements
                 'power',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.43356.2.1.2.6.1.1.2.' . $index,
-                'mimosa-tx',
+                'mimosa-ptp-tx',
                 $index,
                 sprintf('Tx Power: %s Chain', $this->getPolarization($polar[$index])),
-                $entry['mimosaTxPower']
+                $entry['mimosaTxPower'],
+                1,
+                10
             );
             $sensors[] = new WirelessSensor(
                 'power',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.43356.2.1.2.6.1.1.3.' . $index,
-                'mimosa-rx',
+                'mimosa-ptp-rx',
                 $index,
                 sprintf('Rx Power: %s Chain', $this->getPolarization($polar[$index])),
-                $entry['mimosaRxPower']
+                $entry['mimosaRxPower'],
+                1,
+                10
             );
         }
 
