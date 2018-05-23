@@ -72,7 +72,7 @@ vrf:
         excluded_fields: [vrf_id, device_id]
     ports:
         included_fields: [ifIndex, ifVrf]
-        custom_where: device_id=? AND ifVrf!=0
+        custom_where: where device_id=? AND ifVrf!=0
 wireless:
     wireless_sensors:
         excluded_fields: [device_id, sensor_id, access_point_id, lastupdate]
