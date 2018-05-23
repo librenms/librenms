@@ -52,7 +52,7 @@ class Discord implements Transport
 
             $ret  = curl_exec($curl);
             $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            if ($code != 200) {
+            if ($code != 204) {
                 var_dump("API '$host' returned Error"); //FIXME: propper debuging
                 var_dump("Params: " . $alert_message); //FIXME: propper debuging
                 var_dump("Return: " . $ret); //FIXME: propper debuging
