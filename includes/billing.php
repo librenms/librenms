@@ -1,22 +1,5 @@
 <?php
 
-
-function format_bytes_billing($value)
-{
-    global $config;
-
-    return format_number($value, $config['billing']['base']).'B';
-}//end format_bytes_billing()
-
-
-function format_bytes_billing_short($value)
-{
-    global $config;
-
-    return format_number($value, $config['billing']['base'], 2, 3);
-}//end format_bytes_billing_short()
-
-
 function getDates($dayofmonth, $months = 0)
 {
     $dayofmonth = zeropad($dayofmonth);
