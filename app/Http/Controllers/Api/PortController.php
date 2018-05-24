@@ -8,7 +8,7 @@ use App\Http\Controllers\Api\ApiController;
 class PortController extends ApiController
 {
     /**
-     * @api {get} /ports Get All Ports
+     * @api {get} /api/v1/ports Get All Ports
      * @apiName Get_Ports
      * @apiGroup Port
      * @apiVersion  1.0.0
@@ -110,7 +110,7 @@ class PortController extends ApiController
     }
 
     /**
-     * @api {get} /devices/:id Get individual Port
+     * @api {get} /api/v1/devices/:id Get individual Port
      * @apiName Get_Port
      * @apiGroup Port
      * @apiVersion  1.0.0

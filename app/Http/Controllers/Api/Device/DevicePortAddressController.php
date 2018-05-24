@@ -10,7 +10,7 @@ use App\Http\Controllers\Api\ApiController;
 class DevicePortAddressController extends ApiController
 {
     /**
-     * @api {get} /devices/:id/ports/:port_id/addresses Get device port addresses
+     * @api {get} /api/v1/devices/:id/ports/:port_id/addresses Get device port addresses
      * @apiName Get_Device_Port_Addresses
      * @apiGroup Device Ports
      * @apiVersion  1.0.0
@@ -43,7 +43,7 @@ class DevicePortAddressController extends ApiController
      *          "status": "Item not Found"
      *      }
      */
-    public function index(Device $device, Port $port)
+    public function index(Port $port)
     {
         return $this->objectResponse(['ipv4' => $port->ipv4()->get(), 'ipv6' => $port->ipv6()->get()]);
     }

@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\ApiController;
 class DeviceWirelessController extends ApiController
 {
     /**
-     * @api {get} /devices/:id/wireless Get Wireless Sensors
+     * @api {get} /api/v1/devices/:id/wireless Get Wireless Sensors
      * @apiName Get_Device_Wireless
      * @apiGroup Device Wireless
      * @apiVersion  1.0.0
@@ -40,7 +40,7 @@ class DeviceWirelessController extends ApiController
     }
 
     /**
-     * @api {get} /devices/:id/wireless/:class Get all wireless sensors for a Wireless Class
+     * @api {get} /api/v1/devices/:id/wireless/:class Get all wireless sensors for a Wireless Class
      * @apiName Get_All_Wireless_Sensors_For_Class
      * @apiGroup Device Wireless
      * @apiVersion  1.0.0

@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\ApiController;
 class DeviceGraphController extends ApiController
 {
     /**
-     * @api {get} /devices/:id/graphs Get Generic graphs
+     * @api {get} /api/v1/devices/:id/graphs Get Generic graphs
      * @apiName Get_Device_Graphs
      * @apiDescription Get a list of available graphs for a device, this does not include ports.
      * @apiGroup Device

@@ -10,7 +10,7 @@ class GroupDeviceController extends ApiController
 {
     /**
      *
-     * @api {get} /groups/device Get Device Groups
+     * @api {get} /api/v1/groups/device Get Device Groups
      * @apiName Get_Device_groups
      * @apiGroup Group
      * @apiVersion  1.0.0
@@ -39,7 +39,7 @@ class GroupDeviceController extends ApiController
 
     /**
      *
-     * @api {get} /groups/device Get Devices in Device Group
+     * @api {get} /api/v1/groups/device Get Devices in Device Group
      * @apiName Get_Devices_In_Group
      * @apiGroup Group
      * @apiVersion  1.0.0

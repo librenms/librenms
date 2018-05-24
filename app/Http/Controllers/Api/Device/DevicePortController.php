@@ -10,7 +10,7 @@ use App\Http\Controllers\Api\ApiController;
 class DevicePortController extends ApiController
 {
     /**
-     * @api {get} /devices/:id/ports Get device ports
+     * @api {get} /api/v1/devices/:id/ports Get device ports
      * @apiName Get_Device_Ports
      * @apiGroup Device Ports
      * @apiVersion  1.0.0
@@ -105,7 +105,7 @@ class DevicePortController extends ApiController
     }
 
     /**
-     * @api {get} /devices/:id/ports/:port_id Get individual Port for a device
+     * @api {get} /api/v1/devices/:id/ports/:port_id Get individual Port for a device
      * @apiName Get_Port
      * @apiGroup Device Ports
      * @apiVersion  1.0.0
@@ -205,7 +205,7 @@ class DevicePortController extends ApiController
     }
 
     /**
-     * @api {get} /devices/:id/ports/stack Get ports stack for Device
+     * @api {get} /api/v1/devices/:id/ports/stack Get ports stack for Device
      * @apiName Get_Ports_Stack
      * @apiDescription Get a list of port mappings for a device. This is useful for showing physical ports that are in a virtual port-channel.
      * @apiGroup Device Ports
@@ -242,9 +242,9 @@ class DevicePortController extends ApiController
      */
     public function stack(Device $device)
     {
-        $input = (request()->input('valid_mappings') != null ? strtolower(request()->input('valid_mappings')) == 'true' : false);
+        $input = $this->booleanInput('valid_mappings');
         if ($input) {
-            return $this->objectResponse($device->portStack()->isActive()->validMappings()->orderBy('port_id_high', 'asc')->get());    
+            return $this->objectResponse($device->portStack()->isActive()->validMappings()->orderBy('port_id_high', 'asc')->get());
         }
         return $this->objectResponse($device->portStack()->isActive()->orderBy('port_id_high', 'asc')->get());
     }

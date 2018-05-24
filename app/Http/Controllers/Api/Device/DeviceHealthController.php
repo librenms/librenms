@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\ApiController;
 class DeviceHealthController extends ApiController
 {
     /**
-     * @api {get} /devices/:id/health Get Health Sensors
+     * @api {get} /api/v1/devices/:id/health Get Health Sensors
      * @apiName Get_Device_Health
      * @apiGroup Device Health
      * @apiVersion  1.0.0
@@ -34,7 +34,7 @@ class DeviceHealthController extends ApiController
     }
 
     /**
-     * @api {get} /devices/:id/health/:class Get all sensors for a Health Class
+     * @api {get} /api/v1/devices/:id/health/:class Get all sensors for a Health Class
      * @apiName Get_All_Sensors_For_Class
      * @apiGroup Device Health
      * @apiVersion  1.0.0

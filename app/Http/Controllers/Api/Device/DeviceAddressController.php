@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\ApiController;
 class DeviceAddressController extends ApiController
 {
     /**
-     * @api {get} /devices/:id/addresses Get all addresses for a device
+     * @api {get} /api/v1/devices/:id/addresses Get all addresses for a device
      * @apiName Get_Device_Addresses
      * @apiGroup Device
      * @apiVersion  1.0.0

@@ -10,7 +10,7 @@ use App\Http\Controllers\Api\ApiController;
 class DeviceController extends ApiController
 {
     /**
-     * @api {get} /devices Get All Devices
+     * @api {get} /api/v1/devices Get All Devices
      * @apiName Get_Devices
      * @apiGroup Device
      * @apiVersion  1.0.0
@@ -87,7 +87,7 @@ class DeviceController extends ApiController
     }
 
     /**
-     * @api {get} /devices/:id Get individual Device
+     * @api {get} /api/v1/devices/:id Get individual Device
      * @apiName Get_Device
      * @apiGroup Device
      * @apiVersion  1.0.0
@@ -168,9 +168,9 @@ class DeviceController extends ApiController
      * @apiVersion  1.0.0
      *
      * @apiParam {String} hostname The hostname of the new device
-     * @apiParam {Number} port="161" The SNMP port to use
-     * @apiParam {String="v1,v2c,v3"} version="v2c" The SNMP version
-     * @apiParam {String} [transport=udp] Optional
+     * @apiParam {Number} port=161 The SNMP port to use
+     * @apiParam {String="v1","v2c","v3"} version="v2c" The SNMP version
+     * @apiParam {String="udp","udp6","tcp","tcp6"} [transport=udp] Optional
      * @apiParam {Number} [poller_group=0] Optional
      * @apiParam {Boolean} [force_add=false] Optional
      * @apiParam {String} [os] Optional
@@ -261,8 +261,8 @@ class DeviceController extends ApiController
         $snmp_disable = ($request->snmp_disable);
         if ($snmp_disable) {
             $additional = array(
-                'os'           => $request->os ? mres($request->os) : 'ping',
-                'hardware'     => $request->hardware ? mres($request->hardware) : '',
+                'os'           => $request->os ? $request->os : 'ping',
+                'hardware'     => $request->hardware ? $request->hardware : '',
                 'snmp_disable' => 1,
             );
         } elseif ($request->version == 'v1' || $request->version == 'v2c') {
@@ -270,15 +270,15 @@ class DeviceController extends ApiController
                 $config['snmp']['community'] = array($data['community']);
             }
 
-            $snmpver = mres($request->version);
+            $snmpver = $request->version;
         } elseif ($request->version == 'v3') {
             $v3 = array(
-                'authlevel'  => mres($request->v3['authlevel']),
-                'authname'   => mres($request->v3['authname']),
-                'authpass'   => mres($request->v3['authpass']),
-                'authalgo'   => mres($request->v3['authalgo']),
-                'cryptopass' => mres($request->v3['cryptopass']),
-                'cryptoalgo' => mres($request->v3['cryptoalgo']),
+                'authlevel'  => $request->v3['authlevel'],
+                'authname'   => $request->v3['authname'],
+                'authpass'   => $request->v3['authpass'],
+                'authalgo'   => $request->v3['authalgo'],
+                'cryptopass' => $request->v3['cryptopass'],
+                'cryptoalgo' => $request->v3['cryptoalgo'],
             );
 
             array_push(Config::get('snmp.v3'), $v3);
@@ -306,7 +306,7 @@ class DeviceController extends ApiController
      */
     public function update(Device $device)
     {
-        // 
+        //
     }
 
     /**
