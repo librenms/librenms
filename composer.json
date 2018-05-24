@@ -63,7 +63,10 @@
             "App\\": "app",
             "LibreNMS\\": "LibreNMS",
             "LibreNMS\\Tests\\": "tests"
-        }
+        },
+        "files": [
+            "app/helpers.php"
+        ]
     },
     "scripts": {
         "pre-update-cmd": "LibreNMS\\ComposerHelper::preUpdate",
