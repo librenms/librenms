@@ -65,7 +65,7 @@ $sql = 'SELECT * FROM `devices` AS D, `services` AS S WHERE S.device_id = D.devi
 
 foreach (dbFetchRows($sql) as $service) {
     // Run the polling function only if the associated device is up
-    if ($service['status'] === "1") {
+    if ($service['status'] === "1" || ($service['status'] === '0' && $service['status_reason'] === 'snmp')) {
         poll_service($service);
     } else {
         d_echo("\nNagios Service - ".$service['service_id']."\nSkipping service check because device ".$service['device_id']." is down.\n");
