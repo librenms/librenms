@@ -39,7 +39,6 @@ class Discord implements Transport
             $discord_msg   = strip_tags($obj['msg']);
             $color         = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
             $data          = array(
-                'attachments' => array(
                         'username'=>$tmp_api['username'],
                         'content' => "". $obj['title'] ."\n" . $discord_msg
                 );
