@@ -36,9 +36,10 @@ class Discord implements Transport
         foreach ($opts as $tmp_api) {
             $host          = $tmp_api['url'];
             $curl          = curl_init();
-            $discord_msg     = strip_tags($obj['msg']);
+            $discord_msg   = strip_tags($obj['msg']);
             $color         = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
-            $data = array(
+            $data          = array(
+                'attachments' => array(
                         'username'=>$tmp_api['username'],
                         'content' => "". $obj['title'] ."\n" . $discord_msg
                 );
