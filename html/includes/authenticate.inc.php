@@ -49,6 +49,9 @@ try {
                 $username = $authorizer->getExternalUsername();
             }
 
+            // clean auth data from input variables to be safe
+            unset($_REQUEST['username'], $_REQUEST['password'], $_POST['username'], $_POST['password'], $_GET['username'], $_GET['password']);
+
             // form authentication
             if (isset($username) && $authorizer->authenticate($username, $password)) {
                 $_SESSION['username'] = $username;
