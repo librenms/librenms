@@ -11,10 +11,10 @@
                     "hardware": "",
                     "features": null,
                     "location": null,
-                    "os": "linux",
-                    "type": "server",
+                    "os": "barracudaspamfirewall",
+                    "type": "firewall",
                     "serial": null,
-                    "icon": "linux.svg"
+                    "icon": "barracuda.svg"
                 }
             ]
         },
@@ -25,14 +25,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
                     "sysDescr": "Barracuda Email Security Gateway",
                     "sysContact": "<private>",
-                    "version": "Security",
+                    "version": null,
                     "hardware": "",
                     "features": null,
                     "location": "<private>",
-                    "os": "linux",
-                    "type": "server",
+                    "os": "barracudaspamfirewall",
+                    "type": "firewall",
                     "serial": null,
-                    "icon": "linux.svg"
+                    "icon": "barracuda.svg"
                 }
             ]
         }
@@ -486,6 +486,18 @@
                     "processor_perc_warn": "75"
                 }
             ]
+        },
+        "poller": "matches discovery"
+    },
+    "bgp-peers": {
+        "discovery": {
+            "devices": [
+                {
+                    "bgpLocalAs": null
+                }
+            ],
+            "bgpPeers": [],
+            "bgpPeers_cbgp": []
         },
         "poller": "matches discovery"
     }
