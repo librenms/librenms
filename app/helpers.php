@@ -67,6 +67,9 @@ function format_si($value, $round = '2', $sf = '3')
 
 function format_bi($value, $round = '2', $sf = '3')
 {
+    // This was added becuase when the method was called the $neg variable was being undefined 
+    $neg = 0;
+
     if ($value < "0") {
         $neg = 1;
         $value = $value * -1;

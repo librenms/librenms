@@ -7,6 +7,8 @@ class Port extends BaseModel
     public $timestamps = false;
     protected $primaryKey = 'port_id';
 
+    protected $hidden = ['pivot'];
+
     // ---- Helper Functions ----
 
     /**

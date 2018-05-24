@@ -11,6 +11,8 @@ class PortStack extends BaseModel
 
     protected $filliable = ['port_id_high', 'port_id_low', 'ifStackStatus'];
 
+    // ---- Query Scopes ----
+
     public function scopeIsActive($query)
     {
         return $query->where('ifStackStatus', 'active');

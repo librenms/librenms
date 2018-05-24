@@ -27,7 +27,7 @@ class ApiController extends Controller
      */
     protected function paginateResponse($data)
     {
-        $per_page = (request()->per_page ? request()->per_page : 15);
+        $per_page = (request()->per_page ? request()->per_page : 50);
         $current_page = (request()->current_page ? request()->current_page : 1);
         return response()->json($data->paginate($per_page, ['*'], 'page', $current_page));
     }
@@ -54,5 +54,17 @@ class ApiController extends Controller
     protected function errorResponse($http_code = 400, $message = 'Bad Request')
     {
         return response()->json(['error' => $message], $http_code);
+    }
+
+
+    /**
+     * Get Boolean input and use corresponding value
+     * @param string Name of input to retrieve
+     * 
+     * @return boolean
+     */
+    protected function booleanInput($value)
+    {
+        return (request()->input($value) != null ? strtolower(request()->input($value)) == 'true' : false);
     }
 }

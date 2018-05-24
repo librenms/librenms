@@ -26,7 +26,7 @@ Route::namespace('Api')->group(function () {
         Route::get('addresses', 'Device\\DeviceAddressController@index')->name('device.address.index');
 
         Route::get('ports/stack', 'Device\\DevicePortController@stack')->name('device.port.stack');
-        
+
         Route::resource('ports', 'Device\\DevicePortController', ['only' => [
             'index',
             'show'
@@ -60,17 +60,20 @@ Route::namespace('Api')->group(function () {
         'show'
     ]]);
 
-    Route::resource('bills', 'BillController', ['only' => [
-        'index',
-        'show'
+    Route::resource('bills', 'Bill\\BillController', ['except' => [
+        'create',
+        'edit'
     ]]);
+    Route::get('bills/{bill}/history', 'Bill\\BillHistoryController@index')->name('bill.history.index');
 
     Route::prefix('graphs')->group(function () {
-        Route::get('devices/{device}/health/{class}', 'Graph\\DeviceHealthController@index');
-        Route::get('devices/{device}/health/{class}/{id}', 'Graph\\DeviceHealthController@show');
-        Route::get('devices/{device}/wireless/{class}', 'Graph\\DeviceWirelessController@index');
-        Route::get('devices/{device}/wireless/{class}/{id}', 'Graph\\DeviceWirelessController@show');
+        Route::prefix('devices/{device}')->group(function() {
+            Route::get('health/{class}', 'Graph\\DeviceHealthController@index');
+            Route::get('health/{class}/{id}', 'Graph\\DeviceHealthController@show');
+            Route::get('wireless/{class}', 'Graph\\DeviceWirelessController@index');
+            Route::get('wireless/{class}/{id}', 'Graph\\DeviceWirelessController@show');
+        });
 
-        Route::get('bills', 'Graph\\BillController@');
+        // Route::get('bills', 'Graph\\BillController@');
     });
 });
