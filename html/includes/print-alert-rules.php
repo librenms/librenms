@@ -131,7 +131,7 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
             $ico = 'check';
             $col = 'success';
         } elseif ((int) $sub['state'] === 1 || (int) $sub['state'] === 2) {
-            $ico   = 'remove';
+            $ico   = 'exclamation';
             $col   = 'danger';
             $extra = 'danger';
         }
