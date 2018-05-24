@@ -10,6 +10,8 @@
                 <th data-column-id="ipv4_address">IPv4 Address</th>
                 <th data-column-id="interface">Port</th>
                 <th data-column-id="vlan">Vlan</th>
+                <th data-column-id="description">Description</th>
+                <th data-column-id="dnsname">DNS Name</th>
             </tr>
         </thead>
     </table>
@@ -71,6 +73,22 @@ if ($_POST['searchby'] == 'ip') {
 ?>
 
                 ">IP Address</option>"+
+                "<option value=\"dnsname\" "+
+<?php
+if ($_POST['searchby'] == 'dnsname') {
+    echo '" selected "+';
+}
+?>
+
+                ">DNS Name</option>"+
+                "<option value=\"description\" "+
+<?php
+if ($_POST['searchby'] == 'description') {
+    echo '" selected "+';
+}
+?>
+
+                ">Description</option>"+
                 "<option value=\"vlan\" "+
 <?php
 if ($_POST['searchby'] == 'vlan') {
