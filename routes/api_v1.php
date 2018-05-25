@@ -26,7 +26,6 @@ Route::namespace('Api')->group(function () {
         Route::get('addresses', 'Device\\DeviceAddressController@index')->name('device.address.index');
 
         Route::get('ports/stack', 'Device\\DevicePortController@stack')->name('device.port.stack');
-
         Route::resource('ports', 'Device\\DevicePortController', ['only' => [
             'index',
             'show'
@@ -43,10 +42,8 @@ Route::namespace('Api')->group(function () {
             'show'
         ]]);
         
-        Route::resource('ports', 'Device\\DevicePortController', ['only' => [
-            'index',
-            'show'
-        ]]);
+        Route::get('services', 'Device\\DeviceServiceController@index')->name('device.service.index');
+        Route::post('services', 'Device\\DeviceServiceController@store')->name('device.service.store');
     });
     
     Route::prefix('groups')->group(function () {
@@ -64,10 +61,15 @@ Route::namespace('Api')->group(function () {
         'create',
         'edit'
     ]]);
+
+    Route::get('services', 'ServiceController@index')->name('device.service.index');
+
     Route::get('bills/{bill}/history', 'Bill\\BillHistoryController@index')->name('bill.history.index');
 
+    Route::get('inventory', 'InventoryController@index')->name('inventory.index');
+
     Route::prefix('graphs')->group(function () {
-        Route::prefix('devices/{device}')->group(function() {
+        Route::prefix('devices/{device}')->group(function () {
             Route::get('health/{class}', 'Graph\\DeviceHealthController@index');
             Route::get('health/{class}/{id}', 'Graph\\DeviceHealthController@show');
             Route::get('wireless/{class}', 'Graph\\DeviceWirelessController@index');

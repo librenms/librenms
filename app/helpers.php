@@ -20,8 +20,23 @@
  * @link       http://librenms.org
  * @copyright  2018 Paul Heinrichs
  * @author     Paul Heinrichs <pdheinrichs@gmail.com>
+ *
+ *
+ * Order of Contents
+ *
+ * - Formatting
+ *  - format_bytes_billing()
+ *  - format_bytes_billing_short()
+ *  - format_si()
+ *  - format_bi()
+ *  - format_number()
+ *
+ * - Services
+ *  - list_available_services()
  */
 use Librenms\Config;
+
+// --- Formatting ----
 
 function format_bytes_billing($value)
 {
@@ -67,7 +82,7 @@ function format_si($value, $round = '2', $sf = '3')
 
 function format_bi($value, $round = '2', $sf = '3')
 {
-    // This was added becuase when the method was called the $neg variable was being undefined 
+    // This was added becuase when the method was called the $neg variable was being undefined
     $neg = 0;
 
     if ($value < "0") {
@@ -95,4 +110,23 @@ function format_number($value, $base = '1000', $round = 2, $sf = 3)
     } else {
         return format_bi($value, $round, $sf);
     }
+}
+
+
+// ---- SERVICES ----
+
+/**
+ * List all available services from nagios plugins directory
+ *
+ * @return array
+ */
+function list_available_services()
+{
+    $services = array();
+    foreach (scandir(Config::get('nagios_plugins')) as $file) {
+        if (substr($file, 0, 6) === 'check_') {
+            $services[] = substr($file, 6);
+        }
+    }
+    return $services;
 }
