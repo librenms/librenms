@@ -96,4 +96,4 @@ if ($rawdata) {
     update_application($app, $rawdata, $metrics);
 }
 
-unset($pihole, $rawdata, $line, $lines, $var, $value,$rrd_name, $rrd_def, $fields, $tags);
+unset($pihole, $rawdata, $line, $lines, $var, $value, $rrd_name, $rrd_def, $fields, $tags);
