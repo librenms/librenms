@@ -53,6 +53,13 @@ Route::namespace('Api')->group(function () {
         // Route::get('ports', 'Group\\GroupPortController@index')->name('group.device.index');
     });
 
+    Route::prefix('logs')->group(function () {
+        Route::get('alertlog', 'LogController@alertlog')->name('logs.alertlog');
+        Route::get('authlog', 'LogController@authlog')->name('logs.authlog');
+        Route::get('eventlog', 'LogController@eventlog')->name('logs.eventlog');
+        Route::get('syslog', 'LogController@syslog')->name('logs.syslog');
+    });
+
     Route::resource('ports', 'PortController', ['only' => [
         'index',
         'show'

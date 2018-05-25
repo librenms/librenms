@@ -333,7 +333,7 @@ class DeviceController extends ApiController
      *     {
      *          "data":
      *          {
-     *              "message": "Removed device test.example.org
+     *              "message": "Removed device test.example.org"
      *          }
      *     }
      *
