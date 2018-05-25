@@ -14,6 +14,8 @@ Then you can procede to the LibreNMS Web UI and go to Oxidized Settings in the E
 
 To have devices automatically added, you will need to configure oxidized to pull them from LibreNMS [Feeding Oxidized](#feeding-oxidized)
 
+LibreNMS will automatically map the OS to the Oxidized model name if they don't match. this means you shouldn't need to use the model_map config option within Oxidized.
+
 ### Detailed integration information
 ---
 
