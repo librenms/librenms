@@ -15,7 +15,7 @@ class BillController extends ApiController
      * @api {get} /api/v1/bills Get Bills
      * @apiName Get_all_bills
      * @apiDescription Retrieve the list of bills currently in the system.
-     * @apiGroup Bill
+     * @apiGroup Bills
      * @apiVersion  1.0.0
      *
      * @apiParam {Boolean} [previous=false] Optional Indicates you would like the data for the last complete period rather than the current period
@@ -160,7 +160,7 @@ class BillController extends ApiController
      * @api {get} /api/v1/bills/:id Get individual Bill
      * @apiName Get_gil
      * @apiDescription Retrieve the list of bills currently in the system.
-     * @apiGroup Bill
+     * @apiGroup Bills
      * @apiVersion  1.0.0
      *
      * @apiParam {Number} id The ID of the bill to retrieve
@@ -292,7 +292,7 @@ class BillController extends ApiController
      *
      * @api {post} /api/v1/bills Create a new Bill
      * @apiName Create_New_Bill
-     * @apiGroup Bill
+     * @apiGroup Bills
      * @apiVersion  1.0.0
      *
      * @apiParam {Array} ports Array of port IDs for this bill.
@@ -428,7 +428,7 @@ class BillController extends ApiController
      *              "The selected ports.1 is invalid."
      *          ]
      *      }
-     * 
+     *
      */
     public function store(Request $request)
     {
@@ -450,9 +450,9 @@ class BillController extends ApiController
             'bill_day'          => $request->bill_day,
             'bill_type'         => $request->bill_type,
             "bill_{$request->bill_type}" => $request["bill_{$request->bill_type}"],
-            'bill_custid'       => (isset($request->custid) ?: ''),
-            'bill_ref'          => (isset($request->bill_ref) ?: ''),
-            'bill_notes'        => (isset($request->bill_notes) ?: ''),
+            'bill_custid'       => $request->get('custid', ''),
+            'bill_ref'          => $request->get('bill_ref', ''),
+            'bill_notes'        => $request->get('bill_notes', ''),
             'rate_95th_in'      => 0,
             'rate_95th_out'     => 0,
             'rate_95th'         => 0,
@@ -476,13 +476,13 @@ class BillController extends ApiController
      *
      * @api {put} /api/v1/bills/:id Update a Bill
      * @apiName Update_Bill
-     * @apiDescription Update a specific bill 
-     * @apiGroup Bill
+     * @apiDescription Update a specific bill
+     * @apiGroup Bills
      * @apiVersion  1.0.0
      *
      * @apiParam {Number} id The ID of the port
      * @apiParam {Array} [ports] Optional Array of port associated to this bill.
-     * This array should be the all the desired associated ports for this bill. 
+     * This array should be the all the desired associated ports for this bill.
      * If not included in the request the ports will remain as previously entered
      * @apiParam {String} [bill_name] Optional Name of the bill.
      * @apiParam {Number} [bill_day] Optional Day of the month.
@@ -541,14 +541,28 @@ class BillController extends ApiController
             $bill->ports()->sync($request->ports);
         }
         
-        if ($request->bill_name) $bill->bill_name         = $request->bill_name;
-        if ($request->bill_day) $bill->bill_day          = $request->bill_day;
-        if ($request->bill_type) $bill->bill_type         = $request->bill_type;
-        if ($request->{"bill_{$bill->bill_type}"}) $bill->{"bill_{$bill->bill_type}"} = $request->{"bill_{$bill->bill_type}"};
-        if ($request->bill_custid) $bill->bill_custid       = (isset($request->custid) ?: '');
-        if ($request->bill_ref) $bill->bill_ref          = (isset($request->bill_ref) ?: '');
-        if ($request->bill_notes) $bill->bill_notes        = (isset($request->bill_notes) ?: '');
-        
+        if ($request->bill_name) {
+            $bill->bill_name = $request->bill_name;
+        }
+        if ($request->bill_day) {
+            $bill->bill_day = $request->bill_day;
+        }
+        if ($request->bill_type) {
+            $bill->bill_type = $request->bill_type;
+        }
+        if ($request->{"bill_{$bill->bill_type}"}) {
+            $bill->{"bill_{$bill->bill_type}"} = $request->{"bill_{$bill->bill_type}"};
+        }
+        if ($request->bill_custid) {
+            $bill->bill_custid = $request->get('custid', '');
+        }
+        if ($request->bill_ref) {
+            $bill->bill_ref = $request->get('bill_ref', '');
+        }
+        if ($request->bill_notes) {
+            $bill->bill_notes = $request->get('bill_notes', '');
+        }
+
         $bill->save();
 
         return $this->messageResponse("Bill successfully updated");
@@ -558,7 +572,7 @@ class BillController extends ApiController
      * @api {delete} /api/v1/bills/:id Delete a Bill
      * @apiName Delete_Bill
      * @apiDescription Delete a specific bill and all dependent data
-     * @apiGroup Bill
+     * @apiGroup Bills
      * @apiVersion  1.0.0
      *
      * @apiParam  {Number} id Id of the bill

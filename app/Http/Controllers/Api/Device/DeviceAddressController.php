@@ -11,7 +11,7 @@ class DeviceAddressController extends ApiController
     /**
      * @api {get} /api/v1/devices/:id/addresses Get all addresses for a device
      * @apiName Get_Device_Addresses
-     * @apiGroup Device
+     * @apiGroup Devices
      * @apiVersion  1.0.0
      *
      * @apiParam {Number} id Id of the Device

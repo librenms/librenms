@@ -13,7 +13,7 @@ class BillHistoryController extends ApiController
      * @apiName Get_Bill_History
      * @apiGroup Bill History
      * @apiVersion  1.0.0
-     * 
+     *
      * @apiParam  {Number} id Id of the bill
      *
      * @apiSuccessExample Success-Response:
@@ -67,4 +67,3 @@ class BillHistoryController extends ApiController
         return $this->paginateResponse($bill->history());
     }
 }
-

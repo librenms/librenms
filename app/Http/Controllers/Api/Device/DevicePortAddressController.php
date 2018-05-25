@@ -21,7 +21,7 @@ class DevicePortAddressController extends ApiController
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
      *     {
-     *          "data": 
+     *          "data":
      *          {
      *              "ipv4": [
      *                  {

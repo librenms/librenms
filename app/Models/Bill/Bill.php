@@ -35,13 +35,13 @@ class Bill extends BaseModel
     protected $hidden = ['pivot'];
 
     protected $fillable = [
-        'bill_name', 
-        'bill_type', 
-        'bill_day', 
-        'bill_cdr', 
-        'bill_quota', 
-        'bill_notes', 
-        'bill_custid', 
+        'bill_name',
+        'bill_type',
+        'bill_day',
+        'bill_cdr',
+        'bill_quota',
+        'bill_notes',
+        'bill_custid',
         'bill_ref',
         'rate_95th_in',
         'rate_95th_out',
@@ -63,7 +63,7 @@ class Bill extends BaseModel
     {
         parent::boot();
 
-        static::deleting(function($bill) {
+        static::deleting(function ($bill) {
             $bill->ports()->detach();
             $bill->history()->delete();
         });

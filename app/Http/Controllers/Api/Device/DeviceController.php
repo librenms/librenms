@@ -12,7 +12,7 @@ class DeviceController extends ApiController
     /**
      * @api {get} /api/v1/devices Get All Devices
      * @apiName Get_Devices
-     * @apiGroup Device
+     * @apiGroup Devices
      * @apiVersion  1.0.0
      *
      * @apiSuccessExample Success-Response:
@@ -89,7 +89,7 @@ class DeviceController extends ApiController
     /**
      * @api {get} /api/v1/devices/:id Get individual Device
      * @apiName Get_Device
-     * @apiGroup Device
+     * @apiGroup Devices
      * @apiVersion  1.0.0
      *
      * @apiParam {Number} id ID or Hostname of the Device
@@ -162,9 +162,9 @@ class DeviceController extends ApiController
     }
 
     /**
-     * @api {post} /devices Create a new Device
+     * @api {post} /api/v1/devices Create a new Device
      * @apiName Create_Device
-     * @apiGroup Device
+     * @apiGroup Devices
      * @apiVersion  1.0.0
      *
      * @apiParam {String} hostname The hostname of the new device
@@ -237,6 +237,17 @@ class DeviceController extends ApiController
      *             "port_association_mode": "1"
      *         }
      *     }
+     *
+     * @apiErrorExample {json} Error-Response:
+     *      HTTP/1.1 422 Unproccesssable Entity
+     *      {
+     *          "hostname": [
+     *              "The hostname field is requireds."
+     *          ],
+     *          "port": [
+     *              "The port field is required."
+     *          ]
+     *      }
      */
     public function store(Request $request)
     {
@@ -254,9 +265,9 @@ class DeviceController extends ApiController
         ]);
         $snmpver = 'v2c';
         $hostname     = $request->hostname;
-        $port         = (isset($request->port) ? $request->port : Config::get('snmp.port'));
-        $transport    = (isset($request->transport) ? $request->transport : 'udp');
-        $poller_group = (isset($request->poller_group) ? $request->poller_group : 0);
+        $port         = $request->get('port', Config::get('snmp.port', 161));
+        $transport    = $request->get('transport', 'udp');
+        $poller_group = $request->get('poller_group', 0);
         $force_add    = ($request->force_add ? true : false);
         $snmp_disable = ($request->snmp_disable);
         if ($snmp_disable) {
@@ -310,9 +321,9 @@ class DeviceController extends ApiController
     }
 
     /**
-     * @api {delete} /devices/:id Delete device
+     * @api {delete} /api/v1/devices/:id Delete device
      * @apiName Delete_Device
-     * @apiGroup Device
+     * @apiGroup Devices
      * @apiVersion  1.0.0
      *
      * @apiParam {Number} id ID or Hostname of the Device
