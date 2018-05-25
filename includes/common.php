@@ -1859,25 +1859,3 @@ function array_pairs($array)
 
     return $pairs;
 }
-
-/**
- * Search in a multi dimensional array for $needle
- *
- * @param $needle
- * @param $haystack
- * @return bool
- */
-function in_multi_array($needle, $haystack)
-{
-    while (current($haystack) !== false) {
-        if (current($haystack) == $needle) {
-            return true;
-        } elseif (is_array(current($haystack))) {
-            if (in_multi_array($needle, current($haystack))) {
-                return true;
-            }
-        }
-        next($haystack);
-    }
-    return false;
-}

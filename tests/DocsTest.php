@@ -35,8 +35,11 @@ class DocTest extends TestCase
         $dir    = __DIR__ . '/../doc/';
         $files  = rtrim(`find $dir -name '*.md'`);
         $files = explode(PHP_EOL, str_replace($dir, '', $files));
+
+        // just pages
+        $pages = collect($mkdocs['pages'])->flatten();
         foreach ($files as $page) {
-            $this->assertTrue(in_multi_array($page, $mkdocs), "The doc $page doesn't exist in mkdocs.yml, please add it to the relevant section");
+            $this->assertTrue($pages->contains($page), "The doc $page doesn't exist in mkdocs.yml, please add it to the relevant section");
         }
     }
 }
