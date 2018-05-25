@@ -78,7 +78,7 @@ class DeviceServiceController extends ApiController
      * @apiParam {String} type Service type (Ex: http.c, ntp.c, ...)
      * @apiParam {String} ip Ip of the service
      * @apiParam {String} [desc] Optional  Descrtion to use for the service
-     * @apiParam {String} [param] Optional Parameters for the service 
+     * @apiParam {String} [param] Optional Parameters for the service
      * @apiParam {Boolean} [ignore] Optional Ignore the service for checks
 
      * @apiSuccessExample Success-Response:
@@ -115,19 +115,21 @@ class DeviceServiceController extends ApiController
      */
     public function store(Request $request, Device $device)
     {
-        $this->validate($request, [
-            'type'  => [
-                'required',
-                \Illuminate\Validation\Rule::in(list_available_services())
+        $this->validate(
+            $request, [
+                'type'  => [
+                    'required',
+                    \Illuminate\Validation\Rule::in(list_available_services())
+                ],
+                'ip'    => 'required|ip',
+                'ignore' => [
+                    \Illuminate\Validation\Rule::in([0, 1, true, false, "true", "false", "1", "0"]),
+                ]
             ],
-            'ip'    => 'required|ip',
-            'ignore' => [
-                \Illuminate\Validation\Rule::in([0, 1, true, false, "true", "false", "1", "0"]),
+            [
+                'ignore.*'    => "The ignore field must be a boolean"
             ]
-        ],
-        [
-            'ignore.*'    => "The ignore field must be a boolean"
-        ]);
+        );
         
         $service = $device->services()->create([
             'service_type'      => $request->type,

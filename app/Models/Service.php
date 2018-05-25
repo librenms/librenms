@@ -29,7 +29,7 @@ class Service extends BaseModel
 
     public function scopeState($query, $string)
     {
-        switch($string) {
+        switch ($string) {
             case 'ok':
                 return $query->where('service_status', 0);
             case 'warning':

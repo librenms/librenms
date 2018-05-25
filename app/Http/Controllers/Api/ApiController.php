@@ -60,7 +60,7 @@ class ApiController extends Controller
     /**
      * Get Boolean input and use corresponding value
      * @param string Name of input to retrieve
-     * 
+     *
      * @return boolean
      */
     protected function booleanInput($value)

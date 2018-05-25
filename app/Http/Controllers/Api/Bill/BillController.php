@@ -169,7 +169,7 @@ class BillController extends ApiController
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
      *     {
-     *          "data": 
+     *          "data":
      *          {
      *              "bill_id": 1,
      *              "bill_name": "test",
