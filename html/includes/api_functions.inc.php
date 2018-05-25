@@ -1264,6 +1264,14 @@ function list_oxidized()
             }
         }
 
+        // We remap certain device OS' that have different names with Oxidized models
+        $models = [
+            'arista_eos' => 'eos',
+            'vyos'       => 'vyatta',
+        ];
+
+        $device['os'] = str_replace(array_keys($models), array_values($models), $device['os']);
+
         unset($device['location']);
         unset($device['sysname']);
         $devices[] = $device;
