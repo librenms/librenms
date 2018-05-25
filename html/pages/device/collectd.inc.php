@@ -16,8 +16,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02150-1301, USA.
  */
 
-error_reporting((E_ALL | E_NOTICE | E_WARNING));
-
 require 'includes/collectd/config.php';
 require 'includes/collectd/functions.php';
 require 'includes/collectd/definitions.php';
