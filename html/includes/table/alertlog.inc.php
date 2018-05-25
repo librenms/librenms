@@ -88,7 +88,7 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
         'id' => $rulei++,
         'time_logged' => $alertlog['humandate'],
         'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . ($rulei) . '" data-parent="#alerts"></a>',
-        'hostname' => '<div class="incident">' . generate_device_link($dev, shorthost($dev['hostname'])) . '<div id="incident' . ($rulei) . '" class="collapse">' . $fault_detail . '</div></div>',
+        'hostname' => '<div class="incident">' . generate_device_link($dev, $dev['hostname']) . '<div id="incident' . ($rulei) . '" class="collapse">' . $fault_detail . '</div></div>',
         'alert' => htmlspecialchars($alertlog['alert']),
         'status' => "<i class='alert-status " . $status . "'></i>"
     );

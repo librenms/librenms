@@ -150,7 +150,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         $severity .= ' <strong>-</strong>';
     }
 
-    $hostname = '<div class="incident">' . generate_device_link($alert, shorthost($alert['hostname'])) . '<div id="incident' . ($rulei + 1) . '" class="collapse">' . $fault_detail . '</div></div>';
+    $hostname = '<div class="incident">' . generate_device_link($alert, $alert['hostname']) . '<div id="incident' . ($rulei + 1) . '" class="collapse">' . $fault_detail . '</div></div>';
 
     switch ($severity) {
         case 'critical':
