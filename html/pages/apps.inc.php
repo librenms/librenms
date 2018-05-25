@@ -241,6 +241,7 @@ $graphs['pi-hole'] = array(
     'query_results',
     'block_percent',
     'blocklist',
+    'clients',
 );
 $graphs['freeradius'] = array(
     'access',

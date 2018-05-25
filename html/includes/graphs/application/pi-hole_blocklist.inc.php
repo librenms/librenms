@@ -12,7 +12,7 @@ $dostack       = 0;
 $printtotal    = 0;
 $addarea       = 1;
 $transparency  = 33;
-$rrd_filename = rrd_name($device['hostname'], array('app', $app['app_type'], $app['app_id']));
+$rrd_filename = rrd_name($device['hostname'], array('app', $app['app_type'].'-stats', $app['app_id']));
 
 $array = array(
     'domains_blocked' => array('descr' => 'Blocked domains','colour' => '000000',),

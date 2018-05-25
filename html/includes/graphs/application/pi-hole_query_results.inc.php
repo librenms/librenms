@@ -12,11 +12,11 @@ $dostack       = 0;
 $printtotal    = 0;
 $addarea       = 1;
 $transparency  = 33;
-$rrd_filename = rrd_name($device['hostname'], array('app', $app['app_type'], $app['app_id']));
+$rrd_filename = rrd_name($device['hostname'], array('app', $app['app_type'].'-stats', $app['app_id']));
 
 $array = array(
-    'dns_query' => array('descr' => 'Today DNS Queries','colour' => '657C5E',),
-    'ads_blocked' => array('descr' => 'ADs blocked','colour' => 'F44842',),
+    'dns_query' => array('descr' => 'Queries today','colour' => '657C5E',),
+    'ads_blocked' => array('descr' => 'Ads blocked today','colour' => 'F44842',),
 );
 
 $i = 0;

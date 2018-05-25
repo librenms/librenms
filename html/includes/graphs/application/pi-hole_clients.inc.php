@@ -3,7 +3,6 @@
 require 'includes/graphs/common.inc.php';
 
 $scale_min     = 0;
-$scale_max     = 100;
 $colours       = 'mixed';
 $unit_text     = 'Stats';
 $unitlen       = 6;
@@ -13,10 +12,11 @@ $dostack       = 0;
 $printtotal    = 0;
 $addarea       = 1;
 $transparency  = 33;
-$rrd_filename = rrd_name($device['hostname'], array('app', $app['app_type'].'-stats', $app['app_id']));
+$rrd_filename = rrd_name($device['hostname'], array('app', $app['app_type'].'-clients', $app['app_id']));
 
 $array = array(
-    'ads_percentage' => array('descr' => '% queries block','colour' => '912925',),
+    'clients_ever_seen' => array('descr' => 'All clients','colour' => '657C5E',),
+    'unique_clients' => array('descr' => 'Unique clients ','colour' => 'F44842',),
 );
 
 $i = 0;

@@ -20,7 +20,8 @@ $graphs = array(
     'pi-hole_destinations' => 'Destinations',
     'pi-hole_query_results' => 'Query Results',
     'pi-hole_block_percent' => 'Block Percentage',
-    'pi-hole_blocklist' => 'Blocklist Domains'
+    'pi-hole_blocklist' => 'Blocklist Domains',
+    'pi-hole_clients' => 'Client Counts'
 );
 
 foreach ($graphs as $key => $text) {

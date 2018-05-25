@@ -24,7 +24,7 @@ require 'includes/graphs/common.inc.php';
 
 $scale_min     = 0;
 $colours       = 'mixed';
-$unit_text     = 'Queries';
+$unit_text     = '%';
 $unitlen       = 6;
 $bigdescrlen   = 25;
 $smalldescrlen = 25;
@@ -32,13 +32,13 @@ $dostack       = 0;
 $printtotal    = 0;
 $addarea       = 1;
 $transparency  = 33;
-$rrd_filename = rrd_name($device['hostname'], array('app', $app['app_type'], $app['app_id']));
+$rrd_filename = rrd_name($device['hostname'], array('app', $app['app_type'].'-query_types', $app['app_id']));
 
 $array = array(
-    'query_a' => array('descr' => 'A Type','colour' => '000000',),
-    'query_aaaa' => array('descr' => 'AAAA Type','colour' => '657C5E',),
-    'query_ptr' => array('descr' => 'PTR Type','colour' => 'F44842',),
-    'query_srv' => array('descr' => 'SRV Type','colour' => '912925',),
+    'query_a' => array('descr' => 'A queries','colour' => '000000',),
+    'query_aaaa' => array('descr' => 'AAAA queries','colour' => '657C5E',),
+    'query_ptr' => array('descr' => 'PTR queries','colour' => 'F44842',),
+    'query_srv' => array('descr' => 'SRV queries','colour' => '912925',),
 );
 
 $i = 0;
