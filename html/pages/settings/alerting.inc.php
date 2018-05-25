@@ -531,11 +531,7 @@ if (empty($config_groups['alert.transports.pagerduty']['config_value']) === fals
                         <div class="col-sm-8">
                             <button class="btn btn-success btn-xs" type="button" name="new_config" id="new_config_item" data-toggle="modal" data-target="#new-config-slack">Add Slack URL</button>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-// Begin Slack Section
+                    </div>';
                     $slack_urls = get_config_like_name('alert.transports.slack.%.url');
 foreach ($slack_urls as $slack_url) {
     unset($upd_slack_extra);
@@ -595,13 +591,7 @@ foreach ($slack_urls as $slack_url) {
                 </div>
             </div>
         </div>
-// End Slack Section
-
-// Begin Discord Section
-      <div class="panel panel-default">
-            <div class="panel-heading">
-                <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#discord_transport_expand"><i class="fa fa-caret-down"></i> Discord transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="discord" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                  <a data-toggle="collapse" data-parent="#accordion" href="#discord_transport_expand"><i class="fa fa-caret-down"></i> Discord transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="discord" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="discord_transport_expand" class="panel-collapse collapse">
@@ -670,23 +660,7 @@ foreach ($discord_urls as $discord_url) {
                 </div>
             </div>
         </div>
-// End Discord Section
-
         <div class="panel panel-default">
-            <div class="panel-heading">
-                <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#rocket_transport_expand"><i class="fa fa-caret-down"></i> Rocket.chat transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="rocket" class="btn btn-primary btn-xs pull-right">Test transport</button>
-                </h4>
-            </div>
-            <div id="rocket_transport_expand" class="panel-collapse collapse">
-                <div class="panel-body">
-                    <div class="form-group">
-                        <div class="col-sm-8">
-                            <button class="btn btn-success btn-xs" type="button" name="new_config" id="new_config_item" data-toggle="modal" data-target="#new-config-rocket">Add rocket URL</button>
-                        </div>
-                    </div>';
-
-       <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
                     <a data-toggle="collapse" data-parent="#accordion" href="#rocket_transport_expand"><i class="fa fa-caret-down"></i> Rocket.chat transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="rocket" class="btn btn-primary btn-xs pull-right">Test transport</button>
@@ -1843,7 +1817,7 @@ echo '
         });
     });// End Add Slack config
 
-   // Add Discord config
+    // Add Discord config
     discordIndex = 0;
     $("button#submit-discord").click(function(){
         var config_value = $('#discord_value').val();
@@ -2302,3 +2276,4 @@ echo '
         });
     });
 </script>
+
