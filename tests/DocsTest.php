@@ -33,13 +33,13 @@ class DocTest extends TestCase
     {
         $mkdocs = Yaml::parse(file_get_contents(__DIR__ . '/../mkdocs.yml'));
         $dir    = __DIR__ . '/../doc/';
-        $files  = rtrim(`find $dir -name '*.md'`);
-        $files = explode(PHP_EOL, str_replace($dir, '', $files));
+        $files  = str_replace($dir, '', rtrim(`find $dir -name '*.md'`));
 
-        // just pages
-        $pages = collect($mkdocs['pages'])->flatten();
-        foreach ($files as $page) {
-            $this->assertTrue($pages->contains($page), "The doc $page doesn't exist in mkdocs.yml, please add it to the relevant section");
-        }
+        // check for missing pages
+        collect(explode(PHP_EOL, $files))
+            ->diff(collect($mkdocs['pages'])->flatten()) // grab defined pages and diff
+            ->each(function ($missing_doc) {
+                $this->fail("The doc $missing_doc doesn't exist in mkdocs.yml, please add it to the relevant section");
+            });
     }
 }
