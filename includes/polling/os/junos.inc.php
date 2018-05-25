@@ -2,7 +2,7 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-$oid_list = 'jnxJsSPUMonitoringCurrentFlowSession.0 jnxJsSPUMonitoringCPUUsage.0 jnxJsSPUMonitoringMemoryUsage.0';
+$oid_list = 'jnxJsSPUMonitoringCurrentFlowSession.0';
 $junos = snmp_get_multi($device, $oid_list, '-OUQs', 'JUNIPER-SRX5000-SPU-MONITORING-MIB');
 
 if (is_numeric($junos[0]['jnxJsSPUMonitoringCurrentFlowSession'])) {
@@ -17,34 +17,6 @@ if (is_numeric($junos[0]['jnxJsSPUMonitoringCurrentFlowSession'])) {
 
     $graphs['junos_jsrx_spu_sessions'] = true;
     echo ' Flow Sessions';
-}
-
-if (is_numeric($junos[0]['jnxJsSPUMonitoringCPUUsage'])) {
-    $tags = array(
-        'rrd_def' => RrdDefinition::make()->addDataset('spu_cpu', 'GAUGE', 0),
-    );
-    $fields = array(
-        'spu_cpu' => $junos[0]['jnxJsSPUMonitoringCPUUsage'],
-    );
-
-    data_update($device, 'junos_jsrx_spu_cpu', $tags, $fields);
-
-    $graphs['junos_jsrx_spu_cpu'] = true;
-    echo ' SPU CPU%';
-}
-
-if (is_numeric($junos[0]['jnxJsSPUMonitoringMemoryUsage'])) {
-    $tags = array(
-        'rrd_def' => RrdDefinition::make()->addDataset('spu_mem', 'GAUGE', 0),
-    );
-    $fields = array(
-        'spu_mem' => $junos[0]['jnxJsSPUMonitoringMemoryUsage'],
-    );
-
-    data_update($device, 'junos_jsrx_spu_mem', $tags, $fields);
-
-    $graphs['junos_jsrx_spu_mem'] = true;
-    echo ' SPU MEM%';
 }
 
 $version = snmp_get($device, 'jnxVirtualChassisMemberSWVersion.0', '-Oqv', 'JUNIPER-VIRTUALCHASSIS-MIB');
