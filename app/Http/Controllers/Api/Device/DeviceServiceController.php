@@ -19,10 +19,10 @@ class DeviceServiceController extends ApiController
      * @apiParam {String} [type] Optional Service type used sql LIKE to find services, so for tcp, use type=tcp for http use type=http
      *
      * @apiExample {curl} Example usage wihout parameters:
-     *     curl -i http://example.org/api/v1/devices/1/services
+     *     curl -H 'X-Auth-Token: YOURAPITOKENHERE' -i http://example.org/api/v1/devices/1/services
      *
      * @apiExample {curl} Example usage with parameters:
-     *     curl -i http://example.org/api/v1/devices/1/services?state=ok&type=http
+     *     curl -H 'X-Auth-Token: YOURAPITOKENHERE' -i http://example.org/api/v1/devices/1/services?state=ok&type=http
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK

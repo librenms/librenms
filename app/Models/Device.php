@@ -285,4 +285,9 @@ class Device extends BaseModel
     {
         return $this->hasManyThrough('App\Models\IP\IPv6Address', 'App\Models\Port', 'device_id', 'port_id');
     }
+
+    public function inventory()
+    {
+        return $this->hasMany('App\Models\Inventory', 'device_id', 'device_id');
+    }
 }
