@@ -7,7 +7,7 @@ chdir($install_dir);
 
 require $install_dir . '/vendor/autoload.php';
 
-$short_opts = 'lsufpcho:m:';
+$short_opts = 'lsufqcho:m:';
 $long_opts = array(
     'lint',
     'style',
@@ -15,7 +15,7 @@ $long_opts = array(
     'os:',
     'module:',
     'fail-fast',
-    'passthru',
+    'quiet',
     'snmpsim',
     'db',
     'commands',
