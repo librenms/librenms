@@ -75,7 +75,7 @@ if ($config['title_image']) {
           </li>
           <li class="dropdown-submenu">
             <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> Plugins</a>
-            <ul class="dropdown-menu scrollable-menu">
+            <ul class="dropdown-menu">
                 <?php
                 \LibreNMS\Plugins::call('menu');
 
