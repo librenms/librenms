@@ -1,0 +1,726 @@
+-- *****************************************************************
+-- CISCO-VRF-MIB.my
+--   
+-- July 2009, Ganesan Rajam
+--   
+-- Copyright (c) 2009 by cisco Systems Inc.
+-- All rights reserved.
+-- *****************************************************************
+--   
+
+CISCO-VRF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    StorageType,
+    RowStatus,
+    TruthValue,
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    ifIndex,
+    InterfaceIndex,
+    ifName
+        FROM IF-MIB
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoVrfMIB MODULE-IDENTITY
+    LAST-UPDATED    "200912100000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+            Postal: 170 W Tasman Drive
+            San Jose, CA  95134
+            USA
+            Tel: +1 800 553-NETS
+            E-mail: cs-snmp@cisco.com"
+    DESCRIPTION
+        "The MIB module for provisioning and managing network
+        virtualization features. 
+
+        This module provides manageability for VRF, VRF-Lite and 
+        vNET. VRF stands for Virtual Routing and Forwarding. VRF 
+        is an extension of IP routing that provides multiple routing
+        instances. VRF provides independent routing instances and
+        hence the same or over-lapping addresses can be used without
+        conflicting each other. VRFs are used in conjunction with 
+        MPLS VPN to provide traffic separation between multiple VPN
+        customers. 
+
+        A VRF-Lite enabled device implements VRFs and does not require
+        MPLS for end to end communication. Instead of using MPLS
+        labels, VRF-Lite uses the interfaces to distinguish routes for
+        different VPNs. VRF-Lite forms virtual packet-forwarding tables
+        by associating one or more interfaces with each VRF, and
+        interfaces cannot belong to more than one VRF at any time.
+
+        VRF-Lite is an IP based hop-by-hop virtualization mechanism and
+        it involves complex configuration of every hop in the network.
+        vNET, virtual network, is also an IP based hop-by-hop mechanism
+        that can provide end-to-end virtualization of the network. vNET
+        greatly reduces the complexity in VRF-Lite deployment.
+
+        This MIB module will allow the user to perform the following
+
+          * Create and monitor VRFs
+          * Group VRFs to create VRF List
+          * Associate/Dis-associate interface to/from a VRF
+          * Enable vNET trunking on an interface
+          * Specify VRF list per trunk"
+    REVISION        "200912100000Z"
+    DESCRIPTION
+        "Latest version of this MIB module."
+    ::= { ciscoMgmt 711 }
+
+
+
+-- User Defined Types used in this MIB
+
+CvVrfIfType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The type value denotes the manner in which the interface is
+        used.
+
+        vNETTrunkSI(1) : The sub-interface is created under a vNET
+                         trunk interface to carry vNET tagged traffic
+                         belonging to a VRF.
+        vNETEdge(2)    : The interface is assigned to a VRF which is 
+                         tagged with a vNET tag.
+        vrfEdge(3)     : The interface is assigned to an untagged VRF."
+    SYNTAX          INTEGER  {
+                        vNETTrunkSI(1),
+                        vNETEdge(2),
+                        vrfEdge(3)
+                    }
+
+CvVnetTagOrZero ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The tag value assigned to a vNET. The tag value is global,
+        meaning on each router, the same vNET must be assigned the
+        same numerical tag value. This is assigned by the system
+        operator or NMS or through a network tag distribution
+        mechanism.
+
+        The valid tag value is ranged from 2 to 4094. Traffic that 
+        carries a vNET tag is called tagged traffic. On the other 
+        hand, traffic that does not carry a vNET tag is called 
+        untagged traffic. A vNET is defined as a VRF with a tag 
+        assigned. A valid tag value assigned to a VRF indicates 
+        it is a vNET. 
+
+        Zero(0) is a special value and its meaning should be 
+        interpreted in conjunction with the object definition
+        using this type."
+    SYNTAX          Unsigned32 (0 | 2..4094)
+-- Top Level Object hierarchy
+
+ciscoVrfMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoVrfMIB 1 }
+
+ciscoVrfMIBNotifs  OBJECT IDENTIFIER
+    ::= { ciscoVrfMIB 0 }
+
+ciscoVrfMIBConform  OBJECT IDENTIFIER
+    ::= { ciscoVrfMIB 2 }
+
+cvVrf  OBJECT IDENTIFIER
+    ::= { ciscoVrfMIBObjects 1 }
+
+cvInterface  OBJECT IDENTIFIER
+    ::= { ciscoVrfMIBObjects 2 }
+
+cvNotifCntl  OBJECT IDENTIFIER
+    ::= { ciscoVrfMIBObjects 3 }
+
+-- Object definitions
+
+cvVrfTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CvVrfEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains entries representing a VRF - Virtual
+        Routing and Forwarding instance. There will be an entry for
+        each VRF instance created in the system."
+    ::= { cvVrf 1 }
+
+cvVrfEntry OBJECT-TYPE
+    SYNTAX          CvVrfEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry representing the information pertaining to a virtual
+        routing and forwarding instance."
+    INDEX           { cvVrfIndex } 
+    ::= { cvVrfTable 1 }
+
+CvVrfEntry ::= SEQUENCE {
+        cvVrfIndex         Unsigned32,
+        cvVrfName          SnmpAdminString,
+        cvVrfVnetTag       CvVnetTagOrZero,
+        cvVrfOperStatus    INTEGER,
+        cvVrfRouteDistProt BITS,
+        cvVrfStorageType   StorageType,
+        cvVrfRowStatus     RowStatus
+}
+
+cvVrfIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..65535)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An identifier that is assigned to each VRF and is used to
+        uniquely identify it. The uniqueness of this identifier is
+        restricted only to this device." 
+    ::= { cvVrfEntry 1 }
+
+cvVrfName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (1..64))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The human-readable name of the VRF instance. This name
+        uniquely identifies the VRF instance in the system.
+
+        This object is mandatory for creating an entry in this table." 
+    ::= { cvVrfEntry 2 }
+
+cvVrfVnetTag OBJECT-TYPE
+    SYNTAX          CvVnetTagOrZero (0 | 2..4094)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The vNET tag assigned to this VRF instance.
+
+        A value of zero(0) indicates the VRF instance is not a vNET and
+        such vrf could be part of a VRF-Lite or MPLS deployment.
+
+        A set with a value of zero(0) will remove the vNET tag assigned
+        to this VRF.
+
+        The value of this object can be changed even when
+        cvVrfRowStatus is having a value of active(1)."
+    DEFVAL          { 0 } 
+    ::= { cvVrfEntry 3 }
+
+cvVrfOperStatus OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        up(1),
+                        down(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Denotes whether a VRF is operational or not. A VRF is
+        up(1) when at least one interface associated with the
+        VRF, which ifOperStatus is up(1). A VRF is down(2) when:
+
+        a. There does not exist at least one interface whose
+           ifOperStatus is up(1).
+
+        b. There are no interfaces associated with the VRF." 
+    ::= { cvVrfEntry 4 }
+
+cvVrfRouteDistProt OBJECT-TYPE
+    SYNTAX          BITS {
+                        none(0),
+                        other(1),
+                        ospf(2),
+                        rip(3),
+                        isis(4),
+                        eigrp(5),
+                        bgp(6)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Denotes the route distribution protocol enabled in this
+        VRF. Note that more than one routing protocol may be
+        enabled at the same time." 
+    ::= { cvVrfEntry 5 }
+
+cvVrfStorageType OBJECT-TYPE
+    SYNTAX          StorageType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The storage type for this entry." 
+    ::= { cvVrfEntry 6 }
+
+cvVrfRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object is used to create, modify, and/or delete a row in
+        this table." 
+    ::= { cvVrfEntry 7 }
+ 
+
+
+cvVrfListTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CvVrfListEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the entries representing the VRFs in a VRF
+        List."
+    ::= { cvVrf 2 }
+
+cvVrfListEntry OBJECT-TYPE
+    SYNTAX          CvVrfListEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in this table represents a VRF in a VRF list. A VRF
+        list is a collection of VRFs grouped together. The list defined
+
+        here can be associated to a vNET trunk interface, which would
+        then act as a trunk carrying traffic for all VRFs in the VRF
+        list.
+
+        An example of a VRF List -
+        list1.1 = Vrf_Finance
+        list1.2 = Vrf_HR"
+    INDEX           {
+                        cvVrfListName,
+                        cvVrfListVindex
+                    } 
+    ::= { cvVrfListTable 1 }
+
+CvVrfListEntry ::= SEQUENCE {
+        cvVrfListName        SnmpAdminString,
+        cvVrfListVindex      Unsigned32,
+        cvVrfListVrfIndex    Unsigned32,
+        cvVrfListStorageType StorageType,
+        cvVrfListRowStatus   RowStatus
+}
+
+cvVrfListName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (1..64))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The human-readable name of the VRF List. This name uniquely
+        identifies the VRF List in the system." 
+    ::= { cvVrfListEntry 1 }
+
+cvVrfListVindex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..32)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This index uniquely identifies a VRF within the VRF list." 
+    ::= { cvVrfListEntry 2 }
+
+cvVrfListVrfIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..65535)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the associated VRF in the cvVrfTable.
+        The value of this object is index value (cvVrfIndex)
+        of cvVrfTable.
+
+        The value of this object cannot be modified when the entry is
+        in active(1) state." 
+    ::= { cvVrfListEntry 3 }
+
+cvVrfListStorageType OBJECT-TYPE
+    SYNTAX          StorageType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The storage type for this entry." 
+    ::= { cvVrfListEntry 4 }
+
+cvVrfListRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object is used to create, modify, and/or delete a row in
+        this table." 
+    ::= { cvVrfListEntry 5 }
+ 
+
+
+cvVrfInterfaceTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CvVrfInterfaceEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the entries representing the interfaces
+        associated with a VRF instance."
+    ::= { cvInterface 1 }
+
+cvVrfInterfaceEntry OBJECT-TYPE
+    SYNTAX          CvVrfInterfaceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in this table represents an interface to which a VRF
+        is associated. A VRF can be associated to multiple interfaces.
+        There will be one entry per interface for each VRF instance in
+        this table."
+    INDEX           {
+                        cvVrfIndex,
+                        cvVrfInterfaceIndex
+                    } 
+    ::= { cvVrfInterfaceTable 1 }
+
+CvVrfInterfaceEntry ::= SEQUENCE {
+        cvVrfInterfaceIndex           InterfaceIndex,
+        cvVrfInterfaceType            CvVrfIfType,
+        cvVrfInterfaceVnetTagOverride CvVnetTagOrZero,
+        cvVrfInterfaceStorageType     StorageType,
+        cvVrfInterfaceRowStatus       RowStatus
+}
+
+cvVrfInterfaceIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex (1..2147483647)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This is a unique index for an entry in this table. A non-zero
+        index for an entry indicates the ifIndex for the corresponding
+        interface entry in the ifTable. Note that this table does not 
+        necessarily correspond one-to-one with all entries in the
+        Interface MIB." 
+    ::= { cvVrfInterfaceEntry 1 }
+
+cvVrfInterfaceType OBJECT-TYPE
+    SYNTAX          CvVrfIfType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The VRF type of this interface. The type of the interface is
+        determined based on the VRF associated with this interface.
+        If the VRF is not tagged with vnet tag then the type will be
+        vrfEdge. If the VRF is tagged with vnet tag then it will become
+        vnetEdge. For vNETTrunkSI, the sub-interface in question is
+        automatically created for a VRF when trunking is enabled on the
+        main interface." 
+    ::= { cvVrfInterfaceEntry 2 }
+
+cvVrfInterfaceVnetTagOverride OBJECT-TYPE
+    SYNTAX          CvVnetTagOrZero (0 | 2..4094)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object can be used to over-ride the vNET tag assigned
+        to the VRF traffic going through this interface. This object is
+        applicable only if the cvVrfInterfaceType of this interface
+        has a value of vNETTrunkSI(1).
+
+        By default the tagged traffic will use the value denoted by 
+        cvVrfVnetTag of this VRF. In which case this object will
+        have a value of zero(0).
+
+        A set with a value of zero(0) will revert the tag assignment
+        behaviour to default behaviour mentioned above."
+    DEFVAL          { 0 } 
+    ::= { cvVrfInterfaceEntry 3 }
+
+cvVrfInterfaceStorageType OBJECT-TYPE
+    SYNTAX          StorageType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The storage type for this entry." 
+    ::= { cvVrfInterfaceEntry 4 }
+
+cvVrfInterfaceRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object is used to create, modify, and/or delete a row in
+        this table.
+
+        When a row is created in this table the VRF is associated to an
+        interface. When a row is deleted from this table the VRF is
+        dis-associated from the interface." 
+    ::= { cvVrfInterfaceEntry 5 }
+ 
+
+
+cvInterfaceTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CvInterfaceEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains entries representing the interfaces on
+        which the vNET trunking can be enabled."
+    ::= { cvInterface 2 }
+
+cvInterfaceEntry OBJECT-TYPE
+    SYNTAX          CvInterfaceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in this table represents an interface on which the
+        vNET trunking can be enabled. When an interface is enabled for 
+        vNET trunking, it will carry the traffic for the VRFs which are
+        tagged with the vNET tag."
+    INDEX           { ifIndex } 
+    ::= { cvInterfaceTable 1 }
+
+CvInterfaceEntry ::= SEQUENCE {
+        cvInterfaceVnetTrunkEnabled TruthValue,
+        cvInterfaceVnetVrfList      SnmpAdminString
+}
+
+cvInterfaceVnetTrunkEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object represents the vNET trunking status for this
+        interface. When enabled for vNET trunking the interface will
+        carry traffic of all vNETs in the device."
+    DEFVAL          { false } 
+    ::= { cvInterfaceEntry 1 }
+
+cvInterfaceVnetVrfList OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0 | 1..32))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The name of the VRF List associated with this interface.
+        A non-zero length string represent a list of vNET tagged VRFs,
+        whose traffic will be forwarded through this interface.
+        A zero length string denotes that the traffic for all the vNET
+        tagged VRFs will be forwarded through this interface."
+    DEFVAL          { "" } 
+    ::= { cvInterfaceEntry 2 }
+ 
+
+
+-- Notification control objects
+
+cvVrfIfNotifEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object indicates whether the device should generate
+        notifications related to VRF Interface status change."
+    DEFVAL          { false } 
+    ::= { cvNotifCntl 1 }
+
+cvVnetTrunkNotifEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object indicates whether the device should generate
+        notifications related to vNET Trunk Interface status change."
+    DEFVAL          { false } 
+    ::= { cvNotifCntl 2 }
+
+-- Notification definitions
+
+cvVrfIfUp NOTIFICATION-TYPE
+    OBJECTS         {
+                        ifName,
+                        cvVrfName,
+                        cvVrfOperStatus
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification is generated when:
+        a. The ifOperStatus of an interface associated with a VRF
+           changes to the up(1) state.
+        b. When an interface with ifOperStatus = up(1) is 
+           associated with a VRF.
+
+        The interface is identified by ifName and the VRF is
+        identified by cvVrfName varbinds respectively."
+   ::= { ciscoVrfMIBNotifs 1 }
+
+cvVrfIfDown NOTIFICATION-TYPE
+    OBJECTS         {
+                        ifName,
+                        cvVrfName,
+                        cvVrfOperStatus
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification is generated when:
+        a. The ifOperStatus of an interface associated with a VRF 
+           changes to the down(2) state.
+        b. When an interface with ifOperStatus = up(1) state is 
+           disassociated with a VRF.
+
+        The interface is identified by ifName and the VRF is
+        identified by cvVrfName varbinds respectively.
+
+        If all the interfaces associated with the VRF are in down(2) 
+        state or if there are no more interfaces associated with the
+        VRF, then the cvVrfOperStatus will have a value of down(2)."
+   ::= { ciscoVrfMIBNotifs 2 }
+
+cvVnetTrunkUp NOTIFICATION-TYPE
+    OBJECTS         { ifName }
+    STATUS          current
+    DESCRIPTION
+        "This notification is generated when the ifOperStatus of a vNET
+        trunk interface changes to the up(1) state. The interface is
+        identified by ifName varbind. The notification will be
+        generated for only those interfaces for which the
+        cvInterfaceVnetTrunkEnabled object has a value of True(1)."
+   ::= { ciscoVrfMIBNotifs 3 }
+
+cvVnetTrunkDown NOTIFICATION-TYPE
+    OBJECTS         { ifName }
+    STATUS          current
+    DESCRIPTION
+        "This notification is generated when the ifOperStatus of a vNET
+        trunk interface changes to the down(2) state. The interface is
+        identified by ifName varbind. The notification will be
+        generated for only those interfaces for which the
+        cvInterfaceVnetTrunkEnabled object has a value of True(1)."
+   ::= { ciscoVrfMIBNotifs 4 }
+-- Units of Conformance
+
+cvMIBGroups  OBJECT IDENTIFIER
+    ::= { ciscoVrfMIBConform 1 }
+
+
+cvMIBVrfGroup OBJECT-GROUP
+    OBJECTS         {
+                        cvVrfOperStatus,
+                        cvVrfStorageType,
+                        cvVrfRowStatus,
+                        cvVrfRouteDistProt,
+                        cvVrfInterfaceType,
+                        cvVrfInterfaceStorageType,
+                        cvVrfInterfaceRowStatus,
+                        cvVrfIfNotifEnable,
+                        cvVrfName
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Collection of objects needed for VRF and VRF-Lite management."
+    ::= { cvMIBGroups 1 }
+
+cvMIBVrfNotifGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    {
+                        cvVrfIfUp,
+                        cvVrfIfDown
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Collection of VRF notifications."
+    ::= { cvMIBGroups 2 }
+
+cvMIBVnetGroup OBJECT-GROUP
+    OBJECTS         {
+                        cvVrfVnetTag,
+                        cvVrfListVrfIndex,
+                        cvVrfListStorageType,
+                        cvVrfListRowStatus,
+                        cvVrfInterfaceVnetTagOverride,
+                        cvInterfaceVnetTrunkEnabled,
+                        cvInterfaceVnetVrfList,
+                        cvVnetTrunkNotifEnable
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Collection of objects needed for vNET management."
+    ::= { cvMIBGroups 3 }
+
+cvMIBVnetNotifGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    {
+                        cvVnetTrunkUp,
+                        cvVnetTrunkDown
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Collection of VRF and vNET notifications."
+    ::= { cvMIBGroups 4 }
+cvMIBCompliances  OBJECT IDENTIFIER
+    ::= { ciscoVrfMIBConform 2 }
+
+
+cvMIBCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for SNMP Agents which
+        implement this MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cvMIBVrfGroup,
+                        cvMIBVrfNotifGroup
+                    }
+
+    GROUP           cvMIBVnetGroup
+    DESCRIPTION
+        "This group is required to manage vNETs."
+
+    GROUP           cvMIBVnetNotifGroup
+    DESCRIPTION
+        "The group is required to provide VRF and vNET notifications."
+
+    OBJECT          cvVrfVnetTag
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "It is enough to provide read-only access to this object even
+        though write access is desirable."
+
+    OBJECT          cvVrfInterfaceVnetTagOverride
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "It is enough to provide read-only access to this object even
+        though write access is desirable."
+
+    OBJECT          cvVrfRowStatus
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "It is enough to provide read-only access to the table
+        containing this object even though it is desirable to use this
+        object to create a row in the table."
+
+    OBJECT          cvVrfListRowStatus
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "It is enough to provide read-only access to the table
+        containing this object even though it is desirable to use this 
+        object to create a row in the table."
+
+    OBJECT          cvVrfInterfaceRowStatus
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "It is enough to provide read-only access to the table
+        containing this object even though it is desirable to use this 
+        object to create a row in the table."
+
+    OBJECT          cvInterfaceVnetTrunkEnabled
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "It is enough to provide read-only access to this object even
+        though write access is desirable."
+
+    OBJECT          cvInterfaceVnetVrfList
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "It is enough to provide read-only access to this object even
+        though write access is desirable."
+    ::= { cvMIBCompliances 1 }
+
+END
