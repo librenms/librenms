@@ -51,7 +51,7 @@ class ModuleTestHelper
     // Definitions
     // ignore these when dumping all modules
     private $exclude_from_all = ['arp-table', 'fdb-table'];
-    private $module_deps = [
+    private static $module_deps = [
         'arp-table' => ['ports', 'arp-table'],
         'fdb-table' => ['ports', 'vlans', 'fdb-table'],
         'vlans' => ['ports', 'vlans'],
@@ -70,7 +70,7 @@ class ModuleTestHelper
     {
         global $influxdb;
 
-        $this->modules = $this->resolveModuleDependencies((array)$modules);
+        $this->modules = self::resolveModuleDependencies((array)$modules);
         $this->os = strtolower($os);
         $this->variant = strtolower($variant);
 
@@ -251,7 +251,7 @@ class ModuleTestHelper
             $os_list[$base_name] = [
                 $os,
                 $variant,
-                $valid_modules,
+                self::resolveModuleDependencies($valid_modules),
             ];
         }
 
@@ -286,7 +286,7 @@ class ModuleTestHelper
      * @return array
      * @throws InvalidModuleException
      */
-    private function resolveModuleDependencies($modules)
+    private static function resolveModuleDependencies($modules)
     {
         // generate a full list of modules
         $full_list = [];
@@ -296,8 +296,8 @@ class ModuleTestHelper
                 throw new InvalidModuleException("Invalid module name: $module");
             }
 
-            if (isset($this->module_deps[$module])) {
-                $full_list = array_merge($full_list, $this->module_deps[$module]);
+            if (isset(self::$module_deps[$module])) {
+                $full_list = array_merge($full_list, self::$module_deps[$module]);
             } else {
                 $full_list[] = $module;
             }
