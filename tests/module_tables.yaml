@@ -29,7 +29,7 @@ mempools:
         excluded_fields: [device_id, mempool_id]
 ports:
     ports:
-        excluded_fields: [device_id, port_id, poll_time, poll_period]
+        excluded_fields: [device_id, port_id, poll_time, poll_period, ifVrf]
         joins:
             - { left: ports.port_id, right: ports_statistics.port_id }
         order_by: ports.ifIndex, ports.ifDescr, ports.ifName
