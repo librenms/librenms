@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Exceptions\JsonAppParsingFailedException;
+use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'ntp-server';
@@ -8,11 +10,26 @@ $app_id = $app['app_id'];
 echo $name;
 
 try {
-    $ntp=json_app_get($device, 'ntp-server', 1);
-} catch (JsonAppPollingFailedException $e) {
-    echo $e->getMessage();
+    $ntp=json_app_get($device, $name);
+} catch (JsonAppParsingFailedException $e) {
+    // Legacy script, build compatible array
+    $legacy = $e->getOutput();
+
+    $ntp=array(
+        data => array(),
+    );
+
+    list ($ntp['data']['stratum'], $ntp['data']['offset'], $ntp['data']['frequency'], $ntp['data']['jitter'],
+          $ntp['data']['noise'], $ntp['data']['stability'], $ntp['data']['uptime'], $ntp['data']['buffer_recv'],
+          $ntp['data']['buffer_free'], $ntp['data']['buffer_used'], $ntp['data']['packets_drop'],
+          $ntp['data']['packets_ignore'], $ntp['data']['packets_recv'], $ntp['data']['packets_sent']) = explode("\n", $legacy); 
+
+} catch (JsonAppException $e) {
+    echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
+    update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message
     return;
 }
+
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
@@ -33,20 +50,20 @@ $rrd_def = RrdDefinition::make()
 
 
 $fields = array(
-    'stratum'        => $ntp['stratum'],
-    'offset'         => $ntp['offset'],
-    'frequency'      => $ntp['frequency'],
-    'jitter'         => $ntp['sys_jitter'],
-    'noise'          => $ntp['clk_jitter'],
-    'stability'      => $ntp['clk_wander'],
-    'uptime'         => $ntp['time_since_reset'],
-    'buffer_recv'    => $ntp['receive_buffers'],
-    'buffer_free'    => $ntp['free_receive_buffers'],
-    'buffer_used'    => $ntp['used_receive_buffers'],
-    'packets_drop'   => $ntp['dropped_packets'],
-    'packets_ignore' => $ntp['ignored_packets'],
-    'packets_recv'   => $ntp['received_packets'],
-    'packets_sent'   => $ntp['packets_sent'],
+    'stratum'        => $ntp['data']['stratum'],
+    'offset'         => $ntp['data']['offset'],
+    'frequency'      => $ntp['data']['frequency'],
+    'jitter'         => $ntp['data']['sys_jitter'],
+    'noise'          => $ntp['data']['clk_jitter'],
+    'stability'      => $ntp['data']['clk_wander'],
+    'uptime'         => $ntp['data']['time_since_reset'],
+    'buffer_recv'    => $ntp['data']['receive_buffers'],
+    'buffer_free'    => $ntp['data']['free_receive_buffers'],
+    'buffer_used'    => $ntp['data']['used_receive_buffers'],
+    'packets_drop'   => $ntp['data']['dropped_packets'],
+    'packets_ignore' => $ntp['data']['ignored_packets'],
+    'packets_recv'   => $ntp['data']['received_packets'],
+    'packets_sent'   => $ntp['data']['packets_sent'],
 );
 
 
