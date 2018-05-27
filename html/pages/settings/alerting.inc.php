@@ -591,6 +591,9 @@ foreach ($slack_urls as $slack_url) {
                 </div>
             </div>
         </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
                   <a data-toggle="collapse" data-parent="#accordion" href="#discord_transport_expand"><i class="fa fa-caret-down"></i> Discord transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="discord" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
