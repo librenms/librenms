@@ -4,6 +4,7 @@ source: os/Settings.md
 This page documents settings that can be set in the os yaml files or in config.php.
 All settings listed here are optional. If they are not set, the global default will be used.
 
+### User override in config.php
 Users can override these settings in their config.php.
 
 For example, to set an alternate icon for ios:
@@ -31,6 +32,18 @@ bad_iftype: # ifType (substring)
 good_if: # ignore all other bad_if settings ifDescr (substring, case insensitive)
     - virtual
 
+```
+
+### Controlling interface labels
+By default we use ifDescr to label ports/interfaces.
+Setting either `ifname` or `ifalias` will override that.  Only set one of these.  ifAlias is user supplied.
+`ifindex` will append the ifindex to the port label.
+
+```yaml
+ifname: true
+ifalias: true
+
+ifindex: true
 ```
 
 ### Disable snmpbulkwalk
