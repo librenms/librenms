@@ -77,14 +77,16 @@ foreach (array_keys($transports) as $transport) {
         echo '</div>';
         echo '</div>';
     }
+    echo '<div class="form-group">';
+    echo '<div class="col-sm-12 text-center">';
+    echo '<button type="button" class="btn btn-success btn-save" name="save-contact">';
+    echo 'Save Contact';
+    echo '</button>';
+    echo '</div>';
+    echo '</div>';
     echo '</form>';
 }
 ?>
-                    <div class="col-sm-12 text-center">
-                        <button type="button" class="btn btn-success" id="btn-save" name="save-contact">
-                        Save Contact
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -167,7 +169,7 @@ foreach (array_keys($transports) as $transport) {
         }
 
         // Save alert contact
-        $("#btn-save").on("click", function (e) {
+        $(".btn-save").on("click", function (e) {
             e.preventDefault();
 
             //Combine form data (general and contact specific)
