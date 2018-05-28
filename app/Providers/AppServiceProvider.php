@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\DatabaseConnectException;
@@ -68,6 +69,11 @@ class AppServiceProvider extends ServiceProvider
                 $this->app->register(\Barryvdh\Debugbar\ServiceProvider::class);
             }
         }
+
+        // Extended version of bool check, to allow for string True of False
+        Validator::extend('ext_bool', function ($attribute, $value, $parameters, $validator) {
+            return in_array($value, [0, 1, true, false, "true", "false", "1", "0"], true);
+        });
     }
 
     /**

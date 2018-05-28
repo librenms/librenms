@@ -87,7 +87,7 @@ return [
     'unique'               => 'The :attribute has already been taken.',
     'uploaded'             => 'The :attribute failed to upload.',
     'url'                  => 'The :attribute format is invalid.',
-
+    'ext_bool'             => 'The :attribute field must be true or false.',
     /*
     |--------------------------------------------------------------------------
     | Custom Validation Language Lines
