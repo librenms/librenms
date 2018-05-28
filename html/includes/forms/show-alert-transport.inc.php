@@ -28,7 +28,7 @@ if (is_numeric($transport_id) && $transport_id > 0) {
 
     $details = [];
     // Get alert transport configuration details
-    foreach (json_decode($transport['transport_config']) as $key => $value) {
+    foreach (json_decode($transport['transport_config'], true) as $key => $value) {
         $details[] = [
             'name' => $key,
             'value' => $value
