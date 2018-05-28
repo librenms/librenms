@@ -119,8 +119,8 @@ class DeviceComponentController extends ApiController
             $request,
             [
                 'type'      => 'required|max:255',
-                'ignore'    => 'extBool',
-                'disabled'  => 'extBool',
+                'ignore'    => 'ext_bool',
+                'disabled'  => 'ext_bool',
                 'label'     => 'max:500'
             ]
         );
@@ -180,8 +180,8 @@ class DeviceComponentController extends ApiController
             $request,
             [
                 'type'      => 'max:255',
-                'ignore'    => 'extBool',
-                'disabled'  => 'extBool',
+                'ignore'    => 'ext_bool',
+                'disabled'  => 'ext_bool',
                 'label'     => 'max:500'
             ]
         );
