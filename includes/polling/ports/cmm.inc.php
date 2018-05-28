@@ -54,4 +54,4 @@ foreach ($cmm_stats as $index => $port) {
     array_push($cmm_ports, $cmm_port);
 }
 
-$port_stats = array_merge($port_stats, $cmm_ports);
+$port_stats = array_replace_recursive($cmm_ports, $port_stats);
