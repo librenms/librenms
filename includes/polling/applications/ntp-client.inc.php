@@ -18,8 +18,8 @@ try {
     $ntp=array(
         data => array(),
     );
-    list ($ntp['data']['offset'], $ntp['data']['frequency'], $ntp['data']['jitter'],
-          $ntp['data']['noise'], $ntp['data']['stability']) = explode("\n", $legacy); 
+    list ($ntp['data']['offset'], $ntp['data']['frequency'], $ntp['data']['sys_jitter'],
+          $ntp['data']['clk_jitter'], $ntp['data']['clk_wander']) = explode("\n", $legacy); 
     
 } catch (JsonAppException $e) {
     echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
