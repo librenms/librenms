@@ -1,8 +1,8 @@
 <?php
 /**
- * contacts.inc.php
+ * transports.inc.php
  *
- * List contacts
+ * List transports
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,11 +33,11 @@ $query = '';
 $params = [];
 
 if (!empty($_REQUEST['search'])) {
-    $query .= ' WHERE `contact_name` LIKE ?';
+    $query .= ' WHERE `transport_name` LIKE ?';
     $params[] = '%' . mres($_REQUEST['search']) . '%';
 }
 
-$total = dbFetchCell("SELECT COUNT(*) FROM `alert_contacts` $query", $params);
+$total = dbFetchCell("SELECT COUNT(*) FROM `alert_transports` $query", $params);
 $more = false;
 
 if (!empty($_REQUEST['limit'])) {
@@ -50,15 +50,15 @@ if (!empty($_REQUEST['limit'])) {
     $offset = 0;
 }
 
-$sql = "SELECT `contact_id` AS `id`, `contact_name` AS `text`, `transport_type` AS `type` FROM `alert_contacts` $query";
-$contacts = dbFetchRows($sql, $params);
+$sql = "SELECT `transport_id` AS `id`, `transport_name` AS `text`, `transport_type` AS `type` FROM `alert_transports` $query";
+$transports = dbFetchRows($sql, $params);
 
-$more = ($offset + count($contacts))<$total;
-$contacts = array_map(function ($contact) {
-    $contact['text'] = ucfirst($contact['type']).": ".$contact['text'];
-    unset($contact['type']);
-    return $contact;
-}, $contacts);
+$more = ($offset + count($transports))<$total;
+$transports = array_map(function ($transport) {
+    $transport['text'] = ucfirst($transport['type']).": ".$transport['text'];
+    unset($transport['type']);
+    return $transport;
+}, $transports);
 
-$data = [['text' => 'Contacts', 'children' => $contacts]];
+$data = [['text' => 'Transports', 'children' => $transports]];
 return[$data, $more];

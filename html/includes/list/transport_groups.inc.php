@@ -1,8 +1,8 @@
 <?php
 /**
- * contact-groups.inc.php
+ * transport-groups.inc.php
  *
- * List contacts and contact groups
+ * List transports and transport groups
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,17 +29,17 @@ if (!Auth::user()->hasGlobalRead()) {
     return [];
 }
 
-list($contacts, $c_more) = include 'contacts.inc.php';
+list($transports, $t_more) = include 'transports.inc.php';
 
 $query = '';
 $params = [];
 
 if (!empty($_REQUEST['search'])) {
-    $query .= ' WHERE `contact_group_name` LIKE ?';
+    $query .= ' WHERE `transport_group_name` LIKE ?';
     $params[] = '%' . mres($_REQUEST['search']) . '%';
 }
 
-$total = dbFetchCell("SELECT COUNT(*) FROM `alert_contact_groups` $query", $params);
+$total = dbFetchCell("SELECT COUNT(*) FROM `alert_transport_groups` $query", $params);
 $more = false;
 
 if (!empty($_REQUEST['limit'])) {
@@ -52,7 +52,7 @@ if (!empty($_REQUEST['limit'])) {
     $offset = 0;
 }
 
-$sql = "SELECT `contact_group_id` AS `id`, `contact_group_name` AS `text` FROM `alert_contact_groups` $query";
+$sql = "SELECT `transport_group_id` AS `id`, `transport_group_name` AS `text` FROM `alert_transport_groups` $query";
 $groups = dbFetchRows($sql, $params);
 $more = ($offset + count($groups))<$total;
 $groups = array_map(function ($group) {
@@ -61,6 +61,6 @@ $groups = array_map(function ($group) {
     return $group;
 }, $groups);
 
-$data = [['text' => 'Contact Groups', 'children' => $groups], $contacts[0]];
+$data = [['text' => 'Transport Groups', 'children' => $groups], $transports[0]];
 
 return[$data, $more || $c_more];

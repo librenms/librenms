@@ -4,8 +4,6 @@
  *
  * Copyright (c) 2018 Vivia Nguyen-Tran <vivia@ualberta.ca>
  *
- * Heavily based off of new_alert_rule.inc.php
- *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
@@ -18,26 +16,26 @@ use LibreNMS\Config;
 
 if (Auth::user()->hasGlobalAdmin()) {
 ?>
-<!--Modal for adding or updating an alert contact -->
-    <div class="modal fade" id="edit-alert-contact" tabindex="-1" role="dialog"
-         aria-labelledby="Edit-contact" aria-hidden="true">
+<!--Modal for adding or updating an alert transport -->
+    <div class="modal fade" id="edit-alert-transport" tabindex="-1" role="dialog"
+         aria-labelledby="Edit-transport" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h5 class="modal-title" id="Edit-contact">Alert Contacts :: <a href="https://docs.librenms.org/Alerting/">Docs <i class="fa fa-book fa-1x"></i></a> </h5>
+                    <h5 class="modal-title" id="Edit-transport">Alert Transport :: <a href="https://docs.librenms.org/Alerting/">Docs <i class="fa fa-book fa-1x"></i></a> </h5>
                 </div>
                 <div class="modal-body">
-                    <form method="post" role="form" id="contacts" class="form-horizontal contacts-form">
-                        <input type="hidden" name="contact_id" id="contact_id" value="">
-                        <input type="hidden" name="type" id="type" value="alert-contacts">
-                        <div class='form-group' title="The description of this alert contact.">
-                            <label for='name' class='col-sm-3 col-md-2 control-label'>Contact name: </label>
+                    <form method="post" role="form" id="transports" class="form-horizontal transports-form">
+                        <input type="hidden" name="transport_id" id="transport_id" value="">
+                        <input type="hidden" name="type" id="type" value="alert-transports">
+                        <div class='form-group' title="The description of this alert transport.">
+                            <label for='name' class='col-sm-3 col-md-2 control-label'>Transport name: </label>
                             <div class='col-sm-9 col-md-10'>
                                 <input type='text' id='name' name='name' class='form-control validation' maxlength='200' required>
                             </div>
                         </div>
-                        <div class="form-group" title="The type of transport for this contact.">
+                        <div class="form-group" title="The type of transport.">
                             <label for='transport-choice' class='col-sm-3 col-md-2 control-label'>Transport type: </label>
                             <div class="col-sm-3">
                                 <select name='transport-choice' id='transport-choice' class='form-control'>
@@ -79,8 +77,8 @@ foreach (array_keys($transports) as $transport) {
     }
     echo '<div class="form-group">';
     echo '<div class="col-sm-12 text-center">';
-    echo '<button type="button" class="btn btn-success btn-save" name="save-contact">';
-    echo 'Save Contact';
+    echo '<button type="button" class="btn btn-success btn-save" name="save-transport">';
+    echo 'Save Transport';
     echo '</button>';
     echo '</div>';
     echo '</div>';
@@ -91,35 +89,35 @@ foreach (array_keys($transports) as $transport) {
             </div>
         </div>
     </div>
-<!-- Modal end for adding or updating an alert contact-->
+<!-- Modal end for adding or updating an alert tramsport-->
 
-<!--Modal for deleting an alert contact -->
-    <div class="modal fade" id="delete-alert-contact" tabindex="-1" role="dialog"
+<!--Modal for deleting an alert transport -->
+    <div class="modal fade" id="delete-alert-transport" tabindex="-1" role="dialog"
          aria-labelledby="Delete" aria-hidden="true">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h5 class="modal-title" id="Delete">Confirm Contact Delete</h5>
+                    <h5 class="modal-title" id="Delete">Confirm Transport Delete</h5>
                 </div>
                 <div class="modal-body">
-                    <p>If you would like to remove this alert contact then please click Delete.</p>
+                    <p>If you would like to remove this alert transport then please click Delete.</p>
                 </div>
                 <div class="modal-footer">
-                    <form role="form" class="remove_contact_form">
+                    <form role="form" class="remove_transport_form">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-danger danger" id="remove-alert-contact" data-target="remove-alert-contact">Delete</button>
-                        <input type="hidden" name="contact_id" id="delete_contact_id" value="">
+                        <button type="submit" class="btn btn-danger danger" id="remove-alert-transport" data-target="remove-alert-transport">Delete</button>
+                        <input type="hidden" name="transport_id" id="delete_transport_id" value="">
                         <input type="hidden" name="confirm" id="confirm" value="yes">
                     </form>
                 </div>
             </div>
         </div>
     </div>
-<!--Modal end for deleting an alert contact -->
+<!--Modal end for deleting an alert transport -->
 
     <script>
-        // Scripts related to editing/updating alert contact
+        // Scripts related to editing/updating alert transports
 
         // Display different form on selection 
         $("#transport-choice").change(function (){
@@ -128,20 +126,20 @@ foreach (array_keys($transports) as $transport) {
          
         });
 
-        $("#edit-alert-contact").on("show.bs.modal", function(e) {
-            // Get contact id of clicked element
-            var contact_id = $(e.relatedTarget).data("contact_id");
-            $("#contact_id").val(contact_id);
-            if(contact_id > 0) {
+        $("#edit-alert-transport").on("show.bs.modal", function(e) {
+            // Get transport id of clicked element
+            var transport_id = $(e.relatedTarget).data("transport_id");
+            $("#transport_id").val(transport_id);
+            if(transport_id > 0) {
                 $.ajax({
                     type: "POST",
                     url: "ajax_form.php",
-                    data: { type: "show-alert-contact", contact_id: contact_id },
+                    data: { type: "show-alert-transport", transport_id: transport_id },
                     success: function (data) {
-                        loadContact(data); 
+                        loadTransport(data);
                     },
                     error: function () {
-                        toastr.error("Failed to process alert contact");
+                        toastr.error("Failed to process alert transport");
                     }
                 });
             
@@ -154,26 +152,26 @@ foreach (array_keys($transports) as $transport) {
             }
         });
 
-        function loadContact(contact) {
-            $("#name").val(contact.name);
-            $("#transport-choice").val(contact.type+"-form");
+        function loadTransport(transport) {
+            $("#name").val(transport.name);
+            $("#transport-choice").val(transport.type+"-form");
 
             $(".transport").hide();
             $("#" + $("#transport-choice").val()).show().find("input:text").val("");
             
             // Populate the field values
-            contact.details.forEach(function(config) {
+            transport.details.forEach(function(config) {
                 $("#" + config.name).val(config.value);
             });
 
         }
 
-        // Save alert contact
+        // Save alert transport
         $(".btn-save").on("click", function (e) {
             e.preventDefault();
 
-            //Combine form data (general and contact specific)
-            data = $("form.contacts-form").serializeArray();
+            //Combine form data (general and transport specific)
+            data = $("form.transports-form").serializeArray();
             data = data.concat($("#" + $("#transport-choice").val()).serializeArray());
             if (data !== null) {
                 //post data to ajax form
@@ -186,7 +184,7 @@ foreach (array_keys($transports) as $transport) {
                         if (data.status == 'ok') {
                             toastr.success(data.message);
                             setTimeout(function (){
-                                $("#edit-alert-contacts").modal("hide");
+                                $("#edit-alert-transports").modal("hide");
                                 window.location.reload();
                             }, 500);
                         } else {
@@ -194,44 +192,44 @@ foreach (array_keys($transports) as $transport) {
                         }
                     },
                     error: function () {
-                        toastr.error("Failed to process alert contact");
+                        toastr.error("Failed to process alert transport");
                     }
                 });
             }
         });
 
-        // Scripts related to deleting an alert contact
+        // Scripts related to deleting an alert transport
 
-        // Populate contact id value
-        $("#delete-alert-contact").on("show.bs.modal", function(event) {
-            contact_id = $(event.relatedTarget).data("contact_id");
-            $("#delete_contact_id").val(contact_id);
+        // Populate transport id value
+        $("#delete-alert-transport").on("show.bs.modal", function(event) {
+            transport_id = $(event.relatedTarget).data("transport_id");
+            $("#delete_transport_id").val(transport_id);
         });
 
-        // Delete the alert contact
-        $("#remove-alert-contact").click('', function(event) {
+        // Delete the alert transport
+        $("#remove-alert-transport").click('', function(event) {
             event.preventDefault();
-            var contact_id = $("#delete_contact_id").val();
+            var transport_id = $("#delete_transport_id").val();
             $.ajax({
                 type: "POST",
                 url: "ajax_form.php",
-                data: { type: "delete-alert-contact", contact_id: contact_id },
+                data: { type: "delete-alert-transport", transport_id: transport_id },
                 dataType: "json",
                 success: function(data) {
                     if (data.status == 'ok') {
                         toastr.success(data.message);
                         setTimeout(function () {
-                            $("#delete-alert-contact").modal("hide");
+                            $("#delete-alert-transport").modal("hide");
                             window.location.reload();
                         }, 500)
                     } else {
                         $("#message").html("<div class='alert alert-info'>"+data.message+"</div>");
-                        $("#delete-alert-contact").modal("hide");
+                        $("#delete-alert-transport").modal("hide");
                     }
                 },
                 error: function() {
-                    $("#message").html("<div class='alert alert-info'>The alert contact could not be deleted.</div>");
-                    $("#delete-alert-contact").modal("hide");
+                    $("#message").html("<div class='alert alert-info'>The alert transport could not be deleted.</div>");
+                    $("#delete-alert-transport").modal("hide");
                 }
             });
         });

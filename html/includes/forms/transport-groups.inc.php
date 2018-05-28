@@ -1,8 +1,8 @@
 <?php
 /**
- * contact-groups.inc.php
+ * transport-groups.inc.php
  *
- * LibreNMS alert-contactsinc.php for processor
+ * LibreNMS alert-transportsinc.php for processor
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ foreach ((array)$_POST['members'] as $target) {
 
 if (empty($name)) {
     $status = 'error';
-    $message = 'No contact group name provided';
+    $message = 'No transport group name provided';
 } elseif (sizeof($target_members) <= 1) {
     // Not enough members for a group; requires 2 at least
     $status = 'error';
@@ -55,43 +55,43 @@ if (empty($name)) {
 } else {
     if (is_numeric($group_id) && $group_id > 0) {
         dbUpdate(array(
-            'contact_group_name' => $name
-        ), 'alert_contact_groups', "`contact_group_id`=?", [$group_id]);
+            'transport_group_name' => $name
+        ), 'alert_transport_groups', "`transport_group_id`=?", [$group_id]);
     } else {
         // Insert into db
         $group_id = dbInsert(array(
-            'contact_group_name' => $name
-        ), 'alert_contact_groups');
+            'transport_group_name' => $name
+        ), 'alert_transport_groups');
     }
     
     if (is_numeric($group_id) && $group_id > 0) {
-        $sql = "SELECT `contact_id` FROM `contact_group_contact` WHERE `contact_group_id`=?";
+        $sql = "SELECT `transport_id` FROM `transport_group_transport` WHERE `transport_group_id`=?";
         $db_members = dbFetchColumn($sql, [$group_id]);
 
-        // Compare arrays to get added and removed contacts
+        // Compare arrays to get added and removed transports
         $add = array_diff($target_members, $db_members);
         $remove = array_diff($db_members, $target_members);
 
-        // Insert new contact group members
+        // Insert new transport group members
         $insert = [];
-        foreach ($add as $contact_id) {
+        foreach ($add as $transport_id) {
             $insert[] = array(
-                'contact_id' => $contact_id,
-                'contact_group_id' => $group_id
+                'transport_id' => $transport_id,
+                'transport_group_id' => $group_id
             );
         }
         if (!empty($insert)) {
-            dbBulkInsert($insert, 'contact_group_contact');
+            dbBulkInsert($insert, 'transport_group_transport');
         }
 
-        // Remove old contact group members
+        // Remove old transport group members
         if (!empty($remove)) {
-            dbDelete('contact_group_contact', 'contact_group_id=? AND `contact_id` IN (?)', array($group_id, array(implode(',', $remove))));
+            dbDelete('transport_group_transport', 'transport_group_id=? AND `transport_id` IN (?)', array($group_id, array(implode(',', $remove))));
         }
-        $message = 'Updated alert contact group';
+        $message = 'Updated alert transport group';
     } else {
         $status = 'error';
-        $message = 'ERROR: Did not update alert contact group';
+        $message = 'ERROR: Did not update alert transport group';
     }
 }
 

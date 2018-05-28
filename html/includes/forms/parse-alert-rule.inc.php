@@ -37,21 +37,21 @@ if (is_numeric($alert_id) && $alert_id > 0) {
         $maps[] = ['id' => 'g' . $group['group_id'], 'text' => $group['name']];
     }
 
-    $contacts = [];
-    $members = dbFetchRows('SELECT `contact_or_group_id`, `contact_name`, `transport_type` FROM `alert_contact_map` LEFT JOIN `alert_contacts` ON `contact_or_group_id` = `contact_id` WHERE `contact_type`="single" AND `rule_id`=?', [$alert_id]);
+    $transports = [];
+    $members = dbFetchRows('SELECT `transport_or_group_id`, `transport_name`, `transport_type` FROM `alert_transport_map` LEFT JOIN `alert_transports` ON `transport_or_group_id` = `transport_id` WHERE `target_type`="single" AND `rule_id`=?', [$alert_id]);
 
     foreach ($members as $member) {
-        $contacts[] = [
-            'id' => $member['contact_or_group_id'],
-            'text' => ucfirst($member['transport_type']).": ".$member['contact_name']
+        $transports[] = [
+            'id' => $member['transport_or_group_id'],
+            'text' => ucfirst($member['transport_type']).": ".$member['transport_name']
         ];
     }
 
-    $c_groups = dbFetchRows('SELECT `contact_or_group_id`, `contact_group_name` FROM `alert_contact_map` LEFT JOIN `alert_contact_groups` ON `contact_or_group_id`=`contact_group_id` WHERE `contact_type`="group" AND `rule_id`=?', [$alert_id]);
-    foreach ($c_groups as $group) {
-        $contacts[] = [
-            'id' => 'g'.$group['contact_or_group_id'],
-            'text' => 'Group: '.$group['contact_group_name']
+    $t_groups = dbFetchRows('SELECT `transport_or_group_id`, `transport_group_name` FROM `alert_transport_map` LEFT JOIN `alert_transport_groups` ON `transport_or_group_id`=`transport_group_id` WHERE `target_type`="group" AND `rule_id`=?', [$alert_id]);
+    foreach ($t_groups as $group) {
+        $transports[] = [
+            'id' => 'g'.$group['transport_or_group_id'],
+            'text' => 'Group: '.$group['transport_group_name']
         ];
     }
 } elseif (is_numeric($template_id) && $template_id >= 0) {
@@ -72,7 +72,7 @@ if (is_array($rule)) {
     echo json_encode([
         'extra'    => isset($rule['extra']) ? json_decode($rule['extra']) : null,
         'maps'     => $maps,
-        'contacts' => $contacts,
+        'transports' => $transports,
         'name'     => $rule['name'],
         'proc'     => $rule['proc'],
         'builder'  => $builder,

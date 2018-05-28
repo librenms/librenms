@@ -3,8 +3,6 @@
 /*
  * LibreNMS
  *
- * Copyright (c) 2014 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk/fa>
- *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
@@ -26,18 +24,17 @@ if (!Auth::user()->hasGlobalAdmin()) {
 $status = 'ok';
 $message = '';
 
-if (!is_numeric($_POST['contact_id'])) {
+if (!is_numeric($_POST['transport_id'])) {
     $status = 'error';
-    $message = 'ERROR: No contact selected';
+    $message = 'ERROR: No transport selected';
 } else {
-    if (dbDelete('alert_contacts', '`contact_id` = ?', [$_POST['contact_id']])) {
-        dbDelete('alert_configs', '`contact_id` = ?', [$_POST['contact_id']]);
-        dbDelete('alert_contact_map', '`contact_type` = "single" AND `contact_or_group_id` = ?', [$_POST['contact_id']]);
-        dbDelete('contact_group_contact', '`contact_id`=?', [$_POST['contact_id']]);
+    if (dbDelete('alert_transports', '`transport_id` = ?', [$_POST['transport_id']])) {
+        dbDelete('alert_transport_map', '`target_type` = "single" AND `transport_or_group_id` = ?', [$_POST['transport_id']]);
+        dbDelete('transport_group_transport', '`transport_id`=?', [$_POST['transport_id']]);
 
-        $message = 'Alert contact has been deleted';
+        $message = 'Alert transport has been deleted';
     } else {
-        $message = 'ERROR: Alert contact has not been deleted';
+        $message = 'ERROR: Alert transport has not been deleted';
     }
 }
 

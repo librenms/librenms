@@ -21,31 +21,30 @@ if (!Auth::user()->hasGlobalAdmin()) {
     ]));
 }
 
-$contact_id = $_POST['contact_id'];
-// Retrieve alert contact
-if (is_numeric($contact_id) && $contact_id > 0) {
-    $contact = dbFetchRow('SELECT * FROM `alert_contacts` WHERE `contact_id` =? LIMIT 1', [$contact_id]);
+$transport_id = $_POST['transport_id'];
+// Retrieve alert transport
+if (is_numeric($transport_id) && $transport_id > 0) {
+    $transport = dbFetchRow('SELECT * FROM `alert_transports` WHERE `transport_id` =? LIMIT 1', [$transport_id]);
 
     $details = [];
-    $configs = dbFetchRows('SELECT `config_name` AS `name`, `config_value` AS `value` FROM `alert_configs` WHERE `contact_id`=?', [$contact_id]);
-    // Get alert contact configuration details
-    foreach ($configs as $detail) {
+    // Get alert transport configuration details
+    foreach (json_decode($transport['transport_config']) as $key => $value) {
         $details[] = [
-            'name' => $detail['name'],
-            'value' => $detail['value']
+            'name' => $key,
+            'value' => $value
         ];
     }
 }
 
-if (is_array($contact)) {
+if (is_array($transport)) {
     die(json_encode([
-        'name' => $contact['contact_name'],
-        'type' => $contact['transport_type'],
+        'name' => $transport['transport_name'],
+        'type' => $transport['transport_type'],
         'details' => $details
     ]));
 } else {
     die(json_encode([
         'status' => 'error',
-        'message' => 'ERROR: No alert contact found'
+        'message' => 'ERROR: No alert transport found'
     ]));
 }

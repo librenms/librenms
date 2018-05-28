@@ -109,10 +109,10 @@ if (Auth::user()->hasGlobalAdmin()) {
                                 <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
                             </div>
                         </div>
-                        <div class="form-group" title="Restricts this alert rule to specified contacts.">
-                            <label for="contacts" class="col-sm-3 col-md-2 control-label">Contact: </label>
+                        <div class="form-group" title="Restricts this alert rule to specified transports.">
+                            <label for="transports" class="col-sm-3 col-md-2 control-label">Transports: </label>
                             <div class="col-sm-9 col-md-10">
-                                <select id="contacts" name="contacts[]" class="form-control" multiple="multiple"></select>
+                                <select id="transports" name="transports[]" class="form-control" multiple="multiple"></select>
                             </div>
                         </div>
                         <div class='form-group' title="A link to some documentation on how to handle this alert. This will be included in notifications.">
@@ -279,9 +279,9 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $maps.val(null).trigger('change');
                 setRuleDevice() // pre-populate device in the maps if this is a per-device rule
                 
-                var $contacts = $("#contacts");
-                $contacts.empty();
-                $contacts.val(null).trigger('change');
+                var $transports = $("#transports");
+                $transports.empty();
+                $transports.val(null).trigger('change');
                 $("#transport-choice").val("email");
             }
         });
@@ -304,13 +304,13 @@ if (Auth::user()->hasGlobalAdmin()) {
                     $maps.append(option).trigger('change')
                 });
             }
-            var $contacts = $("#contacts");
-            $contacts.empty();
-            $contacts.val(null).trigger('change');
-            if(rule.contacts != null) {
-                $.each(rule.contacts, function(index, value) {
+            var $transports = $("#transports");
+            $transports.empty();
+            $transports.val(null).trigger('change');
+            if(rule.transports != null) {
+                $.each(rule.transports, function(index, value) {
                     var option = new Option(value.text, value.id, true, true);
-                    $contacts.append(option).trigger("change");
+                    $transports.append(option).trigger("change");
                 });
             }
 
@@ -373,15 +373,15 @@ if (Auth::user()->hasGlobalAdmin()) {
             }
         });
 
-        $("#contacts").select2({
+        $("#transports").select2({
             width: "100%",
-            placeholder: "Contact/Group Name",
+            placeholder: "Transport/Group Name",
             ajax: {
                 url: 'ajax_list.php',
                 delay: 250,
                 data: function(params) {
                     return {
-                        type: "contact_groups",
+                        type: "transport_groups",
                         search: params.term
                     }
                 }

@@ -22,17 +22,17 @@ if (!Auth::user()->hasGlobalAdmin()) {
 }
 
 $group_id = $_POST['group_id'];
-// Retrieve alert contact
+// Retrieve alert transport
 if (is_numeric($group_id) && $group_id > 0) {
-    $name = dbFetchCell('SELECT `contact_group_name` FROM `alert_contact_groups` WHERE `contact_group_id`=? LIMIT 1', [$group_id]);
+    $name = dbFetchCell('SELECT `transport_group_name` FROM `alert_transport_groups` WHERE `transport_group_id`=? LIMIT 1', [$group_id]);
     
-    $query = "SELECT `a`.`contact_id`, `transport_type`, `contact_name` FROM `contact_group_contact` AS `a` LEFT JOIN `alert_contacts` AS `b` ON `a`.`contact_id`=`b`.`contact_id` WHERE `contact_group_id`=?";
+    $query = "SELECT `a`.`transport_id`, `transport_type`, `transport_name` FROM `transport_group_transport` AS `a` LEFT JOIN `alert_transports` AS `b` ON `a`.`transport_id`=`b`.`transport_id` WHERE `transport_group_id`=?";
     
     $members = [];
     foreach (dbFetchRows($query, [$group_id]) as $member) {
         $members[] =  [
-            'id' => $member['contact_id'],
-            'text' => ucfirst($member['transport_type']).": ".$member['contact_name']
+            'id' => $member['transport_id'],
+            'text' => ucfirst($member['transport_type']).": ".$member['transport_name']
         ];
     }
 }
@@ -45,6 +45,6 @@ if (is_array($members)) {
 } else {
     die(json_encode([
         'status' => 'error',
-        'message' => 'ERROR: No alert contact found'
+        'message' => 'ERROR: No transport group found'
     ]));
 }
