@@ -14,16 +14,17 @@ $not_legacy=1;
 
 try {
     $fetched_zfs=json_app_get($device, $name, 1);
-} catch(JsonAppMissingKeysException $e) {
+} catch (JsonAppMissingKeysException $e) {
     //old version with out the data key
     $zfs=$fetched_zfs;
+    $not_legacy=0;
 } catch (JsonAppException $e) {
     echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
     update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message
     return;
 }
 
-if ($not_legacy == 1){
+if ($not_legacy == 1) {
     $zfs=$fetched_zfs[data];
 }
 
