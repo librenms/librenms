@@ -16,7 +16,7 @@ class Alertlog extends Model
      *
      * @var string
      */
-    
+
     protected $table = 'alert_log';
     /**
      * The primary key column name.

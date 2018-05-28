@@ -1,6 +1,8 @@
 <?php
 namespace App\Models\Log;
+
 use Illuminate\Database\Eloquent\Model;
+
 /**
  * App\Models\Log\Eventlog
  *

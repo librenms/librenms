@@ -116,7 +116,8 @@ class DeviceServiceController extends ApiController
     public function store(Request $request, Device $device)
     {
         $this->validate(
-            $request, [
+            $request, 
+            [
                 'type'  => [
                     'required',
                     \Illuminate\Validation\Rule::in(list_available_services())

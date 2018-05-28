@@ -17,7 +17,7 @@ class DeviceInventoryController extends ApiController
      * @apiParam {Number} id ID or Hostname of the Device
      * @apiParam  {String} [entPhysicalClass] Optional This is used to restrict the class of the inventory,
      * for example you can specify chassis to only return items in the inventory that are labelled as chassis.
-     * @apiParam {Number} [entPhysicalContainedIn] Optional This is used to retrieve items within the inventory assigned to a previous component, 
+     * @apiParam {Number} [entPhysicalContainedIn] Optional This is used to retrieve items within the inventory assigned to a previous component,
      * for example specifying the chassis (entPhysicalIndex) will retrieve all items where the chassis is the parent.
      *
      * @apiExample {curl} Example usage wihout parameters:
