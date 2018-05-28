@@ -20,8 +20,8 @@ class Ciscospark implements Transport
         $tryDefault = true;
 
         if ($opts['alert']['notDefault'] == true) {
-            $sql = "SELECT `config_name`, `config_value` FROM `alert_configs` WHERE `contact_id`=?";
-            $details = dbFetchKeyValue($sql, [$opts['alert']['contact_id']]);
+            $sql = "SELECT `transport_config` FROM `alert_transports` WHERE `transport_id`=?";
+            $details = json_decode(dbFetchCell($sql, [$opts['alert']['transport_id']]), true);
             $text = strip_tags($obj['msg']);
             $data = array (
                 'roomId' => $details['room-id'],
@@ -70,7 +70,7 @@ class Ciscospark implements Transport
         return true;
     }
 
-    public function configTemplate()
+    public static function configTemplate()
     {
         return [
             [

@@ -875,20 +875,20 @@ function ExtTransports($obj)
     global $config;
     $tmp = false;
     
-    // If alert contact mapping exists, override the default transports
-    $contacts = GetAlertContacts($obj['alert_id']);
-    if ($contacts) {
-        foreach ($contacts as $contact) {
-            $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($contact['transport_type']);
+    // If alert transport mapping exists, override the default transports
+    $transport_maps = GetAlertContacts($obj['alert_id']);
+    if ($transport_maps) {
+        foreach ($transport_maps as $item) {
+            $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($item['transport_type']);
             if (class_exists($class)) {
-                $obj['transport'] = $contact['transport_type'];
+                $obj['transport'] = $item['transport_type'];
                 $msg = FormatAlertTpl($obj);
                 $obj['msg'] = $msg;
                 echo $obj['transport'].' => ';
                 $instance = new $class;
                 // Set flag to indicate non default transports
                 $opts['alert']['notDefault'] = true;
-                $opts['alert']['contact_id'] = $contact['contact_id'];
+                $opts['alert']['transport_id'] = $item['transport_id'];
                 $tmp = $instance->deliverAlert($obj, $opts);
                 AlertLog($tmp, $obj, $obj['transport']);
             }
@@ -970,14 +970,14 @@ function GetRuleId($alert_id)
 }
 
 /**
- * Get alert contacts (includes contact groups)
+ * Get alert transports (includes transport groups)
  * @param $alert_id
- * @return array $contact_id $transport_type
+ * @return array $transport_id $transport_type
  */
 function GetAlertContacts($alert_id)
 {
-    // Query for list of contact ids
-    $query = "SELECT b.contact_id, b.transport_type FROM alert_contact_map AS a LEFT JOIN alert_contacts AS b ON b.contact_id=a.contact_or_group_id WHERE a.contact_type='single' AND a.rule_id=? UNION DISTINCT SELECT d.contact_id, d.transport_type FROM alert_contact_map AS a LEFT JOIN alert_contact_groups AS b ON a.contact_or_group_id=b.contact_group_id LEFT JOIN contact_group_contact AS c ON b.contact_group_id=c.contact_group_id LEFT JOIN alert_contacts AS d ON c.contact_id=d.contact_id WHERE a.contact_type='group' AND a.rule_id=?;";
+    // Query for list of transport ids
+    $query = "SELECT b.transport_id, b.transport_type FROM alert_transport_map AS a LEFT JOIN alert_transports AS b ON b.transport_id=a.transport_or_group_id WHERE a.target_type='single' AND a.rule_id=? UNION DISTINCT SELECT d.transport_id, d.transport_type FROM alert_transport_map AS a LEFT JOIN alert_transport_groups AS b ON a.transport_or_group_id=b.transport_group_id LEFT JOIN transport_group_transport AS c ON b.transport_group_id=c.transport_group_id LEFT JOIN alert_transports AS d ON c.transport_id=d.transport_id WHERE a.target_type='group' AND a.rule_id=?;";
     $rule_id = GetRuleId($alert_id);
     return dbFetchRows($query, [$rule_id, $rule_id]);
 }

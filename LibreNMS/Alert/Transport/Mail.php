@@ -31,11 +31,11 @@ class Mail implements Transport
     {
         global $config;
         if ($opts['alert']['notDefault'] == true) {
-            $sql = "SELECT `config_value` AS `email` FROM `alert_configs` WHERE `config_name`='email' AND`contact_id`=?";
-            $email = dbFetchCell($sql, [$opts['alert']['contact_id']]);
-            if ($email) {
+            $sql = "SELECT `transport_config` FROM `alert_transports` WHERE `transport_id`=?";
+            $details = json_decode(dbFetchCell($sql, [$opts['alert']['transport_id']]), true);
+            if ($details['email']) {
                 // Check if query successfull
-                $obj['contacts'] = $email;
+                $obj['contacts'] = $details['email'];
             } else {
                 echo("Transport not successful, using default transport.\r\n");
             }
@@ -44,7 +44,7 @@ class Mail implements Transport
         return send_mail($obj['contacts'], $obj['title'], $obj['msg'], ($config['email_html'] == 'true') ? true : false);
     }
 
-    public function configTemplate()
+    public static function configTemplate()
     {
         return [
             [
