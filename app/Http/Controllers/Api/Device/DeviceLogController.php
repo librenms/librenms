@@ -1,23 +1,27 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Device;
 
-use App\Models\Service;
+use App\Models\Device;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\ApiController;
 
-class LogController extends ApiController
+class DeviceLogController extends ApiController
 {
     /**
-     * @api {get} /api/v1/logs/syslog Get all syslogs
+     * @api {get} /api/v1/devices/:id/logs/syslog Get all syslogs
      * @apiName Get_syslogs
      * @apiGroup Logs
      * @apiVersion  1.0.0
      *
+     * @apiParam {Number} id The id or Hostname of the device.
      * @apiParam {String} [to] Optional The data and time to search to.
      * @apiParam {String} [from] Optional The date and time to search from.
      * @apiParam {Number} [per_page=50] Optional How many items to retrieve
      * @apiParam {Number} [current_page=1] Optional Active page of items
+     *
+     * @apiExample {curl} Example usage:
+     *     curl -H 'X-Auth-Token: YOURAPITOKENHERE' -H 'Content-Type: application/json' -i http://example.org/api/v1/devices/1/logs/syslog?from=2018-05-28 12:00
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -37,8 +41,8 @@ class LogController extends ApiController
      *          "current_page": 1,
      *          "from": 1,
      *          "last_page": 1789,
-     *          "next_page_url": "http://example.org/logs/syslog?page=2",
-     *          "path": "http://example.org/logs/syslog",
+     *          "next_page_url": "http://example.org/api/v1/devices/:id/logs/syslog?page=2",
+     *          "path": "http://example.org/api/v1/devices/:id/logs/syslog",
      *          "per_page": 50,
      *          "prev_page_url": null,
      *          "to": 50,
@@ -46,13 +50,13 @@ class LogController extends ApiController
      *     }
      *
      */
-    public function syslog(Request $request)
+    public function syslog(Request $request, Device $device)
     {
 
         $to = $request->get('to', null);
         $from = $request->get('from', null);
 
-        $query = new \App\Models\Log\Syslog;
+        $query = $device->syslogs();
 
         if ($to) {
             $query = $query->where('timestamp', '<', $to);
@@ -65,68 +69,19 @@ class LogController extends ApiController
     }
 
     /**
-     * @api {get} /api/v1/logs/authlog Get all authlogs
-     * @apiName Get_authlogs
-     * @apiGroup Logs
-     * @apiVersion  1.0.0
-     *
-     * @apiParam {String} [to] Optional The data and time to search to.
-     * @apiParam {String} [from] Optional The date and time to search from.
-     * @apiParam {Number} [per_page=50] Optional How many items to retrieve
-     * @apiParam {Number} [current_page=1] Optional Active page of items
-     *
-     * @apiSuccessExample Success-Response:
-     *     HTTP/1.1 200 OK
-     *     {
-     *          "data": [
-     *              {
-     *                  "id": "2",
-     *                  "datetime": "2018-04-25 00:16:02",
-     *                  "user": "admin",
-     *                  "address": "127.0.0.1",
-     *                  "result": "Logged In",
-     *              },
-     *          ],
-     *          "current_page": 1,
-     *          "from": 1,
-     *          "last_page": 1789,
-     *          "next_page_url": "http://example.org/api/v1/logs/eventlog?page=2",
-     *          "path": "http://example.org/api/v1/logs/eventlog",
-     *          "per_page": 50,
-     *          "prev_page_url": null,
-     *          "to": 50,
-     *          "total": 89439
-     *     }
-     *
-     */
-    
-    public function authlog(Request $request)
-    {
-        $to = $request->get('to', null);
-        $from = $request->get('from', null);
-
-        $query = new \App\Models\Log\Authlog;
-
-        if ($to) {
-            $query = $query->where('timestamp', '<', $to);
-        }
-        if ($from) {
-            $query = $query->where('timestamp', '>=', $from);
-        }
-
-        return $this->paginateResponse($query);
-    }
-
-    /**
-     * @api {get} /api/v1/logs/eventlog Get all eventlogs
+     * @api {get} /api/v1/devices/:id/logs/eventlog Get all eventlogs
      * @apiName Get_eventlogs
      * @apiGroup Logs
      * @apiVersion  1.0.0
      *
+     * @apiParam {Number} id The id or Hostname of the device.
      * @apiParam {String} [to] Optional The data and time to search to.
      * @apiParam {String} [from] Optional The date and time to search from.
      * @apiParam {Number} [per_page=50] Optional How many items to retrieve
      * @apiParam {Number} [current_page=1] Optional Active page of items
+     *
+     * @apiExample {curl} Example usage:
+     *     curl -H 'X-Auth-Token: YOURAPITOKENHERE' -H 'Content-Type: application/json' -i http://example.org/api/v1/devices/1/logs/eventlog?from=2018-05-28 12:00&to=2018-05-30 12:00
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -147,8 +102,8 @@ class LogController extends ApiController
      *          "current_page": 1,
      *          "from": 1,
      *          "last_page": 1789,
-     *          "next_page_url": "http://example.org/api/v1/logs/eventlog?page=2",
-     *          "path": "http://example.org/api/v1/logs/eventlog",
+     *          "next_page_url": "http://example.org/api/v1/devices/:id/logs/eventlog?page=2",
+     *          "path": "http://example.org/api/v1/devices/:id/logs/eventlog",
      *          "per_page": 50,
      *          "prev_page_url": null,
      *          "to": 50,
@@ -156,13 +111,13 @@ class LogController extends ApiController
      *     }
      *
      */
-    public function eventlog(Request $request)
+    public function eventlog(Request $request, Device $device)
     {
 
         $to = $request->get('to', null);
         $from = $request->get('from', null);
 
-        $query = new \App\Models\Log\Eventlog;
+        $query = $device->eventlogs();
 
         if ($to) {
             $query = $query->where('datetime', '<', $to);
@@ -175,15 +130,19 @@ class LogController extends ApiController
     }
 
     /**
-     * @api {get} /api/v1/logs/syslog Get all alertlogs
+     * @api {get} /api/v1/devices/:id/logs/alertlog Get all alertlogs
      * @apiName Get_alertlogs
      * @apiGroup Logs
      * @apiVersion  1.0.0
      *
+     * @apiParam {Number} id The id or Hostname of the device.
      * @apiParam {String} [to] Optional The data and time to search to.
      * @apiParam {String} [from] Optional The date and time to search from.
-     * @apiParam {Number} [per_page=50] Optional How many items to retrieve
-     * @apiParam {Number} [current_page=1] Optional Active page of items
+     * @apiParam {Number} [per_page=50] Optional How many items to retrieve.
+     * @apiParam {Number} [current_page=1] Optional Active page of items.
+     *
+     * @apiExample {curl} Example usage:
+     *     curl -H 'X-Auth-Token: YOURAPITOKENHERE' -H 'Content-Type: application/json' -i http://example.org/api/v1/devices/1/logs/alertlog?from=2018-05-28 12:00&to=2018-05-30
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -201,8 +160,8 @@ class LogController extends ApiController
      *          "current_page": 1,
      *          "from": 1,
      *          "last_page": 1789,
-     *          "next_page_url": "http://example.org/api/v1/logs/alertlog?page=2",
-     *          "path": "http://example.org/api/v1/logs/alertlog",
+     *          "next_page_url": "http://example.org/api/v1/devices/:id/logs/alertlog?page=2",
+     *          "path": "http://example.org/api/v1/devices/:id/logs/alertlog",
      *          "per_page": 50,
      *          "prev_page_url": null,
      *          "to": 50,
@@ -210,13 +169,13 @@ class LogController extends ApiController
      *     }
      *
      */
-    public function alertlog(Request $request)
+    public function alertlog(Request $request, Device $device)
     {
 
         $to = $request->get('to', null);
         $from = $request->get('from', null);
 
-        $query = new \App\Models\Log\Alertlog;
+        $query = $device->alertlogs();
 
         if ($to) {
             $query = $query->where('time_logged', '<', $to);

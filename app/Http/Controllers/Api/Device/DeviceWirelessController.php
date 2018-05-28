@@ -48,6 +48,9 @@ class DeviceWirelessController extends ApiController
      * @apiParam {Number} id ID or Hostname of the Device
      * @apiParam {String} class The class name of the sensor (gathered from the Get_Device_Wireless method)
      *
+     * @apiExample {curl} Example usage:
+     *     curl -H 'X-Auth-Token: YOURAPITOKENHERE' -H 'Content-Type: application/json' -i http://example.org/api/v1/devices/1/wireless/clients
+     * 
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
      *     {

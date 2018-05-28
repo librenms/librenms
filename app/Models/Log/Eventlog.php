@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Eventlog extends Model
 {
+    const UPDATED_AT = 'datetime';
     /**
      * Indicates if the model should be timestamped.
      *
@@ -52,5 +53,15 @@ class Eventlog extends Model
     public function device()
     {
         return $this->belongsTo('App\Models\Device', 'device_id', 'device_id');
+    }
+
+    public function setCreatedAt($value)
+    {
+        // Created at fields don't exist
+    }
+
+    public function getCreatedAt($value)
+    {
+        // Created at fields don't exist
     }
 }

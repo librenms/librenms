@@ -29,12 +29,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Syslog extends Model
 {
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
+    const UPDATED_AT = 'timestamp';
+
+    protected $dateFormat = 'U';
+
     /**
      * The table associated with the model.
      *
@@ -48,6 +46,17 @@ class Syslog extends Model
      */
     protected $primaryKey = 'seq';
     // ---- Accessors/Mutators ----
+
+    public function setCreatedAt($value)
+    {
+        // Created at fields don't exist
+    }
+
+    public function getCreatedAt($value)
+    {
+        // Created at fields don't exist
+    }
+    
     // ---- Define Relationships ----
     /**
      * Returns the device this entry belongs to.

@@ -47,6 +47,12 @@ Route::namespace('Api')->group(function () {
             'edit'
         ]]);
 
+        Route::prefix('logs')->group(function () {
+            Route::get('alertlog', 'Device\\DeviceLogController@alertlog')->name('logs.alertlog');
+            Route::get('eventlog', 'Device\\DeviceLogController@eventlog')->name('logs.eventlog');
+            Route::get('syslog', 'Device\\DeviceLogController@syslog')->name('logs.syslog');
+        });
+
         Route::get('services', 'Device\\DeviceServiceController@index')->name('devices.service.index');
         Route::post('services', 'Device\\DeviceServiceController@store')->name('devices.service.store');
         Route::get('inventory', 'Device\\DeviceInventoryController@index')->name('devices.inventory.index');

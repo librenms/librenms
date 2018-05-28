@@ -190,7 +190,7 @@ class Device extends BaseModel
 
     public function eventlogs()
     {
-        return $this->hasMany('App\Models\General\Eventlog', 'host', 'device_id');
+        return $this->hasMany('App\Models\Log\Eventlog', 'device_id', 'device_id');
     }
 
     public function groups()
@@ -250,7 +250,12 @@ class Device extends BaseModel
 
     public function syslogs()
     {
-        return $this->hasMany('App\Models\General\Syslog', 'device_id', 'device_id');
+        return $this->hasMany('App\Models\Log\Syslog', 'device_id', 'device_id');
+    }
+
+    public function alertlogs()
+    {
+        return $this->hasMany('App\Models\Log\Alertlog', 'device_id', 'device_id');
     }
 
     public function users()

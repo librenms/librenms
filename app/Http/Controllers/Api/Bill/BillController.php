@@ -18,15 +18,17 @@ class BillController extends ApiController
      * @apiGroup Bills
      * @apiVersion  1.0.0
      *
+     * @apiParam {Number} [per_page=50] Optional How many items to retrieve
+     * @apiParam {Number} [current_page=1] Optional Active page of items
      * @apiParam {Boolean} [previous=false] Optional Indicates you would like the data for the last complete period rather than the current period
      * @apiParam {String} [ref] Optional The billing reference
      * @apiParam {String} [custid] Optional The customer reference
      *
      * @apiExample {curl} Example usage wihout parameters:
-     *     curl -i http://example.org/api/v1/bill
+     *     curl -H 'X-Auth-Token: YOURAPITOKENHERE' -H 'Content-Type: application/json' -i http://example.org/api/v1/bill
      *
      * @apiExample {curl} Example usage with parameters:
-     *     curl -i http://example.org/api/v1/bill?customer=12&pervious=true
+     *     curl -H 'X-Auth-Token: YOURAPITOKENHERE' -H 'Content-Type: application/json' -i http://example.org/api/v1/bill?customer=12&pervious=true
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK

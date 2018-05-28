@@ -21,7 +21,7 @@ class InventoryController extends ApiController
      * for example specifying the chassis (entPhysicalIndex) will retrieve all items where the chassis is the parent.
      *
      * @apiExample {curl} Example usage wihout parameters:
-     *     curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://example.org/api/v1/inventory?entPhysicalContainedIn=65536
+     *     curl -H 'X-Auth-Token: YOURAPITOKENHERE' -H 'Content-Type: application/json' https://example.org/api/v1/inventory?entPhysicalContainedIn=65536
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK

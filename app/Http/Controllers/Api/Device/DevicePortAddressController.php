@@ -18,6 +18,9 @@ class DevicePortAddressController extends ApiController
      * @apiParam {Number} id ID or Hostname of the Device
      * @apiParam {Number} port_id ID of the port
      *
+     * @apiExample {curl} Example usage:
+     *     curl -H 'X-Auth-Token: YOURAPITOKENHERE' -H "Content-Type:application/json" -i http://example.org/api/v1/devices/1/ports/23/addresses
+     *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
      *     {

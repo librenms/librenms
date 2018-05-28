@@ -15,6 +15,9 @@ class DeviceController extends ApiController
      * @apiGroup Devices
      * @apiVersion  1.0.0
      *
+     * @apiParam {Number} [per_page=50] Optional How many items to retrieve
+     * @apiParam {Number} [current_page=1] Optional Active page of items
+     *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
      *     {

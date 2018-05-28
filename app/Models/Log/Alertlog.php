@@ -5,12 +5,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Alertlog extends Model
 {
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
+    const UPDATED_AT = 'time_logged';
+
     /**
      * The table associated with the model.
      *
@@ -25,6 +21,17 @@ class Alertlog extends Model
      */
 
     // ---- Accessors/Mutators ----
+
+    public function setCreatedAt($value)
+    {
+        // Created at fields don't exist
+    }
+
+    public function getCreatedAt($value)
+    {
+        // Created at fields don't exist
+    }
+
     // ---- Define Relationships ----
     /**
      * Returns the device this entry belongs to.
