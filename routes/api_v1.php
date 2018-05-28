@@ -24,7 +24,7 @@ Route::namespace('Api')->group(function () {
     Route::prefix('devices/{device}')->group(function () {
         Route::get('graphs', 'Device\\DeviceGraphController@index')->name('devices.graph.index');
         Route::get('addresses', 'Device\\DeviceAddressController@index')->name('devices.address.index');
-
+        
         Route::get('ports/stack', 'Device\\DevicePortController@stack')->name('devices.port.stack');
         Route::resource('ports', 'Device\\DevicePortController', ['only' => [
             'index',
@@ -42,6 +42,11 @@ Route::namespace('Api')->group(function () {
             'show'
         ]]);
         
+        Route::resource('components', 'Device\\DeviceComponentController', ['except' => [
+            'create',
+            'edit'
+        ]]);
+
         Route::get('services', 'Device\\DeviceServiceController@index')->name('devices.service.index');
         Route::post('services', 'Device\\DeviceServiceController@store')->name('devices.service.store');
         Route::get('inventory', 'Device\\DeviceInventoryController@index')->name('devices.inventory.index');

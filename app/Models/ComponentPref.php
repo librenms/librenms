@@ -25,44 +25,22 @@
 
 namespace App\Models;
 
-class Component extends BaseModel
+class ComponentPref extends BaseModel
 {
     public $timestamps = false;
-    protected $table = 'component';
+
+    protected $table = 'component_prefs';
 
     protected $fillable = [
-        'type',
-        'label',
-        'status',
-        'ignore',
-        'disabled'
+        'attribute',
+        'value'
     ];
 
-    // ---- Query Scopes ----
 
-    public function scopeHasAccess($query, User $user)
-    {
-        return $this->hasDeviceAccess($query, $user);
-    }
-
-    public function setIgnoreAttribute($value)
-    {
-        $this->attributes['ignore'] = (int)$value;
-    }
-
-    public function setDisabledAttribute($value)
-    {
-        $this->attributes['disabled'] = (int)$value;
-    }
     // ---- Define Relationships ----
 
-    public function device()
+    public function component()
     {
-        return $this->belongsTo('App\Models\Device', 'device_id');
-    }
-
-    public function prefs()
-    {
-        return $this->hasMany('App\Models\ComponentPref', 'component');
+        return $this->belongsTo('App\Models\Component', 'component_id', 'component');
     }
 }

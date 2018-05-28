@@ -123,9 +123,7 @@ class DeviceServiceController extends ApiController
                     \Illuminate\Validation\Rule::in(list_available_services())
                 ],
                 'ip'    => 'required|ip',
-                'ignore' => [
-                    \Illuminate\Validation\Rule::in([0, 1, true, false, "true", "false", "1", "0"]),
-                ]
+                'ignore' => 'ext_bool'
             ],
             [
                 'ignore.*'    => "The ignore field must be a boolean"
@@ -137,7 +135,7 @@ class DeviceServiceController extends ApiController
             'service_ip'        => $request->ip,
             'service_desc'      => $request->get('desc', ''),
             'service_param'     => $request->get('param', ''),
-            'service_ignore'    => $request->get('ignore', false),
+            'service_ignore'    => (int)$request->get('ignore', false),
             'service_message'   => "Service not yet checked",
             'service_ds'        => "{}"
         ]);
