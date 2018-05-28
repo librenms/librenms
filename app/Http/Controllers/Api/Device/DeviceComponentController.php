@@ -76,8 +76,8 @@ class DeviceComponentController extends ApiController
      * @apiParam {Number} component_id The id of the Component
      * @apiParam {String} type The type of component to add
      * @apiParam {String} [label] The label for the component
-     * @apiParam {Boolean} [ignore] Ignore alerts on this component, defaults to false
-     * @apiParam {Boolean} [disabled] Disable component entierly, defaults to false
+     * @apiParam {Boolean} [ignore=false] Ignore alerts on this component, defaults to false
+     * @apiParam {Boolean} [disabled=false] Disable component entierly, defaults to false
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -145,8 +145,8 @@ class DeviceComponentController extends ApiController
      * @apiParam {Number} component_id The id of the Component to update
      * @apiParam {String} [type] The type of component to add
      * @apiParam {String} [label] The label for the component
-     * @apiParam {Boolean} [ignore] Ignore alerts on this component, defaults to false
-     * @apiParam {Boolean} [disabled] Disable component entierly, defaults to false
+     * @apiParam {Boolean} [ignore] Ignore alerts on this component
+     * @apiParam {Boolean} [disabled] Disable component entierly
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
