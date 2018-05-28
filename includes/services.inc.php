@@ -129,8 +129,13 @@ function poll_service($service)
 
     // If we do not have a cmd from the check script, build one.
     if ($check_cmd == "") {
-        $check_cmd = $config['nagios_plugins'] . "/check_" . $service['service_type'] . " -H " . ($service['service_ip'] ? $service['service_ip'] : $service['hostname']);
-        $check_cmd .= " " . $service['service_param'];
+        if ($config['disable-H'] == 1) {
+            $check_cmd = $config['nagios_plugins'] . "/check_" . $service['service_type'];
+            $check_cmd .= " " . $service['service_param'];
+        } else {
+            $check_cmd = $config['nagios_plugins'] . "/check_" . $service['service_type'] . " -H " . ($service['service_ip'] ? $service['service_ip'] : $service['hostname']);
+            $check_cmd .= " " . $service['service_param'];
+        }
     }
 
     $service_id = $service['service_id'];
