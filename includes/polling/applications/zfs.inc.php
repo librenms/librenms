@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Exceptions\JsonAppMissingKeysException;
+use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'zfs';
@@ -7,16 +9,23 @@ $app_id = $app['app_id'];
 
 echo $name;
 
+// Is set to false later if missing keys are found. 
+$not_legacy=1;
+
 try {
-    $zfs=json_app_get($device, $name, 0);
-} catch (JsonAppPollingFailedException $e) {
+    $fetched_zfs=json_app_get($device, $name, 1);
+} catch(JsonAppMissingKeysException $e) {
+    //old version with out the data key
+    $zfs=$fetched_zfs;
+} catch (JsonAppException $e) {
     echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
-    update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message 
-    
+    update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message
     return;
 }
 
-
+if ($not_legacy == 1){
+    $zfs=$fetched_zfs[data];
+}
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
@@ -205,4 +214,4 @@ if (empty($pools)) {
 
 //replace $zfs['pools'] with a array where the keys are the pool names and update metrics
 $zfs['pools']=$pools_for_mertrics;
-update_application($app, $json, $zfs);
+update_application($app, $fetched_zfs, $zfs);
