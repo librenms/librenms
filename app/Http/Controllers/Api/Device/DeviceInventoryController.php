@@ -51,11 +51,7 @@ class DeviceInventoryController extends ApiController
      *          ]
      *     }
      *
-     * @apiErrorExample {json} Error-Response:
-     *      HTTP/1.1 404 Not-Found
-     *      {
-     *          "status": "Item not Found"
-     *      }
+     * @apiUse NotFoundError
      */
     public function index(Device $device, Request $request)
     {

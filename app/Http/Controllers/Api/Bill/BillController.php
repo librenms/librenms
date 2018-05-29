@@ -18,11 +18,10 @@ class BillController extends ApiController
      * @apiGroup Bills
      * @apiVersion  1.0.0
      *
-     * @apiParam {Number} [per_page=50] Optional How many items to retrieve
-     * @apiParam {Number} [current_page=1] Optional Active page of items
      * @apiParam {Boolean} [previous=false] Optional Indicates you would like the data for the last complete period rather than the current period
      * @apiParam {String} [ref] Optional The billing reference
      * @apiParam {String} [custid] Optional The customer reference
+     * @apiUse Pagination
      *
      * @apiExample {curl} Example usage wihout parameters:
      *     curl -H 'X-Auth-Token: YOURAPITOKENHERE' -H 'Content-Type: application/json' -i http://example.org/api/v1/bill
@@ -277,11 +276,7 @@ class BillController extends ApiController
      *          }
      *      }
      *
-     * @apiErrorExample {json} Error-Response:
-     *      HTTP/1.1 404 Not-Found
-     *      {
-     *          "status": "Item not Found"
-     *      }
+     * @apiUse NotFoundError
      *
      */
     public function show(Bill $bill)
@@ -501,11 +496,7 @@ class BillController extends ApiController
      *          "message": "Bill has been updated"
      *      }
      *
-     * @apiErrorExample {json} Error-Response:
-     *      HTTP/1.1 404 Not-Found
-     *      {
-     *          "status": "Item not Found"
-     *      }
+     * @apiUse NotFoundError
      *
      * @apiErrorExample {json} Validation Error-Response:
      *      HTTP/1.1 422 Unproccesssable Entity
@@ -585,11 +576,7 @@ class BillController extends ApiController
      *          "message": "Bill has been removed"
      *      }
      *
-     * @apiErrorExample {json} Error-Response:
-     *      HTTP/1.1 404 Not-Found
-     *      {
-     *          "status": "Item not Found"
-     *      }
+     * @apiUse NotFoundError
      *
      */
     public function destroy(Bill $bill)

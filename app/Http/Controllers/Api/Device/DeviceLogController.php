@@ -9,16 +9,15 @@ use App\Http\Controllers\Api\ApiController;
 class DeviceLogController extends ApiController
 {
     /**
-     * @api {get} /api/v1/devices/:id/logs/syslog Get all syslogs
-     * @apiName Get_syslogs
-     * @apiGroup Logs
+     * @api {get} /api/v1/devices/:id/logs/syslog Get device syslogs
+     * @apiName Get_device_syslogs
+     * @apiGroup Device Logs
      * @apiVersion  1.0.0
      *
      * @apiParam {Number} id The id or Hostname of the device.
      * @apiParam {String} [to] Optional The data and time to search to.
      * @apiParam {String} [from] Optional The date and time to search from.
-     * @apiParam {Number} [per_page=50] Optional How many items to retrieve
-     * @apiParam {Number} [current_page=1] Optional Active page of items
+     * @apiUse Pagination
      *
      * @apiExample {curl} Example usage:
      *     curl -H 'X-Auth-Token: YOURAPITOKENHERE' -H 'Content-Type: application/json' -i http://example.org/api/v1/devices/1/logs/syslog?from=2018-05-28 12:00
@@ -69,9 +68,9 @@ class DeviceLogController extends ApiController
     }
 
     /**
-     * @api {get} /api/v1/devices/:id/logs/eventlog Get all eventlogs
-     * @apiName Get_eventlogs
-     * @apiGroup Logs
+     * @api {get} /api/v1/devices/:id/logs/eventlog Get device eventlogs
+     * @apiName Get_device_eventlogs
+     * @apiGroup Device Logs
      * @apiVersion  1.0.0
      *
      * @apiParam {Number} id The id or Hostname of the device.
@@ -130,9 +129,9 @@ class DeviceLogController extends ApiController
     }
 
     /**
-     * @api {get} /api/v1/devices/:id/logs/alertlog Get all alertlogs
-     * @apiName Get_alertlogs
-     * @apiGroup Logs
+     * @api {get} /api/v1/devices/:id/logs/alertlog Get device alertlogs
+     * @apiName Get_device_alertlogs
+     * @apiGroup Device Logs
      * @apiVersion  1.0.0
      *
      * @apiParam {Number} id The id or Hostname of the device.

@@ -15,8 +15,7 @@ class DeviceController extends ApiController
      * @apiGroup Devices
      * @apiVersion  1.0.0
      *
-     * @apiParam {Number} [per_page=50] Optional How many items to retrieve
-     * @apiParam {Number} [current_page=1] Optional Active page of items
+     * @apiUse Pagination
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -152,11 +151,7 @@ class DeviceController extends ApiController
      *         }
      *     }
      *
-     * @apiErrorExample {json} Error-Response:
-     *      HTTP/1.1 404 Not-Found
-     *      {
-     *          "status": "Item not Found"
-     *      }
+     * @apiUse NotFoundError
      *
      */
     public function show(Device $device)
@@ -339,6 +334,8 @@ class DeviceController extends ApiController
      *              "message": "Removed device test.example.org"
      *          }
      *     }
+     *
+     * @apiUse NotFoundError
      *
      */
     public function destroy(Device $device)

@@ -13,8 +13,7 @@ class PortController extends ApiController
      * @apiGroup Port
      * @apiVersion  1.0.0
      *
-     * @apiParam {Number} [per_page=50] Optional How many items to retrieve
-     * @apiParam {Number} [current_page=1] Optional Active page of items
+     * @apiUse Pagination
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -200,6 +199,7 @@ class PortController extends ApiController
      *          }
      *     }
      *
+     * @apiUse NotFoundError
      */
 
     public function show(Port $port)

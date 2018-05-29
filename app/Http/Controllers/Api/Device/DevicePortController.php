@@ -193,11 +193,7 @@ class DevicePortController extends ApiController
      *          }
      *     }
      *
-     * @apiErrorExample {json} Error-Response:
-     *      HTTP/1.1 404 Not-Found
-     *      {
-     *          "status": "Item not Found"
-     *      }
+     * @apiUse NotFoundError
      */
     public function show(Device $device, Port $port)
     {
@@ -234,11 +230,7 @@ class DevicePortController extends ApiController
      *          ]
      *      }
      *
-     * @apiErrorExample {json} Error-Response:
-     *      HTTP/1.1 404 Not-Found
-     *      {
-     *          "status": "Item not Found"
-     *      }
+     * @apiUse NotFoundError
      */
     public function stack(Device $device)
     {

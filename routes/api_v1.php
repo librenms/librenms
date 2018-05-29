@@ -87,6 +87,16 @@ Route::namespace('Api')->group(function () {
 
     Route::get('inventory', 'InventoryController@index')->name('inventory.index');
 
+    Route::resource('alerts', 'AlertController', ['except' => [
+        'create',
+        'edit'
+    ]]);
+
+    Route::resource('rules', 'RuleController', ['except' => [
+        'create',
+        'edit'
+    ]]);
+
     Route::prefix('graphs')->group(function () {
         Route::prefix('devices/{device}')->group(function () {
             // Route::get('health/{class}', 'Graph\\DeviceHealthController@index');

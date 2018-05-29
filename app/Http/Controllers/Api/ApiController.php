@@ -4,6 +4,23 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 
+/**
+ * @apiDefine NotFoundError
+ * @apiError NotFound The id of this resource was not found
+ * 
+ * @apiErrorExample Error-Response:
+ *      HTTP/1.1 404 Not Found
+ *      {
+ *          "status": "Item not found"
+ *      }
+ *
+ */
+
+/**
+ * @apiDefine Pagination
+ * @apiParam {Number} [per_page=50] How many items to retrieve
+ * @apiParam {Number} [current_page=1] Active page of items
+ */
 class ApiController extends Controller
 {
     /**

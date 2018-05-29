@@ -14,7 +14,8 @@ class BillHistoryController extends ApiController
      * @apiGroup Bill History
      * @apiVersion  1.0.0
      *
-     * @apiParam  {Number} id Id of the bill
+     * @apiParam  {Number} id Id of the bill.
+     * @apiUse Pagination
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -55,11 +56,7 @@ class BillHistoryController extends ApiController
      *         "total": 1
      *     }
      *
-     * @apiErrorExample {json} Error-Response:
-     *      HTTP/1.1 404 Not-Found
-     *      {
-     *          "status": "Item not Found"
-     *      }
+     * @apiUse NotFoundError
      *
      */
     public function index(Bill $bill)

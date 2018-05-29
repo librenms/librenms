@@ -72,8 +72,7 @@ class LogController extends ApiController
      *
      * @apiParam {String} [to] Optional The data and time to search to.
      * @apiParam {String} [from] Optional The date and time to search from.
-     * @apiParam {Number} [per_page=50] Optional How many items to retrieve
-     * @apiParam {Number} [current_page=1] Optional Active page of items
+     * @apiUse Pagination
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -125,8 +124,7 @@ class LogController extends ApiController
      *
      * @apiParam {String} [to] Optional The data and time to search to.
      * @apiParam {String} [from] Optional The date and time to search from.
-     * @apiParam {Number} [per_page=50] Optional How many items to retrieve
-     * @apiParam {Number} [current_page=1] Optional Active page of items
+     * @apiUse Pagination
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -182,8 +180,7 @@ class LogController extends ApiController
      *
      * @apiParam {String} [to] Optional The data and time to search to.
      * @apiParam {String} [from] Optional The date and time to search from.
-     * @apiParam {Number} [per_page=50] Optional How many items to retrieve
-     * @apiParam {Number} [current_page=1] Optional Active page of items
+     * @apiUse Pagination
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK

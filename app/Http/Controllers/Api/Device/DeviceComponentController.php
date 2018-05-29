@@ -168,11 +168,7 @@ class DeviceComponentController extends ApiController
      *          ]
      *      }
      *
-     * @apiErrorExample {json} Error-Response:
-     *      HTTP/1.1 404 Not-Found
-     *      {
-     *          "status": "Item not Found"
-     *      }
+     * @apiUse NotFoundError
      */
     public function update(Request $request, Device $device, Component $component)
     {
@@ -208,11 +204,7 @@ class DeviceComponentController extends ApiController
      *          }
      *     }
      *
-     * @apiErrorExample {json} Error-Response:
-     *      HTTP/1.1 404 Not-Found
-     *      {
-     *          "status": "Item not Found"
-     *      }
+     * @apiUse NotFoundError
      */
     public function destroy(Device $device, Component $component)
     {

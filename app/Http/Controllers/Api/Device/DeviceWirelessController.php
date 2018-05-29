@@ -50,7 +50,7 @@ class DeviceWirelessController extends ApiController
      *
      * @apiExample {curl} Example usage:
      *     curl -H 'X-Auth-Token: YOURAPITOKENHERE' -H 'Content-Type: application/json' -i http://example.org/api/v1/devices/1/wireless/clients
-     * 
+     *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
      *     {
@@ -84,11 +84,7 @@ class DeviceWirelessController extends ApiController
      *          ]
      *     }
      *
-     * @apiErrorExample {json} Error-Response:
-     *      HTTP/1.1 404 Not-Found
-     *      {
-     *          "status": "Item not Found"
-     *      }
+     * @apiUse NotFoundError
      */
     public function show(Device $device, $class)
     {
