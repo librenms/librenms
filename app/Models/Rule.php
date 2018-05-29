@@ -26,6 +26,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+
 /**
  * App\Models\Alerting\Rule
  *
@@ -73,14 +74,11 @@ class Rule extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        "mute",
+        "extra",
         "disabled",
         "severity",
-        "invert",
-        "count",
         "rule",
         "device_id",
-        "delay",
     ];
 
     public function setDisabledAttribute($value)

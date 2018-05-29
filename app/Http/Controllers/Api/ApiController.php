@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 /**
  * @apiDefine NotFoundError
  * @apiError NotFound The id of this resource was not found
- * 
+ *
  * @apiErrorExample Error-Response:
  *      HTTP/1.1 404 Not Found
  *      {

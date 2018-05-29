@@ -16,8 +16,6 @@ class AlertController extends ApiController
      *
      * @apiUse Pagination
      *
-     * @apiSuccess (200) {type} name description
-     *
      * @apiSuccessExample {type} Success-Response:
      *      HTTP/1.1 200 OK
      *      {
@@ -36,8 +34,8 @@ class AlertController extends ApiController
      *          "current_page": 1,
      *          "from": 1,
      *          "last_page": 4,
-     *          "next_page_url": "http://172.16.2.198/api/v1/alerts?page=2",
-     *          "path": "http://172.16.2.198/api/v1/alerts",
+     *          "next_page_url": "http://example.org/api/v1/alerts?page=2",
+     *          "path": "http://example.org/api/v1/alerts",
      *          "per_page": 50,
      *          "prev_page_url": null,
      *          "to": 50,
@@ -132,16 +130,16 @@ class AlertController extends ApiController
     }
 
     /**
-     * 
+     *
      * @api {put} /api/v1/alerts/:id Acknowledge an alert
      * @apiName Acknowledge_alert
      * @apiDescription Acknowledge an alert by ID
      * @apiGroup Alerts
      * @apiVersion  1.0.0
-     * 
-     * 
+     *
+     *
      * @apiParam  {Number} id The id of the alert.
-     * 
+     *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
      *     {
@@ -152,7 +150,7 @@ class AlertController extends ApiController
      *     }
      *
      * @apiUse NotFoundError
-     * 
+     *
      */
     public function update(Alert $alert)
     {
@@ -161,16 +159,16 @@ class AlertController extends ApiController
     }
 
     /**
-     * 
+     *
      * @api {delete} /api/v1/alerts/:id Unmute an alert
      * @apiName Unute_alert
      * @apiDescription Unmute an alert by ID
      * @apiGroup Alerts
      * @apiVersion  1.0.0
-     * 
-     * 
+     *
+     *
      * @apiParam  {Number} id The id of the alert.
-     * 
+     *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
      *     {
@@ -181,7 +179,7 @@ class AlertController extends ApiController
      *     }
      *
      * @apiUse NotFoundError
-     * 
+     *
      */
     public function destroy(Alert $alert)
     {

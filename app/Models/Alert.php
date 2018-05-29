@@ -54,6 +54,18 @@ class Alert extends Model
         return $query->where('state', '=', '2');
     }
 
+    public function acknowledge()
+    {
+        $this->attributes['state'] = '2';
+        $this->save();
+    }
+
+    public function unmute()
+    {
+        $this->attributes['state'] = '1';
+        $this->save();
+    }
+
     // ---- Define Relationships ----
 
     public function device()
