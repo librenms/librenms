@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use LibreNMS\Util\GitHub;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\ProcessBuilder;
 
 class release extends Command
 {
@@ -12,7 +14,11 @@ class release extends Command
      *
      * @var string
      */
-    protected $signature = 'release:tag {tag} {from} {file}';
+    protected $signature = 'release:tag
+                            {tag : The new tag / version}
+                            {from : The previous tag / version}
+                            {--file= : The filename to update}
+                            {--pr= : The last PR to include in this release if not master branch}';
 
     /**
      * The console command description.
@@ -40,11 +46,22 @@ class release extends Command
     {
         $tag   = $this->argument('tag');
         $from  = $this->argument('from');
-        $file  = $this->argument('file');
+        $file  = $this->option('file') ?: 'doc/General/Changelog.md';
+        $pr    = $this->option('pr');
         $token = getenv('GH_TOKEN') ?: $this->secret('Enter a GitHub Token?');
 
-        $gh = new GitHub($tag, $from, $file, $token);
         $this->info("Creating release $tag.....");
-        $gh->createRelease();
+        $gh = new GitHub($tag, $from, $file, $token, $pr);
+        $gh->createChangelog();
+        $this->info("Changelog generated for $tag");
+
+        if ($this->confirm('Do you want to view the generated Changelog?')) {
+            echo $gh->getMarkdown();
+        }
+
+        if ($this->confirm("Do you want to create the release $tag on GitHub?")) {
+            //$gh->createRelease();
+            $this->error('Unsupported right now');
+        }
     }
 }

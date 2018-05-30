@@ -28,6 +28,7 @@ namespace LibreNMS\Util;
 
 use Requests;
 use DateTime;
+use SebastianBergmann\CodeCoverage\Report\PHP;
 
 class GitHub
 {
@@ -35,6 +36,7 @@ class GitHub
     protected $from;
     protected $token;
     protected $file;
+    protected $pr;
     protected $stop = false;
     protected $pull_requests = [];
     protected $changelog = [];
@@ -42,17 +44,24 @@ class GitHub
     protected $labels = ['webui', 'api', 'documentation', 'security', 'feature', 'enhancement', 'device', 'bug', 'alerting'];
     protected $github = 'https://api.github.com/repos/librenms/librenms';
 
-    public function __construct($tag, $from, $file, $token = null)
+    public function __construct($tag, $from, $file, $token = null, $pr = null)
     {
         $this->tag  = $tag;
         $this->from = $from;
         $this->file = $file;
+        $this->pr   = $pr;
         if (is_null($token) === false || getenv('GH_TOKEN')) {
             $this->token = $token ?: getenv('GH_TOKEN');
         }
     }
 
-    public function getToken()
+    /**
+     *
+     * Return the GitHub Authorization header for the API call
+     *
+     * @return array
+     */
+    public function getHeaders()
     {
         if (is_null($this->token) === false) {
             return ['Authorization' => "token {$this->token}"];
@@ -60,23 +69,55 @@ class GitHub
         return [];
     }
 
+    /**
+     *
+     * Get the release information for a specific tag
+     *
+     * @param $tag
+     * @return mixed
+     */
     public function getRelease($tag)
     {
-        $release = Requests::get($this->github . "/releases/tags/$tag", self::getToken());
+        $release = Requests::get($this->github . "/releases/tags/$tag", self::getHeaders());
         return json_decode($release->body, true);
     }
 
+    /**
+     *
+     * Get a single pull request information
+     *
+     * @return mixed
+     */
+    public function getPullRequest()
+    {
+        $pull_request = Requests::get($this->github . "/pulls/{$this->pr}", self::getHeaders());
+        $this->pr = json_decode($pull_request->body, true);
+    }
+
+    /**
+     *
+     * Get all closed pull requests up to a certain date
+     *
+     * @param $date
+     * @param int $page
+     * @return bool
+     */
     public function getPullRequests($date, $page = 1)
     {
-        $prs = Requests::get($this->github . "/pulls?state=closed&page=$page", self::getToken());
+        $prs = Requests::get($this->github . "/pulls?state=closed&page=$page", self::getHeaders());
         $prs = json_decode($prs->body, true);
         foreach ($prs as $k => $pr) {
             if ($pr['merged_at']) {
-                $merged = new DateTime($pr['merged_at']);
-                $end_date = new DateTime($date);
-                if ($merged < $end_date) {
+                $merged     = new DateTime($pr['merged_at']);
+                $end_date   = new DateTime($date);
+                if (isset($this->pr['merged_at']) && $merged > new DateTime($this->pr['merged_at'])) {
+                    // If the date of this PR is newer than the final PR then skip over it
+                    continue;
+                } elseif ($merged < $end_date) {
+                    // If the date of this PR is older than the last release we're done
                     return true;
                 } else {
+                    // If not, assign this PR to the array
                     $this->pull_requests[] = $pr;
                 }
             }
@@ -84,6 +125,11 @@ class GitHub
         $this->getPullRequests($date, $page+1);
     }
 
+    /**
+     *
+     * Build the data for the change log.
+     *
+     */
     public function buildChangeLog()
     {
         $output = [];
@@ -106,12 +152,17 @@ class GitHub
         $this->changelog = ['changelog' => $output, 'users' => $users];
     }
 
+    /**
+     *
+     * Format the change log into Markdown.
+     *
+     */
     public function formatChangeLog()
     {
         $tmp_markdown = "##$this->tag" . PHP_EOL;
-        $tmp_markdown .= '*(' . date('Y-m-d') . ')*' . PHP_EOL;
+        $tmp_markdown .= '*(' . date('Y-m-d') . ')*' . PHP_EOL . PHP_EOL;
         if (!empty($this->changelog['users'])) {
-            $tmp_markdown .= count($this->changelog['users']) . " contributing users" . PHP_EOL;
+            $tmp_markdown .= "A big thank you to the following " . count($this->changelog['users']) . " contributors this last month:" . PHP_EOL;
             asort($this->changelog['users']);
             foreach (array_reverse($this->changelog['users']) as $user => $count) {
                 $tmp_markdown .= "  - $user ($count)" . PHP_EOL;
@@ -128,20 +179,63 @@ class GitHub
         $this->markdown = $tmp_markdown;
     }
 
+    /**
+     *
+     * Update the specified file with the new Change log info.
+     *
+     */
     public function writeChangeLog()
     {
-        $existing = file_get_contents($this->file);
-        $content  = $this->markdown . PHP_EOL . $existing;
-        file_put_contents($this->file, $content);
+        if (file_exists($this->file)) {
+            $existing = file_get_contents($this->file);
+            $content = $this->getMarkdown() . PHP_EOL . $existing;
+            if (is_writable($this->file)) {
+                file_put_contents($this->file, $content);
+            }
+        } else {
+            echo "Couldn't write to file {$this->file}" . PHP_EOL;
+            exit;
+        }
+    }
+
+    /**
+     *
+     * Return the generated markdown.
+     *
+     * @return mixed
+     */
+    public function getMarkdown()
+    {
+        return $this->markdown;
     }
 
     public function createRelease()
     {
+        //FIXME Come back to this
+        return false;
+        $sha = isset($this->pr['merge_commit_sha']) ? $this->pr['merge_commit_sha'] : 'master';
+        $release = Requests::post($this->github . "/releases", self::getHeaders(), [
+            'tag_name' => $this->tag,
+            'target_commitish' => $sha,
+            'body' => $this->getMarkdown(),
+            'draft' => true,
+        ]);
+    }
+
+    /**
+     *
+     * Function to control the creation of creating a change log.
+     *
+     */
+    public function createChangelog()
+    {
         $previous_release = $this->getRelease($this->from);
+        if (is_null($this->pr) !== true) {
+            $this->getPullRequest();
+        }
         $this->getPullRequests($previous_release['published_at']);
         $this->buildChangeLog();
         $this->formatChangeLog();
         $this->writeChangeLog();
     }
-
 }
