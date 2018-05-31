@@ -1,5 +1,5 @@
 os: barracudaspamfirewall
-text: 'Barracuda Spam Firewall'
+text: 'Barracuda Email Security Gateway'
 type: firewall
 icon: barracuda
 over:
@@ -7,3 +7,4 @@ over:
 discovery:
     - sysDescr:
         - Barracuda Spam Firewall
+        - Barracuda Email Security Gateway

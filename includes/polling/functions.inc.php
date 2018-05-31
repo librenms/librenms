@@ -1,6 +1,13 @@
 <?php
 
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Exceptions\JsonAppException;
+use LibreNMS\Exceptions\JsonAppPollingFailedException;
+use LibreNMS\Exceptions\JsonAppParsingFailedException;
+use LibreNMS\Exceptions\JsonAppBlankJsonException;
+use LibreNMS\Exceptions\JsonAppMissingKeysException;
+use LibreNMS\Exceptions\JsonAppWrongVersionException;
+use LibreNMS\Exceptions\JsonAppExtendErroredException;
 
 function bulk_sensor_snmpget($device, $sensors)
 {
@@ -689,4 +696,86 @@ function convert_to_celsius($value)
 {
     $value = ($value - 32) / 1.8;
     return sprintf('%.02f', $value);
+}
+
+
+/**
+ * This is to make it easier polling apps. Also to help standardize around JSON.
+ *
+ * The required keys for the returned JSON are as below.
+ *  version     - The version of the snmp extend script. Should be numeric and at least 1.
+ *  error       - Error code from the snmp extend script. Should be > 0 (0 will be ignored and negatives are reserved)
+ *  errorString - Text to describe the error.
+ *  data        - An key with an array with the data to be used.
+ *
+ * If the app returns an error, an exception will be raised.
+ * Positive numbers will be errors returned by the extend script.
+ *
+ * Possible parsing related errors:
+ * -2 : Failed to fetch data from the device
+ * -3 : Could not decode the JSON.
+ * -4 : Empty JSON parsed, meaning blank JSON was returned.
+ * -5 : Valid json, but missing required keys
+ * -6 : Returned version is less than the min version.
+ *
+ * Error checking may also be done via checking the exceptions listed below.
+ *   JsonAppPollingFailedException, -2 : Empty return from SNMP.
+ *   JsonAppParsingFailedException, -3 : Could not parse the JSON.
+ *   JsonAppBlankJsonException, -4     : Blank JSON.
+ *   JsonAppMissingKeysException, -5   : Missing required keys.
+ *   JsonAppWrongVersionException , -6 : Older version than supported.
+ *   JsonAppExtendErroredException     : Polling and parsing was good, but the returned data has an error set.
+ *                                       This may be checked via $e->getParsedJson() and then checking the
+ *                                       keys error and errorString.
+ * The error value can be accessed via $e->getCode()
+ * The output can be accessed via $->getOutput() Only returned for code -3 or lower.
+ * The parsed JSON can be access via $e->getParsedJson()
+ *
+ * All of the exceptions extend JsonAppException.
+ *
+ * If the error is less than -1, you can assume it is a legacy snmp extend script.
+ *
+ * @param array $device
+ * @param string $extend the extend name. For example, if 'zfs' is passed it will be converted to 'nsExtendOutputFull.3.122.102.115'.
+ * @param integer $min_version the minimum version to accept for the returned JSON. default: 1
+ *
+ * @return array The json output data parsed into an array
+ * @throws JsonAppPollingFailedException
+ */
+function json_app_get($device, $extend, $min_version = 1)
+{
+    $output = snmp_get($device, 'nsExtendOutputFull.'.string_to_oid($extend), '-Oqv', 'NET-SNMP-EXTEND-MIB');
+
+    // make sure we actually get something back
+    if (empty($output)) {
+        throw new JsonAppPollingFailedException("Empty return from snmp_get.", -2);
+    }
+
+    //  turn the JSON into a array
+    $parsed_json = json_decode(stripslashes($output), true);
+
+    // improper JSON or something else was returned. Populate the variable with an error.
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        throw new JsonAppParsingFailedException("Invalid JSON", $output, -3);
+    }
+
+    // There no keys in the array, meaning '{}' was was returned
+    if (empty($parsed_json)) {
+        throw new JsonAppBlankJsonException("Blank JSON returned.", $output, -4);
+    }
+
+    // It is a legacy JSON app extend, meaning these are not set
+    if (!isset($parsed_json['error'], $parsed_json['data'], $parsed_json['errorString'], $parsed_json['version'])) {
+        throw new JsonAppMissingKeysException("Legacy script or extend error, missing one or more required keys.", $output, $parsed_json, -5);
+    }
+
+    if ($parsed_json['version'] < $min_version) {
+        throw new JsonAppWrongVersionException("Script,'".$parsed_json['version']."', older than required version of '$min_version'", $output, $parsed_json, -6);
+    }
+
+    if ($parsed_json['error'] != 0) {
+        throw new JsonAppExtendErroredException("Script returned exception: {$parsed_json['errorString']}", $output, $parsed_json, $parsed_json['error']);
+    }
+
+    return $parsed_json;
 }

@@ -5,7 +5,7 @@ use LibreNMS\Authentication\Auth;
 $param = array();
 
 $select = "SELECT `F`.`port_id` AS `port_id`, `F`.`device_id`, `ifInErrors`, `ifOutErrors`, `ifOperStatus`,";
-$select .= " `ifAdminStatus`, `ifAlias` AS `interface`, `ifDescr`, `mac_address`, `V`.`vlan_vlan` AS `vlan`,";
+$select .= " `ifAdminStatus`, `ifAlias`, `ifDescr`, `mac_address`, `V`.`vlan_vlan` AS `vlan`,";
 $select .= " `hostname`, `hostname` AS `device` , group_concat(`M`.`ipv4_address` SEPARATOR ', ') AS `ipv4_address`";
 
 $sql  = " FROM `ports_fdb` AS `F`";
@@ -35,16 +35,26 @@ if (is_numeric($vars['port_id'])) {
 
 if (isset($vars['searchPhrase']) && !empty($vars['searchPhrase'])) {
     $search = mres(trim($vars['searchPhrase']));
-    $ip_search = '%'.mres(trim($vars['searchPhrase'])).'%';
     $mac_search = '%'.str_replace(array(':', ' ', '-', '.', '0x'), '', $search).'%';
 
     if (isset($vars['searchby']) && $vars['searchby'] == 'vlan') {
         $where  .= ' AND `V`.`vlan_vlan` = ?';
         $param[] = (int)$search;
     } elseif (isset($vars['searchby']) && $vars['searchby'] == 'ip') {
+        $ip = $vars['searchPhrase'];
+        $ip_search = '%'.mres(trim($ip)).'%';
         $sql .= " LEFT JOIN `ipv4_mac` AS `M` USING (`mac_address`)";
         $where  .= ' AND `M`.`ipv4_address` LIKE ?';
         $param[] = $ip_search;
+    } elseif (isset($vars['searchby']) && $vars['searchby'] == 'dnsname') {
+        $ip = gethostbyname($vars['searchPhrase']);
+        $ip_search = '%'.mres(trim($ip)).'%';
+        $sql .= " LEFT JOIN `ipv4_mac` AS `M` USING (`mac_address`)";
+        $where  .= ' AND `M`.`ipv4_address` LIKE ?';
+        $param[] = $ip_search;
+    } elseif (isset($vars['searchby']) && $vars['searchby'] == 'description') {
+        $where  .= ' AND `P`.`ifAlias` LIKE ?';
+        $param[] = $desc_search;
     } elseif ((isset($vars['searchby']) && $vars['searchby'] == 'mac') ||
         (!is_numeric($search) || $search > 4096)
     ) {
@@ -60,8 +70,8 @@ if (isset($vars['searchPhrase']) && !empty($vars['searchPhrase'])) {
 $total = (int)dbFetchCell("SELECT COUNT(*) $sql $where", $param);
 
 // Don't use ipv4_mac in count it will inflate the rows unless we aggregate it
-// Except for 'ip' search.
-if ($vars['searchby'] != 'ip') {
+// Except for ip search.
+if ($vars['searchby'] != 'ip' && $vars['searchby'] != 'dnsname') {
     $sql .= " LEFT JOIN `ipv4_mac` AS `M` USING (`mac_address`)";
 }
 $sql .= $where;
@@ -106,8 +116,10 @@ foreach (dbFetchRows($select . $sql, $param) as $entry) {
         }
         if ($entry['port_id'] == $endpoint_portid) {
             $endpoint_img = "<i class='fa fa-star fa-lg' style='color:green' aria-hidden='true' title='This indicates the most likely endpoint switchport'></i>";
+            $dnsname = gethostbyaddr(reset(explode(',', $entry['ipv4_address']))) ?: 'N/A';
         } else {
             $endpoint_img = '';
+            $dnsname = "N/A";
         }
 
         $response[] = array(
@@ -116,6 +128,8 @@ foreach (dbFetchRows($select . $sql, $param) as $entry) {
             'ipv4_address' => $entry['ipv4_address'],
             'interface'    => generate_port_link($entry, makeshortif(fixifname($entry['label']))).' '.$error_img.' '.$endpoint_img,
             'vlan'         => $entry['vlan'],
+            'description'  => $entry['ifAlias'],
+            'dnsname'      => $dnsname,
         );
     }//end if
 
