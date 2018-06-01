@@ -33,21 +33,21 @@ if (!Auth::user()->hasGlobalAdmin()) {
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-8">
                         <div class="form-group">
                             <label for="template" class="control-label">Template:</label><br />
                             <div class="alert alert-danger" role="alert">You can enter text for your template directly below if you're feeling brave enough :)</div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
-                            <label for="designer" class="control-label">Designer:</label><br />
-                            <div class="alert alert-warning" role="alert">The designer below will help you create a template - be warned, it's beta :)</div>
+                            <label for="designer" class="control-label">Documentation:</label><br />
+                            <div class="alert alert-warning" role="alert">Alert templates</div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-8">
                         <div class="form-group">
                             <textarea class="form-control" id="template" name="template" rows="15"></textarea><br /><br />
                             <strong><em>Give your template a name: </em></strong><br />
@@ -58,7 +58,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
                             <button type="button" class="btn btn-primary btn-sm" name="create-template" id="create-template">Create template</button>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <span><strong>Controls:</strong><br />
 <?php

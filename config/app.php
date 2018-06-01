@@ -183,6 +183,7 @@ return [
          */
         Kamaln7\Toastr\ToastrServiceProvider::class,
 
+        'Flynsarmy\DbBladeCompiler\DbBladeCompilerServiceProvider',
     ],
 
     /*
@@ -236,6 +237,8 @@ return [
 
         // LibreNMS
 //        'LibreConfig' => \LibreNMS\Config::class,
+
+        'DbView'          => 'Flynsarmy\DbBladeCompiler\Facades\DbView',
     ],
 
 ];

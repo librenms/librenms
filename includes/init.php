@@ -88,6 +88,12 @@ if (module_selected('polling', $init_modules)) {
 }
 
 if (module_selected('alerts', $init_modules)) {
+    // Boot Laravel - we only use it in alerting at present
+    require $install_dir . '/bootstrap/autoload.php';
+    $app = require_once $install_dir . '/bootstrap/app.php';
+    $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+    $kernel->bootstrap();
+
     require_once $install_dir . '/includes/device-groups.inc.php';
     require_once $install_dir . '/includes/alerts.inc.php';
 }

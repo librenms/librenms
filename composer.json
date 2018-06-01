@@ -37,7 +37,7 @@
         "influxdb/influxdb-php": "^1.14",
         "laravel/laravel": "5.4.*",
         "oriceon/toastr-5-laravel": "dev-master",
-
+        "flynsarmy/db-blade-compiler": "*",
         "doctrine/inflector": "1.1.*",
         "symfony/event-dispatcher": "3.*",
         "symfony/css-selector": "3.*",

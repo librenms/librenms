@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "43d724abea8fe593dd8200103c96583d",
+    "content-hash": "fe5b2d9ba828d0addc6ef862870f3626",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -405,6 +405,54 @@
                 "html"
             ],
             "time": "2018-02-23T01:58:20+00:00"
+        },
+        {
+            "name": "flynsarmy/db-blade-compiler",
+            "version": "5.4.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Flynsarmy/laravel-db-blade-compiler.git",
+                "reference": "a776c4d6f7b746fc0018f8a2ad511c6cdbadffa8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Flynsarmy/laravel-db-blade-compiler/zipball/a776c4d6f7b746fc0018f8a2ad511c6cdbadffa8",
+                "reference": "a776c4d6f7b746fc0018f8a2ad511c6cdbadffa8",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Flynsarmy\\DbBladeCompiler\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Flyn San",
+                    "email": "flynsarmy@gmail.com"
+                },
+                {
+                    "name": "Ebrahim Radi",
+                    "email": "ebrahim.radi@gmail.com",
+                    "homepage": "http://me2bits.com"
+                }
+            ],
+            "description": "Render Blade templates from Eloquent Model Fields",
+            "keywords": [
+                "blade",
+                "compiler",
+                "eloquent",
+                "laravel",
+                "model"
+            ],
+            "time": "2017-12-11T23:11:52+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
