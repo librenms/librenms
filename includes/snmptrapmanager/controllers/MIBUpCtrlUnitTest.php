@@ -1,13 +1,15 @@
-<?php
+<?php namespace snmptrapmanager;
 
-class MIBUpCtrlUnitTest extends MIBUpCtrl {
+class MIBUpCtrlUnitTest extends MIBUpCtrl
+{
 
-	private function test() {
-		return true;
-	}
+    private function test()
+    {
+        return true;
+    }
 
-	public function run() {
-		return $this->test();
-	}
-
+    public function run()
+    {
+        return $this->test();
+    }
 }

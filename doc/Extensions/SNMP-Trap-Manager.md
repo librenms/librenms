@@ -6,7 +6,7 @@ SNMP Trap Manager is a plugin which adds SNMP Trap functionality into LibreNMS t
 
  * LibreNMS SNMPTT plugin
  * Add trap handler `genericTrap.inc.php`
- * Need `snmptrap.php` minor change to work
+ * Add `snmptrap.php` minor changes
 
 ## Setup
 
@@ -17,11 +17,8 @@ Mandatory configuration lines are available into specific configuration files, t
     3. Configure `snmptrapd.conf`, `snmptt.ini` and `snmp.conf`. See embedded files for the configuration lines to check/add
     4. Start and enable the `snmptt` daemon. Check that it is correctly launched and fix all startup problem before continuing
     5. Start and enable the `snmptrapd` daemon
-    6. Copy files from `librenms` directory into the librenms setup directory, reespecting the current plugin tree.
-    7. Add required plugin configuraton lines into `config.php`. See `src/librenms/config.php`
-    8. Enable the plugin through `Plugin Admin`
-    9. Go to plugin index page to init the database. Actually this step is not made during a trap reception for performance optimization
-    10. Fill the `ssh/config` file from `misc` directory and configure SSH commands into configuration. The SSH keys copy is mandatory.
+    6. Go to `Admin Menu`, `SNMP Trap Manager` menu index page to init the database. Actually this step is not made during a trap reception for performance optimization
+    10. Creating the `/opt/librenms/ssh` directory and fill the `/opt/librenms/ssh/config` file from `misc/ssh` directory and configure SSH commands into configuration. The SSH keys creation is mandatory ( ssh-keygen -t rsa -f /opt/librenms/ssh/id_rsa ).
 
 Note from `snmp.conf` : it is not possible to modify thi file, you can use the environment variable `MIBDIRS` before all PHP/snmptt script launch.
 
@@ -30,10 +27,12 @@ From the `snmptt_restart` command, you have to configure `sudo`, like in this sa
 Creating directories and files configured for the plugin, on the `frontend` side but also on the `pollers` side :
 
 ```
-mkdir -p /opt/librenms/mibuploader/mibs/
-mkdir -p /opt/librenms/mibuploader/snmpttmibs/
-touch /opt/librenms/mibuploader/snmptt.conf
-chown -R apache:librenms /opt/librenms/mibuploader
+mkdir -p /opt/librenms/snmptrapmanager/mibs/
+mkdir -p /opt/librenms/snmptrapmanager/snmpttmibs/
+touch /opt/librenms/snmptrapmanager/snmptt.conf
+chown -R apache:librenms /opt/librenms/snmptrapmanager ( apache on redhat like distrib)
+chown -R nginx:librenms /opt/librenms/snmptrapmanager ( nginx on redhat like distrib)
+chown -R www-data:librenms /opt/librenms/snmptrapmanager ( on debian like distrib)
 ```
 
 Using `snmptrap.mibup.php` to catch snmp traps. It's a copy of `snmptrap.php`, but with the include of  `genericTrap.inc.php`.
@@ -46,7 +45,7 @@ This plugin will check SQL tables existency which are required to plugin well be
 
 On the LibreNMS `frontend` side :
 
- * Install `net-snmp-utils` and `snmptt` packages to get `snmptranslate` and `snmpttconvertmib` executable file.
+ * Install `net-snmp-utils`( redhat like distrib ) or `libnet-snmp-perl` ( on debian like distrib ) and `snmptt` packages to get `snmptranslate` and `snmpttconvertmib` executable file.
  * Follow the classic installation process, but without configuring `snmptt.ini` which will not be used.
 
 On the LibreNMS `poller` side :
@@ -80,7 +79,7 @@ Here is the `MIBUploader`  menu:
 
 ![../img/mibup.menu](../img/mibup.menu.png)
 
-### MIB Uploading
+### MIB Upload
 
 To generate the SNMPTT configuration, but particularly for the MIBs versioning, it is required to upload these MIBs.
 
@@ -95,7 +94,7 @@ The `Uptate mibs to the new uploaded version` checkbox, allow you to update the 
 
 Warning : A MIB detection is made from the MIB filename : if filenames are different, a new MIB will be created.
 
-### Releases management
+### MIB Version Manager
 
 Each time a MIB is uploaded, if the MIB filename is detected as already inside the database, a content file comparison is made ( from SHA2 checksum ).
 
@@ -122,7 +121,7 @@ Note : the `Valider` and `Réinitialiser` buttons, are present in the top and th
 
 Here is the result of an update. it is a massive update from may MIBs, made with the checkbox.
 
-### SNMPTT configuration generation
+### Generate SNMPTT configuration
 
 One MIBs are downloaded and/or the good release chosen, you can generate SNMPTT configuration.
 

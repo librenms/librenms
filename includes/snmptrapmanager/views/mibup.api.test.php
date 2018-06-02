@@ -3,7 +3,7 @@
 //$(window).bind("load", function() {
 $(function() {
 	$('#apip').click(function() {
-		$.get("/plugins/MIBUploader/MIBUploaderAPI.php", {'coucou': 1}, success, "json");
+		$.get("/snmptrapmanager/MIBUploaderAPI.php", {'coucou': 1}, success, "json");
 	});
 
 	function success(data) {

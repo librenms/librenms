@@ -8,17 +8,17 @@
 <br /><br />
 <?php
 $bFlip = false;
-foreach($aMIBList as $aMIB) {
-	if ($bFlip) {
-		$sColor = 'lightgrey';
-	} else {
-		$sColor = 'white';
-	}
-	$bFlip = !$bFlip;
-	$sCBVal = $aMIB['id'];
-	echo '<div style="display: inline-block; background-color: '.$sColor.'">';
-	echo '<label><div style="display: inline-block; text-align: right; padding-right: 20px; min-width: 300px;">' . $aMIB['name'] . ' </div><input type="checkbox" name="snmptt_mib_gen_ids[]" value="' . $sCBVal . '" /></label><br />';
-	echo '</div><br />';
+foreach ($aMIBList as $aMIB) {
+    if ($bFlip) {
+        $sColor = 'lightgrey';
+    } else {
+        $sColor = 'white';
+    }
+    $bFlip = !$bFlip;
+    $sCBVal = $aMIB['id'];
+    echo '<div style="display: inline-block; background-color: '.$sColor.'">';
+    echo '<label><div style="display: inline-block; text-align: right; padding-right: 20px; min-width: 300px;">' . $aMIB['name'] . ' </div><input type="checkbox" name="snmptt_mib_gen_ids[]" value="' . $sCBVal . '" /></label><br />';
+    echo '</div><br />';
 }
 ?>
 <br />

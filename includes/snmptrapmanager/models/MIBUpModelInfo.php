@@ -1,53 +1,59 @@
-<?php
+<?php namespace snmptrapmanager;
 
-class MIBUpModelInfo extends MIBUpModel {
+class MIBUpModelInfo extends MIBUpModel
+{
 
-	public function getSNMPTTState() {
-		$sQuery = "select value from MIBUploaderPlugin where info = ?";
-		$aParams = Array(
-			'snmptt_state'
-		);
+    public function getSNMPTTState()
+    {
+        $sQuery = "select value from MIBUploaderPlugin where info = ?";
+        $aParams = array(
+        'snmptt_state'
+        );
 
-		$aRes = dbFetch($sQuery, $aParams);
+        $aRes = dbFetch($sQuery, $aParams);
 
-		if (empty($aRes)) {
-			return false;
-		}
+        if (empty($aRes)) {
+            return false;
+        }
 
-		return $aRes[0]['value'];
-	}
+        return $aRes[0]['value'];
+    }
 
 
-	public function setSNMPTTState($sState) {
-		$sQuery = "insert into MIBUploaderPlugin values (?, ?) on duplicate key update value=?";
-		$aParams = Array(
-			'snmptt_state',
-			$sState,
-			$sState
-		);
+    public function setSNMPTTState($sState)
+    {
+        $sQuery = "insert into MIBUploaderPlugin values (?, ?) on duplicate key update value=?";
+        $aParams = array(
+        'snmptt_state',
+        $sState,
+        $sState
+        );
 
-		return dbQuery($sQuery, $aParams);
-	}
+        return dbQuery($sQuery, $aParams);
+    }
 
-	public function setSNMPTTIdle() {
-		return $this->setSNMPTTState('idle');
-	}
+    public function setSNMPTTIdle()
+    {
+        return $this->setSNMPTTState('idle');
+    }
 
-	public function getMIBStats() {
-		$sQuery = "select count(*) as count from MIBUploaderMIBS";
-		$aRes = dbFetch($sQuery);
+    public function getMIBStats()
+    {
+        $sQuery = "select count(*) as count from MIBUploaderMIBS";
+        $aRes = dbFetch($sQuery);
 
-		$iMIBCount = (int) $aRes[0]['count'];
+        $iMIBCount = (int) $aRes[0]['count'];
 
-		$aStats = Array(
-			'mibcount' => $iMIBCount
-		);
+        $aStats = array(
+        'mibcount' => $iMIBCount
+        );
 
-		return $aStats;
-	}
+        return $aStats;
+    }
 
-	public function getDBSchemaVersion() {
-		$oDBSetup = new MIBUpDBSetup();
-		return $oDBSetup->getDBSchema();
-	}
+    public function getDBSchemaVersion()
+    {
+        $oDBSetup = new MIBUpDBSetup();
+        return $oDBSetup->getDBSchema();
+    }
 }

@@ -1,2 +1,0 @@
-msgid "Update mibs to the new uploaded version"
-msgstr "Update mibs to the new uploaded version"

@@ -12,16 +12,16 @@
 <tr><th>Device</th><th>Trap OID</th><th>Last Update</th></tr>
 <?php
 
-foreach($aTraps as $aTrap) {
-	$sOid = $aTrap['oid'];
-	$iLastUpdate = $aTrap['last_update'];
-	$sDevice = $aTrap['hostname'];
-	$iDeviceID = $aTrap['device_id'];
+foreach ($aTraps as $aTrap) {
+    $sOid = $aTrap['oid'];
+    $iLastUpdate = $aTrap['last_update'];
+    $sDevice = $aTrap['hostname'];
+    $iDeviceID = $aTrap['device_id'];
 
 
-	$sDevLink = '<a href=/device/device=' . $iDeviceID . '/>' . $sDevice . '</a>';
+    $sDevLink = '<a href=/device/device=' . $iDeviceID . '/>' . $sDevice . '</a>';
 
-	echo '<tr><td>' . $sDevLink . '</td><td>' . $sOid . '</td><td>' . $iLastUpdate . '</td></tr>';
+    echo '<tr><td>' . $sDevLink . '</td><td>' . $sOid . '</td><td>' . $iLastUpdate . '</td></tr>';
 }
 
 ?>

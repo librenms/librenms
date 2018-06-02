@@ -1,23 +1,27 @@
-<?php
+<?php namespace snmptrapmanager;
 
 /**
  * https://github.com/gilbitron/PIP/blob/master/system/view.php
  *
  * https://github.com/gilbitron/PIP
  */
-class MIBUpView {
+class MIBUpView
+{
 
     private $pageVars = array();
     private $template;
 
-    public function __construct($template) {
-        $this->template = MIBUpUtils::bfp(Array(
-                dirname(__FILE__), '..', 'views', $template . '.php'
+    public function __construct($template)
+    {
+        $this->template = MIBUpUtils::bfp(
+            array(
+            dirname(__FILE__), '..', 'views', $template . '.php'
             )
         );
     }
 
-    public static function load($sName) {
+    public static function load($sName)
+    {
         $res = new MIBUpView($sName);
         return $res;
     }
@@ -27,7 +31,8 @@ class MIBUpView {
      *
      * @return MIBUpView
      */
-    public function set($var, $val) {
+    public function set($var, $val)
+    {
         $this->pageVars[$var] = $val;
         return $this;
     }
@@ -37,12 +42,12 @@ class MIBUpView {
      *
      * @return string
      */
-    public function render() {
+    public function render()
+    {
         extract($this->pageVars);
 
         ob_start();
-        require($this->template);
+        include $this->template;
         return ob_get_clean();
     }
-
 }

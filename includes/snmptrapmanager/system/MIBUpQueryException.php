@@ -1,5 +1,6 @@
-<?php
+<?php namespace snmptrapmanager;
 
-class MIBUpQueryException extends MIBUpException {
+class MIBUpQueryException extends MIBUpException
+{
 
 }

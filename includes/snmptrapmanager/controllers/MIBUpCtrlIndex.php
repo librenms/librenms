@@ -1,10 +1,11 @@
-<?php
+<?php namespace snmptrapmanager;
 
-class MIBUpCtrlIndex extends MIBUpCtrl {
+class MIBUpCtrlIndex extends MIBUpCtrl
+{
 
-	public function run() {
-		// Display Index Menu
-		echo $this->loadView('mibup.index.menu')->render();
-	}
-
+    public function run()
+    {
+        // Display Index Menu
+        echo $this->loadView('mibup.index.menu')->render();
+    }
 }

@@ -1,10 +1,11 @@
-<?php
+<?php namespace snmptrapmanager;
 
-class MIBUpModel {
+class MIBUpModel
+{
 
-	public static function load($sName) {
-		$sName = 'MIBUpModel' . $sName;
-		return new $sName;
-	}
-
+    public static function load($sName)
+    {
+        $sName = '\snmptrapmanager\MIBUpModel' . $sName;
+        return new $sName;
+    }
 }

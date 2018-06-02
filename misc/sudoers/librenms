@@ -1,0 +1,2 @@
+Defaults !requiretty
+librenms ALL=(ALL) NOPASSWD:/bin/systemctl restart snmptt.service

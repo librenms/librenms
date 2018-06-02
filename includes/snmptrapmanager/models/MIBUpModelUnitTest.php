@@ -1,5 +1,6 @@
-<?php
+<?php namespace snmptrapmanager;
 
-class MIBUpModelUnitTest extends MIBUpModel {
+class MIBUpModelUnitTest extends MIBUpModel
+{
 
 }

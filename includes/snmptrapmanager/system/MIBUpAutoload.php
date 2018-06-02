@@ -1,37 +1,50 @@
-<?php
+<?php namespace snmptrapmanager;
 
-class MIBUpAutoload {
+class MIBUpAutoload
+{
 
-	private static $bRegistered = false;
+    private static $bRegistered = false;
 
-	private static function mibuploader_reqin($sSubPath, $class) {
-		$sFile = join(DIRECTORY_SEPARATOR, Array(
-			dirname(__FILE__),
-			'..',
-			$sSubPath,
-			$class . '.php'));
+    private static function snmptrapmanagerReqin($sSubPath, $class)
+    {
+        preg_match("/.*\\\([^\\\]+)$/", $class, $m);
+        $sFile = join(
+            DIRECTORY_SEPARATOR,
+            array(
+            dirname(__FILE__),
+            '..',
+            $sSubPath,
+            $m[1] . '.php')
+        );
 
-		if(is_file($sFile)) {
-			require_once $sFile;
-			return true;
-		}
+        if (is_file($sFile)) {
+            include_once $sFile;
+            return true;
+        }
+        return false;
+    }
 
-		return false;
-	}
+    // Ugly autoloader.
+    public static function snmptrapmanagerAutoload($class)
+    {
+        if (self::snmptrapmanagerReqin('system', $class)) {
+            return;
+        }
+        if (self::snmptrapmanagerReqin('controllers', $class)) {
+            return;
+        }
+        if (self::snmptrapmanagerReqin('models', $class)) {
+            return;
+        }
+    }
 
-	// Ugly autoloader.
-	public static function mibuploader_autoload($class) {
-		if(self::mibuploader_reqin('system', $class)) { return; }
-		if(self::mibuploader_reqin('controllers', $class)) { return; }
-		if(self::mibuploader_reqin('models', $class)) { return; }
-	}
-
-	public static function register() {
-		if (!self::$bRegistered) {
-			spl_autoload_register(
-				Array(get_class(), 'mibuploader_autoload')
-			);
-			self::$bRegistered = true;
-		}
-	}
+    public static function register()
+    {
+        if (!self::$bRegistered) {
+            spl_autoload_register(
+                __NAMESPACE__.'\MIBUpAutoload::snmptrapmanagerAutoload'
+            );
+            self::$bRegistered = true;
+        }
+    }
 }
