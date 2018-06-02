@@ -34,62 +34,49 @@ if (!Auth::user()->hasGlobalAdmin()) {
                 </div>
                 <div class="row">
                     <div class="col-md-8">
-                        <div class="form-group">
-                            <label for="template" class="control-label">Template:</label><br />
-                            <div class="alert alert-danger" role="alert">You can enter text for your template directly below if you're feeling brave enough :)</div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="name">Template name: </label>
+                                    <input type="text" class="form-control input-sm" id="name" name="name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="template">Template: </label>
+                                    <textarea class="form-control" id="template" name="template" rows="15"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="title">Alert title: </label>
+                                    <input type="text" class="form-control input-sm" id="title" name="title" placeholder="Alert Title">
+                                </div>
+                                <div class="form-group">
+                                    <label for="title_rec">Recovery title: </label>
+                                    <input type="text" class="form-control input-sm" id="title_rec" name="title_rec" placeholder="Recovery Title">
+                                </div>
+                                <div class="form-group">
+                                    <label for="template_type">Template type:</label>
+                                    <select size="1" name="template_type" id="template_type" class="form-control">
+                                        <option value="blade">Blade</option>
+                                        <option value="librenms">LibreNMS (deprecated)</option>
+                                    </select>
+                                </div>
+                                <button type="button" class="btn btn-primary btn-sm" name="create-template" id="create-template">Create template</button>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="designer" class="control-label">Documentation:</label><br />
-                            <div class="alert alert-warning" role="alert">Alert templates</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="form-group">
-                            <textarea class="form-control" id="template" name="template" rows="15"></textarea><br /><br />
-                            <strong><em>Give your template a name: </em></strong><br />
-                            <input type="text" class="form-control input-sm" id="name" name="name"><br />
-                            <em>Optionally, add custom titles: </em><br />
-                            <input type="text" class="form-control input-sm" id="title" name="title" placeholder="Alert Title"><input type="text" class="form-control input-sm" id="title_rec" name="title_rec" placeholder="Recovery Title"><br />
-                            <span id="error"></span><br />
-                            <button type="button" class="btn btn-primary btn-sm" name="create-template" id="create-template">Create template</button>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <span><strong>Controls:</strong><br />
-<?php
-    $controls = array('if','endif','else','foreach', 'endforeach');
-foreach ($controls as $control) {
-    echo '              <button type="button" class="btn btn-primary btn-sm" data-target="#control-add" id="control-add" name="control-add" data-type="control" data-value="'.$control.'">'.$control.'</button>';
-}
-?>
-                            </span><br /><br />
-                            <span><strong>Placeholders:</strong><br />
-<?php
-    $placeholders = array('hostname', 'sysName', 'location', 'uptime', 'description', 'notes', 'title','elapsed','id','uid','faults','state','severity','rule','timestamp','contacts','key','value','new line');
-foreach ($placeholders as $placeholder) {
-    echo '              <button type="button" class="btn btn-success btn-sm" data-target="#placeholder-add" id="placeholder-add" name="placeholder-add" data-type="placeholder" data-value="'.$placeholder.'">'.$placeholder.'</button>';
-}
-?>
-                            </span><br /><br />
-                            <span><strong>Operator:</strong><br />
-<?php
-    $operators = array('==','!=','>=','>','<=','<','&&','||','blank');
-foreach ($operators as $operator) {
-    echo '              <button type="button" class="btn btn-warning btn-sm" data-target="#operator-add" id="operator-add" name="operator-add" data-type="operator" data-value="'.$operator.'">'.$operator.'</button>';
-}
-?>
-<br /><br />
-                            <small><em>Free text - press enter to add</em></small><br />
-                            <input type="text" class="form-control" id="value" name="value" autocomplete="off"><br /><br />
-                            <input type="text" class="form-control" id="line" name="line"><br /><br />
-                            <input type="hidden" name="template_id" id="template_id">
-                            <input type="hidden" name="default_template" id="default_template" value="0">
-                            <button type="button" class="btn btn-primary" id="add_line" name="add_line">Add line</button>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="panel panel-warning">
+                                        <div class="panel-heading">
+                                            Templating Docs <a href="https://laravel.com/docs/5.4/blade"><i class="fa fa-book fa-1x"></i></a>
+                                        </div>
+                                        <div class="panel-body">
+                                            {{ placeholder }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -120,6 +107,7 @@ $('#alert-template').on('show.bs.modal', function (event) {
                 $('#name').val(output['name']);
                 $('#title').val(output['title']);
                 $('#title_rec').val(output['title_rec']);
+                $('#template_type option[value="'+ output['type'] +'"]').attr('selected','selected');
             }
         });
     }
@@ -131,6 +119,7 @@ $('#alert-template').on('hide.bs.modal', function(event) {
     $('#line').val('');
     $('#value').val('');
     $('#name').val('');
+    $('#template_type').val('');
     $('#create-template').text('Create template');
     $('#default-template').val('0');
     $('#reset-default').remove();
@@ -145,7 +134,8 @@ $('#create-template').click('', function(e) {
     var name = $("#name").val();
     var title = $("#title").val();
     var title_rec = $("#title_rec").val();
-    alertTemplateAjaxOps(template, name, template_id, title, title_rec);
+    var template_type = $("#template_type").val();
+    alertTemplateAjaxOps(template, name, template_id, title, title_rec, template_type);
 });
 
 $('#add_line').click('', function(e) {
@@ -217,12 +207,12 @@ $('div').on('click', 'button#reset-default', function(e) {
     alertTemplateAjaxOps(template, name, template_id, '', '');
 });
 
-function alertTemplateAjaxOps(template, name, template_id, title, title_rec)
+function alertTemplateAjaxOps(template, name, template_id, title, title_rec, template_type)
 {
     $.ajax({
         type: "POST",
         url: "ajax_form.php",
-        data: { type: "alert-templates", template: template, name: name, template_id: template_id, title: title, title_rec: title_rec},
+        data: { type: "alert-templates", template: template, name: name, template_id: template_id, title: title, title_rec: title_rec, template_type: template_type},
         dataType: "json",
         success: function(output){
             if(output.status == 'ok') {
