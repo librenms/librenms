@@ -67,6 +67,7 @@ pages:
       - Extensions/IRC-Bot-Extensions.md
       - Extensions/SNMP-Proxy.md
       - Extensions/SNMP-Trap-Handler.md
+      - Extensions/SNMP-Trap-Manager.md
       - Support/Cleanup-options.md
   - 6. 3rd Party Integration:
       - Extensions/Gateone.md
