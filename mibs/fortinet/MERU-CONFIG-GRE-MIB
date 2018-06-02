@@ -1,0 +1,165 @@
+-- *****************************************************************
+-- Meru Networks Enterprise Specific MIB
+--
+-- Copyright (c) 2005 by Meru Networks
+-- All rights reserved
+--
+-- *****************************************************************
+
+MERU-CONFIG-GRE-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE, 
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY,
+    enterprises, 
+    Counter32, 
+    Counter64, 
+    Gauge32, 
+    TimeTicks, 
+    IpAddress, 
+    Integer32
+        FROM SNMPv2-SMI
+    Ipv6Address
+        FROM IPV6-TC
+    TEXTUAL-CONVENTION, 
+    TimeInterval, 
+    TimeStamp,
+    DateAndTime, 
+    TruthValue, 
+    DisplayString, 
+    MacAddress, 
+    RowStatus
+        FROM SNMPv2-TC
+    mwConfiguration
+        FROM MERU-SMI
+    MwlOnOffSwitch,
+    MwlProfileOwner
+        FROM MERU-TC;
+
+  mwConfigGRE  MODULE-IDENTITY
+    LAST-UPDATED "200506050000Z"
+    ORGANIZATION "Meru Networks"
+    CONTACT-INFO "support@merunetworks.com"
+    DESCRIPTION
+        "This MIB defines all the managed objects used to manage the Meru WLAN 
+         GRE Configuration infrastructure"
+    ::= { mwConfiguration 15 } 
+  
+    
+  
+  mwGreTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwGreEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes GRE Configuration "
+    ::= { mwConfigGRE 1 }
+
+  mwGreEntry  OBJECT-TYPE
+    SYNTAX MwGreEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes GRE Configuration "
+    INDEX {  mwGreTableIndex  }
+    ::= { mwGreTable 1 }
+
+  MwGreEntry  ::=  SEQUENCE { 
+       mwGreTableIndex                                             Integer32, 
+       mwGreName                                                   DisplayString(SIZE (1..32)),
+       mwGreInterfaceIndex                                         Unsigned32,
+       mwGreDHCPServerIpAddress                                    IpAddress,
+       mwGreLocalInternalAddress                                   IpAddress,
+       mwGreLocalInternalNetmask                                   IpAddress,
+       mwGreRemoteEndpointAddress                                  IpAddress,
+       mwGreOverrideDefaultDHCPServer                              MwlOnOffSwitch,
+       mwGreOwner                                                  MwlProfileOwner,
+       mwGreRowStatus                                              RowStatus 
+  }
+   
+   
+  mwGreTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwGreEntry 1 }
+
+  mwGreName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes GRE Name"
+    ::= { mwGreEntry    2 }
+
+  mwGreInterfaceIndex  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Local External Ethernet Index"
+    ::= { mwGreEntry    3 }
+
+  mwGreDHCPServerIpAddress  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes DHCP Server IP Address"
+    ::= { mwGreEntry    4 }
+
+  mwGreLocalInternalAddress  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tunnel IP address"
+    ::= { mwGreEntry    5 }
+
+  mwGreLocalInternalNetmask  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tunnel IP Netmask"
+    ::= { mwGreEntry    6 }
+
+  mwGreRemoteEndpointAddress  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Remote External Address"
+    ::= { mwGreEntry    7 }
+
+  mwGreOverrideDefaultDHCPServer  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Override Default DHCP Server Flag"
+    ::= { mwGreEntry    8 }
+
+  mwGreOwner  OBJECT-TYPE
+    SYNTAX MwlProfileOwner
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Owner"
+    ::= { mwGreEntry    9 }
+
+  mwGreRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwGreEntry 17 }
+
+  
+END
+   

@@ -321,6 +321,10 @@ modules:
                         oid: rPDU2SensorTempHumidityStatusType
                         op: '='
                         value: 4
+                      - 
+                        oid: rPDU2SensorTempHumidityStatusRelativeHumidity
+                        op: '<'
+                        value: 0
         airflow:
             data:
                 -

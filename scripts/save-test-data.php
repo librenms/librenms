@@ -103,7 +103,8 @@ $snmpsim_port = $snmpsim->getPort();
 
 if (!$snmpsim->isRunning()) {
     echo "Failed to start snmpsim, make sure it is installed, working, and there are no bad snmprec files.\n";
-    exit;
+    echo "Run ./scripts/save-test-data.php --snmpsim to see the log output\n";
+    exit(1);
 }
 
 
@@ -118,7 +119,7 @@ try {
         }
         echo PHP_EOL;
 
-
+        update_os_cache(true); // Force update of OS Cache
         $tester = new ModuleTestHelper($modules, $target_os, $target_variant);
 
         $test_data = $tester->generateTestData($snmpsim, $no_save);

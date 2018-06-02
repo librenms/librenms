@@ -87,7 +87,7 @@ function showPercent($per)
 
 <div class="row">
     <div class="col-lg-5 col-lg-push-7">
-        <?php print_port_list() ?>
+        <?php print_port_list($ports) ?>
     </div>
     <div class="col-lg-7 col-lg-pull-5">
         <div class="panel panel-default">
@@ -141,8 +141,8 @@ function showPercent($per)
                     <td><?php echo $ousage['est'] ?></td>
                     <td><?php echo showPercent($ousage['per']) ?></td>
                 </tr>
-                
-        <?php } ?>        
+
+        <?php } ?>
             </tbody>
             </table>
         </div>

@@ -72,7 +72,11 @@ class Snmpsim
         }
 
         if (isCli() && !$this->proc->isRunning()) {
-            echo `tail -5 $this->log` . PHP_EOL;
+            // if starting failed, run snmpsim again and output to the console and validate the data
+            passthru($this->getCmd(false) . ' --validate-data');
+
+            echo "\nFailed to start Snmpsim. Scroll up for error.\n";
+            exit;
         }
     }
 
@@ -149,7 +153,9 @@ class Snmpsim
     {
         $cmd = "snmpsimd.py --data-dir={$this->snmprec_dir} --agent-udpv4-endpoint={$this->ip}:{$this->port}";
 
-        if ($with_log) {
+        if (is_null($this->log)) {
+            $cmd .= " --logging-method=null";
+        } elseif ($with_log) {
             $cmd .= " --logging-method=file:{$this->log}";
         }
 
