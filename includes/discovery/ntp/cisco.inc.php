@@ -123,7 +123,7 @@ if (is_null($cntpPeersVarEntry)) {
 $module = strtolower($module);
 if (count($components) > 0) {
     if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?', array($device['device_id'], $module)) == '0') {
-        dbInsert(array('device_id' => $device['device_id'], 'app_type' => $module), 'applications');
+        dbInsert(array('device_id' => $device['device_id'], 'app_type' => $module, 'app_status' => '', 'app_instance' => ''), 'applications');
     }
 } else {
     dbDelete('applications', '`device_id` = ? AND `app_type` = ?', array($device['device_id'], $module));

@@ -10,19 +10,6 @@ ini_set('session.cookie_httponly', 1);
 ini_set('session.use_strict_mode', 1); // php >= 5.5.2
 ini_set('session.use_trans_sid', 0);   // insecure feature, be sure it is disabled
 
-// Pre-flight checks
-if (!is_dir($config['rrd_dir'])) {
-    echo "<div class='errorbox'>RRD Log Directory is missing ({$config['rrd_dir']}).  Graphing may fail.</div>";
-}
-
-if (!is_dir($config['temp_dir'])) {
-    echo "<div class='errorbox'>Temp Directory is missing ({$config['temp_dir']}).  Graphing may fail.</div>";
-}
-
-if (!is_writable($config['temp_dir'])) {
-    echo "<div class='errorbox'>Temp Directory is not writable ({$config['tmp_dir']}).  Graphing may fail.</div>";
-}
-
 // Clear up any old sessions
 dbDelete('session', '`session_expiry` <  ?', array(time()));
 

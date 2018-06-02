@@ -25,10 +25,20 @@
 
 namespace LibreNMS\Tests;
 
+use LibreNMS\Util\Snmpsim;
+
 abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
-    protected $snmpsimIp = '127.1.6.2';
-    protected $snmpsimPort = 1161;
+    /** @var Snmpsim snmpsim instance */
+    protected $snmpsim = null;
+
+    public function __construct($name = null, $data = [], $dataName = '')
+    {
+        parent::__construct($name, $data, $dataName);
+        // grab global $snmpsim from bootstrap and make it accessible
+        global $snmpsim;
+        $this->snmpsim = $snmpsim;
+    }
 
     public function dbSetUp()
     {

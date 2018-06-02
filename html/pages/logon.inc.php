@@ -1,4 +1,5 @@
 <?php
+global $twofactorform;
 if ($config['twofactor'] && isset($twofactorform)) {
     echo \LibreNMS\Authentication\TwoFactor::getForm();
 } else {

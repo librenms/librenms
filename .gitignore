@@ -9,6 +9,7 @@
 !/.github/
 !/.codeclimate.yml
 !/.mention-bot
+!/.env.example
 
 # Others #
 ##########
@@ -25,11 +26,13 @@ nbproject
 patches
 !/lib/yaml
 /vendor
+/node_modules
 composer.phar
 .ssh
 snmptrapmanager/mibs
 snmptrapmanager/snmpttmibs
 ssh
+_ide_helper.php
 
 # Docs #
 ########
