@@ -35,7 +35,7 @@ $template_id = 0;
 
 $name = mres($vars['name']);
 if (!empty($name)) {
-    if (is_numeric($vars['template_id']) && $vars['rule_id']) {
+    if ((isset($vars['template_id']) && is_numeric($vars['template_id'])) && (isset($vars['rule_id']) && $vars['rule_id'])) {
         //Update the template/rule mapping
 
         if (is_array($vars['rule_id'])) {
@@ -47,7 +47,7 @@ if (!empty($name)) {
         if (substr($vars['rule_id'], -1, 1) != ",") {
             $vars['rule_id'] .= ",";
         }
-        if (dbUpdate(array('rule_id' => mres($vars['rule_id']), 'name' => $name, 'template_type' => $vars['template_type']), "alert_templates", "id = ?", array($vars['template_id'])) >= 0) {
+        if (dbUpdate(array('rule_id' => mres($vars['rule_id']), 'name' => $name, 'type' => $vars['template_type']), "alert_templates", "id = ?", array($vars['template_id'])) >= 0) {
             $message = "Updated template and rule id mapping";
         } else {
             $message ="Failed to update the template and rule id mapping";
@@ -55,7 +55,7 @@ if (!empty($name)) {
     } elseif ($vars['template'] && is_numeric($vars['template_id'])) {
         //Update template-text
 
-        if (dbUpdate(array('template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec'], 'template_type' => $vars['template_type']), "alert_templates", "id = ?", array($vars['template_id'])) >= 0) {
+        if (dbUpdate(array('template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec'], 'type' => $vars['template_type']), "alert_templates", "id = ?", array($vars['template_id'])) >= 0) {
             $status = 'ok';
             $message = "Alert template updated";
         } else {
@@ -65,7 +65,7 @@ if (!empty($name)) {
         //Create new template
 
         if ($name != 'Default Alert Template') {
-            $template_id = dbInsert(array('template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec'], 'template_type' => $vars['template_type']), "alert_templates");
+            $template_id = dbInsert(array('template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec'], 'type' => $vars['template_type']), "alert_templates");
             if ($template_id != false) {
                 $status = 'ok';
                 $message = "Alert template has been created.";
