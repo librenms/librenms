@@ -107,7 +107,7 @@ $('#alert-template').on('show.bs.modal', function (event) {
                 $('#name').val(output['name']);
                 $('#title').val(output['title']);
                 $('#title_rec').val(output['title_rec']);
-                $('#template_type option[value="'+ output['type'] +'"]').attr('selected','selected');
+                $('#template_type').val(output['type']);
             }
         });
     }

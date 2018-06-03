@@ -27,7 +27,7 @@
 
 use LibreNMS\Util\FileLock;
 
-$init_modules = array('alerts-cli');
+$init_modules = ['alerts', 'alerts-cli'];
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('d::');
@@ -46,7 +46,7 @@ if (isset($options['d'])) {
     // ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
     ini_set('log_errors', 0);
-    // ini_set('error_reporting', 0);
+    ini_set('error_reporting', 0);
 }
 
 if (!defined('TEST') && $config['alert']['disable'] != 'true') {
