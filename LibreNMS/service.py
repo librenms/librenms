@@ -182,13 +182,13 @@ class ServiceConfig:
         self.redis_host = config.get('redis_host', ServiceConfig.redis_host)
         self.redis_db = config.get('redis_db', ServiceConfig.redis_db)
         self.redis_pass = config.get('redis_pass', ServiceConfig.redis_pass)
-        self.redis_port = config.get('redis_port', ServiceConfig.redis_port)
+        self.redis_port = int(config.get('redis_port', ServiceConfig.redis_port))
         self.redis_socket = config.get('redis_socket', ServiceConfig.redis_socket)
 
         self.db_host = config.get('db_host', ServiceConfig.db_host)
         self.db_name = config.get('db_name', ServiceConfig.db_name)
         self.db_pass = config.get('db_pass', ServiceConfig.db_pass)
-        self.db_port = config.get('db_port', ServiceConfig.db_port)
+        self.db_port = int(config.get('db_port', ServiceConfig.db_port))
         self.db_socket = config.get('db_socket', ServiceConfig.db_socket)
         self.db_user = config.get('db_user', ServiceConfig.db_user)
 
@@ -253,7 +253,7 @@ class Service:
         self.stats_timer = LibreNMS.RecurringTimer(self.config.poller.frequency, self.log_performance_stats)
         self.is_master = False
 
-        self.performance_stats = {'poll': PerformanceCounter(), 'discover': PerformanceCounter(), 'service': PerformanceCounter()}
+        self.performance_stats = {'poller': PerformanceCounter(), 'discovery': PerformanceCounter(), 'services': PerformanceCounter()}
 
     def start(self):
         if self.config.single_instance:
@@ -323,17 +323,14 @@ class Service:
         for device in devices:
             self.discovery_manager.post_work(device[0], device[1])
 
-    def discover_device(self, device_id, group):
-        if not self.verify_queue(device_id, group):
-            return False
-
+    def discover_device(self, device_id):
         if self.lock_discovery(device_id):
             try:
                 with TimeitContext.start() as t:
                     info("Discovering device {}".format(device_id))
                     self.call_script('discovery.php', ('-h', device_id))
                     info('Discovery complete {}'.format(device_id))
-                    self.report_execution_time(t.delta(), 'discover')
+                    self.report_execution_time(t.delta(), 'discovery')
             except subprocess.CalledProcessError as e:
                 if e.returncode == 5:
                     info("Device {} is down, cannot discover, waiting {}s for retry"
@@ -345,7 +342,7 @@ class Service:
                 self.unlock_discovery(device_id)
 
     # ------------ Alerting ------------
-    def poll_alerting(self, _=None, group=None):
+    def poll_alerting(self, _=None):
         try:
             info("Checking alerts")
             self.call_script('alerts.php')
@@ -361,14 +358,23 @@ class Service:
         for device in devices:
             self.services_manager.post_work(device[0], device[1])
 
-    def poll_services(self, device_id, group):
-        if not self.verify_queue(device_id, group):
-            return False
-
-        with TimeitContext.start() as t:
-            info("Checking services on device {}".format(device_id))
-            self.call_script('check-services.php', ('-h', device_id))
-            self.report_execution_time(t.delta(), 'service')
+    def poll_services(self, device_id):
+        if self.lock_services(device_id):
+            try:
+                with TimeitContext.start() as t:
+                    info("Checking services on device {}".format(device_id))
+                    self.call_script('check-services.php', ('-h', device_id))
+                    info('Services complete {}'.format(device_id))
+                    self.report_execution_time(t.delta(), 'services')
+            except subprocess.CalledProcessError as e:
+                if e.returncode == 5:
+                    info("Device {} is down, cannot poll service, waiting {}s for retry"
+                         .format(device_id, self.config.down_retry))
+                    self.lock_discovery(device_id, True)
+                else:
+                    self.unlock_services(device_id)
+            else:
+                self.unlock_services(device_id)
 
     # ------------ Billing ------------
     def dispatch_calculate_billing(self):
@@ -377,7 +383,7 @@ class Service:
     def dispatch_poll_billing(self):
         self.billing_manager.post_work('poll')
 
-    def poll_billing(self, run_type, group=None):
+    def poll_billing(self, run_type):
         if run_type == 'poll':
             info("Polling billing")
             self.call_script('poll-billing.php')
@@ -399,17 +405,14 @@ class Service:
                     debug("Dispatching polling for device {}, time since last poll {:.2f}s"
                           .format(device_id, elapsed))
 
-    def poll_device(self, device_id, group):
-        if not self.verify_queue(device_id, group):
-            return False
-
+    def poll_device(self, device_id):
         if self.lock_polling(device_id):
             info('Polling device {}'.format(device_id))
 
             try:
                 with TimeitContext.start() as t:
                     self.call_script('poller.php', ('-h', device_id))
-                    self.report_execution_time(t.delta(), 'poll')
+                    self.report_execution_time(t.delta(), 'poller')
             except subprocess.CalledProcessError as e:
                 if e.returncode == 6:
                     warning('Polling device {} unreachable, waiting {}s for retry'.format(device_id, self.config.down_retry))
@@ -427,9 +430,6 @@ class Service:
     def fetch_services_device_list(self):
         return self._services_db.fetch("SELECT DISTINCT(`device_id`), `poller_group` FROM `services`"
                                        " LEFT JOIN `devices` USING (`device_id`) WHERE `disabled`=0")
-
-    def fetch_device(self, device_id):
-        return self._discovery_db.fetch("SELECT `device_id`, `poller_group` FROM `devices` WHERE `device_id`=%s", device_id)
 
     def fetch_device_list(self):
         return self._discovery_db.fetch("SELECT `device_id`, `poller_group` FROM `devices` WHERE `disabled`=0")
@@ -498,6 +498,19 @@ class Service:
 
     def polling_is_locked(self, device_id):
         lock_name = self.gen_lock_name('polling', device_id)
+        return self._lm.check_lock(lock_name)
+
+    def lock_services(self, device_id, retry=False):
+        lock_name = self.gen_lock_name('services', device_id)
+        timeout = self.config.down_retry if retry else self.config.services.frequency
+        return self._lm.lock(lock_name, self.gen_lock_owner(), timeout, retry)
+
+    def unlock_services(self, device_id):
+        lock_name = self.gen_lock_name('services', device_id)
+        return self._lm.unlock(lock_name, self.gen_lock_owner())
+
+    def services_is_locked(self, device_id):
+        lock_name = self.gen_lock_name('services', device_id)
         return self._lm.check_lock(lock_name)
 
     @staticmethod
@@ -644,20 +657,27 @@ class Service:
 
     def log_performance_stats(self):
         info("Counting up time spent polling")
-        time, jobs = self.performance_stats['poll'].reset()
 
-        self._db.fetch('INSERT INTO pollers(poller_name, last_polled, devices, time_taken) '
-                       'values("{0}", NOW(), "{1}", "{2}") '
-                       'ON DUPLICATE KEY UPDATE '
-                       'last_polled=values(last_polled), devices=values(devices), time_taken=values(time_taken);'
-                       .format(self.config.name, jobs, time))
+        # Report on the poller instance as a whole
+        self._db.fetch('INSERT INTO poller_cluster(poller_name, poller_version, poller_groups, last_report, master) '
+                       'values("{0}", "{1}", "{2}", NOW(), {3}) '
+                       'ON DUPLICATE KEY UPDATE poller_version="{1}", poller_groups="{2}", last_report=NOW(), master={3}; '
+                       .format(self.config.name, "librenms-service", ','.join(str(g) for g in self.config.group), 1 if self.is_master else 0))
 
-    def verify_queue(self, device_id, group):
-        devices = self.fetch_device(device_id)
+        # Find our ID
+        self._db.fetch('SELECT id INTO @parent_poller_id FROM poller_cluster WHERE poller_name="{0}"; '.format(self.config.name))
 
-        for device in devices:
-            if device[1] != group:
-                error("Device {} has been entered into queue {} instead of queue {}".format(device[0], group, device[1]))
-                return False
+        for worker_type, counter in self.performance_stats.items():
+            worker_seconds, devices = counter.reset()
 
-        return True
+            # Record the queue state
+            self._db.fetch('INSERT INTO poller_cluster_stats(parent_poller, poller_type, depth, devices, worker_seconds, workers, frequency) '
+                           'values(@parent_poller_id, "{0}", {1}, {2}, {3}, {4}, {5}) '
+                           'ON DUPLICATE KEY UPDATE depth={1}, devices={2}, worker_seconds={3}, workers={4}, frequency={5}; '
+                           .format(worker_type,
+                                   sum([getattr(self, ''.join([worker_type, '_manager'])).get_queue(group).qsize() for group in self.config.group]),
+                                   devices,
+                                   worker_seconds,
+                                   getattr(self.config, worker_type).workers,
+                                   getattr(self.config, worker_type).frequency)
+                           )

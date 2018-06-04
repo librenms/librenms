@@ -40,6 +40,7 @@ class QueueManager:
         self._work_function = work_function
         self._stop_event = threading.Event()
 
+        info("Groups: {}".format(self.config.group))
         info("{} QueueManager created: {} workers, {}s frequency"
              .format(self.type.title(), self.get_poller_config().workers, self.get_poller_config().frequency))
 
@@ -49,13 +50,12 @@ class QueueManager:
     def _service_worker(self, work_func, queue_id):
         while not self._stop_event.is_set():
             try:
-                for queue in random.sample(queue_id, len(queue_id)):
-                    # cannot break blocking request with redis-py, so timeout :(
-                    device_id = self.get_queue(queue).get(True, 3)
+                # cannot break blocking request with redis-py, so timeout :(
+                device_id = self.get_queue(queue_id).get(True, 3)
 
-                    if device_id:  # None returned by redis after timeout when empty
-                        info("Worker attached to queues: {} removed job from queue {}".format(queue_id, queue))
-                        work_func(device_id, queue)
+                if device_id:  # None returned by redis after timeout when empty
+                    debug("Queues: {}".format(self._queues))
+                    work_func(device_id)
             except Empty:
                 pass  # ignore empty queue exception from subprocess.Queue
             except CalledProcessError as e:
@@ -79,15 +79,25 @@ class QueueManager:
         """
         Start worker threads
         """
-        workers = max(self.get_poller_config().workers, 1)
-        for i in range(workers):
-            thread_name = "{}-{}".format(self.type.title(), i + 1)
-            pt = threading.Thread(target=self._service_worker, name=thread_name,
-                                  args=(self._work_function, self.config.group))
-            pt.daemon = True
-            self._threads.append(pt)
-            pt.start()
-        debug("Started {} {} threads".format(workers, self.type))
+        workers = self.get_poller_config().workers
+        groups = self.config.group if hasattr(self.config.group, "__iter__") else [self.config.group]
+        if self.type == "discovery" or self.type == "poller":
+            for group in groups:
+                group_workers = max(int(workers / len(groups)), 1)
+                for i in range(group_workers):
+                    thread_name = "{}_{}-{}".format(self.type.title(), group, i + 1)
+                    self.spawn_worker(thread_name, group)
+
+                debug("Started {} {} threads for group {}".format(group_workers, self.type, group))
+        else:
+            self.spawn_worker(self.type.title(), 0)
+
+    def spawn_worker(self, thread_name, group):
+        pt = threading.Thread(target=self._service_worker, name=thread_name,
+                              args=(self._work_function, group))
+        pt.daemon = True
+        self._threads.append(pt)
+        pt.start()
 
     def restart(self):
         """
@@ -128,16 +138,16 @@ class QueueManager:
 
         return self._queues[name]
 
-    def _create_queue(self, type, group=0):
+    def _create_queue(self, queue_type, group=0):
         """
         Create a queue (not thread safe)
         :param name:
         :param group:
         :return:
         """
-        debug("Creating queue {}".format(self.queue_name(type, group)))
+        info("Creating queue {}".format(self.queue_name(queue_type, group)))
         try:
-            return LibreNMS.RedisQueue(self.queue_name(type, group),
+            return LibreNMS.RedisQueue(self.queue_name(queue_type, group),
                                        namespace='librenms.queue',
                                        host=self.config.redis_host,
                                        port=self.config.redis_port,
@@ -159,8 +169,13 @@ class QueueManager:
         return Queue()
 
     @staticmethod
-    def queue_name(type, group):
-        return "{}:{}".format(type, group)
+    def queue_name(queue_type, group):
+        if queue_type and type(group) == int:
+            return "{}:{}".format(type, group)
+        if queue_type and (type(group) == int or group == "all"):
+            return "{}:{}".format(queue_type, group)
+        else:
+            raise ValueError("Refusing to create improperly scoped queue - parameters were invalid or not set")
 
 
 class TimedQueueManager(QueueManager):
