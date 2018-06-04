@@ -957,4 +957,4 @@ $config['api']['cors']['allowmethods'] = array('POST', 'GET', 'PUT', 'DELETE', '
 $config['api']['cors']['allowheaders'] = array('Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'X-Auth-Token');
 
 // Disk
-$config['bad_disk_regexp'] = array();
+$config['bad_disk_regexp'] = [];
