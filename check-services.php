@@ -61,14 +61,20 @@ if ($options['h']) {
     }
 }
 
-$sql = 'SELECT * FROM `devices` AS D, `services` AS S WHERE S.device_id = D.device_id ' . $where . ' ORDER by D.device_id DESC';
+$sql = 'SELECT * FROM `devices` AS D INNER JOIN `services` AS S ON S.device_id = D.device_id ' . $where .
+' LEFT JOIN `devices_attribs` as A ON S.device_id = A.device_id AND A.attrib_type = "override_icmp_disable"
+ ORDER by D.device_id DESC;';
 
 foreach (dbFetchRows($sql) as $service) {
-    // Run the polling function only if the associated device is up
-    if ($service['status'] === "1" || ($service['status'] === '0' && $service['status_reason'] === 'snmp')) {
+    // Run the polling function if the associated device is up, "Disable ICMP Test" option is enabled, 
+    // or service hostname/ip is different from the associated device
+    if ($service['status'] === "1" || ($service['status'] === '0' && $service['status_reason'] === 'snmp') ||
+    $service['attrib_value'] === 'true' || ($service['service_ip'] !== $service['hostname'] &&
+    $service['service_ip'] !== $service['ip'] )) {
         poll_service($service);
     } else {
-        d_echo("\nNagios Service - ".$service['service_id']."\nSkipping service check because device ".$service['device_id']." is down.\n");
+        d_echo("\nNagios Service - ".$service['service_id']."\nSkipping service check because device "
+        .$service['hostname']." is down due to icmp.\n");
     }
 } //end foreach
 rrdtool_close();
