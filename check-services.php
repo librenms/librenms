@@ -63,10 +63,10 @@ if ($options['h']) {
 
 $sql = 'SELECT * FROM `devices` AS D INNER JOIN `services` AS S ON S.device_id = D.device_id ' . $where .
 ' LEFT JOIN `devices_attribs` as A ON S.device_id = A.device_id AND A.attrib_type = "override_icmp_disable"
- ORDER by D.device_id DESC;';
+ORDER by D.device_id DESC;';
 
 foreach (dbFetchRows($sql) as $service) {
-    // Run the polling function if the associated device is up, "Disable ICMP Test" option is enabled, 
+    // Run the polling function if the associated device is up, "Disable ICMP Test" option is enabled,
     // or service hostname/ip is different from the associated device
     if ($service['status'] === "1" || ($service['status'] === '0' && $service['status_reason'] === 'snmp') ||
     $service['attrib_value'] === 'true' || ($service['service_ip'] !== $service['hostname'] &&
