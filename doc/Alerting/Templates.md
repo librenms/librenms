@@ -2,7 +2,7 @@ source: Alerting/Templates.md
 
 # Templates
 
-> This page is for installs running version 1.41 or later.
+> This page is for installs running version 1.41 or later. You can find the older docs [here](Old_Templates.md)
 
 Templates can be assigned to a single or a group of rules and can contain any kind of text. There is also a default template which is used for any rule that isn't associated with a template. This template can be found under `Alert Templates` page and can be edited. It also has an option revert it back to its default content. 
 
@@ -21,7 +21,9 @@ Placeholders:
 
 Placeholders are special variables that if used within the template will be replaced with the relevant data, I.e:
 
-`The device $hostname has been up for $uptime seconds` would result in the following `The device localhost has been up for 30344 seconds`.
+`The device {{ $hostname }} has been up for {{ $uptime }} seconds` would result in the following `The device localhost has been up for 30344 seconds`.
+
+> When using placeholders to echo data, you need to wrap the palceholder in `{{ }}`. I.e `{{ $hostname }}`.
 
 - Device ID: `$device_id`
 - Hostname of the Device: `$hostname`
