@@ -4,7 +4,7 @@ $diskio_array = snmpwalk_cache_oid($device, 'diskIOEntry', array(), 'UCD-DISKIO-
 $valid_diskio = array();
 if (is_array($diskio_array)) {
     foreach ($diskio_array as $index => $entry) {
-        if ($entry['diskIONRead'] > '0' || $entry['diskIONWritten'] > '0') {
+        if (($entry['diskIONRead'] > '0' || $entry['diskIONWritten'] > '0') && is_disk_valid($entry, $device) === true) {
             d_echo("$index ".$entry['diskIODevice']."\n");
 
             if (dbFetchCell('SELECT COUNT(*) FROM `ucd_diskio` WHERE `device_id` = ? AND `diskio_index` = ? and `diskio_descr` = ?', array($device['device_id'], $index, $entry['diskIODevice'])) == '0') {
