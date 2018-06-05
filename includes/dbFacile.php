@@ -176,7 +176,6 @@ function dbInsert($data, $table)
         dbCommitTransaction();
         // return $id;
     } else {
-
         dbRollbackTransaction();
         $id = null;
     }

@@ -154,6 +154,7 @@ pages:
           - Intro: Support/Device-Notes/index.md
           - Carel pCOweb: Support/Device-Notes/Carel-pCOweb-Devices.md
   - hidden:
+      - Alerting/Old_Templates.md
       - API/API-Docs.md
       - Installation/Installing-LibreNMS.md
       - Extensions/Alerting.md

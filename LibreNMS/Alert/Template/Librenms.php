@@ -6,40 +6,22 @@
  * Time: 21:38
  */
 
-namespace LibreNMS\Alert;
+namespace LibreNMS\Alert\Template;
 
 use App\Models\AlertTemplate;
-use App\Models\AlertTemplateMap;
 
-class Template
+class Librenms extends Template
 {
-    public static function format($obj)
-    {
-        if ($obj['template_type'] === 'librenms') {
-            return self::librenms($obj);
-        } else {
-            return self::blade($obj);
-        }
-    }
-
-    private static function blade($obj)
-    {
-        print_r($obj['rule_id']);
-        $tpl = AlertTemplateMap::with('template')->where('alert_rule_id', '=', $obj['rule_id'])->first();
-        if (!$tpl) {
-            $tpl = AlertTemplate::where('name', '=', 'Default Alert Template')->first();
-        }
-        echo \DbView::make($tpl, ['foo' => 'Bar'], [], 'template')->render();exit;
-    }
-
     /**
-     * Format Alert
-     * @param array  $obj Alert-Array
-     * @return string
+     *
+     * Get the parsed body
+     *
+     * @param $data
+     * @return mixed|string
      */
-    private static function librenms($obj)
+    public function getBody($data)
     {
-        $tpl    = $obj["template"];
+        $tpl    = $this->getTemplate()->template;
         $msg    = '$ret .= "'.str_replace(array('{else}', '{/if}', '{/foreach}'), array('"; } else { $ret .= "', '"; } $ret .= "', '"; } $ret .= "'), addslashes($tpl)).'";';
         $parsed = $msg;
         $s      = strlen($msg);
@@ -102,6 +84,41 @@ class Template
             }//end if
         }//end while
         $parsed = populate($parsed);
-        return RunJail($parsed, $obj);
-    }//end FormatAlertTpl()
+        return RunJail($parsed, $data);
+    }
+
+    /**
+     *
+     * Get the parsed title
+     *
+     * @param $data
+     * @return mixed|string
+     */
+    public function getTitle($data)
+    {
+        if (strstr($this->getTemplate()->title, '%')) {
+            return RunJail('$ret = "'.populate(addslashes($this->getTemplate()->title)).'";', $data);
+        } else {
+            return $this->getTemplate()->title;
+        }
+    }
+
+    /**
+     *
+     * Get the default template for this parsing engine
+     *
+     * @return string
+     */
+    public function getDefaultTemplate()
+    {
+        return '%title' . PHP_EOL .
+            'Severity: %severity' . PHP_EOL .
+            '{if %state == 0}Time elapsed: %elapsed{/if}' . PHP_EOL .
+            'Timestamp: %timestamp' . PHP_EOL .
+            'Unique-ID: %uid' . PHP_EOL .
+            'Rule: {if %name}%name{else}%rule{/if}' . PHP_EOL .
+            '{if %faults}Faults:' . PHP_EOL .
+            '{foreach %faults}  #%key: %value.string{/foreach}{/if}' . PHP_EOL .
+            'Alert sent to: {foreach %contacts}%value <%key> {/foreach}';
+    }
 }
