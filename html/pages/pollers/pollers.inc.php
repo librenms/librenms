@@ -38,8 +38,7 @@ $rows = dbFetchRows($query);
 
 if (count($rows) === 0) {
     echo '<tr><td colspan="5">You have no standard distributed pollers active</td></tr>';
-}
-else {
+} else {
     foreach ($rows as $poller) {
         $old = ($poller['now'] - $poller['then']);
         $step = Config::get('rrd.step', 300);
@@ -77,7 +76,7 @@ else {
 <h2>Poller Cluster Health</h2>
 
 <div class="table-responsive">
-    <table class="table table-striped table-bordered table-hover table-condensed">
+    <table class="table table-striped table-bordered table-condensed">
         <tr>
             <th>Name</th>
             <th>Version</th>
@@ -98,8 +97,7 @@ $rows = dbFetchRows($query);
 
 if (count($rows) === 0) {
     echo '<tr><td colspan="11">You have no clustered pollers active</td></tr>';
-}
-else {
+} else {
     foreach ($rows as $poller) {
         $old = ($poller['now'] - $poller['then']);
         $step = Config::get('rrd.step', 300);
@@ -120,9 +118,9 @@ else {
 
         $stat_query = 'SELECT * FROM `poller_cluster_stats` WHERE `parent_poller`=' . $poller['id'] . ';';
         $stat_row = dbFetchRows($stat_query);
-        $stat_count = count($stat_row) + 1;
+        $stat_count = count($stat_row);
 
-        $first_row = TRUE;
+        $first_row = true;
 
         foreach ($stat_row as $stats) {
             $health_query = 'SELECT * FROM `poller_cluster_queue_health` WHERE `parent_poller`=' . $poller['id'] . ' AND `poller_type`="' . $stats['poller_type'] . '";';
@@ -160,7 +158,7 @@ else {
 
             // End the row
             echo '</tr>';
-            $first_row = FALSE;
+            $first_row = false;
         }
     }
 }
