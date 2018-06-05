@@ -1062,6 +1062,30 @@ pollers:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [poller_name], Unique: true, Type: BTREE }
     id: { Name: id, Columns: [id], Unique: false, Type: BTREE }
+poller_cluster:
+  Columns:
+    - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
+    - { Field: poller_name, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: poller_version, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
+    - { Field: poller_groups, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
+    - { Field: last_report, Type: datetime, 'Null': false, Extra: '' }
+    - { Field: master, Type: tinyint(1), 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [poller_name], Unique: true, Type: BTREE }
+    id: { Name: id, Columns: [id], Unique: true, Type: BTREE }
+poller_cluster_stats:
+  Columns:
+    - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
+    - { Field: parent_poller, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
+    - { Field: poller_type, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
+    - { Field: depth, Type: 'int(11) unsigned', 'Null': false, Extra: '' }
+    - { Field: devices, Type: 'int(11) unsigned', 'Null': false, Extra: '' }
+    - { Field: worker_seconds, Type: 'double unsigned', 'Null': false, Extra: '' }
+    - { Field: workers, Type: 'int(11) unsigned', 'Null': false, Extra: '' }
+    - { Field: frequency, Type: 'int(11) unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [parent_poller, poller_type], Unique: true, Type: BTREE }
+    id: { Name: id, Columns: [id], Unique: true, Type: BTREE }
 poller_groups:
   Columns:
     - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
