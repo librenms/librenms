@@ -1,12 +1,12 @@
 os: powerlogic
-text: Schneider PowerLogic
+text: 'Schneider PowerLogic'
 icon: schneider
 type: power
 over:
-    - { graph: sensor_voltage, text: 'Voltage' }
-    - { graph: sensor_current, text: 'Current' }
-    - { graph: sensor_power, text: 'Power' }
-    - { graph: sensor_frequency, text: 'Frequency' }
+    - { graph: sensor_voltage, text: Voltage }
+    - { graph: sensor_current, text: Current }
+    - { graph: sensor_power, text: Power }
+    - { graph: sensor_frequency, text: Frequency }
 mib_dir:
     - schneider
 discovery:

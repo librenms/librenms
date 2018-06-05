@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "43d724abea8fe593dd8200103c96583d",
+    "content-hash": "bc9d83d402f1cfa44cd5fe0495366bfb",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -3634,6 +3634,72 @@
             "time": "2018-02-24T15:31:20+00:00"
         },
         {
+            "name": "justinrainbow/json-schema",
+            "version": "5.2.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/justinrainbow/json-schema.git",
+                "reference": "8560d4314577199ba51bf2032f02cd1315587c23"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/justinrainbow/json-schema/zipball/8560d4314577199ba51bf2032f02cd1315587c23",
+                "reference": "8560d4314577199ba51bf2032f02cd1315587c23",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.1",
+                "json-schema/json-schema-test-suite": "1.2.0",
+                "phpunit/phpunit": "^4.8.35"
+            },
+            "bin": [
+                "bin/validate-json"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "5.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JsonSchema\\": "src/JsonSchema/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bruno Prieto Reis",
+                    "email": "bruno.p.reis@gmail.com"
+                },
+                {
+                    "name": "Justin Rainbow",
+                    "email": "justin.rainbow@gmail.com"
+                },
+                {
+                    "name": "Igor Wiedler",
+                    "email": "igor@wiedler.ch"
+                },
+                {
+                    "name": "Robert Schönthal",
+                    "email": "seroscho@googlemail.com"
+                }
+            ],
+            "description": "A library to validate a json schema.",
+            "homepage": "https://github.com/justinrainbow/json-schema",
+            "keywords": [
+                "json",
+                "schema"
+            ],
+            "time": "2018-02-14T22:26:30+00:00"
+        },
+        {
             "name": "maximebf/debugbar",
             "version": "1.13.1",
             "source": {
@@ -4142,6 +4208,48 @@
                 "xunit"
             ],
             "time": "2017-06-30T09:13:00+00:00"
+        },
+        {
+            "name": "romaricdrigon/metayaml",
+            "version": "1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/romaricdrigon/MetaYaml.git",
+                "reference": "03b0af567981a8a060606989c395974baf385bd1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/romaricdrigon/MetaYaml/zipball/03b0af567981a8a060606989c395974baf385bd1",
+                "reference": "03b0af567981a8a060606989c395974baf385bd1",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3",
+                "symfony/yaml": "~2.3|~3.0"
+            },
+            "require-dev": {
+                "atoum/atoum": "~1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "RomaricDrigon\\MetaYaml": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Using [Yaml|Xml|json] schemas files to validate [Yaml|Xml|json] ",
+            "homepage": "http://github.com/romaricdrigon/MetaYaml",
+            "keywords": [
+                "json",
+                "schema",
+                "validation",
+                "xml",
+                "yaml"
+            ],
+            "time": "2016-02-29T10:28:30+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",

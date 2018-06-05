@@ -1,7 +1,7 @@
 os: xos
 text: 'Extreme XOS'
 type: network
-ifname: 1
+ifname: true
 icon: extreme
 mib_dir:
     - extreme
