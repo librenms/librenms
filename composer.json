@@ -53,7 +53,8 @@
         "fojuth/readmegen": "1.*",
         "barryvdh/laravel-ide-helper": "^2.4",
         "barryvdh/laravel-debugbar": "~2.4",
-        "justinrainbow/json-schema": "^5.2"
+        "justinrainbow/json-schema": "^5.2",
+        "brianium/paratest": "^0.15.0"
     },
     "suggest": {
         "ext-memcached": "Required if you utilize distributed polling",
