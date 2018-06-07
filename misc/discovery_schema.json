@@ -59,12 +59,13 @@
                                                                     "type": "string"
                                                                 },
                                                                 "op": {
-                                                                    "type": "string"
+                                                                    "$ref": "#/definitions/comparison"
                                                                 },
                                                                 "value": {
                                                                     "type": "integer"
                                                                 }
                                                             },
+                                                            "additionalProperties": false,
                                                             "required": [
                                                                 "oid",
                                                                 "op",
@@ -83,6 +84,7 @@
                                         "type": "string"
                                     }
                                 },
+                                "additionalProperties": false,
                                 "required": [
                                     "num_oid",
                                     "oid"
@@ -90,6 +92,7 @@
                             }
                         }
                     },
+                    "additionalProperties": false,
                     "required": [
                         "data"
                     ]
@@ -112,7 +115,8 @@
                                                 "type": "string"
                                             },
                                             "num_oid": {
-                                                "type": "string"
+                                                "type": "string",
+                                                "pattern": "^(\\.\\d+)+\\.?$"
                                             },
                                             "descr": {
                                                 "type": "string"
@@ -141,6 +145,7 @@
                                                             "type": "integer"
                                                         }
                                                     },
+                                                    "additionalProperties": false,
                                                     "required": [
                                                         "descr",
                                                         "generic",
@@ -166,7 +171,7 @@
                                                                     "type": "string"
                                                                 },
                                                                 "op": {
-                                                                    "type": "string"
+                                                                    "$ref": "#/definitions/comparison"
                                                                 },
                                                                 "value": {
                                                                     "type": "integer"
@@ -192,318 +197,16 @@
                                             "states"
                                         ]
                                     }
-                                }
-                            },
-                            "required": [
-                                "data"
-                            ]
-                        },
-                        "voltage": {
-                            "type": "object",
-                            "properties": {
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
-                                            "num_oid": {
-                                                "type": "string"
-                                            },
-                                            "index": {
-                                                "type": "string"
-                                            },
-                                            "descr": {
-                                                "type": "string"
-                                            },
-                                            "divisor": {
-                                                "type": "integer"
-                                            },
-                                            "value": {
-                                                "type": "string"
-                                            },
-                                            "low_limit": {
-                                                "type": [
-                                                    "integer",
-                                                    "string"
-                                                ]
-                                            },
-                                            "high_limit": {
-                                                "type": [
-                                                    "integer",
-                                                    "string"
-                                                ]
-                                            },
-                                            "skip_values": {
-                                                "anyOf": [
-                                                    {
-                                                        "type": "integer"
-                                                    },
-                                                    {
-                                                        "type": "array",
-                                                        "items": {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "oid": {
-                                                                    "type": "string"
-                                                                },
-                                                                "op": {
-                                                                    "type": "string"
-                                                                },
-                                                                "value": {
-                                                                    "type": "integer"
-                                                                }
-                                                            },
-                                                            "required": [
-                                                                "oid",
-                                                                "op",
-                                                                "value"
-                                                            ]
-                                                        }
-                                                    }
-                                                ]
-                                            },
-                                            "low_warn_limit": {
-                                                "type": "string"
-                                            },
-                                            "warn_limit": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": [
-                                            "descr",
-                                            "num_oid",
-                                            "oid"
-                                        ]
-                                    }
                                 },
-                                "options": {
-                                    "type": "object",
-                                    "properties": {
-                                        "skip_values": {
-                                            "type": "integer"
-                                        },
-                                        "divisor": {
-                                            "type": "integer"
-                                        },
-                                        "skip_values_lt": {
-                                            "type": "integer"
-                                        }
-                                    }
-                                }
+                                "options": {"$ref": "#/definitions/options"}
                             },
                             "required": [
                                 "data"
                             ]
                         },
-                        "fanspeed": {
-                            "type": "object",
-                            "properties": {
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
-                                            "value": {
-                                                "type": "string"
-                                            },
-                                            "num_oid": {
-                                                "type": "string"
-                                            },
-                                            "descr": {
-                                                "type": "string"
-                                            },
-                                            "index": {
-                                                "type": "string"
-                                            },
-                                            "divisor": {
-                                                "type": "integer"
-                                            },
-                                            "low_limit": {
-                                                "type": "string"
-                                            },
-                                            "skip_values": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "oid": {
-                                                            "type": "string"
-                                                        },
-                                                        "op": {
-                                                            "type": "string"
-                                                        },
-                                                        "value": {
-                                                            "type": "integer"
-                                                        }
-                                                    },
-                                                    "required": [
-                                                        "oid",
-                                                        "op",
-                                                        "value"
-                                                    ]
-                                                }
-                                            }
-                                        },
-                                        "required": [
-                                            "descr",
-                                            "num_oid",
-                                            "oid"
-                                        ]
-                                    }
-                                },
-                                "options": {
-                                    "type": "object",
-                                    "properties": {
-                                        "skip_values": {
-                                            "type": "integer"
-                                        }
-                                    },
-                                    "required": [
-                                        "skip_values"
-                                    ]
-                                }
-                            },
-                            "required": [
-                                "data"
-                            ]
-                        },
-                        "temperature": {
-                            "type": "object",
-                            "properties": {
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
-                                            "num_oid": {
-                                                "type": "string"
-                                            },
-                                            "descr": {
-                                                "type": "string"
-                                            },
-                                            "index": {
-                                                "type": [
-                                                    "integer",
-                                                    "string"
-                                                ]
-                                            },
-                                            "divisor": {
-                                                "type": "integer"
-                                            },
-                                            "value": {
-                                                "type": "string"
-                                            },
-                                            "high_limit": {
-                                                "type": [
-                                                    "integer",
-                                                    "string"
-                                                ]
-                                            },
-                                            "skip_values": {
-                                                "anyOf": [
-                                                    {
-                                                        "type": "integer"
-                                                    },
-                                                    {
-                                                        "type": "array",
-                                                        "items": {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "oid": {
-                                                                    "type": "string"
-                                                                },
-                                                                "op": {
-                                                                    "type": "string"
-                                                                },
-                                                                "value": {
-                                                                    "type": "integer"
-                                                                }
-                                                            },
-                                                            "required": [
-                                                                "oid",
-                                                                "op",
-                                                                "value"
-                                                            ]
-                                                        }
-                                                    }
-                                                ]
-                                            },
-                                            "low_limit": {
-                                                "type": [
-                                                    "integer",
-                                                    "string"
-                                                ]
-                                            },
-                                            "warn_limit": {
-                                                "type": [
-                                                    "integer",
-                                                    "string"
-                                                ]
-                                            },
-                                            "skip_value_lt": {
-                                                "type": "integer"
-                                            },
-                                            "low_warn_limit": {
-                                                "type": [
-                                                    "integer",
-                                                    "string"
-                                                ]
-                                            },
-                                            "snmp_flags": {
-                                                "type": "string"
-                                            },
-                                            "entPhysicalIndex": {
-                                                "type": "string"
-                                            },
-                                            "entPhysicalIndex_measured": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": [
-                                            "descr",
-                                            "num_oid",
-                                            "oid"
-                                        ]
-                                    }
-                                },
-                                "options": {
-                                    "type": "object",
-                                    "properties": {
-                                        "divisor": {
-                                            "type": "integer"
-                                        },
-                                        "skip_values": {
-                                            "anyOf": [
-                                                {
-                                                    "type": "integer"
-                                                },
-                                                {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "integer"
-                                                    }
-                                                }
-                                            ]
-                                        },
-                                        "skip_values_lt": {
-                                            "type": "integer"
-                                        }
-                                    }
-                                }
-                            },
-                            "required": [
-                                "data"
-                            ]
-                        },
+                        "voltage": {"$ref": "#/definitions/sensor"},
+                        "fanspeed": {"$ref": "#/definitions/sensor"},
+                        "temperature": {"$ref": "#/definitions/sensor"},
                         "pre-cache": {
                             "type": "object",
                             "properties": {
@@ -519,1062 +222,164 @@
                                                 }
                                             }
                                         },
+                                        "additionalProperties": false,
                                         "required": [
                                             "oid"
                                         ]
                                     }
                                 }
                             },
+                            "additionalProperties": false,
                             "required": [
                                 "data"
                             ]
                         },
-                        "humidity": {
-                            "type": "object",
-                            "properties": {
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
-                                            "num_oid": {
-                                                "type": "string"
-                                            },
-                                            "index": {
-                                                "type": [
-                                                    "integer",
-                                                    "string"
-                                                ]
-                                            },
-                                            "descr": {
-                                                "type": "string"
-                                            },
-                                            "divisor": {
-                                                "type": "integer"
-                                            },
-                                            "value": {
-                                                "type": "string"
-                                            },
-                                            "skip_values": {
-                                                "anyOf": [
-                                                    {
-                                                        "type": "integer"
-                                                    },
-                                                    {
-                                                        "type": "array",
-                                                        "items": {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "oid": {
-                                                                    "type": "string"
-                                                                },
-                                                                "op": {
-                                                                    "type": "string"
-                                                                },
-                                                                "value": {
-                                                                    "type": "integer"
-                                                                }
-                                                            },
-                                                            "required": [
-                                                                "oid",
-                                                                "op",
-                                                                "value"
-                                                            ]
-                                                        }
-                                                    }
-                                                ]
-                                            },
-                                            "low_limit": {
-                                                "type": "string"
-                                            },
-                                            "high_limit": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": [
-                                            "descr",
-                                            "num_oid",
-                                            "oid"
-                                        ]
-                                    }
-                                },
-                                "options": {
-                                    "type": "object",
-                                    "properties": {
-                                        "divisor": {
-                                            "type": "integer"
-                                        },
-                                        "skip_values_lt": {
-                                            "type": "integer"
-                                        }
-                                    }
-                                }
-                            },
-                            "required": [
-                                "data"
-                            ]
-                        },
-                        "airflow": {
-                            "type": "object",
-                            "properties": {
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
-                                            "num_oid": {
-                                                "type": "string"
-                                            },
-                                            "index": {
-                                                "type": "string"
-                                            },
-                                            "descr": {
-                                                "type": "string"
-                                            },
-                                            "divisor": {
-                                                "type": "integer"
-                                            },
-                                            "value": {
-                                                "type": "string"
-                                            },
-                                            "skip_values": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "oid": {
-                                                            "type": "string"
-                                                        },
-                                                        "op": {
-                                                            "type": "string"
-                                                        },
-                                                        "value": {
-                                                            "type": "integer"
-                                                        }
-                                                    },
-                                                    "required": [
-                                                        "oid",
-                                                        "op",
-                                                        "value"
-                                                    ]
-                                                }
-                                            }
-                                        },
-                                        "required": [
-                                            "descr",
-                                            "num_oid",
-                                            "oid"
-                                        ]
-                                    }
-                                }
-                            },
-                            "required": [
-                                "data"
-                            ]
-                        },
-                        "current": {
-                            "type": "object",
-                            "properties": {
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
-                                            "num_oid": {
-                                                "type": "string"
-                                            },
-                                            "index": {
-                                                "type": "string"
-                                            },
-                                            "descr": {
-                                                "type": "string"
-                                            },
-                                            "divisor": {
-                                                "type": "integer"
-                                            },
-                                            "value": {
-                                                "type": "string"
-                                            },
-                                            "low_limit": {
-                                                "type": "string"
-                                            },
-                                            "low_warn_limit": {
-                                                "type": "string"
-                                            },
-                                            "warn_limit": {
-                                                "type": "string"
-                                            },
-                                            "high_limit": {
-                                                "type": "string"
-                                            },
-                                            "skip_values": {
-                                                "type": "integer"
-                                            },
-                                            "entPhysicalIndex": {
-                                                "type": "string"
-                                            },
-                                            "entPhysicalIndex_measured": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": [
-                                            "descr",
-                                            "num_oid",
-                                            "oid"
-                                        ]
-                                    }
-                                },
-                                "options": {
-                                    "type": "object",
-                                    "properties": {
-                                        "divisor": {
-                                            "type": "integer"
-                                        },
-                                        "skip_values": {
-                                            "type": "integer"
-                                        },
-                                        "skip_values_lt": {
-                                            "type": "integer"
-                                        }
-                                    },
-                                    "required": [
-                                        "divisor"
-                                    ]
-                                }
-                            },
-                            "required": [
-                                "data"
-                            ]
-                        },
-                        "frequency": {
-                            "type": "object",
-                            "properties": {
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
-                                            "num_oid": {
-                                                "type": "string"
-                                            },
-                                            "index": {
-                                                "type": "string"
-                                            },
-                                            "descr": {
-                                                "type": "string"
-                                            },
-                                            "divisor": {
-                                                "type": "integer"
-                                            },
-                                            "value": {
-                                                "type": "string"
-                                            },
-                                            "entPhysicalIndex": {
-                                                "type": "string"
-                                            },
-                                            "entPhysicalIndex_measured": {
-                                                "type": "string"
-                                            },
-                                            "multiplier": {
-                                                "type": "integer"
-                                            }
-                                        },
-                                        "required": [
-                                            "descr",
-                                            "index",
-                                            "num_oid",
-                                            "oid"
-                                        ]
-                                    }
-                                },
-                                "options": {
-                                    "type": "object",
-                                    "properties": {
-                                        "skip_values_lt": {
-                                            "type": "integer"
-                                        },
-                                        "divisor": {
-                                            "type": "integer"
-                                        }
-                                    },
-                                    "required": [
-                                        "divisor"
-                                    ]
-                                }
-                            },
-                            "required": [
-                                "data"
-                            ]
-                        },
-                        "power": {
-                            "type": "object",
-                            "properties": {
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
-                                            "num_oid": {
-                                                "type": "string"
-                                            },
-                                            "index": {
-                                                "type": "string"
-                                            },
-                                            "descr": {
-                                                "type": "string"
-                                            },
-                                            "multiplier": {
-                                                "type": "integer"
-                                            },
-                                            "value": {
-                                                "type": "string"
-                                            },
-                                            "divisor": {
-                                                "type": "integer"
-                                            },
-                                            "high_limit": {
-                                                "type": "string"
-                                            },
-                                            "skip_values": {
-                                                "type": "integer"
-                                            },
-                                            "low_limit": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": [
-                                            "descr",
-                                            "num_oid",
-                                            "oid"
-                                        ]
-                                    }
-                                },
-                                "options": {
-                                    "type": "object",
-                                    "properties": {
-                                        "divisor": {
-                                            "type": "integer"
-                                        },
-                                        "skip_values": {
-                                            "type": "integer"
-                                        },
-                                        "skip_values_lt": {
-                                            "type": "integer"
-                                        }
-                                    }
-                                }
-                            },
-                            "required": [
-                                "data"
-                            ]
-                        },
-                        "pressure": {
-                            "type": "object",
-                            "properties": {
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
-                                            "num_oid": {
-                                                "type": "string"
-                                            },
-                                            "index": {
-                                                "type": "string"
-                                            },
-                                            "descr": {
-                                                "type": "string"
-                                            },
-                                            "value": {
-                                                "type": "string"
-                                            },
-                                            "multiplier": {
-                                                "type": "integer"
-                                            }
-                                        },
-                                        "required": [
-                                            "descr",
-                                            "index",
-                                            "num_oid",
-                                            "oid"
-                                        ]
-                                    }
-                                }
-                            },
-                            "required": [
-                                "data"
-                            ]
-                        },
-                        "cooling": {
-                            "type": "object",
-                            "properties": {
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
-                                            "num_oid": {
-                                                "type": "string"
-                                            },
-                                            "index": {
-                                                "type": "string"
-                                            },
-                                            "descr": {
-                                                "type": "string"
-                                            },
-                                            "multiplier": {
-                                                "type": "integer"
-                                            },
-                                            "value": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": [
-                                            "descr",
-                                            "index",
-                                            "multiplier",
-                                            "num_oid",
-                                            "oid"
-                                        ]
-                                    }
-                                }
-                            },
-                            "required": [
-                                "data"
-                            ]
-                        },
-                        "charge": {
-                            "type": "object",
-                            "properties": {
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
-                                            "num_oid": {
-                                                "type": "string"
-                                            },
-                                            "index": {
-                                                "type": "string"
-                                            },
-                                            "descr": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": [
-                                            "descr",
-                                            "index",
-                                            "num_oid",
-                                            "oid"
-                                        ]
-                                    }
-                                }
-                            },
-                            "required": [
-                                "data"
-                            ]
-                        },
-                        "runtime": {
-                            "type": "object",
-                            "properties": {
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
-                                            "num_oid": {
-                                                "type": "string"
-                                            },
-                                            "index": {
-                                                "type": "string"
-                                            },
-                                            "descr": {
-                                                "type": "string"
-                                            },
-                                            "divisor": {
-                                                "type": "integer"
-                                            },
-                                            "value": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": [
-                                            "descr",
-                                            "num_oid",
-                                            "oid"
-                                        ]
-                                    }
-                                },
-                                "options": {
-                                    "type": "object",
-                                    "properties": {
-                                        "divisor": {
-                                            "type": "integer"
-                                        }
-                                    },
-                                    "required": [
-                                        "divisor"
-                                    ]
-                                }
-                            },
-                            "required": [
-                                "data"
-                            ]
-                        },
-                        "dbm": {
-                            "type": "object",
-                            "properties": {
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
-                                            "value": {
-                                                "type": "string"
-                                            },
-                                            "num_oid": {
-                                                "type": "string"
-                                            },
-                                            "descr": {
-                                                "type": "string"
-                                            },
-                                            "index": {
-                                                "type": "string"
-                                            },
-                                            "low_warn_limit": {
-                                                "type": "string"
-                                            },
-                                            "low_limit": {
-                                                "type": "string"
-                                            },
-                                            "warn_limit": {
-                                                "type": "string"
-                                            },
-                                            "high_limit": {
-                                                "type": "string"
-                                            },
-                                            "entPhysicalIndex": {
-                                                "type": "string"
-                                            },
-                                            "entPhysicalIndex_measured": {
-                                                "type": "string"
-                                            },
-                                            "divisor": {
-                                                "type": "integer"
-                                            },
-                                            "skip_values": {
-                                                "type": "integer"
-                                            },
-                                            "user_func": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": [
-                                            "descr",
-                                            "index",
-                                            "num_oid",
-                                            "oid",
-                                            "value"
-                                        ]
-                                    }
-                                }
-                            },
-                            "required": [
-                                "data"
-                            ]
-                        },
-                        "load": {
-                            "type": "object",
-                            "properties": {
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
-                                            "value": {
-                                                "type": "string"
-                                            },
-                                            "num_oid": {
-                                                "type": "string"
-                                            },
-                                            "index": {
-                                                "type": "string"
-                                            },
-                                            "descr": {
-                                                "type": "string"
-                                            },
-                                            "skip_values": {
-                                                "type": "integer"
-                                            },
-                                            "divisor": {
-                                                "type": "integer"
-                                            },
-                                            "warn_limit": {
-                                                "type": "integer"
-                                            },
-                                            "high_limit": {
-                                                "type": "integer"
-                                            }
-                                        },
-                                        "required": [
-                                            "descr",
-                                            "num_oid",
-                                            "oid"
-                                        ]
-                                    }
-                                }
-                            },
-                            "required": [
-                                "data"
-                            ]
-                        },
-                        "chromatic_dispersion": {
-                            "type": "object",
-                            "properties": {
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
-                                            "value": {
-                                                "type": "string"
-                                            },
-                                            "num_oid": {
-                                                "type": "string"
-                                            },
-                                            "entPhysicalIndex": {
-                                                "type": "string"
-                                            },
-                                            "entPhysicalIndex_measured": {
-                                                "type": "string"
-                                            },
-                                            "descr": {
-                                                "type": "string"
-                                            },
-                                            "index": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": [
-                                            "descr",
-                                            "entPhysicalIndex",
-                                            "entPhysicalIndex_measured",
-                                            "index",
-                                            "num_oid",
-                                            "oid",
-                                            "value"
-                                        ]
-                                    }
-                                }
-                            },
-                            "required": [
-                                "data"
-                            ]
-                        },
-                        "delay": {
-                            "type": "object",
-                            "properties": {
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
-                                            "value": {
-                                                "type": "string"
-                                            },
-                                            "num_oid": {
-                                                "type": "string"
-                                            },
-                                            "entPhysicalIndex": {
-                                                "type": "string"
-                                            },
-                                            "entPhysicalIndex_measured": {
-                                                "type": "string"
-                                            },
-                                            "divisor": {
-                                                "type": "integer"
-                                            },
-                                            "descr": {
-                                                "type": "string"
-                                            },
-                                            "index": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": [
-                                            "descr",
-                                            "divisor",
-                                            "entPhysicalIndex",
-                                            "entPhysicalIndex_measured",
-                                            "index",
-                                            "num_oid",
-                                            "oid",
-                                            "value"
-                                        ]
-                                    }
-                                }
-                            },
-                            "required": [
-                                "data"
-                            ]
-                        },
-                        "quality_factor": {
-                            "type": "object",
-                            "properties": {
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
-                                            "value": {
-                                                "type": "string"
-                                            },
-                                            "num_oid": {
-                                                "type": "string"
-                                            },
-                                            "entPhysicalIndex": {
-                                                "type": "string"
-                                            },
-                                            "entPhysicalIndex_measured": {
-                                                "type": "string"
-                                            },
-                                            "divisor": {
-                                                "type": "integer"
-                                            },
-                                            "descr": {
-                                                "type": "string"
-                                            },
-                                            "index": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": [
-                                            "descr",
-                                            "divisor",
-                                            "entPhysicalIndex",
-                                            "entPhysicalIndex_measured",
-                                            "index",
-                                            "num_oid",
-                                            "oid",
-                                            "value"
-                                        ]
-                                    }
-                                }
-                            },
-                            "required": [
-                                "data"
-                            ]
-                        },
-                        "snr": {
-                            "type": "object",
-                            "properties": {
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
-                                            "value": {
-                                                "type": "string"
-                                            },
-                                            "num_oid": {
-                                                "type": "string"
-                                            },
-                                            "entPhysicalIndex": {
-                                                "type": "string"
-                                            },
-                                            "entPhysicalIndex_measured": {
-                                                "type": "string"
-                                            },
-                                            "divisor": {
-                                                "type": "integer"
-                                            },
-                                            "descr": {
-                                                "type": "string"
-                                            },
-                                            "index": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": [
-                                            "descr",
-                                            "divisor",
-                                            "entPhysicalIndex",
-                                            "entPhysicalIndex_measured",
-                                            "index",
-                                            "num_oid",
-                                            "oid",
-                                            "value"
-                                        ]
-                                    }
-                                }
-                            },
-                            "required": [
-                                "data"
-                            ]
-                        },
-                        "waterflow": {
-                            "type": "object",
-                            "properties": {
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
-                                            "value": {
-                                                "type": "string"
-                                            },
-                                            "divisor": {
-                                                "type": "integer"
-                                            },
-                                            "num_oid": {
-                                                "type": "string"
-                                            },
-                                            "descr": {
-                                                "type": "string"
-                                            },
-                                            "index": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": [
-                                            "descr",
-                                            "divisor",
-                                            "index",
-                                            "num_oid",
-                                            "oid",
-                                            "value"
-                                        ]
-                                    }
-                                }
-                            },
-                            "required": [
-                                "data"
-                            ]
-                        },
-                        "eer": {
-                            "type": "object",
-                            "properties": {
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "oid": {
-                                                "type": "string"
-                                            },
-                                            "value": {
-                                                "type": "string"
-                                            },
-                                            "num_oid": {
-                                                "type": "string"
-                                            },
-                                            "descr": {
-                                                "type": "string"
-                                            },
-                                            "index": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": [
-                                            "descr",
-                                            "index",
-                                            "num_oid",
-                                            "oid",
-                                            "value"
-                                        ]
-                                    }
-                                }
-                            },
-                            "required": [
-                                "data"
-                            ]
-                        }
+                        "humidity": {"$ref": "#/definitions/sensor"},
+                        "airflow": {"$ref": "#/definitions/sensor"},
+                        "current": {"$ref": "#/definitions/sensor"},
+                        "frequency": {"$ref": "#/definitions/sensor"},
+                        "power": {"$ref": "#/definitions/sensor"},
+                        "pressure": {"$ref": "#/definitions/sensor"},
+                        "cooling": {"$ref": "#/definitions/sensor"},
+                        "charge": {"$ref": "#/definitions/sensor"},
+                        "runtime": {"$ref": "#/definitions/sensor"},
+                        "dbm": {"$ref": "#/definitions/sensor"},
+                        "load": {"$ref": "#/definitions/sensor"},
+                        "chromatic_dispersion": {"$ref": "#/definitions/sensor"},
+                        "delay": {"$ref": "#/definitions/sensor"},
+                        "quality_factor": {"$ref": "#/definitions/sensor"},
+                        "snr": {"$ref": "#/definitions/sensor"},
+                        "waterflow": {"$ref": "#/definitions/sensor"},
+                        "eer": {"$ref": "#/definitions/sensor"}
                     }
                 }
             }
         }
     },
+    "additionalProperties": false,
     "required": [
         "modules"
     ],
-    "defintions": {
-        "sensor_type": {
+    "definitions": {
+        "sensor": {
             "type": "object",
             "properties": {
                 "data": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "oid": {
-                                "type": "string"
-                            },
-                            "num_oid": {
-                                "type": "string"
-                            },
-                            "descr": {
-                                "type": "string"
-                            },
-                            "index": {
-                                "type": [
-                                    "integer",
-                                    "string"
-                                ]
-                            },
-                            "divisor": {
-                                "type": "integer"
-                            },
-                            "value": {
-                                "type": "string"
-                            },
-                            "high_limit": {
-                                "type": [
-                                    "integer",
-                                    "string"
-                                ]
-                            },
-                            "skip_values": {
-                                "anyOf": [
-                                    {
-                                        "type": "integer"
-                                    },
-                                    {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "object",
-                                            "properties": {
-                                                "oid": {
-                                                    "type": "string"
-                                                },
-                                                "op": {
-                                                    "type": "string"
-                                                },
-                                                "value": {
-                                                    "type": "integer"
-                                                }
-                                            },
-                                            "required": [
-                                                "oid",
-                                                "op",
-                                                "value"
-                                            ]
-                                        }
-                                    }
-                                ]
-                            },
-                            "low_limit": {
-                                "type": [
-                                    "integer",
-                                    "string"
-                                ]
-                            },
-                            "warn_limit": {
-                                "type": [
-                                    "integer",
-                                    "string"
-                                ]
-                            },
-                            "skip_value_lt": {
-                                "type": "integer"
-                            },
-                            "low_warn_limit": {
-                                "type": [
-                                    "integer",
-                                    "string"
-                                ]
-                            },
-                            "snmp_flags": {
-                                "type": "string"
-                            },
-                            "entPhysicalIndex": {
-                                "type": "string"
-                            },
-                            "entPhysicalIndex_measured": {
-                                "type": "string"
-                            }
-                        },
-                        "required": [
-                            "descr",
-                            "num_oid",
-                            "oid"
-                        ]
-                    }
+                    "$ref": "#/definitions/data"
                 },
                 "options": {
-                    "type": "object",
-                    "properties": {
-                        "divisor": {
-                            "type": "integer"
-                        },
-                        "skip_values": {
-                            "anyOf": [
-                                {
-                                    "type": "integer"
-                                },
-                                {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "integer"
-                                    }
-                                }
-                            ]
-                        },
-                        "skip_values_lt": {
-                            "type": "integer"
-                        }
-                    }
+                    "$ref": "#/definitions/options"
                 }
             },
+            "additionalProperties": false,
             "required": [
                 "data"
+            ]
+        },
+        "data": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "oid": {
+                        "type": "string"
+                    },
+                    "num_oid": {
+                        "type": "string",
+                        "pattern": "^(\\.\\d+)+\\.?$"
+                    },
+                    "index": {
+                        "type": ["integer", "string"]
+                    },
+                    "descr": {
+                        "type": "string"
+                    },
+                    "divisor": {
+                        "type": "integer"
+                    },
+                    "value": {
+                        "type": "string"
+                    },
+                    "skip_values": {
+                        "type": ["number", "array"],
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "oid": {
+                                    "type": "string"
+                                },
+                                "op": {
+                                    "$ref": "#/definitions/comparison"
+                                },
+                                "value": {
+                                    "type": "integer"
+                                }
+                            },
+                            "additionalProperties": false,
+                            "required": [
+                                "oid",
+                                "op",
+                                "value"
+                            ]
+                        }
+                    },
+                    "snmp_flags": {
+                        "type": "string"
+                    },
+                    "entPhysicalIndex": {
+                        "type": "string"
+                    },
+                    "entPhysicalIndex_measured": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "descr",
+                    "num_oid",
+                    "oid"
+                ]
+            }
+        },
+        "options": {
+            "type": "object",
+            "properties": {
+                "divisor": {
+                    "type": "integer"
+                },
+                "skip_values": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    ]
+                },
+                "skip_values_lt": {
+                    "type": "integer"
+                }
+            },
+            "additionalProperties": false
+        },
+        "comparison": {
+            "type": "string",
+            "enum": [
+                "=",
+                "!=",
+                "==",
+                "!==",
+                "<=",
+                ">=",
+                "<",
+                ">",
+                "starts",
+                "ends",
+                "contains",
+                "regex"
             ]
         }
     }
