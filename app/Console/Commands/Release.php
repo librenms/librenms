@@ -7,7 +7,7 @@ use LibreNMS\Util\GitHub;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 
-class release extends Command
+class Release extends Command
 {
     /**
      * The name and signature of the console command.
