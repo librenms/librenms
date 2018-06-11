@@ -23,10 +23,11 @@ require_once 'includes/modal/edit_transport_group.inc.php';
     <th>#</th>
     <th>Transport Name</th>
     <th>Transport Type</th>
+    <th>Default</th>
     <th>Details</th>
     <th style="width:86px;">Action</th>
     </tr>
-    <td colspan="5">
+    <td colspan="6">
 <?php
 if (Auth::user()->hasGlobalAdmin()) {
     echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#edit-alert-transport'><i class='fa fa-plus'></i> Create alert transport</button>";
@@ -35,12 +36,17 @@ if (Auth::user()->hasGlobalAdmin()) {
 echo "</td>";
 
 // Iterate through each alert transport
-$query = "SELECT `transport_id` AS `id`, `transport_name` AS `name`, `transport_type` AS `type`, `transport_config` AS `config` FROM `alert_transports`";
+$query = "SELECT `transport_id` AS `id`, `transport_name` AS `name`, `transport_type` AS `type`, `is_default`, `transport_config` AS `config` FROM `alert_transports`";
 foreach (dbFetchRows($query) as $transport) {
     echo "<tr>";
     echo "<td><i>#".((int)$transport['id'])."</i></td>";
     echo "<td>".$transport['name']."</td>";
     echo "<td>".$transport['type']."</td>";
+    if ($transport['is_default'] == true) {
+        echo "<td>Yes</td>";
+    } else {
+        echo "<td>No</td>";
+    }
     
     echo "<td class='col-sm-4'>";
 

@@ -45,6 +45,12 @@ if (Auth::user()->hasGlobalAdmin()) {
                                 </select>
                             </div>
                         </div>
+                        <div class="form-group" title="The transport is default.">
+                            <label for="default" class="col-sm-3 col-md-2 control-label">Default Alert: </label>
+                            <div class="col-sm-2">
+                                <input type="checkbox" name="is_default" id="is_default">
+                            </div>
+                        </div>
                     </form>
 <?php
 $transports = Config::get('alert.transports');
@@ -149,21 +155,21 @@ foreach (array_keys($transports) as $transport) {
                 $("#transport-choice").val("mail-form");
                 $(".transport").hide();
                 $("#" + $("#transport-choice").val()).show().find("input:text").val("");
+                $("#is_default").bootstrapSwitch('state', false);
             }
         });
 
         function loadTransport(transport) {
             $("#name").val(transport.name);
             $("#transport-choice").val(transport.type+"-form");
-
+            $("#is_default").bootstrapSwitch('state', transport.is_default); 
             $(".transport").hide();
             $("#" + $("#transport-choice").val()).show().find("input:text").val("");
-            
+             
             // Populate the field values
             transport.details.forEach(function(config) {
                 $("#" + config.name).val(config.value);
             });
-
         }
 
         // Save alert transport

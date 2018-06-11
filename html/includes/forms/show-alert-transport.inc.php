@@ -26,6 +26,11 @@ $transport_id = $_POST['transport_id'];
 if (is_numeric($transport_id) && $transport_id > 0) {
     $transport = dbFetchRow('SELECT * FROM `alert_transports` WHERE `transport_id` =? LIMIT 1', [$transport_id]);
 
+    if ($transport['is_default'] == true) {
+        $is_default = true;
+    } else {
+        $is_default = false;
+    }
     $details = [];
     // Get alert transport configuration details
     foreach (json_decode($transport['transport_config'], true) as $key => $value) {
@@ -40,6 +45,7 @@ if (is_array($transport)) {
     die(json_encode([
         'name' => $transport['transport_name'],
         'type' => $transport['transport_type'],
+        'is_default' => $is_default,
         'details' => $details
     ]));
 } else {

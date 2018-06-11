@@ -39,7 +39,14 @@ $message = '';
 
 $transport_id        = mres($_POST['transport_id']);
 $name                = mres($_POST['name']);
+$is_default          = mres($_POST['is_default']);
 $transport_type      = mres($_POST['transport-type']);
+
+if ($is_default == 'on') {
+    $is_default = true;
+} else {
+    $is_default = false;
+}
 
 if (empty($name)) {
     $status = 'error';
@@ -49,7 +56,8 @@ if (empty($name)) {
     $message = 'Missing transport information';
 } else {
     $details = array(
-        'transport_name' => $name
+        'transport_name' => $name,
+        'is_default' => $is_default
     );
 
     if (is_numeric($transport_id) && $transport_id > 0) {
