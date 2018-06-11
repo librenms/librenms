@@ -876,7 +876,7 @@ function ExtTransports($obj)
     $tmp = false;
     
     // If alert transport mapping exists, override the default transports
-    $transport_maps = GetAlertContacts($obj['alert_id']);
+    $transport_maps = GetAlertTransports($obj['alert_id']);
     if ($transport_maps) {
         foreach ($transport_maps as $item) {
             $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($item['transport_type']);
@@ -886,8 +886,6 @@ function ExtTransports($obj)
                 $obj['msg'] = $msg;
                 echo $obj['transport'].' => ';
                 $instance = new $class;
-                // Set flag to indicate non default transports
-                $opts['alert']['notDefault'] = true;
                 $opts['alert']['transport_id'] = $item['transport_id'];
                 $tmp = $instance->deliverAlert($obj, $opts);
                 AlertLog($tmp, $obj, $obj['transport']);
@@ -895,8 +893,33 @@ function ExtTransports($obj)
             echo '; ';
         }
     } else {
+        // This is temperorary code to be used while support for other transports are added
+        
+        // Get a list of transport types that are configured in alert_transports
+        $default_transports = GetDefaultAlertTransports();
+        foreach ($default_transports as $item) {
+            $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($item['transport_type']);
+            if (class_exists($class)) {
+                $obj['transport'] = $item['transport_type'];
+                $msg = FormatAlertTpl($obj);
+                $obj['msg'] = $msg;
+                echo $obj['transport'].' => ';
+                $instance = new $class;
+                $opts['alert']['transport_id'] = $item['transport_id'];
+                $tmp = $instance->deliverAlert($obj, $opts);
+                AlertLog($tmp, $obj, $transport);
+                unset($instance);
+            }
+            echo '; ';
+        }
+
         // To keep scrutinizer from naging because it doesnt understand eval
+        $default_transports = GetDefaultTransportList();
         foreach ($config['alert']['transports'] as $transport => $opts) {
+            if (in_array($transport, $default_transports)) {
+                // If it is a default transport type, then the alert has already been sent out, so skip
+                continue;
+            }
             if (is_array($opts)) {
                 $opts = array_filter($opts);
             }
@@ -974,10 +997,25 @@ function GetRuleId($alert_id)
  * @param $alert_id
  * @return array $transport_id $transport_type
  */
-function GetAlertContacts($alert_id)
+function GetAlertTransports($alert_id)
 {
     // Query for list of transport ids
-    $query = "SELECT b.transport_id, b.transport_type FROM alert_transport_map AS a LEFT JOIN alert_transports AS b ON b.transport_id=a.transport_or_group_id WHERE a.target_type='single' AND a.rule_id=? UNION DISTINCT SELECT d.transport_id, d.transport_type FROM alert_transport_map AS a LEFT JOIN alert_transport_groups AS b ON a.transport_or_group_id=b.transport_group_id LEFT JOIN transport_group_transport AS c ON b.transport_group_id=c.transport_group_id LEFT JOIN alert_transports AS d ON c.transport_id=d.transport_id WHERE a.target_type='group' AND a.rule_id=?;";
+    $query = "SELECT b.transport_id, b.transport_type FROM alert_transport_map AS a LEFT JOIN alert_transports AS b ON b.transport_id=a.transport_or_group_id WHERE a.target_type='single' AND a.rule_id=? UNION DISTINCT SELECT d.transport_id, d.transport_type FROM alert_transport_map AS a LEFT JOIN alert_transport_groups AS b ON a.transport_or_group_id=b.transport_group_id LEFT JOIN transport_group_transport AS c ON b.transport_group_id=c.transport_group_id LEFT JOIN alert_transports AS d ON c.transport_id=d.transport_id WHERE a.target_type='group' AND a.rule_id=?";
     $rule_id = GetRuleId($alert_id);
     return dbFetchRows($query, [$rule_id, $rule_id]);
+}
+
+/**
+ * Get list of transport with a default configured
+ */
+function GetDefaultAlertTransports()
+{
+    $query = "SELECT transport_id, transport_type FROM alert_transports WHERE is_default=true";
+    return dbFetchRows($query);
+}
+
+function GetDefaultTransportList()
+{
+    $query = "SELECT DISTINCT transport_type FROM alert_transports WHERE is_default=true ";
+    return dbFetchColumn($query);
 }

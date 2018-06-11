@@ -17,39 +17,15 @@ class Ciscospark implements Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        $tryDefault = true;
+        $sql = "SELECT `transport_config` FROM `alert_transports` WHERE `transport_id`=?";
+        $details = json_decode(dbFetchCell($sql, [$opts['alert']['transport_id']]), true);
+        $text = strip_tags($obj['msg']);
+        $data = array (
+            'roomId' => $details['room-id'],
+            'text' => $text
+        );
+        $token = $details['api-token'];
 
-        if ($opts['alert']['notDefault'] == true) {
-            $sql = "SELECT `transport_config` FROM `alert_transports` WHERE `transport_id`=?";
-            $details = json_decode(dbFetchCell($sql, [$opts['alert']['transport_id']]), true);
-            $text = strip_tags($obj['msg']);
-            $data = array (
-                'roomId' => $details['room-id'],
-                'text' => $text
-            );
-            $token = $details['api-token'];
-            if ($this->sendCurl($token, $data)) {
-                $tryDefault = false;
-            } else {
-                echo("Transport not successful, reverting back to default transport\r\n");
-            }
-        }
-        if ($tryDefault) {
-            $token  = $opts['token'];
-            $roomId = $opts['roomid'];
-            $text   = strip_tags($obj['msg']);
-            $data   = array(
-                'roomId' => $roomId,
-                'text' => $text
-            );
-
-            return $this->sendCurl($token, $data);
-        }
-        return true;
-    }
-
-    public function sendCurl($token, $data)
-    {
         $curl   = curl_init();
         set_curl_proxy($curl);
         curl_setopt($curl, CURLOPT_URL, 'https://api.ciscospark.com/v1/messages');

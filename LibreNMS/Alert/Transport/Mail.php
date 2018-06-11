@@ -30,18 +30,9 @@ class Mail implements Transport
     public function deliverAlert($obj, $opts)
     {
         global $config;
-        if ($opts['alert']['notDefault'] == true) {
-            $sql = "SELECT `transport_config` FROM `alert_transports` WHERE `transport_id`=?";
-            $details = json_decode(dbFetchCell($sql, [$opts['alert']['transport_id']]), true);
-            if ($details['email']) {
-                // Check if query successfull
-                $obj['contacts'] = $details['email'];
-            } else {
-                echo("Transport not successful, using default transport.\r\n");
-            }
-        }
-
-        return send_mail($obj['contacts'], $obj['title'], $obj['msg'], ($config['email_html'] == 'true') ? true : false);
+        $sql = "SELECT `transport_config` FROM `alert_transports` WHERE `transport_id`=?";
+        $details = json_decode(dbFetchCell($sql, [$opts['alert']['transport_id']]), true);
+        return send_mail($details['email'], $obj['title'], $obj['msg'], ($config['email_html'] == 'true') ? true : false);
     }
 
     public static function configTemplate()
