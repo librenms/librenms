@@ -29,7 +29,7 @@ mempools:
         excluded_fields: [device_id, mempool_id]
 ports:
     ports:
-        excluded_fields: [device_id, port_id, poll_time, poll_period]
+        excluded_fields: [device_id, port_id, poll_time, poll_period, ifVrf]
         joins:
             - { left: ports.port_id, right: ports_statistics.port_id }
         order_by: ports.ifIndex, ports.ifDescr, ports.ifName
@@ -70,9 +70,8 @@ vlans:
 vrf:
     vrfs:
         excluded_fields: [vrf_id, device_id]
-    ports:
-        included_fields: [ifIndex, ifVrf]
-        custom_where: device_id=? AND ifVrf!=0
+        joins:
+            - { custom: "JOIN (SELECT ifVrf, GROUP_CONCAT(ifIndex ORDER BY ifIndex ASC SEPARATOR ',') as ifIndices FROM ports GROUP BY ifVrf) p ON p.ifVrf = vrfs.vrf_id", select: ["p.ifIndices"] }
 wireless:
     wireless_sensors:
         excluded_fields: [device_id, sensor_id, access_point_id, lastupdate]
