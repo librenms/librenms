@@ -66,6 +66,14 @@ discovery_modules:
     arp-table: 0
 ```
 
+### Port Polling
+See also: [Per port polling - experimental](../../Support/Performance.md#per-port-polling-experimental)
+
+```yaml
+polling:
+    force_hc: true # force ifXTable even if the device does not properly report ifHighSpeed
+```
+
 ### Storage Settings
 See also: [Global Storage Config](../../Support/Configuration.md#storage-configuration)
 

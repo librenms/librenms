@@ -84,6 +84,7 @@ class YamlTest extends TestCase
         'poller_modules',
         'discovery_modules',
         'icons',
+        'polling',
         'ifname',
         'good_if',
         'bad_if',

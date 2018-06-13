@@ -195,7 +195,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
                     echo 'port is still down';
                 } else {
                     echo 'valid';
-                    if (is_numeric($data[$i]['ifHighSpeed']) && $data[$i]['ifHighSpeed'] > 0) {
+                    if ((is_numeric($data[$i]['ifHighSpeed']) && $data[$i]['ifHighSpeed'] > 0) || $config['os'][$device['os']]['polling']['force_hc'] === true) {
                         $full_oids = array_merge($hc_oids, $shared_oids);
                     } else {
                         $full_oids = array_merge($nonhc_oids, $shared_oids);
@@ -222,7 +222,8 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
         $hc_test = array_slice($port_stats, 0, 1);
         // If the device doesn't have ifXentry data, fetch ifEntry instead.
         if ((!isset($hc_test[0]['ifHCInOctets']) && !is_numeric($hc_test[0]['ifHCInOctets'])) ||
-            ((!isset($hc_test[0]['ifHighSpeed']) && !is_numeric($hc_test[0]['ifHighSpeed'])))) {
+            ((!isset($hc_test[0]['ifHighSpeed']) && !is_numeric($hc_test[0]['ifHighSpeed']))) ||
+            $config['os'][$device['os']]['polling']['force_hc'] === true) {
             $port_stats = snmpwalk_cache_oid($device, 'ifEntry', $port_stats, 'IF-MIB', null, '-OQUst');
         } else {
             // For devices with ifXentry data, only specific ifEntry keys are fetched to reduce SNMP load
