@@ -97,13 +97,14 @@ if (Auth::user()->hasGlobalRead()) {
         $port_fields = 'port_id, ifvrf, device_id, ifDescr, ifAlias, ifName';
 
         foreach (dbFetchRows("SELECT $vrf_fields, $dev_fields FROM `vrfs` AS V, `devices` AS D WHERE D.device_id = V.device_id") as $vrf_device) {
-            if (empty($vrf_devices[$vrf_device['mplsVpnVrfRouteDistinguisher']])) {
-                $vrf_devices[$vrf_device['mplsVpnVrfRouteDistinguisher']][0] = $vrf_device;
+            if (empty($vrf_devices[$vrf_device['vrf_name']][$vrf_device['mplsVpnVrfRouteDistinguisher']])) {
+                $vrf_devices[$vrf_device['vrf_name']][$vrf_device['mplsVpnVrfRouteDistinguisher']][0] = $vrf_device;
             } else {
-                array_push($vrf_devices[$vrf_device['mplsVpnVrfRouteDistinguisher']], $vrf_device);
+                array_push($vrf_devices[$vrf_device['vrf_name']][$vrf_device['mplsVpnVrfRouteDistinguisher']], $vrf_device);
             }
         }
-
+        
+        unset($ports);
         foreach (dbFetchRows("SELECT $port_fields FROM `ports` WHERE ifVrf<>0") as $port) {
             if (empty($ports[$port['ifvrf']][$port['device_id']])) {
                 $ports[$port['ifvrf']][$port['device_id']][0] = $port;
@@ -114,7 +115,7 @@ if (Auth::user()->hasGlobalRead()) {
 
         echo "<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>";
         $i = '1';
-        foreach (dbFetchRows('SELECT * FROM `vrfs` GROUP BY `mplsVpnVrfRouteDistinguisher`') as $vrf) {
+        foreach (dbFetchRows('SELECT * FROM `vrfs` GROUP BY `mplsVpnVrfRouteDistinguisher`,`vrf_name`') as $vrf) {
             if (($i % 2)) {
                 $bg_colour = $config['list_colour']['even'];
             } else {
@@ -127,7 +128,7 @@ if (Auth::user()->hasGlobalRead()) {
             // echo("<td width=200 class=box-desc>" . $vrf['mplsVpnVrfDescription'] . "</td>");
             echo '<td><table border=0 cellspacing=0 cellpadding=5 width=100%>';
             $x = 1;
-            foreach ($vrf_devices[$vrf['mplsVpnVrfRouteDistinguisher']] as $device) {
+            foreach ($vrf_devices[$vrf['vrf_name']][$vrf['mplsVpnVrfRouteDistinguisher']] as $device) {
                 if (($i % 2)) {
                     if (($x % 2)) {
                         $dev_colour = $config['list_colour']['even_alt'];
