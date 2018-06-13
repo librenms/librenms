@@ -518,6 +518,11 @@ $config['graph_types']['device']['sgos_average_requests']['section']  = 'network
 $config['graph_types']['device']['sgos_average_requests']['order']    = '0';
 $config['graph_types']['device']['sgos_average_requests']['descr']    = 'Average HTTP Requests';
 
+// SRX Flow Sessions
+$config['graph_types']['device']['junos_jsrx_spu_sessions']['section']  = 'network';
+$config['graph_types']['device']['junos_jsrx_spu_sessions']['order']    = '0';
+$config['graph_types']['device']['junos_jsrx_spu_sessions']['descr']    = 'Flow Sessions';
+
 // Blue Coat SGOS
 // Client Connections
 $config['graph_types']['device']['bluecoat_http_client_connections']['section'] = 'network';
