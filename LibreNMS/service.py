@@ -10,7 +10,7 @@ import time
 import timeit
 
 from datetime import timedelta
-from logging import debug, info, warning, error, critical
+from logging import debug, info, warning, error, critical, exception
 from platform import python_version
 from time import sleep
 from socket import gethostname
@@ -236,12 +236,13 @@ class Service:
     services_manager = None
     billing_manager = None
     last_poll = {}
+    terminate_flag = False
 
     def __init__(self):
         self.config.populate()
         threading.current_thread().name = self.config.name  # rename main thread
 
-        signal(SIGTERM, self.shutdown)  # capture sigterm and exit gracefully
+        self.attach_signals()
 
         # init database connections different ones for different threads
         self._db = LibreNMS.DB(self.config)  # main
@@ -249,13 +250,19 @@ class Service:
         self._discovery_db = LibreNMS.DB(self.config)  # discovery dispatch
 
         self._lm = self.create_lock_manager()
-        self.daily_timer = LibreNMS.RecurringTimer(self.config.update_frequency, self.run_maintenance)
-        self.stats_timer = LibreNMS.RecurringTimer(self.config.poller.frequency, self.log_performance_stats)
+        self.daily_timer = LibreNMS.RecurringTimer(self.config.update_frequency, self.run_maintenance, 'maintenance')
+        self.stats_timer = LibreNMS.RecurringTimer(self.config.poller.frequency, self.log_performance_stats, 'performance')
         self.is_master = False
 
         self.performance_stats = {'poller': PerformanceCounter(), 'discovery': PerformanceCounter(), 'services': PerformanceCounter()}
 
+    def attach_signals(self):
+        info("Attaching signal handlers on thread %s", threading.current_thread().name)
+        signal(SIGTERM, self.terminate)  # capture sigterm and exit gracefully
+
     def start(self):
+        debug("Performing startup checks...")
+
         if self.config.single_instance:
             self.check_single_instance()  # don't allow more than one service at a time
 
@@ -263,9 +270,12 @@ class Service:
             raise RuntimeWarning("Not allowed to start Poller twice")
         self._started = True
 
+        debug("Starting up queue managers...")
+
         # initialize and start the worker pools
         self.poller_manager = LibreNMS.QueueManager(self.config, 'poller', self.poll_device)
-        self.alerting_manager = LibreNMS.TimedQueueManager(self.config, 'alerting', self.poll_alerting)
+        self.alerting_manager = LibreNMS.TimedQueueManager(self.config, 'alerting', self.poll_alerting,
+                                                           self.dispatch_alerting)
         self.services_manager = LibreNMS.TimedQueueManager(self.config, 'services', self.poll_services,
                                                            self.dispatch_services)
         self.discovery_manager = LibreNMS.TimedQueueManager(self.config, 'discovery', self.discover_device,
@@ -284,7 +294,7 @@ class Service:
 
         # Main dispatcher loop
         try:
-            while True:
+            while not self.terminate_flag:
                 master_lock = self._lm.lock('dispatch.master', self.config.unique_name, self.config.master_timeout, True)
                 if master_lock:
                     if not self.is_master:
@@ -311,6 +321,7 @@ class Service:
         except KeyboardInterrupt:
             pass
 
+        info("Dispatch loop terminated")
         self.shutdown()
 
     # ------------ Discovery ------------
@@ -342,6 +353,9 @@ class Service:
                 self.unlock_discovery(device_id)
 
     # ------------ Alerting ------------
+    def dispatch_alerting(self):
+        self.alerting_manager.post_work('alerts', 0)
+
     def poll_alerting(self, _=None):
         try:
             info("Checking alerts")
@@ -378,18 +392,20 @@ class Service:
 
     # ------------ Billing ------------
     def dispatch_calculate_billing(self):
-        self.billing_manager.post_work('calculate')
+        self.billing_manager.post_work('calculate', 0)
 
     def dispatch_poll_billing(self):
-        self.billing_manager.post_work('poll')
+        self.billing_manager.post_work('poll', 0)
 
     def poll_billing(self, run_type):
         if run_type == 'poll':
             info("Polling billing")
             self.call_script('poll-billing.php')
+            info("Polling billing complete")
         else:  # run_type == 'calculate'
             info("Calculating billing")
             self.call_script('billing-calculate.php')
+            info("Calculating billing complete")
 
     # ------------ Polling ------------
     def dispatch_immediate_polling(self, device_id, group):
@@ -460,6 +476,7 @@ class Service:
         wait = 5
         max_runtime = 86100
         max_tries = int(max_runtime / wait)
+        info("Waiting for schema lock")
         while not self._lm.lock('schema-update', self.config.unique_name, max_runtime):
             attempt += 1
             if attempt >= max_tries:  # don't get stuck indefinitely
@@ -582,6 +599,15 @@ class Service:
         python = sys.executable
         os.execl(python, python, *sys.argv)
 
+    def terminate(self, _unused=None, _=None):
+        """
+        Handle a set the terminate flag to begin a clean shutdown
+        :param _unused:
+        :param _:
+        """
+        info("Received SIGTERM on thead %s, handling", threading.current_thread().name)
+        self.terminate_flag = True
+
     def shutdown(self, _unused=None, _=None):
         """
         Stop and exit, waiting for all child processes to exit.
@@ -594,11 +620,12 @@ class Service:
         self._lm.unlock('dispatch.master', self.config.unique_name)
 
         self.daily_timer.stop()
+        self.stats_timer.stop()
 
         self._stop_managers_and_wait()
 
         # try to release master lock
-        info('Shutdown complete')
+        info('Shutdown of %s/%s complete', os.getpid(), threading.current_thread().name)
         sys.exit(0)
 
     def start_dispatch_timers(self):
@@ -658,26 +685,29 @@ class Service:
     def log_performance_stats(self):
         info("Counting up time spent polling")
 
-        # Report on the poller instance as a whole
-        self._db.fetch('INSERT INTO poller_cluster(poller_name, poller_version, poller_groups, last_report, master) '
-                       'values("{0}", "{1}", "{2}", NOW(), {3}) '
-                       'ON DUPLICATE KEY UPDATE poller_version="{1}", poller_groups="{2}", last_report=NOW(), master={3}; '
-                       .format(self.config.name, "librenms-service", ','.join(str(g) for g in self.config.group), 1 if self.is_master else 0))
+        try:
+            # Report on the poller instance as a whole
+            self._db.fetch('INSERT INTO poller_cluster(poller_name, poller_version, poller_groups, last_report, master) '
+                           'values("{0}", "{1}", "{2}", NOW(), {3}) '
+                           'ON DUPLICATE KEY UPDATE poller_version="{1}", poller_groups="{2}", last_report=NOW(), master={3}; '
+                           .format(self.config.name, "librenms-service", ','.join(str(g) for g in self.config.group), 1 if self.is_master else 0))
 
-        # Find our ID
-        self._db.fetch('SELECT id INTO @parent_poller_id FROM poller_cluster WHERE poller_name="{0}"; '.format(self.config.name))
+            # Find our ID
+            self._db.fetch('SELECT id INTO @parent_poller_id FROM poller_cluster WHERE poller_name="{0}"; '.format(self.config.name))
 
-        for worker_type, counter in self.performance_stats.items():
-            worker_seconds, devices = counter.reset()
+            for worker_type, counter in self.performance_stats.items():
+                worker_seconds, devices = counter.reset()
 
-            # Record the queue state
-            self._db.fetch('INSERT INTO poller_cluster_stats(parent_poller, poller_type, depth, devices, worker_seconds, workers, frequency) '
-                           'values(@parent_poller_id, "{0}", {1}, {2}, {3}, {4}, {5}) '
-                           'ON DUPLICATE KEY UPDATE depth={1}, devices={2}, worker_seconds={3}, workers={4}, frequency={5}; '
-                           .format(worker_type,
-                                   sum([getattr(self, ''.join([worker_type, '_manager'])).get_queue(group).qsize() for group in self.config.group]),
-                                   devices,
-                                   worker_seconds,
-                                   getattr(self.config, worker_type).workers,
-                                   getattr(self.config, worker_type).frequency)
-                           )
+                # Record the queue state
+                self._db.fetch('INSERT INTO poller_cluster_stats(parent_poller, poller_type, depth, devices, worker_seconds, workers, frequency) '
+                               'values(@parent_poller_id, "{0}", {1}, {2}, {3}, {4}, {5}) '
+                               'ON DUPLICATE KEY UPDATE depth={1}, devices={2}, worker_seconds={3}, workers={4}, frequency={5}; '
+                               .format(worker_type,
+                                       sum([getattr(self, ''.join([worker_type, '_manager'])).get_queue(group).qsize() for group in self.config.group]),
+                                       devices,
+                                       worker_seconds,
+                                       getattr(self.config, worker_type).workers,
+                                       getattr(self.config, worker_type).frequency)
+                               )
+        except Exception:
+            exception("Unable to log performance statistics - is the database still online?")

@@ -1,9 +1,14 @@
 #!/usr/bin/env python
-import sys
+
 import argparse
 import logging
+import os
+import sys
+import threading
 
 import LibreNMS
+
+from logging import info
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='LibreNMS Service - manages polling and other periodic processes')
@@ -26,6 +31,7 @@ if __name__ == '__main__':
     if args.debug:
         logging.getLogger().setLevel(logging.DEBUG)
 
+    info("Configuring LibreNMS service")
     try:
         service = LibreNMS.Service()
     except Exception as e:
@@ -38,5 +44,5 @@ if __name__ == '__main__':
     if args.group:
         service.config.group = [ args.group ]
 
-    print('Starting LibreNMS Service...')
+    info('Entering main LibreNMS service loop on {}/{}...'.format(os.getpid(), threading.current_thread().name))
     service.start()

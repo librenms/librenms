@@ -65,7 +65,7 @@ class QueueManager:
                 error('{} poller exception! {}'.format(self.type.title(), e))
                 traceback.print_exc()
 
-    def post_work(self, payload='all', queue_id=0):
+    def post_work(self, payload, queue_id):
         """
         Post work to the the queue group.
         :param payload: string payload to deliver to the worker
@@ -128,7 +128,7 @@ class QueueManager:
         """
         return getattr(self.config, self.type)
 
-    def get_queue(self, group=0):
+    def get_queue(self, group):
         name = self.queue_name(self.type, group)
 
         if name not in self._queues.keys():
@@ -138,10 +138,10 @@ class QueueManager:
 
         return self._queues[name]
 
-    def _create_queue(self, queue_type, group=0):
+    def _create_queue(self, queue_type, group):
         """
         Create a queue (not thread safe)
-        :param name:
+        :param queue_type:
         :param group:
         :return:
         """
@@ -171,15 +171,13 @@ class QueueManager:
     @staticmethod
     def queue_name(queue_type, group):
         if queue_type and type(group) == int:
-            return "{}:{}".format(type, group)
-        if queue_type and (type(group) == int or group == "all"):
             return "{}:{}".format(queue_type, group)
         else:
             raise ValueError("Refusing to create improperly scoped queue - parameters were invalid or not set")
 
 
 class TimedQueueManager(QueueManager):
-    def __init__(self, config, type_desc, work_function, dispatch_function=None, auto_start=True):
+    def __init__(self, config, type_desc, work_function, dispatch_function, auto_start=True):
         """
         A queue manager that periodically dispatches work to the queue
         The times are normalized like they started at 0:00
@@ -190,8 +188,6 @@ class TimedQueueManager(QueueManager):
         :param auto_start: automatically start worker threads
         """
         QueueManager.__init__(self, config, type_desc, work_function, auto_start)
-        if not dispatch_function:
-            dispatch_function = self.post_work
         self.timer = LibreNMS.RecurringTimer(self.get_poller_config().frequency, dispatch_function)
 
     def start_dispatch(self):
@@ -227,7 +223,7 @@ class BillingQueueManager(TimedQueueManager):
         :param auto_start: automatically start worker threads
         """
         TimedQueueManager.__init__(self, config, 'billing', work_function, poll_dispatch_function, auto_start)
-        self.calculate_timer = LibreNMS.RecurringTimer(self.get_poller_config().calculate, calculate_dispatch_function)
+        self.calculate_timer = LibreNMS.RecurringTimer(self.get_poller_config().calculate, calculate_dispatch_function, 'calculate_billing_timer')
 
     def start_dispatch(self):
         """

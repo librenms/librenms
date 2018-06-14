@@ -20,25 +20,24 @@ require_once 'includes/modal/delete_poller.inc.php';
 ?>
 <br />
 
-<h2>Standard Distributed Pollers</h2>
-
-<div class="table-responsive">
-    <table class="table table-striped table-bordered table-hover table-condensed">
-        <tr>
-            <th>Poller Name</th>
-            <th>Devices Polled</th>
-            <th>Total Poll Time</th>
-            <th>Last Ran</th>
-            <th>Actions</th>
-        </tr>
-
 <?php
 $query = 'SELECT *,UNIX_TIMESTAMP(NOW()) AS `now`, UNIX_TIMESTAMP(`last_polled`) AS `then` FROM `pollers` ORDER BY poller_name';
 $rows = dbFetchRows($query);
 
-if (count($rows) === 0) {
-    echo '<tr><td colspan="5">You have no standard distributed pollers active</td></tr>';
-} else {
+if (count($rows) !== 0) {
+    echo '
+    <h2>Standard Distributed Pollers</h2>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover table-condensed">
+            <tr>
+                <th>Poller Name</th>
+                <th>Devices Polled</th>
+                <th>Total Poll Time</th>
+                <th>Last Ran</th>
+                <th>Actions</th>
+            </tr>';
+
     foreach ($rows as $poller) {
         $old = ($poller['now'] - $poller['then']);
         $step = Config::get('rrd.step', 300);
@@ -67,37 +66,35 @@ if (count($rows) === 0) {
             </tr>
     ';
     }
+
+    echo '
+        </table>
+    </div>';
 }
-?>
 
-    </table>
-</div>
-
-<h2>Poller Cluster Health</h2>
-
-<div class="table-responsive">
-    <table class="table table-striped table-bordered table-condensed">
-        <tr>
-            <th>Name</th>
-            <th>Version</th>
-            <th>Groups Served</th>
-            <th>Last Checkin</th>
-            <th>Cluster Master</th>
-            <th>Job</th>
-            <th>Workers</th>
-            <th>Devices Actioned<br><small>Last Interval</small></th>
-            <th>Devices Pending</th>
-            <th>Worker Seconds<br><small>Consumed/Maximum</small></th>
-            <th>Actions</th>
-        </tr>
-
-<?php
 $query = 'SELECT *,UNIX_TIMESTAMP(NOW()) AS `now`, UNIX_TIMESTAMP(`last_report`) AS `then` FROM `poller_cluster` ORDER BY poller_name';
 $rows = dbFetchRows($query);
 
-if (count($rows) === 0) {
-    echo '<tr><td colspan="11">You have no clustered pollers active</td></tr>';
-} else {
+if (count($rows) !== 0) {
+    echo '
+    <h2>Poller Cluster Health</h2>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-condensed">
+            <tr>
+                <th>Name</th>
+                <th>Version</th>
+                <th>Groups Served</th>
+                <th>Last Checkin</th>
+                <th>Cluster Master</th>
+                <th>Job</th>
+                <th>Workers</th>
+                <th>Devices Actioned<br><small>Last Interval</small></th>
+                <th>Devices Pending</th>
+                <th>Worker Seconds<br><small>Consumed/Maximum</small></th>
+                <th>Actions</th>
+            </tr>';
+
     foreach ($rows as $poller) {
         $old = ($poller['now'] - $poller['then']);
         $step = Config::get('rrd.step', 300);
@@ -161,11 +158,12 @@ if (count($rows) === 0) {
             $first_row = false;
         }
     }
+        echo '
+        </table>
+        <small>
+          Worker seconds indicates the maximum polling throughput a node can achieve in perfect conditions. If the consumed is close to the maximum, consider adding more threads, or better tuning your groups.<br>
+          If there are devices pending but consumed worker seconds is low, your hardware is not sufficient for the number of devices and the poller cannot reach maximum throughput.
+       </small>
+    </div>';
 }
 ?>
-    </table>
-    <small>
-      Worker seconds indicates the maximum polling throughput a node can achieve in perfect conditions. If the consumed is close to the maximum, consider adding more threads, or better tuning your groups.<br>
-      If there are devices pending but consumed worker seconds is low, your hardware is not sufficient for the number of devices and the poller cannot reach maximum throughput.
-   </small>
-</div>

@@ -84,10 +84,11 @@ class DB:
 
 
 class RecurringTimer:
-    def __init__(self, duration, target):
+    def __init__(self, duration, target, thread_name=None):
         self.duration = duration
         self.target = target
         self._timer_thread = None
+        self._thread_name = thread_name
         self._event = threading.Event()
 
     def _loop(self):
@@ -98,6 +99,8 @@ class RecurringTimer:
 
     def start(self):
         self._timer_thread = threading.Thread(target=self._loop)
+        if self._thread_name:
+            self._timer_thread.name = self._thread_name
         self._event.clear()
         self._timer_thread.start()
 
