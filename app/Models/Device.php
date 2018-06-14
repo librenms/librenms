@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\JoinClause;
+
 class Device extends BaseModel
 {
     public $timestamps = false;
@@ -138,6 +141,19 @@ class Device extends BaseModel
         ]);
     }
 
+    public function scopeCanPing(Builder $query)
+    {
+        return $query->where('disabled', 0)
+            ->leftJoin('devices_attribs', function (JoinClause $query) {
+                $query->on('devices.device_id', 'devices_attribs.device_id')
+                    ->where('devices_attribs.attrib_type', 'override_icmp_disable');
+            })
+            ->where(function (Builder $query) {
+                $query->whereNull('devices_attribs.attrib_value')
+                    ->orWhere('devices_attribs.attrib_value', '!=', 'true');
+            });
+    }
+
     public function scopeHasAccess($query, User $user)
     {
         return $this->hasDeviceAccess($query, $user);
@@ -188,6 +204,11 @@ class Device extends BaseModel
     public function packages()
     {
         return $this->hasMany('App\Models\Package', 'device_id', 'device_id');
+    }
+
+    public function perf()
+    {
+        return $this->hasMany('App\Models\DevicePerf', 'device_id');
     }
 
     public function ports()
