@@ -3,20 +3,21 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $oid_list = 'jnxJsSPUMonitoringCurrentFlowSession.0';
-$junos = snmp_get_multi($device, $oid_list, '-OUQs', 'JUNIPER-SRX5000-SPU-MONITORING-MIB');
+$srx_sess_data = snmp_get_multi($device, $oid_list, '-OUQs', 'JUNIPER-SRX5000-SPU-MONITORING-MIB');
 
-if (is_numeric($junos[0]['jnxJsSPUMonitoringCurrentFlowSession'])) {
+if (is_numeric($srx_sess_data[0]['jnxJsSPUMonitoringCurrentFlowSession'])) {
     $tags = array(
         'rrd_def' => RrdDefinition::make()->addDataset('spu_flow_sessions', 'GAUGE', 0),
     );
     $fields = array(
-        'spu_flow_sessions' => $junos[0]['jnxJsSPUMonitoringCurrentFlowSession'],
+        'spu_flow_sessions' => $srx_sess_data[0]['jnxJsSPUMonitoringCurrentFlowSession'],
     );
 
     data_update($device, 'junos_jsrx_spu_sessions', $tags, $fields);
 
     $graphs['junos_jsrx_spu_sessions'] = true;
     echo ' Flow Sessions';
+    unset($srx_sess_data);
 }
 
 $version = snmp_get($device, 'jnxVirtualChassisMemberSWVersion.0', '-Oqv', 'JUNIPER-VIRTUALCHASSIS-MIB');
