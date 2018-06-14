@@ -46,7 +46,7 @@ class DevicePerf extends BaseModel
     {
         parent::boot();
 
-        static::creating(function($model){
+        static::creating(function ($model) {
             $model->timestamp = $model->freshTimestamp();
         });
     }
