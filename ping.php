@@ -8,6 +8,8 @@ use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 use Symfony\Component\Process\Process;
 
+$options = getopt('d');
+
 $init_modules = [];
 require __DIR__ . '/includes/init.php';
 
@@ -20,6 +22,9 @@ require __DIR__ . '/includes/init.php';
 //$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 //$kernel->bootstrap();
 
+if (isset($options['d'])) {
+    $debug = true;
+}
 
 if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
     $influxdb = influxdb_connect();
