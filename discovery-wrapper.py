@@ -193,7 +193,7 @@ discovered_devices = 0
 parser = argparse.ArgumentParser(description='Spawn multiple discovery.php processes in parallel.',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('-d', '--debug', action='store_true', default=False,
-                    help="Enable debug output.")
+                    help="Enable debug output. WARNING: Leaving this enabled will consume a lot of disk space.")
 parser.add_argument('workers', metavar='N', type=int, default=1, nargs='?',
                     help='The max number of workers allowed to run at one time. If too high this can overwelm your server.')
 args = parser.parse_args()
