@@ -1065,13 +1065,14 @@ pollers:
 poller_cluster:
   Columns:
     - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
+    - { Field: node_id, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: poller_name, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: poller_version, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
     - { Field: poller_groups, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
     - { Field: last_report, Type: datetime, 'Null': false, Extra: '' }
     - { Field: master, Type: tinyint(1), 'Null': false, Extra: '' }
   Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [poller_name], Unique: true, Type: BTREE }
+    PRIMARY: { Name: PRIMARY, Columns: [node_id], Unique: true, Type: BTREE }
     id: { Name: id, Columns: [id], Unique: true, Type: BTREE }
 poller_cluster_stats:
   Columns:
