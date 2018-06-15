@@ -87,7 +87,7 @@ class YamlTest extends TestCase
         $pattern = Config::get('install_dir') . $pattern;
 
         return collect(glob($pattern))
-            ->reduce(function($array, $file) {
+            ->reduce(function ($array, $file) {
                 $name = basename($file);
                 $array[$name] = [$name, $file];
                 return $array;
