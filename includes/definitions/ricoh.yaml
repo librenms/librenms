@@ -7,10 +7,9 @@ over:
     - { graph: device_toner, text: Toner }
 discovery:
     - sysDescr:
-        - RICOH Aficio
-        - RICOH Network Printer
+        - 'RICOH Aficio'
+        - 'RICOH Network Printer'
 discovery_modules:
-    toner: 1
+    toner: true
 poller_modules:
-    toner: 1
-
+    toner: true

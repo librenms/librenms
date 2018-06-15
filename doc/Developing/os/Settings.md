@@ -61,9 +61,9 @@ Usually, a poller module will not work if it's corresponding discovery module is
 
 ```yaml
 poller_modules:
-    bgp-peers: 1
+    bgp-peers: true
 discovery_modules:
-    arp-table: 0
+    arp-table: false
 ```
 
 ### Storage Settings
