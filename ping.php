@@ -88,6 +88,9 @@ foreach (explode("\n", $output) as $line) {
                 $device->status_reason = $device->status ? '' : 'icmp';
                 $type = $device->status ? 'up' : 'down';
                 log_event('Device status changed to ' . ucfirst($type) . " from icmp check.", $device->toArray(), $type);
+
+                echo "Device $device->hostname changed status, running alerts\n";
+                RunRules($device->device_id);
             }
             $device->save(); // only saves if needed
 
