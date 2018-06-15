@@ -1,5 +1,5 @@
 os: benuos
-text: 'Benu'
+text: Benu
 type: network
 icon: benuos
 mib_dir:
@@ -12,7 +12,7 @@ over:
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 poller_modules:
-    mib: 1
+    mib: true
 register_mibs:
     bTWagNumGrePmip6Tunnels: BENU-TWAG-STATS-MIB
     bWagNumCurrentL2tpv3TunnelsIPv4: BENU-WAG-STATS-MIB

@@ -74,6 +74,7 @@ pages:
       - Nagios Plugins: Extensions/Services.md
       - Extensions/NFSen.md
       - Extensions/Oxidized.md
+      - Extensions/Rancid.md
       - Extensions/PeeringDB.md
       - Extensions/Proxmox.md
       - Storing Metrics:
@@ -97,6 +98,7 @@ pages:
       - API/Bills.md
       - API/ARP.md
       - API/Services.md
+      - API/System.md
       - API/Logs.md
   - 8. Alerting:
       - Intro: Alerting/index.md
@@ -157,7 +159,12 @@ pages:
       - Extensions/Alerting.md
       - Extensions/Email-Alerting.md
       - Parsing Port Descriptions: Extensions/Port-Description-Parser.md
+      - Extensions/InfluxDB.md
+      - Extensions/Graphite.md
+      - Extensions/OpenTSDB.md
+      - Extensions/Prometheus.md
       - Extensions/RRDCached-Security.md
+      - General/Contributing.md
       - General/Credits.md
       - Installation/Installation-Ubuntu-1404-Nginx.md
       - Installation/Installation-Ubuntu-1404-Apache.md
@@ -165,3 +172,4 @@ pages:
       - Installation/Installation-CentOS-6-Apache-Nginx.md
       - Installation/Installation-(Debian-Ubuntu).md
       - Installation/Installation-(RHEL-CentOS).md
+      - Support/Support-New-OS.md

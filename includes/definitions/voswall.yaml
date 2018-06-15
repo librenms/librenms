@@ -5,7 +5,7 @@ type: firewall
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
-processor_stacked: 1
+processor_stacked: true
 discovery:
     - sysDescr:
         - Voswall

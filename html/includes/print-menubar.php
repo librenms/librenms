@@ -75,7 +75,7 @@ if ($config['title_image']) {
           </li>
           <li class="dropdown-submenu">
             <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> Plugins</a>
-            <ul class="dropdown-menu scrollable-menu">
+            <ul class="dropdown-menu">
                 <?php
                 \LibreNMS\Plugins::call('menu');
 
@@ -214,6 +214,11 @@ if (Auth::user()->hasGlobalAdmin()) {
     }
 
     echo '<li><a href="'.generate_url(array('page'=>'device-dependencies')).'"><i class="fa fa-group fa-fw fa-lg"></i> Device Dependencies</a></li>';
+
+    $vm_count = dbFetchCell('SELECT COUNT(id) from `vminfo`');
+    if ($vm_count > 0) {
+        echo '<li><a href="'.generate_url(array('page'=>'vminfo')).'"><i class="fa fa-cog fa-fw fa-lg"></i> Virtual Machines</a></li>';
+    }
 
      echo '
             <li role="presentation" class="divider"></li>
