@@ -10,17 +10,8 @@ use Symfony\Component\Process\Process;
 
 $options = getopt('d');
 
-$init_modules = [];
+$init_modules = ['alerts', 'eloquent'];
 require __DIR__ . '/includes/init.php';
-
-\LibreNMS\DB\Eloquent::boot(); // just boot Eloquent
-
-//require __DIR__ . '/bootstrap/autoload.php';
-
-//// boot laravel
-//$app = require_once __DIR__ . '/bootstrap/app.php';
-//$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-//$kernel->bootstrap();
 
 if (isset($options['d'])) {
     $debug = true;
@@ -33,7 +24,6 @@ if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
 }
 
 rrdtool_initialize();
-
 
 /** @var \Illuminate\Database\Eloquent\Builder $query */
 $query = Device::canPing()->select(['devices.device_id', 'hostname', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken']);
@@ -96,8 +86,6 @@ foreach (explode("\n", $output) as $line) {
 
             // add data to rrd
             data_update($device->toArray(), 'ping-perf', $tags, ['ping' => $result->avg]);
-
-            // TODO check alerts?
         }
     }
 }

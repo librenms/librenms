@@ -41,6 +41,11 @@ class DevicePerf extends BaseModel
     ];
     public $timestamps = false;
     const CREATED_AT = 'timestamp';
+    protected $attributes = [
+        'min' => 0,
+        'max' => 0,
+        'avg' => 0,
+    ];
 
     protected static function boot()
     {
