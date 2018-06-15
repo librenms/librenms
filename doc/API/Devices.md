@@ -876,6 +876,8 @@ Output:
 
 List devices for use with Oxidized. If you have group support enabled then a group will also be returned based on your config.
 
+> LibreNMS will automatically map the OS to the Oxidized model name if they don't match.
+
 Route: `/api/v0/oxidized(/:hostname)`
 
 Input (JSON):

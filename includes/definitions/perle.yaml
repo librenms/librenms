@@ -6,4 +6,4 @@ over:
     - { graph: device_bits, text: Traffic }
 discovery:
     - sysDescr:
-        - Perle MCR-MGT
+        - 'Perle MCR-MGT'

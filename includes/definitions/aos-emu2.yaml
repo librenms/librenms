@@ -3,8 +3,8 @@ text: 'APC Environmental Monitoring Unit'
 type: environment
 icon: apc
 over:
-    - {graph: device_temperature, text: Temperature}
-    - {graph: device_humidity, text: Humidity}
+    - { graph: device_temperature, text: Temperature }
+    - { graph: device_humidity, text: Humidity }
 mib_dir:
     - apc
 discovery:
@@ -12,40 +12,40 @@ discovery:
         - .1.3.6.1.4.1.318.1.3.8.2
         - .1.3.6.1.4.1.318.1.3.8.3
 discovery_modules:
-    ports: 0
-    ports-stack: 0
-    entity-physical: 0
-    processors: 0
-    mempools: 0
-    cisco-vrf-lite: 0
-    storage: 0
-    hr-device: 0
-    discovery-protocols: 0
-    bgp-peers: 0
-    vlans: 0
-    ucd-diskio: 0
-    services: 0
-    stp: 0
-    ntp: 0
-    wireless: 0
-    fdb-table: 0
+    ports: false
+    ports-stack: false
+    entity-physical: false
+    processors: false
+    mempools: false
+    cisco-vrf-lite: false
+    storage: false
+    hr-device: false
+    discovery-protocols: false
+    bgp-peers: false
+    vlans: false
+    ucd-diskio: false
+    services: false
+    stp: false
+    ntp: false
+    wireless: false
+    fdb-table: false
 poller_modules:
-    ipmi: 0
-    entity-physical: 0
-    processors: 0
-    mempools: 0
-    storage: 0
-    netstats: 0
-    hr-mib: 0
-    ucd-mib: 0
-    ipSystemStats: 0
-    ports: 0
-    bgp-peers: 0
-    ospf: 0
-    ucd-diskio: 0
-    services: 0
-    stp: 0
-    ntp: 0
-    wireless: 0
-    fdb-table: 0
-    applications: 0
+    ipmi: false
+    entity-physical: false
+    processors: false
+    mempools: false
+    storage: false
+    netstats: false
+    hr-mib: false
+    ucd-mib: false
+    ipSystemStats: false
+    ports: false
+    bgp-peers: false
+    ospf: false
+    ucd-diskio: false
+    services: false
+    stp: false
+    ntp: false
+    wireless: false
+    fdb-table: false
+    applications: false

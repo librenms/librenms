@@ -1,12 +1,9 @@
-#OS info - https://www.alliedtelesis.com/products/software/AlliedWare-Plus
-#OS Datasheet - https://www.alliedtelesis.com/documents/datasheet-alliedware-plus
-
 os: awplus
 text: 'Alliedware Plus'
 type: network
 icon: alliedtelesis
 group: alliedtelesis
-ifname: 1
+ifname: true
 over:
     - { graph: device_bits, text: Traffic }
 discovery:
