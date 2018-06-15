@@ -118,6 +118,7 @@ class ServiceConfig:
     # config variables with defaults
     BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 
+    node_id = None
     name = None
     unique_name = None
     single_instance = True
@@ -155,6 +156,7 @@ class ServiceConfig:
         config = self._get_config_data()
 
         # populate config variables
+        self.node_id = os.getenv('NODE_ID')
         self.set_name(config.get('distributed_poller_name', None))
         self.distributed = config.get('distributed_poller', ServiceConfig.distributed)
         self.group = ServiceConfig.parse_group(config.get('distributed_poller_group', ServiceConfig.group))
@@ -179,18 +181,18 @@ class ServiceConfig:
         self.log_level = config.get('service_loglevel', ServiceConfig.log_level)
         self.update_frequency = config.get('service_update_frequency', ServiceConfig.update_frequency)
 
-        self.redis_host = config.get('redis_host', ServiceConfig.redis_host)
-        self.redis_db = config.get('redis_db', ServiceConfig.redis_db)
-        self.redis_pass = config.get('redis_pass', ServiceConfig.redis_pass)
-        self.redis_port = int(config.get('redis_port', ServiceConfig.redis_port))
-        self.redis_socket = config.get('redis_socket', ServiceConfig.redis_socket)
+        self.redis_host = os.getenv('REDIS_HOST', config.get('redis_host', ServiceConfig.redis_host))
+        self.redis_db = os.getenv('REDIS_DB', config.get('redis_db', ServiceConfig.redis_db))
+        self.redis_pass = os.getenv('REDIS_PASSWORD', config.get('redis_pass', ServiceConfig.redis_pass))
+        self.redis_port = int(os.getenv('REDIS_PORT', config.get('redis_port', ServiceConfig.redis_port)))
+        self.redis_socket = os.getenv('REDIS_SOCKET', config.get('redis_socket', ServiceConfig.redis_socket))
 
-        self.db_host = config.get('db_host', ServiceConfig.db_host)
-        self.db_name = config.get('db_name', ServiceConfig.db_name)
-        self.db_pass = config.get('db_pass', ServiceConfig.db_pass)
-        self.db_port = int(config.get('db_port', ServiceConfig.db_port))
-        self.db_socket = config.get('db_socket', ServiceConfig.db_socket)
-        self.db_user = config.get('db_user', ServiceConfig.db_user)
+        self.db_host = os.getenv('DB_HOST', config.get('db_host', ServiceConfig.db_host))
+        self.db_name = os.getenv('DB_DATABASE', config.get('db_name', ServiceConfig.db_name))
+        self.db_pass = os.getenv('DB_PASSWORD', config.get('db_pass', ServiceConfig.db_pass))
+        self.db_port = int(os.getenv('DB_PORT', config.get('db_port', ServiceConfig.db_port)))
+        self.db_socket = os.getenv('DB_SOCKET', config.get('db_socket', ServiceConfig.db_socket))
+        self.db_user = os.getenv('DB_USERNAME', config.get('db_user', ServiceConfig.db_user))
 
         # set convenient debug variable
         self.debug = logging.getLogger().isEnabledFor(logging.DEBUG)
@@ -203,6 +205,12 @@ class ServiceConfig:
                 logging.getLogger().setLevel(logging.INFO)
 
     def _get_config_data(self):
+        try:
+            import dotenv
+            dotenv.load_dotenv(dotenv_path="{}/.env".format(self.BASE_DIR), verbose=True)
+        except ImportError:
+            info("Could not import .env")
+
         config_cmd = ['/usr/bin/env', 'php', '{}/config_to_json.php'.format(self.BASE_DIR), '2>&1']
         try:
             return json.loads(subprocess.check_output(config_cmd).decode())
@@ -444,17 +452,17 @@ class Service:
             debug('Tried to poll {}, but it is locked'.format(device_id))
 
     def fetch_services_device_list(self):
-        return self._services_db.fetch("SELECT DISTINCT(`device_id`), `poller_group` FROM `services`"
+        return self._services_db.query("SELECT DISTINCT(`device_id`), `poller_group` FROM `services`"
                                        " LEFT JOIN `devices` USING (`device_id`) WHERE `disabled`=0")
 
     def fetch_device_list(self):
-        return self._discovery_db.fetch("SELECT `device_id`, `poller_group` FROM `devices` WHERE `disabled`=0")
+        return self._discovery_db.query("SELECT `device_id`, `poller_group` FROM `devices` WHERE `disabled`=0")
 
     def fetch_immediate_device_list(self):
         poller_find_time = self.config.poller.frequency - 1
         discovery_find_time = self.config.discovery.frequency - 1
 
-        return self._db.fetch('''SELECT `device_id`,
+        return self._db.query('''SELECT `device_id`,
               `poller_group`,
               COALESCE(`last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_polled_timetaken` SECOND), 1) AS `poll`,
               COALESCE(`last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_discovered_timetaken` SECOND), 1) AS `discover`
@@ -687,19 +695,19 @@ class Service:
 
         try:
             # Report on the poller instance as a whole
-            self._db.fetch('INSERT INTO poller_cluster(poller_name, poller_version, poller_groups, last_report, master) '
-                           'values("{0}", "{1}", "{2}", NOW(), {3}) '
-                           'ON DUPLICATE KEY UPDATE poller_version="{1}", poller_groups="{2}", last_report=NOW(), master={3}; '
-                           .format(self.config.name, "librenms-service", ','.join(str(g) for g in self.config.group), 1 if self.is_master else 0))
+            self._db.query('INSERT INTO poller_cluster(node_id, poller_name, poller_version, poller_groups, last_report, master) '
+                           'values("{0}", "{1}", "{2}", "{3}", NOW(), {4}) '
+                           'ON DUPLICATE KEY UPDATE poller_version="{2}", poller_groups="{3}", last_report=NOW(), master={4}; '
+                           .format(self.config.node_id, self.config.name, "librenms-service", ','.join(str(g) for g in self.config.group), 1 if self.is_master else 0))
 
             # Find our ID
-            self._db.fetch('SELECT id INTO @parent_poller_id FROM poller_cluster WHERE poller_name="{0}"; '.format(self.config.name))
+            self._db.query('SELECT id INTO @parent_poller_id FROM poller_cluster WHERE poller_name="{0}"; '.format(self.config.name))
 
             for worker_type, counter in self.performance_stats.items():
                 worker_seconds, devices = counter.reset()
 
                 # Record the queue state
-                self._db.fetch('INSERT INTO poller_cluster_stats(parent_poller, poller_type, depth, devices, worker_seconds, workers, frequency) '
+                self._db.query('INSERT INTO poller_cluster_stats(parent_poller, poller_type, depth, devices, worker_seconds, workers, frequency) '
                                'values(@parent_poller_id, "{0}", {1}, {2}, {3}, {4}, {5}) '
                                'ON DUPLICATE KEY UPDATE depth={1}, devices={2}, worker_seconds={3}, workers={4}, frequency={5}; '
                                .format(worker_type,

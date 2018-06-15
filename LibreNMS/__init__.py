@@ -69,7 +69,7 @@ class DB:
 
         return self._db[threading.get_ident()]
 
-    def fetch(self, query, args=None):
+    def query(self, query, args=None):
         """
         Open a cursor, fetch the query with args, close the cursor and return it.
         :rtype: MySQLdb.Cursor
