@@ -11,14 +11,14 @@ discovery:
         - .1.3.6.1.4.1.9.1.2319
         - .1.3.6.1.4.1.9.1.2409
 discovery_modules:
-    entity-physical: 0
-    processors: 0
-    mempools: 0
-    cisco-vrf-lite: 0
-    sensors: 0
-    storage: 0
-    hr-device: 0
-    arp-table: 0
-    ucd-diskio: 0
-    services: 0
-    wireless: 0
+    entity-physical: false
+    processors: false
+    mempools: false
+    cisco-vrf-lite: false
+    sensors: false
+    storage: false
+    hr-device: false
+    arp-table: false
+    ucd-diskio: false
+    services: false
+    wireless: false

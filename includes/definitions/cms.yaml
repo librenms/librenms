@@ -5,7 +5,7 @@ icon: corero
 group: Corero
 over:
     - { graph: device_ping_perf, text: 'Ping Repsonse' }
-    - { graph: device_uptime, text: 'Uptime' }
+    - { graph: device_uptime, text: Uptime }
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.41036

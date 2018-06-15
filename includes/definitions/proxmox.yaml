@@ -1,25 +1,25 @@
 os: proxmox
 type: server
 group: unix
-text: proxmox pve
+text: 'proxmox pve'
 icon: proxmox
-ifXmcbc: 1
-ifname: 1
+ifXmcbc: true
+ifname: true
 over:
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_ucd_memory, text: 'Memory Usage' }
     - { graph: device_storage, text: 'Storage Usage' }
 poller_modules:
-    bgp-peers: 0
-    ospf: 0
-    stp: 0
+    bgp-peers: false
+    ospf: false
+    stp: false
 discovery_modules:
-    applications: 1
-    bgp-peers: 0
-    stp: 0
-    vmware-vminfo: 0
-    libvirt-vminfo: 0
-processor_stacked: 1
+    applications: true
+    bgp-peers: false
+    stp: false
+    vmware-vminfo: false
+    libvirt-vminfo: false
+processor_stacked: true
 discovery:
     -
       sysObjectID:

@@ -53,6 +53,7 @@ if (isset($vars['searchPhrase']) && !empty($vars['searchPhrase'])) {
         $where  .= ' AND `M`.`ipv4_address` LIKE ?';
         $param[] = $ip_search;
     } elseif (isset($vars['searchby']) && $vars['searchby'] == 'description') {
+        $desc_search = '%' . $search . '%';
         $where  .= ' AND `P`.`ifAlias` LIKE ?';
         $param[] = $desc_search;
     } elseif ((isset($vars['searchby']) && $vars['searchby'] == 'mac') ||
