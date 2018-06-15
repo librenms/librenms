@@ -2,7 +2,7 @@ os: merakimr
 text: 'Meraki AP'
 type: wireless
 icon: meraki
-ifname: 1
+ifname: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 bad_uptime: true
