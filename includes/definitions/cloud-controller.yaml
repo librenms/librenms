@@ -1,0 +1,11 @@
+os: cloud-controller
+text: 'Meraki Cloud Controller'
+type: wireless
+icon: cisco
+group: cisco
+over:
+    - { graph: device_uptime, text: 'Device Uptime' }
+    - { graph: device_ping_perf, text: 'Ping Response' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.29671.1
