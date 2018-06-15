@@ -1,0 +1,9 @@
+os: tplink-dsl
+text: 'TP-Link DSL'
+type: network
+icon: tplink
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.16972
