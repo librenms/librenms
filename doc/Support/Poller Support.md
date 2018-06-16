@@ -36,12 +36,6 @@ even. all will run poller against all devices.
 
 `-m` This enables you to specify the module you want to run for poller.
 
-#### Poller Wrapper
-
-We have a `poller-wrapper.py` script by [Job Snijders](https://github.com/job). This script is currently the default.
-
-If you need to debug the output of poller-wrapper.py then you can add `-d` to the end of the command - it is NOT recommended to do this in cron.
-
 #### Poller config
 
 These are the default poller config items. You can globally disable a module by setting it to 0. If you just want to
