@@ -39,8 +39,6 @@ new will poll only those devices that have recently been added or have been sele
 
 We have a `discovery-wrapper.py` script which is based on `poller-wrapper.py` by [Job Snijders](https://github.com/job). This script is currently the default.
 
-If you need to debug the output of discovery-wrapper.py then you can add `-d` to the end of the command - it is NOT recommended to do this in cron.
-
 If you want to switch back to discovery.php then you can replace:
 
 `33  */6   * * *   librenms    /opt/librenms/discovery-wrapper.py 1 >> /dev/null 2>&1`
