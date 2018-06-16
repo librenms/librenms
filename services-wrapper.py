@@ -40,7 +40,7 @@ try:
     import sys
     import threading
     import time
-    import argparse
+    from optparse import OptionParser
 
 except:
     print "ERROR: missing one or more of the following python modules:"
@@ -194,16 +194,18 @@ service_devices = 0
     Take the amount of threads we want to run in parallel from the commandline
     if None are given or the argument was garbage, fall back to default of 16
 """
-parser = argparse.ArgumentParser(description='Spawn multiple check-services.php processes in parallel.',
-                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('-d', '--debug', action='store_true', default=False,
+usage = "usage: %prog [options] <workers> (Default: 1 (Do not set too high)"
+description = "Spawn multiple check-services.php processes in parallel."
+parser = OptionParser(usage=usage, description=description)
+parser.add_option('-d', '--debug', action='store_true', default=False,
                     help="Enable debug output. WARNING: Leaving this enabled will consume a lot of disk space.")
-parser.add_argument('workers', metavar='N', type=int, default=1, nargs='?',
-                    help='The max number of workers allowed to run at one time. If too high this can overwelm your server.')
-args = parser.parse_args()
+(options, args) = parser.parse_args()
 
-amount_of_workers = args.workers
-debug = args.debug
+debug = options.debug
+try:
+    amount_of_workers = int(args[0])
+except (IndexError, ValueError):
+    amount_of_workers = 1
 
 devices_list = []
 
