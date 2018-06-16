@@ -1,6 +1,7 @@
 import threading
 
 from logging import critical, info, debug
+from math import ceil
 from time import time
 
 from .service import Service, ServiceConfig
@@ -8,7 +9,7 @@ from .queuemanager import QueueManager, TimedQueueManager, BillingQueueManager
 
 
 def normalize_wait(seconds):
-    return seconds - (time() % seconds)
+    return ceil(seconds - (time() % seconds))
 
 
 class DB:
