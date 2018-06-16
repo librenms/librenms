@@ -115,7 +115,7 @@ if (Auth::user()->hasGlobalRead()) {
 
         echo "<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>";
         $i = '1';
-        foreach (dbFetchRows('SELECT * FROM `vrfs` GROUP BY `mplsVpnVrfRouteDistinguisher`,`vrf_name`') as $vrf) {
+        foreach (dbFetchRows('SELECT `vrf_name`, `mplsVpnVrfRouteDistinguisher`, `mplsVpnVrfDescription` FROM `vrfs` GROUP BY `mplsVpnVrfRouteDistinguisher`, `mplsVpnVrfDescription`,`vrf_name`') as $vrf) {
             if (($i % 2)) {
                 $bg_colour = $config['list_colour']['even'];
             } else {
@@ -125,7 +125,6 @@ if (Auth::user()->hasGlobalRead()) {
             echo "<tr valign=top bgcolor='$bg_colour'>";
             echo "<td width=240><a class=list-large href='routing/vrf/".$vrf['mplsVpnVrfRouteDistinguisher'].'/'.$_GET['optc']."/'>".$vrf['vrf_name'].'</a><br /><span class=box-desc>'.$vrf['mplsVpnVrfDescription'].'</span></td>';
             echo '<td width=100 class=box-desc>'.$vrf['mplsVpnVrfRouteDistinguisher'].'</td>';
-            // echo("<td width=200 class=box-desc>" . $vrf['mplsVpnVrfDescription'] . "</td>");
             echo '<td><table border=0 cellspacing=0 cellpadding=5 width=100%>';
             $x = 1;
             foreach ($vrf_devices[$vrf['vrf_name']][$vrf['mplsVpnVrfRouteDistinguisher']] as $device) {
