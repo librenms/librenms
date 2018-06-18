@@ -168,12 +168,12 @@ class DeviceController extends ApiController
      * @apiParam {String} hostname The hostname of the new device
      * @apiParam {Number} port=161 The SNMP port to use
      * @apiParam {String="v1","v2c","v3"} version="v2c" The SNMP version
-     * @apiParam {String="udp","udp6","tcp","tcp6"} [transport=udp] Optional
-     * @apiParam {Number} [poller_group=0] Optional
-     * @apiParam {Boolean} [force_add=false] Optional
-     * @apiParam {String} [os] Optional
-     * @apiParam {String} [hardware] Optional
-     * @apiParam {Object} [v3] Optional The v3 object is only required when the snmp is set accordingly
+     * @apiParam {String="udp","udp6","tcp","tcp6"} [transport=udp]
+     * @apiParam {Number} [poller_group=0]
+     * @apiParam {Boolean} [force_add=false]
+     * @apiParam {String} [os]
+     * @apiParam {String} [hardware]
+     * @apiParam {Object} [v3] The v3 object is only required when the snmp is set accordingly
      * @apiParam {String} v3.authlevel
      * @apiParam {String} v3.authname
      * @apiParam {String} v3.authpass

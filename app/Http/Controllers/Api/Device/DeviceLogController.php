@@ -15,8 +15,8 @@ class DeviceLogController extends ApiController
      * @apiVersion  1.0.0
      *
      * @apiParam {Number} id The id or Hostname of the device.
-     * @apiParam {String} [to] Optional The data and time to search to.
-     * @apiParam {String} [from] Optional The date and time to search from.
+     * @apiParam {String} [to] The data and time to search to.
+     * @apiParam {String} [from] The date and time to search from.
      * @apiUse Pagination
      *
      * @apiExample {curl} Example usage:
@@ -74,10 +74,10 @@ class DeviceLogController extends ApiController
      * @apiVersion  1.0.0
      *
      * @apiParam {Number} id The id or Hostname of the device.
-     * @apiParam {String} [to] Optional The data and time to search to.
-     * @apiParam {String} [from] Optional The date and time to search from.
-     * @apiParam {Number} [per_page=50] Optional How many items to retrieve
-     * @apiParam {Number} [current_page=1] Optional Active page of items
+     * @apiParam {String} [to] The data and time to search to.
+     * @apiParam {String} [from] The date and time to search from.
+     * @apiParam {Number} [per_page=50] How many items to retrieve
+     * @apiParam {Number} [current_page=1] Active page of items
      *
      * @apiExample {curl} Example usage:
      *     curl -H 'X-Auth-Token: YOURAPITOKENHERE' -H 'Content-Type: application/json' -i http://example.org/api/v1/devices/1/logs/eventlog?from=2018-05-28 12:00&to=2018-05-30 12:00
@@ -135,10 +135,10 @@ class DeviceLogController extends ApiController
      * @apiVersion  1.0.0
      *
      * @apiParam {Number} id The id or Hostname of the device.
-     * @apiParam {String} [to] Optional The data and time to search to.
-     * @apiParam {String} [from] Optional The date and time to search from.
-     * @apiParam {Number} [per_page=50] Optional How many items to retrieve.
-     * @apiParam {Number} [current_page=1] Optional Active page of items.
+     * @apiParam {String} [to] The data and time to search to.
+     * @apiParam {String} [from] The date and time to search from.
+     * @apiParam {Number} [per_page=50] How many items to retrieve.
+     * @apiParam {Number} [current_page=1] Active page of items.
      *
      * @apiExample {curl} Example usage:
      *     curl -H 'X-Auth-Token: YOURAPITOKENHERE' -H 'Content-Type: application/json' -i http://example.org/api/v1/devices/1/logs/alertlog?from=2018-05-28 12:00&to=2018-05-30

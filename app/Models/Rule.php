@@ -74,16 +74,18 @@ class Rule extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        "extra",
+        "name",
         "disabled",
+        "extra",
         "severity",
         "rule",
-        "device_id",
+        "query",
+        "builder"
     ];
 
     public function setDisabledAttribute($value)
     {
-        $this->attributes['mute'] = (bool)$value;
+        $this->attributes['disabled'] = (bool)$value;
     }
     // ---- Define Relationships ----
     /**
@@ -94,10 +96,10 @@ class Rule extends Model
         return $this->hasMany('App\Models\Alerting\Alert', 'rule_id');
     }
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function device()
+    public function devices()
     {
-        return $this->belongsTo('App\Models\Device', 'device_id');
+        return $this->belongsToMany('App\Models\Device', 'alert_device_map', 'device_id', 'rule_id');
     }
 }

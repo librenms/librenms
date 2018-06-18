@@ -23,6 +23,20 @@ use App\Http\Controllers\Controller;
  */
 class ApiController extends Controller
 {
+
+    /**
+     * Current Api Version
+     */
+    private $api_version = '1.0.0';
+    
+    /**
+     * Get the current api version
+     */
+    public function version()
+    {
+        return response()->json(['version' => $this->api_version]);
+    }
+
     /**
      * Return an api response
      * This method is used when an object ir returned

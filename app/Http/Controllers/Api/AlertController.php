@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Alert;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Api\ApiController;
 
 class AlertController extends ApiController
@@ -15,6 +16,7 @@ class AlertController extends ApiController
      * @apiVersion  1.0.0
      *
      * @apiUse Pagination
+     * @apiParam {Number=0,1,2} [state] Get a list of alerts in the desired state. `0 = ok, 1 = alert, 2 = ack`
      *
      * @apiSuccessExample {type} Success-Response:
      *      HTTP/1.1 200 OK
@@ -44,9 +46,19 @@ class AlertController extends ApiController
      *
      *
      */
-    public function index()
+    public function index(Request $request)
     {
-        return $this->paginateResponse(new Alert);
+        $this->validate($request, [
+            'state' => \Illuminate\Validation\Rule::in([0, 1, 2])
+        ]);
+
+        $alert = new Alert;
+
+        if ($request->get('state')) {
+            $alert = $alert->where('state', (string)$request->get('state'));
+        }
+
+        return $this->paginateResponse($alert);
     }
 
     /**
