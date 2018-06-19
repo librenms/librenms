@@ -980,4 +980,3 @@ function IsParentDown($device)
 
     return false;
 } //end IsParentDown()
-
