@@ -48,4 +48,27 @@ class Mail implements Transport
             ]
         ];
     }
+
+    public static function configBuilder()
+    {
+        global $vars;
+
+        $status = 'ok';
+        $message = '';
+
+        if ($vars['email']) {
+            $transport_config = [
+                'email' => $vars['email']
+            ];
+        } else {
+            $status = 'error';
+            $message = 'Missing email information';
+        }
+
+        return [
+            'transport_config' => $transport_config,
+            'status' => $status,
+            'meessage' => $message
+        ];
+    }
 }

@@ -70,30 +70,20 @@ if (empty($name)) {
     }
 
     if ($transport_id) {
-        // Grab config values
-        if ($transport_type == 'mail') {
-            if ($vars['email']) {
-                $transport_config = array(
-                    'email' => $vars['email']
-                );
-            } else {
-                $status = 'error';
-                $message = 'Missing email information';
-            }
-        } elseif ($transport_type == 'ciscospark') {
-            if ($vars['api-token'] && $vars['room-id']) {
-                $transport_config = array(
-                    'api-token' => $vars['api-token'],
-                    'room-id' => $vars['room-id']
-                );
-            } else {
-                $status = 'error';
-                $message = 'Missing API token or Room ID';
-            }
-        } else {
-            $status = 'error';
-            $message = 'No transport type provided';
+        $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($transport_type);
+
+        if (!method_exists($class, 'configBuilder')) {
+            die(json_encode([
+                'status' => 'error',
+                'message' => 'This transport type is not yet supported'
+            ]));
         }
+        
+        // Build config values
+        $result = call_user_func($class.'::configBuilder');
+        $transport_config = $result['transport_config'];
+        $status = $result['status'];
+        $message = $result['message'];
 
         //Update the json config field
         if ($transport_config) {

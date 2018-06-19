@@ -67,4 +67,27 @@ class Ciscospark implements Transport
             ]
         ];
     }
+
+    public static function configBuilder()
+    {
+        global $vars;
+        $status = 'ok';
+        $message  = '';
+
+        if ($vars['api-token'] && $vars['room-id']) {
+            $transport_config = [
+                'api-token' => $vars['api-token'],
+                'room-id' => $vars['room-id']
+            ];
+        } else {
+            $status = 'error';
+            $message = 'Missing API token or Room ID';
+        }
+
+        return [
+            'transport_config' => $transport_config,
+            'status' => $status,
+            'message' => $message
+        ];
+    }
 }
