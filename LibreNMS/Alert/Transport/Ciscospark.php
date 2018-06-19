@@ -12,13 +12,13 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\AlertUtil;
 
 class Ciscospark implements Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        $sql = "SELECT `transport_config` FROM `alert_transports` WHERE `transport_id`=?";
-        $details = json_decode(dbFetchCell($sql, [$opts['alert']['transport_id']]), true);
+        $details = AlertUtil::getTransportConfig($opts['alert']['transport_id']);
         $text = strip_tags($obj['msg']);
         $data = array (
             'roomId' => $details['room-id'],
