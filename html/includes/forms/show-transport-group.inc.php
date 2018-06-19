@@ -21,7 +21,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
     ]));
 }
 
-$group_id = $_POST['group_id'];
+$group_id = $vars['group_id'];
 // Retrieve alert transport
 if (is_numeric($group_id) && $group_id > 0) {
     $name = dbFetchCell('SELECT `transport_group_name` FROM `alert_transport_groups` WHERE `transport_group_id`=? LIMIT 1', [$group_id]);

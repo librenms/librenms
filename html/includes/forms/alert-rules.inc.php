@@ -152,7 +152,7 @@ if (is_numeric($rule_id) && $rule_id > 0) {
     //Update transport groups and transports - can't use dbSyncRelationship
     $transports = [];
     $groups = [];
-    foreach ((array)$_POST['transports'] as $item) {
+    foreach ((array)$vars['transports'] as $item) {
         if (starts_with($item, 'g')) {
             $groups[] = (int)substr($item, 1);
         } else {

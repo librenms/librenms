@@ -37,10 +37,10 @@ if (!Auth::user()->hasGlobalAdmin()) {
 $status = 'ok';
 $message = '';
 
-$transport_id        = mres($_POST['transport_id']);
-$name                = mres($_POST['name']);
-$is_default          = mres($_POST['is_default']);
-$transport_type      = mres($_POST['transport-type']);
+$transport_id        = $vars['transport_id'];
+$name                = $vars['name'];
+$is_default          = $vars['is_default'];
+$transport_type      = $vars['transport-type'];
 
 if ($is_default == 'on') {
     $is_default = true;
@@ -72,19 +72,19 @@ if (empty($name)) {
     if ($transport_id) {
         // Grab config values
         if ($transport_type == 'mail') {
-            if ($_POST['email']) {
+            if ($vars['email']) {
                 $transport_config = array(
-                    'email' => $_POST['email']
+                    'email' => $vars['email']
                 );
             } else {
                 $status = 'error';
                 $message = 'Missing email information';
             }
         } elseif ($transport_type == 'ciscospark') {
-            if ($_POST['api-token'] && $_POST['room-id']) {
+            if ($vars['api-token'] && $vars['room-id']) {
                 $transport_config = array(
-                    'api-token' => $_POST['api-token'],
-                    'room-id' => $_POST['room-id']
+                    'api-token' => $vars['api-token'],
+                    'room-id' => $vars['room-id']
                 );
             } else {
                 $status = 'error';

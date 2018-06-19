@@ -24,13 +24,13 @@ if (!Auth::user()->hasGlobalAdmin()) {
 $status = 'ok';
 $message = '';
 
-if (!is_numeric($_POST['transport_id'])) {
+if (!is_numeric($vars['transport_id'])) {
     $status = 'error';
     $message = 'ERROR: No transport selected';
 } else {
-    if (dbDelete('alert_transports', '`transport_id` = ?', [$_POST['transport_id']])) {
-        dbDelete('alert_transport_map', '`target_type` = "single" AND `transport_or_group_id` = ?', [$_POST['transport_id']]);
-        dbDelete('transport_group_transport', '`transport_id`=?', [$_POST['transport_id']]);
+    if (dbDelete('alert_transports', '`transport_id` = ?', [$vars['transport_id']])) {
+        dbDelete('alert_transport_map', '`target_type` = "single" AND `transport_or_group_id` = ?', [$vars['transport_id']]);
+        dbDelete('transport_group_transport', '`transport_id`=?', [$vars['transport_id']]);
 
         $message = 'Alert transport has been deleted';
     } else {

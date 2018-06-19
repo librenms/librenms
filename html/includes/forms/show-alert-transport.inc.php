@@ -21,7 +21,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
     ]));
 }
 
-$transport_id = $_POST['transport_id'];
+$transport_id = $vars['transport_id'];
 // Retrieve alert transport
 if (is_numeric($transport_id) && $transport_id > 0) {
     $transport = dbFetchRow('SELECT * FROM `alert_transports` WHERE `transport_id` =? LIMIT 1', [$transport_id]);

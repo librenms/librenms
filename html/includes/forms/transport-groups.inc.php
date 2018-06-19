@@ -37,11 +37,11 @@ if (!Auth::user()->hasGlobalAdmin()) {
 $status = 'ok';
 $message = '';
 
-$group_id            = mres($_POST['group_id']);
-$name                = mres($_POST['name']);
+$group_id            = $vars['group_id'];
+$name                = $vars['name'];
 
 $target_members = [];
-foreach ((array)$_POST['members'] as $target) {
+foreach ((array)$vars['members'] as $target) {
     $target_members[] = (int)$target;
 }
 

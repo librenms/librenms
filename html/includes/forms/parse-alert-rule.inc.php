@@ -19,8 +19,8 @@ if (!Auth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
-$alert_id = $_POST['alert_id'];
-$template_id = $_POST['template_id'];
+$alert_id = $vars['alert_id'];
+$template_id = $vars['template_id'];
 
 if (is_numeric($alert_id) && $alert_id > 0) {
     $rule = dbFetchRow('SELECT * FROM `alert_rules` WHERE `id` = ? LIMIT 1', [$alert_id]);
