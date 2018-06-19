@@ -11,7 +11,7 @@
                     "hardware": "",
                     "features": null,
                     "location": null,
-                    "os": "calix",
+                    "os": "occamos",
                     "type": "network",
                     "serial": null,
                     "icon": "calix.svg"
@@ -29,7 +29,7 @@
                     "hardware": "Calix B6-256",
                     "features": null,
                     "location": "<private>",
-                    "os": "calix",
+                    "os": "occamos",
                     "type": "network",
                     "serial": null,
                     "icon": "calix.svg"
