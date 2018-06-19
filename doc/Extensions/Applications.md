@@ -891,6 +891,8 @@ extend raspberry /etc/snmp/raspberry.sh
 snmp ALL=(ALL) NOPASSWD: /etc/snmp/raspberry.sh, /usr/bin/vcgencmd*
 ```
 
+**Note:** If you are using Raspian, the default user is `Debian-snmp`. Change `snmp` above to `Debian-snmp`. You can verify the user snmpd is using with `ps aux | grep snmpd` 
+
 5. Restart snmpd on PI host
 
 

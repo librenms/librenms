@@ -77,7 +77,7 @@ Disabled by default.
 
 Adds devices that are listed in another device's arp table.  This module depends on the arp-table module being enabled and returning data.
 
-To enable, switch on globally the `$config['discovery_modules']['discovery-arp'] = 1;` or per device within the Modules section.
+To enable, switch on globally the `$config['discovery_modules']['discovery-arp'] = true;` or per device within the Modules section.
 
 ### XDP
 Enabled by default.

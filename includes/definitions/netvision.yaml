@@ -5,4 +5,4 @@ over:
     - { graph: device_current, text: Current }
 discovery:
     - sysDescr:
-        - Net Vision
+        - 'Net Vision'
