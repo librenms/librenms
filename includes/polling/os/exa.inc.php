@@ -5,4 +5,3 @@ $version = strtok(snmp_walk($device, "e7CardSoftwareVersion.1", "-OQv", "E7-Cali
 $hardware = "Calix " . $device['sysDescr'];
 $features = str_replace(PHP_EOL, ', ', snmp_walk($device, "e7CardProvType", "-OQv", "E7-Calix-MIB"));
 $serial = str_replace(PHP_EOL, ', ', snmp_walk($device, "e7CardSerialNumber", "-OQv", "E7-Calix-MIB"));
-
