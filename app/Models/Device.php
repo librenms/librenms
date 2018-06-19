@@ -178,6 +178,11 @@ class Device extends BaseModel
         return $this->hasMany('App\Models\BgpPeer', 'device_id');
     }
 
+    public function cbgp()
+    {
+        return $this->hasMany('App\Models\CbgpPeer', 'device_id');
+    }
+
     public function cefSwitching()
     {
         return $this->hasMany('App\Models\CefSwitching', 'device_id');
@@ -294,5 +299,15 @@ class Device extends BaseModel
     public function inventory()
     {
         return $this->hasMany('App\Models\Inventory', 'device_id', 'device_id');
+    }
+
+    public function vlans()
+    {
+        return $this->hasMany('App\Models\Vlan', 'device_id', 'device_id');
+    }
+
+    public function ipsecTunnels()
+    {
+        return $this->hasMany('App\Models\IpsecTunnel', 'device_id', 'device_id');
     }
 }

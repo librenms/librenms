@@ -21,6 +21,11 @@ use App\Http\Controllers\Controller;
  * @apiParam {Number} [per_page=50] How many items to retrieve
  * @apiParam {Number} [current_page=1] Active page of items
  */
+
+ /**
+  * @apiDefine DeviceParam
+  * @apiParam {Number} id The id or hostname of the Device.
+  */
 class ApiController extends Controller
 {
 

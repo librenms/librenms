@@ -56,6 +56,15 @@ Route::namespace('Api')->group(function () {
         Route::get('services', 'Device\\DeviceServiceController@index')->name('devices.service.index');
         Route::post('services', 'Device\\DeviceServiceController@store')->name('devices.service.store');
         Route::get('inventory', 'Device\\DeviceInventoryController@index')->name('devices.inventory.index');
+        Route::get('vlans', 'Device\\DeviceVlanController@index')->name('devices.vlan.index');
+
+        Route::prefix('routing')->group(function () {
+            Route::get('ipsec', 'Device\\DeviceRoutingController@ipsec');
+            Route::get('ospf', 'Device\\DeviceRoutingController@ospf');
+            Route::get('vrf', 'Device\\DeviceRoutingController@vrf');
+            Route::get('bgp', 'Device\\DeviceRoutingController@bgp');
+            Route::get('cbgp', 'Device\\DeviceRoutingController@cbgp');
+        });
     });
     
     Route::prefix('groups')->group(function () {
@@ -86,6 +95,19 @@ Route::namespace('Api')->group(function () {
     Route::get('bills/{bill}/history', 'Bill\\BillHistoryController@index')->name('bill.history.index');
 
     Route::get('inventory', 'InventoryController@index')->name('inventory.index');
+
+    Route::prefix('resources')->group(function () {
+        Route::get('vlans', 'VlanController@index')->name('vlans.index');
+        Route::get('networks', 'NetworkController@index');
+    });
+
+    Route::prefix('routing')->group(function () {
+        Route::get('ipsec', 'RoutingController@ipsec');
+        Route::get('ospf', 'RoutingController@ospf');
+        Route::get('vrf', 'RoutingController@vrf');
+        Route::get('bgp', 'RoutingController@bgp');
+        Route::get('cbgp', 'RoutingController@cbgp');
+    });
 
     Route::resource('alerts', 'AlertController', ['except' => [
         'create',

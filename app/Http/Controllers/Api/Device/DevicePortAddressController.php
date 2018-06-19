@@ -15,7 +15,7 @@ class DevicePortAddressController extends ApiController
      * @apiGroup Device Ports
      * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id ID or Hostname of the Device
+     * @apiUse DeviceParam
      * @apiParam {Number} port_id ID of the port
      *
      * @apiExample {curl} Example usage:

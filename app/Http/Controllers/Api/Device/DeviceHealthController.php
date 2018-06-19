@@ -14,7 +14,7 @@ class DeviceHealthController extends ApiController
      * @apiGroup Device Health
      * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id Id of the Device
+     * @apiUse DeviceParam
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -39,7 +39,7 @@ class DeviceHealthController extends ApiController
      * @apiGroup Device Health
      * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id ID or Hostname of the Device
+     * @apiUse DeviceParam
      * @apiParam {String} class The class name of the sensor (gathered from the Get_Device_Health method)
      *
      * @apiExample {curl} Example usage:

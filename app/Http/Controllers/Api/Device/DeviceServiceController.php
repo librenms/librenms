@@ -14,7 +14,7 @@ class DeviceServiceController extends ApiController
      * @apiGroup Device Services
      * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id ID or Hostname of the Device
+     * @apiUse DeviceParam
      * @apiParam {String="ok","warning","critical"} [state] Optional Only which have a certain state
      * @apiParam {String} [type] Optional Service type used sql LIKE to find services, so for tcp, use type=tcp for http use type=http
      *
@@ -74,7 +74,7 @@ class DeviceServiceController extends ApiController
      * @apiGroup Device Services
      * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id ID or Hostname of the Device
+     * @apiUse DeviceParam
      * @apiParam {String} type Service type (Ex: http.c, ntp.c, ...)
      * @apiParam {String} ip Ip of the service
      * @apiParam {String} [desc] Optional  Descrtion to use for the service

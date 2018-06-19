@@ -134,7 +134,7 @@ class DeviceLogController extends ApiController
      * @apiGroup Device Logs
      * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id The id or Hostname of the device.
+     * @apiUse DeviceParam
      * @apiParam {String} [to] The data and time to search to.
      * @apiParam {String} [from] The date and time to search from.
      * @apiParam {Number} [per_page=50] How many items to retrieve.

@@ -36,6 +36,11 @@ class IPv6Address extends BaseModel
 
     public $timestamps = false;
 
+    public function scopeHasAccess($query, User $user)
+    {
+        return $this->hasPortAccess($query, $user);
+    }
+    
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */

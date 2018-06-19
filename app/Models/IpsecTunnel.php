@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
-class Inventory extends BaseModel
-{
-    protected $table = 'entPhysical';
+use Illuminate\Database\Eloquent\Model;
 
-    protected $primaryKey = 'entPhysical_id';
+class IpsecTunnel extends Model
+{
+    protected $table = 'ipsec_tunnels';
+
+    protected $primaryKey = 'tunnel_id';
 
     public $timestamps = false;
 
@@ -14,6 +16,8 @@ class Inventory extends BaseModel
     {
         return $this->hasDeviceAccess($query, $user);
     }
+
+    // ---- Define Relationships ----
 
     public function device()
     {

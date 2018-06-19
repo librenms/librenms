@@ -94,7 +94,7 @@ class DeviceController extends ApiController
      * @apiGroup Devices
      * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id ID or Hostname of the Device
+     * @apiUse DeviceParam
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -324,7 +324,7 @@ class DeviceController extends ApiController
      * @apiGroup Devices
      * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id ID or Hostname of the Device
+     * @apiUse DeviceParam
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK

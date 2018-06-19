@@ -15,7 +15,7 @@ class DevicePortController extends ApiController
      * @apiGroup Device Ports
      * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id ID or Hostname of the Device
+     * @apiUse DeviceParam
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -110,7 +110,7 @@ class DevicePortController extends ApiController
      * @apiGroup Device Ports
      * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id ID or Hostname of the device
+     * @apiUse DeviceParam
      * @apiParam {Number} port_id ID of the Port
      *
      * @apiSuccessExample Success-Response:
@@ -207,7 +207,7 @@ class DevicePortController extends ApiController
      * @apiGroup Device Ports
      * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id ID or Hostname of the device
+     * @apiUse DeviceParam
      * @apiParam {Boolean} [valid_mappings=true] Optional Filter the result by only showing valid mappings ("0" values not shown).
      *
      * @apiSuccessExample Success-Response:

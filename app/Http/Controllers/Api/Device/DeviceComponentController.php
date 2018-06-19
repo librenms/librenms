@@ -15,7 +15,7 @@ class DeviceComponentController extends ApiController
      * @apiGroup Device Components
      * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id The id or Hostname of the Device
+     * @apiUse DeviceParam
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -72,7 +72,7 @@ class DeviceComponentController extends ApiController
      * @apiGroup Device Components
      * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id The id or Hostname of the Device
+     * @apiUse DeviceParam
      * @apiParam {Number} component_id The id of the Component
      * @apiParam {String} type The type of component to add
      * @apiParam {String} [label] The label for the component
@@ -141,7 +141,7 @@ class DeviceComponentController extends ApiController
      * @apiGroup Device Components
      * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id The id or Hostname of the Device
+     * @apiUse DeviceParam
      * @apiParam {Number} component_id The id of the Component to update
      * @apiParam {String} [type] The type of component to add
      * @apiParam {String} [label] The label for the component
@@ -192,7 +192,7 @@ class DeviceComponentController extends ApiController
      * @apiGroup Device Components
      * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id The id or Hostname of the Device
+     * @apiUse DeviceParam
      * @apiParam {Number} component_id The id of the Component to delete
      *
      * @apiSuccessExample Success-Response:

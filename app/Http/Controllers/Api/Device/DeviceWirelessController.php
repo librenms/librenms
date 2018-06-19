@@ -14,7 +14,7 @@ class DeviceWirelessController extends ApiController
      * @apiGroup Device Wireless
      * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id ID or Hostname of the Device
+     * @apiUse DeviceParam
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -45,7 +45,7 @@ class DeviceWirelessController extends ApiController
      * @apiGroup Device Wireless
      * @apiVersion  1.0.0
      *
-     * @apiParam {Number} id ID or Hostname of the Device
+     * @apiUse DeviceParam
      * @apiParam {String} class The class name of the sensor (gathered from the Get_Device_Wireless method)
      *
      * @apiExample {curl} Example usage:

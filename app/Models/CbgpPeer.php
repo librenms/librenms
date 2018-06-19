@@ -1,8 +1,8 @@
 <?php
 /**
- * IPv4Address.php
+ * CbgpPeer.php
  *
- * IPv4 Address for a port
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,29 +23,25 @@
  * @author     Paul Heinrichs <pdheinrichs@gmail.com>
  */
 
-namespace App\Models\IP;
+namespace App\Models;
 
-use LibreNMS\Config;
-use App\Models\BaseModel;
+use Illuminate\Database\Eloquent\Builder;
 
-class IPv4Address extends BaseModel
+class CbgpPeer extends BaseModel
 {
-    protected $table = 'ipv4_addresses';
-
-    protected $primaryKey = 'ipv4_address_id';
-
     public $timestamps = false;
+    protected $table = 'bgpPeers_cbgp';
+    protected $primaryKey = 'device_id';
 
     public function scopeHasAccess($query, User $user)
     {
-        return $this->hasPortAccess($query, $user);
+        return $this->hasDeviceAccess($query, $user);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function port()
+    // ---- Define Relationships ----
+
+    public function device()
     {
-        return $this->belongsTo('App\Models\Port');
+        return $this->belongsTo('App\Models\Device', 'device_id');
     }
 }
