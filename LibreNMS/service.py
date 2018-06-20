@@ -392,7 +392,7 @@ class Service:
                 if e.returncode == 5:
                     info("Device {} is down, cannot poll service, waiting {}s for retry"
                          .format(device_id, self.config.down_retry))
-                    self.lock_discovery(device_id, True)
+                    self.lock_services(device_id, True)
                 else:
                     self.unlock_services(device_id)
             else:

@@ -1,6 +1,6 @@
 import threading
 
-from logging import critical, info, debug
+from logging import critical, info, debug, exception
 from math import ceil
 from time import time
 
@@ -207,9 +207,19 @@ class RedisLock(Lock):
         :param owner: str a unique name for the locking node
         :param expiration: int in seconds, 0 expiration means forever
         """
-        key = self.__key(name)
-        non_existing = not (allow_owner_relock and self._redis.get(key) == owner)
-        return self._redis.set(key, owner, ex=int(expiration), nx=non_existing)
+        import redis
+
+        try:
+            if int(expiration) < 1:
+                expiration = 1
+
+            key = self.__key(name)
+            non_existing = not (allow_owner_relock and self._redis.get(key) == owner)
+            return self._redis.set(key, owner, ex=int(expiration), nx=non_existing)
+        except redis.exceptions.ResponseError as e:
+            exception("Unable to obtain lock, local state: name: %s, owner: %s, expiration: %s, allow_owner_relock: %s",
+                      name, owner, expiration, allow_owner_relock)
+
 
     def unlock(self, name, owner):
         """
