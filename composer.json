@@ -44,7 +44,8 @@
         "phpdocumentor/reflection-docblock": "3.*",
         "phpunit/php-token-stream": "1.*",
         "wpb/string-blade-compiler": "3.4",
-        "myclabs/deep-copy": "1.7.*"
+        "myclabs/deep-copy": "1.7.*",
+        "nikic/php-parser": "v3.1.*"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.9.1",
