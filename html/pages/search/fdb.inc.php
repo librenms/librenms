@@ -46,7 +46,7 @@ if (!Auth::user()->hasGlobalRead()) {
 $sql .= " WHERE F.port_id = P.port_id AND P.device_id = D.device_id $where GROUP BY `D`.`device_id`, `D`.`hostname` ORDER BY `hostname`";
 foreach (dbFetchRows($sql, $param) as $data) {
     echo '"<option value=\"'.$data['device_id'].'\""+';
-    if ($data['device_id'] == $_POST['device_id']) {
+    if ($data['device_id'] == $vars['device_id']) {
         echo '" selected "+';
     }
 
@@ -59,7 +59,7 @@ foreach (dbFetchRows($sql, $param) as $data) {
                 "<select name=\"searchby\" id=\"searchby\" class=\"form-control input-sm\">"+
                 "<option value=\"mac\" "+
 <?php
-if ($_POST['searchby'] == 'mac') {
+if ($vars['searchby'] == 'mac') {
     echo '" selected "+';
 }
 ?>
@@ -67,7 +67,7 @@ if ($_POST['searchby'] == 'mac') {
                 ">MAC Address</option>"+
                 "<option value=\"ip\" "+
 <?php
-if ($_POST['searchby'] == 'ip') {
+if ($vars['searchby'] == 'ip') {
     echo '" selected "+';
 }
 ?>
@@ -75,7 +75,7 @@ if ($_POST['searchby'] == 'ip') {
                 ">IP Address</option>"+
                 "<option value=\"dnsname\" "+
 <?php
-if ($_POST['searchby'] == 'dnsname') {
+if ($vars['searchby'] == 'dnsname') {
     echo '" selected "+';
 }
 ?>
@@ -83,7 +83,7 @@ if ($_POST['searchby'] == 'dnsname') {
                 ">DNS Name</option>"+
                 "<option value=\"description\" "+
 <?php
-if ($_POST['searchby'] == 'description') {
+if ($vars['searchby'] == 'description') {
     echo '" selected "+';
 }
 ?>
@@ -91,7 +91,7 @@ if ($_POST['searchby'] == 'description') {
                 ">Description</option>"+
                 "<option value=\"vlan\" "+
 <?php
-if ($_POST['searchby'] == 'vlan') {
+if ($vars['searchby'] == 'vlan') {
     echo '" selected "+';
 }
 ?>
@@ -102,7 +102,7 @@ if ($_POST['searchby'] == 'vlan') {
                 "<div class=\"form-group\">"+
                 "<input type=\"text\" name=\"searchPhrase\" id=\"address\" value=\""+
 <?php
-echo '"'.$_POST['searchPhrase'].'"+';
+echo '"'.$vars['searchPhrase'].'"+';
 ?>
 
                 "\" class=\"form-control input-sm\" placeholder=\"Value\" />"+
@@ -115,9 +115,9 @@ echo '"'.$_POST['searchPhrase'].'"+';
     {
         return {
             id: "fdb-search",
-            device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>',
-            searchby: '<?php echo mres($_POST['searchby']); ?>',
-            searchPhrase: '<?php echo mres($_POST['searchPhrase']); ?>'
+            device_id: '<?php echo $vars['device_id']; ?>',
+            searchby: '<?php echo $vars['searchby']; ?>',
+            searchPhrase: '<?php echo $vars['searchPhrase']; ?>'
         };
     },
     url: "ajax_table.php"
