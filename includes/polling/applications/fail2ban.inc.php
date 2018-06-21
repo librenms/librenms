@@ -1,21 +1,41 @@
 <?php
 
+use LibreNMS\Exceptions\JsonAppParsingFailedException;
+use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
-
-echo "fail2ban";
 
 $name = 'fail2ban';
 $app_id = $app['app_id'];
 
-$options      = '-O qv';
-$oid          = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.102.97.105.108.50.98.97.110';
-$f2b = snmp_walk($device, $oid, $options);
-$f2b = trim($f2b, '"');
+echo $name;
 
-$metrics = array();
-$bannedStuff = explode("\n", $f2b);
+try {
+    $f2b = json_app_get($device, $name);
+} catch (JsonAppParsingFailedException $e) {
+    // Legacy script, build compatible array
+    $legacy = explode("\n", $e->getOutput());
+    $f2b = [
+        'data' => [
+            'total' => array_shift($legacy), // total was first line in legacy app
+            'jails' => []
+        ]
+    ];
 
-$total_banned=$bannedStuff[0];
+    foreach ($legacy as $jail_data) {
+        list($jail, $banned) = explode(" ", $jail_data);
+        if (isset($jail) && isset($banned)) {
+            $f2b['data']['jails'][$jail] = $banned;
+        }
+    }
+} catch (JsonAppException $e) {
+    echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
+    update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message
+    return;
+}
+
+$f2b = $f2b[data];
+
+$metrics = [];
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
@@ -24,41 +44,30 @@ $rrd_def = RrdDefinition::make()
 
 
 $fields = array(
-    'banned' =>$total_banned,
-    'firewalled'=>'U',
+    'banned' => $f2b['total'],
+    'firewalled'=>'U', // legacy ds
 );
 $metrics['total'] = $fields;
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
 
-$int=1;
-$jails=array();
+foreach ($f2b['jails'] as $jail => $banned) {
+    $rrd_name = array('app', $name, $app_id, $jail);
+    $rrd_def = RrdDefinition::make()->addDataset('banned', 'GAUGE', 0);
+    $fields = array('banned' => $banned);
 
-while (isset($bannedStuff[$int])) {
-    list($jail, $banned) = explode(" ", $bannedStuff[$int]);
-
-    if (isset($jail) && isset($banned)) {
-        $jails[] = $jail;
-
-        $rrd_name = array('app', $name, $app_id, $jail);
-        $rrd_def = RrdDefinition::make()->addDataset('banned', 'GAUGE', 0);
-        $fields = array('banned' => $banned);
-
-        $metrics["jail_$jail"] = $fields;
-        $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
-        data_update($device, 'app', $tags, $fields);
-    }
-
-    $int++;
+    $metrics["jail_$jail"] = $fields;
+    $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+    data_update($device, 'app', $tags, $fields);
 }
 
-update_application($app, $f2b, $metrics);
+update_application($app, 'ok', $metrics);
 
 //
 // component processing for fail2ban
 //
-$device_id=$device['device_id'];
+$device_id = $device['device_id'];
 
 $options=array(
     'filter' => array(
@@ -85,7 +94,7 @@ if (empty($jails)) {
 
     $id = $component->getFirstComponentID($f2bc);
     $f2bc[$id]['label'] = 'Fail2ban Jails';
-    $f2bc[$id]['jails'] = json_encode($jails);
+    $f2bc[$id]['jails'] = json_encode(array_keys($f2b['jails']));
 
     $component->setComponentPrefs($device_id, $f2bc);
 }

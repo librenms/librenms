@@ -165,9 +165,9 @@ $load_raw = snmp_get_multi($device, 'laLoadInt.1 laLoadInt.2 laLoadInt.3', '-OQU
 // Check to see that the 5-min OID is actually populated before we make the rrd
 if (is_numeric($load_raw[2]['laLoadInt'])) {
     $rrd_def = RrdDefinition::make()
-        ->addDataset('1min', 'GAUGE', 0, 5000)
-        ->addDataset('5min', 'GAUGE', 0, 5000)
-        ->addDataset('15min', 'GAUGE', 0, 5000);
+        ->addDataset('1min', 'GAUGE', 0)
+        ->addDataset('5min', 'GAUGE', 0)
+        ->addDataset('15min', 'GAUGE', 0);
 
     $fields = array(
         '1min'   => $load_raw[1]['laLoadInt'],

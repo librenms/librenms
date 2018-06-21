@@ -104,6 +104,11 @@ if (count($components) > 0) {
     $menu_options['cbqos'] = 'CBQoS';
 }
 
+if (LibreNMS\Plugins::countHooks('port_container')) {
+    // Checking if any plugin implements the port_container. If yes, allow to display the menu_option
+    $menu_options['plugins'] = 'Plugins';
+}
+
 $sep = '';
 foreach ($menu_options as $option => $text) {
     echo $sep;

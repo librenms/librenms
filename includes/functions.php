@@ -2460,3 +2460,22 @@ function hexbin($hex_string)
     }
     return $chr_string;
 }
+
+/**
+ * Check if disk is valid to poll.
+ * Settings: bad_disk_regexp
+ *
+ * @param array $disk
+ * @param array $device
+ * @return bool
+ */
+function is_disk_valid($disk, $device)
+{
+    foreach (Config::getCombined($device['os'], 'bad_disk_regexp') as $bir) {
+        if (preg_match($bir ."i", $disk['diskIODevice'])) {
+            d_echo("Ignored Disk: {$disk['diskIODevice']} (matched: $bir)\n");
+            return false;
+        }
+    }
+    return true;
+}

@@ -82,6 +82,16 @@ class Plugins
         return $plugin;
     }//end load()
 
+    public static function countHooks($hook)
+    {
+        // count all plugins implementing a specific hook
+        self::start();
+        if (!empty(self::$plugins[$hook])) {
+            return count(self::$plugins[$hook]);
+        } else {
+            return false;
+        }
+    }
 
     public static function call($hook, $params = false)
     {
