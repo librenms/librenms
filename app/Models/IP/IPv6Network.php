@@ -1,8 +1,8 @@
 <?php
 /**
- * IPv4Address.php
+ * IPv6Network.php
  *
- * IPv4 Address for a port
+ * IPv6 Network 
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,24 +27,18 @@ namespace App\Models\IP;
 
 use App\Models\BaseModel;
 
-class IPv4Address extends BaseModel
+class IPv6Network extends BaseModel
 {
-    protected $table = 'ipv4_addresses';
+    protected $table = 'ipv6_networks';
 
-    protected $primaryKey = 'ipv4_address_id';
+    protected $primaryKey = 'ipv6_network_id';
 
     public $timestamps = false;
 
-    public function scopeHasAccess($query, User $user)
-    {
-        return $this->hasPortAccess($query, $user);
-    }
+    // Relationships
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function port()
+    public function addresses()
     {
-        return $this->belongsTo('App\Models\Port');
+        return $this->hasMany('App\Models\IP\IPv6Address','ipv6_network_id', 'ipv6_network_id');
     }
 }

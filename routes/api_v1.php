@@ -88,16 +88,38 @@ Route::resource('bills', 'Bill\\BillController', ['except' => [
     'create',
     'edit'
 ]]);
+Route::get('bills/{bill}/history', 'Bill\\BillHistoryController@index')->name('bill.history.index');
 
 Route::get('services', 'ServiceController@index')->name('device.service.index');
 
-Route::get('bills/{bill}/history', 'Bill\\BillHistoryController@index')->name('bill.history.index');
 
 Route::get('inventory', 'InventoryController@index')->name('inventory.index');
 
-Route::prefix('resources')->group(function () {
-    Route::get('vlans', 'VlanController@index')->name('vlans.index');
-    Route::get('networks', 'NetworkController@index');
+Route::get('vlans', 'VlanController@index')->name('vlans.index');
+
+
+Route::prefix('addresses')->group(function () {
+    Route::get('ipv4', 'IPv4Controller@index');
+    Route::get('ipv4/networks', 'IPv4Controller@networks');
+    Route::get('ipv4/networks/{id}', 'IPv4Controller@show');
+
+    Route::get('ipv6', 'IPv6Controller@index');
+    Route::get('ipv6/networks', 'IPv6Controller@networks');
+    Route::get('ipv6/networks/{id}', 'IPv6Controller@show');
+
+    // Route::get('addresses/ipv4', 'AddressController@ipv4');
+    // Route::get('addresses/ipv6', 'AddressController@ipv6');
+    // Route::get('networks', 'AddressController@networks');
+    // Route::get('networks/{id}', 'AddressController@show');
+    Route::get('arp/{ip}', 'AddressController@arp');
+});
+
+Route::prefix('ip')->group(function () {
+    Route::get('addresses/ipv4', 'AddressController@ipv4');
+    Route::get('addresses/ipv6', 'AddressController@ipv6');
+    Route::get('networks', 'AddressController@networks');
+    Route::get('networks/{id}', 'AddressController@show');
+    Route::get('arp/{ip}', 'AddressController@arp');
 });
 
 Route::prefix('routing')->group(function () {

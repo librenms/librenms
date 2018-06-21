@@ -25,7 +25,6 @@
 
 namespace App\Models\IP;
 
-use LibreNMS\Config;
 use App\Models\BaseModel;
 
 class IPv6Address extends BaseModel
