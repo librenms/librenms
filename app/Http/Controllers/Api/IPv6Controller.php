@@ -18,7 +18,7 @@ class IPv6Controller extends ApiController
      * @apiVersion  1.0.0
      *
      * @apiUse Pagination
-     * 
+     *
      * @apiExample {curl} Example usage wihout parameters:
      *     curl -H 'X-Auth-Token: YOURAPITOKENHERE' -H 'Content-Type: application/json' https://example.org/api/v1/addresses/ipv6?current_page=1
      *
@@ -61,7 +61,7 @@ class IPv6Controller extends ApiController
      * @apiVersion  1.0.0
      *
      * @apiUse Pagination
-     * 
+     *
      * @apiExample {curl} Example usage wihout parameters:
      *     curl -H 'X-Auth-Token: YOURAPITOKENHERE' -H 'Content-Type: application/json' https://example.org/api/v1/addresses/ipv6/networks?current_page=3
      *

@@ -18,7 +18,7 @@ class IPv4Controller extends ApiController
      * @apiVersion  1.0.0
      *
      * @apiUse Pagination
-     * 
+     *
      * @apiExample {curl} Example usage wihout parameters:
      *     curl -H 'X-Auth-Token: YOURAPITOKENHERE' -H 'Content-Type: application/json' https://example.org/api/v1/addresses/ipv4?current_page=2
      *
@@ -59,7 +59,7 @@ class IPv4Controller extends ApiController
      * @apiVersion  1.0.0
      *
      * @apiUse Pagination
-     * 
+     *
      * @apiExample {curl} Example usage wihout parameters:
      *     curl -H 'X-Auth-Token: YOURAPITOKENHERE' -H 'Content-Type: application/json' https://example.org/api/v1/addresses/ipv4/networks?current_page=3
      *

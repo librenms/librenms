@@ -2,7 +2,7 @@
 /**
  * IPv4Network.php
  *
- * IPv4 Network 
+ * IPv4 Network
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,6 +39,6 @@ class IPv4Network extends BaseModel
 
     public function addresses()
     {
-        return $this->hasMany('App\Models\IP\IPv4Address','ipv4_network_id', 'ipv4_network_id');
+        return $this->hasMany('App\Models\IP\IPv4Address', 'ipv4_network_id', 'ipv4_network_id');
     }
 }

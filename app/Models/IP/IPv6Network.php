@@ -2,7 +2,7 @@
 /**
  * IPv6Network.php
  *
- * IPv6 Network 
+ * IPv6 Network
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,6 +39,6 @@ class IPv6Network extends BaseModel
 
     public function addresses()
     {
-        return $this->hasMany('App\Models\IP\IPv6Address','ipv6_network_id', 'ipv6_network_id');
+        return $this->hasMany('App\Models\IP\IPv6Address', 'ipv6_network_id', 'ipv6_network_id');
     }
 }
