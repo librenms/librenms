@@ -115,9 +115,9 @@ echo '"'.$vars['searchPhrase'].'"+';
     {
         return {
             id: "fdb-search",
-            device_id: '<?php echo htmlspecialchars($vars['device_id']); ?>',
-            searchby: '<?php echo mres($vars['searchby']); ?>',
-            searchPhrase: '<?php echo mres($vars['searchPhrase']); ?>'
+            device_id: '<?php echo $vars['device_id']; ?>',
+            searchby: '<?php echo $vars['searchby']; ?>',
+            searchPhrase: '<?php echo $vars['searchPhrase']; ?>'
         };
     },
     url: "ajax_table.php"
