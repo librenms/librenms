@@ -494,11 +494,7 @@ function DescribeAlert($alert)
     $obj['timestamp'] = $alert['time_logged'];
     $obj['contacts']  = $extra['contacts'];
     $obj['state']     = $alert['state'];
-
-    $class            = 'LibreNMS\\Alert\\Template\\' . ucfirst($template->type);
-    $type             = new $class;
-    $obj['title']     = $type->getTitle($obj);
-    $obj['msg']       = $type->getBody($obj);
+    $obj['template']  = $template;
     return $obj;
 }//end DescribeAlert()
 
@@ -803,6 +799,8 @@ function ExtTransports($obj)
 {
     global $config;
     $tmp = false;
+    $class = 'LibreNMS\\Alert\\Template\\' . ucfirst($obj['template']->type);
+    $type  = new $class;
     // To keep scrutinizer from naging because it doesnt understand eval
     foreach ($config['alert']['transports'] as $transport => $opts) {
         if (is_array($opts)) {
@@ -811,7 +809,8 @@ function ExtTransports($obj)
         $class  = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport);
         if (($opts === true || !empty($opts)) && $opts != false && class_exists($class)) {
             $obj['transport'] = $transport;
-
+            $obj['title']     = $type->getTitle($obj);
+            $obj['msg']       = $type->getBody($obj);
             echo $transport.' => ';
             $instance = new $class;
             $tmp = $instance->deliverAlert($obj, $opts);

@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4ecc95b1d8dc68e1aace7083c2b218cb",
+    "content-hash": "1ec95b9b21153d67687370be2181ea01",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
-            "version": "3.6.19",
+            "version": "3.6.20",
             "source": {
                 "type": "git",
                 "url": "https://github.com/HuasoFoundries/jpgraph.git",
-                "reference": "c9f800a00850706f3fc4b26b6055b55952eb79bc"
+                "reference": "10a818bc8c1b40deb0063f0f3c3e67c23e3030b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/HuasoFoundries/jpgraph/zipball/c9f800a00850706f3fc4b26b6055b55952eb79bc",
-                "reference": "c9f800a00850706f3fc4b26b6055b55952eb79bc",
+                "url": "https://api.github.com/repos/HuasoFoundries/jpgraph/zipball/10a818bc8c1b40deb0063f0f3c3e67c23e3030b7",
+                "reference": "10a818bc8c1b40deb0063f0f3c3e67c23e3030b7",
                 "shasum": ""
             },
             "require": {
@@ -59,7 +59,7 @@
                 "jpgraph",
                 "pie"
             ],
-            "time": "2018-05-18T17:10:05+00:00"
+            "time": "2018-06-13T13:59:24+00:00"
         },
         {
             "name": "dapphp/radius",
@@ -3519,16 +3519,16 @@
         },
         {
             "name": "wpb/string-blade-compiler",
-            "version": "3.4.0",
+            "version": "3.4.x-dev",
             "source": {
                 "type": "git",
-                "url": "https://github.com/TerrePorter/StringBladeCompiler.git",
-                "reference": "03ed8a69aa31690195c4fcbc292a9767e2dd54f7"
+                "url": "https://github.com/librenms/StringBladeCompiler.git",
+                "reference": "30c974a305c14f412af3a8c515b74528429c4f5f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TerrePorter/StringBladeCompiler/zipball/03ed8a69aa31690195c4fcbc292a9767e2dd54f7",
-                "reference": "03ed8a69aa31690195c4fcbc292a9767e2dd54f7",
+                "url": "https://api.github.com/repos/librenms/StringBladeCompiler/zipball/30c974a305c14f412af3a8c515b74528429c4f5f",
+                "reference": "30c974a305c14f412af3a8c515b74528429c4f5f",
                 "shasum": ""
             },
             "require": {
@@ -3541,7 +3541,6 @@
                     "Wpb\\String_Blade_Compiler\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -3557,7 +3556,10 @@
                 "compiler",
                 "laravel"
             ],
-            "time": "2017-01-26T23:19:08+00:00"
+            "support": {
+                "source": "https://github.com/librenms/StringBladeCompiler/tree/3.4"
+            },
+            "time": "2018-06-21T21:13:41+00:00"
         },
         {
             "name": "xjtuwangke/passwordhash",
@@ -5101,7 +5103,8 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "xjtuwangke/passwordhash": 20,
-        "oriceon/toastr-5-laravel": 20
+        "oriceon/toastr-5-laravel": 20,
+        "wpb/string-blade-compiler": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
