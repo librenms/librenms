@@ -25,12 +25,12 @@ if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
 
 rrdtool_initialize();
 
-/** @var \Illuminate\Database\Eloquent\Builder $query */
-$query = Device::canPing()->select(['devices.device_id', 'hostname', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken']);
-
-// TODO sort by device dependencies (graph resolution)
-
-$devices = $query->get()->keyBy('hostname');
+/** @var \Illuminate\Database\Eloquent\Collection $devices List of devices keyed by hostname*/
+$devices = Device::canPing()
+    ->select(['devices.device_id', 'hostname', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken'])
+    ->orderBy('max_depth')
+    ->get()
+    ->keyBy('hostname');
 
 $period = max(Config::get('fping_options.interval', 500), 10); // minimum period is 10ms
 $timeout = min(Config::get('fping_options.timeout', 500), $period); // must be smaller than period

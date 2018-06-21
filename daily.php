@@ -294,3 +294,28 @@ if ($options['f'] === 'refresh_os_cache') {
     echo 'Clearing OS cache' . PHP_EOL;
     unlink(Config::get('install_dir') . '/cache/os_defs.cache');
 }
+
+if ($options['f'] === 'recalculate_device_dependencies') {
+    // fix broken dependency max_depth calculation in case things weren't done though eloquent
+
+    try {
+        if (Config::get('distributed_poller')) {
+            MemcacheLock::lock('recalculate_device_dependencies', 0, 86000);
+        }
+        \LibreNMS\DB\Eloquent::boot();
+
+        // update all root nodes and recurse, chunk so we don't blow up
+        \App\Models\Device::doesntHave('parents')->chunk(100, function($devices) {
+            // anonymous recursive function
+            $recurse = function ($dev) use (&$recurse) {
+                $dev->updateMaxDepth();
+                $dev->children()->each($recurse);
+            };
+
+            $devices->each($recurse);
+        });
+    } catch (LockException $e) {
+        echo $e->getMessage() . PHP_EOL;
+        exit(-1);
+    }
+}

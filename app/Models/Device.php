@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 
 class Device extends BaseModel
 {
+    use PivotEventTrait;
+
     public $timestamps = false;
     protected $primaryKey = 'device_id';
     protected $fillable = ['hostname', 'ip', 'status', 'status_reason'];
@@ -23,6 +26,36 @@ class Device extends BaseModel
             $device->ports()->delete();
             $device->syslogs()->delete();
             $device->eventlogs()->delete();
+
+            // handle device dependency updates
+            $device->children->each->updateMaxDepth($device->device_id);
+        });
+
+        // handle device dependency updates
+        static::updated(function (Device $device) {
+            if ($device->isDirty('max_depth')) {
+                $device->children->each->updateMaxDepth();
+            }
+        });
+
+        static::pivotAttached(function (Device $device, $relationName, $pivotIds, $pivotIdsAttributes) {
+            if ($relationName == 'parents') {
+                $device->updateMaxDepth();
+            } elseif ($relationName == 'children') {
+                foreach ($pivotIds as $child_id) {
+                    Device::find($child_id)->updateMaxDepth();
+                }
+            }
+        });
+
+        static::pivotDetached(function (Device $device, $relationName, $pivotIds) {
+            if ($relationName == 'parents') {
+                $device->updateMaxDepth();
+            } elseif ($relationName == 'children') {
+                foreach ($pivotIds as $child_id) {
+                    Device::find($child_id)->updateMaxDepth();
+                }
+            }
         });
     }
 
@@ -51,6 +84,31 @@ class Device extends BaseModel
     }
 
     /**
+     * Update the max_depth field based on parents
+     * Performs SQL query, so make sure all parents are saved first
+     *
+     * @param int $exclude exclude a device_id from being considered (used for deleting)
+     */
+    public function updateMaxDepth($exclude = null)
+    {
+        // optimize for memory instead of time
+        $query = $this->parents()->getQuery();
+        if (!is_null($exclude)) {
+            $query->where('device_id', '!=', $exclude);
+        }
+
+        $count = $query->count();
+        if ($count == 0) {
+            $this->max_depth = 0;
+        } else {
+            $parents_max_depth = $query->max('max_depth');
+            $this->max_depth = $parents_max_depth + 1;
+        }
+
+        $this->save();
+    }
+
+    /**
      * @return string
      */
     public function statusColour()
@@ -73,9 +131,9 @@ class Device extends BaseModel
     public function getIconAttribute($icon)
     {
         if (isset($icon)) {
-            return asset("images/os/$icon");
+            return "images/os/$icon";
         }
-        return asset('images/os/generic.svg');
+        return 'images/os/generic.svg';
     }
     public function getIpAttribute($ip)
     {
@@ -181,6 +239,11 @@ class Device extends BaseModel
         return $this->hasMany('App\Models\CefSwitching', 'device_id');
     }
 
+    public function children()
+    {
+        return $this->belongsToMany('App\Models\Device', 'device_relationships', 'parent_device_id', 'child_device_id');
+    }
+
     public function components()
     {
         return $this->hasMany('App\Models\Component', 'device_id');
@@ -204,6 +267,11 @@ class Device extends BaseModel
     public function packages()
     {
         return $this->hasMany('App\Models\Package', 'device_id', 'device_id');
+    }
+
+    public function parents()
+    {
+        return $this->belongsToMany('App\Models\Device', 'device_relationships', 'child_device_id', 'parent_device_id');
     }
 
     public function perf()
