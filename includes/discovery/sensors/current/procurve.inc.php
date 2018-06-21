@@ -1,7 +1,7 @@
 <?php
 $multiplier    = 1;
 $divisor       = 1000000;
-$divisor_alarm = 10000000;
+$divisor_alarm = 1000000;
 foreach ($pre_cache['procurve_hpicfXcvrInfoTable'] as $index => $entry) {
     if (is_numeric($entry['hpicfXcvrBias']) && $entry['hpicfXcvrBias'] != 0) {
         $oid                       = '.1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.13.' . $index;
