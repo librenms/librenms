@@ -43,7 +43,10 @@
         "symfony/css-selector": "3.*",
         "doctrine/instantiator": "1.0.*",
         "phpdocumentor/reflection-docblock": "3.*",
-        "phpunit/php-token-stream": "1.*"
+        "phpunit/php-token-stream": "1.*",
+        "hirak/prestissimo": "^0.3.7",
+        "myclabs/deep-copy": "1.7.*",
+        "nikic/php-parser": "v3.1.*"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.9.1",
