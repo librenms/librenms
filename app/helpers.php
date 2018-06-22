@@ -23,6 +23,9 @@
  *
  *
  * Order of Contents
+ * - Common
+ *  - d_echo()
+ *  - array_pairs()
  *
  * - Formatting
  *  - format_bytes_billing()
@@ -33,8 +36,45 @@
  *
  * - Services
  *  - list_available_services()
+ *
+ * - Validation
  */
 use Librenms\Config;
+
+/*
+ * convenience function - please use this instead of 'if ($debug) { echo ...; }'
+ */
+function d_echo($text, $no_debug_text = null)
+{
+    global $debug, $php_debug;
+    if ($debug) {
+        if (isset($php_debug)) {
+            $php_debug[] = $text;
+        } else {
+            print_r($text);
+        }
+    } elseif ($no_debug_text) {
+        echo "$no_debug_text";
+    }
+} // d_echo
+
+/**
+ * Get all consecutive pairs of values in an array.
+ * [1,2,3,4] -> [[1,2],[2,3],[3,4]]
+ *
+ * @param array $array
+ * @return array
+ */
+function array_pairs($array)
+{
+    $pairs = [];
+
+    for ($i = 1; $i < count($array); $i++) {
+        $pairs[] = [$array[$i -1], $array[$i]];
+    }
+
+    return $pairs;
+}
 
 // --- Formatting ----
 
@@ -129,4 +169,26 @@ function list_available_services()
         }
     }
     return $services;
+}
+
+
+/**
+ * Checks if the $hostname provided exists in the DB already
+ *
+ * @param string $hostname The hostname to check for
+ * @param string $sysName The sysName to check
+ * @return bool true if hostname already exists
+ *              false if hostname doesn't exist
+ */
+function host_exists($hostname, $sysName = null)
+{
+    $query = \App\Models\Device::where('hostname', $hostname);
+
+    if (!empty($sysName) && !Config::get('allow_duplicate_sysName')) {
+        $query->orWhere('sysName', $sysName);
+        if (!empty(Config::get('mydomain'))) {
+            $query->orWhere('sysName', rtrim($sysName, '.') . '.' . Config::get('mydomain'));
+        }
+    }
+    return $query->count() > 0;
 }

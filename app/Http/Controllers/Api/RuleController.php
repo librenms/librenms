@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\Rule;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\ApiController;
+use LibreNMS\Alerting\QueryBuilderParser;
 
 class RuleController extends ApiController
 {
@@ -85,41 +86,58 @@ class RuleController extends ApiController
      *
      * @api {post} /rules Create new Rule
      * @apiName Create_rule
-     * @apiDescription Add a new alert rule.
+     * @apiDescription `Advanced` This api endpoint can be very complex and in most cases for creating rules it'll be easier to use the UI
+     * but if you so dare the option is here. There is very limited validation on the builder field so good luck :).
      * @apiGroup Rules
      * @apiVersion  1.0.0
      *
      * @apiParam {String} name The name of the rule
-     * @apiParam {String} rule The rule which should be in the format %entity $condition $value (i.e `%devices.status != 0` for devices marked as down).
+     * @apiParam {Object} builder The builder object
+     * @apiParam {String="AND","OR"} builder.condition
+     * @apiParam {Array} builder.rules Array of rule / rule group objects
+     * @apiParam {Object} [rule] This is the rule object that is inserted into the `builder rules` array
+     * @apiParam {String} [rule.id] The database key your rule relates to
+     * @apiParam {String} [rule.field] The database field your rule relates to
+     * @apiParam {String="integer","string"} [rule.type]
+     * @apiParam {String="number","text","radio"} [rule.input]
+     * @apiParam {String="equal","not_equal","between","not_between","is_null","is_not_null","less","less_or_equal","greater","greater_or_equal","regex","not_regex"} [rule.operator]
+     * @apiParam {String} [rule.value] The value to match the operator to the input
+     * @apiParam {Object} [group] This is the rule Group that is inserted into the `builder rules` array. It can have nested rule object / rule groups.
+     * @apiParam {String="AND","OR"} [group.condition] The database key your rule relates to
+     * @apiParam {Array} [group.rules] Array of rule / rule group objects
+     * @apiParam {String="ok","critical","warning"} severity How to display the alert, OK:`Green`, Warning:`Yellow`, Critical:`Red`
      * @apiParam {Boolean} [mute=false] Show alert status but mute notifications
      * @apiParam {Boolean} [disabled=false] Disable rule
-     * @apiParam {String="ok","critical","warning"} severity How to display the alert, OK:`Green`, Warning:`Yellow`, Critical:`Red`
      * @apiParam {Boolean} [invert=false] Alert when this rule doesn't match
      * @apiParam {Number} [count=-1] This is how many polling runs before an alert will trigger and the frequency.
      * @apiParam {Array} [devices] An array of device ID's to map to this rule. If empty the rule will be global.
      *
+     * @apiExample {curl} Example 1:
+     *  curl -X POST -d '{"name": "Test Rule 1", "severity": "ok", "builder": {"condition": "AND", "rules": [{"id":"devices.status", "field":"devices.status", "type": "integer", "input": "number", "operator": "equal", "value": 1}]}}' http://example.org/api/v1/rules -H 'Content-Type:application/json' -H 'Accept:application/json' -H "X-Auth-Token:YOUR_TOKEN_HERE"
+     *
+     * @apiExample {curl} Example 2:
+     *  curl -X POST -d '{"name": "Test Rule 2", "severity": "ok", "builder": {"condition": "AND", "rules": [{"id":"devices.status", "field":"devices.status", "type": "integer", "input": "number", "operator": "equal", "value": 1}, {"condition": "OR", "rules": [{"id":"devices.status", "field":"devices.status", "type": "integer", "input": "number", "operator": "equal", "value": 1}, {"id":"devices.status", "field":"devices.status", "type": "integer", "input": "number", "operator": "equal", "value": 2}]}]}}' http://example.org/api/v1/rules -H 'Content-Type:application/json' -H 'Accept:application/json' -H "X-Auth-Token:YOUR_TOKEN_HERE"
+     *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
      *     {
-     *          "data":
-     *          {
-     *              "id": 1,
-     *              "rule": "%macros.device_down = \"1\"",
-     *              "severity": "critical",
-     *              "extra": "{\"mute\":false,\"count\":-1,\"delay\":300,\"invert\":false,\"interval\":300}",
-     *              "disabled": "0",
-     *              "name": "Devices up/down",
-     *              "query": "SELECT * FROM devices WHERE (devices.device_id = ?) && (((devices.status = 0  &&  ((devices.disabled = 0  &&  devices.ignore = 0)))) = \"1\")",
-     *              "builder": "",
-     *              "proc": null
-     *          },
+     *          "data": {
+     *              "name":"Test Rule 2",
+     *              "disabled":false,
+     *              "severity":"ok",
+     *              "rule":"",
+     *              "extra": "{\"count\":-1,\"mute\":false,\"delay\":300,\"invert\":false,\"interval\":300}",
+     *              "query":"SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.status = 1 AND (devices.status = 1)",
+     *              "builder":"{\"condition\":\"AND\",\"rules\":[{\"id\":\"devices.status\",\"field\":\"devices.status\",\"type\":\"integer\",\"input\":\"number\",\"operator\":\"equal\",\"value\":1},{\"condition\":\"OR\",\"rules\":[{\"id\":\"devices.status\",\"field\":\"devices.status\",\"type\":\"integer\",\"input\":\"number\",\"operator\":\"equal\",\"value\":1}]}]}",
+     *              "id":21
+     *          }
      *      }
      *
      * @apiErrorExample {json} Error-Response:
      *      HTTP/1.1 422 Unproccesssable Entity
      *      {
      *          "rule": [
-     *              "The rule field is required."
+     *              "The builder field is required."
      *          ],
      *          "name": [
      *              "The name field is required."
@@ -135,8 +153,14 @@ class RuleController extends ApiController
             'severity'  => [\Illuminate\Validation\Rule::in(['ok', 'critical', 'warning']), 'required'],
             'invert'    => 'ext_bool',
             'count'     => 'numeric',
-            'rule'      => 'required',
-            'devices'   => 'array'
+            'devices'   => 'array',
+            'builder.condition' => [\Illuminate\Validation\Rule::in(['OR', 'AND']), 'required'],
+            'builder.rules'     => 'required|array',
+            'builder.rules.*.input'     => [\Illuminate\Validation\Rule::in(["number","text","radio"])],
+            'builder.rules.*.type'      => [\Illuminate\Validation\Rule::in(["integer","string"])],
+            'builder.rules.*.operator'  => [\Illuminate\Validation\Rule::in(["equal","not_equal","between","not_between","is_null","is_not_null","less","less_or_equal","greater","greater_or_equal","regex","not_regex"])],
+            'builder.rules.*.condition' => [\Illuminate\Validation\Rule::in(['OR', 'AND'])],
+            'builder.rules.*.rules'     => 'array',
         ]);
 
         $extra = [
@@ -151,9 +175,10 @@ class RuleController extends ApiController
             'name'      => $request->name,
             'disabled'  => $request->get('disabled', false),
             'severity'  => $request->severity,
-            'rule'      => $request->rule,
+            'rule'      => '',
             'extra'     => json_encode($extra),
-            'query'     => '' // TODO: Actually generate query?
+            'query'     => QueryBuilderParser::fromJson($request->builder)->toSql(),
+            'builder'   => json_encode($request->builder)
         ]);
 
         if ($request->devices) {
@@ -163,6 +188,69 @@ class RuleController extends ApiController
         return $this->objectResponse($rule);
     }
 
+    /**
+     *
+     * @api {put} /rules/:id Update new Rule
+     * @apiName Update_rule
+     * @apiDescription `Advanced` This api endpoint can be very complex and in most cases for creating rules it'll be easier to use the UI
+     * but if you so dare the option is here. There is very limited validation on the builder field so good luck :).
+     * @apiGroup Rules
+     * @apiVersion  1.0.0
+     *
+     * @apiParam {Number} id The id of the rule to update
+     * @apiParam {String} [name] The name of the rule
+     * @apiParam {Object} [builder] The builder object
+     * @apiParam {String="AND","OR"} builder.condition
+     * @apiParam {Array} builder.rules Array of rule / rule group objects
+     * @apiParam {Object} [rule] This is the rule object that is inserted into the `builder rules` array
+     * @apiParam {String} [rule.id] The database key your rule relates to
+     * @apiParam {String} [rule.field] The database field your rule relates to
+     * @apiParam {String="integer","string"} [rule.type]
+     * @apiParam {String="number","text","radio"} [rule.input]
+     * @apiParam {String="equal","not_equal","between","not_between","is_null","is_not_null","less","less_or_equal","greater","greater_or_equal","regex","not_regex"} [rule.operator]
+     * @apiParam {String} [rule.value] The value to match the operator to the input
+     * @apiParam {Object} [group] This is the rule Group that is inserted into the `builder rules` array. It can have nested rule object / rule groups.
+     * @apiParam {String="AND","OR"} [group.condition] The database key your rule relates to
+     * @apiParam {Array} [group.rules] Array of rule / rule group objects
+     * @apiParam {String="ok","critical","warning"} severity How to display the alert, OK:`Green`, Warning:`Yellow`, Critical:`Red`
+     * @apiParam {Boolean} [mute=false] Show alert status but mute notifications
+     * @apiParam {Boolean} [disabled=false] Disable rule
+     * @apiParam {Boolean} [invert=false] Alert when this rule doesn't match
+     * @apiParam {Number} [count=-1] This is how many polling runs before an alert will trigger and the frequency.
+     * @apiParam {Array} [devices] An array of device ID's to map to this rule. If empty the rule will be global.
+     *
+     * @apiExample {curl} Example 1:
+     *  curl -X PUT -d '{"name": "Test Rule 1", "severity": "ok", "builder": {"condition": "AND", "rules": [{"id":"devices.status", "field":"devices.status", "type": "integer", "input": "number", "operator": "equal", "value": 1}]}}' http://example.org/api/v1/rules/1 -H 'Content-Type:application/json' -H 'Accept:application/json' -H "X-Auth-Token:YOUR_TOKEN_HERE"
+     *
+     * @apiExample {curl} Example 2:
+     *  curl -X PUT -d '{"name": "Test Rule 2", "severity": "ok", "builder": {"condition": "AND", "rules": [{"id":"devices.status", "field":"devices.status", "type": "integer", "input": "number", "operator": "equal", "value": 1}, {"condition": "OR", "rules": [{"id":"devices.status", "field":"devices.status", "type": "integer", "input": "number", "operator": "equal", "value": 1}, {"id":"devices.status", "field":"devices.status", "type": "integer", "input": "number", "operator": "equal", "value": 2}]}]}}' http://example.org/api/v1/rules/1 -H 'Content-Type:application/json' -H 'Accept:application/json' -H "X-Auth-Token:YOUR_TOKEN_HERE"
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *          "data": {
+     *              "name":"Test Rule 2",
+     *              "disabled":false,
+     *              "severity":"ok",
+     *              "rule":"",
+     *              "extra": "{\"count\":-1,\"mute\":false,\"delay\":300,\"invert\":false,\"interval\":300}",
+     *              "query":"SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.status = 1 AND (devices.status = 1)",
+     *              "builder":"{\"condition\":\"AND\",\"rules\":[{\"id\":\"devices.status\",\"field\":\"devices.status\",\"type\":\"integer\",\"input\":\"number\",\"operator\":\"equal\",\"value\":1},{\"condition\":\"OR\",\"rules\":[{\"id\":\"devices.status\",\"field\":\"devices.status\",\"type\":\"integer\",\"input\":\"number\",\"operator\":\"equal\",\"value\":1}]}]}",
+     *              "id":21
+     *          }
+     *      }
+     *
+     * @apiErrorExample {json} Error-Response:
+     *      HTTP/1.1 422 Unproccesssable Entity
+     *      {
+     *          "rule": [
+     *              "The builder field is required."
+     *          ],
+     *          "name": [
+     *              "The name field is required."
+     *          ]
+     *      }
+     */
     public function update(Request $request, Rule $rule)
     {
         $this->validate($request, [
@@ -172,8 +260,14 @@ class RuleController extends ApiController
             'severity'  => [\Illuminate\Validation\Rule::in(['ok', 'critical', 'warning']), 'required'],
             'invert'    => 'ext_bool',
             'count'     => 'numeric',
-            'rule'      => 'required',
-            'devices'   => 'array'
+            'devices'   => 'array',
+            'builder.condition' => [\Illuminate\Validation\Rule::in(['OR', 'AND'])],
+            'builder.rules'     => 'array',
+            'builder.rules.*.input'     => [\Illuminate\Validation\Rule::in(["number","text","radio"])],
+            'builder.rules.*.type'      => [\Illuminate\Validation\Rule::in(["integer","string"])],
+            'builder.rules.*.operator'  => [\Illuminate\Validation\Rule::in(["equal","not_equal","between","not_between","is_null","is_not_null","less","less_or_equal","greater","greater_or_equal","regex","not_regex"])],
+            'builder.rules.*.condition' => [\Illuminate\Validation\Rule::in(['OR', 'AND'])],
+            'builder.rules.*.rules'     => 'array',
         ]);
         
         $current = json_decode($rule->extra);
@@ -185,18 +279,20 @@ class RuleController extends ApiController
             'interval' => $request->get('interval', $current['interval'])
         ];
 
-        $rule = Rule::create([
-            'name'      => $request->get('name', $rule->name),
-            'disabled'  => $request->get('disabled', $rule->disabled),
-            'severity'  => $request->get('severity', $rule->severity),
-            'rule'      => $request->get('rule', $rule->rule),
-            'extra'     => json_encode($extra),
-            'query'     => '' // TODO: Actually generate query?
-        ]);
+        $rule->name = $request->get('name', $rule->name);
+        $rule->disabled = $request->get('disabled', $rule->disabled);
+        $rule->severity = $request->get('severity', $rule->severity);
+        $rule->extra = $extra;
+        if (isset($request->builder)) {
+            $rule->query = QueryBuilderParser::fromJson($request->builder)->toSql();
+            $rule->builder = json_encode($rule->builder);
+        }
 
-        if ($requst->devices) {
+        if ($request->devices) {
             $rule->devices()->sync($request->devices);
         }
+
+        $rule->save();
 
         return $this->objectResponse($rule);
     }

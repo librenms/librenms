@@ -164,7 +164,7 @@ class DeviceRoutingController extends ApiController
     /**
      * @api {get} /api/v1/devices/:id/routing/ipsec List active IPSec tunnels
      * @apiName Get_device_routing_ipsec
-     * @apiDescrption Please note, this will only show active VPN sessions not all configured.
+     * @apiDescription Please note, this will only show active VPN sessions not all configured.
      * @apiGroup Device Routing
      * @apiVersion  1.0.0
      *

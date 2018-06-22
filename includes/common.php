@@ -602,23 +602,6 @@ function is_valid_hostname($hostname)
     );
 }
 
-/*
- * convenience function - please use this instead of 'if ($debug) { echo ...; }'
- */
-function d_echo($text, $no_debug_text = null)
-{
-    global $debug, $php_debug;
-    if ($debug) {
-        if (isset($php_debug)) {
-            $php_debug[] = $text;
-        } else {
-            print_r($text);
-        }
-    } elseif ($no_debug_text) {
-        echo "$no_debug_text";
-    }
-} // d_echo
-
 /**
  * Output using console color if possible
  * https://github.com/pear/Console_Color2/blob/master/examples/documentation
@@ -1780,22 +1763,4 @@ function check_file_permissions($file, $mask)
 function array_by_column($array, $column)
 {
     return array_combine(array_column($array, $column), $array);
-}
-
-/**
- * Get all consecutive pairs of values in an array.
- * [1,2,3,4] -> [[1,2],[2,3],[3,4]]
- *
- * @param array $array
- * @return array
- */
-function array_pairs($array)
-{
-    $pairs = [];
-
-    for ($i = 1; $i < count($array); $i++) {
-        $pairs[] = [$array[$i -1], $array[$i]];
-    }
-
-    return $pairs;
 }

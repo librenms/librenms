@@ -111,15 +111,7 @@ Route::prefix('addresses')->group(function () {
     // Route::get('addresses/ipv6', 'AddressController@ipv6');
     // Route::get('networks', 'AddressController@networks');
     // Route::get('networks/{id}', 'AddressController@show');
-    Route::get('arp/{ip}', 'AddressController@arp');
-});
-
-Route::prefix('ip')->group(function () {
-    Route::get('addresses/ipv4', 'AddressController@ipv4');
-    Route::get('addresses/ipv6', 'AddressController@ipv6');
-    Route::get('networks', 'AddressController@networks');
-    Route::get('networks/{id}', 'AddressController@show');
-    Route::get('arp/{ip}', 'AddressController@arp');
+    // Route::get('arp/{ip}', 'AddressController@arp');
 });
 
 Route::prefix('routing')->group(function () {
