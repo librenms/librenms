@@ -2,7 +2,7 @@
 /**
  * cmts.inc.php
  *
- * LibreNMS snr discovery module for Cisco EPC
+ * LibreNMS snr discovery module for Arris CMTS
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,9 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Neil Lathwood
- * @author     Neil Lathwood <neil@lathwood.co.uk>
+ * @copyright  2018 TheGreatDoc
+ * @author     TheGreatDoc
+ * Based on Neil Lathwood Cisco EPC files
  */
 
 foreach ($pre_cache['cmts_docsIfSignalQualityTable'] as $index => $data) {
