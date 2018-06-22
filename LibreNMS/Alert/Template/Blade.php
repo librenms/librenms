@@ -37,9 +37,9 @@ class Blade extends Template
     public function getBody($data)
     {
         try {
-            return view(['template' => $this->getTemplate()->template], $data)->__toString();
+            return view(['template' => $this->getTemplate($data)->template], $data)->__toString();
         } catch (\Exception $e) {
-            return view(['template' => $this->getDefaultTemplate()], $data)->__toString();
+            return view(['template' => $this->getDefaultTemplate($data)], $data)->__toString();
         }
     }
 
@@ -53,9 +53,10 @@ class Blade extends Template
     public function getTitle($data)
     {
         try {
-            return view(['template' => $this->getTemplate()->title], $data)->__toString();
+            $title = view(['template' => $this->getTemplate($data)->title], $data)->__toString();
+            return !empty($title) ? $title : $data['title'];
         } catch (\Exception $e) {
-            return view(['template' => "Template " . $this->getTemplate()->name], $data)->__toString();
+            return $data['title'] ?: view(['template' => "Template " . $this->getTemplate($data)->name], $data)->__toString();
         }
     }
 

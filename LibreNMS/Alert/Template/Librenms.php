@@ -38,7 +38,7 @@ class Librenms extends Template
      */
     public function getBody($data)
     {
-        $tpl    = $this->getTemplate()->template;
+        $tpl    = $this->getTemplate($data)->template;
         $msg    = '$ret .= "'.str_replace(array('{else}', '{/if}', '{/foreach}'), array('"; } else { $ret .= "', '"; } $ret .= "', '"; } $ret .= "'), addslashes($tpl)).'";';
         $parsed = $msg;
         $s      = strlen($msg);
@@ -113,10 +113,10 @@ class Librenms extends Template
      */
     public function getTitle($data)
     {
-        if (strstr($this->getTemplate()->title, '%')) {
-            return RunJail('$ret = "'.populate(addslashes($this->getTemplate()->title)).'";', $data);
+        if (strstr($this->getTemplate($data)->title, '%')) {
+            return RunJail('$ret = "'.populate(addslashes($this->getTemplate($data)->title)).'";', $data);
         } else {
-            return $this->getTemplate()->title;
+            return $this->getTemplate($data)->title ?: $data['title'];
         }
     }
 
