@@ -22,7 +22,7 @@
  * @subpackage Alerts
  */
 
-use LibreNMS\Alert\Template\Template;
+use LibreNMS\Alert\Template;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Authentication\Auth;
 
@@ -799,8 +799,7 @@ function ExtTransports($obj)
 {
     global $config;
     $tmp = false;
-    $class = 'LibreNMS\\Alert\\Template\\' . ucfirst($obj['template']->type);
-    $type  = new $class;
+    $type  = new Template;
     // To keep scrutinizer from naging because it doesnt understand eval
     foreach ($config['alert']['transports'] as $transport => $opts) {
         if (is_array($opts)) {

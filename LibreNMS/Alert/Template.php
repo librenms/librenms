@@ -1,8 +1,8 @@
 <?php
 /**
- * Librenms.php
+ * Template.php
  *
- * Librenms Template class
+ * Base Template class
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,22 +23,90 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-namespace LibreNMS\Alert\Template;
+namespace LibreNMS\Alert;
 
 use App\Models\AlertTemplate;
 
-class Librenms extends Template
+class Template
 {
+    public $template;
+
     /**
      *
-     * Get the parsed body
+     * Get the template details
+     *
+     * @param null $obj
+     * @return mixed
+     */
+    public function getTemplate($obj = null)
+    {
+        if ($this->template) {
+            // Return the cached template information.
+            return $this->template;
+        }
+        $this->template = AlertTemplate::whereHas('map', function ($query) use ($obj) {
+            $query->where('alert_rule_id', '=', $obj['rule_id']);
+        })->first();
+        if (!$this->template) {
+            $this->template = AlertTemplate::where('name', '=', 'Default Alert Template')->first();
+        }
+        return $this->template;
+    }
+
+    public function getTitle($data)
+    {
+        $data['title'] = $this->bladeTitle($data);
+        return $this->legacyTitle($data);
+    }
+
+    public function getBody($data)
+    {
+        $data['template']->template = $this->bladeBody($data);
+        return $this->legacyBody($data);
+    }
+
+    /**
+     *
+     * Parse Blade body
+     *
+     * @param $data
+     * @return string
+     */
+    public function bladeBody($data)
+    {
+        try {
+            return view(['template' => $data['template']->template], $data)->__toString();
+        } catch (\Exception $e) {
+            return view(['template' => $this->getDefaultTemplate($data)], $data)->__toString();
+        }
+    }
+
+    /**
+     *
+     * Parse Blade title
+     *
+     * @param $data
+     * @return string
+     */
+    public function bladeTitle($data)
+    {
+        try {
+            return view(['template' => $data['title']], $data)->__toString();
+        } catch (\Exception $e) {
+            return $data['title'] ?: view(['template' => "Template " . $data['name']], $data)->__toString();
+        }
+    }
+
+    /**
+     *
+     * Parse legacy body
      *
      * @param $data
      * @return mixed|string
      */
-    public function getBody($data)
+    public function legacyBody($data)
     {
-        $tpl    = $this->getTemplate($data)->template;
+        $tpl    = $data['template']->template;
         $msg    = '$ret .= "'.str_replace(array('{else}', '{/if}', '{/foreach}'), array('"; } else { $ret .= "', '"; } $ret .= "', '"; } $ret .= "'), addslashes($tpl)).'";';
         $parsed = $msg;
         $s      = strlen($msg);
@@ -106,36 +174,38 @@ class Librenms extends Template
 
     /**
      *
-     * Get the parsed title
+     * Parse legacy title
      *
      * @param $data
      * @return mixed|string
      */
-    public function getTitle($data)
+    public function legacyTitle($data)
     {
-        if (strstr($this->getTemplate($data)->title, '%')) {
-            return RunJail('$ret = "'.populate(addslashes($this->getTemplate($data)->title)).'";', $data);
+        if (strstr($data['title'], '%')) {
+            return RunJail('$ret = "'.populate(addslashes($data['title'])).'";', $data);
         } else {
-            return $this->getTemplate($data)->title ?: $data['title'];
+            return $data['title'];
         }
     }
 
     /**
      *
-     * Get the default template for this parsing engine
+     * Get the default template
      *
      * @return string
      */
     public function getDefaultTemplate()
     {
-        return '%title' . PHP_EOL .
-            'Severity: %severity' . PHP_EOL .
-            '{if %state == 0}Time elapsed: %elapsed{/if}' . PHP_EOL .
-            'Timestamp: %timestamp' . PHP_EOL .
-            'Unique-ID: %uid' . PHP_EOL .
-            'Rule: {if %name}%name{else}%rule{/if}' . PHP_EOL .
-            '{if %faults}Faults:' . PHP_EOL .
-            '{foreach %faults}  #%key: %value.string{/foreach}{/if}' . PHP_EOL .
-            'Alert sent to: {foreach %contacts}%value <%key> {/foreach}';
+        return '{{ $title }}' . PHP_EOL .
+            'Severity: {{ $severity }}' . PHP_EOL .
+            '@if ($state == 0)Time elapsed: {{ $elapsed }} @endif ' . PHP_EOL .
+            'Timestamp: {{ $timestamp }}' . PHP_EOL .
+            'Unique-ID: {{ $uid }}' . PHP_EOL .
+            'Rule: @if ($name) {{ $name }} @else {{ $rule }} @endif ' . PHP_EOL .
+            '@if ($faults)Faults:' . PHP_EOL .
+            '@foreach ($faults as $key => $value)' . PHP_EOL .
+            '  #{{ $key }}: {{ $value[\'string\'] }} @endforeach' . PHP_EOL .
+            '@endif' . PHP_EOL .
+            'Alert sent to: @foreach ($contacts as $key => $value) {{ $value }} <{{ $key }}> @endforeach';
     }
 }
