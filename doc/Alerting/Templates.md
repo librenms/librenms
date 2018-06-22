@@ -29,6 +29,10 @@ Placeholders are special variables that if used within the template will be repl
 - Hostname of the Device: `$hostname`
 - sysName of the Device: `$sysName`
 - sysDescr of the Device: `$sysDescr`
+- sysContact of the Device: `$sysContact`
+- OS of the Device: `$os`
+- Type of Device: `$type`
+- IP of the Device: `$ip`
 - hardware of the Device: `$hardware`
 - Software version of the Device: `$version` 
 - location of the Device: `$location`

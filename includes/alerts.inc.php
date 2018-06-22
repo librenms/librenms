@@ -403,7 +403,7 @@ function DescribeAlert($alert)
 {
     $obj         = array();
     $i           = 0;
-    $device      = dbFetchRow('SELECT hostname, sysName, sysDescr, hardware, version, location, purpose, notes, uptime FROM devices WHERE device_id = ?', array($alert['device_id']));
+    $device      = dbFetchRow('SELECT hostname, sysName, sysDescr, sysContact, os, type, ip, hardware, version, location, purpose, notes, uptime FROM devices WHERE device_id = ?', array($alert['device_id']));
     $attribs     = get_dev_attribs($alert['device_id']);
     if (can_ping_device($attribs)) {
         $ping_stats = dbFetchRow('SELECT `timestamp`, `loss`, `min`, `max`, `avg` FROM `device_perf` WHERE `device_id` = ? ORDER BY `timestamp` LIMIT 1', [$alert['device_id']]);
@@ -412,6 +412,10 @@ function DescribeAlert($alert)
     $obj['hostname']     = $device['hostname'];
     $obj['sysName']      = $device['sysName'];
     $obj['sysDescr']     = $device['sysDescr'];
+    $obj['sysContact']   = $device['sysContact'];
+    $obj['os']           = $device['os'];
+    $obj['type']         = $device['type'];
+    $obj['ip']           = inet6_ntop($device['ip']);
     $obj['hardware']     = $device['hardware'];
     $obj['version']      = $device['version'];
     $obj['location']     = $device['location'];
