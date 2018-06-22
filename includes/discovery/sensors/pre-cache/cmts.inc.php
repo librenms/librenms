@@ -32,4 +32,3 @@ $pre_cache['cmts_ifAlias'] = snmpwalk_cache_oid($device, 'ifAlias', array(), 'DO
 
 echo 'docsIfSignalQualityTable ';
 $pre_cache['cmts_docsIfSignalQualityTable'] = snmpwalk_cache_oid($device, 'docsIfSignalQualityTable', array(), 'DOCS-IF-MIB');
-
