@@ -75,13 +75,6 @@ $placeholders = [
                             <label for="title_rec">Recovery title: </label>
                             <input type="text" class="form-control input-sm" id="title_rec" name="title_rec" placeholder="Recovery Title">
                         </div>
-                        <div class="form-group">
-                            <label for="template_type">Template type:</label>
-                            <select size="1" name="template_type" id="template_type" class="form-control">
-                                <option value="blade">Blade</option>
-                                <option value="librenms">LibreNMS (deprecated)</option>
-                            </select>
-                        </div>
                         <button type="button" class="btn btn-primary btn-sm" name="create-template" id="create-template">Create template</button>
                     </div>
                 </div>
@@ -112,7 +105,6 @@ $('#alert-template').on('show.bs.modal', function (event) {
                 $('#name').val(output['name']);
                 $('#title').val(output['title']);
                 $('#title_rec').val(output['title_rec']);
-                $('#template_type').val(output['type']);
                 if (output['type'] == 'librenms') {
                     toastr.info('The old template syntax is no longer supported. Please see https://docs.librenms.org/Alerting/Old-Templates/');
                 }
@@ -127,7 +119,6 @@ $('#alert-template').on('hide.bs.modal', function(event) {
     $('#line').val('');
     $('#value').val('');
     $('#name').val('');
-    $('#template_type').val('');
     $('#create-template').text('Create template');
     $('#default-template').val('0');
     $('#reset-default').remove();
@@ -142,16 +133,15 @@ $('#create-template').click('', function(e) {
     var name = $("#name").val();
     var title = $("#title").val();
     var title_rec = $("#title_rec").val();
-    var template_type = $("#template_type").val();
-    alertTemplateAjaxOps(template, name, template_id, title, title_rec, template_type);
+    alertTemplateAjaxOps(template, name, template_id, title, title_rec);
 });
 
-function alertTemplateAjaxOps(template, name, template_id, title, title_rec, template_type)
+function alertTemplateAjaxOps(template, name, template_id, title, title_rec)
 {
     $.ajax({
         type: "POST",
         url: "ajax_form.php",
-        data: { type: "alert-templates", template: template, name: name, template_id: template_id, title: title, title_rec: title_rec, template_type: template_type},
+        data: { type: "alert-templates", template: template, name: name, template_id: template_id, title: title, title_rec: title_rec},
         dataType: "json",
         success: function(output){
             if(output.status == 'ok') {

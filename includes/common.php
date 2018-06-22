@@ -1029,7 +1029,7 @@ function object_is_cached($section, $obj)
 function can_ping_device($attribs)
 {
     global $config;
-    if ($config['icmp_check'] === true && $attribs['override_icmp_disable'] != "true") {
+    if ($config['icmp_check'] === true && (isset($attribs['override_icmp_disable']) && $attribs['override_icmp_disable'] != "true")) {
         return true;
     } else {
         return false;
@@ -1561,7 +1561,7 @@ function load_os(&$device)
     }
 
     // Set type to a predefined type for the OS if it's not already set
-    if ($device['attribs']['override_device_type'] != 1 && $config['os'][$device['os']]['type'] != $device['type']) {
+    if ((isset($device['attribs']['override_device_type']) && $device['attribs']['override_device_type'] != 1) && $config['os'][$device['os']]['type'] != $device['type']) {
         log_event('Device type changed ' . $device['type'] . ' => ' . $config['os'][$device['os']]['type'], $device, 'system', 3);
         $device['type'] = $config['os'][$device['os']]['type'];
         dbUpdate(array('type' => $device['type']), 'devices', 'device_id=?', array($device['device_id']));

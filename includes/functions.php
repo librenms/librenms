@@ -901,7 +901,7 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         'datetime' => array("NOW()"),
         'severity' => $severity,
         'message' => $text,
-        'username'  => Auth::user()->username ?: '',
+        'username'  => isset(Auth::user()->username) ? Auth::user()->username : '',
      );
 
     dbInsert($insert, 'eventlog');

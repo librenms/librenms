@@ -448,6 +448,7 @@ function DescribeAlert($alert)
         foreach ($extra['rule'] as $incident) {
             $i++;
             $obj['faults'][$i] = $incident;
+            $obj['faults'][$i]['string'] = null;
             foreach ($incident as $k => $v) {
                 if (!empty($v) && $k != 'device_id' && (stristr($k, 'id') || stristr($k, 'desc') || stristr($k, 'msg')) && substr_count($k, '_') <= 1) {
                     $obj['faults'][$i]['string'] .= $k.' = '.$v.'; ';
@@ -826,8 +827,8 @@ function ExtTransports($obj)
                 echo "ERROR: $tmp\r\n";
                 log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $tmp, $obj['device_id'], 'error', 5);
             }
+            echo '; ';
         }
-        echo '; ';
     }
 }//end ExtTransports()
 
