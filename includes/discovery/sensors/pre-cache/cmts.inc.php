@@ -2,7 +2,7 @@
 /**
  * cmts.inc.php
  *
- * LibreNMS os sensor pre-cache module for Cisco EPC
+ * LibreNMS os sensor pre-cache module for Arris CMTS
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
  * @link       http://librenms.org
  * @copyright  2018 TheGreatDoc
  * @author     TheGreatDoc
+ * Based on Neil Lathwood Cisco EPC files
  */
 
 echo 'ifName ';
