@@ -26,6 +26,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use LibreNMS\Alerting\QueryBuilderParser;
 
 /**
  * App\Models\Alerting\Rule
@@ -87,6 +88,13 @@ class Rule extends Model
     {
         $this->attributes['disabled'] = (bool)$value;
     }
+
+
+    public function setQueryAttribute($value)
+    {
+        $this->attributes['query'] = QueryBuilderParser::fromJson($value)->toSql();
+    }
+
     // ---- Define Relationships ----
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany

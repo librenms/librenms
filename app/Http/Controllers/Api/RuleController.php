@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Models\Rule;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\ApiController;
-use LibreNMS\Alerting\QueryBuilderParser;
 
 class RuleController extends ApiController
 {
@@ -177,7 +176,7 @@ class RuleController extends ApiController
             'severity'  => $request->severity,
             'rule'      => '',
             'extra'     => json_encode($extra),
-            'query'     => QueryBuilderParser::fromJson($request->builder)->toSql(),
+            'query'     => $request->builder,
             'builder'   => json_encode($request->builder)
         ]);
 
@@ -254,7 +253,7 @@ class RuleController extends ApiController
     public function update(Request $request, Rule $rule)
     {
         $this->validate($request, [
-            'name'  =>  "required|unique:alert_rules,name,except,$rule->id",
+            'name'  =>  "required|unique:alert_rules,name,except,{$rule->id}",
             'mute'  =>  'ext_bool',
             'disabled'  => 'ext_bool',
             'severity'  => [\Illuminate\Validation\Rule::in(['ok', 'critical', 'warning']), 'required'],
@@ -284,7 +283,7 @@ class RuleController extends ApiController
         $rule->severity = $request->get('severity', $rule->severity);
         $rule->extra = $extra;
         if (isset($request->builder)) {
-            $rule->query = QueryBuilderParser::fromJson($request->builder)->toSql();
+            $rule->query = $request->builder;
             $rule->builder = json_encode($rule->builder);
         }
 

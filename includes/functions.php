@@ -1511,34 +1511,6 @@ function snmpTransportToAddressFamily($transport)
     }
 }
 
-/**
- * Checks if the $hostname provided exists in the DB already
- *
- * @param string $hostname The hostname to check for
- * @param string $sysName The sysName to check
- * @return bool true if hostname already exists
- *              false if hostname doesn't exist
- */
-function host_exists($hostname, $sysName = null)
-{
-    global $config;
-
-    $query = "SELECT COUNT(*) FROM `devices` WHERE `hostname`=?";
-    $params = array($hostname);
-
-    if (!empty($sysName) && !$config['allow_duplicate_sysName']) {
-        $query .= " OR `sysName`=?";
-        $params[] = $sysName;
-
-        if (!empty($config['mydomain'])) {
-            $full_sysname = rtrim($sysName, '.') . '.' . $config['mydomain'];
-            $query .= " OR `sysName`=?";
-            $params[] = $full_sysname;
-        }
-    }
-    return dbFetchCell($query, $params) > 0;
-}
-
 function oxidized_reload_nodes()
 {
 
