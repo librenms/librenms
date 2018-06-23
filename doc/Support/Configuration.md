@@ -284,6 +284,10 @@ Enable or disable the sysDescr output for a device.
 $config['force_ip_to_sysname'] = false;
 ```
 When using IP addresses as a hostname you can instead represent the devices on the WebUI by its SNMP sysName resulting in an easier to read overview of your network. This would apply on networks where you don't have DNS records for most of your devices.
+```php
+$config['force_hostname_to_sysname'] = false;
+```
+When using a dynamic DNS hostname or one that does not resolve, this option would allow you to make use of the SNMP sysName instead as the preferred reference to the device.
 
 ```php
 $config['device_traffic_iftype'][] = '/loopback/';
