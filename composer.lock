@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cbaf71886db021d5c8e7e2a04c06361a",
+    "content-hash": "cbdd0365bdec0d51c0f0af28520197b2",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
-            "version": "3.6.19",
+            "version": "3.6.20",
             "source": {
                 "type": "git",
                 "url": "https://github.com/HuasoFoundries/jpgraph.git",
-                "reference": "c9f800a00850706f3fc4b26b6055b55952eb79bc"
+                "reference": "10a818bc8c1b40deb0063f0f3c3e67c23e3030b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/HuasoFoundries/jpgraph/zipball/c9f800a00850706f3fc4b26b6055b55952eb79bc",
-                "reference": "c9f800a00850706f3fc4b26b6055b55952eb79bc",
+                "url": "https://api.github.com/repos/HuasoFoundries/jpgraph/zipball/10a818bc8c1b40deb0063f0f3c3e67c23e3030b7",
+                "reference": "10a818bc8c1b40deb0063f0f3c3e67c23e3030b7",
                 "shasum": ""
             },
             "require": {
@@ -59,7 +59,7 @@
                 "jpgraph",
                 "pie"
             ],
-            "time": "2018-05-18T17:10:05+00:00"
+            "time": "2018-06-13T13:59:24+00:00"
         },
         {
             "name": "dapphp/radius",
@@ -599,6 +599,57 @@
                 "url"
             ],
             "time": "2017-03-20T17:10:46+00:00"
+        },
+        {
+            "name": "hirak/prestissimo",
+            "version": "0.3.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hirak/prestissimo.git",
+                "reference": "45fcc8a65fb06b29cc5cdd1b0bae7a690aa09496"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hirak/prestissimo/zipball/45fcc8a65fb06b29cc5cdd1b0bae7a690aa09496",
+                "reference": "45fcc8a65fb06b29cc5cdd1b0bae7a690aa09496",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.0.0",
+                "ext-curl": "*",
+                "php": "^5.3.2 || ^7.0"
+            },
+            "require-dev": {
+                "composer/composer": "1.0.0",
+                "phpunit/phpunit": "^4.8",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Hirak\\Prestissimo\\Plugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Hirak\\Prestissimo\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Hiraku NAKANO",
+                    "email": "hiraku@tojiru.net"
+                }
+            ],
+            "description": "composer parallel install plugin",
+            "keywords": [
+                "install",
+                "parallel",
+                "speedup"
+            ],
+            "time": "2017-05-27T04:45:45+00:00"
         },
         {
             "name": "influxdb/influxdb-php",
@@ -1197,17 +1248,62 @@
             "time": "2017-01-23T04:29:33+00:00"
         },
         {
-            "name": "nesbot/carbon",
-            "version": "1.29.2",
+            "name": "myclabs/deep-copy",
+            "version": "1.7.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "ed6aa898982f441ccc9b2acdec51490f2bc5d337"
+                "url": "https://github.com/myclabs/DeepCopy.git",
+                "reference": "3b8a3a99ba1f6a3952ac2747d989303cbd6b7a3e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/ed6aa898982f441ccc9b2acdec51490f2bc5d337",
-                "reference": "ed6aa898982f441ccc9b2acdec51490f2bc5d337",
+                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/3b8a3a99ba1f6a3952ac2747d989303cbd6b7a3e",
+                "reference": "3b8a3a99ba1f6a3952ac2747d989303cbd6b7a3e",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.6 || ^7.0"
+            },
+            "require-dev": {
+                "doctrine/collections": "^1.0",
+                "doctrine/common": "^2.6",
+                "phpunit/phpunit": "^4.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "DeepCopy\\": "src/DeepCopy/"
+                },
+                "files": [
+                    "src/DeepCopy/deep_copy.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Create deep copies (clones) of your objects",
+            "keywords": [
+                "clone",
+                "copy",
+                "duplicate",
+                "object",
+                "object graph"
+            ],
+            "time": "2017-10-19T19:58:43+00:00"
+        },
+        {
+            "name": "nesbot/carbon",
+            "version": "1.30.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/briannesbitt/Carbon.git",
+                "reference": "863a1a651ea324e1838da3a52753a4239b9d4bea"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/863a1a651ea324e1838da3a52753a4239b9d4bea",
+                "reference": "863a1a651ea324e1838da3a52753a4239b9d4bea",
                 "shasum": ""
             },
             "require": {
@@ -1242,7 +1338,7 @@
                 "datetime",
                 "time"
             ],
-            "time": "2018-05-29T15:23:46+00:00"
+            "time": "2018-06-15T11:52:26+00:00"
         },
         {
             "name": "nikic/php-parser",
@@ -1400,16 +1496,16 @@
         },
         {
             "name": "paragonie/random_compat",
-            "version": "v2.0.14",
+            "version": "v2.0.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/random_compat.git",
-                "reference": "f6ce7dd93628088e1017fb5dd73b0b9fec7df9e5"
+                "reference": "10bcb46e8f3d365170f6de9d05245aa066b81f09"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/f6ce7dd93628088e1017fb5dd73b0b9fec7df9e5",
-                "reference": "f6ce7dd93628088e1017fb5dd73b0b9fec7df9e5",
+                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/10bcb46e8f3d365170f6de9d05245aa066b81f09",
+                "reference": "10bcb46e8f3d365170f6de9d05245aa066b81f09",
                 "shasum": ""
             },
             "require": {
@@ -1445,7 +1541,7 @@
                 "pseudorandom",
                 "random"
             ],
-            "time": "2018-06-06T17:40:22+00:00"
+            "time": "2018-06-08T15:26:40+00:00"
         },
         {
             "name": "pear/console_color2",
@@ -1553,44 +1649,74 @@
         },
         {
             "name": "php-amqplib/php-amqplib",
-            "version": "v2.0.2",
+            "version": "v2.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-amqplib/php-amqplib.git",
-                "reference": "682e3365f51c455f7a0bd32173d79922416fe9f0"
+                "reference": "dfd3694a86f1a7394d3693485259d4074a6ec79b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-amqplib/php-amqplib/zipball/682e3365f51c455f7a0bd32173d79922416fe9f0",
-                "reference": "682e3365f51c455f7a0bd32173d79922416fe9f0",
+                "url": "https://api.github.com/repos/php-amqplib/php-amqplib/zipball/dfd3694a86f1a7394d3693485259d4074a6ec79b",
+                "reference": "dfd3694a86f1a7394d3693485259d4074a6ec79b",
                 "shasum": ""
             },
             "require": {
+                "ext-bcmath": "*",
+                "ext-mbstring": "*",
                 "php": ">=5.3.0"
             },
+            "replace": {
+                "videlalvaro/php-amqplib": "self.version"
+            },
+            "require-dev": {
+                "phpdocumentor/phpdocumentor": "^2.9",
+                "phpunit/phpunit": "^4.8",
+                "scrutinizer/ocular": "^1.1",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "suggest": {
+                "ext-sockets": "Use AMQPSocketConnection"
+            },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.7-dev"
+                }
+            },
             "autoload": {
-                "psr-0": {
-                    "PhpAmqpLib": ""
+                "psr-4": {
+                    "PhpAmqpLib\\": "PhpAmqpLib/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "LGPL-2.1"
+                "LGPL-2.1-or-later"
             ],
             "authors": [
                 {
-                    "name": "Alvaro Videla"
+                    "name": "Alvaro Videla",
+                    "role": "Original Maintainer"
+                },
+                {
+                    "name": "John Kelly",
+                    "email": "johnmkelly86@gmail.com",
+                    "role": "Maintainer"
+                },
+                {
+                    "name": "Raúl Araya",
+                    "email": "nubeiro@gmail.com",
+                    "role": "Maintainer"
                 }
             ],
-            "description": "This library is a pure PHP implementation of the AMQP protocol. It's been tested against RabbitMQ.",
-            "homepage": "https://github.com/videlalvaro/php-amqplib/",
+            "description": "Formerly videlalvaro/php-amqplib.  This library is a pure PHP implementation of the AMQP protocol. It's been tested against RabbitMQ.",
+            "homepage": "https://github.com/php-amqplib/php-amqplib/",
             "keywords": [
                 "message",
                 "queue",
                 "rabbitmq"
             ],
-            "time": "2013-02-13T19:43:51+00:00"
+            "time": "2018-02-11T19:28:00+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -1963,16 +2089,16 @@
         },
         {
             "name": "psy/psysh",
-            "version": "v0.9.5",
+            "version": "v0.9.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bobthecow/psysh.git",
-                "reference": "0951e91ac04ca28cf317f3997a0adfc319e80106"
+                "reference": "4a2ce86f199d51b6e2524214dc06835e872f4fce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bobthecow/psysh/zipball/0951e91ac04ca28cf317f3997a0adfc319e80106",
-                "reference": "0951e91ac04ca28cf317f3997a0adfc319e80106",
+                "url": "https://api.github.com/repos/bobthecow/psysh/zipball/4a2ce86f199d51b6e2524214dc06835e872f4fce",
+                "reference": "4a2ce86f199d51b6e2524214dc06835e872f4fce",
                 "shasum": ""
             },
             "require": {
@@ -2031,7 +2157,7 @@
                 "interactive",
                 "shell"
             ],
-            "time": "2018-06-02T16:39:22+00:00"
+            "time": "2018-06-10T17:57:20+00:00"
         },
         {
             "name": "ramsey/uuid",
@@ -3882,51 +4008,6 @@
                 "debugbar"
             ],
             "time": "2017-01-05T08:46:19+00:00"
-        },
-        {
-            "name": "myclabs/deep-copy",
-            "version": "1.7.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/myclabs/DeepCopy.git",
-                "reference": "3b8a3a99ba1f6a3952ac2747d989303cbd6b7a3e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/3b8a3a99ba1f6a3952ac2747d989303cbd6b7a3e",
-                "reference": "3b8a3a99ba1f6a3952ac2747d989303cbd6b7a3e",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.6 || ^7.0"
-            },
-            "require-dev": {
-                "doctrine/collections": "^1.0",
-                "doctrine/common": "^2.6",
-                "phpunit/phpunit": "^4.1"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "DeepCopy\\": "src/DeepCopy/"
-                },
-                "files": [
-                    "src/DeepCopy/deep_copy.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Create deep copies (clones) of your objects",
-            "keywords": [
-                "clone",
-                "copy",
-                "duplicate",
-                "object",
-                "object graph"
-            ],
-            "time": "2017-10-19T19:58:43+00:00"
         },
         {
             "name": "phpspec/prophecy",
