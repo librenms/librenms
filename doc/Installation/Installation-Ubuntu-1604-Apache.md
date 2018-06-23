@@ -142,6 +142,10 @@ If you ever have issues with your install, run validate.php as root in the libre
 
 There are various options for getting help listed on the LibreNMS web site: https://www.librenms.org/#support
 
+### Choosing how your install will update.
+
+- [Updates](http://docs.librenms.org/#General/Updating/)
+
 ### What next?
 
 Now that you've installed LibreNMS, we'd suggest that you have a read of a few other docs to get you going:
