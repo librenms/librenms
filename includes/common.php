@@ -1203,6 +1203,11 @@ function format_hostname($device, $hostname = '')
             $hostname = $device['sysName'];
         }
     }
+    if ($config['force_hostname_to_sysname'] === true && !empty($device['sysName'])) {
+        if (filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == false && filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == false) {
+            $hostname = $device['sysName'];
+        }
+    }
     return $hostname;
 }//end format_hostname
 
