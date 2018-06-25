@@ -83,6 +83,7 @@ if (count($rows) !== 0) {
         <table class="table table-striped table-bordered table-condensed">
             <tr>
                 <th>Name</th>
+                <th>Node ID</th>
                 <th>Version</th>
                 <th>Groups Served</th>
                 <th>Last Checkin</th>
@@ -134,6 +135,7 @@ if (count($rows) !== 0) {
                 // On the first iteration, print some rowspanned columns
                 echo '
                 <td rowspan="'.$stat_count.'">'.$poller['poller_name'].'</td>
+                <td rowspan="'.$stat_count.'"' . (empty($poller['node_id']) ? ' class="danger"' : '') . '>'.$poller['node_id'].'</td>
                 <td rowspan="'.$stat_count.'">'.$poller['poller_version'].'</td>
                 <td rowspan="'.$stat_count.'">'.$poller['poller_groups'].'</td>
                 <td rowspan="'.$stat_count.'">'.$poller['last_report'].'</td>
