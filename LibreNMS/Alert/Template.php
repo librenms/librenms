@@ -26,6 +26,7 @@
 namespace LibreNMS\Alert;
 
 use App\Models\AlertTemplate;
+use LibreNMS\Alert\AlertData;
 
 class Template
 {
@@ -74,10 +75,11 @@ class Template
      */
     public function bladeBody($data)
     {
+        $alert['alert'] = new AlertData($data['alert']);
         try {
-            return view(['template' => $data['template']->template], $data)->__toString();
+            return view(['template' => $data['template']->template], $alert)->__toString();
         } catch (\Exception $e) {
-            return view(['template' => $this->getDefaultTemplate($data)], $data)->__toString();
+            return view(['template' => $this->getDefaultTemplate($data)], $alert)->__toString();
         }
     }
 
@@ -90,10 +92,11 @@ class Template
      */
     public function bladeTitle($data)
     {
+        $alert['alert'] = new AlertData($data['alert']);
         try {
-            return view(['template' => $data['title']], $data)->__toString();
+            return view(['template' => $data['title']], $alert)->__toString();
         } catch (\Exception $e) {
-            return $data['title'] ?: view(['template' => "Template " . $data['name']], $data)->__toString();
+            return $data['title'] ?: view(['template' => "Template " . $data['name']], $alert)->__toString();
         }
     }
 

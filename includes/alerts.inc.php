@@ -813,6 +813,7 @@ function ExtTransports($obj)
         $class  = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport);
         if (($opts === true || !empty($opts)) && $opts != false && class_exists($class)) {
             $obj['transport'] = $transport;
+            $obj['alert']     = collect($obj);
             $obj['title']     = $type->getTitle($obj);
             $obj['msg']       = $type->getBody($obj);
             echo $transport.' => ';
