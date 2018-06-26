@@ -49,15 +49,13 @@ class Pushover implements Transport
             $data['user']  = $api['userkey'];
             switch ($obj['severity']) {
                 case "critical":
-                    $severity         = "Critical";
                     $data['priority'] = 1;
                     if (!empty($api['sound_critical'])) {
                         $data['sound'] = $api['sound_critical'];
                     }
                     break;
                 case "warning":
-                    $severity         = "Warning";
-                    $data['priority'] = 0;
+                    $data['priority'] = 1;
                     if (!empty($api['sound_warning'])) {
                         $data['sound'] = $api['sound_warning'];
                     }
@@ -65,19 +63,13 @@ class Pushover implements Transport
             }
             switch ($obj['state']) {
                 case 0:
-                    $title_text = "OK";
+                    $data['priority'] = 0;
                     if (!empty($api['sound_ok'])) {
                         $data['sound'] = $api['sound_ok'];
                     }
                     break;
-                case 1:
-                    $title_text = $severity;
-                    break;
-                case 2:
-                    $title_text = "Acknowledged";
-                    break;
             }
-            $data['title'] = $title_text . " - " . $obj['hostname'] . " - " . $obj['name'];
+            $data['title']   = $obj['title'];
             $data['message'] = $obj['msg'];
             $curl            = curl_init();
             set_curl_proxy($curl);
