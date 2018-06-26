@@ -19,7 +19,7 @@ modules:
                     snmp_flags: '-OQUs'
                     index: 'cpqHeTemperatureCelsius.{{ $index }}'
                     descr: cpqHeTemperatureLocale
-                    high_limit: cpqHeTemperatureThreshold
+                    high_limit: '90' #cpqHeTemperatureThreshold
                 -
                     oid: cpqDaPhyDrvTable
                     value: cpqDaPhyDrvCurrentTemperature

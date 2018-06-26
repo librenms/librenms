@@ -222,13 +222,13 @@ foreach (get_port_assoc_modes() as $mode) {
           <div class="form-group">
             <label for="authname" class="col-sm-3 control-label">Auth User Name</label>
             <div class="col-sm-9">
-              <input type="text" name="authname" id="authname" class="form-control input-sm">
+              <input type="text" name="authname" id="authname" class="form-control input-sm" autocomplete="off">
             </div>
           </div>
           <div class="form-group">
             <label for="authpass" class="col-sm-3 control-label">Auth Password</label>
             <div class="col-sm-9">
-              <input type="text" name="authpass" id="authpass" placeholder="AuthPass" class="form-control input-sm">
+              <input type="text" name="authpass" id="authpass" placeholder="AuthPass" class="form-control input-sm" autocomplete="off">
             </div>
           </div>
           <div class="form-group">
@@ -243,7 +243,7 @@ foreach (get_port_assoc_modes() as $mode) {
           <div class="form-group">
             <label for="cryptopass" class="col-sm-3 control-label">Crypto Password</label>
             <div class="col-sm-9">
-              <input type="text" name="cryptopass" id="cryptopass" placeholder="Crypto Password" class="form-control input-sm">
+              <input type="text" name="cryptopass" id="cryptopass" placeholder="Crypto Password" class="form-control input-sm" autocomplete="off">
             </div>
           </div>
           <div class="form-group">
