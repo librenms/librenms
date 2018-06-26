@@ -107,7 +107,6 @@ alert_templates:
     - { Field: template, Type: longtext, 'Null': false, Extra: '' }
     - { Field: title, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: title_rec, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: type, Type: varchar(16), 'Null': false, Extra: '', Default: blade }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 alert_template_map:
