@@ -90,6 +90,15 @@ class Poller extends BaseValidation
                     $validator->fail("The poller ($poller) has not completed within the last 5 minutes, check the cron job.");
                 }
             }
+        } elseif (dbFetchCell('SELECT COUNT(*) FROM `poller_cluster`')) {
+            $sql = "SELECT `node_id` FROM `poller_cluster` WHERE `last_report` <= DATE_ADD(NOW(), INTERVAL - 5 MINUTE)";
+
+            $pollers = dbFetchColumn($sql);
+            if (count($pollers) > 0) {
+                foreach ($pollers as $poller) {
+                    $validator->fail("The poller cluster member ($poller) has not checked in within the last 5 minutes, check that it is running and healthy.");
+                }
+            }
         } else {
             $validator->fail('The poller has never run or you are not using poller-wrapper.py, check the cron job.');
         }
