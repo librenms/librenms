@@ -815,6 +815,7 @@ function ExtTransports($obj)
             $obj['transport'] = $transport;
             $obj['alert']     = collect($obj);
             $obj['title']     = $type->getTitle($obj);
+            $obj['alert']['title'] = $obj['title'];
             $obj['msg']       = $type->getBody($obj);
             echo $transport.' => ';
             $instance = new $class;

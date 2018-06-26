@@ -32,7 +32,7 @@ if ($vars['tool'] === 'convert' || $vars['old']) {
                     ],
                     [
                         '@php echo \1; @endphp ',
-                        '$value[\'string\']',
+                        '$value[\'\2\']',
                     ],
                     $line
                 );
@@ -73,16 +73,27 @@ function convert_template($old)
         '/%([\w\d]+)/',// Replaces %anything
     ];
     $replace = [
-        '@if ($\1) ',
+        '@if ($alert->\1) ',
         ' @else ',
         ' @endif',
-        '@foreach ($faults as $key => $value)',
-        '@foreach ($contacts as $key => $value)',
+        '@foreach ($alert->faults as $key => $value)',
+        '@foreach ($alert->contacts as $key => $value)',
         '@endforeach ',
         '@php echo \1; @endphp ',
         '$value[\'string\']',
         '{{ $\1[\'\2\'] }}',
-        '{{ $\1 }}',
+        '{{ $alert->\1 }}',
+    ];
+    $old = preg_replace($find, $replace, $old);
+
+    // Revert some over-zealous changes:
+    $find = [
+        '/\$alert->key/',
+        '/\$alert->value/',
+    ];
+    $replace = [
+        '$key',
+        '$value',
     ];
     return preg_replace($find, $replace, $old);
 }
