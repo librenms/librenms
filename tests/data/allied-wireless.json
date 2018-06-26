@@ -1890,7 +1890,7 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
-                    "ifInUcastPkts": "9223372036854775807",
+                    "ifInUcastPkts": "12456",
                     "ifInUcastPkts_prev": "0",
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
