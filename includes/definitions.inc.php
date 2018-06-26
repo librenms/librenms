@@ -260,7 +260,24 @@ $config['graph_types']['device']['pf_inserts']['descr']             = 'Inserts';
 $config['graph_types']['device']['pf_removals']['section']           = 'firewall';
 $config['graph_types']['device']['pf_removals']['order']             = '4';
 $config['graph_types']['device']['pf_removals']['descr']             = 'Removals';
-
+$config['graph_types']['device']['pf_matches']['section']            = 'firewall';
+$config['graph_types']['device']['pf_matches']['order']              = '5';
+$config['graph_types']['device']['pf_matches']['descr']              = 'Matches';
+$config['graph_types']['device']['pf_badoffset']['section']          = 'firewall';
+$config['graph_types']['device']['pf_badoffset']['order']            = '6';
+$config['graph_types']['device']['pf_badoffset']['descr']            = 'BadOffset';
+$config['graph_types']['device']['pf_fragmented']['section']         = 'firewall';
+$config['graph_types']['device']['pf_fragmented']['order']           = '7';
+$config['graph_types']['device']['pf_fragmented']['descr']           = 'Fragmented';
+$config['graph_types']['device']['pf_short']['section']              = 'firewall';
+$config['graph_types']['device']['pf_short']['order']                = '8';
+$config['graph_types']['device']['pf_short']['descr']                = 'Short';
+$config['graph_types']['device']['pf_normalized']['section']         = 'firewall';
+$config['graph_types']['device']['pf_normalized']['order']           = '9';
+$config['graph_types']['device']['pf_normalized']['descr']           = 'Normalized';
+$config['graph_types']['device']['pf_memdropped']['section']         = 'firewall';
+$config['graph_types']['device']['pf_memdropped']['order']           = '10';
+$config['graph_types']['device']['pf_memdropped']['descr']           = 'MemDropped';
 
 
 
