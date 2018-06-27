@@ -305,7 +305,7 @@ if ($options['f'] === 'recalculate_device_dependencies') {
         \LibreNMS\DB\Eloquent::boot();
 
         // update all root nodes and recurse, chunk so we don't blow up
-        \App\Models\Device::doesntHave('parents')->chunk(100, function($devices) {
+        \App\Models\Device::doesntHave('parents')->chunk(100, function ($devices) {
             // anonymous recursive function
             $recurse = function ($dev) use (&$recurse) {
                 $dev->updateMaxDepth();
