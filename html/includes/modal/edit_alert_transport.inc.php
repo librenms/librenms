@@ -41,6 +41,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                 <select name='transport-choice' id='transport-choice' class='form-control'>
                                     <option value="mail-form" selected>Mail</option>
                                     <option value="ciscospark-form">Cisco Spark</option>
+                                    <option value="api-form">API</option>
                                     <!--Insert more transport type options here has support is added. Value should be: [transport_name]-form -->
                                 </select>
                             </div>
@@ -53,10 +54,21 @@ if (Auth::user()->hasGlobalAdmin()) {
                         </div>
                     </form>
 <?php
-$transports = Config::get('alert.transports');
+
+// Fetch list of transport classes
+$transport_dir = Config::get('install_dir').'/LibreNMS/Alert/Transport';
+$transports = [];
+foreach (scandir($transport_dir) as $file) {
+    $file = strstr($file, '.', true);
+    if (empty($file)) {
+        continue;
+    }
+    $transports[] = $file;
+}
+
 // Dynamically create transport forms
-foreach (array_keys($transports) as $transport) {
-    $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($transport);
+foreach ($transports as $transport) {
+    $class = 'LibreNMS\\Alert\\Transport\\'.$transport;
     
     if (!method_exists($class, 'configTemplate')) {
         // Skip to next transport since support has not been added
