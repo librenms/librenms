@@ -80,7 +80,7 @@ if (empty($name)) {
         }
         
         // Build config values
-        $result = call_user_func($class.'::configBuilder');
+        $result = call_user_func_array($class.'::configBuilder', array($vars));
         $transport_config = $result['transport_config'];
         $status = $result['status'];
         $message = $result['message'];

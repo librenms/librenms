@@ -49,10 +49,8 @@ class Mail implements Transport
         ];
     }
 
-    public static function configBuilder()
+    public static function configBuilder($vars)
     {
-        global $vars;
-
         $status = 'ok';
         $message = '';
 
