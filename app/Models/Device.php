@@ -13,6 +13,7 @@ class Device extends BaseModel
     public $timestamps = false;
     protected $primaryKey = 'device_id';
     protected $fillable = ['hostname', 'ip', 'status', 'status_reason'];
+    protected $casts = ['status' => 'boolean'];
 
     /**
      * Initialize this class
@@ -147,6 +148,11 @@ class Device extends BaseModel
     public function setIpAttribute($ip)
     {
         $this->attributes['ip'] = inet_pton($ip);
+    }
+
+    public function setStatusAttribute($status)
+    {
+        $this->attributes['status'] = (int)$status;
     }
 
     // ---- Query scopes ----

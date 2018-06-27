@@ -9,6 +9,7 @@ use LibreNMS\RRD\RrdDefinition;
 use Symfony\Component\Process\Process;
 
 $options = getopt('d');
+$ping_start = microtime(true);
 
 $init_modules = ['alerts', 'eloquent'];
 require __DIR__ . '/includes/init.php';
@@ -69,7 +70,8 @@ foreach (explode("\n", $output) as $line) {
             $device->perf()->save($result);
 
             // mark down only if all packets were loss
-            $device->status = ($result->loss != 100);
+            // mark up only if snmp is not down too
+            $device->status = (($result->loss != 100) && $device->status_reason != 'snmp');
             $device->last_ping = Carbon::now();
             $device->last_ping_timetaken = $result->avg;
 
@@ -79,7 +81,7 @@ foreach (explode("\n", $output) as $line) {
                 $type = $device->status ? 'up' : 'down';
                 log_event('Device status changed to ' . ucfirst($type) . " from icmp check.", $device->toArray(), $type);
 
-                echo "Device $device->hostname changed status, running alerts\n";
+                echo "Device $device->hostname changed status to $type, running alerts\n";
                 RunRules($device->device_id);
             }
             $device->save(); // only saves if needed
@@ -96,3 +98,5 @@ DevicePerf::query()
     ->delete();
 
 rrdtool_close();
+
+printf("Pinged %s devices in %.2fs\n", $devices->count(), microtime(true) - $ping_start);
