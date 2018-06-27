@@ -24,18 +24,18 @@
 
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
-use LibreNMS\Alert\AlertUtil;
+use LibreNMS\Alert\Transport;
 
-class Api implements Transport
+class Api extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        $details = AlertUtil::getTransportConfig($opts['alert']['transport_id']);
-        if (empty($details)) {
+        if (empty($this->config)) {
             return $this->deliverAlertOld($obj, $opts);
         }
-        $this->contactAPI($obj, $opts, $details['api-url'], $details['api-method']);
+        $url = $this->config['api-url'];
+        $method = $this->config['api-method'];
+        $this->contactAPI($obj, $opts, $url, $method);
     }
 
     private function deliverAlertOld($obj, $opts)

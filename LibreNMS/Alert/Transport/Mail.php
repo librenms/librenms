@@ -23,16 +23,15 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
-use LibreNMS\Alert\AlertUtil;
+use LibreNMS\Alert\Transport;
 
-class Mail implements Transport
+class Mail extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
         global $config;
-        $details = AlertUtil::getTransportConfig($opts['alert']['transport_id']);
-        return send_mail($details['email'], $obj['title'], $obj['msg'], ($config['email_html'] == 'true') ? true : false);
+        $email = $this->config['email'];
+        return send_mail($email, $obj['title'], $obj['msg'], ($config['email_html'] == 'true') ? true : false);
     }
 
     public static function configTemplate()

@@ -11,20 +11,18 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
-use LibreNMS\Alert\AlertUtil;
+use LibreNMS\Alert\Transport;
 
-class Ciscospark implements Transport
+class Ciscospark extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        $details = AlertUtil::getTransportConfig($opts['alert']['transport_id']);
         $text = strip_tags($obj['msg']);
         $data = array (
-            'roomId' => $details['room-id'],
+            'roomId' => $this->config['room-id'],
             'text' => $text
         );
-        $token = $details['api-token'];
+        $token = $this->config['api-token'];
 
         $curl   = curl_init();
         set_curl_proxy($curl);

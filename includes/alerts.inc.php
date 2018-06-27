@@ -886,8 +886,7 @@ function ExtTransports($obj)
                 $msg = FormatAlertTpl($obj);
                 $obj['msg'] = $msg;
                 echo $obj['transport'].' => ';
-                $instance = new $class;
-                $opts['alert']['transport_id'] = $item['transport_id'];
+                $instance = new $class($item['transport_id']);
                 $tmp = $instance->deliverAlert($obj, $opts);
                 AlertLog($tmp, $obj, $obj['transport']);
             }
@@ -905,8 +904,7 @@ function ExtTransports($obj)
                 $msg = FormatAlertTpl($obj);
                 $obj['msg'] = $msg;
                 echo $obj['transport'].' => ';
-                $instance = new $class;
-                $opts['alert']['transport_id'] = $item['transport_id'];
+                $instance = new $class($item['transport_id']);
                 $tmp = $instance->deliverAlert($obj, $opts);
                 AlertLog($tmp, $obj, $transport);
                 unset($instance);

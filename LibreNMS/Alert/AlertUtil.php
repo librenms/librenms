@@ -34,11 +34,4 @@ class AlertUtil
         $query = "SELECT DISTINCT transport_type FROM alert_transports WHERE is_default=true ";
         return dbFetchColumn($query);
     }
-
-    // Returns associative array of transport config values
-    public static function getTransportConfig($transport_id)
-    {
-        $sql = "SELECT `transport_config` FROM `alert_transports` WHERE `transport_id`=?";
-        return json_decode(dbFetchCell($sql, [$transport_id]), true);
-    }
 }
