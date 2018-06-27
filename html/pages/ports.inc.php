@@ -161,7 +161,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
     $output .= "<option value='admindown' " . $admindown . ">Shutdown</option>";
     $output .= "</select>&nbsp;";
 
-    $output .= "<select name='fSpeed' id='ifSpeed' class='form-control input-sm'>";
+    $output .= "<select name='ifSpeed' id='ifSpeed' class='form-control input-sm'>";
     $output .= "<option value=''>All Speeds</option>";
 
     if (Auth::user()->hasGlobalRead()) {

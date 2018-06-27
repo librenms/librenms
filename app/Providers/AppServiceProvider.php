@@ -16,13 +16,14 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      *
      * @return void
+     * @throws DatabaseConnectException caught by App\Exceptions\Handler and displayed to the user
      */
     public function boot()
     {
-        // connect legacy db
+        // connect legacy db, only if configured
         //FIXME this is for auth right now, remove later
-        try {
-            $db_config = config('database.connections')[config('database.default')];
+        $db_config = config('database.connections')[config('database.default')];
+        if (!empty($db_config['database'])) {
             dbConnect(
                 $db_config['host'],
                 $db_config['username'],
@@ -31,8 +32,6 @@ class AppServiceProvider extends ServiceProvider
                 $db_config['port'],
                 $db_config['unix_socket']
             );
-        } catch (DatabaseConnectException $e) {
-            // ignore failures here
         }
 
         // load config

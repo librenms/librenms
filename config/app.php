@@ -64,7 +64,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => ini_get('date.timezone'), // use existing timezone
 
     /*
     |--------------------------------------------------------------------------

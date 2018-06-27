@@ -143,7 +143,7 @@ Install the policy tool for SELinux:
     setsebool -P httpd_execmem 1
 
 ##### Allow fping
-Create the file http_fping.tt with the following contents:
+Create the file http_fping.tt with the following contents. You can create this file anywhere, as it is a throw-away file. The last step in this install procedure will install the module in the proper location.
 ```
 module http_fping 1.0;
 
@@ -205,6 +205,10 @@ LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large an
 Now head to the web installer and follow the on-screen instructions.
 
     http://librenms.example.com/install.php
+    
+The web installer might prompt you to create a `config.php` file in your librenms install location manually, copying the content displayed on-screen to the file. If you have to do this, please remember to set the permissions on config.php after you copied the on-screen contents to the file. Run:
+
+    chown librenms:librenms /opt/librenms/config.php
 
 ### Final steps
 

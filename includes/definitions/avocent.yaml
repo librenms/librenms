@@ -2,7 +2,7 @@ os: avocent
 text: Avocent
 type: network
 icon: avocent
-rfc1628_compat: 1
+rfc1628_compat: true
 discovery:
     - sysDescr_regex:
         - '/^Avocent/'

@@ -157,16 +157,16 @@ if (Auth::user()->hasGlobalAdmin()) {
             }
 
             if (isset($previous_config)) {
-                $url = $config['oxidized']['url'].'/node/version/diffs?node='.$oxidized_hostname.'&group=';
+                $url = $config['oxidized']['url'].'/node/version/diffs?node='.$oxidized_hostname;
                 if (!empty($node_info['group'])) {
-                    $url .= $node_info['group'];
+                    $url .= '&group='.$node_info['group'];
                 }
                 $url .= '&oid='.$current_config['oid'].'&date='.urlencode($current_config['date']).'&num='.$current_config['version'].'&oid2='.$previous_config['oid'].'&format=text';
 
                 $text = file_get_contents($url); // fetch diff
             } else {
                 // fetch current_version
-                $text = file_get_contents($config['oxidized']['url'].'/node/version/view?node='.$oxidized_hostname.'&group='.(!empty($node_info['group']) ? $node_info['group'] : '').'&oid='.$current_config['oid'].'&date='.urlencode($current_config['date']).'&num='.$current_config['version'].'&format=text');
+                $text = file_get_contents($config['oxidized']['url'].'/node/version/view?node='.$oxidized_hostname.(!empty($node_info['group']) ? '&group='.$node_info['group'] : '').'&oid='.$current_config['oid'].'&date='.urlencode($current_config['date']).'&num='.$current_config['version'].'&format=text');
             }
         } else {  // just fetch the only version
             $text = file_get_contents($config['oxidized']['url'].'/node/fetch/'.(!empty($node_info['group']) ? $node_info['group'].'/' : '').$oxidized_hostname);
@@ -259,7 +259,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         // $geshi->set_line_style('color: #999999');
         echo '<div class="config">';
         echo '<input id="linenumbers" class="btn btn-primary" type="submit" value="Hide line numbers"/>';
-        echo $geshi->parse_code();
+        echo htmlspecialchars_decode($geshi->parse_code());
         echo '</div>';
     }
 }//end if
