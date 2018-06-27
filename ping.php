@@ -2,7 +2,6 @@
 <?php
 
 use App\Models\Device;
-use App\Models\DevicePerf;
 use Carbon\Carbon;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
@@ -33,11 +32,10 @@ $devices = Device::canPing()
     ->get()
     ->keyBy('hostname');
 
-$period = max(Config::get('fping_options.interval', 500), 10); // minimum period is 10ms
-$timeout = min(Config::get('fping_options.timeout', 500), $period); // must be smaller than period
-$count = max(Config::get('fping_options.count', 3), 1);  // minimum count is 1
+$timeout = Config::get('fping_options.timeout', 500); // must be smaller than period
+$retries = Config::get('fping_options.retries', 3);  // how many retries on failure
 
-$cmd = ['fping', '-q', '-f', '-', '-p', $period, '-t', $timeout, '-c', $count];
+$cmd = ['fping', '-f', '-', '-e', '-t', $timeout, '-r', $retries];
 
 $fping = new Process($cmd, null, null, null, 300);
 d_echo($fping->getCommandLine() . PHP_EOL);
@@ -46,8 +44,9 @@ d_echo($fping->getCommandLine() . PHP_EOL);
 $fping->setInput($devices->keys()->implode(PHP_EOL));
 $fping->run();
 
-$output = $fping->getErrorOutput();
+$output = $fping->getOutput();
 d_echo($output);
+d_echo($fping->getErrorOutput());
 
 // rrd vars
 $rrd_step = Config::get('ping_rrd_step', Config::get('rrd.step', 300));
@@ -56,7 +55,7 @@ $tags = ['rrd_def' => $rrd_def, 'rrd_step' => $rrd_step];
 
 foreach (explode("\n", $output) as $line) {
     $res = preg_match(
-        '#^(?<hostname>[^\s]+) +: xmt/rcv/%loss = (?<xmt>\d+)/(?<rcv>\d+)/(?<loss>\d+)%(, min/avg/max = (?<min>[0-9.]+)/(?<avg>[0-9.]+)/(?<max>[0-9.]+))?$#',
+        '/^(?<hostname>[^\s]+) is (?<status>alive|unreachable)(?: \((?<rtt>[\d.]+) ms\))?/',
         $line,
         $captured
     );
@@ -66,14 +65,10 @@ foreach (explode("\n", $output) as $line) {
         $device = $devices->get($captured['hostname']);
 
         if ($device) {
-            $result = new DevicePerf($captured);
-            $device->perf()->save($result);
-
-            // mark down only if all packets were loss
             // mark up only if snmp is not down too
-            $device->status = (($result->loss != 100) && $device->status_reason != 'snmp');
+            $device->status = ($captured['status'] == 'alive' && $device->status_reason != 'snmp');
             $device->last_ping = Carbon::now();
-            $device->last_ping_timetaken = $result->avg;
+            $device->last_ping_timetaken = isset($captured['rtt']) ? $captured['rtt'] : 0;
 
             if ($device->isDirty('status')) {
                 // if changed, update reason
@@ -84,18 +79,13 @@ foreach (explode("\n", $output) as $line) {
                 echo "Device $device->hostname changed status to $type, running alerts\n";
                 RunRules($device->device_id);
             }
-            $device->save(); // only saves if needed
+            $device->save(); // only saves if needed (which is every time because of last_ping)
 
             // add data to rrd
-            data_update($device->toArray(), 'ping-perf', $tags, ['ping' => $result->avg]);
+            data_update($device->toArray(), 'ping-perf', $tags, ['ping' => $device->last_ping_timetaken]);
         }
     }
 }
-
-// delete old perf times (or leave this for daily?)
-DevicePerf::query()
-    ->where('timestamp', '<', Carbon::now()->subDays(Config::get('device_perf_purge', 7)))
-    ->delete();
 
 rrdtool_close();
 
