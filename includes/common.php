@@ -1199,7 +1199,12 @@ function format_hostname($device, $hostname = '')
         $hostname = $device['hostname'];
     }
     if ($config['force_ip_to_sysname'] === true && !empty($device['sysName'])) {
-        if (filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
+        if (filter_var($hostname, FILTER_VALIDATE_IP)) {
+            $hostname = $device['sysName'];
+        }
+    }
+    if ($config['force_hostname_to_sysname'] === true && !empty($device['sysName'])) {
+        if (!filter_var($hostname, FILTER_VALIDATE_IP)) {
             $hostname = $device['sysName'];
         }
     }
