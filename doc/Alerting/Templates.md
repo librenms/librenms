@@ -49,7 +49,7 @@ Placeholders are special variables that if used within the template will be repl
 - ping avg (if icmp enabled): `$alert->ping_avg`
 - Title for the Alert: `$alert->title`
 - Time Elapsed, Only available on recovery (`$alert->state == 0`): `$alert->elapsed`
-- Rule Builder (the actual rule): `$alert->builder`
+- Rule Builder (the actual rule) (use `{!! $alert->builder !!}`): `$alert->builder`
 - Alert-ID: `$alert->id`
 - Unique-ID: `$alert->uid`
 - Faults, Only available on alert (`$alert->state != 0`), must be iterated in a foreach (`@foreach ($alert->faults as $key => $value) @endforeach`). Holds all available information about the Fault, accessible in the format `$value['Column']`, for example: `$value['ifDescr']`. Special field `$value['string']` has most Identification-information (IDs, Names, Descrs) as single string, this is the equivalent of the default used.
