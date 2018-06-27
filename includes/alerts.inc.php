@@ -491,6 +491,7 @@ function DescribeAlert($alert)
     } else {
         return 'Unknown State';
     }//end if
+    $obj['builder']   = $alert['builder'];
     $obj['uid']       = $alert['id'];
     $obj['alert_id']  = $alert['alert_id'];
     $obj['severity']  = $alert['severity'];
