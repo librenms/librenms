@@ -330,7 +330,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             $common_output[] = shorten_text($result['storage_descr'], 50).'</td><td class="text-left">';
             $common_output[] = overlib_link($link, print_percentage_bar(150, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']), $overlib_content);
         } else {
-            $common_output[] = generate_device_link($result['hostname'], generate_minigraph_image($result, $config['time']['day'], $config['time']['now'], $graph_type, 'no', 150, 21), $graph_params, 0, 0, 0);
+            $common_output[] = generate_device_link($result, generate_minigraph_image($result, $config['time']['day'], $config['time']['now'], $graph_type, 'no', 150, 21), $graph_params, 0, 0, 0);
         }
         $common_output[] = '</td></tr>';
     }
