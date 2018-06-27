@@ -30,7 +30,11 @@ class Mail extends Transport
     public function deliverAlert($obj, $opts)
     {
         global $config;
-        $email = $this->config['email'];
+        if (empty($this->config['email'])) {
+            $email = $obj['contacts'];
+        } else {
+            $email = $this->config['email'];
+        }
         return send_mail($email, $obj['title'], $obj['msg'], ($config['email_html'] == 'true') ? true : false);
     }
 

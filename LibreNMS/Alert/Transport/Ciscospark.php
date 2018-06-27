@@ -17,12 +17,24 @@ class Ciscospark extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
+        if (empty($this->config)) {
+            $room_id = $opts['roomid'];
+            $token = $opts['token'];
+        } else {
+            $room_id = $this->config['room-id'];
+            $token = $this->config['api-token'];
+        }
+        return $this->sendCurl($obj, $room_id, $token);
+    }
+
+    public function sendCurl($obj, $room_id, $token)
+    {
         $text = strip_tags($obj['msg']);
         $data = array (
-            'roomId' => $this->config['room-id'],
+            'roomId' => $room_id,
             'text' => $text
         );
-        $token = $this->config['api-token'];
+        $token = $token;
 
         $curl   = curl_init();
         set_curl_proxy($curl);
