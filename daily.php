@@ -312,21 +312,7 @@ if ($options['f'] === 'recalculate_device_dependencies') {
             $recurse = function (Device $device) use (&$recurse) {
                 $device->updateMaxDepth();
 
-                if ($device->children->isNotEmpty()) {
-                    if ($device->max_depth === 0) {
-                        $device->max_depth = 1;
-                        $device->save();
-                    }
-
-                    // update each child
-                    $device->children->each($recurse);
-                } else {
-                    // no children
-                    if ($device->max_depth === 1) {
-                        $device->max_depth = 0;
-                        $device->save();
-                    }
-                }
+                $device->children->each($recurse);
             };
 
             $devices->each($recurse);

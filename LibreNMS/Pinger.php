@@ -41,6 +41,8 @@ class Pinger
     private $devices;
 
     // working data for loop
+    /** @var Collection $tiered */
+    /** @var Collection $current */
     private $tiered;
     private $current;
     private $current_tier;
@@ -78,12 +80,12 @@ class Pinger
         $this->devices = $query->get()->keyBy('hostname');
 
         // working collections
-        $this->tiered = $this->devices->groupBy('max_depth', true)->map->keys();
+        $this->tiered = $this->devices->groupBy('max_depth', true);
         $this->deferred = collect();
 
         // start with tier 1 (the root nodes, 0 is standalone)
         $this->current_tier = 1;
-        $this->current = $this->tiered->get($this->current_tier);
+        $this->current = $this->tiered->get($this->current_tier, collect());
 
         if ($vdebug) {
             $this->tiered->each(function (Collection $tier, $index) {
@@ -130,7 +132,7 @@ class Pinger
         // check for any left over devices
         if ($this->deferred->isNotEmpty()) {
             d_echo("Leftover devices, this shouldn't happen: " . $this->deferred->flatten(1)->implode('hostname', ', ') . PHP_EOL);
-            d_echo("Devices left in tier: " . collect($this->current)->implode(', ') . PHP_EOL);
+            d_echo("Devices left in tier: " . collect($this->current)->implode('hostname', ', ') . PHP_EOL);
         }
     }
 
@@ -160,7 +162,7 @@ class Pinger
         $this->current = $this->tiered->get($this->current_tier);
 
         // update and remove devices in the current tier
-        foreach ($this->deferred->pull($this->current_tier) as $data) {
+        foreach ($this->deferred->pull($this->current_tier, []) as $data) {
             $this->recordData($data);
         }
 
@@ -186,7 +188,7 @@ class Pinger
         $device = $this->devices->get($data['hostname']);
 
         // process the data if this is a standalone device or in the current tier
-        if ($device->max_depth === 0 || $this->current->contains($device->hostname)) {
+        if ($device->max_depth === 0 || $this->current->has($device->hostname)) {
             if ($vdebug) {
                 echo "Success\n";
             }
