@@ -3,7 +3,7 @@ text: 'Firmware'
 type: wireless
 icon: alliedtelesis
 group: allied
-ifname: 1
+ifname: true
 over:
     - { graph: device_bits, text: Traffic }
 discovery:
