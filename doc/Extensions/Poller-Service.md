@@ -18,7 +18,7 @@ The poller service won't work under Python 2.7+; some features require behaviour
 
 These can be obtained from your OS package manager, or from PyPI with the below commands. (You ma)
 ```bash
-pip3 install -U PyMySQL python-dotenv redis
+pip3 install -r requirements.txt
 ```
 
 #### Redis (distributed polling only)
