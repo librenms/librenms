@@ -52,6 +52,13 @@ foreach (dbFetchRows($query) as $transport) {
 
     //Iterate through alert transport config details
     foreach (json_decode($transport['config']) as $key => $value) {
+        if (is_bool($value)) {
+            if ($value == true) {
+                $value = 'true';
+            } else {
+                $value = 'false';
+            }
+        }
         echo "<i>".$key.": ".$value."<br /></i>";
     }
     echo "</td>";

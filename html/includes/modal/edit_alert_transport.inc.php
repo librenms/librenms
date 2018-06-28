@@ -42,6 +42,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <option value="mail-form" selected>Mail</option>
                                     <option value="ciscospark-form">Cisco Spark</option>
                                     <option value="api-form">API</option>
+                                    <option value="test-form">Test</option>
                                     <!--Insert more transport type options here has support is added. Value should be: [transport_name]-form -->
                                 </select>
                             </div>
@@ -79,18 +80,34 @@ foreach ($transports as $transport) {
     echo '<input type="hidden" name="transport-type" id="transport-type" value="'.strtolower($transport).'">';
    
     $tmp = call_user_func($class.'::configTemplate');
+    $switches = []; // store names of bootstrap switches
 
     foreach ($tmp as $item) {
         echo '<div class="form-group" title="'.$item['descr'].'">';
         echo '<label for="'.$item['name'].'" class="col-sm-3 col-md-2 control-label">'.$item['title'].': </label>';
-        echo '<div class="col-sm-9 col-md-10">';
-        echo '<input type="'.$item['type'].'" id="'.$item['name'].'" name="'.$item['name'].'" class="form-control" ';
-        if ($item['required']) {
-            echo 'required>';
-        } else {
-            echo '>';
+        if ($item['type'] == 'text') {
+            echo '<div class="col-sm-9 col-md-10">';
+            echo '<input type="'.$item['type'].'" id="'.$item['name'].'" name="'.$item['name'].'" class="form-control" ';
+            if ($item['required']) {
+                echo 'required>';
+            } else {
+                echo '>';
+            }
+            echo '</div>';
+        } elseif ($item['type'] == 'checkbox') {
+            echo '<div class="col-sm-2">';
+            echo '<input type="checkbox" name="'.$item['name'].'" id="'.$item['name'].'">';
+            echo '</div>';
+            $switches[$item['name']] = $item['default'];
+        } elseif ($item['type'] == 'select') {
+            echo '<div class="col-sm-3">';
+            echo '<select name="'.$item['name'].'" id="'.$item['name'].'" class="form-control">';
+            foreach ($item['options'] as $descr => $opt) {
+                echo '<option value="'.$opt.'">'.$descr.'</option>';
+            }
+            echo '</select>';
+            echo '</div>';
         }
-        echo '</div>';
         echo '</div>';
     }
     echo '<div class="form-group">';
@@ -168,10 +185,17 @@ foreach ($transports as $transport) {
                 $(".transport").hide();
                 $("#" + $("#transport-choice").val()).show().find("input:text").val("");
                 $("#is_default").bootstrapSwitch('state', false);
+                
+                // Turn on all switches in form
+                var switches = <?php echo json_encode($switches);?>;
+                $.each(switches, function(name, state){
+                    $("input[name="+name+"]").bootstrapSwitch('state', state);
+                });
             }
         });
 
         function loadTransport(transport) {
+            console.log(transport);
             $("#name").val(transport.name);
             $("#transport-choice").val(transport.type+"-form");
             $("#is_default").bootstrapSwitch('state', transport.is_default); 
@@ -180,7 +204,14 @@ foreach ($transports as $transport) {
              
             // Populate the field values
             transport.details.forEach(function(config) {
-                $("#" + config.name).val(config.value);
+                var $field = $("#" + config.name);
+                console.log($field.prop('type'));    
+                console.log(config); 
+                if ($field.prop('type') == 'checkbox') {
+                    $field.bootstrapSwitch('state', config.value);
+                } else {
+                    $field.val(config.value);
+                }
             });
         }
 
@@ -191,6 +222,8 @@ foreach ($transports as $transport) {
             //Combine form data (general and transport specific)
             data = $("form.transports-form").serializeArray();
             data = data.concat($("#" + $("#transport-choice").val()).serializeArray());
+            
+            console.log(data);
             if (data !== null) {
                 //post data to ajax form
                 $.ajax({
