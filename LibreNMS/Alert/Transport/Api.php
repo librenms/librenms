@@ -92,7 +92,7 @@ class Api extends Transport
                 'descr' => 'API URL',
                 'type' => 'text',
                 'required' => true,
-                'pattern' => 'http(s)://(.*)'
+                'validation' => 'required|url'
             ]
         ];
     }

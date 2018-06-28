@@ -47,7 +47,7 @@ class Mail extends Transport
                 'descr' => 'Email address of contact',
                 'type'  => 'text',
                 'required' => true,
-                'pattern' => '[a-zA-Z0-9_\-\.\+]+@\[a-zA-Z0-9_\-\.]+\.[a-zA-Z]{2,18}'
+                'validation' => 'required|email'
             ]
         ];
     }

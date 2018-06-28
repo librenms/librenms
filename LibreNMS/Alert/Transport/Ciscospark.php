@@ -65,7 +65,7 @@ class Ciscospark extends Transport
                 'descr' => 'CiscoSpark API Token',
                 'type' => 'text',
                 'required' => true,
-                'pattern' => '[a-zA-Z0-9]'
+                'validation' => 'required|string'
             ],
             [
                 'title' => 'RoomID',
@@ -73,7 +73,7 @@ class Ciscospark extends Transport
                 'descr' => 'CiscoSpark Room ID',
                 'type' => 'text',
                 'required' => true,
-                'pattern' => '[a-zA-Z0-9\-]'
+                'validation' => 'required|string'
             ]
         ];
     }
