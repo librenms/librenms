@@ -38,18 +38,26 @@ if (!Auth::user()->hasGlobalAdmin()) {
 $status = 'ok';
 $message = '';
 
-$builder_json = $_POST['builder_json'];
-$query        = QueryBuilderParser::fromJson($builder_json)->toSql();
-$rule_id      = $_POST['rule_id'];
-$count        = mres($_POST['count']);
-$delay        = mres($_POST['delay']);
-$interval     = mres($_POST['interval']);
-$mute         = mres($_POST['mute']);
-$invert       = mres($_POST['invert']);
-$name         = mres($_POST['name']);
-$proc         = mres($_POST['proc']);
-$recovery     = ($vars['recovery']);
-$severity     = mres($_POST['severity']);
+$builder_json    = $_POST['builder_json'];
+$aggregate       = $vars['aggregate'];
+$aggregate_field = $vars['aggregate_field'];
+$options         = ['query' =>
+    [
+        'aggregate' => $aggregate,
+        'aggregate_field' => $aggregate_field
+    ]
+];
+$query           = QueryBuilderParser::fromJson($builder_json, $options['query'])->toSql();
+$rule_id         = $_POST['rule_id'];
+$count           = mres($_POST['count']);
+$delay           = mres($_POST['delay']);
+$interval        = mres($_POST['interval']);
+$mute            = mres($_POST['mute']);
+$invert          = mres($_POST['invert']);
+$name            = mres($_POST['name']);
+$proc            = mres($_POST['proc']);
+$recovery        = ($vars['recovery']);
+$severity        = mres($_POST['severity']);
 
 if (!is_numeric($count)) {
     $count = '-1';
@@ -79,6 +87,7 @@ $extra = array(
     'invert'   => $invert,
     'interval' => $interval_sec,
     'recovery' => $recovery,
+    'options'  => $options,
 );
 
 $extra_json = json_encode($extra);
