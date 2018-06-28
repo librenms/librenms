@@ -101,7 +101,12 @@ class Pinger
         d_echo($this->process->getCommandLine() . PHP_EOL);
 
         // send hostnames to stdin to avoid overflowing cli length limits
-        $this->process->setInput($this->devices->keys()->implode(PHP_EOL));
+        $ordered_device_list = $this->tiered->get(1, collect())->keys() // root nodes before standalone nodes
+            ->merge($this->devices->keys())
+            ->unique()
+            ->implode(PHP_EOL);
+
+        $this->process->setInput($ordered_device_list);
         $this->process->start(); // start as early as possible
 
         foreach ($this->process as $type => $line) {
