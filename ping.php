@@ -32,6 +32,11 @@ $devices = Device::canPing()
     ->get()
     ->keyBy('hostname');
 
+// rrd vars
+$rrd_step = Config::get('ping_rrd_step', Config::get('rrd.step', 300));
+$rrd_def = RrdDefinition::make()->addDataset('ping', 'GAUGE', 0, 65535, $rrd_step * 2);
+$tags = ['rrd_def' => $rrd_def, 'rrd_step' => $rrd_step];
+
 $timeout = Config::get('fping_options.timeout', 500); // must be smaller than period
 $retries = Config::get('fping_options.retries', 3);  // how many retries on failure
 
@@ -42,18 +47,16 @@ d_echo($fping->getCommandLine() . PHP_EOL);
 
 // send hostnames to stdin to avoid overflowing cli length limits
 $fping->setInput($devices->keys()->implode(PHP_EOL));
-$fping->run();
+$fping->start();
 
-$output = $fping->getOutput();
-d_echo($output);
-d_echo($fping->getErrorOutput());
+foreach ($fping as $type => $line) {
+    d_echo($line);
 
-// rrd vars
-$rrd_step = Config::get('ping_rrd_step', Config::get('rrd.step', 300));
-$rrd_def = RrdDefinition::make()->addDataset('ping', 'GAUGE', 0, 65535, $rrd_step * 2);
-$tags = ['rrd_def' => $rrd_def, 'rrd_step' => $rrd_step];
+    if ($fping::ERR === $type) {
+        // don't process stderr
+        continue;
+    }
 
-foreach (explode("\n", $output) as $line) {
     $res = preg_match(
         '/^(?<hostname>[^\s]+) is (?<status>alive|unreachable)(?: \((?<rtt>[\d.]+) ms\))?/',
         $line,
