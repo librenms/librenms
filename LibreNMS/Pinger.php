@@ -2,7 +2,7 @@
 /**
  * Pinger.php
  *
- * -Description-
+ * Ping a large amount of devices quickly and update the db, ping-perf, and run alerts
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -104,7 +104,7 @@ class Pinger
 
             if (Process::ERR === $type) {
                 // Check for devices we couldn't resolve dns for
-                if (preg_match('/^(?<hostname>[^\s]+): Name or service not known/', $line, $errored)) {
+                if (preg_match('/^(?<hostname>[^\s]+): (?:Name or service not known|Temporary failure in name resolution)/', $line, $errored)) {
                     $this->recordData([
                         'hostname' => $errored['hostname'],
                         'status' => 'unreachable'
@@ -124,41 +124,45 @@ class Pinger
             }
         }
 
-        // update any left over devices
+        // check for any left over devices
         if ($this->deferred->isNotEmpty()) {
-            d_echo("Leftover devices, this shouldn't happen: " . $this->deferred->implode('hostname', ', ') . PHP_EOL);
+            d_echo("Leftover devices, this shouldn't happen: " . $this->deferred->flatten(1)->implode('hostname', ', ') . PHP_EOL);
             d_echo("Devices left in tier: " . collect($this->current)->keys()->implode(', ') . PHP_EOL);
         }
     }
 
+    /**
+     * Check if this tier is complete and move to the next tier
+     * If we moved to the next tier, check if we can report any of our deferred results
+     */
     private function processTier()
     {
         global $vdebug;
 
-        if ($this->current->isEmpty()) {
-            $this->current_tier++;
-            if (!$this->tiered->has($this->current_tier)) {
-                // out of devices
-                return;
-            }
-
-            if ($vdebug) {
-                echo "Out of devices at this tier, moving to tier $this->current_tier\n";
-            }
-
-            $this->current = $this->tiered->get($this->current_tier);
-
-            // update and remove devices in the current tier
-            foreach ($this->deferred as $data) {
-                $this->recordData($data);
-
-                if ($this->current->isEmpty()) {
-                    // tier empty, step to the next and don't process more data in this tier
-                    $this->processTier();
-                    break;
-                }
-            }
+        if ($this->current->isNotEmpty()) {
+            return;
         }
+
+        $this->current_tier++;  // next tier
+
+        if (!$this->tiered->has($this->current_tier)) {
+            // out of devices
+            return;
+        }
+
+        if ($vdebug) {
+            echo "Out of devices at this tier, moving to tier $this->current_tier\n";
+        }
+
+        $this->current = $this->tiered->get($this->current_tier);
+
+        // update and remove devices in the current tier
+        foreach ($this->deferred->pull($this->current_tier) as $data) {
+            $this->recordData($data);
+        }
+
+        // try to process the new tier in case we took care of all the devices
+        $this->processTier();
     }
 
     /**
@@ -204,6 +208,7 @@ class Pinger
 
             // done with this device
             $this->complete($device->hostname);
+            d_echo("Recorded data for $device->hostname (tier $device->max_depth)\n");
         } else {
             if ($vdebug) {
                 echo "Deferred\n";
@@ -213,19 +218,39 @@ class Pinger
         }
     }
 
+    /**
+     * Done processing $hostname, remove it from our active data
+     *
+     * @param $hostname
+     */
     private function complete($hostname)
     {
         $this->current->offsetUnset($hostname);
-        $this->deferred->offsetUnset($hostname);
+        $this->deferred->each->offsetUnset($hostname);
     }
 
+    /**
+     * Defer this data processing until all parent devices are complete
+     *
+     *
+     * @param $data
+     */
     private function defer($data)
     {
-        $hostname = $data['hostname'];
+        $device = $this->devices->get($data['hostname']);
 
-        if (!$this->deferred->has($hostname)) {
-            $this->deferred->put($hostname, $data);
+        if ($this->deferred->has($device->max_depth)) {
+            // add this data to the proper tier, unless it already exists...
+            $tier = $this->deferred->get($device->max_depth);
+            if (!$tier->has($device->hostname)) {
+                $tier->put($device->hostname, $data);
+            }
+        } else {
+            // create a new tier containing this data
+            $this->deferred->put($device->max_depth, collect([$device->hostname => $data]));
         }
+
+
     }
 
     public function count()
