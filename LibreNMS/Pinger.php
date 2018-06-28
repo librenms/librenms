@@ -43,7 +43,7 @@ class Pinger
     // working data for loop
     private $tiered;
     private $current;
-    private $current_tier = 0;
+    private $current_tier;
     private $deferred;
 
     public function __construct($groups = [])
@@ -78,9 +78,12 @@ class Pinger
         $this->devices = $query->get()->keyBy('hostname');
 
         // working collections
-        $this->tiered = $this->devices->groupBy('max_depth', true);
+        $this->tiered = $this->devices->groupBy('max_depth', true)->map->keys();
         $this->deferred = collect();
-        $this->current = $this->tiered->first();
+
+        // start with tier 1 (the root nodes, 0 is standalone)
+        $this->current_tier = 1;
+        $this->current = $this->tiered->get($this->current_tier);
 
         if ($vdebug) {
             $this->tiered->each(function (Collection $tier, $index) {
@@ -127,7 +130,7 @@ class Pinger
         // check for any left over devices
         if ($this->deferred->isNotEmpty()) {
             d_echo("Leftover devices, this shouldn't happen: " . $this->deferred->flatten(1)->implode('hostname', ', ') . PHP_EOL);
-            d_echo("Devices left in tier: " . collect($this->current)->keys()->implode(', ') . PHP_EOL);
+            d_echo("Devices left in tier: " . collect($this->current)->implode(', ') . PHP_EOL);
         }
     }
 
@@ -180,9 +183,10 @@ class Pinger
         }
 
         /** @var Device $device */
-        $device = $this->current->get($data['hostname']);
+        $device = $this->devices->get($data['hostname']);
 
-        if ($device) {
+        // process the data if this is a standalone device or in the current tier
+        if ($device->max_depth === 0 || $this->current->contains($device->hostname)) {
             if ($vdebug) {
                 echo "Success\n";
             }

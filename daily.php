@@ -6,6 +6,8 @@
  * (c) 2013 LibreNMS Contributors
  */
 
+use App\Models\Device;
+use Illuminate\Database\Eloquent\Collection;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\LockException;
 use LibreNMS\Util\MemcacheLock;
@@ -305,11 +307,26 @@ if ($options['f'] === 'recalculate_device_dependencies') {
         \LibreNMS\DB\Eloquent::boot();
 
         // update all root nodes and recurse, chunk so we don't blow up
-        \App\Models\Device::doesntHave('parents')->chunk(100, function ($devices) {
+        Device::doesntHave('parents')->with('children')->chunk(100, function (Collection $devices) {
             // anonymous recursive function
-            $recurse = function ($dev) use (&$recurse) {
-                $dev->updateMaxDepth();
-                $dev->children()->each($recurse);
+            $recurse = function (Device $device) use (&$recurse) {
+                $device->updateMaxDepth();
+
+                if ($device->children->isNotEmpty()) {
+                    if ($device->max_depth === 0) {
+                        $device->max_depth = 1;
+                        $device->save();
+                    }
+
+                    // update each child
+                    $device->children->each($recurse);
+                } else {
+                    // no children
+                    if ($device->max_depth === 1) {
+                        $device->max_depth = 0;
+                        $device->save();
+                    }
+                }
             };
 
             $devices->each($recurse);

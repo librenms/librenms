@@ -41,21 +41,41 @@ class Device extends BaseModel
 
         static::pivotAttached(function (Device $device, $relationName, $pivotIds, $pivotIdsAttributes) {
             if ($relationName == 'parents') {
+                // a parent attached to this device
+
+                // update the parent's max depth incase it used to be standalone
+                Device::whereIn('device_id', $pivotIds)->get()->each->validateStandalone();
+
+                // make sure this device's max depth is updated
                 $device->updateMaxDepth();
             } elseif ($relationName == 'children') {
-                foreach ($pivotIds as $child_id) {
-                    Device::find($child_id)->updateMaxDepth();
-                }
+                // a child device attached to this device
+
+                // if this device used to be standalone, we need to udpate max depth
+                $device->validateStandalone();
+
+                // make sure the child's max depth is updated
+                Device::whereIn('device_id', $pivotIds)->get()->each->updateMaxDepth();
             }
         });
 
         static::pivotDetached(function (Device $device, $relationName, $pivotIds) {
             if ($relationName == 'parents') {
+                // this device detached from a parent
+
+                // update this devices max depth
                 $device->updateMaxDepth();
+
+                // parent may now be standalone, update old parent
+                Device::whereIn('device_id', $pivotIds)->get()->each->validateStandalone();
             } elseif ($relationName == 'children') {
-                foreach ($pivotIds as $child_id) {
-                    Device::find($child_id)->updateMaxDepth();
-                }
+                // a child device detached from this device
+
+                // update the detached child's max_depth
+                Device::whereIn('device_id', $pivotIds)->get()->each->updateMaxDepth();
+
+                // this device may be standalone, update it
+                $device->validateStandalone();
             }
         });
     }
@@ -99,11 +119,33 @@ class Device extends BaseModel
         }
 
         $count = $query->count();
-        if ($count == 0) {
-            $this->max_depth = 0;
+        if ($count === 0) {
+            if ($this->children()->count() === 0) {
+                $this->max_depth = 0; // no children or parents
+            } else {
+                $this->max_depth = 1; // has children
+            }
         } else {
             $parents_max_depth = $query->max('max_depth');
             $this->max_depth = $parents_max_depth + 1;
+        }
+
+        $this->save();
+    }
+
+    /**
+     * Device dependency check to see if this node is standalone or not.
+     * Standalone is a special case where the device has no parents or children and is denoted by a max_depth of 0
+     *
+     * Only checks on root nodes (where max_depth is 1 or 0)
+     *
+     */
+    public function validateStandalone()
+    {
+        if ($this->max_depth === 0 && $this->children()->count() > 0) {
+            $this->max_depth = 1;  // has children
+        } elseif ($this->max_depth === 1 && $this->parents()->count() === 0) {
+            $this->max_depth = 0;  // no children or parents
         }
 
         $this->save();
