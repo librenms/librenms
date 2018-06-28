@@ -2,6 +2,8 @@ os: cmts
 text: 'Arris CMTS'
 type: network
 icon: arris
+mib_dir:
+    - arris
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
