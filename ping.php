@@ -13,9 +13,7 @@ $ping_start = microtime(true);
 $init_modules = ['alerts', 'eloquent'];
 require __DIR__ . '/includes/init.php';
 
-if (isset($options['d'])) {
-    $debug = true;
-}
+set_debug(isset($options['d']));
 
 if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
     $influxdb = influxdb_connect();
