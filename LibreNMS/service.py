@@ -207,9 +207,16 @@ class ServiceConfig:
     def _get_config_data(self):
         try:
             import dotenv
-            dotenv.load_dotenv(dotenv_path="{}/.env".format(self.BASE_DIR), verbose=True)
-        except ImportError:
-            info("Could not import .env")
+            env_path =  "{}/.env".format(self.BASE_DIR)
+            info("Attempting to load .env from '%s'", env_path)
+            dotenv.load_dotenv(dotenv_path=env_path, verbose=True)
+
+            if not os.getenv('NODE_ID'):
+                raise ImportError(".env does not contain a valid NODE_ID setting.")
+
+        except ImportError as e:
+            exception("Could not import .env - check that the poller user can read the file, and that composer install has been run recently")
+            sys.exit(3)
 
         config_cmd = ['/usr/bin/env', 'php', '{}/config_to_json.php'.format(self.BASE_DIR), '2>&1']
         try:
@@ -581,12 +588,12 @@ class Service:
             if self.config.distributed:
                 critical("ERROR: Redis connection required for distributed polling")
                 critical("Please install redis-py, either through your os software repository or from PyPI")
-                exit(2)
+                sys.exit(2)
         except Exception as e:
             if self.config.distributed:
                 critical("ERROR: Redis connection required for distributed polling")
                 critical("Could not connect to Redis. {}".format(e))
-                exit(2)
+                sys.exit(2)
 
         return LibreNMS.ThreadingLock()
 
@@ -701,7 +708,7 @@ class Service:
                            .format(self.config.node_id, self.config.name, "librenms-service", ','.join(str(g) for g in self.config.group), 1 if self.is_master else 0))
 
             # Find our ID
-            self._db.query('SELECT id INTO @parent_poller_id FROM poller_cluster WHERE poller_name="{0}"; '.format(self.config.name))
+            self._db.query('SELECT id INTO @parent_poller_id FROM poller_cluster WHERE node_id="{0}"; '.format(self.config.node_id))
 
             for worker_type, counter in self.performance_stats.items():
                 worker_seconds, devices = counter.reset()
