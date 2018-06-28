@@ -27,6 +27,7 @@ namespace LibreNMS;
 
 use App\Models\Device;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use LibreNMS\RRD\RrdDefinition;
 use Symfony\Component\Process\Process;
@@ -45,15 +46,16 @@ class Pinger
     private $current_tier = 0;
     private $deferred;
 
-    public function __construct()
+    public function __construct($groups = [])
     {
         global $vdebug;
 
-        // rrd vars
+        // define rrd tags
         $rrd_step = Config::get('ping_rrd_step', Config::get('rrd.step', 300));
         $rrd_def = RrdDefinition::make()->addDataset('ping', 'GAUGE', 0, 65535, $rrd_step * 2);
         $this->rrd_tags = ['rrd_def' => $rrd_def, 'rrd_step' => $rrd_step];
 
+        // set up fping process
         $timeout = Config::get('fping_options.timeout', 500); // must be smaller than period
         $retries = Config::get('fping_options.retries', 2);  // how many retries on failure
 
@@ -63,11 +65,17 @@ class Pinger
 
         $this->process = new Process($cmd, null, null, null, $wait);
 
-        $this->devices = Device::canPing()
+        // fetch devices
+        /** @var Builder $query */
+        $query = Device::canPing()
             ->select(['devices.device_id', 'hostname', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken', 'max_depth'])
-            ->orderBy('max_depth')
-            ->get()
-            ->keyBy('hostname');
+            ->orderBy('max_depth');
+
+        if ($groups) {
+            $query->whereIn('poller_group', $groups);
+        }
+
+        $this->devices = $query->get()->keyBy('hostname');
 
         // working collections
         $this->tiered = $this->devices->groupBy('max_depth', true);
