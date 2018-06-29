@@ -26,7 +26,6 @@
 namespace LibreNMS\Alert;
 
 use App\Models\AlertTemplate;
-use LibreNMS\Alert\AlertData;
 
 class Template
 {
@@ -56,13 +55,13 @@ class Template
 
     public function getTitle($data)
     {
-        $data['title'] = $this->bladeTitle($data);
+        $data['parsed_title'] = $this->bladeTitle($data);
         return $this->legacyTitle($data);
     }
 
     public function getBody($data)
     {
-        $data['template']->template = $this->bladeBody($data);
+        $data['template']['parsed_template'] = $this->bladeBody($data);
         return $this->legacyBody($data);
     }
 
@@ -109,7 +108,7 @@ class Template
      */
     public function legacyBody($data)
     {
-        $tpl    = $data['template']->template;
+        $tpl    = $data['template']->parsed_template;
         $msg    = '$ret .= "'.str_replace(array('{else}', '{/if}', '{/foreach}'), array('"; } else { $ret .= "', '"; } $ret .= "', '"; } $ret .= "'), addslashes($tpl)).'";';
         $parsed = $msg;
         $s      = strlen($msg);
@@ -184,10 +183,10 @@ class Template
      */
     public function legacyTitle($data)
     {
-        if (strstr($data['title'], '%')) {
-            return RunJail('$ret = "'.populate(addslashes($data['title'])).'";', $data);
+        if (strstr($data['parsed_title'], '%')) {
+            return RunJail('$ret = "'.populate(addslashes($data['parsed_title'])).'";', $data);
         } else {
-            return $data['title'];
+            return $data['parsed_title'];
         }
     }
 
