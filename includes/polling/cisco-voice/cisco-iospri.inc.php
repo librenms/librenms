@@ -11,38 +11,46 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\RRD\RrdDefinition;
+
 if ($device['os_group'] == "cisco") {
     // TODO: Need to test partial PRI.
 
     // Total
     $total = 0;
-    foreach (snmpwalk_cache_oid_num($device, "1.3.6.1.2.1.2.2.1.3", null) as $key => $value) {
-        // 81 is the ifType for DS0's
-        if ($value[''] == "81") {
-            $total++;
+    $output = snmpwalk_cache_oid_num($device, "1.3.6.1.2.1.2.2.1.3", null);
+    if (is_array($output)) {
+        foreach ($output as $key => $value) {
+            // 81 is the ifType for DS0's
+            if ($value[''] == "81" || $value[''] == "ds0") {
+                $total++;
+            }
         }
+
+        // Active
+        $active = snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.10.19.1.1.4.0", null);
+        $active = $active['1.3.6.1.4.1.9.10.19.1.1.4.0'];
+
+        if (is_array($active)) {
+            $active = $active[''];
+        }
+
+        if (isset($total) && $total > 0) {
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('total', 'GAUGE', 0)
+                ->addDataset('active', 'GAUGE', 0);
+
+            $fields = array(
+                'total' => $total,
+                'active' => $active,
+            );
+
+            $tags = compact('rrd_def');
+            data_update($device, 'cisco-iospri', $tags, $fields);
+
+            $graphs['cisco-iospri'] = true;
+            echo(" Cisco IOS PRI ");
+        }
+        unset($rrd_def, $total, $active, $fields, $tags);
     }
-
-    // Active
-    $active = snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.10.19.1.1.4.0", null);
-    $active = $active['1.3.6.1.4.1.9.10.19.1.1.4.0'][''];
-
-    if (isset($active) && ($active != "") && ($total != 0)) {
-        $rrd_def = array(
-            'DS:total:GAUGE:600:0:U',
-            'DS:active:GAUGE:600:0:U'
-        );
-
-        $fields = array(
-            'total'  => $total,
-            'active' => $active,
-        );
-
-        $tags = compact('rrd_def');
-        data_update($device, 'cisco-iospri', $tags, $fields);
-
-        $graphs['cisco-iospri'] = true;
-        echo (" Cisco IOS PRI ");
-    }
-    unset($rrd_def, $total, $active, $fields, $tags);
 }

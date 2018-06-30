@@ -11,30 +11,17 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-chdir(dirname($argv[0]));
+use LibreNMS\Util\FileLock;
 
-require 'includes/defaults.inc.php';
-require 'config.php';
-require 'includes/definitions.inc.php';
-require 'includes/functions.php';
-require 'includes/discovery/functions.inc.php';
+$init_modules = array('discovery');
+require __DIR__ . '/includes/init.php';
 
 $start         = microtime(true);
-$runtime_stats = array();
 $sqlparams     = array();
 $options       = getopt('h:m:i:n:d::v::a::q', array('os:','type:'));
 
 if (!isset($options['q'])) {
     echo $config['project_name_version']." Discovery\n";
-    $versions = version_info(false);
-    echo "Version info:\n";
-    $cur_sha = $versions['local_sha'];
-    echo "Commit SHA: $cur_sha\n";
-    echo "DB Schema: ".$versions['db_schema']."\n";
-    echo "PHP: ".$versions['php_ver']."\n";
-    echo "MySQL: ".$versions['mysql_ver']."\n";
-    echo "RRDTool: ".$versions['rrdtool_ver']."\n";
-    echo "SNMP: ".$versions['netsnmp_ver']."\n";
 }
 
 if (isset($options['h'])) {
@@ -48,6 +35,7 @@ if (isset($options['h'])) {
         $where = ' ';
         $doing = 'all';
     } elseif ($options['h'] == 'new') {
+        $new_discovery_lock = FileLock::lockOrDie('new-discovery');
         $where = 'AND `last_discovered` IS NULL';
         $doing = 'new';
     } elseif ($options['h']) {
@@ -77,11 +65,26 @@ if (isset($options['i']) && $options['i'] && isset($options['n'])) {
 }
 
 if (isset($options['d']) || isset($options['v'])) {
+    $versions = version_info();
+    echo <<<EOH
+===================================
+Version info:
+Commit SHA: {$versions['local_sha']}
+Commit Date: {$versions['local_date']}
+DB Schema: {$versions['db_schema']}
+PHP: {$versions['php_ver']}
+MySQL: {$versions['mysql_ver']}
+RRDTool: {$versions['rrdtool_ver']}
+SNMP: {$versions['netsnmp_ver']}
+==================================
+EOH;
+
     echo "DEBUG!\n";
     if (isset($options['v'])) {
         $vdebug = true;
     }
     $debug = true;
+    update_os_cache(true); // Force update of OS Cache
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     ini_set('log_errors', 1);
@@ -114,15 +117,14 @@ if (!$where) {
     exit;
 }
 
-require 'includes/sql-schema/update.php';
-
 $discovered_devices = 0;
 
 if (!empty($config['distributed_poller_group'])) {
     $where .= ' AND poller_group IN('.$config['distributed_poller_group'].')';
 }
 
-foreach (dbFetch("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
+global $device;
+foreach (dbFetch("SELECT * FROM `devices` WHERE disabled = 0 AND snmp_disable = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
     discover_device($device, $options);
 }
 
@@ -131,15 +133,22 @@ $run      = ($end - $start);
 $proctime = substr($run, 0, 5);
 
 if ($discovered_devices) {
-    dbInsert(array('type' => 'discover', 'doing' => $doing, 'start' => $start, 'duration' => $proctime, 'devices' => $discovered_devices), 'perf_times');
+    dbInsert(array('type' => 'discover', 'doing' => $doing, 'start' => $start, 'duration' => $proctime, 'devices' => $discovered_devices, 'poller' => $config['distributed_poller_name']), 'perf_times');
+    if ($doing === 'new') {
+        // We have added a new device by this point so we might want to do some other work
+        oxidized_reload_nodes();
+    }
+}
+
+if ($doing === 'new') {
+    $new_discovery_lock->release();
 }
 
 $string = $argv[0]." $doing ".date($config['dateformat']['compact'])." - $discovered_devices devices discovered in $proctime secs";
 d_echo("$string\n");
 
 if (!isset($options['q'])) {
-    echo ('MySQL: Cell['.($db_stats['fetchcell'] + 0).'/'.round(($db_stats['fetchcell_sec'] + 0), 2).'s]'.' Row['.($db_stats['fetchrow'] + 0).'/'.round(($db_stats['fetchrow_sec'] + 0), 2).'s]'.' Rows['.($db_stats['fetchrows'] + 0).'/'.round(($db_stats['fetchrows_sec'] + 0), 2).'s]'.' Column['.($db_stats['fetchcol'] + 0).'/'.round(($db_stats['fetchcol_sec'] + 0), 2).'s]'.' Update['.($db_stats['update'] + 0).'/'.round(($db_stats['update_sec'] + 0), 2).'s]'.' Insert['.($db_stats['insert'] + 0).'/'.round(($db_stats['insert_sec'] + 0), 2).'s]'.' Delete['.($db_stats['delete'] + 0).'/'.round(($db_stats['delete_sec'] + 0), 2).'s]');
-    echo "\n";
+    printStats();
 }
 
 logfile($string);

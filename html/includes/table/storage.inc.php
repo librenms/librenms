@@ -1,4 +1,21 @@
 <?php
+/*
+ * LibreNMS
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2018 LibreNMS
+ * @author     LibreNMS Contributors
+*/
+
+use LibreNMS\Authentication\Auth;
 
 $graph_type = 'storage_usage';
 
@@ -6,10 +23,10 @@ $where = 1;
 
 $sql = ' FROM `storage` AS `S` LEFT JOIN `devices` AS `D` ON `S`.`device_id` = `D`.`device_id`';
 
-if (is_admin() === false && is_read() === false) {
+if (!Auth::user()->hasGlobalRead()) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `S`.`device_id` = `DP`.`device_id`';
     $where  .= ' AND `DP`.`user_id`=?';
-    $param[] = $_SESSION['user_id'];
+    $param[] = Auth::id();
 }
 
 $sql .= " WHERE $where";
@@ -59,7 +76,7 @@ foreach (dbFetchRows($sql, $param) as $drive) {
     $graph_array_zoom['width']  = '400';
     $link       = 'graphs/id='.$graph_array['id'].'/type='.$graph_array['type'].'/from='.$graph_array['from'].'/to='.$graph_array['to'].'/';
     $mini_graph = overlib_link($link, generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), null);
-    $background = get_percentage_colours($perc);
+    $background = get_percentage_colours($perc, $drive['storage_perc_warn']);
     $bar_link   = overlib_link($link, print_percentage_bar(400, 20, $perc, "$used / $total", 'ffffff', $background['left'], $free, 'ffffff', $background['right']), generate_graph_tag($graph_array_zoom), null);
 
     $response[] = array(
@@ -69,7 +86,7 @@ foreach (dbFetchRows($sql, $param) as $drive) {
         'storage_used'  => $bar_link,
         'storage_perc'  => $perc.'%',
     );
-    if ($_POST['view'] == 'graphs') {
+    if ($vars['view'] == 'graphs') {
         $graph_array['height'] = '100';
         $graph_array['width']  = '216';
         $graph_array['to']     = $config['time']['now'];

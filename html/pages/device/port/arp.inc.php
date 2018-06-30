@@ -16,6 +16,7 @@ $no_refresh = true;
 
 var grid = $("#port-arp").bootgrid({
     ajax: true,
+    rowCount: [50, 100, 250, -1],
     post: function ()
     {
         return {

@@ -1,6 +1,7 @@
 <?php
+global $twofactorform;
 if ($config['twofactor'] && isset($twofactorform)) {
-    echo twofactor_form();
+    echo \LibreNMS\Authentication\TwoFactor::getForm();
 } else {
 ?>
       <div class="row">
@@ -8,9 +9,7 @@ if ($config['twofactor'] && isset($twofactorform)) {
           <div class="panel panel-default">
             <div class="panel-heading">
               <h3 class="panel-title">
-                <center>
-                  <img src="images/librenms_logo_light.png">
-                </center>
+                <?php echo '<img src="' . $config['title_image'] . '" class="img-responsive">'; ?>
               </h3>
             </div>
             <div class="panel-body">
@@ -18,7 +17,7 @@ if ($config['twofactor'] && isset($twofactorform)) {
                 <form class="form-horizontal" role="form" action="" method="post" name="logonform">
                     <div class="form-group">
                         <div class="col-md-12">
-                            <input type="text" name="username" id="username" class="form-control" placeholder="Username" required autofocus />
+                            <input type="text" name="username" id="username" class="form-control" placeholder="Username" required autofocus autocorrect="off" autocapitalize="off" spellcheck="false" />
                         </div>
                     </div>
                     <div class="form-group">

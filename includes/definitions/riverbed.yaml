@@ -1,0 +1,10 @@
+os: riverbed
+text: Riverbed
+type: network
+icon: riverbed
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.17163.

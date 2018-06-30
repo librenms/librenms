@@ -1,0 +1,1335 @@
+    -- =================================================================
+    -- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved
+    -- 
+    -- Description:HUAWEI-HWTACACS-MIB
+    -- Reference:
+    -- Version: V1.0
+    -- History:
+    --    <d30957>,<2003-03-20>,<create>
+    -- =================================================================
+HUAWEI-HWTACACS-MIB    DEFINITIONS ::= BEGIN
+
+IMPORTS    
+    hwDatacomm            
+        FROM HUAWEI-MIB
+    IpAddress, Counter32, Gauge32, Integer32,Unsigned32,BITS ,NOTIFICATION-TYPE
+            FROM SNMPv2-SMI              
+    OBJECT-TYPE
+            FROM RFC-1212
+    TRAP-TYPE
+            FROM RFC-1215
+    RowStatus 
+        FROM SNMPv2-TC
+    DisplayString
+        FROM  RFC1213-MIB    
+    enterprises
+        FROM RFC1155-SMI; 
+        
+    hwTACACS MODULE-IDENTITY 
+            LAST-UPDATED "200403030900Z"        -- March 03, 2004 at 09:00 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co., Ltd.
+                "
+            CONTACT-INFO 
+                "Floor 5, Block 4, R&D Building,
+                Huawei Longgang Production Base,
+                Shenzhen,   P.R.C.
+                http://www.huawei.com
+                Zip:518057
+                "
+            DESCRIPTION 
+                "The MIB contains objects of module HWTACACS."
+            ::= { hwDatacomm 20 }
+                       
+
+   ---------- Following is for Node:hwTACACSServerConfig 
+ hwTACACSServerConfig        OBJECT IDENTIFIER ::= { hwTACACS 1 }
+ -- TABLE: hwTACACSServerGroupTable
+  hwTACACSServerGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HWTACACSServerGroupTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Group table."
+    ::= { hwTACACSServerConfig 1 }    
+    
+  hwTACACSServerGroupTableEntry OBJECT-TYPE
+    SYNTAX      HWTACACSServerGroupTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Group table entry."
+    INDEX {  
+              hwTACACSServerGroupIndex
+             }
+    ::= { hwTACACSServerGroupTable 1 }
+    
+  HWTACACSServerGroupTableEntry ::=
+    SEQUENCE
+    { hwTACACSServerGroupIndex  Integer32,     
+      hwTACACSServerGroupName    OCTET STRING,
+      hwTACACSServerGroupSourceIP    IpAddress,
+      hwTACACSServerGroupKey    OCTET STRING,
+      hwTACACSServerGroupTimer    Integer32,
+      hwTACACSServerGroupDomain    INTEGER,
+      hwTACACSServerGroupOctFmt    INTEGER,      
+      hwTACACSServerGroupTimeout    Integer32,
+      hwTACACSServerGroupPriAuthenAddr    IpAddress,
+      hwTACACSServerGroupPriAuthenPort    Integer32,
+      hwTACACSServerGroupPriAuthorAddr    IpAddress,
+      hwTACACSServerGroupPriAuthorPort    Integer32,      
+      hwTACACSServerGroupPriAccoutAddr    IpAddress,
+      hwTACACSServerGroupPriAccoutPort    Integer32, 
+      hwTACACSServerGroupSecAuthenAddr    IpAddress,
+      hwTACACSServerGroupSecAuthenPort    Integer32,
+      hwTACACSServerGroupSecAuthorAddr    IpAddress,
+      hwTACACSServerGroupSecAuthorPort    Integer32,
+      hwTACACSServerGroupSecAccoutAddr    IpAddress,      
+      hwTACACSServerGroupSecAccoutPort    Integer32,
+      hwTACACSServerGroupCurAuthenAddr    IpAddress,
+      hwTACACSServerGroupCurAuthorAddr    IpAddress,
+      hwTACACSServerGroupCurAccoutAddr    IpAddress,
+      hwTACACSPriAuthenClientRoundTripTime    Integer32,
+      hwTACACSPriAuthenClientAccessReqPacket    Counter32,
+      hwTACACSPriAuthenClientAccessReqLogin    Counter32,
+      hwTACACSPriAuthenClientAccessReqChaPass    Counter32,
+      hwTACACSPriAuthenClientAccessReqSendPass    Counter32,
+      hwTACACSPriAuthenClientAccessReqSendAuth    Counter32,
+      hwTACACSPriAuthenClientAccessResPack    Counter32,
+      hwTACACSPriAuthenClientAccessResPass    Counter32,
+      hwTACACSPriAuthenClientAccessResFail    Counter32,
+      hwTACACSPriAuthenClientAccessResGetData    Counter32,
+      hwTACACSPriAuthenClientAccessResGetUser    Counter32,
+      hwTACACSPriAuthenClientAccessResGetPass    Counter32,
+      hwTACACSPriAuthenClientAccessResRestart    Counter32,
+      hwTACACSPriAuthenClientAccessResError    Counter32,
+      hwTACACSPriAuthenClientAccessResFollow    Counter32,
+      hwTACACSPriAuthenClientMalformedAccessResponses    Counter32,
+      hwTACACSPriAuthenClientAccessConPack    Counter32,
+      hwTACACSPriAuthenClientAccessConAbort    Counter32,
+      hwTACACSPriAuthenClientPendingRequests    Counter32,
+      hwTACACSPriAuthenClientTimeouts    Counter32,
+      hwTACACSPriAuthenClientUnknownTypes    Counter32,
+      hwTACACSPriAuthenClientPacketsDropped    Counter32,
+      hwTACACSPriAuthorClientRoundTripTime    Integer32,
+      hwTACACSPriAuthorClientReqPacket    Counter32,
+      hwTACACSPriAuthorClientReqEXEC    Counter32,
+      hwTACACSPriAuthorClientReqVPDN    Counter32,
+      hwTACACSPriAuthorClientResPack    Counter32,
+      hwTACACSPriAuthorClientResEXEC    Counter32,
+      hwTACACSPriAuthorClientResVPDN    Counter32,
+      hwTACACSPriAuthorClientResError    Counter32,
+      hwTACACSPriAuthorClientReqPending    Counter32,
+      hwTACACSPriAuthorClientTimeouts    Counter32,
+      hwTACACSPriAuthorClientUnknownTypes    Counter32,
+      hwTACACSPriAuthorClientPacketsDropped    Counter32,
+      hwTACACSPriAccClientRoundTripTime    Integer32,
+      hwTACACSPriAccClientReqPacket    Counter32,
+      hwTACACSPriAccClientReqNetwork    Counter32,
+      hwTACACSPriAccClientReqConnection    Counter32,
+      hwTACACSPriAccClientReqEXEC    Counter32,
+      hwTACACSPriAccClientReqSysEvent    Counter32,
+      hwTACACSPriAccClientReqCommandLevel    Counter32,
+      hwTACACSPriAccClientReqUpdate    Counter32,
+      hwTACACSPriAccClientResPacket    Counter32,
+      hwTACACSPriAccClientResError    Counter32,
+      hwTACACSPriAccClientReqPending    Counter32,
+      hwTACACSPriAccClientTimeouts    Counter32,
+      hwTACACSPriAccClientUnknownTypes    Counter32,
+      hwTACACSPriAccClientPacketsDropped    Counter32, 
+      hwTACACSSecAuthenClientRoundTripTime    Integer32,
+      hwTACACSSecAuthenClientAccessReqPacket    Counter32,
+      hwTACACSSecAuthenClientAccessReqLogin    Counter32,
+      hwTACACSSecAuthenClientAccessReqChaPass    Counter32,
+      hwTACACSSecAuthenClientAccessReqSendPass    Counter32,
+      hwTACACSSecAuthenClientAccessReqSendAuth    Counter32,
+      hwTACACSSecAuthenClientAccessResPack    Counter32,
+      hwTACACSSecAuthenClientAccessResPass    Counter32,
+      hwTACACSSecAuthenClientAccessResFail    Counter32,
+      hwTACACSSecAuthenClientAccessResGetData    Counter32,
+      hwTACACSSecAuthenClientAccessResGetUser    Counter32,
+      hwTACACSSecAuthenClientAccessResGetPass    Counter32,
+      hwTACACSSecAuthenClientAccessResRestart    Counter32,
+      hwTACACSSecAuthenClientAccessResError    Counter32,
+      hwTACACSSecAuthenClientAccessResFollow    Counter32,
+      hwTACACSSecAuthenClientMalformedAccessResponses    Counter32,
+      hwTACACSSecAuthenClientAccessConPack    Counter32,
+      hwTACACSSecAuthenClientAccessConAbort    Counter32,
+      hwTACACSSecAuthenClientPendingRequests    Counter32,
+      hwTACACSSecAuthenClientTimeouts    Counter32,
+      hwTACACSSecAuthenClientUnknownTypes    Counter32,
+      hwTACACSSecAuthenClientPacketsDropped    Counter32,
+      hwTACACSSecAuthorClientRoundTripTime    Integer32,
+      hwTACACSSecAuthorClientReqPacket    Counter32,
+      hwTACACSSecAuthorClientReqEXEC    Counter32,
+      hwTACACSSecAuthorClientReqVPDN    Counter32,
+      hwTACACSSecAuthorClientResPack    Counter32,
+      hwTACACSSecAuthorClientResEXEC    Counter32,
+      hwTACACSSecAuthorClientResVPDN    Counter32,
+      hwTACACSSecAuthorClientResError    Counter32,
+      hwTACACSSecAuthorClientReqPending    Counter32,
+      hwTACACSSecAuthorClientTimeouts    Counter32,
+      hwTACACSSecAuthorClientUnknownTypes    Counter32,
+      hwTACACSSecAuthorClientPacketsDropped    Counter32,
+      hwTACACSSecAccClientRoundTripTime    Integer32,
+      hwTACACSSecAccClientReqPacket    Counter32,
+      hwTACACSSecAccClientReqNetwork    Counter32,
+      hwTACACSSecAccClientReqConnection    Counter32,
+      hwTACACSSecAccClientReqEXEC    Counter32,
+      hwTACACSSecAccClientReqSysEvent    Counter32,
+      hwTACACSSecAccClientReqCommandLevel    Counter32,
+      hwTACACSSecAccClientReqUpdate    Counter32,
+      hwTACACSSecAccClientResPacket    Counter32,
+      hwTACACSSecAccClientResError    Counter32,
+      hwTACACSSecAccClientReqPending    Counter32,
+      hwTACACSSecAccClientTimeouts    Counter32,
+      hwTACACSSecAccClientUnknownTypes    Counter32,
+      hwTACACSSecAccClientPacketsDropped    Counter32,
+      hwTACACSServerGroupRowStatus    RowStatus
+    }
+            
+  hwTACACSServerGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32(1..128)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Hwtacac server template index."
+    ::={ hwTACACSServerGroupTableEntry 1 }
+      
+  hwTACACSServerGroupName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Hwtacac server template name."
+    ::={ hwTACACSServerGroupTableEntry 2 }
+
+  hwTACACSServerGroupSourceIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specify hwtacacs source-ip."
+    ::={ hwTACACSServerGroupTableEntry 3 }
+
+  hwTACACSServerGroupKey OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specify group encryption shared-key."
+    ::={ hwTACACSServerGroupTableEntry 4 }
+
+  hwTACACSServerGroupTimer OBJECT-TYPE
+    SYNTAX      Integer32(1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Set time interval before retry the down-server."
+    DEFVAL {5}
+    ::={ hwTACACSServerGroupTableEntry 5 }
+     
+  hwTACACSServerGroupDomain OBJECT-TYPE
+    SYNTAX      INTEGER{
+                       open(1),
+                       close(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Domain switch:1,open;2,close."
+    DEFVAL {1}
+    ::={ hwTACACSServerGroupTableEntry 6 }
+
+  hwTACACSServerGroupOctFmt OBJECT-TYPE
+    SYNTAX      INTEGER{
+                byte(1),
+                kbyte(2),
+                mbyte(3),
+                gbyte(4)
+                       
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value must be byte(1), kbyte(2), mbyte(3), gbyte(4)."
+    DEFVAL {1}
+    ::={ hwTACACSServerGroupTableEntry 7 }
+    
+    
+  hwTACACSServerGroupTimeout OBJECT-TYPE
+    SYNTAX      Integer32(1..300)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specify server response timeout."
+    DEFVAL      { 5 }
+    ::={ hwTACACSServerGroupTableEntry 8 }    
+    
+  hwTACACSServerGroupPriAuthenAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Primary authen server Address."
+    ::={ hwTACACSServerGroupTableEntry 9 }
+
+  hwTACACSServerGroupPriAuthenPort OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specify primary authen server port."
+    DEFVAL      { 49 }
+    ::={ hwTACACSServerGroupTableEntry 10 }        
+
+  hwTACACSServerGroupPriAuthorAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Primary author server Address."
+    ::={ hwTACACSServerGroupTableEntry 11 }
+
+  hwTACACSServerGroupPriAuthorPort OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specify primary author server port."
+    DEFVAL      { 49 }
+    ::={ hwTACACSServerGroupTableEntry 12 }  
+
+  hwTACACSServerGroupPriAccoutAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Primary accounting server Address."
+    ::={ hwTACACSServerGroupTableEntry 13 }
+
+  hwTACACSServerGroupPriAccoutPort OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specify primary Accout server port."
+    DEFVAL      { 49 }
+    ::={ hwTACACSServerGroupTableEntry 14 }  
+    
+  hwTACACSServerGroupSecAuthenAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Second authen server Address."
+    ::={ hwTACACSServerGroupTableEntry 15 }
+
+  hwTACACSServerGroupSecAuthenPort OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specify Second authen server port."
+    DEFVAL      { 49 }
+    ::={ hwTACACSServerGroupTableEntry 16 }  
+
+
+  hwTACACSServerGroupSecAuthorAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Second author server address."
+    ::={ hwTACACSServerGroupTableEntry 17 }
+
+  hwTACACSServerGroupSecAuthorPort OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specify Second author server port."
+    DEFVAL      { 49 }
+    ::={ hwTACACSServerGroupTableEntry 18 }  
+
+
+  hwTACACSServerGroupSecAccoutAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Second accounting server Address."
+    ::={ hwTACACSServerGroupTableEntry 19 }
+
+  hwTACACSServerGroupSecAccoutPort OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specify Second accout server port."
+    DEFVAL      { 49 }
+    ::={ hwTACACSServerGroupTableEntry 20 }  
+
+    
+  hwTACACSServerGroupCurAuthenAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current authen server Address."
+    ::={ hwTACACSServerGroupTableEntry 21 }
+
+  hwTACACSServerGroupCurAuthorAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current author server Address."
+    ::={ hwTACACSServerGroupTableEntry 22 }
+
+  hwTACACSServerGroupCurAccoutAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current account server Address."
+    ::={ hwTACACSServerGroupTableEntry 23 }
+  
+   
+    
+  hwTACACSPriAuthenClientRoundTripTime OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Round trip time about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 24 }
+
+  hwTACACSPriAuthenClientAccessReqPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request packets about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 25 }
+
+  hwTACACSPriAuthenClientAccessReqLogin OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request login packets about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 26 }
+
+  hwTACACSPriAuthenClientAccessReqChaPass OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request change password packets about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 27 }
+
+  hwTACACSPriAuthenClientAccessReqSendPass OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request send password packets about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 28 }
+
+  hwTACACSPriAuthenClientAccessReqSendAuth OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request send authen packets about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 29 }
+
+  hwTACACSPriAuthenClientAccessResPack OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response packets about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 30 }
+
+  hwTACACSPriAuthenClientAccessResPass OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response pass packets about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 31 }
+
+  hwTACACSPriAuthenClientAccessResFail OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response fail packets about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 32 }
+
+  hwTACACSPriAuthenClientAccessResGetData OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Get data packets about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 33 }
+
+  hwTACACSPriAuthenClientAccessResGetUser OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Get user packets about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 34 }
+
+  hwTACACSPriAuthenClientAccessResGetPass OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Get password packets about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 35 }
+
+  hwTACACSPriAuthenClientAccessResRestart OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Restart packets about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 36 }
+
+  hwTACACSPriAuthenClientAccessResError OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response error packets about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 37 }
+
+  hwTACACSPriAuthenClientAccessResFollow OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Follow packets about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 38 }
+
+  hwTACACSPriAuthenClientMalformedAccessResponses OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response packets about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 39 }
+
+  hwTACACSPriAuthenClientAccessConPack OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Connection packets about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 40 }
+
+  hwTACACSPriAuthenClientAccessConAbort OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Connection abort packets about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 41 }
+
+  hwTACACSPriAuthenClientPendingRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request pending packets about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 42 }
+
+  hwTACACSPriAuthenClientTimeouts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time out packets about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 43 }
+
+  hwTACACSPriAuthenClientUnknownTypes OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unknown type packets about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 44 }
+
+  hwTACACSPriAuthenClientPacketsDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Drop packets about  primary authen server."
+    ::={ hwTACACSServerGroupTableEntry 45 }
+
+  hwTACACSPriAuthorClientRoundTripTime OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Round trip time about  primary author server."
+    ::={ hwTACACSServerGroupTableEntry 46 }
+
+  hwTACACSPriAuthorClientReqPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request packets about  primary author server."
+    ::={ hwTACACSServerGroupTableEntry 47 }
+
+  hwTACACSPriAuthorClientReqEXEC OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request exec packets about  primary author server."
+    ::={ hwTACACSServerGroupTableEntry 48 }
+
+
+  hwTACACSPriAuthorClientReqVPDN OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request vpdn packets about  primary author server."
+    ::={ hwTACACSServerGroupTableEntry 49 }
+
+
+  hwTACACSPriAuthorClientResPack OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response packets about  primary author server."
+    ::={ hwTACACSServerGroupTableEntry 50 }
+
+  hwTACACSPriAuthorClientResEXEC OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response exec packet about  primary author server."
+    ::={ hwTACACSServerGroupTableEntry 51 }
+
+
+  hwTACACSPriAuthorClientResVPDN OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response vpdn packets about  primary author server."
+    ::={ hwTACACSServerGroupTableEntry 52 }
+
+
+  hwTACACSPriAuthorClientResError OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response error packets about  primary author server."
+    ::={ hwTACACSServerGroupTableEntry 53 }
+
+  hwTACACSPriAuthorClientReqPending OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request pending packets about  primary author server."
+    ::={ hwTACACSServerGroupTableEntry 54 }
+
+  hwTACACSPriAuthorClientTimeouts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time out packets about  primary author server."
+    ::={ hwTACACSServerGroupTableEntry 55 }
+
+  hwTACACSPriAuthorClientUnknownTypes OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unknown type packets about  primary author server."
+    ::={ hwTACACSServerGroupTableEntry 56 }
+
+  hwTACACSPriAuthorClientPacketsDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Drop packets about  primary author server."
+    ::={ hwTACACSServerGroupTableEntry 57 }
+    
+  hwTACACSPriAccClientRoundTripTime OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Round trip time about  primary accounting server."
+    ::={ hwTACACSServerGroupTableEntry 58 }
+
+  hwTACACSPriAccClientReqPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request packets about  primary accounting server."
+    ::={ hwTACACSServerGroupTableEntry 59 }
+
+  hwTACACSPriAccClientReqNetwork OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request network packets about  primary accounting server."
+    ::={ hwTACACSServerGroupTableEntry 60 }
+
+  hwTACACSPriAccClientReqConnection OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request connection packets about  primary accounting server."
+    ::={ hwTACACSServerGroupTableEntry 61 }
+
+  hwTACACSPriAccClientReqEXEC OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request exec packets about  primary accounting server."
+    ::={ hwTACACSServerGroupTableEntry 62 }
+
+  hwTACACSPriAccClientReqSysEvent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request system event packets about  primary accounting server."
+    ::={ hwTACACSServerGroupTableEntry 63 }
+
+  hwTACACSPriAccClientReqCommandLevel OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request command level packets about  primary accounting server."
+    ::={ hwTACACSServerGroupTableEntry 64 }
+
+  hwTACACSPriAccClientReqUpdate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request update packets about  primary accounting server."
+    ::={ hwTACACSServerGroupTableEntry 65 }
+
+  hwTACACSPriAccClientResPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response packets about  primary accounting server."
+    ::={ hwTACACSServerGroupTableEntry 66 }
+
+  hwTACACSPriAccClientResError OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response error packets about  primary accounting server."
+    ::={ hwTACACSServerGroupTableEntry 67 }
+
+  hwTACACSPriAccClientReqPending OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request pending packets about  primary accounting server."
+    ::={ hwTACACSServerGroupTableEntry 68 }
+
+  hwTACACSPriAccClientTimeouts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time out packets about  primary accounting server."
+    ::={ hwTACACSServerGroupTableEntry 69 }
+
+  hwTACACSPriAccClientUnknownTypes OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unknown types packets about  primary accounting server."
+    ::={ hwTACACSServerGroupTableEntry 70 }
+
+  hwTACACSPriAccClientPacketsDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Drop packets about  primary accounting server."
+    ::={ hwTACACSServerGroupTableEntry 71 }
+    
+    
+  hwTACACSSecAuthenClientRoundTripTime OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Round trip time about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 72 }
+
+  hwTACACSSecAuthenClientAccessReqPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request packets about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 73 }
+
+  hwTACACSSecAuthenClientAccessReqLogin OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request login packets about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 74 }
+
+  hwTACACSSecAuthenClientAccessReqChaPass OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request change password packets about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 75 }
+
+  hwTACACSSecAuthenClientAccessReqSendPass OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request send password packets about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 76 }
+
+  hwTACACSSecAuthenClientAccessReqSendAuth OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request send authen packets about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 77 }
+
+  hwTACACSSecAuthenClientAccessResPack OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response packets about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 78 }
+
+  hwTACACSSecAuthenClientAccessResPass OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response pass packets about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 79 }
+
+  hwTACACSSecAuthenClientAccessResFail OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response fail packets about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 80 }
+
+  hwTACACSSecAuthenClientAccessResGetData OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Get data packets about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 81 }
+
+  hwTACACSSecAuthenClientAccessResGetUser OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Get user packets about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 82 }
+
+  hwTACACSSecAuthenClientAccessResGetPass OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Get password packets about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 83 }
+
+  hwTACACSSecAuthenClientAccessResRestart OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Restart packets about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 84 }
+
+  hwTACACSSecAuthenClientAccessResError OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response error packets about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 85 }
+
+  hwTACACSSecAuthenClientAccessResFollow OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Follow packets about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 86 }
+
+  hwTACACSSecAuthenClientMalformedAccessResponses OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response packets about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 87 }
+
+  hwTACACSSecAuthenClientAccessConPack OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Connection packets about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 88 }
+
+  hwTACACSSecAuthenClientAccessConAbort OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Connection abort packets about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 89 }
+
+  hwTACACSSecAuthenClientPendingRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request pending packets about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 90 }
+
+  hwTACACSSecAuthenClientTimeouts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time out packets about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 91 }
+
+  hwTACACSSecAuthenClientUnknownTypes OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unknown type packets about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 92 }
+
+  hwTACACSSecAuthenClientPacketsDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Drop packets about  second authen server."
+    ::={ hwTACACSServerGroupTableEntry 93 }
+
+  hwTACACSSecAuthorClientRoundTripTime OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Round trip time about  second author server."
+    ::={ hwTACACSServerGroupTableEntry 94 }
+
+  hwTACACSSecAuthorClientReqPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request packets about  second author server."
+    ::={ hwTACACSServerGroupTableEntry 95 }
+
+  hwTACACSSecAuthorClientReqEXEC OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request exec packets about  second author server."
+    ::={ hwTACACSServerGroupTableEntry 96 }
+
+
+  hwTACACSSecAuthorClientReqVPDN OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request VPDN packets about second author server."
+    ::={ hwTACACSServerGroupTableEntry 97 }
+
+
+  hwTACACSSecAuthorClientResPack OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response packets about  second author server."
+    ::={ hwTACACSServerGroupTableEntry 98 }
+
+  hwTACACSSecAuthorClientResEXEC OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response exec packet about  second author server."
+    ::={ hwTACACSServerGroupTableEntry 99 }
+
+
+
+  hwTACACSSecAuthorClientResVPDN OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response VPDN packets about  second author server."
+    ::={ hwTACACSServerGroupTableEntry 100 }
+
+
+  hwTACACSSecAuthorClientResError OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response error packets about  second author server."
+    ::={ hwTACACSServerGroupTableEntry 101 }
+
+  hwTACACSSecAuthorClientReqPending OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request pending packets about  second author server."
+    ::={ hwTACACSServerGroupTableEntry 102 }
+
+  hwTACACSSecAuthorClientTimeouts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time out packets about  second author server."
+    ::={ hwTACACSServerGroupTableEntry 103 }
+
+  hwTACACSSecAuthorClientUnknownTypes OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unknown type packets about  second author server."
+    ::={ hwTACACSServerGroupTableEntry 104 }
+
+  hwTACACSSecAuthorClientPacketsDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Drop packets about  second author server."
+    ::={ hwTACACSServerGroupTableEntry 105 }
+    
+  hwTACACSSecAccClientRoundTripTime OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Round trip time about  second accounting server."
+    ::={ hwTACACSServerGroupTableEntry 106 }
+
+  hwTACACSSecAccClientReqPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request packets about  second accounting server."
+    ::={ hwTACACSServerGroupTableEntry 107 }
+
+  hwTACACSSecAccClientReqNetwork OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request network packets about  second accounting server."
+    ::={ hwTACACSServerGroupTableEntry 108 }
+
+  hwTACACSSecAccClientReqConnection OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request connection packets about  second accounting server."
+    ::={ hwTACACSServerGroupTableEntry 109 }
+
+  hwTACACSSecAccClientReqEXEC OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request exec packets about  second accounting server."
+    ::={ hwTACACSServerGroupTableEntry 110 }
+
+  hwTACACSSecAccClientReqSysEvent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request system event packets about  second accounting server."
+    ::={ hwTACACSServerGroupTableEntry 111 }
+
+  hwTACACSSecAccClientReqCommandLevel OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request command level packets about  second accounting server."
+    ::={ hwTACACSServerGroupTableEntry 112 }
+
+  hwTACACSSecAccClientReqUpdate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request update packets about  second accounting server."
+    ::={ hwTACACSServerGroupTableEntry 113 }
+
+  hwTACACSSecAccClientResPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response packets about  second accounting server."
+    ::={ hwTACACSServerGroupTableEntry 114 }
+
+  hwTACACSSecAccClientResError OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Response error packets about  second accounting server."
+    ::={ hwTACACSServerGroupTableEntry 115 }
+
+  hwTACACSSecAccClientReqPending OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Request pending packets about  second accounting server."
+    ::={ hwTACACSServerGroupTableEntry 116 }
+
+  hwTACACSSecAccClientTimeouts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time out packets about  second accounting server."
+    ::={ hwTACACSServerGroupTableEntry 117 }
+
+  hwTACACSSecAccClientUnknownTypes OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unknown types packets about  second accounting server."
+    ::={ hwTACACSServerGroupTableEntry 118 }
+
+  hwTACACSSecAccClientPacketsDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Drop packets about  second accounting server."
+    ::={ hwTACACSServerGroupTableEntry 119 }    
+
+hwTACACSServerGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "RowStatus."
+    ::={ hwTACACSServerGroupTableEntry 120 }   
+    
+    
+    
+    --  ============== conformance information ==============
+        hwTacacsConformance OBJECT IDENTIFIER ::= { hwTACACS 2 }
+        
+        
+        hwTacacsCompliances OBJECT IDENTIFIER ::= { hwTacacsConformance 1 }
+        hwTacacsCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    { hwTacacsTableGroup }  
+                                               
+              ::= { hwTacacsCompliances 1 }
+              
+                --  ============== groups ==============  
+        hwTacacsObjectGroups OBJECT IDENTIFIER ::= { hwTacacsConformance 2 } 
+        
+        hwTacacsTableGroup OBJECT-GROUP
+            OBJECTS {       hwTACACSServerGroupIndex, 
+      hwTACACSServerGroupName,
+      hwTACACSServerGroupSourceIP,
+      hwTACACSServerGroupKey,
+      hwTACACSServerGroupTimer,
+      hwTACACSServerGroupDomain,
+      hwTACACSServerGroupOctFmt,      
+      hwTACACSServerGroupTimeout,
+      hwTACACSServerGroupPriAuthenAddr,
+      hwTACACSServerGroupPriAuthenPort,
+      hwTACACSServerGroupPriAuthorAddr,
+      hwTACACSServerGroupPriAuthorPort,      
+      hwTACACSServerGroupPriAccoutAddr,
+      hwTACACSServerGroupPriAccoutPort, 
+      hwTACACSServerGroupSecAuthenAddr,
+      hwTACACSServerGroupSecAuthenPort,
+      hwTACACSServerGroupSecAuthorAddr,
+      hwTACACSServerGroupSecAuthorPort,
+      hwTACACSServerGroupSecAccoutAddr,      
+      hwTACACSServerGroupSecAccoutPort,
+      hwTACACSServerGroupCurAuthenAddr,
+      hwTACACSServerGroupCurAuthorAddr,
+      hwTACACSServerGroupCurAccoutAddr,
+      hwTACACSPriAuthenClientRoundTripTime,
+      hwTACACSPriAuthenClientAccessReqPacket,
+      hwTACACSPriAuthenClientAccessReqLogin,
+      hwTACACSPriAuthenClientAccessReqChaPass,
+      hwTACACSPriAuthenClientAccessReqSendPass,
+      hwTACACSPriAuthenClientAccessReqSendAuth,
+      hwTACACSPriAuthenClientAccessResPack    ,
+      hwTACACSPriAuthenClientAccessResPass    ,
+      hwTACACSPriAuthenClientAccessResFail    ,
+      hwTACACSPriAuthenClientAccessResGetData    ,
+      hwTACACSPriAuthenClientAccessResGetUser    ,
+      hwTACACSPriAuthenClientAccessResGetPass    ,
+      hwTACACSPriAuthenClientAccessResRestart    ,
+      hwTACACSPriAuthenClientAccessResError    ,
+      hwTACACSPriAuthenClientAccessResFollow,
+      hwTACACSPriAuthenClientMalformedAccessResponses,
+      hwTACACSPriAuthenClientAccessConPack    ,
+      hwTACACSPriAuthenClientAccessConAbort    ,
+      hwTACACSPriAuthenClientPendingRequests    ,
+      hwTACACSPriAuthenClientTimeouts    ,
+      hwTACACSPriAuthenClientUnknownTypes,
+      hwTACACSPriAuthenClientPacketsDropped    ,
+      hwTACACSPriAuthorClientRoundTripTime    ,
+      hwTACACSPriAuthorClientReqPacket,
+      hwTACACSPriAuthorClientReqEXEC    ,
+      hwTACACSPriAuthorClientReqVPDN    ,
+      hwTACACSPriAuthorClientResPack    ,
+      hwTACACSPriAuthorClientResEXEC    ,
+      hwTACACSPriAuthorClientResVPDN    ,
+      hwTACACSPriAuthorClientResError    ,
+      hwTACACSPriAuthorClientReqPending    ,
+      hwTACACSPriAuthorClientTimeouts    ,
+      hwTACACSPriAuthorClientUnknownTypes    ,
+      hwTACACSPriAuthorClientPacketsDropped    ,
+      hwTACACSPriAccClientRoundTripTime    ,
+      hwTACACSPriAccClientReqPacket    ,
+      hwTACACSPriAccClientReqNetwork    ,
+      hwTACACSPriAccClientReqConnection    ,
+      hwTACACSPriAccClientReqEXEC    ,
+      hwTACACSPriAccClientReqSysEvent    ,
+      hwTACACSPriAccClientReqCommandLevel    ,
+      hwTACACSPriAccClientReqUpdate    ,
+      hwTACACSPriAccClientResPacket    ,
+      hwTACACSPriAccClientResError    ,
+      hwTACACSPriAccClientReqPending    ,
+      hwTACACSPriAccClientTimeouts    ,
+      hwTACACSPriAccClientUnknownTypes    ,
+      hwTACACSPriAccClientPacketsDropped    , 
+      hwTACACSSecAuthenClientRoundTripTime    ,
+      hwTACACSSecAuthenClientAccessReqPacket    ,
+      hwTACACSSecAuthenClientAccessReqLogin    ,
+      hwTACACSSecAuthenClientAccessReqChaPass    ,
+      hwTACACSSecAuthenClientAccessReqSendPass    ,
+      hwTACACSSecAuthenClientAccessReqSendAuth    ,
+      hwTACACSSecAuthenClientAccessResPack    ,
+      hwTACACSSecAuthenClientAccessResPass    ,
+      hwTACACSSecAuthenClientAccessResFail    ,
+      hwTACACSSecAuthenClientAccessResGetData    ,
+      hwTACACSSecAuthenClientAccessResGetUser    ,
+      hwTACACSSecAuthenClientAccessResGetPass    ,
+      hwTACACSSecAuthenClientAccessResRestart    ,
+      hwTACACSSecAuthenClientAccessResError    ,
+      hwTACACSSecAuthenClientAccessResFollow    ,
+      hwTACACSSecAuthenClientMalformedAccessResponses    ,
+      hwTACACSSecAuthenClientAccessConPack    ,
+      hwTACACSSecAuthenClientAccessConAbort    ,
+      hwTACACSSecAuthenClientPendingRequests    ,
+      hwTACACSSecAuthenClientTimeouts    ,
+      hwTACACSSecAuthenClientUnknownTypes    ,
+      hwTACACSSecAuthenClientPacketsDropped    ,
+      hwTACACSSecAuthorClientRoundTripTime    ,
+      hwTACACSSecAuthorClientReqPacket    ,
+      hwTACACSSecAuthorClientReqEXEC    ,
+      hwTACACSSecAuthorClientReqVPDN    ,
+      hwTACACSSecAuthorClientResPack    ,
+      hwTACACSSecAuthorClientResEXEC    ,
+      hwTACACSSecAuthorClientResVPDN    ,
+      hwTACACSSecAuthorClientResError    ,
+      hwTACACSSecAuthorClientReqPending    ,
+      hwTACACSSecAuthorClientTimeouts    ,
+      hwTACACSSecAuthorClientUnknownTypes    ,
+      hwTACACSSecAuthorClientPacketsDropped    ,
+      hwTACACSSecAccClientRoundTripTime    ,
+      hwTACACSSecAccClientReqPacket    ,
+      hwTACACSSecAccClientReqNetwork    ,
+      hwTACACSSecAccClientReqConnection    ,
+      hwTACACSSecAccClientReqEXEC    ,
+      hwTACACSSecAccClientReqSysEvent    ,
+      hwTACACSSecAccClientReqCommandLevel    ,
+      hwTACACSSecAccClientReqUpdate    ,
+      hwTACACSSecAccClientResPacket    ,
+      hwTACACSSecAccClientResError    ,
+      hwTACACSSecAccClientReqPending    ,
+      hwTACACSSecAccClientTimeouts    ,
+      hwTACACSSecAccClientUnknownTypes    ,
+      hwTACACSSecAccClientPacketsDropped    ,
+      hwTACACSServerGroupRowStatus     }
+            STATUS current
+            DESCRIPTION 
+                "The HWTACACS configuration table."
+            ::= { hwTacacsObjectGroups 1 }
+             
+
+END
+

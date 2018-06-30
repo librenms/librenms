@@ -12,7 +12,7 @@ if (count($mempools)) {
         <div class="panel-heading">
         ';
     echo '<a href="device/device='.$device['device_id'].'/tab=health/metric=mempool/">';
-    echo "<img src='images/icons/memory.png'> <strong>Memory Pools</strong></a>";
+    echo '<i class="fa fa-braille fa-lg icon-theme" aria-hidden="true"></i> <strong>Memory Pools</strong></a>';
     echo '
         </div>
         <table class="table table-hover table-condensed table-striped">
@@ -24,7 +24,7 @@ if (count($mempools)) {
         $total      = formatStorage($mempool['mempool_total']);
         $used       = formatStorage($mempool['mempool_used']);
         $free       = formatStorage($mempool['mempool_free']);
-        $background = get_percentage_colours($percent);
+        $background = get_percentage_colours($percent, $mempool['mempool_perc_warn']);
 
         $graph_array           = array();
         $graph_array['height'] = '100';

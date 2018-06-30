@@ -1,0 +1,14 @@
+os: huaweiups
+text: 'Huawei UPS'
+group: ups
+type: power
+icon: huawei
+rfc1628_compat: true
+over:
+    - { graph: device_current, text: Current }
+discovery:
+    -
+      sysDescr: Linux GSE200M
+      snmpget:
+        oid: UPS-MIB::upsIdentManufacturer.0
+        value: HUAWEI

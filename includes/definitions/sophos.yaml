@@ -1,0 +1,14 @@
+os: sophos
+text: 'Sophos UTM Firewall'
+type: firewall
+icon: sophos
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+      sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+      sysDescr_regex:
+        - '/^Linux \S+ [0-9\-.]{1,11}\.g[a-f\d]{7}\./'
+        - '/^Linux \S+ [0-9\-.]{1,19}\.g[a-f\d]{7}\./'

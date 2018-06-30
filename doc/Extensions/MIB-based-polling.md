@@ -1,7 +1,7 @@
 source: Extensions/MIB-based-polling.md
 ## WARNING ##
 
-MIB-based polling is experimental.  It might overload your LibreNMS server,
+MIB-based polling is unmaintained and may be removed in the future.  It might overload your LibreNMS server,
 destroy your data, set your routers on fire, and kick your cat.  It has been
 tested against a very limited set of devices (namely Ruckus ZD1000 wireless
 controllers, and `net-snmp` on Linux).  It may fail badly on other hardware.
@@ -23,7 +23,7 @@ using the script `contrib/convert-mib-graphs.sh`.  Failure to do so will
 result in your data collection silently stopping.
 
 MIB-based polling is disabled by default; you must set
-    `$config['poller_modules']['mib'] = 1;`
+    `$config['poller_modules']['mib'] = true;`
 in `config.php` to enable it.
 
 ## Preparation ##
@@ -147,36 +147,26 @@ graph.
 
 ## Configuration
 ### Main Configuration
-In `/opt/librenms/config.php` add `$config['poller_modules']['mib'] = 1;`
+In `/opt/librenms/config.php` add `$config['poller_modules']['mib'] = true;` to enable MIB polling globally.
+Alternatively you can enable MIB polling per device by enabling it within the modules section for the specific device.
 
 ### Discovery
 
-You need to add your desired MIBs to `/opt/librenms/mibs` folder. Afterwards you need to register your MIBs to the discovery function. 
+You need to add your desired MIBs to `/opt/librenms/mibs` folder. 
+You will then need to create a list of the OIDs you wish to use in the OS definition.
 
 #### Example
-`/opt/librenms/includes/discovery/os/f5.inc.php`
+`/opt/librenms/includes/definitions/ruckuswireless.yaml`
 
-```
-<?php
-if (!$os || $os === 'linux') {
-    $f5_sys_parent = '1.3.6.1.4.1.3375.2.1';
-    if (strpos($sysObjectId, $f5_sys_parent)) {
-        $os = 'f5';
-   }
-
-}
-
-### MIB definition as an array 
-$f5_mibs = array(
-                "ltmVirtualServStatEntry" => "F5-BIGIP-LOCAL-MIB",
-        );
-
-### Actual registering of the MIB
-register_mibs($device, $f5_mibs, "includes/discovery/os/f5.inc.php");
-
+```yaml
+register_mibs:
+    ruckusZDSystemStats: RUCKUS-ZD-SYSTEM-MIB
+    ruckusZDWLANTable: RUCKUS-ZD-WLAN-MIB
+    ruckusZDWLANAPTable: RUCKUS-ZD-WLAN-MIB
+    ruckusZDWLANAPRadioStatsTable: RUCKUS-ZD-WLAN-MIB
 ```
 
-The important thing is the array $f5_mibs where you define which parts (ltmVirtualServStatEntry) of the MIB (F5-BIGIP-LOCAL-MIB) you are going to add. The registering is also important, otherwise poller cannot make use of the MIB.
+These OIDs and MIBs will then be registered as part of the OS discovery ready for mib polling to work.
 
 ## TODO ##
 

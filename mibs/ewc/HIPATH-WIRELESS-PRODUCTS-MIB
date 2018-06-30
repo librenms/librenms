@@ -1,0 +1,916 @@
+	HIPATH-WIRELESS-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			hiPathWirelessProducts, hiPathWirelessModules			
+				FROM HIPATH-WIRELESS-SMI			
+			MODULE-IDENTITY, OBJECT-IDENTITY			
+				FROM SNMPv2-SMI;
+	
+	
+		-- 1.3.6.1.4.1.4329.15.5.1
+		hiPathWirelessProductsMIB MODULE-IDENTITY 
+			LAST-UPDATED "201608051556Z"  -- Friday August 5 15:56 UTC 2016
+			ORGANIZATION 
+				"Chantry Networks Inc."
+			CONTACT-INFO 
+				"Chantry Networks, Inc.
+				
+				55 Commerce Valley Drive (W), Suite 400
+				Thornhill, Ontario L3T 7V9, Canada
+				
+				Phone:   1-289-695-3182
+				Fax:     1 289-695-3299"
+			DESCRIPTION 
+				"This module defines object identifiers assigned to Enterasys Wireless hardware devices."
+
+
+			REVISION "201608051556Z"  -- Friday August 5 15:56 UTC 2016
+			DESCRIPTION 
+				"AP3912i-FCC and AP3912i-ROW access points were added."
+
+			REVISION "201607192221Z"  -- Tuesday July 19 22:21 UTC 2016
+			DESCRIPTION 
+				"AP3935i-IL access point was added."
+
+
+			REVISION "201602231826Z"  -- Tuesday Feb 23 18:26 UTC 2016
+			DESCRIPTION 
+				"Following access point platforms were added:
+				ap3805FCCi, ap3805FCCe, ap3805ROWi, ap3805ROWe,
+				ap3825i-1, ap3825e-1, apVMAPFCCi, and apVMAPROWi."
+
+
+			REVISION "201509211202Z"		-- September 21, 2015 at 12:02 GMT
+			DESCRIPTION 
+				"apW786C2SFP access point was added."
+
+			REVISION "201508131102Z"		-- August 13, 2015 at 11:02 GMT
+			DESCRIPTION 
+				"Following access point platforms were added:
+				ap3935FCCe, ap3965FCCe, ap3935ROWe,
+				ap3965ROWe, ap3935FCCi, ap3965FCCi,
+				ap3935ROWi, and ap3965ROWi."
+
+				
+			REVISION "201411061654Z"		-- November 6, 2014 at 16:54 GMT
+			DESCRIPTION 
+				"New EWC C35 controller platform was added.
+				Modified v2110H controller's description. 
+				Following access points were added to the MIB as well:
+				ap3801i"
+				
+			REVISION "201410281600Z"		-- October 28, 2014 at 16:00 GMT
+			DESCRIPTION 
+				"Added new virtual controller platform: v2110H."
+				
+
+			REVISION "201406301555Z"		-- Jun 30, 2014 at 15:55 GMT
+			DESCRIPTION 
+				"Following access point platforms were added:
+				ap3805i and ap3805e"
+
+			REVISION "201404031553Z"		-- April 03, 2014 at 15:53 GMT
+			DESCRIPTION 
+				"Following access point platforms were added:
+				ap3865e"
+
+			REVISION "201311121553Z"		-- November 12, 2013 at 15:53 GMT
+			DESCRIPTION 
+				"Following access point platforms were added:
+				ap3825i
+				ap3825e"
+				
+			REVISION "201311061445Z"		-- November 6, 2013 at 14:45 GMT
+			DESCRIPTION 
+				"Following access point platform was added:
+				ap3715i-1"
+				
+			REVISION "201303061553Z"		-- March 6, 2013 at 15:53 GMT
+			DESCRIPTION 
+				"Following access point platforms were added:
+				ap3715i
+				ap3715e
+				ap3630ROW1i
+				ap3640ROW1e"
+				
+			REVISION "201208201553Z"		-- August 20, 2012 at 15:53 GMT
+			DESCRIPTION 
+				"New EWC C5210 controller platform was added.
+				Following access points were added to the MIB as well:
+				ap3710i
+				ap3710e
+				ap3725i
+				ap3725e"
+				
+			REVISION "201206191106Z"		-- June 19, 2012 at 11:06 GMT
+			DESCRIPTION 
+				"Following access point platforms were added:
+				ap3765e
+				ap3767e
+				ap3705i
+				And  ap3705 is  obsolete."
+				
+			REVISION "201202131533Z"		-- February 13, 2012 at 15:33 GMT
+			DESCRIPTION 
+				"Added the following access point platforms:
+				ap3765i
+				ap3660Rev1."
+				
+			REVISION "201107141345Z"		-- July 14, 2011 at 13:45 GMT
+			DESCRIPTION 
+				"Added new virtual controller platform: v2110."
+				
+			REVISION "201104251420Z"		-- April 25, 2011 at 14:20 GMT
+			DESCRIPTION 
+				"Replaced following text in the description of OID
+				 	HiPath with Enterasys
+				 	HWC   with  EWC
+				Added the following access point platforms:
+				apW786C2RJ45
+				apW786C2IARJ45
+				apW788C2RJ45
+				apW788C2M12
+				ap3705."
+				
+			REVISION "201101131110Z"		-- January 13, 2011 at 11:10 GMT
+			DESCRIPTION 
+				"Many editorial changes. 
+				- changed OBJECT IDENTIFIERS into OBJECT-IDENTITY macro invocations.
+				- Added the following OIDs for access points:
+				ap2660Rev2,  apW786Rev2PROe2
+				apW786Rev2PROeFO2,  apW786Rev2PROiFO2
+				ap3630NAMInternal,  ap3640NAMExternal
+				ap3630ROWInternal,  ap3640ROWExternal
+				ap3630ILInternal,   ap3640ILExternal.
+				- New controller platform is added:  c25."
+				
+			REVISION "201004291744Z"		-- April 29, 2010 at 17:44 GMT
+			DESCRIPTION 
+				"HWC release 7.31:  New Access Point types have been added."
+				
+			REVISION "200901201543Z"		-- January 20, 2009 at 15:43 GMT
+			DESCRIPTION 
+				"Added OID for new HiPath Controller C4110.
+				Added OID for new Access Point (2605)."
+				
+			REVISION "200811191021Z"		-- November 19, 2008 at 10:21 GMT
+			DESCRIPTION 
+				"Added OID for new HiPath Controllers (CRBT-8110, CRBT-8210 and C5110)."
+				
+			REVISION "200708071357Z"		-- August 07, 2007 at 13:57 GMT
+			DESCRIPTION 
+				"Added product OID for new Access Point."
+				
+			REVISION "200609111803Z"		-- September 11, 2006 at 18:03 GMT
+			DESCRIPTION 
+				"Added OID for C2000 platform."
+				
+			REVISION "200507211450Z"		-- July 21, 2005 at 14:50 GMT
+			DESCRIPTION 
+				"Initial revision."
+			::= { hiPathWirelessModules 1 }
+
+		
+	
+--
+-- Node definitions
+--
+	
+		-- 1.3.6.1.4.1.4329.15.1.1
+		control OBJECT IDENTIFIER ::= { hiPathWirelessProducts 1 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.1.1
+		c10 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless Controller C10 platform."
+			::= { control 1 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.1.2
+		c100 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless Controller C100 platform."
+			::= { control 2 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.1.3
+		c1000 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless Controller C1000 platform."
+			::= { control 3 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.1.4
+		hiPathWirelessManager OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless Controller manager server."
+			::= { control 4 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.1.5
+		c2000 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless Controller C2000 platform."
+			::= { control 5 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.1.6
+		c20 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless Controller C20 platform."
+			::= { control 6 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.1.7
+		c20N OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless Controller C20N platform."
+			::= { control 7 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.1.8
+		crbt8110 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless Controller CRBT-8110 platform."
+			::= { control 8 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.1.9
+		crbt8210 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless Controller CRBT-8210 platform."
+			::= { control 9 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.1.10
+		c5110 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless Controller C5110 platform."
+			::= { control 10 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.1.11
+		c4110 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless Controller C4110 platform."
+			::= { control 11 }
+
+
+		-- 1.3.6.1.4.1.4329.15.1.1.12
+		c25 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless Controller C25 platform."
+			::= { control 12 }
+		
+
+		-- 1.3.6.1.4.1.4329.15.1.1.13
+		v2110 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless Virtual Gateway 2110."
+			::= { control 13 }
+
+
+		-- 1.3.6.1.4.1.4329.15.1.1.14
+		c5210 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless Controller C5210 platform."
+			::= { control 14 }
+
+
+		-- 1.3.6.1.4.1.4329.15.1.1.15
+		v2110H OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless Controller V2110 Hyper-V Edition."
+			::= { control 15 }
+
+
+		-- 1.3.6.1.4.1.4329.15.1.1.17
+		c35 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless Controller C35 platform."
+			::= { control 17 }
+
+
+		-- 1.3.6.1.4.1.4329.15.1.2
+		access OBJECT IDENTIFIER ::= { hiPathWirelessProducts 2 }
+
+		-- 1.3.6.1.4.1.4329.15.1.2.2
+		ap26xx OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Generic legacy access point known as 26xx family."
+			::= { access 2 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.3
+		ap2600 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless Access Point 2600 series"
+			::= { access 3 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.4
+		ap2650 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless access point 2650 series."
+			::= { access 4 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.5
+		apW786 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless access point scalance 786 series."
+			::= { access 5 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.6
+		apW788 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless access point scalance 788 series."
+			::= { access 6 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.7
+		ap3610 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless access point 802.11n series."
+			::= { access 7 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.8
+		ap2605 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless access point 2605 series."
+			::= { access 8 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.9
+		ap3630 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless access point 3630 series (standalone 11n AP)."
+			::= { access 9 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.10
+		ap3640 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless access point 3640 series (standalone 11n AP)."
+			::= { access 10 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.11
+		ap2650Rev1 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless access point 2650 revision one known as AP2650-1."
+			::= { access 11 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.12
+		apW786Rev1 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless access point W786 revision one known as W786-1."
+			::= { access 12 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.13
+		ap4102 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless access point 4102 family."
+			::= { access 13 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.14
+		ap4102c OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless access point 4102C family."
+			::= { access 14 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.15
+		ap4102RevEU OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless access point 4102 family for Europe known as AP4102-EU."
+			::= { access 15 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.16
+		ap4102cRevEU OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless access point 4102C family for Europe known as AP4102-EU."
+			::= { access 16 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.17
+		ap2600Rev1 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless access point 2600 revision one known as AP2600-1."
+			::= { access 17 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.18
+		ap3600Rev1 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless access point 3600 revision one known as AP3600-1."
+			::= { access 18 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.19
+		ap2650Rev2 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless access point AP2650-2 internal revision two from AP2650-2 platform."
+			::= { access 19 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.20
+		apW786Rev2 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless internal access point W786 revision two from W786-2 platform family
+				known as 'A&D Scalance W786-2HPW-Internal-2'."
+			::= { access 20 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.21
+		ap3600 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless access point 3600 (802.11n)."
+			::= { access 21 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.22
+		ap3605 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless access point 3605 series."
+			::= { access 22 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.23
+		ap3660 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless AP3660 outdoor access point."
+			::= { access 23 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.24
+		ap2660Rev2 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless access point AP2660-2 external revision two from AP2650-2 platform."
+			::= { access 24 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.25
+		apW786Rev2PROe2 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless external access point W786 revision two from W786-2 platform family
+				known as 'A&D Scalance W786-2HPW-External-2'."
+			::= { access 25 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.26
+		apW786Rev2PROeFO2 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless external access point W786 revision two from W786-2 platform family
+				known as 'A&D Scalance W786-2HPW-External-FO-2'."
+			::= { access 26 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.27
+		apW786Rev2PROiFO2 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless external access point W786 revision two from W786-2 platform family
+				known as 'A&D Scalance W786-2HPW-Internal-FO-2'."
+			::= { access 27 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.28
+		ap3630NAMInternal OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless AP3630-NAM internal access point for North American region."
+			::= { access 28 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.29
+		ap3640NAMExternal OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless AP3640-NAM external access point for North American region."
+			::= { access 29 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.30
+		ap3630ROWInternal OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless AP3630-ROW internal access point for all regions except North America 
+				and Israel."
+			::= { access 30 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.31
+		ap3640ROWExternal OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless AP3640-ROW external access point for all regions except North America 
+				and Israel."
+			::= { access 31 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.32
+		ap3630ILInternal OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless AP3630-IL internal access point for Israel only."
+			::= { access 32 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.33
+		ap3640ILExternal OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless AP3640-IL external access point for Israel only."
+			::= { access 33 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.34
+		apW786C2RJ45 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless Fit access point, model W786C-2-RJ45, with external antenna."
+			::= { access 34 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.35
+		apW786C2IARJ45 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless Fit access point, model W786C-2IA-RJ45, with internal antenna."
+			::= { access 35 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.36
+		apW788C2RJ45 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless Fit access point, model W788C-2-RJ45, with external antenna."
+			::= { access 36 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.37
+		apW788C2M12 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless Fit access point, model W788C-2-M12, with external antenna."
+			::= { access 37 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.38
+		ap3705 OBJECT-IDENTITY
+			STATUS obsolete
+			DESCRIPTION 
+				"Enterasys Wireless AP3705 access point with internal antenna."
+			::= { access 38 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.39
+		ap3765i OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless Fit outdoor access point, model AP3765i, with internal antenna."
+			::= { access 39 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.40
+		ap3660Rev1 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless AP3660-1 outdoor access point."
+			::= { access 40 }
+
+
+		-- 1.3.6.1.4.1.4329.15.1.2.41
+		ap3765e OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless AP3765e External access point."
+			::= { access 41 }
+		
+	
+		-- 1.3.6.1.4.1.4329.15.1.2.42
+		ap3767e OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless AP3767e External access point."
+			::= { access 42 }
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.43
+		ap3705i OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless AP3705i access point with internal antenna."
+			::= { access 43 }
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.44
+		ap3710i OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless 3710i AP dual-radio 3x3:3  with internal antennas."
+			::= { access 44 }
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.45
+		ap3710e OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless 3710e AP dual-radio 3x3:3 with external antennas"
+			::= { access 45 }
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.46
+		ap3725i OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless 3725i AP  dual-radio 3x3:3 and a dual-band 2x2:2 radio with internal antennas."
+			::= { access 46 }
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.47
+		ap3725e OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless 3725e AP dual-radio 3x3:3 and a dual-band 2x2:2 radio with external antennas."
+			::= { access 47 }
+
+		-- 1.3.6.1.4.1.4329.15.1.2.48
+		ap3715i OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless AP3715i access point with internal antenna."
+			::= { access 48 }
+		
+		-- 1.3.6.1.4.1.4329.15.1.2.49
+		ap3715e OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless AP3715e access point with external antenna."
+			::= { access 49 }
+
+		-- 1.3.6.1.4.1.4329.15.1.2.50
+		ap3630ROW1i OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless AP3630-ROW-1 access point with internal antenna."
+			::= { access 50 }
+
+
+		-- 1.3.6.1.4.1.4329.15.1.2.51
+		ap3640ROW1e OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless AP3640-ROW-1 access point with external antenna."
+			::= { access 51 }
+
+		-- 1.3.6.1.4.1.4329.15.1.2.52
+		ap3715i-1 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless AP3715i-1 access point with internal antenna."
+			::= { access 52 }
+
+		-- 1.3.6.1.4.1.4329.15.1.2.53
+		ap3825i OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless AP3825i access point with internal antenna."
+			::= { access 53 }
+
+
+		-- 1.3.6.1.4.1.4329.15.1.2.54
+		ap3825e OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Enterasys Wireless AP3825e access point with external antenna."
+			::= { access 54 }
+			
+		-- 1.3.6.1.4.1.4329.15.1.2.55
+		ap3865e OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless AP3865e access point with external antenna."
+			::= { access 55 }
+
+		-- 1.3.6.1.4.1.4329.15.1.2.56
+		ap3805i OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless AP3805i access point with internal antenna."
+			::= { access 56 }
+
+		-- 1.3.6.1.4.1.4329.15.1.2.57
+		ap3805e OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless AP3805e access point with external antenna."
+			::= { access 57 }
+
+		-- 1.3.6.1.4.1.4329.15.1.2.58
+		ap3801i OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless AP3801i access point with internal antenna."
+			::= { access 58 }
+
+		-- 1.3.6.1.4.1.4329.15.1.2.59
+		ap3935FCCe OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless AP3935FCCe access point with external antenna."
+			::= { access 59 }
+
+
+		-- 1.3.6.1.4.1.4329.15.1.2.60
+		ap3965FCCe OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless AP3965FCCe access point with external antenna."
+			::= { access 60 }
+
+		-- 1.3.6.1.4.1.4329.15.1.2.61
+		ap3935ROWe OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless AP3935ROWe access point with external antenna."
+			::= { access 61 }
+
+
+		-- 1.3.6.1.4.1.4329.15.1.2.62
+		ap3965ROWe OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless AP3965ROWe access point with external antenna."
+			::= { access 62 }
+
+		-- 1.3.6.1.4.1.4329.15.1.2.63
+		ap3935FCCi OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless AP3935FCCi access point with internal antenna."
+			::= { access 63 }
+
+		-- 1.3.6.1.4.1.4329.15.1.2.64
+		ap3965FCCi OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless AP3965FCCi access point with internal antenna."
+			::= { access 64 }
+			
+		-- 1.3.6.1.4.1.4329.15.1.2.65
+		ap3935ROWi OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless AP3935ROWi access point with internal antenna."
+			::= { access 65 }
+
+
+		-- 1.3.6.1.4.1.4329.15.1.2.66
+		ap3965ROWi OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless AP3965ROWi access point with internal antenna."
+			::= { access 66 }
+
+		-- 1.3.6.1.4.1.4329.15.1.2.67
+		apW786C2SFP OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless access point, model W786C-2-SFP, with internal antenna."
+			::= { access 67 }
+
+		-- 1.3.6.1.4.1.4329.15.1.2.68
+		ap3805FCCi OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless AP3805FCCi access point with internal antenna."
+			::= { access 68 }
+
+
+
+		-- 1.3.6.1.4.1.4329.15.1.2.69
+		ap3805FCCe OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless AP3805FCCe access point with external antenna."
+			::= { access 69 }
+
+
+
+		-- 1.3.6.1.4.1.4329.15.1.2.70
+		ap3805ROWi OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless AP3805ROWi access point with internal antenna."
+			::= { access 70 }
+
+
+
+		-- 1.3.6.1.4.1.4329.15.1.2.71
+		ap3805ROWe OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless AP3805ROWe access point with external antenna."
+			::= { access 71 }
+
+
+		-- 1.3.6.1.4.1.4329.15.1.2.72
+		ap3825i-1 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless AP3825i-1 access point with internal antenna."
+			::= { access 72 }
+
+
+		-- 1.3.6.1.4.1.4329.15.1.2.73
+		ap3825e-1 OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless AP3825e-1 access point with external antenna."
+			::= { access 73 }
+
+		-- 1.3.6.1.4.1.4329.15.1.2.74
+		apVMAPFCCi OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless Virtual APVMAPi-FCC access point."
+			::= { access 74 }
+
+
+		-- 1.3.6.1.4.1.4329.15.1.2.75
+		apVMAPROWi OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless Virtual APVMAPi-ROW access point."
+			::= { access 75 }
+
+
+		-- 1.3.6.1.4.1.4329.15.1.2.76
+		ap3935i-IL OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless AP3935i-IL access point with internal antenna."
+			::= { access 76 }
+
+		-- 1.3.6.1.4.1.4329.15.1.2.77
+		ap3912FCCi OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless AP3912i-FCC access point with internal antenna."
+			::= { access 77 }
+
+		-- 1.3.6.1.4.1.4329.15.1.2.78
+		ap3912ROWi OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"ExtremeNetworks Wireless AP3912i-ROW access point with internal antenna."
+			::= { access 78 }
+
+
+
+	END

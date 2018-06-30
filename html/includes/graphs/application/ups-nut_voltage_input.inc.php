@@ -34,17 +34,17 @@ $transparency  = 33;
 $rrd_filename = rrd_name($device['hostname'], array('app', 'ups-nut', $app['app_id']));
 $array    = array(
     'input_voltage' => array('descr' => 'Input','colour' => '630606',),
-    'nominal_voltage' => array('descr' => 'Nominal','colour' => '50C150',),
+    'line_nominal' => array('descr' => 'Nominal','colour' => '50C150',)
 );
 
 $i = 0;
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
-    foreach ($array as $ds => $vars) {
+    foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr']    = $vars['descr'];
+        $rrd_list[$i]['descr']    = $var['descr'];
         $rrd_list[$i]['ds']       = $ds;
-        $rrd_list[$i]['colour']   = $vars['colour'];
+        $rrd_list[$i]['colour']   = $var['colour'];
         $i++;
     }
 } else {

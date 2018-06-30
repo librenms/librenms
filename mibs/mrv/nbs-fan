@@ -1,0 +1,187 @@
+NBS-FAN-MIB   DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+
+    DisplayString
+        FROM SNMPv2-TC
+
+    InterfaceIndex
+        FROM IF-MIB
+
+    nbs, NbsTcPartIndex, NbsTcStatusSimple
+        FROM NBS-MIB
+    ;
+
+nbsFanMib  MODULE-IDENTITY
+    LAST-UPDATED "201306270000Z"  -- June 27, 2013
+    ORGANIZATION  "NBS"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+    DESCRIPTION
+      "For managing cooling systems"
+    ::= { nbs 226 }
+
+
+
+
+-- *******************************************************************
+-- Groups in NBS-ODSYS-MIB
+-- *******************************************************************
+
+
+nbsFanFanGrp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Fans in trays and power supplies"
+    ::= { nbsFanMib 1 }
+
+
+nbsFanEventsGrp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       ""
+    ::= { nbsFanMib 100 }
+
+nbsFanEvents OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Event NOTIFICATIONS"
+    ::= { nbsFanEventsGrp 0 }
+
+
+
+
+-- ********************************************************************
+--
+-- Objects for the nbsFanFanGrp group
+--
+-- ********************************************************************
+
+nbsFanFanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsFanFanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Includes all fans in power supplies or fan trays"
+    ::= { nbsFanFanGrp 1 }
+
+nbsFanFanEntry      OBJECT-TYPE
+    SYNTAX      NbsFanFanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A particular fan"
+    INDEX { nbsFanFanParentIfIndex, nbsFanFanParentPartIndex, nbsFanFanIndex }
+    ::= { nbsFanFanTable 1 }
+
+NbsFanFanEntry ::= SEQUENCE {
+    nbsFanFanParentIfIndex     InterfaceIndex,
+    nbsFanFanParentPartIndex   NbsTcPartIndex,
+    nbsFanFanIndex             INTEGER,
+    nbsFanFanDescription       DisplayString,
+    nbsFanFanStatus            NbsTcStatusSimple,
+    nbsFanFanSpeed             INTEGER
+}
+
+nbsFanFanParentIfIndex        OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The ifIndex of the component where this fan is installed"
+    ::= { nbsFanFanEntry 1 }
+
+nbsFanFanParentPartIndex    OBJECT-TYPE
+    SYNTAX      NbsTcPartIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The nbsPartHardPartIndex of the component where this fan is installed"
+    ::= { nbsFanFanEntry 2 }
+
+nbsFanFanIndex    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The ordinal Id of this fan, unique within its parent part."
+    ::= { nbsFanFanEntry 3 }
+
+nbsFanFanDescription  OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..100))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The nbsPartHardDescription of this fan"
+    ::= { nbsFanFanEntry 10 }
+
+nbsFanFanStatus    OBJECT-TYPE
+    SYNTAX      NbsTcStatusSimple
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The operational status of this fan"
+    ::= { nbsFanFanEntry 30 }
+
+nbsFanFanSpeed    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        off          (2),
+        low          (3),
+        medium       (4),
+        high         (5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The speed level of this fan"
+    ::= { nbsFanFanEntry 40 }
+
+nbsFanFanTableSize OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of rows in nbsFanFanTable"
+    ::= { nbsFanFanGrp 2 }
+
+
+
+
+-- ********************************************************************
+--
+-- Notifications in nbsFanEvents
+--
+-- ********************************************************************
+
+
+nbsFanTrapFanStatusBad  NOTIFICATION-TYPE
+    OBJECTS     { nbsFanFanParentIfIndex, nbsFanFanParentPartIndex,
+                  nbsFanFanIndex, nbsFanFanDescription, nbsFanFanStatus }
+    STATUS      current
+    DESCRIPTION
+       "Sent when fan's nbsFanFanStatus changes to bad (2)"
+    ::= { nbsFanEvents 30 }
+
+nbsFanTrapFanStatusOk  NOTIFICATION-TYPE
+    OBJECTS     { nbsFanFanParentIfIndex, nbsFanFanParentPartIndex,
+                  nbsFanFanIndex, nbsFanFanDescription, nbsFanFanStatus }
+    STATUS      current
+    DESCRIPTION
+       "Sent when fan's nbsFanFanStatus changes to good (3)"
+    ::= { nbsFanEvents 31 }
+
+nbsFanTrapFanSpeedChanged  NOTIFICATION-TYPE
+    OBJECTS     { nbsFanFanParentIfIndex, nbsFanFanParentPartIndex,
+                  nbsFanFanIndex, nbsFanFanDescription, nbsFanFanSpeed }
+    STATUS      current
+    DESCRIPTION
+       "Sent when fan's nbsFanFanSpeed changes"
+    ::= { nbsFanEvents 40 }
+
+
+
+END

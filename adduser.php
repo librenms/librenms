@@ -12,24 +12,18 @@
  *
  */
 
-chdir(dirname($argv[0]));
+use LibreNMS\Authentication\Auth;
 
-require 'includes/defaults.inc.php';
-require 'config.php';
-require 'includes/definitions.inc.php';
-require 'includes/functions.php';
-
-if (file_exists('html/includes/authentication/'.$config['auth_mechanism'].'.inc.php')) {
-    include 'html/includes/authentication/'.$config['auth_mechanism'].'.inc.php';
-} else {
-    echo "ERROR: no valid auth_mechanism defined.\n";
-    exit();
+$init_modules = array();
+if (php_sapi_name() != 'cli') {
+    $init_modules[] = 'auth';
 }
+require __DIR__ . '/includes/init.php';
 
-if (auth_usermanagement()) {
+if (Auth::get()->canManageUsers()) {
     if (isset($argv[1]) && isset($argv[2]) && isset($argv[3])) {
-        if (!user_exists($argv[1])) {
-            if (adduser($argv[1], $argv[2], $argv[3], @$argv[4])) {
+        if (!Auth::get()->userExists($argv[1])) {
+            if (Auth::get()->addUser($argv[1], $argv[2], $argv[3], @$argv[4])) {
                 echo 'User '.$argv[1]." added successfully\n";
             }
         } else {

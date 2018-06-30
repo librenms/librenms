@@ -1,0 +1,9 @@
+os: powerwalker
+text: 'PowerWalker UPS'
+type: power
+icon: powerwalker
+discovery:
+   - sysObjectID:
+       - .1.3.6.1.4.1.935.10
+   - sysDescr_regex:
+       - '/^Network Management Card for UPS/'

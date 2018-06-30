@@ -1,0 +1,15 @@
+os: extremeware
+text: Extremeware
+type: network
+ifname: true
+icon: extreme
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+      sysObjectID:
+        - .1.3.6.1.4.1.1916.2.
+      sysDescr:
+        - Release_Master

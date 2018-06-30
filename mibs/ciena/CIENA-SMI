@@ -1,0 +1,95 @@
+-- This file was included in WWP MIB release 04-16-00-0047
+--
+-- CIENA-SMI.my
+--
+--
+
+	CIENA-SMI DEFINITIONS ::= BEGIN
+
+		IMPORTS 
+			enterprises, MODULE-IDENTITY, OBJECT-IDENTITY			
+				FROM SNMPv2-SMI;
+	
+		ciena MODULE-IDENTITY
+			LAST-UPDATED "201304220000Z"
+			ORGANIZATION "Ciena, Inc"
+			CONTACT-INFO
+				"  Mib Meister
+				115 North Sullivan Road
+				Spokane Valley, WA 99037
+				USA            
+				Phone:  +1 509 242 9000
+				Email:  support@ciena.com"
+			DESCRIPTION
+				"MIB Version: MIBS-CIENA-CES-XX-XX-XX-XXX."
+
+			REVISION "201304220000Z"
+			DESCRIPTION
+				"Fixed miscellaneous spelling and description errors."
+
+			REVISION "201212260000Z"
+			DESCRIPTION
+				"Fixed the revision and description minor errors."
+
+			REVISION "201009272317Z"
+			DESCRIPTION
+				"Initial creation of MIB file structure for Ciena Packet Networking Products."
+
+			::= { enterprises 1271 }
+	
+--
+-- Node definitions
+--
+	
+		cienaCes OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION
+				"cienaCes provides a root object identifier that can be
+				used to define MIBs pertaining to Ciena Packet Networking Products."
+			::= { ciena 2 }
+
+		cienaCommon OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION
+				"cienaCes provides a root object identifier that can be
+				used to define common MIBs pertaining to Ciena Packet Networking Products."
+			::= { ciena 1 }
+
+		cienaProducts OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION
+				"cienaProducts is the root OBJECT-IDENTIFIER for all Ciena products.  
+				sysObjectID values will be assigned the OID representing the product specified in 
+				CIENA-PRODUCTS-MIB.my."
+			::= { cienaCommon 2 }
+
+			                                         
+		cienaCesStatistics	  OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION
+				"Provides a root object identifier for all the statistics MIBs."
+			::= { cienaCes 3 }			                    
+			                
+		cienaCesNotifications OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION
+				"Provides a root object identifier for all the notifications."
+			::= { cienaCes 2 }	
+			
+		cienaCesNotificationsControlModule	OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION
+				"Provides a root object identifier to place the state control objects." 		                                    
+			::= { cienaCesNotifications 1 }
+
+		cienaCesConfig OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION
+				"Provides a root object identifier for all the Trap MIBs."
+			::= { cienaCes 1 }			                                    
+
+END
+			
+--
+-- CIENA-SMI.my
+--

@@ -1,0 +1,18 @@
+os: edgeos
+text: EdgeOS
+type: network
+ifname: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_ucd_memory, text: 'Memory Usage' }
+discovery:
+    - sysObjectID: .1.3.6.1.4.1.41112.1.5
+    - sysDescr_regex:
+        - '/^EdgeOS/'
+        - '/^EdgeRouter/'
+bad_if_regexp:
+    - '/^npi[0-9]/'
+    - '/^loop[0-9]/'
+    - '/^gre[0-9]/'
+    - '/^gretap[0-9]/'

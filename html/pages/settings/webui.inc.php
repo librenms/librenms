@@ -7,20 +7,34 @@ $config_groups = get_config_by_group('webui');
 $search_conf = array(
     array('name'               => 'webui.global_search_result_limit',
           'descr'              => 'Set the max search result limit',
-          'type'               => 'text',
+          'type'               => 'numeric',
+          'required'           => true,
     ),
 );
 
 $graph_conf = array(
     array('name'               => 'webui.min_graph_height',
           'descr'              => 'Set the minimum graph height',
-          'type'               => 'text',
+          'type'               => 'numeric',
+          'required'           => true,
+    ),
+    array('name'               => 'webui.graph_type',
+          'descr'              => 'Set the graph type',
+          'type'               => 'select',
+          'options'            => array(
+              'png' => 'png',
+              'svg' => 'svg',
+        ),
+    ),
+    array('name' => 'webui.graph_stacked',
+          'descr' => 'Use stacked graphs',
+          'type' => 'checkbox',
     ),
 );
 
 $availability_map_conf = array(
-    array('name'               => 'webui.old_availability_map',
-          'descr'              => 'Availability map old view',
+    array('name'               => 'webui.availability_map_compact',
+          'descr'              => 'Availability map compact view',
           'type'               => 'checkbox',
     ),
     array('name'               => 'webui.availability_map_sort_status',
@@ -30,6 +44,10 @@ $availability_map_conf = array(
     array('name'               => 'webui.availability_map_use_device_groups',
           'descr'              => 'Use device groups filter',
           'type'               => 'checkbox',
+    ),
+    array('name'               => 'webui.availability_map_box_size',
+          'descr'              => 'Availability box width',
+          'type'               => 'numeric',
     ),
 );
 

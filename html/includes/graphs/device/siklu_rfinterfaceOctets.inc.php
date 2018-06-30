@@ -4,7 +4,7 @@ require 'includes/graphs/common.inc.php';
 
 $rrdfilename = rrd_name($device['hostname'], 'siklu-interface');
 
-if (file_exists($rrdfilename)) {
+if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'bps      Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:rfInOctets='.$rrdfilename.':rfInOctets:AVERAGE ';
     $rrd_options .= ' DEF:rfOutOctets='.$rrdfilename.':rfOutOctets:AVERAGE ';

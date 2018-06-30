@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 /**
  * Check if a port on a Proxmox VM exists
  * @param string  $p Port name
@@ -60,10 +62,12 @@ if ($proxmox) {
         array($device['device_id'], $name)
     );
 
+    $metrics = array();
     if (count($pmxlines) > 0) {
         $pmxcache = array();
 
         foreach ($pmxlines as $vm) {
+            $vm = str_replace('"', '', $vm);
             list($vmid, $vmport, $vmpin, $vmpout, $vmdesc) = explode('/', $vm, 5);
             print "Proxmox ($pmxcluster): $vmdesc: $vmpin/$vmpout/$vmport\n";
 
@@ -72,15 +76,16 @@ if ($proxmox) {
                 'vmid' => $vmid,
                 'vmport' => $vmport
             );
-            $rrd_def = array(
-                'DS:INOCTETS:DERIVE:600:0:12500000000',
-                'DS:OUTOCTETS:DERIVE:600:0:12500000000'
-            );
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('INOCTETS', 'DERIVE', 0, 12500000000)
+                ->addDataset('OUTOCTETS', 'DERIVE', 0, 12500000000);
             $fields = array(
                 'INOCTETS' => $vmpin,
                 'OUTOCTETS' => $vmpout
             );
 
+            $proxmox_metric_prefix = "pmxcluster{$pmxcluster}_vmid{$vmid}_vmport$vmport";
+            $metrics[$proxmox_metric_prefix] = $fields;
             $tags = compact('name', 'app_id', 'pmxcluster', 'vmid', 'vmport', 'rrd_proxmox_name', 'rrd_def');
             data_update($device, 'app', $tags, $fields);
 
@@ -111,6 +116,8 @@ if ($proxmox) {
             }
         }
     }
+
+    update_application($app, $proxmox, $metrics);
 }
 
 unset($pmxlines, $pmxcluster, $pmxcdir, $proxmox, $pmxcache);

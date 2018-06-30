@@ -1,0 +1,3013 @@
+
+EATON-EPDU-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY, 
+	Counter32, Unsigned32, Integer32
+		FROM SNMPv2-SMI
+	NOTIFICATION-GROUP, OBJECT-GROUP, MODULE-COMPLIANCE
+		FROM SNMPv2-CONF
+	TEXTUAL-CONVENTION, DateAndTime, DisplayString
+		FROM SNMPv2-TC
+	pduAgent
+		FROM EATON-OIDS;
+
+eatonEpdu MODULE-IDENTITY
+	LAST-UPDATED "201312181200Z"
+	ORGANIZATION 
+		"Eaton Corporation"
+	CONTACT-INFO 
+		"www.eaton.com/epdu"
+	DESCRIPTION 
+		"The MIB module for Eaton ePDUs (Enclosure Power Distribution Units)."
+
+	REVISION "201409291200Z"
+	DESCRIPTION 
+		"Added outletControlSwitchable and outletControlShutoffDelay object."
+
+	REVISION "201312181200Z"
+	DESCRIPTION 
+		"Added notifyStrappingStatus and strappingStatus object."
+
+    REVISION "201309021200Z"
+    DESCRIPTION
+        "- Add values for commInterface : ftp (4), xml (5)"
+
+    REVISION "201305291200Z"
+    DESCRIPTION
+        "- Edited values for outletType: removed nema51520(21); added nemaL715(29), rf203p277 (30)"
+
+	REVISION "201302211200Z"
+	DESCRIPTION 
+		"- Added unit objects : unitType.
+		- Added input objects : inputCurrentCrestFactor, inputCurrentPercentLoad, inputPowerFactor, inputVAR, inputPlugType.
+		- Added gang objects : groupCurrentCrestFactor, groupCurrentPercentLoad, groupPowerFactor, groupVAR.
+		- Added outlet objects : outletCurrentCrestFactor, outletCurrentPercentLoad, outletPowerFactor, outletVAR."
+
+	REVISION "201111211200Z"
+	DESCRIPTION 
+		"- Added notifyGroupBreakerStatus object.
+		 - Renamed groupStatus object to groupBreakerStatus.  This object had not yet
+		             been implemented so there is no user impact. 
+		 - Updated descriptions for inputWhTimer, groupWhTimer, and outletWhTimer."
+
+	REVISION "201110241200Z"
+	DESCRIPTION 
+		"- Added notifyBootUp object.
+		           - Added outletType object.
+		           - Updated description for all lower and upper thresholds to indicate that
+		             a value of -1 indicates that it is not supported by a particular ePDU model.
+		           - Updated descriptions for inputVA, inputWatts, groupVA, groupWatts, outletVA,
+		             outletWatts to indicate that a value of -1 indicates that it is not
+		             supported by a particular ePDU model.
+		           - Added a note to unit, group, and outlet level control command objects
+		             indicating that some products (mainly with part numbers that begin with IPV
+		             or IPC) do not support delayed outlet control commands and will reply with
+		             an error if a command value is written that is > 0.
+		           - Corrected description for inputType.
+		           - Added a UnixTimeStamp Textual Convention and changed the SYNTAX of
+		             inputWhTimer, groupWhTimer, and outletWhTimer to use it.
+		           - Updated the contact info to reference the ePDU website."
+
+	REVISION "201102071529Z"
+	DESCRIPTION 
+		"Initial release."
+::= { pduAgent 7 }
+
+
+UnixTimeStamp ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		"Unix time stamp.  Measured in seconds since January 1, 1970."
+	SYNTAX  Counter32
+
+
+-- eatonEpdu { iso org(3) dod(6) internet(1) private(4)
+--       enterprises(1) eaton(534) products(6) pduAgent(6) (7) }
+
+notifications        OBJECT IDENTIFIER ::= { eatonEpdu 0 }
+units                OBJECT IDENTIFIER ::= { eatonEpdu 1 }
+inputs               OBJECT IDENTIFIER ::= { eatonEpdu 3 }
+groups               OBJECT IDENTIFIER ::= { eatonEpdu 5 }
+outlets              OBJECT IDENTIFIER ::= { eatonEpdu 6 }
+environmental        OBJECT IDENTIFIER ::= { eatonEpdu 7 }
+conformance          OBJECT IDENTIFIER ::= { eatonEpdu 25 }
+objectGroups         OBJECT IDENTIFIER ::= { conformance 5 }
+
+notifyUserLogin  NOTIFICATION-TYPE
+	OBJECTS { userName, 
+		commInterface }
+	STATUS     current
+	DESCRIPTION 
+		"Sent whenever a user logs in."
+	::= { notifications 1 }
+
+notifyUserLogout  NOTIFICATION-TYPE
+	OBJECTS { userName, 
+		commInterface }
+	STATUS     current
+	DESCRIPTION 
+		"Sent whenever a user logs out."
+	::= { notifications 2 }
+
+notifyFailedLogin  NOTIFICATION-TYPE
+	OBJECTS { userName, 
+		commInterface }
+	STATUS     current
+	DESCRIPTION 
+		"Sent when someone attempts to log in and fails.  On some models, may be
+		      sent after three failed login attempts."
+	::= { notifications 3 }
+
+notifyBootUp  NOTIFICATION-TYPE
+	OBJECTS { strappingIndex }
+	STATUS     current
+	DESCRIPTION 
+		"Sent whenever an ePDU finishes booting up (hard or soft reboot)."
+	::= { notifications 4 }
+
+notifyInputVoltageThStatus  NOTIFICATION-TYPE
+	OBJECTS { strappingIndex, 
+		inputIndex, 
+		inputVoltageIndex, 
+		inputVoltage, 
+		inputVoltageThStatus }
+	STATUS     current
+	DESCRIPTION 
+		"Sent whenever an input voltage threshold status changes."
+	::= { notifications 11 }
+
+notifyInputCurrentThStatus  NOTIFICATION-TYPE
+	OBJECTS { strappingIndex, 
+		inputIndex, 
+		inputCurrentIndex, 
+		inputCurrent, 
+		inputCurrentThStatus }
+	STATUS     current
+	DESCRIPTION 
+		"Sent whenever an input current threshold status changes."
+	::= { notifications 12 }
+
+notifyInputFrequencyStatus  NOTIFICATION-TYPE
+	OBJECTS { strappingIndex, 
+		inputIndex, 
+		inputFrequency, 
+		inputFrequencyStatus }
+	STATUS     current
+	DESCRIPTION 
+		"Sent whenever the input frequency status changes."
+	::= { notifications 13 }
+
+notifyGroupVoltageThStatus  NOTIFICATION-TYPE
+	OBJECTS { strappingIndex, 
+		groupIndex, 
+		groupVoltage, 
+		groupVoltageThStatus }
+	STATUS     current
+	DESCRIPTION 
+		"Sent whenever a group voltage threshold status changes."
+	::= { notifications 21 }
+
+notifyGroupCurrentThStatus  NOTIFICATION-TYPE
+	OBJECTS { strappingIndex, 
+		groupIndex, 
+		groupCurrent, 
+		groupCurrentThStatus }
+	STATUS     current
+	DESCRIPTION 
+		"Sent whenever a group current threshold status changes."
+	::= { notifications 22 }
+
+notifyGroupBreakerStatus  NOTIFICATION-TYPE
+	OBJECTS { strappingIndex, 
+		groupIndex, 
+		groupBreakerStatus }
+	STATUS     current
+	DESCRIPTION 
+		"Sent whenever a group status changes to indicate whether the circuit
+		          breaker is on or off."
+	::= { notifications 23 }
+
+notifyOutletVoltageThStatus  NOTIFICATION-TYPE
+	OBJECTS { strappingIndex, 
+		outletIndex, 
+		outletVoltage, 
+		outletVoltageThStatus }
+	STATUS     current
+	DESCRIPTION 
+		"Sent whenever an outlet voltage threshold status changes."
+	::= { notifications 31 }
+
+notifyOutletCurrentThStatus  NOTIFICATION-TYPE
+	OBJECTS { strappingIndex, 
+		outletIndex, 
+		outletCurrent, 
+		outletCurrentThStatus }
+	STATUS     current
+	DESCRIPTION 
+		"Sent whenever an outlet current threshold status changes."
+	::= { notifications 32 }
+
+notifyOutletControlStatus  NOTIFICATION-TYPE
+	OBJECTS { strappingIndex, 
+		outletIndex, 
+		outletControlStatus }
+	STATUS     current
+	DESCRIPTION 
+		"Sent whenever an outlet state On / Off changes."
+	::= { notifications 33 }
+
+notifyTemperatureThStatus  NOTIFICATION-TYPE
+	OBJECTS { strappingIndex, 
+		temperatureIndex, 
+		temperatureValue, 
+		temperatureThStatus }
+	STATUS     current
+	DESCRIPTION 
+		"Sent whenever a temperature threshold status changes."
+	::= { notifications 41 }
+
+notifyHumidityThStatus  NOTIFICATION-TYPE
+	OBJECTS { strappingIndex, 
+		humidityIndex, 
+		humidityValue, 
+		humidityThStatus }
+	STATUS     current
+	DESCRIPTION 
+		"Sent whenever a humidity threshold status changes."
+	::= { notifications 42 }
+
+notifyContactState  NOTIFICATION-TYPE
+	OBJECTS { strappingIndex, 
+		contactIndex, 
+		contactState }
+	STATUS     current
+	DESCRIPTION 
+		"Sent whenever a contact sensor state changes."
+	::= { notifications 43 }
+
+notifyProbeStatus  NOTIFICATION-TYPE
+	OBJECTS { strappingIndex, 
+		temperatureIndex, 
+		temperatureProbeStatus }
+	STATUS     current
+	DESCRIPTION 
+		"Sent whenever the environment probe status changes."
+	::= { notifications 44 }
+
+notifyCommunicationStatus  NOTIFICATION-TYPE
+	OBJECTS { strappingIndex, 
+		communicationStatus }
+	STATUS     current
+	DESCRIPTION 
+		"Sent whenever the PDU communication status changes."
+	::= { notifications 51 }
+
+notifyInternalStatus  NOTIFICATION-TYPE
+	OBJECTS { strappingIndex, 
+		internalStatus }
+	STATUS     current
+	DESCRIPTION 
+		"Sent whenever the PDU internal status changes."
+	::= { notifications 52 }
+
+notifyTest  NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION 
+		"Sent whenever the trap test feature is used by the communication card."
+	::= { notifications 53 }
+
+notifyStrappingStatus  NOTIFICATION-TYPE
+	OBJECTS { strappingIndex, 
+		strappingStatus }
+	STATUS     current
+	DESCRIPTION 
+		"Sent whenever the strapping communication status changes."
+	::= { notifications 54 }
+
+unitsPresent  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Each unit is identified by a Strapping Index.  This object returns a comma-delimited list of the
+		Strapping Indexes of all units present in the strapping group.  For example, if units 0, 1, 5,
+		and 7 are present, this value will be '0,1,5,7'.  For units that do not support strapping,
+		a Strapping Index of '0' is assumed."
+	::= { units 1 }
+
+unitTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF UnitEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of units.  In most cases this list will only contain one entry.
+		      However, some units have a 'strapping' feature which allow units to be
+		      daisy-chained together such that all of them can be accessed through
+		      the SNMP interface of the master.  If strapping is enabled, the 
+		      strapping indexes of the units that can be accessed will be listed in the
+		      unitsPresent object."
+	::= { units 2 }
+
+unitEntry  OBJECT-TYPE
+	SYNTAX 	UnitEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for a PDU."
+	INDEX { strappingIndex }
+	::= { unitTable 1 }
+
+UnitEntry ::= SEQUENCE {
+	strappingIndex
+		Integer32,
+	productName
+		OCTET STRING,
+	partNumber
+		OCTET STRING,
+	serialNumber
+		OCTET STRING,
+	firmwareVersion
+		OCTET STRING,
+	unitName
+		OCTET STRING,
+	lcdControl
+		INTEGER,
+	clockValue
+		DateAndTime,
+	temperatureScale
+		INTEGER,
+	unitType
+		INTEGER,
+	inputCount
+		Integer32,
+	groupCount
+		Integer32,
+	outletCount
+		Integer32,
+	temperatureCount
+		Integer32,
+	humidityCount
+		Integer32,
+	contactCount
+		Integer32,
+	communicationStatus
+		INTEGER,
+	internalStatus
+		INTEGER,
+	strappingStatus
+		INTEGER,
+	userName
+		OCTET STRING,
+	commInterface
+		INTEGER
+}
+
+strappingIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (0..23)
+	MAX-ACCESS accessible-for-notify
+	STATUS     current
+	DESCRIPTION 
+		"For units that support 'strapping' functionality, this will be a unique
+		      value for each unit.  If units do not support 'strapping', this will
+		      always be '0'."
+	::= { unitEntry 1 }
+
+productName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..127))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Name of the product."
+	::= { unitEntry 2 }
+
+partNumber  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Part number of the unit."
+	::= { unitEntry 3 }
+
+serialNumber  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Serial number of the unit."
+	::= { unitEntry 4 }
+
+firmwareVersion  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Firmware version."
+	::= { unitEntry 5 }
+
+unitName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..63))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Descriptive name for the unit."
+	::= { unitEntry 6 }
+
+lcdControl  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApplicable (0),
+		lcdScreenOff (1),
+		lcdKeyLock (2),
+		lcdScreenOffAndKeyLock (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Control the local LCD."
+	::= { unitEntry 7 }
+
+clockValue  OBJECT-TYPE
+	SYNTAX     DateAndTime
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Clock value.  This could be from either a real-time clock (in which case
+		      it is likely writeable) or from a time server via NTP (probably read-only)."
+	::= { unitEntry 8 }
+
+temperatureScale  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		celsius (0),
+		fahrenheit (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Scale used to return temperature objects."
+	::= { unitEntry 9 }
+
+unitType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		unknown (0),
+		switched (1),
+		advancedMonitored (2),
+		managed (3),
+		monitored (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Technical capabilities of the PDU.  Functionality is as follows:
+            Monitored (MI) - input and usually section/group monitoring.
+            Advanced Monitored (AM) - input, section/group, and outlet monitoring.
+            Switched (SW) - input and section/group monitoring, outlet switching.
+            Managed (MA) - input, section/group, and outlet monitoring plug outlet switching."
+	::= { unitEntry 10 }
+
+inputCount  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Number of inputs on this ePDU."
+	::= { unitEntry 20 }
+
+groupCount  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Number of groups on this ePDU.  Groups include breakers, outlet sections,
+		      and user-defined groups."
+	::= { unitEntry 21 }
+
+outletCount  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Number of outlets on this ePDU."
+	::= { unitEntry 22 }
+
+temperatureCount  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Max number of temperature measurements on this ePDU."
+	::= { unitEntry 23 }
+
+humidityCount  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Max number of humidity measurements on this ePDU."
+	::= { unitEntry 24 }
+
+contactCount  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Max number of contact sensors on this ePDU."
+	::= { unitEntry 25 }
+
+communicationStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (0),
+		communicationLost (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Status of the internal communication with the PDU."
+	::= { unitEntry 30 }
+
+internalStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (0),
+		internalFailure (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Status of the internal failure inside the PDU."
+	::= { unitEntry 31 }
+
+strappingStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (0),
+		communicationLost (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Status of the external communication with a strapping unit."
+	::= { unitEntry 32 }
+
+userName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(0..31))
+	MAX-ACCESS accessible-for-notify
+	STATUS     current
+	DESCRIPTION 
+		"Username used to log into the PDU."
+	::= { unitEntry 40 }
+
+commInterface  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		serial (0),
+		usb (1),
+		telnet (2),
+		web (3),
+		ftp (4),
+		xml (5)
+	}
+	MAX-ACCESS accessible-for-notify
+	STATUS     current
+	DESCRIPTION 
+		"Communications interface used to log into the PDU."
+	::= { unitEntry 41 }
+
+unitControlTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF UnitControlEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of units that have controllable outlets."
+	::= { units 3 }
+
+unitControlEntry  OBJECT-TYPE
+	SYNTAX 	UnitControlEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for a PDU which has controllable outlets."
+	INDEX { strappingIndex }
+	::= { unitControlTable 1 }
+
+UnitControlEntry ::= SEQUENCE {
+	unitControlOffCmd
+		Integer32,
+	unitControlOnCmd
+		Integer32
+}
+
+unitControlOffCmd  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..99999)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Unit-level outlet control command.
+		
+		Once the command is issued, outlets will turn Off.
+		0-n : Time in seconds until the outlet Sequence Off command is issued
+		-1 : Cancel a pending unit-level Off command 
+		
+		When read, returns -1 if no command is pending, or the current downcount in seconds of a pending command.
+		          
+		          Certain ePDUs (mainly those with part numbers beginning with IPV or IPC) do not support delayed control
+		          commands.  These will respond with an error if a command value of > 0 is written to this object."
+	::= { unitControlEntry 2 }
+
+unitControlOnCmd  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..99999)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Unit-level outlet control command.
+		
+		Once the command is issued, outlets will turn On according to their outletControlSequenceDelay value.
+		0-n : Time in seconds until the outlet Sequence On command is issued
+		-1 : Cancel a pending unit-level On command 
+		
+		When read, returns -1 if no command is pending, or the current downcount in seconds of a pending command.
+		          
+		          Certain ePDUs (mainly those with part numbers beginning with IPV or IPC) do not support delayed control
+		          commands.  These will respond with an error if a command value of > 0 is written to this object."
+	::= { unitControlEntry 3 }
+
+inputTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF InputEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"List of inputs to the PDU."
+	::= { inputs 1 }
+
+inputEntry  OBJECT-TYPE
+	SYNTAX 	InputEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for a particular input."
+	INDEX { strappingIndex, 
+		inputIndex }
+	::= { inputTable 1 }
+
+InputEntry ::= SEQUENCE {
+	inputIndex
+		Integer32,
+	inputType
+		INTEGER,
+	inputFrequency
+		Integer32,
+	inputFrequencyStatus
+		INTEGER,
+	inputVoltageCount
+		Integer32,
+	inputCurrentCount
+		Integer32,
+	inputPowerCount
+		Integer32,
+	inputPlugType
+		INTEGER
+}
+
+inputIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..2)
+	MAX-ACCESS accessible-for-notify
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each input.  Its value ranges from 1 to inputCount."
+	::= { inputEntry 1 }
+
+inputType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		singlePhase (1),
+		splitPhase (2),
+		threePhaseDelta (3),
+		threePhaseWye (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Type of input - single phase, split phase, three phase delta, or three
+		phase wye."
+	::= { inputEntry 2 }
+
+inputFrequency  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Units are 0.1 Hz; divide by ten to get Hz."
+	::= { inputEntry 3 }
+
+inputFrequencyStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (0),
+		outOfRange (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Status of the measured input frequency relative to the nominal frequency and the admitted tolerance."
+	::= { inputEntry 4 }
+
+inputVoltageCount  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Number of input voltage measurements on this ePDU."
+	::= { inputEntry 5 }
+
+inputCurrentCount  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Number of input current measurements on this ePDU."
+	::= { inputEntry 6 }
+
+inputPowerCount  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Number of rows in the inputPowerTable."
+	::= { inputEntry 7 }
+
+inputPlugType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		other1Phase (100),
+        other2Phase (200),
+        other3Phase (300),
+        iecC14Inlet (101),
+        iecC20Inlet (102),
+        iec316P6 (103),
+        iec332P6 (104),
+        iec360P6 (105),
+        iecC14Plug (106),
+        iecC20Plug (107),
+        nema515 (120),
+        nemaL515 (121),
+        nema520 (122),
+        nemaL520 (123),
+        nema615 (124),
+        nemaL615 (125),
+        nemaL530 (126),
+        nema620 (127),
+        nemaL620 (128),
+        nemaL630 (129),
+        cs8265 (130),
+        french (150),
+        schuko (151),
+        uk (152),
+        nemaL1420 (201),
+        nemaL1430 (202),
+        iec516P6 (301),
+        iec460P9 (302),
+        iec560P9 (303),
+        iec532P6 (304),
+        iec563P6 (306),
+        nemaL1520 (320),
+        nemaL2120 (321),
+        nemaL1530 (322),
+        nemaL2130 (323),
+        cs8365 (324),
+        nemaL2220 (325),
+        nemaL2230 (326),
+        bladeUps208V (350),
+        bladeUps400V (351)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Identifies which plug is on the input."
+	::= { inputEntry 8 }
+
+inputVoltageTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF InputVoltageEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of input voltage measurements.  The number of entries
+		      is given by inputVoltageCount."
+	::= { inputs 2 }
+
+inputVoltageEntry  OBJECT-TYPE
+	SYNTAX 	InputVoltageEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for a particular input voltage measurement."
+	INDEX { strappingIndex, 
+		inputIndex, 
+		inputVoltageIndex }
+	::= { inputVoltageTable 1 }
+
+InputVoltageEntry ::= SEQUENCE {
+	inputVoltageIndex
+		Integer32,
+	inputVoltageMeasType
+		INTEGER,
+	inputVoltage
+		Integer32,
+	inputVoltageThStatus
+		INTEGER,
+	inputVoltageThLowerWarning
+		Integer32,
+	inputVoltageThLowerCritical
+		Integer32,
+	inputVoltageThUpperWarning
+		Integer32,
+	inputVoltageThUpperCritical
+		Integer32
+}
+
+inputVoltageIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..3)
+	MAX-ACCESS accessible-for-notify
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each input voltage measurement.  Its value ranges 
+		      from 1 to inputVoltageCount."
+	::= { inputVoltageEntry 1 }
+
+inputVoltageMeasType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		singlePhase (1),
+		phase1toN (2),
+		phase2toN (3),
+		phase3toN (4),
+		phase1to2 (5),
+		phase2to3 (6),
+		phase3to1 (7)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Value indicates what input voltage is being measured in this table row - single phase
+		voltage, phase 1 to neutral, phase 2 to neutral, phase 3 to neutral, phase 1 to phase 2,
+		phase 2 to phase 3, or phase 3 to phase 1."
+	::= { inputVoltageEntry 2 }
+
+inputVoltage  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"An input voltage measurement value.  Units are millivolts."
+	::= { inputVoltageEntry 3 }
+
+inputVoltageThStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (0),
+		lowWarning (1),
+		lowCritical (2),
+		highWarning (3),
+		highCritical (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Status of the measured input voltage relative to the configured thresholds."
+	::= { inputVoltageEntry 4 }
+
+inputVoltageThLowerWarning  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..500000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Lower warning threshold.  Units are millivolts.  A negative value indicates
+		          that this object is not available."
+	::= { inputVoltageEntry 5 }
+
+inputVoltageThLowerCritical  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..500000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Lower critical threshold.  Units are millivolts.  A negative value indicates
+		          that this object is not available."
+	::= { inputVoltageEntry 6 }
+
+inputVoltageThUpperWarning  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..500000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Upper warning threshold.  Units are millivolts.  A negative value indicates
+		          that this object is not available."
+	::= { inputVoltageEntry 7 }
+
+inputVoltageThUpperCritical  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..500000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Upper critical threshold.  Units are millivolts.  A negative value indicates
+		          that this object is not available."
+	::= { inputVoltageEntry 8 }
+
+inputCurrentTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF InputCurrentEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of input current measurements.  The number of entries
+		      is given by inputCurrentCount."
+	::= { inputs 3 }
+
+inputCurrentEntry  OBJECT-TYPE
+	SYNTAX 	InputCurrentEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for a particular input current measurement."
+	INDEX { strappingIndex, 
+		inputIndex, 
+		inputCurrentIndex }
+	::= { inputCurrentTable 1 }
+
+InputCurrentEntry ::= SEQUENCE {
+	inputCurrentIndex
+		Integer32,
+	inputCurrentMeasType
+		INTEGER,
+	inputCurrentCapacity
+		Integer32,
+	inputCurrent
+		Integer32,
+	inputCurrentThStatus
+		INTEGER,
+	inputCurrentThLowerWarning
+		Integer32,
+	inputCurrentThLowerCritical
+		Integer32,
+	inputCurrentThUpperWarning
+		Integer32,
+	inputCurrentThUpperCritical
+		Integer32,
+	inputCurrentCrestFactor
+		Integer32,
+	inputCurrentPercentLoad
+		Integer32
+}
+
+inputCurrentIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..4)
+	MAX-ACCESS accessible-for-notify
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each input current measurement.  Its value ranges
+		      from 1 to inputCurrentCount."
+	::= { inputCurrentEntry 1 }
+
+inputCurrentMeasType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		singlePhase (1),
+		neutral (2),
+		phase1 (3),
+		phase2 (4),
+		phase3 (5)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Which input wire is being measured in this table row - single phase, neutral, phase 1,
+		phase 2, or phase 3."
+	::= { inputCurrentEntry 2 }
+
+inputCurrentCapacity  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Rated current capacity of the input.  A negative value indicates that
+		the hardware current capacity is unknown.  Units are milliamps."
+	::= { inputCurrentEntry 3 }
+
+inputCurrent  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"An input current measurement value.  Units are milliamps."
+	::= { inputCurrentEntry 4 }
+
+inputCurrentThStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (0),
+		lowWarning (1),
+		lowCritical (2),
+		highWarning (3),
+		highCritical (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Status of the measured input current relative to the configured thresholds."
+	::= { inputCurrentEntry 5 }
+
+inputCurrentThLowerWarning  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..100000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Lower warning threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { inputCurrentEntry 6 }
+
+inputCurrentThLowerCritical  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..100000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Lower critical threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { inputCurrentEntry 7 }
+
+inputCurrentThUpperWarning  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..100000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Upper warning threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { inputCurrentEntry 8 }
+
+inputCurrentThUpperCritical  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..100000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Upper critical threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { inputCurrentEntry 9 }
+
+inputCurrentCrestFactor  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current crest factor.  Units are in milli, for example a crest factor of
+                  1.414 will be returned as 1414.  A negative value indicates
+		          that this object is not available."
+	::= { inputCurrentEntry 10 }
+
+inputCurrentPercentLoad  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current percent load, based on the rated current capacity.  Units are
+                  percentage, for example 80% will be returned as 80.  A negative
+                  value indicates that this object is not available."
+	::= { inputCurrentEntry 11 }
+
+inputPowerTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF InputPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of input power measurements.  The number of entries
+		      is given by inputPowerCount."
+	::= { inputs 4 }
+
+inputPowerEntry  OBJECT-TYPE
+	SYNTAX 	InputPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for an input power measurement."
+	INDEX { strappingIndex, 
+		inputIndex, 
+		inputPowerIndex }
+	::= { inputPowerTable 1 }
+
+InputPowerEntry ::= SEQUENCE {
+	inputPowerIndex
+		Integer32,
+	inputPowerMeasType
+		INTEGER,
+	inputVA
+		Integer32,
+	inputWatts
+		Integer32,
+	inputWh
+		Unsigned32,
+	inputWhTimer
+		UnixTimeStamp,
+	inputPowerFactor
+		Integer32,
+	inputVAR
+		Integer32
+}
+
+inputPowerIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..12)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each input power measurement.  Its value ranges
+		      from 1 to inputPowerCount."
+	::= { inputPowerEntry 1 }
+
+inputPowerMeasType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		unknown (0),
+		phase1 (1),
+		phase2 (2),
+		phase3 (3),
+		total (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Value indicates what is being measured in this table row."
+	::= { inputPowerEntry 2 }
+
+inputVA  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"An input VA value.  Units are VA.  A negative value indicates
+		          that this object is not available."
+	::= { inputPowerEntry 3 }
+
+inputWatts  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"An input Watts value.  Units are Watts.  A negative value indicates
+		          that this object is not available."
+	::= { inputPowerEntry 4 }
+
+inputWh  OBJECT-TYPE
+	SYNTAX     Unsigned32 (0..4294967295)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Units are Watt-hours.  This object is writable so that it can be reset to 0.  When it is
+		written to, the inputWhTimer will be reset updated as well."
+	::= { inputPowerEntry 5 }
+
+inputWhTimer  OBJECT-TYPE
+	SYNTAX     UnixTimeStamp
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Timestamp of when input Watt-hours (inputWh) was last reset."
+	::= { inputPowerEntry 6 }
+
+inputPowerFactor  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"An input PF value.  Units are in thousandths, for example a power factor
+                  of 0.958 would be returned as 958, and 0.92 would be returned 
+		          as 920.  A negative value indicates that this object is not
+                  available."
+	::= { inputPowerEntry 7 }
+
+inputVAR  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"An input VAR value.  Units are VAR.  A negative value indicates
+		          that this object is not available."
+	::= { inputPowerEntry 8 }
+
+
+
+
+
+inputTotalPowerTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF InputTotalPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of total input power measurements."
+	::= { inputs 5 }
+
+inputTotalPowerEntry  OBJECT-TYPE
+	SYNTAX 	InputTotalPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for a total input power measurement."
+	INDEX { strappingIndex, 
+		inputIndex }
+	::= { inputTotalPowerTable 1 }
+
+InputTotalPowerEntry ::= SEQUENCE {
+	inputTotalVA
+		Integer32,
+	inputTotalWatts
+		Integer32,
+	inputTotalWh
+		Unsigned32,
+	inputTotalWhTimer
+		UnixTimeStamp,
+	inputTotalPowerFactor
+		Integer32,
+	inputTotalVAR
+		Integer32
+}
+
+inputTotalVA  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"An input VA value.  Units are VA.  A negative value indicates
+		          that this object is not available."
+	::= { inputTotalPowerEntry 3 }
+
+inputTotalWatts  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"An input Watts value.  Units are Watts.  A negative value indicates
+		          that this object is not available."
+	::= { inputTotalPowerEntry 4 }
+
+inputTotalWh  OBJECT-TYPE
+	SYNTAX     Unsigned32 (0..4294967295)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Units are Watt-hours.  This object is writable so that it can be reset to 0.  When it is
+		written to, the inputWhTimer will be reset updated as well."
+	::= { inputTotalPowerEntry 5 }
+
+inputTotalWhTimer  OBJECT-TYPE
+	SYNTAX     UnixTimeStamp
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Timestamp of when input Watt-hours (inputWh) was last reset."
+	::= { inputTotalPowerEntry 6 }
+
+inputTotalPowerFactor  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"An input PF value.  Units are in thousandths, for example a power factor
+                  of 0.958 would be returned as 958, and 0.92 would be returned 
+		          as 920.  A negative value indicates that this object is not
+                  available."
+	::= { inputTotalPowerEntry 7 }
+
+inputTotalVAR  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"An input VAR value.  Units are VAR.  A negative value indicates
+		          that this object is not available."
+	::= { inputTotalPowerEntry 8 }
+
+
+
+
+
+groupTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF GroupEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of groups.  The number of entries is given by groupCount."
+	::= { groups 1 }
+
+groupEntry  OBJECT-TYPE
+	SYNTAX 	GroupEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for a particular group."
+	INDEX { strappingIndex, 
+		groupIndex }
+	::= { groupTable 1 }
+
+GroupEntry ::= SEQUENCE {
+	groupIndex
+		Integer32,
+	groupID
+		DisplayString,
+	groupName
+		OCTET STRING,
+	groupType
+		INTEGER,
+	groupBreakerStatus
+		INTEGER,
+	groupChildCount
+		Integer32
+}
+
+groupIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..64)
+	MAX-ACCESS accessible-for-notify
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each group.  Its value ranges from 1 to groupCount."
+	::= { groupEntry 1 }
+
+groupID  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(2..4))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Alphanumeric designator for the group.  This value may be written
+		      on the face of the unit."
+	::= { groupEntry 2 }
+
+groupName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..31))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"A descriptive name for the group."
+	::= { groupEntry 3 }
+
+groupType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		unknown (0),
+		breaker1pole (1),
+		breaker2pole (2),
+		breaker3pole (3),
+		outletSection (4),
+		userDefined (5)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The type of the group."
+	::= { groupEntry 4 }
+
+groupBreakerStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApplicable (0),
+		breakerOn (1),
+		breakerOff (2)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Only applicable to breaker-groups.  Indicates whether a breaker is turned
+		      off or on."
+	::= { groupEntry 5 }
+
+groupChildCount  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Number of children for this group."
+	::= { groupEntry 6 }
+
+groupChildTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF GroupChildEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of children for this group.  For example, this table will link
+		      to all of the outlets that are contained in a particular group."
+	::= { groups 2 }
+
+groupChildEntry  OBJECT-TYPE
+	SYNTAX 	GroupChildEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for a particular child."
+	INDEX { strappingIndex, 
+		groupIndex, 
+		groupChildIndex }
+	::= { groupChildTable 1 }
+
+GroupChildEntry ::= SEQUENCE {
+	groupChildIndex
+		Integer32,
+	groupChildType
+		INTEGER,
+	groupChildOID
+		OBJECT IDENTIFIER
+}
+
+groupChildIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..32)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each child.  Its value ranges from 1 to groupChildCount."
+	::= { groupChildEntry 1 }
+
+groupChildType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		unknown (0),
+		section (2),
+		custom (3),
+		outlet (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The type of the child."
+	::= { groupChildEntry 2 }
+
+groupChildOID  OBJECT-TYPE
+	SYNTAX     OBJECT IDENTIFIER
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Object ID of a child object."
+	::= { groupChildEntry 3 }
+
+groupVoltageTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF GroupVoltageEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of group voltage measurements.  There can be only one voltage
+		      measurement for each group."
+	::= { groups 3 }
+
+groupVoltageEntry  OBJECT-TYPE
+	SYNTAX 	GroupVoltageEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for a group voltage measurement."
+	INDEX { strappingIndex, 
+		groupIndex }
+	::= { groupVoltageTable 1 }
+
+GroupVoltageEntry ::= SEQUENCE {
+	groupVoltageMeasType
+		INTEGER,
+	groupVoltage
+		Integer32,
+	groupVoltageThStatus
+		INTEGER,
+	groupVoltageThLowerWarning
+		Integer32,
+	groupVoltageThLowerCritical
+		Integer32,
+	groupVoltageThUpperWarning
+		Integer32,
+	groupVoltageThUpperCritical
+		Integer32
+}
+
+groupVoltageMeasType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		unknown (0),
+		singlePhase (1),
+		phase1toN (2),
+		phase2toN (3),
+		phase3toN (4),
+		phase1to2 (5),
+		phase2to3 (6),
+		phase3to1 (7)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Value indicates what voltage is being measured in this table row."
+	::= { groupVoltageEntry 2 }
+
+groupVoltage  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Units are millivolts."
+	::= { groupVoltageEntry 3 }
+
+groupVoltageThStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (0),
+		lowWarning (1),
+		lowCritical (2),
+		highWarning (3),
+		highCritical (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Status of the measured group voltage relative to the configured thresholds."
+	::= { groupVoltageEntry 4 }
+
+groupVoltageThLowerWarning  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..500000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Lower warning threshold.  Units are millivolts.  A negative value indicates
+		          that this object is not available."
+	::= { groupVoltageEntry 5 }
+
+groupVoltageThLowerCritical  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..500000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Lower critical threshold.  Units are millivolts.  A negative value indicates
+		          that this object is not available."
+	::= { groupVoltageEntry 6 }
+
+groupVoltageThUpperWarning  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..500000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Upper warning threshold.  Units are millivolts.  A negative value indicates
+		          that this object is not available."
+	::= { groupVoltageEntry 7 }
+
+groupVoltageThUpperCritical  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..500000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Upper critical threshold.  Units are millivolts.  A negative value indicates
+		          that this object is not available."
+	::= { groupVoltageEntry 8 }
+
+groupCurrentTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF GroupCurrentEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of group current measurements.  There can be only one current
+		      measurement for each group."
+	::= { groups 4 }
+
+groupCurrentEntry  OBJECT-TYPE
+	SYNTAX 	GroupCurrentEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for a group current measurement."
+	INDEX { strappingIndex, 
+		groupIndex }
+	::= { groupCurrentTable 1 }
+
+GroupCurrentEntry ::= SEQUENCE {
+	groupCurrentCapacity
+		Integer32,
+	groupCurrent
+		Integer32,
+	groupCurrentThStatus
+		INTEGER,
+	groupCurrentThLowerWarning
+		Integer32,
+	groupCurrentThLowerCritical
+		Integer32,
+	groupCurrentThUpperWarning
+		Integer32,
+	groupCurrentThUpperCritical
+		Integer32,
+	groupCurrentCrestFactor
+		Integer32,
+	groupCurrentPercentLoad
+		Integer32
+}
+
+groupCurrentCapacity  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Rated current capacity of the group.  Units are milliamps.  A negative 
+		      value indicates that the hardware current capacity is unknown (it
+		      will always be unknown for custom groups)."
+	::= { groupCurrentEntry 2 }
+
+groupCurrent  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A group current measurement value.  Units are milliamps."
+	::= { groupCurrentEntry 3 }
+
+groupCurrentThStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (0),
+		lowWarning (1),
+		lowCritical (2),
+		highWarning (3),
+		highCritical (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Status of the measured group current relative to the configured thresholds."
+	::= { groupCurrentEntry 4 }
+
+groupCurrentThLowerWarning  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..100000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Lower warning threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { groupCurrentEntry 5 }
+
+groupCurrentThLowerCritical  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..100000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Lower critical threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { groupCurrentEntry 6 }
+
+groupCurrentThUpperWarning  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..100000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Upper warning threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { groupCurrentEntry 7 }
+
+groupCurrentThUpperCritical  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..100000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Upper critical threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { groupCurrentEntry 8 }
+
+groupCurrentCrestFactor  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current crest factor.  Units are in milli, for example a crest factor of
+                  1.414 will be returned as 1414.  A negative value indicates
+		          that this object is not available."
+	::= { groupCurrentEntry 9 }
+
+groupCurrentPercentLoad  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current percent load, based on the rated current capacity.  Units are
+                  percentage, for example 80% will be returned as 80.  A negative
+                  value indicates that this object is not available."
+	::= { groupCurrentEntry 10 }
+
+groupPowerTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF GroupPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of group power measurements.  There can be only one power
+		      measurement for each group."
+	::= { groups 5 }
+
+groupPowerEntry  OBJECT-TYPE
+	SYNTAX 	GroupPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for a group power measurement."
+	INDEX { strappingIndex, 
+		groupIndex }
+	::= { groupPowerTable 1 }
+
+GroupPowerEntry ::= SEQUENCE {
+	groupVA
+		Integer32,
+	groupWatts
+		Integer32,
+	groupWh
+		Unsigned32,
+	groupWhTimer
+		UnixTimeStamp,
+	groupPowerFactor
+		Integer32,
+	groupVAR
+		Integer32
+}
+
+groupVA  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A group VA value.  Units are VA.  A negative value indicates
+		          that this object is not available."
+	::= { groupPowerEntry 2 }
+
+groupWatts  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A group Watts value.  Units are Watts.  A negative value indicates
+		          that this object is not available."
+	::= { groupPowerEntry 3 }
+
+groupWh  OBJECT-TYPE
+	SYNTAX     Unsigned32 (0..4294967295)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Units are Watt-hours.  This object is writable so that it can be reset to 0.  When it is
+		written to, the inputWhTotalTimer will be reset to 0 as well."
+	::= { groupPowerEntry 4 }
+
+groupWhTimer  OBJECT-TYPE
+	SYNTAX     UnixTimeStamp
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Timestamp of when group Watt-hours (groupWh) was last reset."
+	::= { groupPowerEntry 5 }
+
+groupPowerFactor  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A group PF value.  Units are in thousandths, for example a power factor
+                  of 0.958 would be returned as 958, and 0.92 would be returned 
+		          as 920.  A negative value indicates that this object is not available."
+	::= { groupPowerEntry 6 }
+
+groupVAR  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A group VAR value.  Units are VAR.  A negative value indicates
+		          that this object is not available."
+	::= { groupPowerEntry 7 }
+
+groupControlTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF GroupControlEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of controllable groups."
+	::= { groups 6 }
+
+groupControlEntry  OBJECT-TYPE
+	SYNTAX 	GroupControlEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for a controllable group."
+	INDEX { strappingIndex, 
+		groupIndex }
+	::= { groupControlTable 1 }
+
+GroupControlEntry ::= SEQUENCE {
+	groupControlStatus
+		INTEGER,
+	groupControlOffCmd
+		Integer32,
+	groupControl0nCmd
+		Integer32,
+	groupControlRebootCmd
+		Integer32
+}
+
+groupControlStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		off (0),
+		on (1),
+		rebooting (2),
+		mixed (3)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current state of a controlled group.  A value of 'mixed' means that 
+		          that the outlets within the group have differing states."
+	::= { groupControlEntry 2 }
+
+groupControlOffCmd  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..99999)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Group-level outlet control command.
+		
+		Once the command is issued, the outlets in the group will turn Off immediately.
+		0-n : Time in seconds until the group command is issued
+		-1 : Cancel a pending group-level Off command 
+		
+		When read, returns -1 if no command is pending, or the current downcount in seconds of a pending command.
+		          
+		          Certain ePDUs (mainly those with part numbers beginning with IPV or IPC) do not support delayed control
+		          commands.  These will respond with an error if a command value of > 0 is written to this object."
+	::= { groupControlEntry 3 }
+
+groupControl0nCmd  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..99999)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Group-level outlet control command.
+		
+		Once the command is issued, the outlets in the group will turn On immediately.
+		0-n : Time in seconds until the group command is issued
+		-1 : Cancel a pending group-level On command 
+		
+		When read, returns -1 if no command is pending, or the current downcount in seconds of a pending command.
+		          
+		          Certain ePDUs (mainly those with part numbers beginning with IPV or IPC) do not support delayed control
+		          commands.  These will respond with an error if a command value of > 0 is written to this object."
+	::= { groupControlEntry 4 }
+
+groupControlRebootCmd  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..0)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Group-level outlet control command.
+		
+		          For outlets that are On prior to the Reboot command, they will switch Off immediately when the command is
+		          issued, remain Off for outletControlRebootOffTime seconds, and then turn back On.
+		          For outlets that are Off prior to the Reboot command, they will turn On after a delay of outletControlRebootOffTime
+		          seconds from when the command is issued.
+		0-n : Time in seconds until the Reboot command is issued
+		-1 : Cancel a pending group-level Reboot command 
+		
+		When read, returns -1 if no command is pending, or the current downcount in seconds of a pending command.
+		          
+		          Certain ePDUs (mainly those with part numbers beginning with IPV or IPC) do not support delayed control
+		          commands.  These will respond with an error if a command value of > 0 is written to this object."
+	::= { groupControlEntry 5 }
+
+outletTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF OutletEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of outlets.  The number of entries is given by outletCount."
+	::= { outlets 1 }
+
+outletEntry  OBJECT-TYPE
+	SYNTAX 	OutletEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for a particular outlet."
+	INDEX { strappingIndex, 
+		outletIndex }
+	::= { outletTable 1 }
+
+OutletEntry ::= SEQUENCE {
+	outletIndex
+		Integer32,
+	outletID
+		DisplayString,
+	outletName
+		OCTET STRING,
+	outletParentCount
+		Integer32,
+	outletType
+		INTEGER
+}
+
+outletIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..64)
+	MAX-ACCESS accessible-for-notify
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each outlet.  its value ranges from 1 to outletCount."
+	::= { outletEntry 1 }
+
+outletID  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(2..4))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Alphanumeric designator for the outlet."
+	::= { outletEntry 2 }
+
+outletName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..31))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"A descriptive name for the outlet."
+	::= { outletEntry 3 }
+
+outletParentCount  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Number of parents for this outlet."
+	::= { outletEntry 4 }
+
+outletType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		unknown (0),
+		iecC13 (1),
+		iecC19 (2),
+        uk (10),
+		french (11),
+		schuko (12),
+		nema515 (20),
+		nema51520 (21),
+		nema520 (22),
+		nemaL520 (23),
+		nemaL530 (24),
+		nema615 (25),
+		nema620 (26),
+		nemaL620 (27),
+		nemaL630 (28),
+        nemaL715 (29),
+        rf203p277 (30)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The physical type of outlet."
+	::= { outletEntry 5 }
+
+outletParentTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF OutletParentEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of parents for this outlet.  For example, this table will link
+		      to all of the groups that have this outlet as a child."
+	::= { outlets 2 }
+
+outletParentEntry  OBJECT-TYPE
+	SYNTAX 	OutletParentEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for a particular parent."
+	INDEX { strappingIndex, 
+		outletIndex, 
+		outletParentIndex }
+	::= { outletParentTable 1 }
+
+OutletParentEntry ::= SEQUENCE {
+	outletParentIndex
+		Integer32,
+	outletParentType
+		INTEGER,
+	outletParentOID
+		OBJECT IDENTIFIER
+}
+
+outletParentIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..32)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each parent.  Its value ranges from 1 to outletParentCount."
+	::= { outletParentEntry 1 }
+
+outletParentType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		unknown (0),
+		breaker (1),
+		section (2),
+		custom (3)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The type of the parent."
+	::= { outletParentEntry 2 }
+
+outletParentOID  OBJECT-TYPE
+	SYNTAX     OBJECT IDENTIFIER
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Object ID of a parent object."
+	::= { outletParentEntry 3 }
+
+outletVoltageTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF OutletVoltageEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of outlet voltage measurements."
+	::= { outlets 3 }
+
+outletVoltageEntry  OBJECT-TYPE
+	SYNTAX 	OutletVoltageEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for an outlet voltage measurement."
+	INDEX { strappingIndex, 
+		outletIndex }
+	::= { outletVoltageTable 1 }
+
+OutletVoltageEntry ::= SEQUENCE {
+	outletVoltage
+		Integer32,
+	outletVoltageThStatus
+		INTEGER,
+	outletVoltageThLowerWarning
+		Integer32,
+	outletVoltageThLowerCritical
+		Integer32,
+	outletVoltageThUpperWarning
+		Integer32,
+	outletVoltageThUpperCritical
+		Integer32
+}
+
+outletVoltage  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Units are millivolts."
+	::= { outletVoltageEntry 2 }
+
+outletVoltageThStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (0),
+		lowWarning (1),
+		lowCritical (2),
+		highWarning (3),
+		highCritical (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Status of the measured outlet voltage relative to the configured thresholds."
+	::= { outletVoltageEntry 3 }
+
+outletVoltageThLowerWarning  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..500000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Lower warning threshold.  Units are millivolts.  A negative value indicates
+		          that this object is not available."
+	::= { outletVoltageEntry 4 }
+
+outletVoltageThLowerCritical  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..500000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Lower critical threshold.  Units are millivolts.  A negative value indicates
+		          that this object is not available."
+	::= { outletVoltageEntry 5 }
+
+outletVoltageThUpperWarning  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..500000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Upper warning threshold.  Units are millivolts.  A negative value indicates
+		          that this object is not available."
+	::= { outletVoltageEntry 6 }
+
+outletVoltageThUpperCritical  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..500000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Upper critical threshold.  Units are millivolts.  A negative value indicates
+		          that this object is not available."
+	::= { outletVoltageEntry 7 }
+
+outletCurrentTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF OutletCurrentEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of outlet current measurements."
+	::= { outlets 4 }
+
+outletCurrentEntry  OBJECT-TYPE
+	SYNTAX 	OutletCurrentEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for an outlet current measurement."
+	INDEX { strappingIndex, 
+		outletIndex }
+	::= { outletCurrentTable 1 }
+
+OutletCurrentEntry ::= SEQUENCE {
+	outletCurrentCapacity
+		Integer32,
+	outletCurrent
+		Integer32,
+	outletCurrentThStatus
+		INTEGER,
+	outletCurrentThLowerWarning
+		Integer32,
+	outletCurrentThLowerCritical
+		Integer32,
+	outletCurrentThUpperWarning
+		Integer32,
+	outletCurrentThUpperCritical
+		Integer32,
+	outletCurrentCrestFactor
+		Integer32,
+    outletCurrentPercentLoad
+        Integer32
+}
+
+outletCurrentCapacity  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Rated current capacity of the outlet.  Units are milliamps.  A negative
+        value indicates that the hardware current capacity is unknown."
+	::= { outletCurrentEntry 2 }
+
+outletCurrent  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"An outlet current measurement value.  Units are milliamps."
+	::= { outletCurrentEntry 3 }
+
+outletCurrentThStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (0),
+		lowWarning (1),
+		lowCritical (2),
+		highWarning (3),
+		highCritical (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Status of the measured outlet current relative to the configured thresholds."
+	::= { outletCurrentEntry 4 }
+
+outletCurrentThLowerWarning  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..100000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Lower warning threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { outletCurrentEntry 5 }
+
+outletCurrentThLowerCritical  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..100000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Lower critical threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { outletCurrentEntry 6 }
+
+outletCurrentThUpperWarning  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..100000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Upper warning threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { outletCurrentEntry 7 }
+
+outletCurrentThUpperCritical  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..100000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Upper critical threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { outletCurrentEntry 8 }
+
+outletCurrentCrestFactor  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current crest factor.  Units are in milli, for example a crest factor of
+                  1.414 will be returned as 1414.  A negative value indicates
+		          that this object is not available."
+	::= { outletCurrentEntry 9 }
+
+outletCurrentPercentLoad  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current percent load, based on the rated current capacity.  Units are
+                  percentage, for example 80% will be returned as 80.  A negative
+                  value indicates that this object is not available."
+	::= { outletCurrentEntry 10 }
+
+outletPowerTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF OutletPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of outlet power measurements."
+	::= { outlets 5 }
+
+outletPowerEntry  OBJECT-TYPE
+	SYNTAX 	OutletPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for an outlet power measurement."
+	INDEX { strappingIndex, 
+		outletIndex }
+	::= { outletPowerTable 1 }
+
+OutletPowerEntry ::= SEQUENCE {
+	outletVA
+		Integer32,
+	outletWatts
+		Integer32,
+	outletWh
+		Unsigned32,
+	outletWhTimer
+		UnixTimeStamp,
+	outletPowerFactor
+		Integer32,
+	outletVAR
+		Integer32
+}
+
+outletVA  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"An outlet VA value.  Units are VA.  A negative value indicates
+		          that this object is not available."
+	::= { outletPowerEntry 2 }
+
+outletWatts  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"An outlet Watts value.  Units are Watts.  A negative value indicates
+		          that this object is not available."
+	::= { outletPowerEntry 3 }
+
+outletWh  OBJECT-TYPE
+	SYNTAX     Unsigned32 (0..4294967295)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Units are Watt-hours.  This object is writable so that it can be reset to 0.  When it is
+		written to, the inputWhTotalTimer will be reset to 0 as well."
+	::= { outletPowerEntry 4 }
+
+outletWhTimer  OBJECT-TYPE
+	SYNTAX     UnixTimeStamp
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Timestamp of when outlet Watt-hours (outletWh) was last reset."
+	::= { outletPowerEntry 5 }
+
+outletPowerFactor  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"An outlet PF value.  Units are in thousandths, for example a power factor
+                  of 0.958 would be returned as 958, and 0.92 would be returned 
+		          as 920.  A negative value indicates that this object is not available."
+	::= { outletPowerEntry 6 }
+
+outletVAR  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"An outlet VAR value.  Units are VAR.  A negative value indicates
+		          that this object is not available."
+	::= { outletPowerEntry 7 }
+
+outletControlTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF OutletControlEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of controllable outlets."
+	::= { outlets 6 }
+
+outletControlEntry  OBJECT-TYPE
+	SYNTAX 	OutletControlEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for a controllable outlet."
+	INDEX { strappingIndex, 
+		outletIndex }
+	::= { outletControlTable 1 }
+
+OutletControlEntry ::= SEQUENCE {
+	outletControlStatus
+		INTEGER,
+	outletControlOffCmd
+		Integer32,
+	outletControlOnCmd
+		Integer32,
+	outletControlRebootCmd
+		Integer32,
+	outletControlPowerOnState
+		INTEGER,
+	outletControlSequenceDelay
+		Integer32,
+	outletControlRebootOffTime
+		Integer32,
+  outletControlSwitchable
+    INTEGER,
+  outletControlShutoffDelay
+    Integer32
+}
+
+outletControlStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		off (0),
+		on (1),
+		pendingOff (2),
+		pendingOn (3)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current state of a controlled outlet."
+	::= { outletControlEntry 2 }
+
+outletControlOffCmd  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..99999)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Outlet control command.
+		
+		Once the command is issued, the outlet will turn Off immediately.
+		0-n : Time in seconds until the outlet command is issued
+		-1 : Cancel a pending outlet Off command 
+		
+		When read, returns -1 if no command is pending, or the current downcount in seconds of a pending command.
+		          
+		          Certain ePDUs (mainly those with part numbers beginning with IPV or IPC) do not support delayed control
+		          commands.  These will respond with an error if a command value of > 0 is written to this object."
+	::= { outletControlEntry 3 }
+
+outletControlOnCmd  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..99999)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Outlet control command.
+		
+		Once the command is issued, the outlet will turn On immediately.
+		0-n : Time in seconds until the outlet command is issued
+		-1 : Cancel a pending outlet On command 
+		
+		When read, returns -1 if no command is pending, or the current downcount in seconds of a pending command.
+		          
+		          Certain ePDUs (mainly those with part numbers beginning with IPV or IPC) do not support delayed control
+		          commands.  These will respond with an error if a command value of > 0 is written to this object."
+	::= { outletControlEntry 4 }
+
+outletControlRebootCmd  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..99999)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Outlet control command.
+		
+		          For outlets that are On prior to this Reboot command, they will switch Off immediately when the command is
+		          issued, remain Off for outletControlRebootOffTime seconds, and then turn back On.
+		          For outlets that are Off prior to the Reboot command, they will turn On after a delay of outletControlRebootOffTime
+		          seconds from when the command is issued.
+		0-n : Time in seconds until the Reboot command is issued
+		-1 : Cancel a pending outlet Reboot command 
+		
+		When read, returns -1 if no command is pending, or the current downcount in seconds of a pending command.
+		          
+		          Certain ePDUs (mainly those with part numbers beginning with IPV or IPC) do not support delayed control
+		          commands.  These will respond with an error if a command value of > 0 is written to this object."
+	::= { outletControlEntry 5 }
+
+outletControlPowerOnState  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		off (0),
+		on (1),
+		lastState (2)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Determines the outlet state when power is applied to the unit.
+		0 : not restart at device startup
+		1 : should sequence back ON in line with outletControlSequenceTime
+		2 : should take the state the outlet had when power was lost.
+		If the state was ON, should sequence back ON in line with outletControlSequenceTime."
+	::= { outletControlEntry 6 }
+
+outletControlSequenceDelay  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..99999)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Time delay in seconds from when a Global Sequence On command is issued to
+		when the command is executed on this outlet.  This delay is also used as a power-on
+		delay. Set to -1 to exclude this outlet from Global Sequence On
+		commands."
+	::= { outletControlEntry 7 }
+
+outletControlRebootOffTime  OBJECT-TYPE
+	SYNTAX     Integer32 (1..99999)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Time delay in seconds that the outlet should remain in the Off state when executing a Reboot command."
+	::= { outletControlEntry 8 }
+
+outletControlSwitchable  OBJECT-TYPE
+    	SYNTAX 		    INTEGER {
+		            switchable (1),
+		            notSwitchable (2)
+                            }	
+    	MAX-ACCESS    read-write
+    	STATUS 		    current
+    	DESCRIPTION
+		"Determines the outlet capability to be controlled On/Off from the communication channels.
+		1 : control On/Off enabled
+		2 : control On/Off disabled."
+    	::= { outletControlEntry 9 }
+
+outletControlShutoffDelay  OBJECT-TYPE
+    	SYNTAX 		        Integer32 (-1..99999)		
+    	MAX-ACCESS        read-write
+    	STATUS 		        current
+    	DESCRIPTION
+		"Time delay in seconds that could be taken in account before shutting of the outlet.
+    An application which need to shutoff properly an outlet will read this parameter first
+    then write it to the command outletControlOffCmd."
+    	::= { outletControlEntry 10 }
+
+temperatureTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF TemperatureEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of temperature probe measurements.  The number of entries is
+		      given by temperatureCount."
+	::= { environmental 1 }
+
+temperatureEntry  OBJECT-TYPE
+	SYNTAX 	TemperatureEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for a temperature measurement."
+	INDEX { strappingIndex, 
+		temperatureIndex }
+	::= { temperatureTable 1 }
+
+TemperatureEntry ::= SEQUENCE {
+	temperatureIndex
+		Integer32,
+	temperatureName
+		OCTET STRING,
+	temperatureProbeStatus
+		INTEGER,
+	temperatureValue
+		Integer32,
+	temperatureThStatus
+		INTEGER,
+	temperatureThLowerWarning
+		Integer32,
+	temperatureThLowerCritical
+		Integer32,
+	temperatureThUpperWarning
+		Integer32,
+	temperatureThUpperCritical
+		Integer32
+}
+
+temperatureIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..2)
+	MAX-ACCESS accessible-for-notify
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each temperature probe measurement.  Its value
+		      ranges from 1 to temperatureCount."
+	::= { temperatureEntry 1 }
+
+temperatureName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..31))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"A descriptive name for the temperature probe."
+	::= { temperatureEntry 2 }
+
+temperatureProbeStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		bad (-1),
+		disconnected (0),
+		connected (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Indicates whether a probe is connected or not."
+	::= { temperatureEntry 3 }
+
+temperatureValue  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Units are in tenths of a degree according to the scale specified by
+		      temperatureScale (either Fahrenheit or Celsius). Divide by ten to get
+		      degrees."
+	::= { temperatureEntry 4 }
+
+temperatureThStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (0),
+		lowWarning (1),
+		lowCritical (2),
+		highWarning (3),
+		highCritical (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Status of the measured temperature relative to the configured
+		      thresholds."
+	::= { temperatureEntry 5 }
+
+temperatureThLowerWarning  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..150000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Lower warning threshold.  Units are tenths of a degree.  A negative value
+                  indicates that this object is not available."
+	::= { temperatureEntry 6 }
+
+temperatureThLowerCritical  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..150000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Lower critical threshold.  Units are tenths of a degree.  A negative value
+		          indicates that this object is not available."
+	::= { temperatureEntry 7 }
+
+temperatureThUpperWarning  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..150000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Upper warning threshold.  Units are tenths of a degree.  A negative value
+                  indicates that this object is not available."
+	::= { temperatureEntry 8 }
+
+temperatureThUpperCritical  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..150000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Upper critical threshold.  Units are tenths of a degree.  A negative value
+                  indicates that this object is not available."
+	::= { temperatureEntry 9 }
+
+humidityTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF HumidityEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of humidity probe measurements.  The number of entries is
+		      given by humidityCount."
+	::= { environmental 2 }
+
+humidityEntry  OBJECT-TYPE
+	SYNTAX 	HumidityEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for a humidity measurement."
+	INDEX { strappingIndex, 
+		humidityIndex }
+	::= { humidityTable 1 }
+
+HumidityEntry ::= SEQUENCE {
+	humidityIndex
+		Integer32,
+	humidityName
+		OCTET STRING,
+	humidityProbeStatus
+		INTEGER,
+	humidityValue
+		Integer32,
+	humidityThStatus
+		INTEGER,
+	humidityThLowerWarning
+		Integer32,
+	humidityThLowerCritical
+		Integer32,
+	humidityThUpperWarning
+		Integer32,
+	humidityThUpperCritical
+		Integer32
+}
+
+humidityIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..2)
+	MAX-ACCESS accessible-for-notify
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each humidity probe measurement.  Its value
+		      ranges from 1 to humidityCount."
+	::= { humidityEntry 1 }
+
+humidityName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..31))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"A descriptive name for the humidity probe."
+	::= { humidityEntry 2 }
+
+humidityProbeStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		bad (-1),
+		disconnected (0),
+		connected (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Indicates whether a probe is connected or not."
+	::= { humidityEntry 3 }
+
+humidityValue  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Units are tenths of a percent relative humidity.  Divide the value by 10 to get %RH."
+	::= { humidityEntry 4 }
+
+humidityThStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (0),
+		lowWarning (1),
+		lowCritical (2),
+		highWarning (3),
+		highCritical (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Status of the measured humidity relative to the configured
+		      thresholds."
+	::= { humidityEntry 5 }
+
+humidityThLowerWarning  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..1000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Lower warning threshold.  Units are 0.1 %RH.  A negative value
+                  indicates that this object is not available."
+	::= { humidityEntry 6 }
+
+humidityThLowerCritical  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..1000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Lower critical threshold.  Units are 0.1 %RH.  A negative value
+                  indicates that this object is not available."
+	::= { humidityEntry 7 }
+
+humidityThUpperWarning  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..1000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Upper warning threshold.  Units are 0.1 %RH.  A negative value
+                  indicates that this object is not available."
+	::= { humidityEntry 8 }
+
+humidityThUpperCritical  OBJECT-TYPE
+	SYNTAX     Integer32 (-1..1000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Upper critical threshold.  Units are 0.1 %RH.  A negative value
+                  indicates that this object is not available."
+	::= { humidityEntry 9 }
+
+contactTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF ContactEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of contact sensors.  The number of entries is
+		      given by contactCount."
+	::= { environmental 3 }
+
+contactEntry  OBJECT-TYPE
+	SYNTAX 	ContactEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for a contact sensor"
+	INDEX { strappingIndex, 
+		contactIndex }
+	::= { contactTable 1 }
+
+ContactEntry ::= SEQUENCE {
+	contactIndex
+		Integer32,
+	contactName
+		OCTET STRING,
+	contactProbeStatus
+		INTEGER,
+	contactState
+		INTEGER
+}
+
+contactIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..3)
+	MAX-ACCESS accessible-for-notify
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each contact sensor.  Its value ranges from 1 to
+		      contactCount."
+	::= { contactEntry 1 }
+
+contactName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..31))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"A descriptive name for the contact sensor."
+	::= { contactEntry 2 }
+
+contactProbeStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		bad (-1),
+		disconnected (0),
+		connected (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Indicates whether a probe is connected or not.
+		Will not be returned  if the contact sensor is internal to the ePDU,
+		in that case only contactState should be read."
+	::= { contactEntry 3 }
+
+contactState  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		contactBad (-1),
+		contactOpen (0),
+		contactClosed (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The state of the contact sensor."
+	::= { contactEntry 4 }
+
+eatonEpduCompliances  MODULE-COMPLIANCE
+	STATUS     current
+	DESCRIPTION 
+		"The requirements for conforming to the ePDU MIB."
+	MODULE
+		MANDATORY-GROUPS { epduRequiredGroup } 
+		GROUP epduOptionalGroup
+		DESCRIPTION 
+		"Different ePDUs will support a subset of the defined objects."
+		GROUP epduNotifyGroup
+		DESCRIPTION 
+		"Different ePDUs will support a subset of the defined notifications."
+	::= { conformance 1 }
+
+epduRequiredGroup  OBJECT-GROUP
+	OBJECTS { unitName, 
+		firmwareVersion }
+	STATUS     current
+	DESCRIPTION 
+		"Minimal objects are required to conform to this MIB."
+	::= { objectGroups 1 }
+
+epduOptionalGroup  OBJECT-GROUP
+	OBJECTS { clockValue, 
+		commInterface, 
+		communicationStatus, 
+		contactCount, 
+		contactIndex, 
+		contactName, 
+		contactProbeStatus, 
+		contactState, 
+		groupChildCount, 
+		groupChildOID, 
+		groupChildType, 
+		groupControl0nCmd, 
+		groupControlOffCmd, 
+		groupControlRebootCmd, 
+		groupControlStatus, 
+		groupCount, 
+		groupCurrent, 
+		groupCurrentCapacity, 
+		groupCurrentCrestFactor, 
+		groupCurrentPercentLoad, 
+		groupCurrentThLowerCritical, 
+		groupCurrentThLowerWarning, 
+		groupCurrentThStatus, 
+		groupCurrentThUpperCritical, 
+		groupCurrentThUpperWarning, 
+		groupID, 
+		groupIndex, 
+		groupName, 
+		groupBreakerStatus, 
+		groupPowerFactor, 
+		groupType, 
+		groupVA, 
+		groupVAR, 
+		groupVoltage, 
+		groupVoltageMeasType, 
+		groupVoltageThLowerCritical, 
+		groupVoltageThLowerWarning, 
+		groupVoltageThStatus, 
+		groupVoltageThUpperCritical, 
+		groupVoltageThUpperWarning, 
+		groupWatts, 
+		groupWh, 
+		groupWhTimer, 
+		humidityCount, 
+		humidityIndex, 
+		humidityName, 
+		humidityProbeStatus, 
+		humidityThLowerCritical, 
+		humidityThLowerWarning, 
+		humidityThStatus, 
+		humidityThUpperCritical, 
+		humidityThUpperWarning, 
+		humidityValue, 
+		inputCount, 
+		inputCurrent, 
+		inputCurrentCapacity, 
+		inputCurrentCount, 
+		inputCurrentCrestFactor, 
+		inputCurrentIndex, 
+		inputCurrentMeasType, 
+		inputCurrentPercentLoad, 
+		inputCurrentThLowerCritical, 
+		inputCurrentThLowerWarning, 
+		inputCurrentThStatus, 
+		inputCurrentThUpperCritical, 
+		inputCurrentThUpperWarning, 
+		inputFrequency, 
+		inputFrequencyStatus, 
+		inputIndex, 
+		inputPlugType, 
+		inputPowerCount, 
+		inputPowerFactor, 
+		inputPowerMeasType, 
+		inputType, 
+		inputVA, 
+		inputVAR, 
+		inputVoltage, 
+		inputVoltageCount, 
+		inputVoltageIndex, 
+		inputVoltageMeasType, 
+		inputVoltageThLowerCritical, 
+		inputVoltageThLowerWarning, 
+		inputVoltageThStatus, 
+		inputVoltageThUpperCritical, 
+		inputVoltageThUpperWarning, 
+		inputWatts, 
+		inputWh, 
+		inputWhTimer, 
+        inputTotalVA,
+        inputTotalWatts,
+        inputTotalWh,
+        inputTotalWhTimer,
+        inputTotalPowerFactor,
+        inputTotalVAR,
+		internalStatus, 
+		lcdControl,
+    outletControlSwitchable,
+    outletControlShutoffDelay,
+		outletControlOffCmd, 
+		outletControlOnCmd, 
+		outletControlPowerOnState, 
+		outletControlRebootCmd, 
+		outletControlRebootOffTime, 
+		outletControlSequenceDelay, 
+		outletControlStatus, 
+		outletCount, 
+		outletCurrent, 
+		outletCurrentCapacity, 
+		outletCurrentCrestFactor, 
+        outletCurrentPercentLoad,
+		outletCurrentThLowerCritical, 
+		outletCurrentThLowerWarning, 
+		outletCurrentThStatus, 
+		outletCurrentThUpperCritical, 
+		outletCurrentThUpperWarning, 
+		outletID, 
+		outletIndex, 
+		outletName, 
+		outletParentCount, 
+		outletParentOID, 
+		outletParentType, 
+		outletPowerFactor, 
+		outletType, 
+		outletVA, 
+		outletVAR, 
+		outletVoltage, 
+		outletVoltageThLowerCritical, 
+		outletVoltageThLowerWarning, 
+		outletVoltageThStatus, 
+		outletVoltageThUpperCritical, 
+		outletVoltageThUpperWarning, 
+		outletWatts, 
+		outletWh, 
+		outletWhTimer, 
+		partNumber, 
+		productName, 
+		serialNumber, 
+		strappingIndex, 
+		strappingStatus, 
+		temperatureCount, 
+		temperatureIndex, 
+		temperatureName, 
+		temperatureProbeStatus, 
+		temperatureScale, 
+		unitType, 
+		temperatureThLowerCritical, 
+		temperatureThLowerWarning, 
+		temperatureThStatus, 
+		temperatureThUpperCritical, 
+		temperatureThUpperWarning, 
+		temperatureValue, 
+		unitControlOffCmd, 
+		unitControlOnCmd, 
+		unitName, 
+		unitsPresent,
+        userName }
+	STATUS     current
+	DESCRIPTION 
+		"Most objects in this MIB are optional."
+	::= { objectGroups 2 }
+
+epduNotifyGroup  NOTIFICATION-GROUP
+	NOTIFICATIONS { notifyBootUp, 
+		notifyCommunicationStatus, 
+		notifyContactState, 
+		notifyFailedLogin, 
+		notifyGroupCurrentThStatus, 
+		notifyGroupVoltageThStatus, 
+		notifyGroupBreakerStatus, 
+		notifyHumidityThStatus, 
+		notifyInputCurrentThStatus, 
+		notifyInputFrequencyStatus, 
+		notifyInputVoltageThStatus, 
+		notifyInternalStatus, 
+		notifyOutletControlStatus, 
+		notifyOutletCurrentThStatus, 
+		notifyOutletVoltageThStatus, 
+		notifyProbeStatus, 
+		notifyStrappingStatus, 
+		notifyTemperatureThStatus, 
+		notifyTest, 
+		notifyUserLogin, 
+		notifyUserLogout }
+	STATUS     current
+	DESCRIPTION 
+		"These notifications will be supported depending on the features of the ePDU.
+		      Check the web interface for options to turn these notifications on/off.  If 
+		      an option is not listed, then the ePDU likely does not support that
+		      notification."
+	::= { objectGroups 3 }
+END
+
+
+-- This MIB was created using NuDesign Team's Visual MIBuilder (Ver 4.7).
+

@@ -21,7 +21,7 @@ IMPORTS
         FROM IF-MIB;
 
 jnxOtnMib MODULE-IDENTITY
-    LAST-UPDATED "200807100931Z" -- Thur Jul 10 09:30:00 2008 UTC
+    LAST-UPDATED "201506171138Z" -- Wed Jun 17 11:38:23 IST 2015
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
             "        Juniper Technical Assistance Center
@@ -30,6 +30,12 @@ jnxOtnMib MODULE-IDENTITY
                      Sunnyvale, CA 94089
                      E-mail: support@juniper.net"
 
+    DESCRIPTION 
+            "Changed jnxOtnIntervalOdu15minIntervalNumber,
+             jnxOtnIntervalOtu15minIntervalNumber,
+             jnxOtnIntervalOtuFec15minIntervalNumber
+             from read-only to not-accessible" 
+    REVISION      "201506170000Z"
     DESCRIPTION
             "This MIB module defines objects used for managing the
              OTN interfaces of Juniper products."
@@ -313,7 +319,7 @@ JnxOtnIntervalOdu15minEntry ::=
 
 jnxOtnIntervalOdu15minIntervalNumber OBJECT-TYPE
         SYNTAX      INTEGER (1..96)
-        MAX-ACCESS  read-only
+        MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION
             "A number between 1 and 96, where 1 is the most
@@ -601,7 +607,7 @@ JnxOtnIntervalOtu15minEntry ::=
 
 jnxOtnIntervalOtu15minIntervalNumber OBJECT-TYPE
         SYNTAX      INTEGER (1..96)
-        MAX-ACCESS  read-only
+        MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION
             "A number between 1 and 96, where 1 is the most
@@ -876,7 +882,7 @@ JnxOtnIntervalOtuFec15minEntry ::=
 
 jnxOtnIntervalOtuFec15minIntervalNumber OBJECT-TYPE
         SYNTAX      INTEGER (1..96)
-        MAX-ACCESS  read-only
+        MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION
             "A number between 1 and 96, where 1 is the most

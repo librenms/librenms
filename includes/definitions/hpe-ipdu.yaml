@@ -1,0 +1,11 @@
+os: hpe-ipdu
+text: 'HPE iPDU'
+type: power
+icon: hpe
+over:
+    - { graph: device_bits, text: Traffic }
+mib_dir:
+    - hp
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.232.165.5

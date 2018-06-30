@@ -1,0 +1,9 @@
+os: 3com
+text: 3Com
+over:
+    - { graph: device_bits, text: Traffic }
+type: network
+discovery:
+    - sysObjectID:
+      - .1.3.6.1.4.1.43.1.
+      - .1.3.6.1.4.1.43.10.

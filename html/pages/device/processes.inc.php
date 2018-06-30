@@ -72,7 +72,7 @@ foreach ($heads as $head => $extra) {
     $bhead = 'asc';
     $icon  = '';
     if ('`'.$lhead.'`' == $order) {
-        $icon = " class='glyphicon glyphicon-chevron-";
+        $icon = " class='fa fa-chevron-";
         if ($by == 'asc') {
             $bhead = 'desc';
             $icon .= 'up';

@@ -28,7 +28,7 @@
 
 
 	jnxJsNatMIB  	MODULE-IDENTITY
-    	LAST-UPDATED  "201203011122Z" -- March 01, 2012
+    	LAST-UPDATED  "201301051022Z" -- January 05, 2012
     	ORGANIZATION  "Juniper Networks, Inc."
     	CONTACT-INFO
 					"Juniper Technical Assistance Center
@@ -49,6 +49,15 @@
         DESCRIPTION     "Deprecated jnxJsNatRuleTransHits and
                          jnxJsNatPoolTransHits, added
                          jnxJsNatRuleHits and jnxJsNatPoolHits."
+
+        REVISION        "201301051022Z" -- January 05, 2012
+        DESCRIPTION     "added jnxJsNatRuleNumOfSessions in 
+                         jnxJsNatRuleEntry;
+                         added jnxJsNatPoolUtil in
+                         jnxJsNatPoolEntry;
+                         added jnxJsNatTrapRuleName, jnxJsNatTrapRuleType, 
+                         jnxJsNatTrapRuleNumOfSessions and
+                         jnxJsNatRuleThresholdStatus."
 
     ::= { jnxJsNAT 1 }   
 
@@ -438,7 +447,8 @@
         jnxJsNatRuleName                     DisplayString,
         jnxJsNatRuleType                     INTEGER,
         jnxJsNatRuleTransHits                INTEGER,
-        jnxJsNatRuleHits                     Counter32
+        jnxJsNatRuleHits                     Counter32,
+        jnxJsNatRuleNumOfSessions            Counter32
     }
 
     jnxJsNatRuleName OBJECT-TYPE
@@ -479,6 +489,14 @@
              deprecate jnxJsNatRuleTransHits"
     ::= { jnxJsNatRuleEntry 4 }
 
+    jnxJsNatRuleNumOfSessions OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of sessions on this NAT rule"
+    ::= { jnxJsNatRuleEntry 5 }
+
     -- ***************************************************************
     --  NAT Pool Hit Table
     -- ***************************************************************
@@ -505,7 +523,8 @@
         jnxJsNatPoolName                     DisplayString,
         jnxJsNatPoolType                     INTEGER,
         jnxJsNatPoolTransHits                INTEGER,
-        jnxJsNatPoolHits                     Counter32
+        jnxJsNatPoolHits                     Counter32,
+        jnxJsNatPoolUtil                     INTEGER
     }
 
     jnxJsNatPoolName OBJECT-TYPE
@@ -546,9 +565,76 @@
              to deprecate jnxJsNatPoolTransHits."
     ::= { jnxJsNatPoolEntry 4 }
 
+    jnxJsNatPoolUtil OBJECT-TYPE
+        SYNTAX        INTEGER (0..100)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        	"The dynamic pool utilization in percentage."
+    ::= { jnxJsNatPoolEntry 5 }
+
     -- ***************************************************************
     --  NAT Trap definition
     -- ***************************************************************
+
+    --
+	-- Trap variables 
+	-- 
+	jnxJsNatAddrPoolUtil OBJECT-TYPE
+		SYNTAX      Integer32 (0..100)
+		MAX-ACCESS  accessible-for-notify
+		STATUS      current
+		DESCRIPTION
+			"The dynamic address pool utilization in percentage."
+        ::= { jnxJsNatTrapVars 1 }
+
+    jnxJsNatTrapPoolName OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..32))
+        MAX-ACCESS    accessible-for-notify
+        STATUS        current
+        DESCRIPTION
+            "Source NAT Pool name who issues trap"
+       ::= { jnxJsNatTrapVars 2 }
+
+    jnxJsNatPatPoolUtil OBJECT-TYPE
+		SYNTAX      Integer32 (0..100)
+		MAX-ACCESS  accessible-for-notify
+		STATUS      current
+		DESCRIPTION
+			"The dynamic pat pool utilization in percentage."
+        ::= { jnxJsNatTrapVars 3 }
+
+    jnxJsNatTrapRuleName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(1..32))
+		MAX-ACCESS  accessible-for-notify
+		STATUS      current
+		DESCRIPTION
+			"NAT rule name"
+        ::= { jnxJsNatTrapVars 4 }
+
+    jnxJsNatTrapRuleType OBJECT-TYPE
+        SYNTAX        INTEGER {
+						source		(1),
+						destination	(2),
+						static		(3)
+				   	  }
+        MAX-ACCESS    accessible-for-notify
+        STATUS        current
+        DESCRIPTION
+            "NAT types: Source, Destination and Static"
+       ::= { jnxJsNatTrapVars 5 }
+
+    jnxJsNatTrapRuleNumOfSessions OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  accessible-for-notify
+		STATUS      current
+		DESCRIPTION
+			"The number of sessions"
+        ::= { jnxJsNatTrapVars 6 }
+
+    --
+	-- Trap notifications 
+	--
 
     --
     -- NAT Address Pool Utilization Threshold Status 
@@ -568,31 +654,13 @@
               of the address pool." 
         ::= { jnxJsNatNotifications 1 }
 	
-	--
-	-- Trap variables 
-	-- 
-	jnxJsNatAddrPoolUtil OBJECT-TYPE
-		SYNTAX      Integer32 (0..100)
-		MAX-ACCESS  accessible-for-notify
-		STATUS      current
-		DESCRIPTION
-			"The dynamic address pool utilization in percentage."
-        ::= { jnxJsNatTrapVars 1 }
-
-    jnxJsNatTrapPoolName OBJECT-TYPE
-        SYNTAX        DisplayString (SIZE(1..32))
-        MAX-ACCESS    accessible-for-notify
-        STATUS        current
-        DESCRIPTION
-            "Source NAT Pool name who issues trap"
-       ::= { jnxJsNatTrapVars 2 }
-
     -- NAT Source Pool Utilization Threshold Status
     -- updated since jnxJsNatSrcIpPoolName is deprecated
     --
     jnxJsSrcNatPoolThresholdStatus NOTIFICATION-TYPE
         OBJECTS         { jnxJsNatTrapPoolName,
-                          jnxJsNatAddrPoolUtil }
+                          jnxJsNatAddrPoolUtil,
+                          jnxJsNatPatPoolUtil }
         STATUS         current
         DESCRIPTION
              "The Source NAT pool untilization threshold status
@@ -602,8 +670,30 @@
               
               jnxJsNatTrapPoolName is the name of source pool
               jnxJsNatAddrPoolUtil is the percentage of utilization
-              of the address pool."
+              of the address pool.
+              jnxJsNatPatPoolUtil is the percentage of utilization
+              of the pat pool."
         ::= { jnxJsNatNotifications 2 }       
+
+	
+    -- NAT rule session count Threshold Status
+    --
+    jnxJsNatRuleThresholdStatus NOTIFICATION-TYPE
+        OBJECTS         { jnxJsNatTrapRuleName,
+                          jnxJsNatTrapRuleType,
+                          jnxJsNatTrapRuleNumOfSessions }
+        STATUS         current
+        DESCRIPTION
+             "The NAT rule session count threshold status 
+              trap signifies that the number of sessions
+              is either exceeds certain threshold, or clear of that
+              threshold.
+              
+              jnxJsNatTrapRuleName is the name of rule
+              jnxJsNatTrapRuleType is the type of rule.
+              jnxJsNatTrapRuleConcurrentHits is the session count
+              of that rule."
+        ::= { jnxJsNatNotifications 3 }
 
     -- ***************************************************************
     --  END of File 

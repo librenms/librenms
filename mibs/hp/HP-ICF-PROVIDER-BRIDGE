@@ -1,0 +1,235 @@
+HP-ICF-PROVIDER-BRIDGE DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hpSwitch            
+            FROM HP-ICF-OID            
+        OBJECT-TYPE, MODULE-IDENTITY
+            FROM SNMPv2-SMI
+        TruthValue
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        dot1qVlanStaticEntry 
+            FROM Q-BRIDGE-MIB 
+        ifIndex 
+            FROM IF-MIB;
+
+
+    hpicfProviderBridge MODULE-IDENTITY
+        LAST-UPDATED "200608150000Z"  -- August 15, 2006
+        ORGANIZATION "Hewlett-Packard Company
+                      Procurve Networking Business"
+        CONTACT-INFO "Hewlett-Packard Company
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+        DESCRIPTION  "This MIB module contains the HP 'version'
+                      of the standard Provider Bridge MIB and 
+                      the proprietary extensions to it."
+        
+        REVISION     "200608150000Z"  -- August 15, 2006
+        DESCRIPTION  "Initial revision."
+        ::= { hpSwitch 40 }
+
+    hpicfProviderBridgeObjects OBJECT IDENTIFIER 
+                     ::= { hpicfProviderBridge 1 }
+
+    hpicfProviderBridgeBase OBJECT IDENTIFIER 
+                     ::= { hpicfProviderBridgeObjects 1 }
+
+-- **********************************************************************
+-- Scalar Objects
+-- **********************************************************************
+
+-- This is a HP specific define - where we can configure a device as a 
+-- regular vlanBridge, s-vlan bridge, provider edge bridge or a vlanSvlanBridge..
+
+    hpicfProviderBridgeType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        vlanBridge(1),
+                        svlanBridge(2),
+                        providerEdgeBridge(3),
+                        vlanSvlanBridge(4)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "hpicfProviderBridgeType controls bridge mode configuration.
+                     A device can function in one of the 4 modes defined above.
+
+                     vlanBridge         - provider bridge feature disabled mode,
+                                          all vlans are cvlans.
+                                          
+                     svlanBridge        - provider bridge mode with only svlans.
+                     
+                     providerEdgeBridge - provider bridge mode with cvlans and 
+                                          svlans and mappings between them.  
+                                          
+                     vlanSvlanBridge    - provider bridge mode with independent 
+                                          cvlans and svlans on the same device.
+                                          
+                     Changing from one mode to another will empty out the 
+                     current configuration information and reboot the device." 
+        DEFVAL     { vlanBridge }
+        ::= { hpicfProviderBridgeBase 1 }
+
+-- This is a HP specific define - to configure the EtherType for Provider 
+-- tagged frames. Applicable to s-vlan bridge, provider edge bridge or 
+-- a vlanSvlanBridge..
+
+    hpicfProviderBridgeEtherType OBJECT-TYPE
+        SYNTAX      INTEGER (1536..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Defines the 2-byte ethertype for provider tagged frames.
+	             The default is 0x88a8. 
+                     Changing from one tag-type to another with a given 
+                     hpicfProviderBridgeType configuration will reboot the
+                     device and the new tag-type will take effect subsequently."
+        DEFVAL     { 34984 }
+        ::= { hpicfProviderBridgeBase 2 }
+
+
+-- **********************************************************************
+-- Tabular Objects
+-- **********************************************************************
+
+-- ------------------------------------------------------------------------
+-- Vlan Classification Table
+-- HP Specific extension table. Augments the dot1qVlanStaticTable and holds
+-- information on whether the vlan is a provider vlan or a customer vlan
+-- ------------------------------------------------------------------------
+    hpicfProviderBridgeVlanTypeTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfProviderBridgeVlanTypeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP proprietaty extension to dot1qVlanStaticTable 
+                     to classify a vlan as a cvlan or an svlan"
+        ::= { hpicfProviderBridgeBase 3}
+
+    hpicfProviderBridgeVlanTypeEntry OBJECT-TYPE
+        SYNTAX      HpicfProviderBridgeVlanTypeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry for HP Specific extension table"
+        AUGMENTS    { dot1qVlanStaticEntry }
+        ::= { hpicfProviderBridgeVlanTypeTable 1 }
+       
+    HpicfProviderBridgeVlanTypeEntry ::=
+        SEQUENCE {
+            hpicfProviderBridgeVlanType INTEGER            
+        }
+       
+    hpicfProviderBridgeVlanType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       cvlan(1), 
+                       svlan(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Indicates the vlantype."
+
+        ::= { hpicfProviderBridgeVlanTypeEntry 1 }
+
+-- Provider Bridge Port Table
+-- -------------------------------------------------------------
+
+    hpicfProviderBridgePortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfProviderBridgePortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This specifies the designated type of an externally 
+                    accessible port on a Provider Bridge."
+        ::= { hpicfProviderBridgeBase 4 }
+
+    hpicfProviderBridgePortEntry OBJECT-TYPE
+        SYNTAX      HpicfProviderBridgePortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry that specifies the designated type of an 
+                    externally accessible port on a Provider Bridge."
+        INDEX       { ifIndex }
+        ::= { hpicfProviderBridgePortTable 1 }
+       
+    HpicfProviderBridgePortEntry ::=
+        SEQUENCE {
+            hpicfProviderBridgePortType        INTEGER
+        }
+       
+    hpicfProviderBridgePortType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        customer-edge(1),
+                        customer-network(2),
+                        provider-network (3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The type of an externally accessible port on 
+                     a Provider Bridge.
+                     A customer-edge port is a C-VLAN component Port 
+                     on a Provider Edge Bridge that is connected to
+                     customer owned equipment and receives and transmits 
+                     frames for a single customer. Designating a port as a 
+                     Customer Edge Port implies Provider Edge Bridge 
+                     functionality and, specifically, the existence of a 
+                     C-VLAN component associated with that port. This 
+                     C-VLAN component is uniquely identified within the 
+                     Bridge by the port number of the associated Customer 
+                     Edge Port.
+                     A customer-network port is an S-VLAN component Port 
+                     on a Provider Bridge or within a Provider Edge
+                     Bridge that receives and transmits frame for a 
+                     single customer.
+                     A provider-network port is an S-VLAN component Port 
+                     on a Provider Bridge that can transmit and
+                     receive frames for multiple customers."
+        REFERENCE
+          "IEEE 802.1ad Sec 3"
+        DEFVAL     { customer-edge }
+
+        ::= { hpicfProviderBridgePortEntry 1 }
+
+
+
+
+-- **********************************************************************
+-- Conformance information
+-- **********************************************************************
+
+    hpicfProviderBridgeConformance OBJECT IDENTIFIER 
+                      ::= { hpicfProviderBridge 2 }
+
+    hpicfProviderBridgeGroups OBJECT IDENTIFIER 
+                      ::= { hpicfProviderBridgeConformance 1 }
+
+    hpicfProviderBridgeBaseGroup OBJECT-GROUP
+        OBJECTS     { hpicfProviderBridgeType,
+                      hpicfProviderBridgeEtherType, 
+                      hpicfProviderBridgePortType,
+                      hpicfProviderBridgeVlanTypeTable
+                     }
+        STATUS      current
+        DESCRIPTION "Basic Provider Bridge configuration information."
+        ::= { hpicfProviderBridgeGroups 1 }
+
+
+-- **********************************************************************
+-- Compliance statements
+-- **********************************************************************
+
+    hpicfProviderBridgeCompliances OBJECT IDENTIFIER 
+                   ::= { hpicfProviderBridgeConformance 2 }
+
+    hpicfProviderBridgeCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP Switches with IEEE
+                    standard Provider Bridge MIBs."
+        MODULE
+            MANDATORY-GROUPS { hpicfProviderBridgeBaseGroup }
+            
+        ::= { hpicfProviderBridgeCompliances 1 }
+
+END
+
+
+
+
+

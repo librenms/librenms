@@ -1,0 +1,275 @@
+FOUNDRY-MAC-VLAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+      FROM SNMPv2-SMI
+    MacAddress, RowStatus
+      FROM SNMPv2-TC
+    InterfaceIndex
+      FROM IF-MIB;
+
+
+fdryMacVlanMIB MODULE-IDENTITY
+    LAST-UPDATED "201006020000Z"  -- 04 June 2010
+    ORGANIZATION "Brocade Communications Systems, Inc."
+    CONTACT-INFO
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+    DESCRIPTION
+             "Management Information Base module for MAC-based VLAN
+              configuration and statistics.
+
+              Copyright 1996-2010 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information Base Specification
+              embodies Brocade Communications Systems' confidential and proprietary
+              intellectual property. Brocade Communications Systems retains all
+              title and ownership in the Specification, including any revisions.
+
+              This Specification is supplied AS IS, and Brocade Communications Systems makes
+              no warranty, either express or implied, as to the use,
+              operation, condition, or performance of the specification, and any unintended
+              consequence it may on the user environment."
+
+    REVISION        "201006020000Z"  -- 04 June 2010
+    DESCRIPTION
+        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
+
+    REVISION     "200812170000Z" -- 17 December 2008
+    DESCRIPTION
+            "Replaces earlier snMacVlan MIB."
+   ::= { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) foundry(1991) products(1) switch(1) snSwitch(3) 32 }
+
+
+--
+-- Mac-based VLAN
+--
+
+fdryMacVlanGlobalObjects OBJECT IDENTIFIER ::= { fdryMacVlanMIB 1 }
+fdryMacVlanTableObjects  OBJECT IDENTIFIER ::= { fdryMacVlanMIB 2 }
+
+--
+-- MAC-based VLAN Global Scalar Object Section
+--
+
+fdryMacVlanGlobalClearOper OBJECT-TYPE
+    SYNTAX     INTEGER { valid(0), clear(1) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "valid(0) - this value is always returned when the variable is read.
+         clear(1) - setting the variable to this value clears the operational
+                    MAC-based VLAN information for all ports."
+    ::= { fdryMacVlanGlobalObjects 1 }
+
+fdryMacVlanGlobalDynConfigState OBJECT-TYPE
+    SYNTAX     INTEGER { disabled(0), enabled(1) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Enable/disable MAC-based VLAN dynamic activation on the global level."
+    ::= { fdryMacVlanGlobalObjects 2}
+
+--
+-- MAC-based VLAN Table Object Section
+--
+
+--
+-- MAC-based VLAN Port Membership Table
+-- Use this table to add or remove ports for MAC-based VLANs
+--
+
+fdryMacVlanPortMemberTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF FdryMacVlanPortMemberEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "MAC-based VLAN port membership table."
+    ::= { fdryMacVlanTableObjects 1 }
+
+fdryMacVlanPortMemberEntry OBJECT-TYPE
+    SYNTAX     FdryMacVlanPortMemberEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry of the MAC-based VLAN port membership table."
+    INDEX { fdryMacVlanPortMemberVLanId, fdryMacVlanPortMemberPortId }
+    ::= { fdryMacVlanPortMemberTable 1 }
+
+FdryMacVlanPortMemberEntry ::= SEQUENCE {
+    fdryMacVlanPortMemberVLanId      INTEGER,
+    fdryMacVlanPortMemberPortId      InterfaceIndex,
+    fdryMacVlanPortMemberRowStatus   RowStatus
+}
+
+fdryMacVlanPortMemberVLanId OBJECT-TYPE
+    SYNTAX    INTEGER (1..4095)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The VLAN identifier (VLAN ID)."
+    ::= { fdryMacVlanPortMemberEntry 1 }
+
+fdryMacVlanPortMemberPortId OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The ifIndex of the port which is a member of the MAC-based VLAN."
+    ::= { fdryMacVlanPortMemberEntry 2 }
+
+fdryMacVlanPortMemberRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This object is used to create and delete rows in the table."
+    ::= { fdryMacVlanPortMemberEntry 3 }
+
+--
+-- MAC-based VLAN Interface Table Object Section
+--
+
+fdryMacVlanIfTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF FdryMacVlanIfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "MAC-based VLAN Interface table."
+    ::= { fdryMacVlanTableObjects 2 }
+
+fdryMacVlanIfEntry OBJECT-TYPE
+    SYNTAX     FdryMacVlanIfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry in the MAC-based VLAN interface table."
+    INDEX { fdryMacVlanIfIndex }
+    ::= { fdryMacVlanIfTable 1 }
+
+FdryMacVlanIfEntry ::= SEQUENCE {
+    fdryMacVlanIfIndex            InterfaceIndex,
+    fdryMacVlanIfEnable           INTEGER,
+    fdryMacVlanIfMaxEntry         Integer32,
+    fdryMacVlanIfClearOper        INTEGER,
+    fdryMacVlanIfClearConfig      INTEGER
+}
+
+fdryMacVlanIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The ifIndex of the interface which is a member of the MAC-based VLAN."
+    ::= { fdryMacVlanIfEntry 1 }
+
+fdryMacVlanIfEnable OBJECT-TYPE
+    SYNTAX     INTEGER { disabled(0), enabled(1) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The administrative status requested by management for
+    MAC-based VLANs on this interface.  The value enabled(1)
+    indicates that MAC-based VLANs should be enabled on this interface,
+    When disabled(2), MAC-based VLANs are disabled on this interface.
+    Enable/disable MAC-based VLAN on this interface."
+    ::= { fdryMacVlanIfEntry 2 }
+
+fdryMacVlanIfMaxEntry OBJECT-TYPE
+    SYNTAX     Integer32 (2..32)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The maximum number of allowed and denied MAC address
+        (static and dynamic) that can be leared on this interface.
+        The default value is 2. The value should be between 2 to 32."
+    DEFVAL      { 2 }
+    ::= { fdryMacVlanIfEntry 3 }
+
+fdryMacVlanIfClearOper OBJECT-TYPE
+    SYNTAX      INTEGER { valid(0), clear(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "valid(0) - this value is always returned when the variable is read.
+         clear(1) - setting the variable to this value clears the operational
+                    MAC-based VLAN information for a port."
+    ::= { fdryMacVlanIfEntry 4 }
+
+fdryMacVlanIfClearConfig OBJECT-TYPE
+    SYNTAX      INTEGER { valid(0), clear(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "valid(0) - this value is always returned when the variable is read.
+         clear(1) - setting the variable to this value clears the configured
+                    MAC-based VLAN information for a port."
+    ::= { fdryMacVlanIfEntry 5 }
+
+--
+-- MAC-based VLAN Table Object section
+--
+
+fdryMacBasedVlanTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF FdryMacBasedVlanEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "MAC-based VLAN table."
+    ::= { fdryMacVlanTableObjects 3 }
+
+fdryMacBasedVlanEntry OBJECT-TYPE
+    SYNTAX     FdryMacBasedVlanEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry in the MAC-based VLAN table."
+    INDEX { fdryMacVlanIfIndex, fdryMacBasedVlanId, fdryMacBasedVlanMac }
+    ::= { fdryMacBasedVlanTable 1 }
+
+FdryMacBasedVlanEntry ::= SEQUENCE {
+    fdryMacBasedVlanId                INTEGER,
+    fdryMacBasedVlanMac               MacAddress,
+    fdryMacBasedVlanPriority          Integer32,
+    fdryMacBasedVlanRowStatus         RowStatus
+}
+
+fdryMacBasedVlanId OBJECT-TYPE
+    SYNTAX     INTEGER (1..4095)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The VLAN ID for this entry."
+    ::= { fdryMacBasedVlanEntry 1 }
+
+fdryMacBasedVlanMac OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A host source MAC address to be authenticated."
+    ::= { fdryMacBasedVlanEntry 2 }
+
+fdryMacBasedVlanPriority OBJECT-TYPE
+    SYNTAX     Integer32 (0..7)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The priority of the source MAC address."
+    ::= { fdryMacBasedVlanEntry 3 }
+
+fdryMacBasedVlanRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "This object is used to create and delete rows in the table."
+    ::= { fdryMacBasedVlanEntry 4 }
+
+END
+
+

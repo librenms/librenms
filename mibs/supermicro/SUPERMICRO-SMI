@@ -1,0 +1,55 @@
+-- SUPERMICRO-SMI.mib:  Super Micro Enterprise Structure of Management Information
+--
+-- October 1995, Software LAB
+--
+-- Copyright (c) 1993-2001 by Super Micro Computer Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+SUPERMICRO-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises
+		FROM SNMPv2-SMI;
+
+supermicro MODULE-IDENTITY
+	LAST-UPDATED "200110260000Z"
+	ORGANIZATION "Super Micro Computer Inc."
+	CONTACT-INFO
+		"	Software Lab
+
+		Postal: 980 Rock Avenue
+			San Jose, CA  95131
+			USA
+
+		   Tel: +1 408 503 8000
+
+		E-mail: SoftLab@supermicro.com"
+	DESCRIPTION
+		"The Structure of Management Information for the
+		Super Micro enterprise."
+	REVISION      "200110260000Z"
+	DESCRIPTION
+		"Initial version of this MIB module."
+	::= { enterprises 10876 }	-- assigned by IANA
+
+
+smProducts OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"smProducts is the root OBJECT IDENTIFIER from
+		which sysObjectID values are assigned.  Actual
+		values are defined in SUPERMICRO-PRODUCTS-MIB."
+	::= { supermicro 1 }
+
+smHealth OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"smHealth is the main subtree for new mib development."
+	::= { supermicro 2 }
+
+END

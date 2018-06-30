@@ -24,6 +24,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use LibreNMS\Config;
 use LibreNMS\Exceptions\FileExistsException;
 use LibreNMS\Proc;
 
@@ -135,6 +136,8 @@ function rrdtool($command, $filename, $options)
     /** @var Proc $rrd_sync_process */
     /** @var Proc $rrd_async_process */
 
+    $start_time = microtime(true);
+
     try {
         $cmd = rrdtool_build_command($command, $filename, $options);
     } catch (FileExistsException $e) {
@@ -147,7 +150,7 @@ function rrdtool($command, $filename, $options)
     // do not write rrd files, but allow read-only commands
     $ro_commands = array('graph', 'graphv', 'dump', 'fetch', 'first', 'last', 'lastupdate', 'info', 'xport');
     if (!empty($config['norrd']) && !in_array($command, $ro_commands)) {
-        c_echo('[%rRRD Disabled%n]');
+        c_echo('[%rRRD Disabled%n]', !$config['hide_rrd_disabled']);
         return array(null, null);
     }
 
@@ -168,6 +171,7 @@ function rrdtool($command, $filename, $options)
         echo $output[1];
     }
 
+    recordRrdStatistic($command, $start_time);
     return $output;
 }
 
@@ -189,7 +193,7 @@ function rrdtool_build_command($command, $filename, $options)
 
     if ($command == 'create') {
         // <1.4.3 doesn't support -O, so make sure the file doesn't exist
-        if (version_compare($config['rrdtool_version'], '1.4.3', '<')) {
+        if (version_compare(Config::get('rrdtool_version', '1.4'), '1.4.3', '<')) {
             if (is_file($filename)) {
                 throw new FileExistsException();
             }
@@ -199,9 +203,10 @@ function rrdtool_build_command($command, $filename, $options)
     }
 
     // no remote for create < 1.5.5 and tune < 1.5
+    $rrdtool_version = Config::get('rrdtool_version', '1.4');
     if ($config['rrdcached'] &&
-        !($command == 'create' && version_compare($config['rrdtool_version'], '1.5.5', '<')) &&
-        !($command == 'tune' && $config['rrdcached'] && version_compare($config['rrdtool_version'], '1.5', '<'))
+        !($command == 'create' && version_compare($rrdtool_version, '1.5.5', '<')) &&
+        !($command == 'tune' && $config['rrdcached'] && version_compare($rrdtool_version, '1.5', '<'))
     ) {
         // only relative paths if using rrdcached
         $filename = str_replace(array($config['rrd_dir'].'/', $config['rrd_dir']), '', $filename);
@@ -223,7 +228,7 @@ function rrdtool_build_command($command, $filename, $options)
 function rrdtool_check_rrd_exists($filename)
 {
     global $config;
-    if ($config['rrdcached'] && version_compare($config['rrdtool_version'], '1.5', '>=')) {
+    if ($config['rrdcached'] && version_compare(Config::get('rrdtool_version', '1.4'), '1.5', '>=')) {
         $chk = rrdtool('last', $filename, '');
         $filename = str_replace(array($config['rrd_dir'].'/', $config['rrd_dir']), '', $filename);
         return !str_contains(implode($chk), "$filename': No such file or directory");
@@ -275,7 +280,6 @@ function rrdtool_escape($string, $length = null)
 {
     $result = shorten_interface_type($string);
     $result = str_replace("'", '', $result);            # remove quotes
-    $result = str_replace('%', '%%', $result);          # double percent signs
     if (is_numeric($length)) {
         $extra = substr_count($string, ':', 0, $length);
         $result = substr(str_pad($result, $length), 0, ($length + $extra));
@@ -301,8 +305,23 @@ function rrd_name($host, $extra, $extension = ".rrd")
 {
     global $config;
     $filename = safename(is_array($extra) ? implode("-", $extra) : $extra);
-    return implode("/", array($config['rrd_dir'], $host, $filename.$extension));
+    return implode("/", array(get_rrd_dir($host), $filename.$extension));
 } // rrd_name
+
+
+/**
+ * Generates a path based on the hostname (or IP)
+ *
+ * @param string $host Host name
+ * @return string the name of the rrd directory for $host
+ */
+function get_rrd_dir($host)
+{
+    global $config;
+    $host = str_replace(':', '_', trim($host, '[]'));
+    return implode("/", array($config['rrd_dir'], $host));
+} // rrd_dir
+
 
 /**
  * Generates a filename for a proxmox cluster rrd
@@ -371,7 +390,7 @@ function rrdtool_tune($type, $filename, $max)
  * rrdtool backend implementation of data_update
  *
  * Tags:
- *   rrd_def     array|string: (required) an array of rrd field definitions example: "DS:dataName:COUNTER:600:U:100000000000"
+ *   rrd_def     RrdDefinition
  *   rrd_name    array|string: the rrd filename, will be processed with rrd_name()
  *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
  *   rrd_step             int: rrd step, defaults to 300
@@ -386,7 +405,7 @@ function rrdtool_data_update($device, $measurement, $tags, $fields)
     global $config;
 
     $rrd_name = $tags['rrd_name'] ?: $measurement;
-    $step = $tags['rrd_step'] ?: 300;
+    $step = $tags['rrd_step'] ?: $config['rrd']['step'];
     $oldname = $tags['rrd_oldname'];
     if (!empty($oldname)) {
         rrd_file_rename($device, $oldname, $rrd_name);
@@ -399,10 +418,8 @@ function rrdtool_data_update($device, $measurement, $tags, $fields)
         $rrd = rrd_name($device['hostname'], $rrd_name);
     }
 
-    if ($tags['rrd_def'] && !rrdtool_check_rrd_exists($rrd)) {
-        $rrd_def = is_array($tags['rrd_def']) ? $tags['rrd_def'] : array($tags['rrd_def']);
-        // add the --step and the rra definitions to the command
-        $newdef = "--step $step " . implode(' ', $rrd_def) . $config['rrd_rra'];
+    if (isset($tags['rrd_def']) && !rrdtool_check_rrd_exists($rrd)) {
+        $newdef = "--step $step " . $tags['rrd_def'] . $config['rrd_rra'];
         rrdtool('create', $rrd, $newdef);
     }
 
@@ -414,8 +431,8 @@ function rrdtool_data_update($device, $measurement, $tags, $fields)
  * rename an rrdfile, can only be done on the LibreNMS server hosting the rrd files
  *
  * @param array $device Device object
- * @param string $oldname RRD name array as used with rrd_name()
- * @param string $newname RRD name array as used with rrd_name()
+ * @param string|array $oldname RRD name array as used with rrd_name()
+ * @param string|array $newname RRD name array as used with rrd_name()
  * @return bool indicating rename success or failure
  */
 function rrd_file_rename($device, $oldname, $newname)
@@ -424,10 +441,10 @@ function rrd_file_rename($device, $oldname, $newname)
     $newrrd = rrd_name($device['hostname'], $newname);
     if (is_file($oldrrd) && !is_file($newrrd)) {
         if (rename($oldrrd, $newrrd)) {
-            log_event("Renamed $oldrrd to $newrrd", $device, "poller");
+            log_event("Renamed $oldrrd to $newrrd", $device, "poller", 1);
             return true;
         } else {
-            log_event("Failed to rename $oldrrd to $newrrd", $device, "poller");
+            log_event("Failed to rename $oldrrd to $newrrd", $device, "poller", 5);
             return false;
         }
     } else {

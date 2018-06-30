@@ -1,0 +1,44 @@
+os: ceraos
+text: 'Ceragon CeraOS'
+type: wireless
+icon: ceragon
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_wireless_power, text: 'Wireless Power' }
+    - { graph: device_ping_perf, text: 'Ping Times' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.2281
+poller_modules:
+    applications: false
+    bgp-peers: false
+    entity-physical: false
+    hr-mib: false
+    ipSystemStats: false
+    ipmi: false
+    mempools: false
+    netstats: false
+    ntp: false
+    ospf: false
+    processors: false
+    services: false
+    storage: false
+    ucd-diskio: false
+    ucd-mib: false
+discovery_modules:
+    ports-stack: false
+    entity-physical: false
+    processors: false
+    mempools: false
+    cisco-vrf-lite: false
+    ipv4-addresses: false
+    ipv6-addresses: false
+    storage: false
+    hr-device: false
+    discovery-protocols: false
+    arp-table: false
+    bgp-peers: false
+    ucd-diskio: false
+    services: false
+    ntp: false
+    charge: false

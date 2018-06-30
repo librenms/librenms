@@ -1,9 +1,12 @@
 <?php
+
+use LibreNMS\Authentication\Auth;
+
 header('Content-type: text/plain');
 
 // FUA
 
-if (is_admin() === false) {
+if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 

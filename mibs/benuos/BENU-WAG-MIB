@@ -1,0 +1,27 @@
+BENU-WAG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+    FROM SNMPv2-SMI
+    benuPlatSerMIB 
+    FROM BENU-PLATFORM-SERVICE-MIB;
+
+
+benuWAG MODULE-IDENTITY
+    LAST-UPDATED "201210080000Z" -- 08 October 2012
+    ORGANIZATION "Benu Networks"
+    CONTACT-INFO "Benu Networks Inc,
+      300 Concord Road,
+      Billerca MA 01821
+      Email: support@benunets.com"
+    DESCRIPTION
+       "The MIB module for defining all mib sub modules 
+        that are specific to WiFiAccessGateway
+        Copyright (C) 2001, 2008 by Benu Networks, Inc.
+        All rights reserved."
+    REVISION "201210080000Z" -- 08 October 2012
+    DESCRIPTION "Initial Version"
+
+    ::= { benuPlatSerMIB 1 }
+
+END

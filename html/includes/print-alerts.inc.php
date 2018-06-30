@@ -19,27 +19,27 @@ echo '<td>'.htmlspecialchars($alert_entry['name']).'</td>';
 
 if ($alert_state != '') {
     if ($alert_state == '0') {
-        $glyph_icon  = 'ok';
-        $glyph_color = 'green';
-        $text        = 'Ok';
+        $fa_icon  = 'check';
+        $fa_color = 'success';
+        $text     = 'Ok';
     } elseif ($alert_state == '1') {
-        $glyph_icon  = 'remove';
-        $glyph_color = 'red';
-        $text        = 'Alert';
+        $fa_icon  = 'remove';
+        $fa_color = 'danger';
+        $text     = 'Alert';
     } elseif ($alert_state == '2') {
-        $glyph_icon  = 'info-sign';
-        $glyph_color = 'lightgrey';
-        $text        = 'Ack';
+        $fa_icon  = 'info-circle';
+        $fa_color = 'muted';
+        $text     = 'Ack';
     } elseif ($alert_state == '3') {
-        $glyph_icon  = 'arrow-down';
-        $glyph_color = 'orange';
-        $text        = 'Worse';
+        $fa_icon  = 'arrow-down';
+        $fa_color = 'warning';
+        $text     = 'Worse';
     } elseif ($alert_state == '4') {
-        $glyph_icon  = 'arrow-up';
-        $glyph_color = 'khaki';
-        $text        = 'Better';
+        $fa_icon  = 'arrow-up';
+        $fa_color = 'info';
+        $text     = 'Better';
     }//end if
-    echo "<td><b><span class='glyphicon glyphicon-".$glyph_icon."' style='color:".$glyph_color."'></span> $text</b></td>";
+    echo "<td><b><i class='fa fa-fw fa-".$fa_icon." text-".$fa_color."'></i> $text</b></td>";
 }//end if
 
 echo '</tr>';

@@ -93,7 +93,7 @@ jnxMbgPgwSMObjects OBJECT IDENTIFIER
 jnxMbgPgwAPNStatsTable OBJECT-TYPE
     SYNTAX  SEQUENCE OF JnxMbgPgwAPNStatsEntry
     MAX-ACCESS  not-accessible
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "The table listing Mobile Gateway Application Program Name level stats.
          Key is APN Name."
@@ -102,7 +102,7 @@ jnxMbgPgwAPNStatsTable OBJECT-TYPE
 jnxMbgPgwAPNStatsTableEntry OBJECT-TYPE
     SYNTAX      JnxMbgPgwAPNStatsEntry
     MAX-ACCESS  not-accessible
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "An entry representing a Mobile Gateway APN Stats."
     INDEX       { jnxMbgPgwAPNName }
@@ -128,7 +128,7 @@ JnxMbgPgwAPNStatsEntry ::= SEQUENCE {
 jnxMbgPgwAPNName OBJECT-TYPE
     SYNTAX      DisplayString
     MAX-ACCESS  not-accessible
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "A string that uniquely identifies the APN."
     ::= { jnxMbgPgwAPNStatsTableEntry 1 }
@@ -136,7 +136,7 @@ jnxMbgPgwAPNName OBJECT-TYPE
 jnxMbgPgwSessnEstAttempts OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Total Session establishment attempts made."
     ::= { jnxMbgPgwAPNStatsTableEntry 2 }
@@ -144,7 +144,7 @@ jnxMbgPgwSessnEstAttempts OBJECT-TYPE
 jnxMbgPgwSuccSessnsEst OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Sessions established successfully."
     ::= { jnxMbgPgwAPNStatsTableEntry 3 }
@@ -152,7 +152,7 @@ jnxMbgPgwSuccSessnsEst OBJECT-TYPE
 jnxMbgPgwSessnFailedServcUnaval OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Sessions that could not be established due
           to service unavailability."
@@ -161,7 +161,7 @@ jnxMbgPgwSessnFailedServcUnaval OBJECT-TYPE
 jnxMbgPgwSessnFailedSysFailure OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Sessions that could not be established
          due to system failure."
@@ -170,7 +170,7 @@ jnxMbgPgwSessnFailedSysFailure OBJECT-TYPE
 jnxMbgPgwSessnFailedNoResource OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Sessions that could not be established
          due to lack of resource."
@@ -179,7 +179,7 @@ jnxMbgPgwSessnFailedNoResource OBJECT-TYPE
 jnxMbgPgwSessnFailedNoAddr OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Sessions that could not be established
          due to lack of address. The address pool
@@ -189,7 +189,7 @@ jnxMbgPgwSessnFailedNoAddr OBJECT-TYPE
 jnxMbgPgwSessnFailedServcDenied OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Sessions that could not be established
          due to service denial."
@@ -198,7 +198,7 @@ jnxMbgPgwSessnFailedServcDenied OBJECT-TYPE
 jnxMbgPgwSessnFailedAuthFailed OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Sessions that could not be established
           due to authentication failure."
@@ -207,7 +207,7 @@ jnxMbgPgwSessnFailedAuthFailed OBJECT-TYPE
 jnxMbgPgwSessnFailedAccessDenied OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Sessions that could not be established
           due to APN access denial."
@@ -216,7 +216,7 @@ jnxMbgPgwSessnFailedAccessDenied OBJECT-TYPE
 jnxMbgPgwPeerInitSessnDeact OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Total Session deactivations initiated by the peer/MS."
     ::= { jnxMbgPgwAPNStatsTableEntry 11 }
@@ -224,7 +224,7 @@ jnxMbgPgwPeerInitSessnDeact OBJECT-TYPE
 jnxMbgPgwSuccPeerInitSessnDeact OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Peer/MS initiated session
          deactivations that succeeded."
@@ -233,7 +233,7 @@ jnxMbgPgwSuccPeerInitSessnDeact OBJECT-TYPE
 jnxMbgPgwGWInitSessnDeact OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Total gateway initiated Session deactivations."
     ::= { jnxMbgPgwAPNStatsTableEntry 13 }
@@ -241,7 +241,7 @@ jnxMbgPgwGWInitSessnDeact OBJECT-TYPE
 jnxMbgPgwSuccGWInitSessnDeact OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Gateway initiated Session deactivations that suceeded."
     ::= { jnxMbgPgwAPNStatsTableEntry 14 }
@@ -2539,55 +2539,55 @@ jnxMbgPgwActvBearers OBJECT-TYPE
 jnxMbgPgwIdleSubscribers OBJECT-TYPE
     SYNTAX      CounterBasedGauge64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Total idle subscribers. 
-        Deprecated : Reported as zero"
+        obsolete : Reported as zero"
     ::= { jnxMbgPgwSMStatusEntry 4 }
 
 jnxMbgPgwIdleSessions OBJECT-TYPE
     SYNTAX      CounterBasedGauge64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Total idle sessions.
-        Deprecated : Reported as zero"
+        obsolete : Reported as zero"
     ::= { jnxMbgPgwSMStatusEntry 5 }
 
 jnxMbgPgwIdleBearers OBJECT-TYPE
     SYNTAX      CounterBasedGauge64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Total idle bearers.
-        Deprecated : Reported as zero"
+        obsolete : Reported as zero"
     ::= { jnxMbgPgwSMStatusEntry 6 }
 
 jnxMbgPgwSuspSubscribers OBJECT-TYPE
     SYNTAX      CounterBasedGauge64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Total suspended subscribers.
-        Deprecated : Reported as zero"
+        obsolete : Reported as zero"
     ::= { jnxMbgPgwSMStatusEntry 7 }
 
 jnxMbgPgwSuspSessions OBJECT-TYPE
     SYNTAX      CounterBasedGauge64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Total suspended sessions.
-        Deprecated : Reported as zero"
+        obsolete : Reported as zero"
     ::= { jnxMbgPgwSMStatusEntry 8 }
 
 jnxMbgPgwSuspBearers OBJECT-TYPE
     SYNTAX      CounterBasedGauge64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Total suspended bearers.
-        Deprecated : Reported as zero"
+        obsolete : Reported as zero"
     ::= { jnxMbgPgwSMStatusEntry 9 }
     
 jnxMbgPgwCPUUtil OBJECT-TYPE
@@ -3102,7 +3102,7 @@ jnxMbgPgwStatus OBJECT IDENTIFIER
 jnxMbgPgwActiveSubscribers OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Total active subscriber."
     ::= { jnxMbgPgwStatus 1 }
@@ -3110,7 +3110,7 @@ jnxMbgPgwActiveSubscribers OBJECT-TYPE
 jnxMbgPgwActiveSessions OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Total active sessions."
     ::= { jnxMbgPgwStatus 2 }
@@ -3118,7 +3118,7 @@ jnxMbgPgwActiveSessions OBJECT-TYPE
 jnxMbgPgwActiveBearers OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Total active bearers."
     ::= { jnxMbgPgwStatus 3 }
@@ -3126,7 +3126,7 @@ jnxMbgPgwActiveBearers OBJECT-TYPE
 jnxMbgPgwCPUUtilization OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Current CPU Utilization."
     ::= { jnxMbgPgwStatus 4 }
@@ -3134,7 +3134,7 @@ jnxMbgPgwCPUUtilization OBJECT-TYPE
 jnxMbgPgwMemoryUtilization OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Current Memory Utilization."
     ::= { jnxMbgPgwStatus 5 }

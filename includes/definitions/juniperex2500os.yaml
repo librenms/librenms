@@ -1,0 +1,9 @@
+os: juniperex2500os
+text: 'Juniper EX2500'
+type: network
+icon: junos
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.1411.102

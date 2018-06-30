@@ -4,20 +4,27 @@ $oid = $mempool['mempool_index'];
 
 d_echo('Ironware Mempool'."\n");
 
-$is_netiron = snmp_get($device, 'sysObjectID.0', '-OvQ', 'FOUNDRY-SN-AGENT-MIB');
-
-if (strpos($is_netiron, 'NI') === false && strpos($is_netiron, 'MLX') === false && strpos($is_netiron, 'Cer') === false) {
+if (str_contains($device['sysDescr'], array('NetIron', 'MLX', 'CER')) === false) {
+    echo 'Ironware Dynamic: ';
     $mempool['total'] = snmp_get($device, 'snAgGblDynMemTotal.0', '-OvQ', 'FOUNDRY-SN-AGENT-MIB');
+    if ($mempool['total'] < 0) {
+        $mempool['total'] =+ 4294967296 ; // signed vs unsigned snmp output
+    }
     $mempool['free']  = snmp_get($device, 'snAgGblDynMemFree.0', '-OvQ', 'FOUNDRY-SN-AGENT-MIB');
+    if ($mempool['free'] < 0) {
+        $mempool['free'] =+ 4294967296 ; // signed vs unsigned snmp output
+    }
     $mempool['used']  = ($mempool['total'] - $mempool['free']);
+    d_echo($mempool);
 } //end_if
 
 else {
+    echo 'NetIron: ';
     d_echo('caching');
     $mempool_cache['ironware-dyn'] = array();
-    $mempool_cache['ironware-dyn'] = snmpwalk_cache_multi_oid($device, 'snAgentBrdMemoryUtil100thPercent', $mempool_cache['ironware-dyn'], 'FOUNDRY-SN-AGENT-MIB', $config['install_dir'].'/mibs');
-    $mempool_cache['ironware-dyn'] = snmpwalk_cache_multi_oid($device, 'snAgentBrdMemoryAvailable', $mempool_cache['ironware-dyn'], 'FOUNDRY-SN-AGENT-MIB', $config['install_dir'].'/mibs');
-    $mempool_cache['ironware-dyn'] = snmpwalk_cache_multi_oid($device, 'snAgentBrdMemoryTotal', $mempool_cache['ironware-dyn'], 'FOUNDRY-SN-AGENT-MIB', $config['install_dir'].'/mibs');
+    $mempool_cache['ironware-dyn'] = snmpwalk_cache_multi_oid($device, 'snAgentBrdMemoryUtil100thPercent', $mempool_cache['ironware-dyn'], 'FOUNDRY-SN-AGENT-MIB');
+    $mempool_cache['ironware-dyn'] = snmpwalk_cache_multi_oid($device, 'snAgentBrdMemoryAvailable', $mempool_cache['ironware-dyn'], 'FOUNDRY-SN-AGENT-MIB');
+    $mempool_cache['ironware-dyn'] = snmpwalk_cache_multi_oid($device, 'snAgentBrdMemoryTotal', $mempool_cache['ironware-dyn'], 'FOUNDRY-SN-AGENT-MIB');
     d_echo($mempool_cache);
 
     $entry = $mempool_cache['ironware-dyn'][$mempool[mempool_index]];

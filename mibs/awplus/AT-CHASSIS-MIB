@@ -1,0 +1,318 @@
+-- ============================================================================
+-- AT-CHASSIS.MIB, Allied Telesis enterprise MIB:
+-- Objects for chassis information
+-- Copyright (c) 2011 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-CHASSIS-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            sysinfo
+                FROM AT-SMI-MIB
+            Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            DisplayString
+                FROM SNMPv2-TC;
+
+        chassis MODULE-IDENTITY
+            LAST-UPDATED "201406090000Z"
+            ORGANIZATION
+                "Allied Telesis, Inc."
+            CONTACT-INFO
+                "  http://www.alliedtelesis.com"
+            DESCRIPTION
+                "Support for accessing trap notifications on chassis based products."
+            REVISION "201406090000Z"
+            DESCRIPTION
+                "Added sofware version to chassisCardTable."
+            REVISION "201405260000Z"
+            DESCRIPTION
+                "Added new chassisMappingTable for mapping node ID to member ID."
+            REVISION "201404160000Z"
+            DESCRIPTION
+                "Added more descriptions to chassisCardSlot for VCStack Plus and
+                 increase the range to 1-24."
+            REVISION "201205150000Z"
+            DESCRIPTION
+                "Added support for the controller cards and line cards."
+            REVISION "201109260000Z"
+            DESCRIPTION
+                "Initial version of this MIB module."
+            ::= { sysinfo 23 }
+
+
+--
+-- Node definitions
+--
+
+--
+-- The VCS Notification Objects (For RFC3584 compliance)
+--
+        chassisNotifications OBJECT IDENTIFIER ::= { chassis 0 }
+
+
+        chassisCardRoleChangeNotify NOTIFICATION-TYPE
+            OBJECTS { slotNumber, chassisRole }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when the CFC's role is changed."
+            ::= { chassisNotifications 1 }
+
+
+        chassisCardJoinNotify NOTIFICATION-TYPE
+            OBJECTS { slotNumber }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when a card connects to the CFC."
+            ::= { chassisNotifications 2 }
+
+
+        chassisCardLeaveNotify NOTIFICATION-TYPE
+            OBJECTS { slotNumber }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when a card detaches from the CFC."
+            ::= { chassisNotifications 3 }
+
+
+        slotNumber OBJECT-TYPE
+            SYNTAX Unsigned32 (1..12)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Slot number of the card that has changed."
+            ::= { chassisNotifications 4 }
+
+
+        chassisRole OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                leaving(1),
+                discovering(2),
+                synchronizing(3),
+                standbyMember(4),
+                pendingMaster(5),
+                disabledMaster(6),
+                activeMaster(7)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "CFC's role in the chassis."
+            ::= { chassisNotifications 5 }
+
+--
+-- The card table
+--
+        chassisCardTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF ChassisCardEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A list of cards presented on the device."
+            ::= { chassis 1 }
+
+        chassisCardEntry OBJECT-TYPE
+            SYNTAX ChassisCardEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table entry containing information about a card."
+            INDEX { chassisCardSlot }
+            ::= { chassisCardTable 1 }
+
+        ChassisCardEntry ::=
+            SEQUENCE {
+                chassisCardSlot
+                    INTEGER,
+                chassisCardBoardOID
+                    OBJECT IDENTIFIER,
+                chassisCardName
+                    DisplayString,
+                chassisCardState
+                    INTEGER,
+                chassisCardControllerState
+                    INTEGER,
+                chassiCardSwVersion
+                   DisplayString
+            }
+
+        chassisCardSlot OBJECT-TYPE
+            SYNTAX INTEGER (1..24)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The slot number the card is in. For VCStack Plus,
+                 1-12 refers to the cards on VCS stack member 1 and
+                 13-24 refers to the cards on VCS stack member 2.
+                 Refer to chassisMappingTable for more details."
+            ::= { chassisCardEntry 1 }
+
+        chassisCardBoardOID OBJECT-TYPE
+            SYNTAX OBJECT IDENTIFIER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The OID value used to identify the type of board
+                that is defined in the alliedTelesis's 'boards'
+                enterprise MIB.
+                If the board is provisioned or an unsupported
+                hardware, this object will have the value of 0 0."
+            ::= { chassisCardEntry 2 }
+
+        chassisCardName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of the card. E.g. AT-SBx81CFC400, AT-SBx81CFC960 for
+                controller cards; AT-SBx81GP24, AT-SBx81GT24, AT-SBx81GS24,
+                AT-SBx81XS6 for line cards; 'unknown' for unsupported hardware."
+            ::= { chassisCardEntry 3 }
+
+        chassisCardState OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                unknown(1),
+                configuring(2),
+                syncing(3),
+                online(4),
+                syncingFirmware(5),
+                joining(6),
+                incompatibleSW(7),
+                disabled(8),
+                initializing(9),
+                booting(10),
+                unsupportedHW(11),
+                provisioned(12)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current state of the card. The valid state is in one of the following:
+                unknown(1), configuring(2), syncing(3), online(4), syncingFirmware(5),
+                joining(6), incompatibleSW(7), disabled(8), initializing(9),
+                booting(10), unsupportedHW(11) or provisioned(12)."
+            ::= { chassisCardEntry 4 }
+
+        chassisCardControllerState OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                unknown(1),
+                active(2),
+                standby(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current state of the controller card, in addition to the
+                card state. The valid state is in one of the following:
+                unknown(1), active(2) or standby(3)."
+            ::= { chassisCardEntry 5 }
+
+        chassiCardSwVersion OBJECT-TYPE
+           SYNTAX DisplayString
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+               "The software version that the card is running. When feature ISSU (In Service
+                Software Update) is supported, there are situations that a LIF card may run
+                a software version different from the active CFC."
+           ::= { chassisCardEntry 6 }
+
+--
+--  Map from node id to VCS member and slot id
+--
+
+       chassisMappingTable OBJECT-TYPE
+           SYNTAX SEQUENCE OF ChassisMappingEntry
+           MAX-ACCESS not-accessible
+           STATUS current
+           DESCRIPTION
+               "A list of cards presented on the device."
+           ::= { chassis 2 }
+
+
+       chassisMappingEntry OBJECT-TYPE
+           SYNTAX ChassisMappingEntry
+           MAX-ACCESS not-accessible
+           STATUS current
+           DESCRIPTION
+               "Other SNMP SET/GET operations refer to a card in a chassis using a
+                single integer index, i.e. a 'node-ID'. This table entry maps a node-ID
+                value to the VCS member-ID and slot number of the card. For example,
+                node-ID 17 would map to card 2.5 (VCS member-ID 2, slot 5)."
+           INDEX { chassisNodeId }
+           ::= { chassisMappingTable 1 }
+
+
+      ChassisMappingEntry ::=
+           SEQUENCE {
+               chassisNodeId
+                   Unsigned32,
+               chassisVCSMemberId
+                   Unsigned32,
+               chassisSlotNumber
+                   Unsigned32,
+               chassisNodeDisplayString
+                   DisplayString,
+               chassisNodeStateString
+                   DisplayString
+           }
+
+
+      chassisNodeId OBJECT-TYPE
+          SYNTAX Unsigned32 (1..24)
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "The node ID of a chassis card."
+          ::= { chassisMappingEntry 1 }
+
+
+      chassisVCSMemberId OBJECT-TYPE
+           SYNTAX Unsigned32 (1..2)
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+               "The VCS member ID of the chassis that the card is in."
+           ::= { chassisMappingEntry 2 }
+
+
+       chassisSlotNumber OBJECT-TYPE
+           SYNTAX Unsigned32 (0..12)
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+               "The chassis slot number that the card is installed in."
+           ::= { chassisMappingEntry 3 }
+
+
+       chassisNodeDisplayString OBJECT-TYPE
+           SYNTAX DisplayString
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+               "The name of the chassis card. E.g. 'card 1.5'."
+           ::= { chassisMappingEntry 4 }
+
+
+        chassisNodeStateString OBJECT-TYPE
+           SYNTAX DisplayString
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+               "The current state of the card for the bay. If the card is present state is
+                displayed as online, or if the bay is provisioned it will be displayed as
+                Provisioned."
+           ::= { chassisMappingEntry 5 }
+
+
+    END
+
+--
+-- at-chassis.mib
+--
+

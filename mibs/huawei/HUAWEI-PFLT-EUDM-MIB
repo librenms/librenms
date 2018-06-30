@@ -1,0 +1,324 @@
+--  =======================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: HUAWEI-PFLT-EUDM-MIB
+-- Reference:
+-- Version:     V1.0
+-- History:
+--  
+--  V1.20 2005-05-30 Wei Rixi(22510) added mplsVpnVrfName as table index,
+--              changed the region of ApplyZoneID(hwNatEudmZoneApplyZoneID1
+--              and hwNatEudmZoneApplyZoneID2) from 1~16 to 0~128.
+--              Added fields to HwAspfEudmAppEnableEntry and hwAspfEudmAppEnableGroup.
+--  V1.00 2003-03-18 Yang Yinzhu(28193)  initial version
+-- =======================================================================
+
+HUAWEI-PFLT-EUDM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-GROUP            
+            FROM SNMPv2-CONF            
+        Integer32, OBJECT-TYPE, MODULE-IDENTITY            
+            FROM SNMPv2-SMI            
+        TEXTUAL-CONVENTION            
+            FROM SNMPv2-TC
+        mplsVpnVrfName            
+            FROM MPLS-VPN-MIB
+        hwDatacomm
+            FROM HUAWEI-MIB;
+
+    hwPFLTEudm MODULE-IDENTITY 
+        LAST-UPDATED "200304110900Z"        -- April 11, 2003 at 09:00 GMT
+        ORGANIZATION 
+            "Huawei Technologies co.,Ltd."
+        CONTACT-INFO 
+            "
+            R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd.,
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085
+            Http://www.huawei.com
+            E-mail:support@huawei.com
+            "
+        DESCRIPTION 
+            "
+            V1.00
+            The HUAWEI-SLOG-EUDM-MIB contains objects to manage the security
+            log for firewall product.
+            "
+        ::= { hwPFLT 2 }
+
+    --
+    -- Textual conventions
+    --
+
+    AclAction ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        SYNTAX INTEGER
+            {
+            aclPermit(1),
+            aclDeny(2)
+            }
+        
+    AclType ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        SYNTAX INTEGER
+            {
+            aclTypeNum(1),
+            aclTypeName(2)
+            }
+        
+    --
+    -- Node definitions
+    --
+
+    -- 1.3.6.1.4.1.2011.5.25.12
+    hwPFLT OBJECT IDENTIFIER ::= { hwDatacomm 12 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.12.2.1
+    hwPFltEudmCfgMibObjects OBJECT IDENTIFIER ::= { hwPFLTEudm 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.12.2.1.1
+    hwPFltEudmDefaultActionTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwPFltEudmDefaultActionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table define the default action in the interzone."
+        ::= { hwPFltEudmCfgMibObjects 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.12.2.1.1.1
+    hwPFltEudmDefaultActionEntry OBJECT-TYPE
+        SYNTAX HwPFltEudmDefaultActionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Define the default action when no match acl."
+        INDEX { hwPFltEudmDefaultActZoneID1, hwPFltEudmDefaultActZoneID2 }
+        ::= { hwPFltEudmDefaultActionTable 1 }
+    
+    HwPFltEudmDefaultActionEntry ::=
+        SEQUENCE { 
+            hwPFltEudmDefaultActZoneID1
+                Integer32,
+            hwPFltEudmDefaultActZoneID2
+                Integer32,
+            hwPFltEudmDeaultActInbound
+                AclAction,
+            hwPFltEudmDeaultActOutbound
+                AclAction
+            }
+
+    -- 1.3.6.1.4.1.2011.5.25.12.2.1.1.1.1
+    hwPFltEudmDefaultActZoneID1 OBJECT-TYPE
+        SYNTAX Integer32 (1..16)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The ID of first zone."
+        ::= { hwPFltEudmDefaultActionEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.12.2.1.1.1.2
+    hwPFltEudmDefaultActZoneID2 OBJECT-TYPE
+        SYNTAX Integer32 (1..16)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The ID of second zone."
+        ::= { hwPFltEudmDefaultActionEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.12.2.1.1.1.3
+    hwPFltEudmDeaultActInbound OBJECT-TYPE
+        SYNTAX AclAction
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The default action for inbound direction of interzone."
+        DEFVAL { aclDeny }
+        ::= { hwPFltEudmDefaultActionEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.12.2.1.1.1.4
+    hwPFltEudmDeaultActOutbound OBJECT-TYPE
+        SYNTAX AclAction
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The default action for outbound direction of interzone."
+        DEFVAL { aclPermit }
+        ::= { hwPFltEudmDefaultActionEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.12.2.1.2
+    hwPFltEudmPolicyApplyTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwPFltEudmPolicyApplyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table define the packet filter policy applied to the interzone."
+        ::= { hwPFltEudmCfgMibObjects 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.12.2.1.2.1
+    hwPFltEudmPolicyApplyEntry OBJECT-TYPE
+        SYNTAX HwPFltEudmPolicyApplyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Define the packet filter policy."
+        INDEX { mplsVpnVrfName, hwPFltEudmPolicyZoneID1, hwPFltEudmPolicyZoneID2 }
+        ::= { hwPFltEudmPolicyApplyTable 1 }
+    
+    HwPFltEudmPolicyApplyEntry ::=
+        SEQUENCE { 
+            hwPFltEudmPolicyZoneID1
+                Integer32,
+            hwPFltEudmPolicyZoneID2
+                Integer32,
+            hwPFltEudmPolicyInAclType
+                AclType,
+            hwPFltEudmPolicyInAclNum
+                Integer32,
+            hwPFltEudmPolicyInAclName
+                OCTET STRING,
+            hwPFltEudmPolicyOutAclType
+                AclType,
+            hwPFltEudmPolicyOutAclNum
+                Integer32,
+            hwPFltEudmPolicyOutAclName
+                OCTET STRING
+            }
+
+    -- 1.3.6.1.4.1.2011.5.25.12.2.1.2.1.1
+    hwPFltEudmPolicyZoneID1 OBJECT-TYPE
+        SYNTAX Integer32 (0..128)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The ID of first security zone."
+        ::= { hwPFltEudmPolicyApplyEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.12.2.1.2.1.2
+    hwPFltEudmPolicyZoneID2 OBJECT-TYPE
+        SYNTAX Integer32 (0..128)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The ID of second security zone."
+        ::= { hwPFltEudmPolicyApplyEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.12.2.1.2.1.3
+    hwPFltEudmPolicyInAclType OBJECT-TYPE
+        SYNTAX AclType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The type of acl applied to the interzone on the inbound direction.
+            "
+        DEFVAL { aclTypeNum }
+        ::= { hwPFltEudmPolicyApplyEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.12.2.1.2.1.4
+    hwPFltEudmPolicyInAclNum OBJECT-TYPE
+        SYNTAX Integer32 (0 | 1000..3999)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            The number of acl for inbound direction,
+            This value is valid when hwPFltPolicyInAclType is aclTypeNum only.
+            
+            When do SET action, the hwPFltEudmPolicyInAclNum and hwPFltEudmPolicyInAclName
+            can only specify one.
+            "
+        ::= { hwPFltEudmPolicyApplyEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.12.2.1.2.1.5
+    hwPFltEudmPolicyInAclName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            IThe name of acl for inbound direction,
+            This value is valid when hwPFltPolicyInAclType is aclTypeName only.
+            
+            When do SET action, the hwPFltEudmPolicyInAclNum and hwPFltEudmPolicyInAclName
+            can only specify one.
+            "
+        ::= { hwPFltEudmPolicyApplyEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.12.2.1.2.1.6
+    hwPFltEudmPolicyOutAclType OBJECT-TYPE
+        SYNTAX AclType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The type of acl applied to the interzone on the outbound direction."
+        DEFVAL { aclTypeNum }
+        ::= { hwPFltEudmPolicyApplyEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.12.2.1.2.1.7
+    hwPFltEudmPolicyOutAclNum OBJECT-TYPE
+        SYNTAX Integer32 (0 | 1000..3999)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            The number of acl for outbound direction,
+            This value is valid when hwPFltPolicyOutAclType is aclTypeNum only.
+            
+            When do SET action, the hwPFltEudmPolicyOutAclNum and hwPFltEudmPolicyOutAclName
+            can only specify one.
+            "
+        ::= { hwPFltEudmPolicyApplyEntry 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.12.2.1.2.1.8
+    hwPFltEudmPolicyOutAclName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            IThe name of acl for outbound direction,
+            This value is valid when hwPFltPolicyOutAclType is aclTypeName only.
+            
+            When do SET action, the hwPFltEudmPolicyOutAclNum and hwPFltEudmPolicyOutAclName
+            can only specify one.
+            "
+        ::= { hwPFltEudmPolicyApplyEntry 8 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.12.2.2
+    hwPFltEudmConformance OBJECT IDENTIFIER ::= { hwPFLTEudm 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.12.2.2.1
+    hwPFltEudmCompliance OBJECT IDENTIFIER ::= { hwPFltEudmConformance 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.12.2.2.2
+    hwPFltEudmMibGroups OBJECT IDENTIFIER ::= { hwPFltEudmConformance 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.12.2.2.2.1
+    hwPFltEudmDefaultActionGroup OBJECT-GROUP
+        OBJECTS { hwPFltEudmDeaultActInbound, hwPFltEudmDeaultActOutbound }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hwPFltEudmMibGroups 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.12.2.2.2.2
+    hwPFltEudmPolicyApplyGroup OBJECT-GROUP
+        OBJECTS { 
+            hwPFltEudmPolicyInAclType, 
+            hwPFltEudmPolicyInAclNum, 
+            hwPFltEudmPolicyInAclName, 
+            hwPFltEudmPolicyOutAclType, 
+            hwPFltEudmPolicyOutAclNum, 
+            hwPFltEudmPolicyOutAclName }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hwPFltEudmMibGroups 2 }
+
+END

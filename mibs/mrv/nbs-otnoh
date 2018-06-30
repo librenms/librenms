@@ -1,0 +1,186 @@
+NBS-OTNOH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+
+    RowStatus
+        FROM SNMPv2-TC
+
+    InterfaceIndex
+        FROM IF-MIB
+
+    nbs
+        FROM NBS-MIB;
+
+nbsOtnohMib  MODULE-IDENTITY
+    LAST-UPDATED "201212200000Z"  -- Dec 20, 2012
+    ORGANIZATION  "NBS"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+    DESCRIPTION
+      "OTN/SONET Overhead fields"
+    ::= { nbs 224 }
+
+-- *******************************************************************
+-- NBS-OTNOH-MIB local defines
+-- *******************************************************************
+
+nbsOtnohTtiGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "OTN overhead fields"
+    ::= { nbsOtnohMib 1 }
+
+
+-- *******************************************************************
+--
+-- the nbsOtnohTtiGrp
+--
+-- *******************************************************************
+
+nbsOtnohTtiTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NbsOtnohTtiEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "OTN Trail Trace Identifier values"
+    ::= { nbsOtnohTtiGrp  1 }
+
+nbsOtnohTtiEntry OBJECT-TYPE
+    SYNTAX          NbsOtnohTtiEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Trail Trace Identifier (TTI) values for a particular interface.
+
+         Per ITU-T G.709, a TTI has 64 bytes; the first 16 contain the
+         Source Access Point Identifer (SAPI), the next 16 contain the
+         Destination Access Point Identifer (SAPI), and the final 32
+         contain an Operator Specific value.
+
+         For the SAPI and DAPI, the first byte is all zero, and the other
+         fifteen are seven-bit International Reference Alphabet (IRA)
+         characters; ACSII is the USA variant. There is a three character
+         international segment field followed by a twelve character
+         national segment field, which consists of two subfields: the
+         ITU carrier code (ICC) and a unique access point code (UAPC)."
+    INDEX {
+        nbsOtnohTtiIfIndex,
+        nbsOtnohTtiScope
+    }
+    ::= { nbsOtnohTtiTable 1 }
+
+NbsOtnohTtiEntry ::= SEQUENCE {
+    nbsOtnohTtiIfIndex        InterfaceIndex,
+    nbsOtnohTtiScope          INTEGER,
+    nbsOtnohTtiSendSapi       OCTET STRING,
+    nbsOtnohTtiSendDapi       OCTET STRING,
+    nbsOtnohTtiSendOpSpec     OCTET STRING,
+    nbsOtnohTtiExpectSapi     OCTET STRING,
+    nbsOtnohTtiExpectDapi     OCTET STRING,
+    nbsOtnohTtiExpectOpSpec   OCTET STRING,
+    nbsOtnohTtiRowStatus      RowStatus
+}
+
+nbsOtnohTtiIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The mib2 ifIndex"
+    ::= { nbsOtnohTtiEntry 1 }
+
+nbsOtnohTtiScope OBJECT-TYPE
+    SYNTAX          INTEGER {
+        tcm1    (1),  -- ODU
+        tcm2    (2),  -- ODU
+        tcm3    (3),  -- ODU
+        tcm4    (4),  -- ODU
+        tcm5    (5),  -- ODU
+        tcm6    (6),  -- ODU
+        section (7),  -- OTU
+        path    (8)   -- ODU
+    }
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "This object specifies the TTI field that the following row values
+        apply."
+    ::= { nbsOtnohTtiEntry 2 }
+
+nbsOtnohTtiSendSapi OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object specifies the Source Access Point Identifier (SAPI)
+        byte value(s) to send in the selected TTI field of outgoing OTN
+        frames. There are sixteen bytes in the SAPI. Any bytes unspecified
+        by this string will be set to zero."
+    ::= { nbsOtnohTtiEntry 3 }
+
+nbsOtnohTtiSendDapi OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object specifies the Destination Access Point Identifier (DAPI)
+        byte value(s) to send in the selected TTI field of outgoing OTN
+        frames. There are sixteen bytes in the DAPI. Any bytes unspecified
+        by this string will be set to zero."
+    ::= { nbsOtnohTtiEntry 4 }
+
+nbsOtnohTtiSendOpSpec OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object specifies the Operator Specfic
+        byte value(s) to send in the selected TTI field of outgoing OTN
+        frames. There are thirty-two bytes in the SAPI. Any bytes unspecified
+        by this string will be set to zero."
+    ::= { nbsOtnohTtiEntry 5 }
+
+nbsOtnohTtiExpectSapi OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object specifies the sixteen byte Source Access Point
+        Identifier (SAPI) value to expect in the selected TTI field of
+        incoming OTN frames. A zero length octet string indicates no SAPI
+        matching is desired."
+    ::= { nbsOtnohTtiEntry 6 }
+
+nbsOtnohTtiExpectDapi OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object specifies the sixteen byte Destination Access Point
+        Identifier (DAPI) value to expect in the selected TTI field of
+        incoming OTN frames. A zero length octet string indicates no DAPI
+        matching is desired."
+   ::= { nbsOtnohTtiEntry 7 }
+
+nbsOtnohTtiExpectOpSpec OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object specifies the thirty-two byte Operator Specfic value
+        to expect in the selected TTI field of incoming OTN frames.
+        A zero length octet string indicates no Operator Specfic
+        matching is desired."
+    ::= { nbsOtnohTtiEntry 8 }
+
+nbsOtnohTtiRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "Used to add/remove the configuration of a network segment"
+    ::= { nbsOtnohTtiEntry 10}
+
+END

@@ -12,7 +12,9 @@
  * the source code distribution for details.
  */
 
-if ($device['os_group'] == 'cisco' && $device['os'] == 'asa' && $device['type'] == 'firewall') {
+use LibreNMS\RRD\RrdDefinition;
+
+if ($device['os_group'] == 'cisco' && ( $device['os'] == 'asa' || $device['os'] == 'ftd' ) && $device['type'] == 'firewall') {
     $oid_list  = 'cfwConnectionStatValue.protoIp.currentInUse';
     $temp_data = snmpwalk_cache_double_oid($device, $oid_list, array(), 'CISCO-FIREWALL-MIB');
     foreach ($temp_data as $oid => $result) {
@@ -29,7 +31,7 @@ if ($device['os_group'] == 'cisco' && $device['os'] == 'asa' && $device['type'] 
     }
 
     if ($data['currentInUse']) {
-        $rrd_def = 'DS:connections:GAUGE:600:0:U';
+        $rrd_def = RrdDefinition::make()->addDataset('connections', 'GAUGE', 0);
         $fields = array(
             'connections' => $data['currentInUse']['data'],
         );
@@ -41,5 +43,5 @@ if ($device['os_group'] == 'cisco' && $device['os'] == 'asa' && $device['type'] 
         echo ' ASA Connections';
     }
 
-    unset($data,$rrd_def);
+    unset($data, $rrd_def);
 }//end if

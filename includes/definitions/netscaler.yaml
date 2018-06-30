@@ -1,0 +1,15 @@
+os: netscaler
+text: 'Citrix Netscaler'
+type: loadbalancer
+icon: citrix
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+mib_dir:
+    - citrix
+poller_modules:
+    netscaler-vsvr: false
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.5951.1
+        - .1.3.6.1.4.1.5951.6

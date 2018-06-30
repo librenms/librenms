@@ -1,0 +1,4777 @@
+--
+--  Copyright(C) 2003-2017 Server Technology, Inc.
+--
+
+    Sentry4-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, enterprises, Integer32,
+        OBJECT-TYPE, NOTIFICATION-TYPE                      FROM SNMPv2-SMI
+        OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE FROM SNMPv2-CONF
+        TEXTUAL-CONVENTION, DisplayString                   FROM SNMPv2-TC;
+
+
+    sentry4 MODULE-IDENTITY
+        LAST-UPDATED "201706151830Z" -- 15 June 2017
+        ORGANIZATION "Server Technology, Inc."
+        CONTACT-INFO
+            "Server Technology, Inc.
+             1040 Sandhill Road
+             Reno, NV 89521
+             Tel: (775) 284-2000
+             Fax: (775) 284-2065
+             Email: mibmaster@servertech.com"
+        DESCRIPTION
+            "This is the MIB module for the fourth generation of the
+             Sentry product family.  This includes the PRO1 and PRO2
+             series of Smart and Switched Cabinet Distribution Unit (CDU)
+             and Power Distribution Unit (PDU) products."
+        REVISION "201706151830Z" -- 15 June 2017
+        DESCRIPTION
+            "Added support for fan sensors, including objects for installed
+             count, identification, speed and status monitoring, threshold
+             and hysteresis configuration, and a notification for events.
+             Added the st4UnitOutletDisplayOrder object."
+        REVISION "201611182340Z" -- 18 November 2016
+        DESCRIPTION
+            "Added the st4UnitProductMfrDate object.  Adjusted the upper
+             limit of voltage objects to 600 Volts."
+        REVISION "201609212300Z" -- 21 September 2016
+        DESCRIPTION
+            "Fixed the st4InputCordOutOfBalanceEvent notification
+             definition to include the correct objects."
+        REVISION "201604252140Z" -- 25 April 2016
+        DESCRIPTION
+            "Added support for the PRO1 product series.  Added the
+             st4SystemProductSeries and st4InputCordNominalPowerFactor
+             objects.  Adjusted the upper limit of cord and line current
+             objects to 600 Amps.  Adjusted the lower limit of nominal
+             voltage objects to 0 Volts.  Corrected the lower limit of
+             several configuration objects from -1 to 0."
+        REVISION "201502191000Z" -- 19 February 2015
+        DESCRIPTION
+            "Corrected the UNITS and value range of temperature sensor
+             threshold objects."
+        REVISION "201412231130Z" -- 23 December 2014
+        DESCRIPTION
+            "Initial release."
+        ::= { serverTech 4 }
+
+    serverTech OBJECT IDENTIFIER ::= { enterprises 1718 }
+
+
+--  Common Definitions
+
+    DeviceStatus ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "Status returned by devices."
+        SYNTAX      INTEGER {
+                        normal(0),          -- operating properly
+                        disabled(1),        -- disabled
+                        purged(2),          -- purged
+                        reading(5),         -- read in process
+                        settle(6),          -- is settling
+                        notFound(7),        -- never connected
+                        lost(8),            -- disconnected
+                        readError(9),       -- read failure
+                        noComm(10),         -- unreachable
+                        pwrError(11),       -- power detection error
+                        breakerTripped(12), -- breaker error
+                        fuseBlown(13),      -- fuse error
+                        lowAlarm(14),       -- under low alarm threshold
+                        lowWarning(15),     -- under low warning threshold
+                        highWarning(16),    -- over high warning threshold
+                        highAlarm(17),      -- over high alarm threshold
+                        alarm(18),          -- general alarm
+                        underLimit(19),     -- under limit alarm
+                        overLimit(20),      -- over limit alarm
+                        nvmFail(21),        -- NVM failure
+                        profileError(22),   -- profile error
+                        conflict(23)        -- conflict
+                    }
+
+    DeviceState ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "On or off state of devices."
+        SYNTAX      INTEGER {
+                        unknown(0),         -- on / off state is unknown
+                        on(1),              -- is on
+                        off(2)              -- is off
+                    }
+
+    EventNotificationMethods ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "Bits to enable event notification methods."
+        SYNTAX      BITS {
+                        snmpTrap(0),     -- enables notifications by SNMP traps
+                        email(1)         -- enables notifications by Email
+                    }
+
+--  Object Definitions
+
+    st4Objects OBJECT IDENTIFIER ::= { sentry4 1 }
+
+    -- System
+
+    st4System OBJECT IDENTIFIER ::= { st4Objects 1 }
+
+    -- System Configuration
+
+    st4SystemConfig OBJECT IDENTIFIER ::= { st4System 1 }
+
+    st4SystemProductName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..63))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The product name."
+        ::= { st4SystemConfig 1 }
+
+    st4SystemLocation OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..63))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The location of the system."
+        ::= { st4SystemConfig 2 }
+
+    st4SystemFirmwareVersion OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..63))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The firmware version."
+        ::= { st4SystemConfig 3 }
+
+    st4SystemFirmwareBuildInfo OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..63))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The firmware build information."
+        ::= { st4SystemConfig 4 }
+
+    st4SystemNICSerialNumber OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..8))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The serial number of the network interface card."
+        ::= { st4SystemConfig 5 }
+
+    st4SystemNICHardwareInfo OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..63))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Hardware information about the network interface card."
+        ::= { st4SystemConfig 6 }
+
+    st4SystemProductSeries OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        pro1(0),
+                        pro2(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The product series."
+        ::= { st4SystemConfig 7 }
+
+    st4SystemFeatures OBJECT-TYPE
+        SYNTAX      BITS {
+                        smartLoadShedding(0),
+                        reserved(1),
+                        outletControlInhibit(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The key-activated features enabled in the system."
+        ::= { st4SystemConfig 10 }
+
+    st4SystemFeatureKey OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..19))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "A valid feature key written to this object will enable a
+             feature in the system.  A valid feature key is in the form
+             xxxx-xxxx-xxxx-xxxx.  A read of this object returns an
+             empty string."
+        ::= { st4SystemConfig 11 }
+
+    st4SystemConfigModifiedCount OBJECT-TYPE
+        SYNTAX      Integer32(0..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of times the system configuration has changed."
+        ::= { st4SystemConfig 20 }
+
+    st4SystemUnitCount OBJECT-TYPE
+        SYNTAX      Integer32(0..8)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of units in the system."
+        ::= { st4SystemConfig 21 }
+
+    -- Units
+
+    st4Units OBJECT IDENTIFIER ::= { st4Objects 2 }
+
+    -- Unit Common Configuration
+
+    st4UnitCommonConfig OBJECT IDENTIFIER ::= { st4Units 1 }
+
+    -- Unit Configuration Table
+
+    st4UnitConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4UnitConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Unit configuration table."
+        ::= { st4Units 2 }
+
+    st4UnitConfigEntry OBJECT-TYPE
+        SYNTAX      St4UnitConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Configuration objects for a particular unit."
+        INDEX       { st4UnitIndex }
+        ::= { st4UnitConfigTable 1 }
+
+    St4UnitConfigEntry ::= SEQUENCE {
+        st4UnitIndex                 Integer32,
+        st4UnitID                    DisplayString,
+        st4UnitName                  DisplayString,
+        st4UnitProductSN             DisplayString,
+        st4UnitModel                 DisplayString,
+        st4UnitAssetTag              DisplayString,
+        st4UnitType                  INTEGER,
+        st4UnitCapabilities          BITS,
+        st4UnitProductMfrDate        DisplayString,
+        st4UnitDisplayOrientation    INTEGER,
+        st4UnitOutletSequenceOrder   INTEGER,
+        st4UnitOutletDisplayOrder    INTEGER,
+        st4UnitInputCordCount        Integer32,
+        st4UnitTempSensorCount       Integer32,
+        st4UnitHumidSensorCount      Integer32,
+        st4UnitWaterSensorCount      Integer32,
+        st4UnitCcSensorCount         Integer32,
+        st4UnitAdcSensorCount        Integer32,
+        st4UnitFanSensorCount        Integer32
+    }
+
+    st4UnitIndex OBJECT-TYPE
+        SYNTAX      Integer32(1..6)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Unit index.  A=1, B=2, C=3, D=4, E=5, F=6."
+        ::= { st4UnitConfigEntry 1 }
+
+    st4UnitID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(1))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The internal ID of the unit.  Format=A."
+        ::= { st4UnitConfigEntry 2 }
+
+    st4UnitName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The name of the unit."
+        ::= { st4UnitConfigEntry 3 }
+
+    st4UnitProductSN OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The product serial number of the unit."
+        ::= { st4UnitConfigEntry 4 }
+
+    st4UnitModel OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The model of the unit."
+        ::= { st4UnitConfigEntry 5 }
+
+    st4UnitAssetTag OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The asset tag of the unit."
+        ::= { st4UnitConfigEntry 6 }
+
+    st4UnitType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        masterPdu(0),
+                        linkPdu(1),
+                        controller(2),
+                        emcu(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of the unit."
+        ::= { st4UnitConfigEntry 7 }
+
+    st4UnitCapabilities OBJECT-TYPE
+        SYNTAX      BITS {
+                        dc(0),         -- unit is DC
+                        phase3(1),     -- unit is 3 phase
+                        wye(2),        -- unit has Wye circuits
+                        delta(3)       -- unit has Delta circuits
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The capabilities of the unit."
+        ::= { st4UnitConfigEntry 8 }
+
+    st4UnitProductMfrDate OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The product manufacture date in YYYY-MM-DD (ISO 8601 format) of
+             the unit."
+        ::= { st4UnitConfigEntry 9 }
+
+    st4UnitDisplayOrientation OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        normal(0),
+                        inverted(1),
+                        auto(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The orientation of all displays in the unit."
+        ::= { st4UnitConfigEntry 20 }
+
+    st4UnitOutletSequenceOrder OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        normal(0),
+                        reversed(1)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The sequencing order of all outlets in the unit."
+        ::= { st4UnitConfigEntry 21 }
+
+    st4UnitOutletDisplayOrder OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        normal(0),
+                        reversed(1)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The display order in the user interfaces of all outlets in the
+             unit."
+        ::= { st4UnitConfigEntry 22 }
+
+    st4UnitInputCordCount OBJECT-TYPE
+        SYNTAX      Integer32(0..4)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of power input cords into the unit."
+        ::= { st4UnitConfigEntry 30 }
+
+    st4UnitTempSensorCount OBJECT-TYPE
+        SYNTAX      Integer32(0..2)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of external temperature sensors supported by the unit."
+        ::= { st4UnitConfigEntry 31 }
+
+    st4UnitHumidSensorCount OBJECT-TYPE
+        SYNTAX      Integer32(0..2)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of external humidity sensors supported by the unit."
+        ::= { st4UnitConfigEntry 32 }
+
+    st4UnitWaterSensorCount OBJECT-TYPE
+        SYNTAX      Integer32(0..1)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of external water sensors supported by the unit."
+        ::= { st4UnitConfigEntry 33 }
+
+    st4UnitCcSensorCount OBJECT-TYPE
+        SYNTAX      Integer32(0..4)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of external contact closure sensors supported by the
+             unit."
+        ::= { st4UnitConfigEntry 34 }
+
+    st4UnitAdcSensorCount OBJECT-TYPE
+        SYNTAX      Integer32(0..1)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of analog-to-digital converter sensors supported by the
+             unit."
+        ::= { st4UnitConfigEntry 35 }
+
+    st4UnitFanSensorCount OBJECT-TYPE
+        SYNTAX      Integer32(0..4)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of fan sensors supported by the unit."
+        ::= { st4UnitConfigEntry 36 }
+
+    -- Unit Monitor Table
+
+    st4UnitMonitorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4UnitMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Unit monitor table."
+        ::= { st4Units 3 }
+
+    st4UnitMonitorEntry OBJECT-TYPE
+        SYNTAX      St4UnitMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Objects to monitor for a particular unit."
+        INDEX       { st4UnitIndex }
+        ::= { st4UnitMonitorTable 1 }
+
+    St4UnitMonitorEntry ::= SEQUENCE {
+        st4UnitStatus                 DeviceStatus
+    }
+
+    st4UnitStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the unit."
+        ::= { st4UnitMonitorEntry 1 }
+
+    -- Unit Event Configuration Table
+
+    st4UnitEventConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4UnitEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Unit event configuration table."
+        ::= { st4Units 4 }
+
+    st4UnitEventConfigEntry OBJECT-TYPE
+        SYNTAX      St4UnitEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Event configuration objects for a particular unit."
+        INDEX       { st4UnitIndex }
+        ::= { st4UnitEventConfigTable 1 }
+
+    St4UnitEventConfigEntry ::= SEQUENCE {
+        st4UnitNotifications              EventNotificationMethods
+    }
+
+    st4UnitNotifications OBJECT-TYPE
+        SYNTAX      EventNotificationMethods
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The notification methods enabled for unit events."
+        ::= { st4UnitEventConfigEntry 1 }
+
+    -- Input Cords
+
+    st4InputCords OBJECT IDENTIFIER ::= { st4Objects 3 }
+
+    -- Input Cord Common Configuration
+
+    st4InputCordCommonConfig OBJECT IDENTIFIER ::= { st4InputCords 1 }
+
+    st4InputCordActivePowerHysteresis OBJECT-TYPE
+        SYNTAX      Integer32(0..1000)
+        UNITS       "Watts"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The active power hysteresis of the input cord in Watts."
+        ::= { st4InputCordCommonConfig 1 }
+
+    st4InputCordApparentPowerHysteresis OBJECT-TYPE
+        SYNTAX      Integer32(0..1000)
+        UNITS       "Volt-Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The apparent power hysteresis of the input cord in Volt-Amps."
+        ::= { st4InputCordCommonConfig 2 }
+
+    st4InputCordPowerFactorHysteresis OBJECT-TYPE
+        SYNTAX      Integer32(0..20)
+        UNITS       "hundredths"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The power factor hysteresis of the input cord in hundredths."
+        ::= { st4InputCordCommonConfig 3 }
+
+    st4InputCordOutOfBalanceHysteresis OBJECT-TYPE
+        SYNTAX      Integer32(0..10)
+        UNITS       "percent"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The 3 phase out-of-balance hysteresis of the input cord in
+             percent."
+        ::= { st4InputCordCommonConfig 4 }
+
+    -- Input Cord Configuration Table
+
+    st4InputCordConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4InputCordConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Input cord configuration table."
+        ::= { st4InputCords 2 }
+
+    st4InputCordConfigEntry OBJECT-TYPE
+        SYNTAX      St4InputCordConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Configuration objects for a particular input cord."
+        INDEX       { st4UnitIndex, st4InputCordIndex }
+        ::= { st4InputCordConfigTable 1 }
+
+    St4InputCordConfigEntry ::= SEQUENCE {
+        st4InputCordIndex                 Integer32,
+        st4InputCordID                    DisplayString,
+        st4InputCordName                  DisplayString,
+        st4InputCordInletType             DisplayString,
+        st4InputCordNominalVoltage        Integer32,
+        st4InputCordNominalVoltageMin     Integer32,
+        st4InputCordNominalVoltageMax     Integer32,
+        st4InputCordCurrentCapacity       Integer32,
+        st4InputCordCurrentCapacityMax    Integer32,
+        st4InputCordPowerCapacity         Integer32,
+        st4InputCordNominalPowerFactor    Integer32,
+        st4InputCordLineCount             Integer32,
+        st4InputCordPhaseCount            Integer32,
+        st4InputCordOcpCount              Integer32,
+        st4InputCordBranchCount           Integer32,
+        st4InputCordOutletCount           Integer32
+    }
+
+    st4InputCordIndex OBJECT-TYPE
+        SYNTAX      Integer32(1..4)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Input cord index.  A=1, B=2, C=3, D=4."
+        ::= { st4InputCordConfigEntry 1 }
+
+    st4InputCordID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(2))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The internal ID of the input cord.  Format=AA."
+        ::= { st4InputCordConfigEntry 2 }
+
+    st4InputCordName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The name of the input cord."
+        ::= { st4InputCordConfigEntry 3 }
+
+    st4InputCordInletType OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of plug on the input cord, or socket for the input cord."
+        ::= { st4InputCordConfigEntry 6}
+
+    st4InputCordNominalVoltage OBJECT-TYPE
+        SYNTAX      Integer32(0..6000)
+        UNITS       "tenth Volts"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The user-configured nominal voltage of the input cord in tenth
+             Volts."
+        ::= { st4InputCordConfigEntry 7 }
+
+    st4InputCordNominalVoltageMin OBJECT-TYPE
+        SYNTAX      Integer32(0..600)
+        UNITS       "Volts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The factory-set minimum allowed for the user-configured nominal
+             voltage of the input cord in Volts."
+        ::= { st4InputCordConfigEntry 8 }
+
+    st4InputCordNominalVoltageMax OBJECT-TYPE
+        SYNTAX      Integer32(0..600)
+        UNITS       "Volts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The factory-set maximum allowed for the user-configured nominal
+             voltage of the input cord in Volts."
+        ::= { st4InputCordConfigEntry 9 }
+
+    st4InputCordCurrentCapacity OBJECT-TYPE
+        SYNTAX      Integer32(0..600)
+        UNITS       "Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The user-configured current capacity of the input cord in Amps."
+        ::= { st4InputCordConfigEntry 10 }
+
+    st4InputCordCurrentCapacityMax OBJECT-TYPE
+        SYNTAX      Integer32(0..600)
+        UNITS       "Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The factory-set maximum allowed for the user-configured current
+             capacity of the input cord in Amps."
+        ::= { st4InputCordConfigEntry 11 }
+
+    st4InputCordPowerCapacity OBJECT-TYPE
+        SYNTAX      Integer32(0..50000)
+        UNITS       "Volt-Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The power capacity of the input cord in Volt-Amps.  For DC
+             products, this is identical to power capacity in Watts."
+        ::= { st4InputCordConfigEntry 12 }
+
+    st4InputCordNominalPowerFactor OBJECT-TYPE
+        SYNTAX      Integer32(0..100)
+        UNITS       "hundredths"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The user-configured estimated nominal power factor of the input
+             cord in hundredths."
+        ::= { st4InputCordConfigEntry 13 }
+
+    st4InputCordLineCount OBJECT-TYPE
+        SYNTAX      Integer32(0..4)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of current-carrying lines in the input cord."
+        ::= { st4InputCordConfigEntry 20 }
+
+    st4InputCordPhaseCount OBJECT-TYPE
+        SYNTAX      Integer32(0..6)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of active phases from the lines in the input cord."
+        ::= { st4InputCordConfigEntry 21 }
+
+    st4InputCordOcpCount OBJECT-TYPE
+        SYNTAX      Integer32(0..12)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of over-current protectors downstream from the input
+             cord."
+        ::= { st4InputCordConfigEntry 22 }
+
+    st4InputCordBranchCount OBJECT-TYPE
+        SYNTAX      Integer32(0..12)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of branches downstream from the input cord."
+        ::= { st4InputCordConfigEntry 23 }
+
+    st4InputCordOutletCount OBJECT-TYPE
+        SYNTAX      Integer32(0..128)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of outlets powered from the input cord."
+        ::= { st4InputCordConfigEntry 24 }
+
+    -- Input Cord Monitor Table
+
+    st4InputCordMonitorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4InputCordMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Input cord monitor table."
+        ::= { st4InputCords 3 }
+
+    st4InputCordMonitorEntry OBJECT-TYPE
+        SYNTAX      St4InputCordMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Objects to monitor for a particular input cord."
+        INDEX       { st4UnitIndex, st4InputCordIndex }
+        ::= { st4InputCordMonitorTable 1 }
+
+    St4InputCordMonitorEntry ::= SEQUENCE {
+        st4InputCordState                  DeviceState,
+        st4InputCordStatus                 DeviceStatus,
+        st4InputCordActivePower            Integer32,
+        st4InputCordActivePowerStatus      DeviceStatus,
+        st4InputCordApparentPower          Integer32,
+        st4InputCordApparentPowerStatus    DeviceStatus,
+        st4InputCordPowerUtilized          Integer32,
+        st4InputCordPowerFactor            Integer32,
+        st4InputCordPowerFactorStatus      DeviceStatus,
+        st4InputCordEnergy                 Integer32,
+        st4InputCordFrequency              Integer32,
+        st4InputCordOutOfBalance           Integer32,
+        st4InputCordOutOfBalanceStatus     DeviceStatus
+    }
+
+    st4InputCordState OBJECT-TYPE
+        SYNTAX      DeviceState
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The on/off state of the input cord."
+        ::= { st4InputCordMonitorEntry 1 }
+
+    st4InputCordStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the input cord."
+        ::= { st4InputCordMonitorEntry 2 }
+
+    st4InputCordActivePower OBJECT-TYPE
+        SYNTAX      Integer32(-1..50000)
+        UNITS       "Watts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured active power of the input cord in Watts."
+        ::= { st4InputCordMonitorEntry 3 }
+
+    st4InputCordActivePowerStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the measured active power of the input cord."
+        ::= { st4InputCordMonitorEntry 4 }
+
+    st4InputCordApparentPower OBJECT-TYPE
+        SYNTAX      Integer32(-1..50000)
+        UNITS       "Volt-Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured apparent power of the input cord in Volt-Amps."
+        ::= { st4InputCordMonitorEntry 5 }
+
+    st4InputCordApparentPowerStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the measured apparent power of the input cord."
+        ::= { st4InputCordMonitorEntry 6 }
+
+    st4InputCordPowerUtilized OBJECT-TYPE
+        SYNTAX      Integer32(-1..1200)
+        UNITS       "tenth percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of the input cord power capacity used in tenth percent.
+             For AC products, this is the ratio of the apparent power to the
+             power capacity.  For DC products, this is the ratio of the active
+             power to the power capacity."
+        ::= { st4InputCordMonitorEntry 7 }
+
+    st4InputCordPowerFactor OBJECT-TYPE
+        SYNTAX      Integer32(-1..100)
+        UNITS       "hundredths"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured power factor of the input cord in hundredths."
+        ::= { st4InputCordMonitorEntry 8 }
+
+    st4InputCordPowerFactorStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the measured power factor of the input cord."
+        ::= { st4InputCordMonitorEntry 9 }
+
+    st4InputCordEnergy OBJECT-TYPE
+        SYNTAX      Integer32(-1..2147483647)
+        UNITS       "tenth Kilowatt-Hours"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total energy consumption of loads through the input cord in
+             tenth Kilowatt-Hours."
+        ::= { st4InputCordMonitorEntry 10 }
+
+    st4InputCordFrequency OBJECT-TYPE
+        SYNTAX      Integer32(-1..1000)
+        UNITS       "tenth Hertz"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The frequency of the input cord voltage in tenth Hertz."
+        ::= { st4InputCordMonitorEntry 11 }
+
+    st4InputCordOutOfBalance OBJECT-TYPE
+        SYNTAX      Integer32(-1..2000)
+        UNITS       "tenth percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current imbalance on the lines of the input cord in tenth
+             percent."
+        ::= { st4InputCordMonitorEntry 12 }
+
+    st4InputCordOutOfBalanceStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the current imbalance on the lines of the input
+             cord."
+        ::= { st4InputCordMonitorEntry 13 }
+
+    -- Input Cord Event Configuration Table
+
+    st4InputCordEventConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4InputCordEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Input cord event configuration table."
+        ::= { st4InputCords 4 }
+
+    st4InputCordEventConfigEntry OBJECT-TYPE
+        SYNTAX      St4InputCordEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Event configuration objects for a particular input cord."
+        INDEX       { st4UnitIndex, st4InputCordIndex }
+        ::= { st4InputCordEventConfigTable 1 }
+
+    St4InputCordEventConfigEntry ::= SEQUENCE {
+        st4InputCordNotifications              EventNotificationMethods,
+        st4InputCordActivePowerLowAlarm        Integer32,
+        st4InputCordActivePowerLowWarning      Integer32,
+        st4InputCordActivePowerHighWarning     Integer32,
+        st4InputCordActivePowerHighAlarm       Integer32,
+        st4InputCordApparentPowerLowAlarm      Integer32,
+        st4InputCordApparentPowerLowWarning    Integer32,
+        st4InputCordApparentPowerHighWarning   Integer32,
+        st4InputCordApparentPowerHighAlarm     Integer32,
+        st4InputCordPowerFactorLowAlarm        Integer32,
+        st4InputCordPowerFactorLowWarning      Integer32,
+        st4InputCordOutOfBalanceHighWarning    Integer32,
+        st4InputCordOutOfBalanceHighAlarm      Integer32
+    }
+
+    st4InputCordNotifications OBJECT-TYPE
+        SYNTAX      EventNotificationMethods
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The notification methods enabled for input cord events."
+        ::= { st4InputCordEventConfigEntry 1 }
+
+    st4InputCordActivePowerLowAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..50000)
+        UNITS       "Watts"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The active power low alarm threshold of the input cord in Watts."
+        ::= { st4InputCordEventConfigEntry 2 }
+
+    st4InputCordActivePowerLowWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..50000)
+        UNITS       "Watts"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The active power low warning threshold of the input cord in
+             Watts."
+        ::= { st4InputCordEventConfigEntry 3 }
+
+    st4InputCordActivePowerHighWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..50000)
+        UNITS       "Watts"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The active power high warning threshold of the input cord in
+             Watts."
+        ::= { st4InputCordEventConfigEntry 4 }
+
+    st4InputCordActivePowerHighAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..50000)
+        UNITS       "Watts"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The active power high alarm threshold of the input cord in Watts."
+        ::= { st4InputCordEventConfigEntry 5 }
+
+    st4InputCordApparentPowerLowAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..50000)
+        UNITS       "Volt-Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The apparent power low alarm threshold of the input cord in
+             Volt-Amps."
+        ::= { st4InputCordEventConfigEntry 6 }
+
+    st4InputCordApparentPowerLowWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..50000)
+        UNITS       "Volt-Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The apparent power low warning threshold of the input cord in
+             Volt-Amps."
+        ::= { st4InputCordEventConfigEntry 7 }
+
+    st4InputCordApparentPowerHighWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..50000)
+        UNITS       "Volt-Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The apparent power high warning threshold of the input cord in
+             Volt-Amps."
+        ::= { st4InputCordEventConfigEntry 8 }
+
+    st4InputCordApparentPowerHighAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..50000)
+        UNITS       "Volt-Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The apparent power high alarm threshold of the input cord in
+             Volt-Amps."
+        ::= { st4InputCordEventConfigEntry 9 }
+
+    st4InputCordPowerFactorLowAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..100)
+        UNITS       "hundredths"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The power factor low alarm threshold of the input cord in
+             hundredths."
+        ::= { st4InputCordEventConfigEntry 10 }
+
+    st4InputCordPowerFactorLowWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..100)
+        UNITS       "hundredths"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The power factor low warning threshold of the input cord in
+             hundredths."
+        ::= { st4InputCordEventConfigEntry 11 }
+
+    st4InputCordOutOfBalanceHighWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..100)
+        UNITS       "percent"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The 3 phase out-of-balance high warning threshold of the input
+             cord in percent."
+        ::= { st4InputCordEventConfigEntry 12 }
+
+    st4InputCordOutOfBalanceHighAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..100)
+        UNITS       "percent"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The 3 phase out-of-balance high alarm threshold of the input cord
+             in percent."
+        ::= { st4InputCordEventConfigEntry 13 }
+
+    -- Lines
+
+    st4Lines OBJECT IDENTIFIER ::= { st4Objects 4 }
+
+    -- Line Common Configuration
+
+    st4LineCommonConfig OBJECT IDENTIFIER ::= { st4Lines 1 }
+
+    st4LineCurrentHysteresis OBJECT-TYPE
+        SYNTAX      Integer32(0..100)
+        UNITS       "tenth Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The current hysteresis of the line in tenth Amps."
+        ::= { st4LineCommonConfig 1 }
+
+    -- Line Configuration Table
+
+    st4LineConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4LineConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Line configuration table."
+        ::= { st4Lines 2 }
+
+    st4LineConfigEntry OBJECT-TYPE
+        SYNTAX      St4LineConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Configuration objects for a particular line."
+        INDEX       { st4UnitIndex, st4InputCordIndex, st4LineIndex }
+        ::= { st4LineConfigTable 1 }
+
+    St4LineConfigEntry ::= SEQUENCE {
+        st4LineIndex                 Integer32,
+        st4LineID                    DisplayString,
+        st4LineLabel                 DisplayString,
+        st4LineCurrentCapacity       Integer32
+    }
+
+    st4LineIndex OBJECT-TYPE
+        SYNTAX      Integer32(1..4)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Line index.  L1=1, L2=2, L3=3, N=4."
+        ::= { st4LineConfigEntry 1 }
+
+    st4LineID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(3))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The internal ID of the line.  Format=AAN."
+        ::= { st4LineConfigEntry 2 }
+
+    st4LineLabel OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The system label assigned to the line for identification."
+        ::= { st4LineConfigEntry 4 }
+
+    st4LineCurrentCapacity OBJECT-TYPE
+        SYNTAX      Integer32(0..600)
+        UNITS       "Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current capacity of the line in Amps."
+        ::= { st4LineConfigEntry 6 }
+
+    -- Line Monitor Table
+
+    st4LineMonitorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4LineMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Line monitor table."
+        ::= { st4Lines 3 }
+
+    st4LineMonitorEntry OBJECT-TYPE
+        SYNTAX      St4LineMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Objects to monitor for a particular line."
+        INDEX       { st4UnitIndex, st4InputCordIndex, st4LineIndex }
+        ::= { st4LineMonitorTable 1 }
+
+    St4LineMonitorEntry ::= SEQUENCE {
+        st4LineState                  DeviceState,
+        st4LineStatus                 DeviceStatus,
+        st4LineCurrent                Integer32,
+        st4LineCurrentStatus          DeviceStatus,
+        st4LineCurrentUtilized        Integer32
+    }
+
+    st4LineState OBJECT-TYPE
+        SYNTAX      DeviceState
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The on/off state of the line."
+        ::= { st4LineMonitorEntry 1 }
+
+    st4LineStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the line."
+        ::= { st4LineMonitorEntry 2 }
+
+    st4LineCurrent OBJECT-TYPE
+        SYNTAX      Integer32(-1..60000)
+        UNITS       "hundredth Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured current on the line in hundredth Amps."
+        ::= { st4LineMonitorEntry 3 }
+
+    st4LineCurrentStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the measured current on the line."
+        ::= { st4LineMonitorEntry 4 }
+
+    st4LineCurrentUtilized OBJECT-TYPE
+        SYNTAX      Integer32(-1..1200)
+        UNITS       "tenth percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of the line current capacity used in tenth percent."
+        ::= { st4LineMonitorEntry 5 }
+
+    -- Line Event Configuration Table
+
+    st4LineEventConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4LineEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Line event configuration table."
+        ::= { st4Lines 4 }
+
+    st4LineEventConfigEntry OBJECT-TYPE
+        SYNTAX      St4LineEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Event configuration objects for a particular line."
+        INDEX       { st4UnitIndex, st4InputCordIndex, st4LineIndex }
+        ::= { st4LineEventConfigTable 1 }
+
+    St4LineEventConfigEntry ::= SEQUENCE {
+        st4LineNotifications              EventNotificationMethods,
+        st4LineCurrentLowAlarm            Integer32,
+        st4LineCurrentLowWarning          Integer32,
+        st4LineCurrentHighWarning         Integer32,
+        st4LineCurrentHighAlarm           Integer32
+    }
+
+    st4LineNotifications OBJECT-TYPE
+        SYNTAX      EventNotificationMethods
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The notification methods enabled for line events."
+        ::= { st4LineEventConfigEntry 1 }
+
+    st4LineCurrentLowAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..6000)
+        UNITS       "tenth Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The current low alarm threshold of the line in tenth Amps."
+        ::= { st4LineEventConfigEntry 2 }
+
+    st4LineCurrentLowWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..6000)
+        UNITS       "tenth Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The current low warning threshold of the line in tenth Amps."
+        ::= { st4LineEventConfigEntry 3 }
+
+    st4LineCurrentHighWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..6000)
+        UNITS       "tenth Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The current high warning threshold of the line in tenth Amps."
+        ::= { st4LineEventConfigEntry 4 }
+
+    st4LineCurrentHighAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..6000)
+        UNITS       "tenth Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The current high alarm threshold of the line in tenth Amps."
+        ::= { st4LineEventConfigEntry 5 }
+
+    -- Phases
+
+    st4Phases OBJECT IDENTIFIER ::= { st4Objects 5 }
+
+    -- Phase Common Configuration
+
+    st4PhaseCommonConfig OBJECT IDENTIFIER ::= { st4Phases 1 }
+
+    st4PhaseVoltageHysteresis OBJECT-TYPE
+        SYNTAX      Integer32(0..200)
+        UNITS       "tenth Volts"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The voltage hysteresis of the phase in tenth Volts."
+        ::= { st4PhaseCommonConfig 1 }
+
+    st4PhasePowerFactorHysteresis OBJECT-TYPE
+        SYNTAX      Integer32(0..20)
+        UNITS       "hundredths"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The power factor hysteresis of the phase in hundredths."
+        ::= { st4PhaseCommonConfig 2 }
+
+    -- Phase Configuration Table
+
+    st4PhaseConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4PhaseConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Phase configuration table."
+        ::= { st4Phases 2 }
+
+    st4PhaseConfigEntry OBJECT-TYPE
+        SYNTAX      St4PhaseConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Configuration objects for a particular phase."
+        INDEX       { st4UnitIndex, st4InputCordIndex, st4PhaseIndex }
+        ::= { st4PhaseConfigTable 1 }
+
+    St4PhaseConfigEntry ::= SEQUENCE {
+        st4PhaseIndex                 Integer32,
+        st4PhaseID                    DisplayString,
+        st4PhaseLabel                 DisplayString,
+        st4PhaseNominalVoltage        Integer32,
+        st4PhaseBranchCount           Integer32,
+        st4PhaseOutletCount           Integer32
+    }
+
+    st4PhaseIndex OBJECT-TYPE
+        SYNTAX      Integer32(1..6)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Phase index.  Three-phase AC Wye: L1-N=1, L2-N=2, L3-N=3;
+             Three-phase AC Delta: L1-L2=1, L2-L3=2, L3-L1=3; Single Phase:
+             L1-R=1; DC: L1-R=1; Three-phase AC Wye & Delta: L1-N=1, L2-N=2,
+             L3-N=3, L1-L2=4, L2-L3=5; L3-L1=6."
+        ::= { st4PhaseConfigEntry 1 }
+
+    st4PhaseID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(3))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The internal ID of the phase.  Format=AAN."
+        ::= { st4PhaseConfigEntry 2 }
+
+    st4PhaseLabel OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The system label assigned to the phase for identification."
+        ::= { st4PhaseConfigEntry 4 }
+
+    st4PhaseNominalVoltage OBJECT-TYPE
+        SYNTAX      Integer32(0..6000)
+        UNITS       "tenth Volts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The nominal voltage of the phase in tenth Volts."
+        ::= { st4PhaseConfigEntry 6 }
+
+    st4PhaseBranchCount OBJECT-TYPE
+        SYNTAX      Integer32(0..12)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of branches downstream from the phase."
+        ::= { st4PhaseConfigEntry 20 }
+
+    st4PhaseOutletCount OBJECT-TYPE
+        SYNTAX      Integer32(0..128)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of outlets powered from the phase."
+        ::= { st4PhaseConfigEntry 21 }
+
+    -- Phase Monitor Table
+
+    st4PhaseMonitorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4PhaseMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Phase monitor table."
+        ::= { st4Phases 3 }
+
+    st4PhaseMonitorEntry OBJECT-TYPE
+        SYNTAX      St4PhaseMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Objects to monitor for a particular phase."
+        INDEX       { st4UnitIndex, st4InputCordIndex, st4PhaseIndex }
+        ::= { st4PhaseMonitorTable 1 }
+
+    St4PhaseMonitorEntry ::= SEQUENCE {
+        st4PhaseState                  DeviceState,
+        st4PhaseStatus                 DeviceStatus,
+        st4PhaseVoltage                Integer32,
+        st4PhaseVoltageStatus          DeviceStatus,
+        st4PhaseVoltageDeviation       Integer32,
+        st4PhaseCurrent                Integer32,
+        st4PhaseCurrentCrestFactor     Integer32,
+        st4PhaseActivePower            Integer32,
+        st4PhaseApparentPower          Integer32,
+        st4PhasePowerFactor            Integer32,
+        st4PhasePowerFactorStatus      DeviceStatus,
+        st4PhaseReactance              Integer32,
+        st4PhaseEnergy                 Integer32
+    }
+
+    st4PhaseState OBJECT-TYPE
+        SYNTAX      DeviceState
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The on/off state of the phase."
+        ::= { st4PhaseMonitorEntry 1 }
+
+    st4PhaseStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the phase."
+        ::= { st4PhaseMonitorEntry 2 }
+
+    st4PhaseVoltage OBJECT-TYPE
+        SYNTAX      Integer32(-1..6000)
+        UNITS       "tenth Volts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured voltage on the phase in tenth Volts."
+        ::= { st4PhaseMonitorEntry 3 }
+
+    st4PhaseVoltageStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the measured voltage on the phase."
+        ::= { st4PhaseMonitorEntry 4 }
+
+    st4PhaseVoltageDeviation OBJECT-TYPE
+        SYNTAX      Integer32(-1000..1000)
+        UNITS       "tenth percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The deviation from the nominal voltage on the phase in tenth
+             percent."
+        ::= { st4PhaseMonitorEntry 5 }
+
+    st4PhaseCurrent OBJECT-TYPE
+        SYNTAX      Integer32(-1..30000)
+        UNITS       "hundredth Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured current on the phase in hundredth Amps."
+        ::= { st4PhaseMonitorEntry 6 }
+
+    st4PhaseCurrentCrestFactor OBJECT-TYPE
+        SYNTAX      Integer32(-1..250)
+        UNITS       "tenths"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured crest factor of the current waveform on the phase in
+             tenths."
+        ::= { st4PhaseMonitorEntry 7 }
+
+    st4PhaseActivePower OBJECT-TYPE
+        SYNTAX      Integer32(-1..25000)
+        UNITS       "Watts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured active power on the phase in Watts."
+        ::= { st4PhaseMonitorEntry 8 }
+
+    st4PhaseApparentPower OBJECT-TYPE
+        SYNTAX      Integer32(-1..25000)
+        UNITS       "Volt-Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured apparent power on the phase in Volt-Amps."
+        ::= { st4PhaseMonitorEntry 9 }
+
+    st4PhasePowerFactor OBJECT-TYPE
+        SYNTAX      Integer32(-1..100)
+        UNITS       "hundredths"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured power factor on the phase in hundredths."
+        ::= { st4PhaseMonitorEntry 10 }
+
+    st4PhasePowerFactorStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the measured power factor on the phase."
+        ::= { st4PhaseMonitorEntry 11 }
+
+    st4PhaseReactance OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        unknown(0),
+                        capacitive(1),
+                        inductive(2),
+                        resistive(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the measured reactance of the phase."
+        ::= { st4PhaseMonitorEntry 12 }
+
+    st4PhaseEnergy OBJECT-TYPE
+        SYNTAX      Integer32(-1..2147483647)
+        UNITS       "tenth Kilowatt-Hours"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total energy consumption of loads through the phase in tenth
+             Kilowatt-Hours."
+        ::= { st4PhaseMonitorEntry 13 }
+
+    -- Phase Event Configuration Table
+
+    st4PhaseEventConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4PhaseEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Phase event configuration table."
+        ::= { st4Phases 4 }
+
+    st4PhaseEventConfigEntry OBJECT-TYPE
+        SYNTAX      St4PhaseEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Event configuration objects for a particular phase."
+        INDEX       { st4UnitIndex, st4InputCordIndex, st4PhaseIndex }
+        ::= { st4PhaseEventConfigTable 1 }
+
+    St4PhaseEventConfigEntry ::= SEQUENCE {
+        st4PhaseNotifications              EventNotificationMethods,
+        st4PhaseVoltageLowAlarm            Integer32,
+        st4PhaseVoltageLowWarning          Integer32,
+        st4PhaseVoltageHighWarning         Integer32,
+        st4PhaseVoltageHighAlarm           Integer32,
+        st4PhasePowerFactorLowAlarm        Integer32,
+        st4PhasePowerFactorLowWarning      Integer32
+    }
+
+    st4PhaseNotifications OBJECT-TYPE
+        SYNTAX      EventNotificationMethods
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The notification methods enabled for phase events."
+        ::= { st4PhaseEventConfigEntry 1 }
+
+    st4PhaseVoltageLowAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..6000)
+        UNITS       "tenth Volts"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The current low alarm threshold of the phase in tenth Volts."
+        ::= { st4PhaseEventConfigEntry 2 }
+
+    st4PhaseVoltageLowWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..6000)
+        UNITS       "tenth Volts"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The current low warning threshold of the phase in tenth Volts."
+        ::= { st4PhaseEventConfigEntry 3 }
+
+    st4PhaseVoltageHighWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..6000)
+        UNITS       "tenth Volts"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The current high warning threshold of the phase in tenth Volts."
+        ::= { st4PhaseEventConfigEntry 4 }
+
+    st4PhaseVoltageHighAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..6000)
+        UNITS       "tenth Volts"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The current high alarm threshold of the phase in tenth Volts."
+        ::= { st4PhaseEventConfigEntry 5 }
+
+    st4PhasePowerFactorLowAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..100)
+        UNITS       "hundredths"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The low power factor alarm threshold of the phase in hundredths."
+        ::= { st4PhaseEventConfigEntry 6 }
+
+    st4PhasePowerFactorLowWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..100)
+        UNITS       "hundredths"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The low power factor warning threshold of the phase in
+             hundredths."
+        ::= { st4PhaseEventConfigEntry 7 }
+
+    -- Over-Current Protectors
+
+    st4OverCurrentProtectors OBJECT IDENTIFIER ::= { st4Objects 6 }
+
+    -- Over-Current Protector Common Configuration
+
+    st4OcpCommonConfig OBJECT IDENTIFIER ::= { st4OverCurrentProtectors 1 }
+
+    -- Over-Current Protector Configuration Table
+
+    st4OcpConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4OcpConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Over-current protector configuration table."
+        ::= { st4OverCurrentProtectors 2 }
+
+    st4OcpConfigEntry OBJECT-TYPE
+        SYNTAX      St4OcpConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Configuration objects for a particular over-current protector."
+        INDEX       { st4UnitIndex, st4InputCordIndex, st4OcpIndex }
+        ::= { st4OcpConfigTable 1 }
+
+    St4OcpConfigEntry ::= SEQUENCE {
+        st4OcpIndex                 Integer32,
+        st4OcpID                    DisplayString,
+        st4OcpLabel                 DisplayString,
+        st4OcpType                  INTEGER,
+        st4OcpCurrentCapacity       Integer32,
+        st4OcpCurrentCapacityMax    Integer32,
+        st4OcpBranchCount           Integer32,
+        st4OcpOutletCount           Integer32
+    }
+
+    st4OcpIndex OBJECT-TYPE
+        SYNTAX      Integer32(1..64)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Over-current protector index."
+        ::= { st4OcpConfigEntry 1 }
+
+    st4OcpID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(3..4))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The internal ID of the over-current protector.  Format=AAN[N]."
+        ::= { st4OcpConfigEntry 2 }
+
+    st4OcpLabel OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The system label assigned to the over-current protector for
+             identification."
+        ::= { st4OcpConfigEntry 4 }
+
+    st4OcpType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        fuse(0),
+                        breaker(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of over-current protector."
+        ::= { st4OcpConfigEntry 6 }
+
+    st4OcpCurrentCapacity OBJECT-TYPE
+        SYNTAX      Integer32(0..125)
+        UNITS       "Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The user-configured current capacity of the over-current protector
+             in Amps."
+        ::= { st4OcpConfigEntry 7 }
+
+    st4OcpCurrentCapacityMax OBJECT-TYPE
+        SYNTAX      Integer32(0..125)
+        UNITS       "Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The factory-set maximum allowed for the user-configured current
+             capacity of the over-current protector in Amps."
+        ::= { st4OcpConfigEntry 8 }
+
+    st4OcpBranchCount OBJECT-TYPE
+        SYNTAX      Integer32(0..12)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of branches downstream from the over-current
+             protector."
+        ::= { st4OcpConfigEntry 20 }
+
+    st4OcpOutletCount OBJECT-TYPE
+        SYNTAX      Integer32(0..128)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of outlets powered from the over-current protector."
+        ::= { st4OcpConfigEntry 21 }
+
+    -- Over-Current Protector Monitor Table
+
+    st4OcpMonitorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4OcpMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Over-current protector monitor table."
+        ::= { st4OverCurrentProtectors 3 }
+
+    st4OcpMonitorEntry OBJECT-TYPE
+        SYNTAX      St4OcpMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Objects to monitor for a particular over-current protector."
+        INDEX       { st4UnitIndex, st4InputCordIndex, st4OcpIndex }
+        ::= { st4OcpMonitorTable 1 }
+
+    St4OcpMonitorEntry ::= SEQUENCE {
+        st4OcpStatus                 DeviceStatus
+    }
+
+    st4OcpStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the over-current protector."
+        ::= { st4OcpMonitorEntry 1 }
+
+    -- Over-Current Protector Event Configuration Table
+
+    st4OcpEventConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4OcpEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Over-current protector event configuration table."
+        ::= { st4OverCurrentProtectors 4 }
+
+    st4OcpEventConfigEntry OBJECT-TYPE
+        SYNTAX      St4OcpEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Event configuration objects for a particular over-current
+             protector."
+        INDEX       { st4UnitIndex, st4InputCordIndex, st4OcpIndex }
+        ::= { st4OcpEventConfigTable 1 }
+
+    St4OcpEventConfigEntry ::= SEQUENCE {
+        st4OcpNotifications              EventNotificationMethods
+    }
+
+    st4OcpNotifications OBJECT-TYPE
+        SYNTAX      EventNotificationMethods
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The notification methods enabled for over-current protector
+             events."
+        ::= { st4OcpEventConfigEntry 1 }
+
+    -- Branches
+
+    st4Branches OBJECT IDENTIFIER ::= { st4Objects 7 }
+
+    -- Branch Common Configuration
+
+    st4BranchCommonConfig OBJECT IDENTIFIER ::= { st4Branches 1 }
+
+    st4BranchCurrentHysteresis OBJECT-TYPE
+        SYNTAX      Integer32(0..100)
+        UNITS       "tenth Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The current hysteresis of the branch in tenth Amps."
+        ::= { st4BranchCommonConfig 1 }
+
+    -- Branch Configuration Table
+
+    st4BranchConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4BranchConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Branch configuration table."
+        ::= { st4Branches 2 }
+
+    st4BranchConfigEntry OBJECT-TYPE
+        SYNTAX      St4BranchConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Configuration objects for a particular branch."
+        INDEX       { st4UnitIndex, st4InputCordIndex, st4BranchIndex }
+        ::= { st4BranchConfigTable 1 }
+
+    St4BranchConfigEntry ::= SEQUENCE {
+        st4BranchIndex                 Integer32,
+        st4BranchID                    DisplayString,
+        st4BranchLabel                 DisplayString,
+        st4BranchCurrentCapacity       Integer32,
+        st4BranchPhaseID               DisplayString,
+        st4BranchOcpID                 DisplayString,
+        st4BranchOutletCount           Integer32
+    }
+
+    st4BranchIndex OBJECT-TYPE
+        SYNTAX      Integer32(1..64)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Branch index."
+        ::= { st4BranchConfigEntry 1 }
+
+    st4BranchID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(3..4))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The internal ID of the branch.  Format=AAN[N]."
+        ::= { st4BranchConfigEntry 2 }
+
+    st4BranchLabel OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The system label assigned to the branch for identification."
+        ::= { st4BranchConfigEntry 4 }
+
+    st4BranchCurrentCapacity OBJECT-TYPE
+        SYNTAX      Integer32(0..125)
+        UNITS       "Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current capacity of the branch in Amps."
+        ::= { st4BranchConfigEntry 6 }
+
+    st4BranchPhaseID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(3))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The internal ID of the phase powering this branch.
+             Format=AAN."
+        ::= { st4BranchConfigEntry 20 }
+
+    st4BranchOcpID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(3..4))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The internal ID of the over-current protector powering this
+             outlet.  Format=AAN[N]."
+        ::= { st4BranchConfigEntry 21 }
+
+    st4BranchOutletCount OBJECT-TYPE
+        SYNTAX      Integer32(0..128)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of outlets powered from the branch."
+        ::= { st4BranchConfigEntry 30 }
+
+    -- Branch Monitor Table
+
+    st4BranchMonitorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4BranchMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Branch monitor table."
+        ::= { st4Branches 3 }
+
+    st4BranchMonitorEntry OBJECT-TYPE
+        SYNTAX      St4BranchMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Objects to monitor for a particular branch."
+        INDEX       { st4UnitIndex, st4InputCordIndex, st4BranchIndex }
+        ::= { st4BranchMonitorTable 1 }
+
+    St4BranchMonitorEntry ::= SEQUENCE {
+        st4BranchState                  DeviceState,
+        st4BranchStatus                 DeviceStatus,
+        st4BranchCurrent                Integer32,
+        st4BranchCurrentStatus          DeviceStatus,
+        st4BranchCurrentUtilized        Integer32
+    }
+
+    st4BranchState OBJECT-TYPE
+        SYNTAX      DeviceState
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The on/off state of the branch."
+        ::= { st4BranchMonitorEntry 1 }
+
+    st4BranchStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the branch."
+        ::= { st4BranchMonitorEntry 2 }
+
+    st4BranchCurrent OBJECT-TYPE
+        SYNTAX      Integer32(-1..12500)
+        UNITS       "hundredth Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured current on the branch in hundredth Amps."
+        ::= { st4BranchMonitorEntry 3 }
+
+    st4BranchCurrentStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the measured current on the branch."
+        ::= { st4BranchMonitorEntry 4 }
+
+    st4BranchCurrentUtilized OBJECT-TYPE
+        SYNTAX      Integer32(-1..1200)
+        UNITS       "tenth percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of the branch current capacity used in tenth percent."
+        ::= { st4BranchMonitorEntry 5 }
+
+    -- Branch Event Configuration Table
+
+    st4BranchEventConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4BranchEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Branch event configuration table."
+        ::= { st4Branches 4 }
+
+    st4BranchEventConfigEntry OBJECT-TYPE
+        SYNTAX      St4BranchEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Event configuration objects for a particular branch."
+        INDEX       { st4UnitIndex, st4InputCordIndex, st4BranchIndex }
+        ::= { st4BranchEventConfigTable 1 }
+
+    St4BranchEventConfigEntry ::= SEQUENCE {
+        st4BranchNotifications              EventNotificationMethods,
+        st4BranchCurrentLowAlarm            Integer32,
+        st4BranchCurrentLowWarning          Integer32,
+        st4BranchCurrentHighWarning         Integer32,
+        st4BranchCurrentHighAlarm           Integer32
+    }
+
+    st4BranchNotifications OBJECT-TYPE
+        SYNTAX      EventNotificationMethods
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The notification methods enabled for branch events."
+        ::= { st4BranchEventConfigEntry 1 }
+
+    st4BranchCurrentLowAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..1250)
+        UNITS       "tenth Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The current low alarm threshold of the branch in tenth Amps."
+        ::= { st4BranchEventConfigEntry 2 }
+
+    st4BranchCurrentLowWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..1250)
+        UNITS       "tenth Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The current low warning threshold of the branch in tenth Amps."
+        ::= { st4BranchEventConfigEntry 3 }
+
+    st4BranchCurrentHighWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..1250)
+        UNITS       "tenth Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The current high warning threshold of the branch in tenth Amps."
+        ::= { st4BranchEventConfigEntry 4 }
+
+    st4BranchCurrentHighAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..1250)
+        UNITS       "tenth Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The current high alarm threshold of the branch in tenth Amps."
+        ::= { st4BranchEventConfigEntry 5 }
+
+    -- Outlets
+
+    st4Outlets OBJECT IDENTIFIER ::= { st4Objects 8 }
+
+    -- Outlet Common Configuration
+
+    st4OutletCommonConfig OBJECT IDENTIFIER ::= { st4Outlets 1 }
+
+    st4OutletCurrentHysteresis OBJECT-TYPE
+        SYNTAX      Integer32(0..100)
+        UNITS       "tenth Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The current hysteresis of the outlet in tenth Amps."
+        ::= { st4OutletCommonConfig 1 }
+
+    st4OutletActivePowerHysteresis OBJECT-TYPE
+        SYNTAX      Integer32(0..1000)
+        UNITS       "Watts"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The power hysteresis of the outlet in Watts."
+        ::= { st4OutletCommonConfig 2 }
+
+    st4OutletPowerFactorHysteresis OBJECT-TYPE
+        SYNTAX      Integer32(0..20)
+        UNITS       "hundredths"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The power factor hysteresis of the outlet in hundredths."
+        ::= { st4OutletCommonConfig 3 }
+
+    st4OutletSequenceInterval OBJECT-TYPE
+        SYNTAX      Integer32(0..15)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The power-on sequencing interval for all outlets in seconds."
+        ::= { st4OutletCommonConfig 10 }
+
+    st4OutletRebootDelay OBJECT-TYPE
+        SYNTAX      Integer32(5..600)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The reboot delay for all outlets in seconds."
+        ::= { st4OutletCommonConfig 11 }
+
+    st4OutletStateChangeLogging OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        disabled(0),
+                        enabled(1)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enables or disables informational Outlet State Change event
+             logging."
+        ::= { st4OutletCommonConfig 12 }
+
+    -- Outlet Configuration Table
+
+    st4OutletConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4OutletConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Outlet configuration table."
+        ::= { st4Outlets 2 }
+
+    st4OutletConfigEntry OBJECT-TYPE
+        SYNTAX      St4OutletConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Configuration objects for a particular outlet."
+        INDEX       { st4UnitIndex, st4InputCordIndex, st4OutletIndex }
+        ::= { st4OutletConfigTable 1 }
+
+    St4OutletConfigEntry ::= SEQUENCE {
+        st4OutletIndex                 Integer32,
+        st4OutletID                    DisplayString,
+        st4OutletName                  DisplayString,
+        st4OutletCapabilities          BITS,
+        st4OutletSocketType            DisplayString,
+        st4OutletCurrentCapacity       Integer32,
+        st4OutletPowerCapacity         Integer32,
+        st4OutletWakeupState           INTEGER,
+        st4OutletPostOnDelay           Integer32,
+        st4OutletPhaseID               DisplayString,
+        st4OutletOcpID                 DisplayString,
+        st4OutletBranchID              DisplayString
+    }
+
+    st4OutletIndex OBJECT-TYPE
+        SYNTAX      Integer32(1..128)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Outlet index."
+        ::= { st4OutletConfigEntry 1 }
+
+    st4OutletID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(3..5))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The internal ID of the outlet.  Format=AAN[N[N]]."
+        ::= { st4OutletConfigEntry 2 }
+
+    st4OutletName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The name of the outlet."
+        ::= { st4OutletConfigEntry 3 }
+
+    st4OutletCapabilities OBJECT-TYPE
+        SYNTAX      BITS {
+                          switched(0),         -- outlet supports power control
+                          pops(1)              -- outlet has pops
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The capabilities of the outlet."
+        ::= { st4OutletConfigEntry 5 }
+
+    st4OutletSocketType OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The socket type of the outlet."
+        ::= { st4OutletConfigEntry 6 }
+
+    st4OutletCurrentCapacity OBJECT-TYPE
+        SYNTAX      Integer32(0..125)
+        UNITS       "Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current capacity of the outlet in Amps."
+        ::= { st4OutletConfigEntry 7 }
+
+    st4OutletPowerCapacity OBJECT-TYPE
+        SYNTAX      Integer32(0..10000)
+        UNITS       "Volt-Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The power capacity of the outlet in Volt-Amps.  For DC products,
+             this is identical to power capacity in Watts."
+        ::= { st4OutletConfigEntry 8 }
+
+    st4OutletWakeupState OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        on(0),
+                        off(1),
+                        last(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The wakeup state of the outlet."
+        ::= { st4OutletConfigEntry 20 }
+
+    st4OutletPostOnDelay OBJECT-TYPE
+        SYNTAX      Integer32(0..900)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The post-on delay of the outlet in seconds."
+        ::= { st4OutletConfigEntry 21 }
+
+    st4OutletPhaseID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(3))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The internal ID of the phase powering this outlet.
+             Format=AAN."
+        ::= { st4OutletConfigEntry 30 }
+
+    st4OutletOcpID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(3..4))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The internal ID of the over-current protector powering this
+             outlet.  Format=AAN[N]."
+        ::= { st4OutletConfigEntry 31 }
+
+    st4OutletBranchID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(3..4))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The internal ID of the branch powering this outlet.
+             Format=AAN[N]."
+        ::= { st4OutletConfigEntry 32 }
+
+    -- Outlet Monitor Table
+
+    st4OutletMonitorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4OutletMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Outlet monitor table."
+        ::= { st4Outlets 3 }
+
+    st4OutletMonitorEntry OBJECT-TYPE
+        SYNTAX      St4OutletMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Objects to monitor for a particular outlet."
+        INDEX       { st4UnitIndex, st4InputCordIndex, st4OutletIndex }
+        ::= { st4OutletMonitorTable 1 }
+
+    St4OutletMonitorEntry ::= SEQUENCE {
+        st4OutletState                  DeviceState,
+        st4OutletStatus                 DeviceStatus,
+        st4OutletCurrent                Integer32,
+        st4OutletCurrentStatus          DeviceStatus,
+        st4OutletCurrentUtilized        Integer32,
+        st4OutletVoltage                Integer32,
+        st4OutletActivePower            Integer32,
+        st4OutletActivePowerStatus      DeviceStatus,
+        st4OutletApparentPower          Integer32,
+        st4OutletPowerFactor            Integer32,
+        st4OutletPowerFactorStatus      DeviceStatus,
+        st4OutletCurrentCrestFactor     Integer32,
+        st4OutletReactance              INTEGER,
+        st4OutletEnergy                 Integer32
+    }
+
+    st4OutletState OBJECT-TYPE
+        SYNTAX      DeviceState
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The on/off state of the outlet."
+        ::= { st4OutletMonitorEntry 1 }
+
+    st4OutletStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the outlet."
+        ::= { st4OutletMonitorEntry 2 }
+
+    st4OutletCurrent OBJECT-TYPE
+        SYNTAX      Integer32(-1..12500)
+        UNITS       "hundredth Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured current on the outlet in hundredth Amps."
+        ::= { st4OutletMonitorEntry 3 }
+
+    st4OutletCurrentStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the measured current on the outlet."
+        ::= { st4OutletMonitorEntry 4 }
+
+    st4OutletCurrentUtilized OBJECT-TYPE
+        SYNTAX      Integer32(-1..1200)
+        UNITS       "tenth percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The amount of the outlet current capacity used in tenth percent."
+        ::= { st4OutletMonitorEntry 5 }
+
+    st4OutletVoltage OBJECT-TYPE
+        SYNTAX      Integer32(-1..6000)
+        UNITS       "tenth Volts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured voltage of the outlet in tenth Volts."
+        ::= { st4OutletMonitorEntry 6 }
+
+    st4OutletActivePower OBJECT-TYPE
+        SYNTAX      Integer32(-1..10000)
+        UNITS       "Watts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured active power of the outlet in Watts."
+        ::= { st4OutletMonitorEntry 7 }
+
+    st4OutletActivePowerStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the measured active power of the outlet."
+        ::= { st4OutletMonitorEntry 8 }
+
+    st4OutletApparentPower OBJECT-TYPE
+        SYNTAX      Integer32(-1..10000)
+        UNITS       "Volt-Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured apparent power of the outlet in Volt-Amps."
+        ::= { st4OutletMonitorEntry 9 }
+
+    st4OutletPowerFactor OBJECT-TYPE
+        SYNTAX      Integer32(-1..100)
+        UNITS       "hundredths"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured power factor of the outlet in hundredths."
+        ::= { st4OutletMonitorEntry 10 }
+
+    st4OutletPowerFactorStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the measured power factor of the outlet."
+        ::= { st4OutletMonitorEntry 11 }
+
+    st4OutletCurrentCrestFactor OBJECT-TYPE
+        SYNTAX      Integer32(-1..250)
+        UNITS       "tenths"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured crest factor of the outlet in tenths."
+        ::= { st4OutletMonitorEntry 12 }
+
+    st4OutletReactance OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        unknown(0),
+                        capacitive(1),
+                        inductive(2),
+                        resistive(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the measured reactance of the outlet."
+        ::= { st4OutletMonitorEntry 13 }
+
+    st4OutletEnergy OBJECT-TYPE
+        SYNTAX      Integer32(-1..2147483647)
+        UNITS       "Watt-Hours"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total energy consumption of the device plugged into the outlet
+             in Watt-Hours."
+        ::= { st4OutletMonitorEntry 14 }
+
+    -- Outlet Event Configuration Table
+
+    st4OutletEventConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4OutletEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Outlet event configuration table."
+        ::= { st4Outlets 4 }
+
+    st4OutletEventConfigEntry OBJECT-TYPE
+        SYNTAX      St4OutletEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Event configuration objects for a particular outlet."
+        INDEX       { st4UnitIndex, st4InputCordIndex, st4OutletIndex }
+        ::= { st4OutletEventConfigTable 1 }
+
+    St4OutletEventConfigEntry ::= SEQUENCE {
+        st4OutletNotifications              EventNotificationMethods,
+        st4OutletCurrentLowAlarm            Integer32,
+        st4OutletCurrentLowWarning          Integer32,
+        st4OutletCurrentHighWarning         Integer32,
+        st4OutletCurrentHighAlarm           Integer32,
+        st4OutletActivePowerLowAlarm        Integer32,
+        st4OutletActivePowerLowWarning      Integer32,
+        st4OutletActivePowerHighWarning     Integer32,
+        st4OutletActivePowerHighAlarm       Integer32,
+        st4OutletPowerFactorLowAlarm        Integer32,
+        st4OutletPowerFactorLowWarning      Integer32
+    }
+
+    st4OutletNotifications OBJECT-TYPE
+        SYNTAX      EventNotificationMethods
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The notification methods enabled for outlet events."
+        ::= { st4OutletEventConfigEntry 1 }
+
+    st4OutletCurrentLowAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..1250)
+        UNITS       "tenth Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The current low alarm threshold of the outlet in tenth Amps."
+        ::= { st4OutletEventConfigEntry 2 }
+
+    st4OutletCurrentLowWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..1250)
+        UNITS       "tenth Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The current low warning threshold of the outlet in tenth Amps."
+        ::= { st4OutletEventConfigEntry 3 }
+
+    st4OutletCurrentHighWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..1250)
+        UNITS       "tenth Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The current high warning threshold of the outlet in tenth Amps."
+        ::= { st4OutletEventConfigEntry 4 }
+
+    st4OutletCurrentHighAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..1250)
+        UNITS       "tenth Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The current high alarm threshold of the outlet in tenth Amps."
+        ::= { st4OutletEventConfigEntry 5 }
+
+    st4OutletActivePowerLowAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..10000)
+        UNITS       "Watts"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The active power low alarm threshold of the outlet in Watts."
+        ::= { st4OutletEventConfigEntry 6 }
+
+    st4OutletActivePowerLowWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..10000)
+        UNITS       "Watts"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The active power low warning threshold of the outlet in Watts."
+        ::= { st4OutletEventConfigEntry 7 }
+
+    st4OutletActivePowerHighWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..10000)
+        UNITS       "Watts"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The active power high warning threshold of the outlet in Watts."
+        ::= { st4OutletEventConfigEntry 8 }
+
+    st4OutletActivePowerHighAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..10000)
+        UNITS       "Watts"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The active power high alarm threshold of the outlet in Watts."
+        ::= { st4OutletEventConfigEntry 9 }
+
+    st4OutletPowerFactorLowAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..100)
+        UNITS       "hundredths"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The low power factor alarm threshold of the outlet in hundredths."
+        ::= { st4OutletEventConfigEntry 10 }
+
+    st4OutletPowerFactorLowWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..100)
+        UNITS       "hundredths"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The low power factor warning threshold of the outlet in
+             hundredths."
+        ::= { st4OutletEventConfigEntry 11 }
+
+    -- Outlet Control Table
+
+    st4OutletControlTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4OutletControlEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Outlet control table."
+        ::= { st4Outlets 5 }
+
+    st4OutletControlEntry OBJECT-TYPE
+        SYNTAX      St4OutletControlEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Objects for control of a particular outlet."
+        INDEX       { st4UnitIndex, st4InputCordIndex, st4OutletIndex }
+        ::= { st4OutletControlTable 1 }
+
+    St4OutletControlEntry ::= SEQUENCE {
+        st4OutletControlState           INTEGER,
+        st4OutletControlAction          INTEGER
+    }
+
+    st4OutletControlState OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        notSet(0),         -- outlet state is unknown
+                        fixedOn(1),        -- outlet is uncontrolled (assumed on)
+                        idleOff(2),        -- outlet has defaulted to off state
+                        idleOn(3),         -- outlet has defaulted to on state
+                        wakeOff(4),        -- outlet has been set to off by wakeup
+                        wakeOn(5),         -- outlet has been set to on by wakeup
+                        ocpOff(6),         -- outlet is off due to OCP failure
+                        ocpOn(7),          -- outlet had OCP power loss
+                        pendOn(8),         -- outlet is off, but will be turning on
+                        pendOff(9),        -- outlet is on, but will be turning off
+                        off(10),           -- outlet was turned off by user
+                        on(11),            -- outlet was turned on by user or reboot event
+                        reboot(12),        -- outlet is preparing to turn on
+                        shutdown(13),      -- outlet is preparing to turn off
+                        lockedOff(14),     -- outlet was locked off by admin
+                        lockedOn(15),      -- outlet was locked on by admin
+                        eventOff(16),      -- outlet was turned off by an event
+                        eventOn(17),       -- outlet was turned on by an event
+                        eventReboot(18),   -- outlet rebooting due to an event
+                        eventShutdown(19)  -- outlet shutting down due to an event
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The control state of the outlet."
+        ::= { st4OutletControlEntry 1 }
+
+    st4OutletControlAction OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        none(0),
+                        on(1),
+                        off(2),
+                        reboot(3),
+                        queueOn(4),
+                        queueOff(5),
+                        queueReboot(6)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "An action to change the control state of the outlet, or to queue
+             an action."
+        ::= { st4OutletControlEntry 2 }
+
+    -- Outlet Common Control
+
+    st4OutletCommonControl OBJECT IDENTIFIER ::= { st4Outlets 6 }
+
+    st4OutletQueueControl OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        clear(0),
+                        commit(1)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "An action to clear or commit queued outlet control actions.  A
+             read of this object returns clear(0) if queue is empty, and
+             commit(1) if the queue is not empty."
+        ::= { st4OutletCommonControl 1 }
+
+    -- Temperature Sensors
+
+    st4TemperatureSensors OBJECT IDENTIFIER ::= { st4Objects 9 }
+
+    -- Temperature Sensor Common Configuration
+
+    st4TempSensorCommonConfig OBJECT IDENTIFIER ::= { st4TemperatureSensors 1 }
+
+    st4TempSensorHysteresis OBJECT-TYPE
+        SYNTAX      Integer32(0..54)
+        UNITS       "degrees"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The temperature hysteresis of the sensor in degrees, using the
+             scale selected by st4TempSensorScale."
+        ::= { st4TempSensorCommonConfig 1 }
+
+    st4TempSensorScale OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        celsius(0),
+                        fahrenheit(1)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The current scale used for all temperature values."
+        ::= { st4TempSensorCommonConfig 10 }
+
+    -- Temperature Sensor Configuration Table
+
+    st4TempSensorConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4TempSensorConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Temperature sensor configuration table."
+        ::= { st4TemperatureSensors 2 }
+
+    st4TempSensorConfigEntry OBJECT-TYPE
+        SYNTAX      St4TempSensorConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Configuration objects for a particular temperature sensor."
+        INDEX       { st4UnitIndex, st4TempSensorIndex }
+        ::= { st4TempSensorConfigTable 1 }
+
+    St4TempSensorConfigEntry ::= SEQUENCE {
+        st4TempSensorIndex                 Integer32,
+        st4TempSensorID                    DisplayString,
+        st4TempSensorName                  DisplayString,
+        st4TempSensorValueMin              Integer32,
+        st4TempSensorValueMax              Integer32
+    }
+
+    st4TempSensorIndex OBJECT-TYPE
+        SYNTAX      Integer32(0..2)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Temperature sensor index."
+        ::= { st4TempSensorConfigEntry 1 }
+
+    st4TempSensorID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(2))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The internal ID of the temperature sensor.  Format=AN."
+        ::= { st4TempSensorConfigEntry 2 }
+
+    st4TempSensorName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The name of the temperature sensor."
+        ::= { st4TempSensorConfigEntry 3 }
+
+    st4TempSensorValueMin OBJECT-TYPE
+        SYNTAX      Integer32(-40..253)
+        UNITS       "degrees"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The minimum temperature limit of the sensor in degrees, using the
+             scale selected by st4TempSensorScale."
+        ::= { st4TempSensorConfigEntry 4 }
+
+    st4TempSensorValueMax OBJECT-TYPE
+        SYNTAX      Integer32(-40..253)
+        UNITS       "degrees"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum temperature limit of the sensor in degrees, using the
+             scale selected by st4TempSensorScale."
+        ::= { st4TempSensorConfigEntry 5 }
+
+    -- Temperature Sensor Monitor Table
+
+    st4TempSensorMonitorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4TempSensorMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Temperature sensor monitor table."
+        ::= { st4TemperatureSensors 3 }
+
+    st4TempSensorMonitorEntry OBJECT-TYPE
+        SYNTAX      St4TempSensorMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Objects to monitor for a particular temperature sensor."
+        INDEX       { st4UnitIndex, st4TempSensorIndex }
+        ::= { st4TempSensorMonitorTable 1 }
+
+    St4TempSensorMonitorEntry ::= SEQUENCE {
+        st4TempSensorValue                  Integer32,
+        st4TempSensorStatus                 DeviceStatus
+    }
+
+    st4TempSensorValue OBJECT-TYPE
+        SYNTAX      Integer32(-410..2540)
+        UNITS       "tenth degrees"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured temperature on the sensor in tenth degrees using the
+             scale selected by st4TempSensorScale. -410 means the temperature
+             reading is invalid."
+        ::= { st4TempSensorMonitorEntry 1 }
+
+    st4TempSensorStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the temperature sensor."
+        ::= { st4TempSensorMonitorEntry 2 }
+
+    -- Temperature Sensor Event Configuration Table
+
+    st4TempSensorEventConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4TempSensorEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Temperature sensor event configuration table."
+        ::= { st4TemperatureSensors 4 }
+
+    st4TempSensorEventConfigEntry OBJECT-TYPE
+        SYNTAX      St4TempSensorEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Event configuration objects for a particular temperature sensor."
+        INDEX       { st4UnitIndex, st4TempSensorIndex }
+        ::= { st4TempSensorEventConfigTable 1 }
+
+    St4TempSensorEventConfigEntry ::= SEQUENCE {
+        st4TempSensorNotifications              EventNotificationMethods,
+        st4TempSensorLowAlarm                   Integer32,
+        st4TempSensorLowWarning                 Integer32,
+        st4TempSensorHighWarning                Integer32,
+        st4TempSensorHighAlarm                  Integer32
+    }
+
+    st4TempSensorNotifications OBJECT-TYPE
+        SYNTAX      EventNotificationMethods
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The notification methods enabled for temperature sensor events."
+        ::= { st4TempSensorEventConfigEntry 1 }
+
+    st4TempSensorLowAlarm OBJECT-TYPE
+        SYNTAX      Integer32(-40..253)
+        UNITS       "degrees"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The low alarm threshold of the temperature sensor in degrees."
+        ::= { st4TempSensorEventConfigEntry 2 }
+
+    st4TempSensorLowWarning OBJECT-TYPE
+        SYNTAX      Integer32(-40..253)
+        UNITS       "degrees"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The low warning threshold of the temperature sensor in degrees."
+        ::= { st4TempSensorEventConfigEntry 3 }
+
+    st4TempSensorHighWarning OBJECT-TYPE
+        SYNTAX      Integer32(-40..253)
+        UNITS       "degrees"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The high warning threshold of the temperature sensor in degrees."
+        ::= { st4TempSensorEventConfigEntry 4 }
+
+    st4TempSensorHighAlarm OBJECT-TYPE
+        SYNTAX      Integer32(-40..253)
+        UNITS       "degrees"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The high alarm threshold of the temperature sensor in degrees."
+        ::= { st4TempSensorEventConfigEntry 5 }
+
+    -- Humidity Sensors
+
+    st4HumiditySensors OBJECT IDENTIFIER ::= { st4Objects 10 }
+
+    -- Humidity Sensor Common Configuration
+
+    st4HumidSensorCommonConfig OBJECT IDENTIFIER ::= { st4HumiditySensors 1 }
+
+    st4HumidSensorHysteresis OBJECT-TYPE
+        SYNTAX      Integer32(0..20)
+        UNITS       "percentage relative humidity"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The humidity hysteresis of the sensor in percent relative
+             humidity."
+        ::= { st4HumidSensorCommonConfig 1 }
+
+    -- Humidity Sensor Configuration Table
+
+    st4HumidSensorConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4HumidSensorConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Humidity sensor configuration table."
+        ::= { st4HumiditySensors 2 }
+
+    st4HumidSensorConfigEntry OBJECT-TYPE
+        SYNTAX      St4HumidSensorConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Configuration objects for a particular humidity sensor."
+        INDEX       { st4UnitIndex, st4HumidSensorIndex }
+        ::= { st4HumidSensorConfigTable 1 }
+
+    St4HumidSensorConfigEntry ::= SEQUENCE {
+        st4HumidSensorIndex                 Integer32,
+        st4HumidSensorID                    DisplayString,
+        st4HumidSensorName                  DisplayString
+    }
+
+    st4HumidSensorIndex OBJECT-TYPE
+        SYNTAX      Integer32(0..2)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Humidity sensor index."
+        ::= { st4HumidSensorConfigEntry 1 }
+
+    st4HumidSensorID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(2))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The internal ID of the humidity sensor.  Format=AN."
+        ::= { st4HumidSensorConfigEntry 2 }
+
+    st4HumidSensorName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The name of the humidity sensor."
+        ::= { st4HumidSensorConfigEntry 3 }
+
+    -- Humidity Sensor Monitor Table
+
+    st4HumidSensorMonitorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4HumidSensorMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Humidity sensor monitor table."
+        ::= { st4HumiditySensors 3 }
+
+    st4HumidSensorMonitorEntry OBJECT-TYPE
+        SYNTAX      St4HumidSensorMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Objects to monitor for a particular humidity sensor."
+        INDEX       { st4UnitIndex, st4HumidSensorIndex }
+        ::= { st4HumidSensorMonitorTable 1 }
+
+    St4HumidSensorMonitorEntry ::= SEQUENCE {
+        st4HumidSensorValue                  Integer32,
+        st4HumidSensorStatus                 DeviceStatus
+    }
+
+    st4HumidSensorValue OBJECT-TYPE
+        SYNTAX      Integer32(-1..100)
+        UNITS       "percentage relative humidity"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured humidity on the sensor in percentage relative
+             humidity."
+        ::= { st4HumidSensorMonitorEntry 1 }
+
+    st4HumidSensorStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the humidity sensor."
+        ::= { st4HumidSensorMonitorEntry 2 }
+
+    -- Humidity Sensor Event Configuration Table
+
+    st4HumidSensorEventConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4HumidSensorEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Humidity sensor event configuration table."
+        ::= { st4HumiditySensors 4 }
+
+    st4HumidSensorEventConfigEntry OBJECT-TYPE
+        SYNTAX      St4HumidSensorEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Event configuration objects for a particular humidity sensor."
+        INDEX       { st4UnitIndex, st4HumidSensorIndex }
+        ::= { st4HumidSensorEventConfigTable 1 }
+
+    St4HumidSensorEventConfigEntry ::= SEQUENCE {
+        st4HumidSensorNotifications              EventNotificationMethods,
+        st4HumidSensorLowAlarm                   Integer32,
+        st4HumidSensorLowWarning                 Integer32,
+        st4HumidSensorHighWarning                Integer32,
+        st4HumidSensorHighAlarm                  Integer32
+    }
+
+    st4HumidSensorNotifications OBJECT-TYPE
+        SYNTAX      EventNotificationMethods
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The notification methods enabled for humidity sensor events."
+        ::= { st4HumidSensorEventConfigEntry 1 }
+
+    st4HumidSensorLowAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..100)
+        UNITS       "percentage relative humidity"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The low alarm threshold of the humidity sensor in percentage
+             relative humidity."
+        ::= { st4HumidSensorEventConfigEntry 2 }
+
+    st4HumidSensorLowWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..100)
+        UNITS       "percentage relative humidity"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The low warning threshold of the humidity sensor in percentage
+             relative humidity."
+        ::= { st4HumidSensorEventConfigEntry 3 }
+
+    st4HumidSensorHighWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..100)
+        UNITS       "percentage relative humidity"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The high warning threshold of the humidity sensor in percentage
+             relative humidity."
+        ::= { st4HumidSensorEventConfigEntry 4 }
+
+    st4HumidSensorHighAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..100)
+        UNITS       "percentage relative humidity"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The high alarm threshold of the humidity sensor in percentage
+             relative humidity."
+        ::= { st4HumidSensorEventConfigEntry 5 }
+
+    -- Water Sensors
+
+    st4WaterSensors OBJECT IDENTIFIER ::= { st4Objects 11 }
+
+    -- Water Sensor Common Configuration
+
+    st4WaterSensorCommonConfig OBJECT IDENTIFIER ::= { st4WaterSensors 1 }
+
+    -- Water Sensor Configuration Table
+
+    st4WaterSensorConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4WaterSensorConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Water sensor configuration table."
+        ::= { st4WaterSensors 2 }
+
+    st4WaterSensorConfigEntry OBJECT-TYPE
+        SYNTAX      St4WaterSensorConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Configuration objects for a particular water sensor."
+        INDEX       { st4UnitIndex, st4WaterSensorIndex }
+        ::= { st4WaterSensorConfigTable 1 }
+
+    St4WaterSensorConfigEntry ::= SEQUENCE {
+        st4WaterSensorIndex                 Integer32,
+        st4WaterSensorID                    DisplayString,
+        st4WaterSensorName                  DisplayString
+    }
+
+    st4WaterSensorIndex OBJECT-TYPE
+        SYNTAX      Integer32(0..1)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Water sensor index."
+        ::= { st4WaterSensorConfigEntry 1 }
+
+    st4WaterSensorID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(2))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The internal ID of the water sensor.  Format=AN."
+        ::= { st4WaterSensorConfigEntry 2 }
+
+    st4WaterSensorName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The name of the water sensor."
+        ::= { st4WaterSensorConfigEntry 3 }
+
+    -- Water Sensor Monitor Table
+
+    st4WaterSensorMonitorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4WaterSensorMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Water sensor monitor table."
+        ::= { st4WaterSensors 3 }
+
+    st4WaterSensorMonitorEntry OBJECT-TYPE
+        SYNTAX      St4WaterSensorMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Objects to monitor for a particular water sensor."
+        INDEX       { st4UnitIndex, st4WaterSensorIndex }
+        ::= { st4WaterSensorMonitorTable 1 }
+
+    St4WaterSensorMonitorEntry ::= SEQUENCE {
+        st4WaterSensorStatus                 DeviceStatus
+    }
+
+    st4WaterSensorStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the water sensor."
+        ::= { st4WaterSensorMonitorEntry 1 }
+
+    -- Water Sensor Event Configuration Table
+
+    st4WaterSensorEventConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4WaterSensorEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Water sensor event configuration table."
+        ::= { st4WaterSensors 4 }
+
+    st4WaterSensorEventConfigEntry OBJECT-TYPE
+        SYNTAX      St4WaterSensorEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Event configuration objects for a particular water sensor."
+        INDEX       { st4UnitIndex, st4WaterSensorIndex }
+        ::= { st4WaterSensorEventConfigTable 1 }
+
+    St4WaterSensorEventConfigEntry ::= SEQUENCE {
+        st4WaterSensorNotifications              EventNotificationMethods
+    }
+
+    st4WaterSensorNotifications OBJECT-TYPE
+        SYNTAX      EventNotificationMethods
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The notification methods enabled for water sensor events."
+        ::= { st4WaterSensorEventConfigEntry 1 }
+
+    -- Contact Closures Sensors
+
+    st4ContactClosureSensors OBJECT IDENTIFIER ::= { st4Objects 12 }
+
+    -- Contact Closure Sensor Common Configuration
+
+    st4CcSensorCommonConfig OBJECT IDENTIFIER ::= { st4ContactClosureSensors 1 }
+
+    -- Contact Closure Sensor Configuration Table
+
+    st4CcSensorConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4CcSensorConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Contact closure sensor configuration table."
+        ::= { st4ContactClosureSensors 2 }
+
+    st4CcSensorConfigEntry OBJECT-TYPE
+        SYNTAX      St4CcSensorConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Configuration objects for a particular contact closure sensor."
+        INDEX       { st4UnitIndex, st4CcSensorIndex }
+        ::= { st4CcSensorConfigTable 1 }
+
+    St4CcSensorConfigEntry ::= SEQUENCE {
+        st4CcSensorIndex                 Integer32,
+        st4CcSensorID                    DisplayString,
+        st4CcSensorName                  DisplayString
+    }
+
+    st4CcSensorIndex OBJECT-TYPE
+        SYNTAX      Integer32(0..4)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Contact closure sensor index."
+        ::= { st4CcSensorConfigEntry 1 }
+
+    st4CcSensorID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(2))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The internal ID of the contact closure sensor.  Format=AN."
+        ::= { st4CcSensorConfigEntry 2 }
+
+    st4CcSensorName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The name of the contact closure sensor."
+        ::= { st4CcSensorConfigEntry 3 }
+
+    -- Contact Closure Sensor Monitor Table
+
+    st4CcSensorMonitorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4CcSensorMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Contact closure sensor monitor table."
+        ::= { st4ContactClosureSensors 3 }
+
+    st4CcSensorMonitorEntry OBJECT-TYPE
+        SYNTAX      St4CcSensorMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Objects to monitor for a particular contact closure sensor."
+        INDEX       { st4UnitIndex, st4CcSensorIndex }
+        ::= { st4CcSensorMonitorTable 1 }
+
+    St4CcSensorMonitorEntry ::= SEQUENCE {
+        st4CcSensorStatus                 DeviceStatus
+    }
+
+    st4CcSensorStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the contact closure."
+        ::= { st4CcSensorMonitorEntry 1 }
+
+    -- Contact Closure Sensor Event Configuration Table
+
+    st4CcSensorEventConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4CcSensorEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Contact closure sensor event configuration table."
+        ::= { st4ContactClosureSensors 4 }
+
+    st4CcSensorEventConfigEntry OBJECT-TYPE
+        SYNTAX      St4CcSensorEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Event configuration objects for a particular contact closure
+             sensor."
+        INDEX       { st4UnitIndex, st4CcSensorIndex }
+        ::= { st4CcSensorEventConfigTable 1 }
+
+    St4CcSensorEventConfigEntry ::= SEQUENCE {
+        st4CcSensorNotifications              EventNotificationMethods
+    }
+
+    st4CcSensorNotifications OBJECT-TYPE
+        SYNTAX      EventNotificationMethods
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The notification methods enabled for contact closure sensor
+             events."
+        ::= { st4CcSensorEventConfigEntry 1 }
+
+    -- Analog-to-Digital Converter Sensors
+
+    st4AnalogToDigitalConvSensors OBJECT IDENTIFIER ::= { st4Objects 13 }
+
+    -- Analog-to-Digital Converter Sensor Common Configuration
+
+    st4AdcSensorCommonConfig OBJECT IDENTIFIER ::= { st4AnalogToDigitalConvSensors 1 }
+
+    st4AdcSensorHysteresis OBJECT-TYPE
+        SYNTAX      Integer32(0..20)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The 8-bit count hysteresis of the analog-to-digital converter
+             sensor."
+        ::= { st4AdcSensorCommonConfig 1 }
+
+    -- Analog-to-Digital Converter Sensor Configuration Table
+
+    st4AdcSensorConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4AdcSensorConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Analog-to-digital converter sensor configuration table."
+        ::= { st4AnalogToDigitalConvSensors 2 }
+
+    st4AdcSensorConfigEntry OBJECT-TYPE
+        SYNTAX      St4AdcSensorConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Configuration objects for a particular analog-to-digital
+             converter sensor."
+        INDEX       { st4UnitIndex, st4AdcSensorIndex }
+        ::= { st4AdcSensorConfigTable 1 }
+
+    St4AdcSensorConfigEntry ::= SEQUENCE {
+        st4AdcSensorIndex                 Integer32,
+        st4AdcSensorID                    DisplayString,
+        st4AdcSensorName                  DisplayString
+    }
+
+    st4AdcSensorIndex OBJECT-TYPE
+        SYNTAX      Integer32(0..1)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Analog-to-digital converter sensor index."
+        ::= { st4AdcSensorConfigEntry 1 }
+
+    st4AdcSensorID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(2))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The internal ID of the analog-to-digital converter sensor.
+             Format=AN."
+        ::= { st4AdcSensorConfigEntry 2 }
+
+    st4AdcSensorName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The name of the analog-to-digital converter sensor."
+        ::= { st4AdcSensorConfigEntry 3 }
+
+    -- Analog-to-Digital Converter Sensor Monitor Table
+
+    st4AdcSensorMonitorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4AdcSensorMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Analog-to-digital converter sensor monitor table."
+        ::= { st4AnalogToDigitalConvSensors 3 }
+
+    st4AdcSensorMonitorEntry OBJECT-TYPE
+        SYNTAX      St4AdcSensorMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Objects to monitor for a particular analog-to-digital converter
+             sensor."
+        INDEX       { st4UnitIndex, st4AdcSensorIndex }
+        ::= { st4AdcSensorMonitorTable 1 }
+
+    St4AdcSensorMonitorEntry ::= SEQUENCE {
+        st4AdcSensorValue                  Integer32,
+        st4AdcSensorStatus                 DeviceStatus
+    }
+
+    st4AdcSensorValue OBJECT-TYPE
+        SYNTAX      Integer32(-1..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The 8-bit value from the analog-to-digital converter sensor."
+        ::= { st4AdcSensorMonitorEntry 1 }
+
+    st4AdcSensorStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the analog-to-digital converter sensor."
+        ::= { st4AdcSensorMonitorEntry 2 }
+
+    -- Analog-to-Digital Converter Sensor Event Configuration Table
+
+    st4AdcSensorEventConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4AdcSensorEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Analog-to-digital converter sensor event configuration table."
+        ::= { st4AnalogToDigitalConvSensors 4 }
+
+    st4AdcSensorEventConfigEntry OBJECT-TYPE
+        SYNTAX      St4AdcSensorEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Event configuration objects for a particular
+             analog-to-digital converter sensor."
+        INDEX       { st4UnitIndex, st4AdcSensorIndex }
+        ::= { st4AdcSensorEventConfigTable 1 }
+
+    St4AdcSensorEventConfigEntry ::= SEQUENCE {
+        st4AdcSensorNotifications              EventNotificationMethods,
+        st4AdcSensorLowAlarm                   Integer32,
+        st4AdcSensorLowWarning                 Integer32,
+        st4AdcSensorHighWarning                Integer32,
+        st4AdcSensorHighAlarm                  Integer32
+    }
+
+    st4AdcSensorNotifications OBJECT-TYPE
+        SYNTAX      EventNotificationMethods
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The notification methods enabled for analog-to-digital converter
+             sensor events."
+        ::= { st4AdcSensorEventConfigEntry 1 }
+
+    st4AdcSensorLowAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..255)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The 8-bit value for the low alarm threshold of the
+             analog-to-digital converter sensor."
+        ::= { st4AdcSensorEventConfigEntry 2 }
+
+    st4AdcSensorLowWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..255)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The 8-bit value for the low warning threshold of the
+             analog-to-digital converter sensor."
+        ::= { st4AdcSensorEventConfigEntry 3 }
+
+    st4AdcSensorHighWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..255)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The 8-bit value for the high warning threshold of the
+             analog-to-digital converter sensor."
+        ::= { st4AdcSensorEventConfigEntry 4 }
+
+    st4AdcSensorHighAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..255)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The 8-bit value for the high alarm threshold of the
+             analog-to-digital converter sensor."
+        ::= { st4AdcSensorEventConfigEntry 5 }
+
+    -- Fan Sensors
+
+    st4FanSensors OBJECT IDENTIFIER ::= { st4Objects 14 }
+
+    -- Fan Sensor Common Configuration
+
+    st4FanSensorCommonConfig OBJECT IDENTIFIER ::= { st4FanSensors 1 }
+
+    st4FanSensorHysteresis OBJECT-TYPE
+        SYNTAX      Integer32(0..1200)
+        UNITS       "rotations per minute"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The fan speed hysteresis of the sensor in rotations per minute."
+        ::= { st4FanSensorCommonConfig 1 }
+
+    -- Fan Sensor Configuration Table
+
+    st4FanSensorConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4FanSensorConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Fan sensor configuration table."
+        ::= { st4FanSensors 2 }
+
+    st4FanSensorConfigEntry OBJECT-TYPE
+        SYNTAX      St4FanSensorConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Configuration objects for a particular fan sensor."
+        INDEX       { st4UnitIndex, st4FanSensorIndex }
+        ::= { st4FanSensorConfigTable 1 }
+
+    St4FanSensorConfigEntry ::= SEQUENCE {
+        st4FanSensorIndex                Integer32,
+        st4FanSensorID                   DisplayString,
+        st4FanSensorName                 DisplayString
+    }
+
+    st4FanSensorIndex OBJECT-TYPE
+        SYNTAX      Integer32(0..4)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Fan sensor index."
+        ::= { st4FanSensorConfigEntry 1 }
+
+    st4FanSensorID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(2))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The internal ID of the fan sensor.  Format=AN."
+        ::= { st4FanSensorConfigEntry 2 }
+
+    st4FanSensorName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The name of the fan sensor."
+        ::= { st4FanSensorConfigEntry 3 }
+
+    -- Fan Sensor Monitor Table
+
+    st4FanSensorMonitorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4FanSensorMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Fan sensor monitor table."
+        ::= { st4FanSensors 3 }
+
+    st4FanSensorMonitorEntry OBJECT-TYPE
+        SYNTAX      St4FanSensorMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Objects to monitor for a particular fan sensor."
+        INDEX       { st4UnitIndex, st4FanSensorIndex }
+        ::= { st4FanSensorMonitorTable 1 }
+
+    St4FanSensorMonitorEntry ::= SEQUENCE {
+        st4FanSensorValue                 Integer32,
+        st4FanSensorStatus                DeviceStatus
+    }
+
+    st4FanSensorValue OBJECT-TYPE
+        SYNTAX      Integer32(-1..15300)
+        UNITS       "rotations per minute"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured fan speed of the sensor in rotations per minute."
+        ::= { st4FanSensorMonitorEntry 1 }
+
+    st4FanSensorStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the fan sensor."
+        ::= { st4FanSensorMonitorEntry 2 }
+
+    -- Fan Sensor Event Configuration Table
+
+    st4FanSensorEventConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4FanSensorEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Fan sensor event configuration table."
+        ::= { st4FanSensors 4 }
+
+    st4FanSensorEventConfigEntry OBJECT-TYPE
+        SYNTAX      St4FanSensorEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Event configuration objects for a particular fan sensor."
+        INDEX       { st4UnitIndex, st4FanSensorIndex }
+        ::= { st4FanSensorEventConfigTable 1 }
+
+    St4FanSensorEventConfigEntry ::= SEQUENCE {
+        st4FanSensorNotifications             EventNotificationMethods,
+        st4FanSensorLowAlarm                  Integer32,
+        st4FanSensorLowWarning                Integer32,
+        st4FanSensorHighWarning               Integer32,
+        st4FanSensorHighAlarm                 Integer32
+    }
+
+    st4FanSensorNotifications OBJECT-TYPE
+        SYNTAX      EventNotificationMethods
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The notification methods enabled for fan sensor events."
+        ::= { st4FanSensorEventConfigEntry 1 }
+
+    st4FanSensorLowAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..15300)
+        UNITS       "rotations per minute"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The low alarm threshold of the fan sensor in rotations per
+             minute."
+        ::= { st4FanSensorEventConfigEntry 2 }
+
+    st4FanSensorLowWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..15300)
+        UNITS       "rotations per minute"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The low warning threshold of the fan sensor in rotations per
+             minute."
+        ::= { st4FanSensorEventConfigEntry 3 }
+
+    st4FanSensorHighWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..15300)
+        UNITS       "rotations per minute"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The high warning threshold of the fan sensor in rotations per
+             minute."
+        ::= { st4FanSensorEventConfigEntry 4 }
+
+    st4FanSensorHighAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..15300)
+        UNITS       "rotations per minute"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The high alarm threshold of the fan sensor in rotations per
+             minute."
+        ::= { st4FanSensorEventConfigEntry 5 }
+
+    -- Event Information
+
+    st4EventInformation OBJECT IDENTIFIER ::= { st4Objects 99 }
+
+    st4EventStatusText OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The text representation of the enumerated integer value of
+             the most-relevant status or state object included in a trap.
+             The value of this object is set only when sent with a trap.
+             A read of this object will return a NULL string."
+        ::= { st4EventInformation 1 }
+
+    st4EventStatusCondition OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        nonError(0),
+                        error(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The condition of the enumerated integer value of the status
+             object included in a trap.  The value of this object is set
+             only when sent with a trap.  A read of this object will
+             return zero."
+        ::= { st4EventInformation 2 }
+
+--  Notification Definitions
+
+    st4Notifications OBJECT IDENTIFIER ::= { sentry4 100 }
+
+    -- Events
+
+    st4Events OBJECT IDENTIFIER ::= { st4Notifications 0 }
+    -- The 0 is for V1 compatibility
+
+    st4UnitStatusEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4UnitID,
+            st4UnitName,
+            st4UnitStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Unit status event."
+        --#TYPE "Sentry: Unit Status Event."
+        --#SUMMARY "Status of Unit '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 4 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 1 }
+
+    st4InputCordStatusEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4InputCordID,
+            st4InputCordName,
+            st4InputCordState,
+            st4InputCordStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Input cord status event."
+        --#TYPE "Sentry: Input Cord Status Event."
+        --#SUMMARY "Status of Input Cord '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 5 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 2 }
+
+    st4InputCordActivePowerEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4InputCordID,
+            st4InputCordName,
+            st4InputCordActivePower,
+            st4InputCordActivePowerStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Input cord active power event."
+        --#TYPE "Sentry: Input Cord Active Power Event."
+        --#SUMMARY "Active Power Status of Input Cord '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 5 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 3 }
+
+    st4InputCordApparentPowerEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4InputCordID,
+            st4InputCordName,
+            st4InputCordApparentPower,
+            st4InputCordApparentPowerStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Input cord apparent power event."
+        --#TYPE "Sentry: Input Cord Apparent Power Event."
+        --#SUMMARY "Apparent Power Status of Input Cord '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 5 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 4 }
+
+    st4InputCordPowerFactorEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4InputCordID,
+            st4InputCordName,
+            st4InputCordPowerFactor,
+            st4InputCordPowerFactorStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Input cord power factor event."
+        --#TYPE "Sentry: Input Cord Power Factor Event."
+        --#SUMMARY "Power Factor Status of Input Cord '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 5 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 5 }
+
+    st4InputCordOutOfBalanceEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4InputCordID,
+            st4InputCordName,
+            st4InputCordOutOfBalance,
+            st4InputCordOutOfBalanceStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Input cord out-of-balance event."
+        --#TYPE "Sentry: Input Cord Out-of-Balance Event."
+        --#SUMMARY "Out-of-Balance Status of Input Cord '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 5 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 6 }
+
+    st4LineStatusEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4LineID,
+            st4LineLabel,
+            st4LineState,
+            st4LineStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Line status event."
+        --#TYPE "Sentry: Line Status Event."
+        --#SUMMARY "Status of Line '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 5 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 7 }
+
+    st4LineCurrentEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4LineID,
+            st4LineLabel,
+            st4LineCurrent,
+            st4LineCurrentStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Line current event."
+        --#TYPE "Sentry: Line Current Event."
+        --#SUMMARY "Current Status of Line '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 5 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 8 }
+
+    st4PhaseStatusEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4PhaseID,
+            st4PhaseLabel,
+            st4PhaseState,
+            st4PhaseStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Phase status event."
+        --#TYPE "Sentry: Phase Status Event."
+        --#SUMMARY "Status of Phase '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 5 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 9 }
+
+    st4PhaseVoltageEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4PhaseID,
+            st4PhaseLabel,
+            st4PhaseVoltage,
+            st4PhaseVoltageStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Phase voltage event."
+        --#TYPE "Sentry: Phase Voltage Event."
+        --#SUMMARY "Voltage Status of Phase '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 5 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 10 }
+
+    st4PhasePowerFactorEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4PhaseID,
+            st4PhaseLabel,
+            st4PhasePowerFactor,
+            st4PhasePowerFactorStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Phase voltage event."
+        --#TYPE "Sentry: Phase Power Factor Event."
+        --#SUMMARY "Power Factor Status of Phase '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 5 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 11 }
+
+    st4OcpStatusEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4OcpID,
+            st4OcpLabel,
+            st4OcpStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Over-current protector status event."
+        --#TYPE "Sentry: Over-current Protector Status Event."
+        --#SUMMARY "Status of Over-current Protector '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 4 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 12 }
+
+    st4BranchStatusEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4BranchID,
+            st4BranchLabel,
+            st4BranchState,
+            st4BranchStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Branch status event."
+        --#TYPE "Sentry: Branch Status Event."
+        --#SUMMARY "Status of Branch '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 5 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 13 }
+
+    st4BranchCurrentEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4BranchID,
+            st4BranchLabel,
+            st4BranchCurrent,
+            st4BranchCurrentStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Branch current event."
+        --#TYPE "Sentry: Branch Current Event."
+        --#SUMMARY "Current Status of Branch '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 5 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 14 }
+
+    st4OutletStatusEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4OutletID,
+            st4OutletName,
+            st4OutletState,
+            st4OutletStatus,
+            st4OutletControlState,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Outlet status event."
+        --#TYPE "Sentry: Outlet Status Event."
+        --#SUMMARY "Status of Outlet '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 6 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 15 }
+
+    st4OutletStateChangeEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4OutletID,
+            st4OutletName,
+            st4OutletState,
+            st4OutletStatus,
+            st4OutletControlState,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Outlet state change event."
+        --#TYPE "Sentry: Outlet State Change Event."
+        --#SUMMARY "Outlet '%s' (%s) state has changed to '%s'."
+        --#ARGUMENTS { 2, 1, 6 }
+        --#SEVERITY INFORMATIONAL
+        --#GENERIC 6
+        --#CATEGORY "Information Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 16 }
+
+    st4OutletCurrentEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4OutletID,
+            st4OutletName,
+            st4OutletCurrent,
+            st4OutletCurrentStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Outlet current event."
+        --#TYPE "Sentry: Outlet Current Event."
+        --#SUMMARY "Current Status of Outlet '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 5 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 17 }
+
+    st4OutletActivePowerEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4OutletID,
+            st4OutletName,
+            st4OutletActivePower,
+            st4OutletActivePowerStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Outlet active power event."
+        --#TYPE "Sentry: Outlet Active Power Event."
+        --#SUMMARY "Active Power Status of Outlet '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 5 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 18 }
+
+    st4OutletPowerFactorEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4OutletID,
+            st4OutletName,
+            st4OutletPowerFactor,
+            st4OutletPowerFactorStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Outlet power factor event."
+        --#TYPE "Sentry: Outlet Power Factor Event."
+        --#SUMMARY "Power Factor Status of Outlet '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 5 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 19 }
+
+    st4TempSensorEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4TempSensorID,
+            st4TempSensorName,
+            st4TempSensorValue,
+            st4TempSensorStatus,
+            st4TempSensorScale,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Temperature sensor event."
+        --#TYPE "Sentry: Temperature Sensor Event."
+        --#SUMMARY "Status of Temperature Sensor '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 6 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 20 }
+
+    st4HumidSensorEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4HumidSensorID,
+            st4HumidSensorName,
+            st4HumidSensorValue,
+            st4HumidSensorStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Humidity sensor event."
+        --#TYPE "Sentry: Humidity Sensor Event."
+        --#SUMMARY "Status of Humidity Sensor '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 5 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 21 }
+
+    st4WaterSensorStatusEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4WaterSensorID,
+            st4WaterSensorName,
+            st4WaterSensorStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Water sensor status event."
+        --#TYPE "Sentry: Water Sensor Status Event."
+        --#SUMMARY "Status of Water Sensor '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 4 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 22 }
+
+    st4CcSensorStatusEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4CcSensorID,
+            st4CcSensorName,
+            st4CcSensorStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Contact closure sensor status event."
+        --#TYPE "Sentry: Contact Closure Sensor Status Event."
+        --#SUMMARY "Status of Contact Closure Sensor '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 4 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 23 }
+
+    st4AdcSensorEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4AdcSensorID,
+            st4AdcSensorName,
+            st4AdcSensorValue,
+            st4AdcSensorStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Analog-to-digital converter sensor event."
+        --#TYPE "Sentry: Analog-to-Digital Converter Sensor Event."
+        --#SUMMARY "Status of Analog-to-Digital Converter Sensor '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 5 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 24 }
+
+    st4FanSensorEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4FanSensorID,
+            st4FanSensorName,
+            st4FanSensorValue,
+            st4FanSensorStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Fan sensor event."
+        --#TYPE "Sentry: Fan Sensor Event."
+        --#SUMMARY "Status of Fan Sensor '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 4 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 25 }
+
+--  Conformance Definitions
+
+    st4Conformance OBJECT IDENTIFIER ::= { sentry4 200 }
+
+    -- Object/Notification Groups
+
+    st4Groups OBJECT IDENTIFIER ::= { st4Conformance 1 }
+
+    st4SystemObjectsGroup OBJECT-GROUP
+        OBJECTS {
+            st4SystemProductName,
+            st4SystemLocation,
+            st4SystemFirmwareVersion,
+            st4SystemFirmwareBuildInfo,
+            st4SystemNICSerialNumber,
+            st4SystemNICHardwareInfo,
+            st4SystemProductSeries,
+            st4SystemFeatures,
+            st4SystemFeatureKey,
+            st4SystemConfigModifiedCount,
+            st4SystemUnitCount
+        }
+        STATUS      current
+        DESCRIPTION
+            "System objects group."
+        ::= { st4Groups 1 }
+
+    st4UnitObjectsGroup OBJECT-GROUP
+        OBJECTS {
+            st4UnitID,
+            st4UnitName,
+            st4UnitProductSN,
+            st4UnitModel,
+            st4UnitAssetTag,
+            st4UnitType,
+            st4UnitCapabilities,
+            st4UnitProductMfrDate,
+            st4UnitDisplayOrientation,
+            st4UnitOutletSequenceOrder,
+            st4UnitOutletDisplayOrder,
+            st4UnitInputCordCount,
+            st4UnitTempSensorCount,
+            st4UnitHumidSensorCount,
+            st4UnitWaterSensorCount,
+            st4UnitCcSensorCount,
+            st4UnitAdcSensorCount,
+            st4UnitFanSensorCount,
+            st4UnitStatus,
+            st4UnitNotifications
+        }
+        STATUS      current
+        DESCRIPTION
+            "Unit objects group."
+        ::= { st4Groups 2 }
+
+    st4InputCordObjectsGroup OBJECT-GROUP
+        OBJECTS {
+            st4InputCordActivePowerHysteresis,
+            st4InputCordApparentPowerHysteresis,
+            st4InputCordPowerFactorHysteresis,
+            st4InputCordOutOfBalanceHysteresis,
+            st4InputCordID,
+            st4InputCordName,
+            st4InputCordInletType,
+            st4InputCordNominalVoltage,
+            st4InputCordNominalVoltageMin,
+            st4InputCordNominalVoltageMax,
+            st4InputCordCurrentCapacity,
+            st4InputCordCurrentCapacityMax,
+            st4InputCordPowerCapacity,
+            st4InputCordNominalPowerFactor,
+            st4InputCordLineCount,
+            st4InputCordPhaseCount,
+            st4InputCordOcpCount,
+            st4InputCordBranchCount,
+            st4InputCordOutletCount,
+            st4InputCordState,
+            st4InputCordStatus,
+            st4InputCordActivePower,
+            st4InputCordActivePowerStatus,
+            st4InputCordApparentPower,
+            st4InputCordApparentPowerStatus,
+            st4InputCordPowerUtilized,
+            st4InputCordPowerFactor,
+            st4InputCordPowerFactorStatus,
+            st4InputCordEnergy,
+            st4InputCordFrequency,
+            st4InputCordOutOfBalance,
+            st4InputCordOutOfBalanceStatus,
+            st4InputCordNotifications,
+            st4InputCordActivePowerLowAlarm,
+            st4InputCordActivePowerLowWarning,
+            st4InputCordActivePowerHighWarning,
+            st4InputCordActivePowerHighAlarm,
+            st4InputCordApparentPowerLowAlarm,
+            st4InputCordApparentPowerLowWarning,
+            st4InputCordApparentPowerHighWarning,
+            st4InputCordApparentPowerHighAlarm,
+            st4InputCordPowerFactorLowAlarm,
+            st4InputCordPowerFactorLowWarning,
+            st4InputCordOutOfBalanceHighWarning,
+            st4InputCordOutOfBalanceHighAlarm
+        }
+        STATUS      current
+        DESCRIPTION
+            "Input cord objects group."
+        ::= { st4Groups 3 }
+
+    st4LineObjectsGroup OBJECT-GROUP
+        OBJECTS {
+            st4LineCurrentHysteresis,
+            st4LineID,
+            st4LineLabel,
+            st4LineCurrentCapacity,
+            st4LineState,
+            st4LineStatus,
+            st4LineCurrent,
+            st4LineCurrentStatus,
+            st4LineCurrentUtilized,
+            st4LineNotifications,
+            st4LineCurrentLowAlarm,
+            st4LineCurrentLowWarning,
+            st4LineCurrentHighWarning,
+            st4LineCurrentHighAlarm
+        }
+        STATUS      current
+        DESCRIPTION
+            "Line objects group."
+        ::= { st4Groups 4 }
+
+    st4PhaseObjectsGroup OBJECT-GROUP
+        OBJECTS {
+            st4PhaseVoltageHysteresis,
+            st4PhasePowerFactorHysteresis,
+            st4PhaseID,
+            st4PhaseLabel,
+            st4PhaseNominalVoltage,
+            st4PhaseBranchCount,
+            st4PhaseOutletCount,
+            st4PhaseState,
+            st4PhaseStatus,
+            st4PhaseVoltage,
+            st4PhaseVoltageStatus,
+            st4PhaseVoltageDeviation,
+            st4PhaseCurrent,
+            st4PhaseCurrentCrestFactor,
+            st4PhaseActivePower,
+            st4PhaseApparentPower,
+            st4PhasePowerFactor,
+            st4PhasePowerFactorStatus,
+            st4PhaseReactance,
+            st4PhaseEnergy,
+            st4PhaseNotifications,
+            st4PhaseVoltageLowAlarm,
+            st4PhaseVoltageLowWarning,
+            st4PhaseVoltageHighWarning,
+            st4PhaseVoltageHighAlarm,
+            st4PhasePowerFactorLowAlarm,
+            st4PhasePowerFactorLowWarning
+        }
+        STATUS      current
+        DESCRIPTION
+            "Phase objects group."
+        ::= { st4Groups 5 }
+
+    st4OcpObjectsGroup OBJECT-GROUP
+        OBJECTS {
+            st4OcpID,
+            st4OcpLabel,
+            st4OcpType,
+            st4OcpCurrentCapacity,
+            st4OcpCurrentCapacityMax,
+            st4OcpBranchCount,
+            st4OcpOutletCount,
+            st4OcpStatus,
+            st4OcpNotifications
+        }
+        STATUS      current
+        DESCRIPTION
+            "Over-current protector objects group."
+        ::= { st4Groups 6 }
+
+    st4BranchObjectsGroup OBJECT-GROUP
+        OBJECTS {
+            st4BranchCurrentHysteresis,
+            st4BranchID,
+            st4BranchLabel,
+            st4BranchCurrentCapacity,
+            st4BranchPhaseID,
+            st4BranchOcpID,
+            st4BranchOutletCount,
+            st4BranchState,
+            st4BranchStatus,
+            st4BranchCurrent,
+            st4BranchCurrentStatus,
+            st4BranchCurrentUtilized,
+            st4BranchNotifications,
+            st4BranchCurrentLowAlarm,
+            st4BranchCurrentLowWarning,
+            st4BranchCurrentHighWarning,
+            st4BranchCurrentHighAlarm
+        }
+        STATUS      current
+        DESCRIPTION
+            "Branch objects group."
+        ::= { st4Groups 7 }
+
+    st4OutletObjectsGroup OBJECT-GROUP
+        OBJECTS {
+            st4OutletCurrentHysteresis,
+            st4OutletActivePowerHysteresis,
+            st4OutletPowerFactorHysteresis,
+            st4OutletSequenceInterval,
+            st4OutletRebootDelay,
+            st4OutletStateChangeLogging,
+            st4OutletID,
+            st4OutletName,
+            st4OutletCapabilities,
+            st4OutletSocketType,
+            st4OutletCurrentCapacity,
+            st4OutletPowerCapacity,
+            st4OutletWakeupState,
+            st4OutletPostOnDelay,
+            st4OutletPhaseID,
+            st4OutletOcpID,
+            st4OutletBranchID,
+            st4OutletState,
+            st4OutletStatus,
+            st4OutletCurrent,
+            st4OutletCurrentStatus,
+            st4OutletCurrentUtilized,
+            st4OutletVoltage,
+            st4OutletActivePower,
+            st4OutletActivePowerStatus,
+            st4OutletApparentPower,
+            st4OutletPowerFactor,
+            st4OutletPowerFactorStatus,
+            st4OutletCurrentCrestFactor,
+            st4OutletReactance,
+            st4OutletEnergy,
+            st4OutletNotifications,
+            st4OutletCurrentLowAlarm,
+            st4OutletCurrentLowWarning,
+            st4OutletCurrentHighWarning,
+            st4OutletCurrentHighAlarm,
+            st4OutletActivePowerLowAlarm,
+            st4OutletActivePowerLowWarning,
+            st4OutletActivePowerHighWarning,
+            st4OutletActivePowerHighAlarm,
+            st4OutletPowerFactorLowAlarm,
+            st4OutletPowerFactorLowWarning,
+            st4OutletControlState,
+            st4OutletControlAction,
+            st4OutletQueueControl
+        }
+        STATUS      current
+        DESCRIPTION
+            "Outlet objects group."
+        ::= { st4Groups 8 }
+
+    st4TempSensorObjectsGroup OBJECT-GROUP
+        OBJECTS {
+            st4TempSensorHysteresis,
+            st4TempSensorScale,
+            st4TempSensorID,
+            st4TempSensorName,
+            st4TempSensorValueMin,
+            st4TempSensorValueMax,
+            st4TempSensorValue,
+            st4TempSensorStatus,
+            st4TempSensorNotifications,
+            st4TempSensorLowAlarm,
+            st4TempSensorLowWarning,
+            st4TempSensorHighWarning,
+            st4TempSensorHighAlarm
+        }
+        STATUS      current
+        DESCRIPTION
+            "Temperature sensor objects group."
+        ::= { st4Groups 9 }
+
+    st4HumidSensorObjectsGroup OBJECT-GROUP
+        OBJECTS {
+            st4HumidSensorHysteresis,
+            st4HumidSensorID,
+            st4HumidSensorName,
+            st4HumidSensorValue,
+            st4HumidSensorStatus,
+            st4HumidSensorNotifications,
+            st4HumidSensorLowAlarm,
+            st4HumidSensorLowWarning,
+            st4HumidSensorHighWarning,
+            st4HumidSensorHighAlarm
+        }
+        STATUS      current
+        DESCRIPTION
+            "Humidity sensor objects group."
+        ::= { st4Groups 10 }
+
+    st4WaterSensorObjectsGroup OBJECT-GROUP
+        OBJECTS {
+            st4WaterSensorID,
+            st4WaterSensorName,
+            st4WaterSensorStatus,
+            st4WaterSensorNotifications
+        }
+        STATUS      current
+        DESCRIPTION
+            "Water sensor objects group."
+        ::= { st4Groups 11 }
+
+    st4CcSensorObjectsGroup OBJECT-GROUP
+        OBJECTS {
+            st4CcSensorID,
+            st4CcSensorName,
+            st4CcSensorStatus,
+            st4CcSensorNotifications
+        }
+        STATUS      current
+        DESCRIPTION
+            "Contact closure sensor objects group."
+        ::= { st4Groups 12 }
+
+    st4AdcSensorObjectsGroup OBJECT-GROUP
+        OBJECTS {
+            st4AdcSensorHysteresis,
+            st4AdcSensorID,
+            st4AdcSensorName,
+            st4AdcSensorValue,
+            st4AdcSensorStatus,
+            st4AdcSensorNotifications,
+            st4AdcSensorLowAlarm,
+            st4AdcSensorLowWarning,
+            st4AdcSensorHighWarning,
+            st4AdcSensorHighAlarm
+        }
+        STATUS      current
+        DESCRIPTION
+            "Analog-to-digital converter sensor objects group."
+        ::= { st4Groups 13 }
+
+    st4FanSensorObjectsGroup OBJECT-GROUP
+        OBJECTS {
+            st4FanSensorHysteresis,
+            st4FanSensorID,
+            st4FanSensorName,
+            st4FanSensorValue,
+            st4FanSensorStatus,
+            st4FanSensorNotifications,
+            st4FanSensorLowAlarm,
+            st4FanSensorLowWarning,
+            st4FanSensorHighWarning,
+            st4FanSensorHighAlarm
+        }
+        STATUS      current
+        DESCRIPTION
+            "Fan sensor objects group."
+        ::= { st4Groups 14 }
+
+    st4EventInfoObjectsGroup OBJECT-GROUP
+        OBJECTS {
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Event information objects group."
+        ::= { st4Groups 99 }
+
+    st4EventNotificationsGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            st4UnitStatusEvent,
+            st4InputCordStatusEvent,
+            st4InputCordActivePowerEvent,
+            st4InputCordApparentPowerEvent,
+            st4InputCordPowerFactorEvent,
+            st4InputCordOutOfBalanceEvent,
+            st4LineStatusEvent,
+            st4LineCurrentEvent,
+            st4PhaseStatusEvent,
+            st4PhaseVoltageEvent,
+            st4PhasePowerFactorEvent,
+            st4OcpStatusEvent,
+            st4BranchStatusEvent,
+            st4BranchCurrentEvent,
+            st4OutletStatusEvent,
+            st4OutletStateChangeEvent,
+            st4OutletCurrentEvent,
+            st4OutletActivePowerEvent,
+            st4OutletPowerFactorEvent,
+            st4TempSensorEvent,
+            st4HumidSensorEvent,
+            st4WaterSensorStatusEvent,
+            st4CcSensorStatusEvent,
+            st4AdcSensorEvent,
+            st4FanSensorEvent
+        }
+        STATUS      current
+        DESCRIPTION
+            "Event notifications group."
+        ::= { st4Groups 100 }
+
+    -- Compliance Statements
+
+    st4Compliances OBJECT IDENTIFIER ::= { st4Conformance 2 }
+
+    st4ModuleCompliances MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The requirements for conformance to the Sentry4-MIB."
+        MODULE
+        GROUP st4SystemObjectsGroup
+        DESCRIPTION
+            "System objects group."
+        GROUP st4UnitObjectsGroup
+        DESCRIPTION
+            "Unit objects group."
+        GROUP st4InputCordObjectsGroup
+        DESCRIPTION
+            "Input cord objects group."
+        GROUP st4LineObjectsGroup
+        DESCRIPTION
+            "Line objects group."
+        GROUP st4PhaseObjectsGroup
+        DESCRIPTION
+            "Phase objects group."
+        GROUP st4OcpObjectsGroup
+        DESCRIPTION
+            "Over-current protector objects group."
+        GROUP st4BranchObjectsGroup
+        DESCRIPTION
+            "Branch objects group."
+        GROUP st4OutletObjectsGroup
+        DESCRIPTION
+            "Outlet objects group."
+        GROUP st4TempSensorObjectsGroup
+        DESCRIPTION
+            "Temperature sensor objects group."
+        GROUP st4HumidSensorObjectsGroup
+        DESCRIPTION
+            "Humidity sensor objects group."
+        GROUP st4WaterSensorObjectsGroup
+        DESCRIPTION
+            "Water sensor objects group."
+        GROUP st4CcSensorObjectsGroup
+        DESCRIPTION
+            "Contact closure sensor objects group."
+        GROUP st4AdcSensorObjectsGroup
+        DESCRIPTION
+            "Analog-to-digital converter sensor objects group."
+        GROUP st4FanSensorObjectsGroup
+        DESCRIPTION
+            "Fan sensor objects group."
+        GROUP st4EventInfoObjectsGroup
+        DESCRIPTION
+            "Event information objects group."
+        GROUP st4EventNotificationsGroup
+        DESCRIPTION
+            "Event notifications group."
+        ::= { st4Compliances 1 }
+
+END

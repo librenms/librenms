@@ -1,0 +1,15 @@
+os: f5
+text: 'F5 Big IP'
+type: loadbalancer
+icon: f5
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_ucd_memory, text: 'Memory Usage' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.3375.2.1
+poller_modules:
+    loadbalancers: true
+discovery_modules:
+    loadbalancers: true

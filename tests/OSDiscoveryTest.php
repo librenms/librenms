@@ -1,8 +1,8 @@
 <?php
 /**
- * DiscoveryTest.php
+ * OSDiscoveryTest.php
  *
- * -Description-
+ * Test all discovery for all OS
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,173 +25,141 @@
 
 namespace LibreNMS\Tests;
 
-include 'tests/mocks/mock.snmp.inc.php';
+use LibreNMS\Config;
+use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 
-class DiscoveryTest extends \PHPUnit_Framework_TestCase
+class OSDiscoveryTest extends TestCase
 {
-    /**
-     * Set up variables and include os discovery
-     *
-     * @param string $expectedOS the OS to test for
-     * @param string $sysDescr set the snmp sysDescr variable
-     * @param string $sysObjectId set the snmp sysObjectId variable
-     * @param array $mockSnmp set arbitrary snmp variables with an associative array
-     * @param array $device device array to send
-     */
-    private function checkOS($expectedOS, $sysDescr = '', $sysObjectId = '', $mockSnmp = array(), $device = array())
-    {
-        global $config;
-        setSnmpMock($mockSnmp);
-        $os = null;
+    private static $unchecked_files;
 
-        // cannot use getHostOS() because of functions.php includes
-        $pattern = $config['install_dir'] . '/includes/discovery/os/*.inc.php';
-        foreach (glob($pattern) as $file) {
-            include $file;
-            if (isset($os)) {
-                break;
-            }
+    public static function setUpBeforeClass()
+    {
+        parent::setUpBeforeClass();
+
+        $glob = Config::get('install_dir') . "/tests/snmpsim/*.snmprec";
+
+        self::$unchecked_files = array_flip(array_map(function ($file) {
+            return basename($file, '.snmprec');
+        }, glob($glob)));
+    }
+
+    /**
+     * Populate a list of files to check and make sure it isn't empty
+     */
+    public function testHaveFilesToTest()
+    {
+        $this->assertNotEmpty(self::$unchecked_files);
+    }
+
+    /**
+     * Test each OS provided by osProvider
+     *
+     * @group os
+     * @dataProvider osProvider
+     * @param $os_name
+     */
+    public function testOS($os_name)
+    {
+        $glob = Config::get('install_dir') . "/tests/snmpsim/$os_name*.snmprec";
+        $files = array_map(function ($file) {
+            return basename($file, '.snmprec');
+        }, glob($glob));
+        $files = array_filter($files, function ($file) use ($os_name) {
+            return $file == $os_name || starts_with($file, $os_name . '_');
+        });
+
+        if (empty($files)) {
+            throw new PHPUnitException("No snmprec files found for $os_name!");
         }
 
-        $this->assertEquals($expectedOS, $os);
+        foreach ($files as $file) {
+            $this->checkOS($os_name, $file);
+            unset(self::$unchecked_files[$file]);  // This file has been tested
+        }
     }
 
-    public function testAiros()
+    /**
+     * Test that all files have been tested (removed from self::$unchecked_files
+     *
+     * @depends testOS
+     */
+    public function testAllFilesTested()
     {
-        $this->checkOS('airos', 'Linux', '.1.3.6.1.4.1.10002.1');
-        $this->checkOS('airos', 'Linux', '.1.3.6.1.4.1.41112.1.4');
-
-        $mockSnmp = array(
-            'dot11manufacturerName.5' => 'Ubiquiti',
+        $this->assertEmpty(
+            self::$unchecked_files,
+            "Not all snmprec files were checked: " . print_r(array_keys(self::$unchecked_files), true)
         );
-        $this->checkOS('airos', 'Linux', '', $mockSnmp);
     }
 
-    public function testAirosAf()
+    /**
+     * Set up and test an os
+     * If $filename is not set, it will use the snmprec file matching $expected_os
+     *
+     * @param string $expected_os The os we should get back from getHostOS()
+     * @param string $filename the name of the snmprec file to use
+     */
+    private function checkOS($expected_os, $filename = null)
     {
-        $mockSnmp = array(
-            'fwVersion.1' => '1.0',
+        $community = $filename ?: $expected_os;
+        global $debug, $vdebug;
+        $debug = true;
+        $vdebug = true;
+        ob_start();
+        $os = getHostOS($this->genDevice($community));
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertEquals($expected_os, $os, "Test file: $community.snmprec\n$output");
+    }
+
+    /**
+     * Generate a fake $device array
+     *
+     * @param string $community The snmp community to set
+     * @return array resulting device array
+     */
+    private function genDevice($community)
+    {
+        return [
+            'device_id' => 1,
+            'hostname' => $this->snmpsim->getIP(),
+            'snmpver' => 'v2c',
+            'port' => $this->snmpsim->getPort(),
+            'timeout' => 3,
+            'retries' => 0,
+            'snmp_max_repeaters' => 10,
+            'community' => $community,
+            'os' => 'generic',
+            'os_group' => '',
+        ];
+    }
+
+    /**
+     * Provides a list of OS to generate tests.
+     *
+     * @return array
+     */
+    public function osProvider()
+    {
+        // make sure all OS are loaded
+        $config_os = array_keys(Config::get('os'));
+        if (count($config_os) < count(glob(Config::get('install_dir').'/includes/definitions/*.yaml'))) {
+            load_all_os();
+            $config_os = array_keys(Config::get('os'));
+        }
+
+        $excluded_os = array(
+            'default',
+            'generic',
+            'ping',
         );
-        $this->checkOS('airos-af', 'Linux', '.1.3.6.1.4.1.10002.1', $mockSnmp);
-    }
+        $filtered_os = array_diff($config_os, $excluded_os);
 
-    public function testAxiscam()
-    {
-        $this->checkOS('axiscam', ' ; AXIS 221; Network Camera; 4.30; Nov 29 2005 11:18; 141; 1;');
-        $this->checkOS('axiscam', ' ; AXIS M7011; Network Video Encoder; 5.75.1; Mar 04 2015 10:10; 1FC; 1;');
-    }
+        $all_os = array();
+        foreach ($filtered_os as $os) {
+            $all_os[$os] = array($os);
+        }
 
-    public function testCiscosmblinux()
-    {
-        $this->checkOS('ciscosmblinux', 'Linux Cisco Small Business');
-    }
-
-    public function testCumulus()
-    {
-        $this->checkOS('cumulus', 'Linux', '.1.3.6.1.4.1.40310');
-    }
-
-    public function testDdnos()
-    {
-        $mockSnmp = array(
-            'SFA-INFO::systemName.0' => 1,
-        );
-        $this->checkOS('ddnos', 'Linux', '', $mockSnmp);
-    }
-
-    public function testDsm()
-    {
-        $mockSnmp = array(
-            'HOST-RESOURCES-MIB::hrSystemInitialLoadParameters.0' => 'syno_hw_version',
-        );
-        $this->checkOS('dsm', 'Linux', '', $mockSnmp);
-    }
-
-    public function testEatonups()
-    {
-        $this->checkOS('eatonups', 'Eaton 5P 2200');
-        $this->checkOS('eatonups', 'Eaton 5PX 2000');
-    }
-
-    public function testEndian()
-    {
-        $this->checkOS('endian', 'Linux endian');
-    }
-
-    public function testLinux()
-    {
-        $this->checkOS('linux', 'Linux');
-    }
-
-    public function testNetbotz()
-    {
-        $this->checkOS('netbotz', 'Linux', '.1.3.6.1.4.1.5528.100.20.10.2014');
-        $this->checkOS('netbotz', 'Linux', '.1.3.6.1.4.1.5528.100.20.10.2016');
-    }
-
-    public function testNios()
-    {
-        $this->checkOS('nios', 'Linux 3.14.25 #1 SMP Thu Jun 16 18:19:37 EDT 2016 x86_64', '.1.3.6.1.4.1.7779.1.1402');
-        $this->checkOS('nios', 'IPAM', '.1.3.6.1.4.1.7779.1.1004');
-    }
-
-    public function testPcoweb()
-    {
-        $mockSnmp = array(
-            'roomTemp.0' => 1,
-        );
-        $this->checkOS('pcoweb', 'Linux', '', $mockSnmp);
-    }
-
-    public function testPktj()
-    {
-        $mockSnmp = array(
-            'GANDI-MIB::rxCounter.0' => 1,
-        );
-        $this->checkOS('pktj', 'Linux', '', $mockSnmp);
-    }
-
-    public function testProcera()
-    {
-        $this->checkOS('procera', 'Linux', '.1.3.6.1.4.1.15397.2');
-    }
-
-    public function testQnap()
-    {
-        $mockSnmp = array(
-            'ENTITY-MIB::entPhysicalMfgName.1' => 'QNAP',
-        );
-        $this->checkOS('qnap', 'Linux', '', $mockSnmp);
-    }
-
-    public function testSophos()
-    {
-        $this->checkOS('sophos', 'Linux g56fa85e');
-        $this->checkOS('sophos', 'Linux gc80f187');
-        $this->checkOS('sophos', 'Linux g829be90');
-        $this->checkOS('sophos', 'Linux g63c0044');
-    }
-
-    public function testUnifi()
-    {
-        $mockSnmp = array(
-            'dot11manufacturerProductName.6' => 'UAP',
-        );
-        $this->checkOS('unifi', 'Linux', '.1.3.6.1.4.1.10002.1', $mockSnmp);
-
-        $mockSnmp = array(
-            'dot11manufacturerProductName.4' => 'UAP-PRO',
-        );
-        $this->checkOS('unifi', 'Linux', '.1.3.6.1.4.1.10002.1', $mockSnmp);
-
-        $mockSnmp = array(
-            'dot11manufacturerProductName.0' => 'UAP-AC2',
-        );
-        $this->checkOS('unifi', 'Linux', '.1.3.6.1.4.1.10002.1', $mockSnmp);
-    }
-
-    public function testZxr10()
-    {
-        $this->checkOS('zxr10', 'ZTE Ethernet Switch  ZXR10 5250-52TM-H, Version: V2.05.11B23');
+        return $all_os;
     }
 }

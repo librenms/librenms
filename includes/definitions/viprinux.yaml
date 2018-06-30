@@ -1,0 +1,12 @@
+os: viprinux
+text: Viprinux
+type: network
+icon: viprinux
+ifname: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'Processor Usage' }
+group: viprinet
+discovery:
+    - sysDescr:
+        - 'Viprinet VPN Router'

@@ -1,0 +1,15 @@
+os: eltex-olt
+text: 'Eltex OLT'
+type: network
+icon: eltex
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+mib_dir:
+    - eltex
+bad_ifXEntry:
+    - 'Eltex LTP-8X'
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.35265.1.22

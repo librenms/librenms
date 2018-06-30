@@ -1,0 +1,258 @@
+HP-AUTZ-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hpSwitch            
+        FROM HP-ICF-OID            
+    InetAddressType, InetAddress            
+        FROM INET-ADDRESS-MIB            
+    OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+        FROM SNMPv2-CONF            
+    OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+        FROM SNMPv2-SMI;
+
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32
+hpSwitchAuthorizationMIB MODULE-IDENTITY 
+    LAST-UPDATED "200708290000Z"      -- August 29, 2007 at 00:00 GMT
+    ORGANIZATION 
+        "Hewlett Packard Company,
+        Procurve Networking Business"
+    CONTACT-INFO 
+        "Hewlett Packard Company
+        8000 Foothills Blvd.
+        Roseville, CA 95747"
+    DESCRIPTION 
+        "This MIB module contains the definitions of objects
+        for managing the user authorization service on HP 
+        networking devices."
+    REVISION "200708290000Z"      -- August 29, 2007 at 00:00 GMT
+    DESCRIPTION 
+        "Added hpicfSwitchAuthServerFail notification"
+    REVISION "200510050000Z"      -- October 05, 2005 at 00:00 GMT
+    DESCRIPTION 
+        "Initial version."
+    ::= { hpSwitch 32 }
+
+
+
+
+--
+-- Node definitions
+--
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.0
+hpicfSwitchAuthorizationNotifications OBJECT IDENTIFIER ::= { hpSwitchAuthorizationMIB 0 }
+
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.0.1
+hpicfSwitchAuthServerFail NOTIFICATION-TYPE
+    OBJECTS { hpicfSwitchAuthServerType, hpicfSwitchAuthServerIPType, 
+    hpicfSwitchAuthServerIP }
+    STATUS current
+    DESCRIPTION 
+        "This notification indicates that the specified server is not reachable."
+    ::= { hpicfSwitchAuthorizationNotifications 1 }
+
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.1
+hpSwitchAuthorizationConfig OBJECT IDENTIFIER ::= { hpSwitchAuthorizationMIB 1 }
+
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.1
+hpSwitchAutzServiceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HpSwitchAutzServiceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The (conceptual) table listing the authorization
+        service types."
+    ::= { hpSwitchAuthorizationConfig 1 }
+
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.1.1
+hpSwitchAutzServiceEntry OBJECT-TYPE
+    SYNTAX HpSwitchAutzServiceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry (conceptual row) in the hpSwitchAutzServiceTable."
+    INDEX { hpSwitchAutzServiceType }
+    ::= { hpSwitchAutzServiceTable 1 }
+
+
+HpSwitchAutzServiceEntry ::=
+    SEQUENCE { 
+        hpSwitchAutzServiceType
+            INTEGER,
+        hpSwitchAutzServicePrimaryMethod
+            INTEGER,
+        hpSwitchAutzServiceSecondaryMethod
+            INTEGER
+     }
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.1.1.1
+hpSwitchAutzServiceType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        commands(1),
+        exec(2),
+        network(3)
+        }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Signifies the authorization service type for which
+        this entry contains configuration information."
+    ::= { hpSwitchAutzServiceEntry 1 }
+
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.1.1.2
+hpSwitchAutzServicePrimaryMethod OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        local(1),
+        tacacs(2),
+        radius(3),
+        none(4)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies the primary method used for authorization."
+    ::= { hpSwitchAutzServiceEntry 2 }
+
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.1.1.3
+hpSwitchAutzServiceSecondaryMethod OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        local(1),
+        none(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies the secondary (backup) method used for 
+        authorization."
+    ::= { hpSwitchAutzServiceEntry 3 }
+
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.2
+hpicfSwitchAuthObjects OBJECT IDENTIFIER ::= { hpSwitchAuthorizationConfig 2 }
+
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.2.1
+hpicfSwitchAuthServerType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        radius(1),
+        tacacs(2),
+        other(9)
+        }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Authorization server type reported in hpicfSwitchAuthorization 
+        notifications."
+    ::= { hpicfSwitchAuthObjects 1 }
+
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.2.2
+hpicfSwitchAuthServerIPType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "InetAddressType of the address reported in 
+        hpicfSwitchAuthServerIP."
+    ::= { hpicfSwitchAuthObjects 2 }
+
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.2.3
+hpicfSwitchAuthServerIP OBJECT-TYPE
+    SYNTAX InetAddress 
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "This object is used in an 
+        hpicfSwitchAuthorizationNotification to report the IP 
+        address of the affected server."
+    ::= { hpicfSwitchAuthObjects 3 }
+
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.3
+hpSwitchAuthConfigObjects OBJECT IDENTIFIER ::= { hpSwitchAuthorizationConfig 3 }
+
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.3.1
+hpicfSwitchAuthServerNotifyEnable OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The operational status of hpicfSwitchAuthServerFail notifications.
+        The default value is ‘1’ (Enabled).  A value of ‘2’ represents 
+        Disabled.  Writing this object requires authentication, such 
+        as provided by SNMPv3."
+    ::= { hpSwitchAuthConfigObjects 1 }
+
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.2
+hpSwitchAuthorizationConformance OBJECT IDENTIFIER ::= { hpSwitchAuthorizationMIB 2 }
+
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.2.1
+hpSwitchAuthorizationMIBCompliances OBJECT IDENTIFIER ::= 
+    { hpSwitchAuthorizationConformance 1 }
+
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.2.1.1
+hpSwitchAuthorizationMIBCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION 
+        "The compliance statement for devices implementing the
+        HP-AUTZ-MIB."
+    MODULE -- this module
+        MANDATORY-GROUPS { hpSwitchAuthorizationConfigGroup }
+    ::= { hpSwitchAuthorizationMIBCompliances 1 }
+
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.2.2
+hpSwitchAuthorizationMIBGroups OBJECT IDENTIFIER ::= { hpSwitchAuthorizationConformance 2 }
+
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.2.2.1
+hpSwitchAuthorizationConfigGroup OBJECT-GROUP
+    OBJECTS { hpSwitchAutzServicePrimaryMethod, 
+        hpSwitchAutzServiceSecondaryMethod, hpicfSwitchAuthServerNotifyEnable }
+    STATUS current
+    DESCRIPTION 
+        "A collection of objects to support authorization service."
+    ::= { hpSwitchAuthorizationMIBGroups 1 }
+
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.2.2.2
+hpicfSwitchAuthorizationNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { hpicfSwitchAuthServerFail }
+    STATUS current
+    DESCRIPTION 
+        "A group of switch authorization notifications."
+    ::= { hpSwitchAuthorizationMIBGroups 2 }
+
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.2.2.3
+hpicfSwitchAuthorizationObjectsGroup OBJECT-GROUP
+    OBJECTS { hpicfSwitchAuthServerType, hpicfSwitchAuthServerIPType, 
+        hpicfSwitchAuthServerIP }
+    STATUS current
+    DESCRIPTION 
+        "A group of switch authorization objects."
+    ::= { hpSwitchAuthorizationMIBGroups 3 }
+
+
+
+END

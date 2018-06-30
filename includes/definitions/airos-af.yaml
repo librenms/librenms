@@ -1,0 +1,12 @@
+os: airos-af
+text: 'Ubiquiti AirFiber'
+type: wireless
+icon: ubiquiti
+nobulk: true
+group: ubnt
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_wireless_rate, text: 'Wireless Rate' }
+    - { graph: device_processor, text: 'CPU Usage' }
+poller_modules:
+    wifi: true

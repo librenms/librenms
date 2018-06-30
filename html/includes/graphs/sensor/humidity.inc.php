@@ -21,7 +21,7 @@ $rrd_options .= ' AREA:sensor_min#ffffffff';
 $rrd_options .= " LINE1:sensor#cc0000:'".rrdtool_escape($sensor['sensor_descr'], 28)."'";
 $rrd_options .= ' LINE1:sensorwarm#660000';
 $rrd_options .= ' GPRINT:sensor:LAST:%3.0lf%%';
-$rrd_options .= ' GPRINT:sensor:MAX:%3.0lf%%\\\\l';
+$rrd_options .= ' GPRINT:sensor:MAX:%3.0lf%%\l';
 
 if (is_numeric($sensor['sensor_limit'])) {
     $rrd_options .= ' HRULE:'.$sensor['sensor_limit'].'#999999::dashes';

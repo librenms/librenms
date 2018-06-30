@@ -1,0 +1,9 @@
+os: smartax
+group: huawei
+text: 'Huawei SmartAX'
+type: network
+icon: huawei
+ifname: true
+discovery:
+    - sysDescr:
+        - 'Huawei Integrated Access Software'

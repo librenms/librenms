@@ -1,0 +1,9 @@
+os: ibm-amm
+text: 'IBM AMM'
+type: appliance
+icon: ibmos
+mib_dir:
+    - ibm
+discovery:
+    - sysDescr:
+        - 'BladeCenter Advanced Management Module'

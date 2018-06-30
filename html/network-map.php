@@ -11,6 +11,8 @@
  *
  */
 
+use LibreNMS\Authentication\Auth;
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('log_errors', 1);
@@ -18,27 +20,18 @@ ini_set('error_reporting', E_ALL);
 
 $links = 1;
 
-include_once '../includes/defaults.inc.php';
-include_once '../config.php';
-include_once '../includes/definitions.inc.php';
-include_once '../includes/functions.php';
-include_once '../includes/dbFacile.php';
-include_once 'includes/functions.inc.php';
-include_once 'includes/authenticate.inc.php';
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 if (strpos($_SERVER['REQUEST_URI'], 'anon')) {
     $anon = 1;
 }
 
-if (is_array($config['branding'])) {
-    if ($config['branding'][$_SERVER['SERVER_NAME']]) {
-        foreach ($config['branding'][$_SERVER['SERVER_NAME']] as $confitem => $confval) {
-            eval("\$config['" . $confitem . "'] = \$confval;");
-        }
+if (isset($config['branding']) && is_array($config['branding'])) {
+    if (isset($config['branding'][$_SERVER['SERVER_NAME']])) {
+        $config = array_replace_recursive($config, $config['branding'][$_SERVER['SERVER_NAME']]);
     } else {
-        foreach ($config['branding']['default'] as $confitem => $confval) {
-            eval("\$config['" . $confitem . "'] = \$confval;");
-        }
+        $config = array_replace_recursive($config, $config['branding']['default']);
     }
 }
 
@@ -58,7 +51,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
             graph [bgcolor=transparent];
 ';
 
-    if (!$_SESSION['authenticated']) {
+    if (!Auth::check()) {
         $map .= "\"Not authenticated\" [fontsize=20 fillcolor=\"lightblue\", URL=\"/\" shape=box3d]\n";
     } else {
         $loc_count = 1;
@@ -123,9 +116,9 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
                             $src = md5($src);
                         }
 
-                        $sif = ifNameDescr(dbFetchRow("SELECT * FROM ports WHERE `port_id` = ?", array($link['local_port_id'])), $device);
+                        $sif = cleanPort(dbFetchRow("SELECT * FROM ports WHERE `port_id` = ?", array($link['local_port_id'])), $device);
                         if ($remote_port_id) {
-                            $dif = ifNameDescr(dbFetchRow("SELECT * FROM ports WHERE `port_id` = ?", array($link['remote_port_id'])));
+                            $dif = cleanPort(dbFetchRow("SELECT * FROM ports WHERE `port_id` = ?", array($link['remote_port_id'])));
                         } else {
                             $dif['label'] = $link['remote_port'];
                             $dif['port_id'] = $link['remote_hostname'] . '/' . $link['remote_port'];
@@ -228,7 +221,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
     }
     echo $img;
 } else {
-    if ($_SESSION['authenticated']) {
+    if (Auth::check()) {
         // FIXME level 10 only?
         echo '<center>
                   <object width=1200 height=1000 data="'. $config['base_url'] . '/map.php?format=svg" type="image/svg+xml"></object>

@@ -11,15 +11,15 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+chdir(__DIR__); // cwd to the directory containing this script
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('log_errors', 1);
 ini_set('error_reporting', E_ALL);
 
-require 'includes/defaults.inc.php';
-require 'config.php';
-require 'includes/definitions.inc.php';
-require 'includes/functions.php';
+$init_modules = array();
+require __DIR__ . '/includes/init.php';
 
 $entry = explode(',', $argv[1]);
 

@@ -16,7 +16,7 @@
 if (!isset($vars['section'])) {
     $vars['section'] = "mib";
 }
-if (is_module_enabled('poller', 'mib')) {
+if (is_mib_poller_enabled($device)) {
 ?>
 
 <h4><i class="fa fa-file-text-o"></i> Device MIB associations</h4>
@@ -53,7 +53,7 @@ if (is_module_enabled('poller', 'mib')) {
 <script>
     var grid = $("#mibs").bootgrid({
         ajax: true,
-        rowCount: [50,100,250,-1],
+        rowCount: [50, 100, 250, -1],
         post: function ()
         {
             return {

@@ -1,0 +1,408 @@
+-- ==================================================================
+-- Copyright (C) 2009 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI Private MPLS LSR MIB
+-- Reference:
+-- Version: V1.00
+-- History:
+--   <author>, <date>, <contents>
+--  zhangbaohui 2009-3-10  create    
+-- ==================================================================
+-- ==================================================================
+-- 
+-- Variables and types be imported
+-- 
+-- ==================================================================
+
+    HUAWEI-MPLSLSR-EXT-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            InterfaceIndex            
+                FROM IF-MIB            
+            OBJECT-GROUP, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            EnabledStatus
+                FROM P-BRIDGE-MIB            
+            DisplayString, RowStatus                        
+                FROM SNMPv2-TC
+            Integer32, IpAddress, OBJECT-TYPE, 
+            MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI;
+    
+    
+-- Mar 10, 2009 at 16:00 GMT
+         hwMplsLsrExtMIB MODULE-IDENTITY 
+            LAST-UPDATED "200903101600Z"        -- Dec 26, 2008 at 16:00 GMT
+            ORGANIZATION 
+                "Multiprotocol Label Switching (MPLS) Working Group"
+            CONTACT-INFO 
+                "MPLS Team Huawei Technologies co.,Ltd.
+                Huawei Building, No.156 Beiqing Rd., 
+                Z-park ,Shi-Chuang-Ke-Ji-Shi-Fan-Yuan,
+                Hai-Dian District Beijing P.R. China
+                http://www.huawei.com
+                Zip:100095
+                E-mail:support@huawei.com
+                "
+            DESCRIPTION 
+                "This MIB provides management of MPLS basic configurations. It is an extension of MPLS-LSR-STD-MIB."
+            REVISION "200903101600Z"  
+            DESCRIPTION
+                "version 1.00, create for the configuration of MPLS capabilities."
+            ::= { hwDatacomm 182 }
+
+--
+-- Node definitions
+--
+    
+        hwMplsLsrExtObject OBJECT IDENTIFIER ::= { hwMplsLsrExtMIB 1 }
+
+             
+        hwMplsLsrId OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the configuration of the MPLS LSR ID. Before the MPLS capability is enabled, the MPLS LSR ID must be configured. After the MPLS capability is enabled, the MPLS LSR ID cannot be modified or deleted. If the MPLS LSR ID is set as 0.0.0.0, it indicates that the MPLS LSR ID is deleted."
+            ::= { hwMplsLsrExtObject 1 }
+            
+        hwMplsCapabilityConfig OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the configuration or deletion of the MPLS capability. Before the MPLS capability is enabled, the MPLS LSR ID must be configured."
+            ::= { hwMplsLsrExtObject 2 }
+            
+        hwMplsLabelAdvertise OBJECT-TYPE
+            SYNTAX INTEGER{
+                explicitNull(1),
+                implicitNull(2),
+                nonNull(3)}
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the way to configure label advertisement policy. By default, the label advertisement policy is implicitnull. Before the label advertisement policy is enabled, the MPLS capability must be enabled."
+            DEFVAL { implicitnull }
+            ::= { hwMplsLsrExtObject 3 }
+        hwMplsStatisticsIntervalTimer OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the value of the MPLS statistics timer. The default value is 0, indicating that the timer does not exist, and then no statistical information is reported. The valid value ranges from 30 to 65535."
+            ::= { hwMplsLsrExtObject 4 }
+        hwMplsBfdCapabilityConfig OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the configuration or deletion of the MPLS BFD capability. Before the MPLS BFD function is enabled, you must enable the MPLS capability and BFD capability."
+            ::= { hwMplsLsrExtObject 5 }
+        hwMplsBfdMinTx OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the minimum forwarding period. If the minimum forwarding period is set as 0 seconds, it indicates that the minimum forwarding period returns to the default value."
+            ::= { hwMplsLsrExtObject 6 }
+            
+        hwMplsBfdMinRx OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the minimum receiving period. If the minimum receiving period is set as 0 seconds, it indicates that the minimum receiving period returns to the default value."
+            ::= { hwMplsLsrExtObject 7 }
+            
+        hwMplsBfdDetectMultiplier OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the value of the detect multiplier. If the value of the detect multiplier is set as 0, it indicates that the value returns to the default value."
+            ::= { hwMplsLsrExtObject 8 }
+
+        hwMplsFecListName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the name of the FEC LIST. The name of the FEC LIST is globally unique, with a valid length from 1 to 31 characters. If the character length is 0, it indicates that the FEC LIST is deleted. Furthermore, the FEC LIST cannot be modified, and you can only delete the FEC LIST and then create a new one. If the FEC LIST is used by others, you need to cancel the usage and then delete the FEC LIST."
+            ::= { hwMplsLsrExtObject 9 }
+
+        hwMplsBfdTrigger OBJECT-TYPE
+            SYNTAX INTEGER{
+                triggerHost(1),
+                triggerFeclist(2),
+                disabled(3)}
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the MPLS BFD trigger policy. By default, the MPLS BFD trigger policy is host. By using this object, you can also specify the next hop and the outgoing interface. To configure the MPLS BFD trigger policy, you need to enable the MPLS BFD capability in advance. In addition, this MPLS BFD trigger policy cannot be modified, and you can only delete the policy and then create a new one."
+            ::= { hwMplsLsrExtObject 10 }
+            
+        hwMplsBfdTriggerNextHop OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the next hop when the MPLS BFD trigger policy is configured as host. The next hop and the outgoing interface can be specified at the same time."
+            ::= { hwMplsLsrExtObject 11 }
+            
+        hwMplsBfdTriggerInterface OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the outgoing interface when the MPLS BFD trigger policy is configured as host. The next hop and the outgoing interface can be specified at the same time. In addition, you can get the correct interface index based on the ifIndex of ifTable."
+            ::= { hwMplsLsrExtObject 12 }
+            
+        hwMplsBfdTriggerFecListName OBJECT-TYPE
+            SYNTAX DisplayString 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the FEC list when the MPLS BFD trigger policy is configured. The valid length of the FEC list ranges from 1 to 31 characters. If the specified FEC list does not exist, or the specified FEC list contains no FEC node, no LSP can be triggered."
+            ::= { hwMplsLsrExtObject 13 }
+
+-- Mpls Fec List Table
+
+        hwMplsFecListTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMplsFecListEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure or delete MPLS FEC Node."
+            ::= { hwMplsLsrExtObject 50 }
+
+        hwMplsFecListEntry OBJECT-TYPE
+            SYNTAX HwMplsFecListEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An FEC node entry of FEC list table. It can be created, or deleted."
+            INDEX { hwMplsFecNodeIpAddress, hwMplsFecNodeInterface, hwMplsFecNodeNextHop }
+            ::= { hwMplsFecListTable 1 }
+
+        
+        HwMplsFecListEntry ::=
+            SEQUENCE { 
+                hwMplsFecNodeIpAddress
+                    IpAddress,
+                hwMplsFecNodeInterface
+                    Unsigned32,
+                hwMplsFecNodeNextHop
+                    IpAddress,
+                hwMplsFecListRowStatus
+                    RowStatus
+             }
+        hwMplsFecNodeIpAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP address of the specified FEC node."
+            ::= { hwMplsFecListEntry 2 }
+            
+        hwMplsFecNodeInterface OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the outgoing interface of the FEC node. You can acquire the correct interface index based on ifIndex of ifTable."
+            ::= { hwMplsFecListEntry 3 }
+        hwMplsFecNodeNextHop OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the next hop of the FEC node."
+            ::= { hwMplsFecListEntry 4 }
+        hwMplsFecListRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether one entry of FEC list table is created or destroyed. The value of the object can be CreatAndGo or Destroy. If the value is set as CreatAndGo, and the entry is created in hwFecListTable, the status of the object will change into active."
+            ::= { hwMplsFecListEntry 51 }
+ 
+-- Mpls interface Table
+ 
+         hwMplsInterfaceTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMplsInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure or delete the MPLS capability on the interface."
+            ::= { hwMplsLsrExtObject 51 }
+
+        hwMplsInterfaceEntry OBJECT-TYPE
+            SYNTAX HwMplsInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry of this table."
+            INDEX {hwMplsInterfaceIndex }
+            ::= { hwMplsInterfaceTable 1 }
+
+        
+        HwMplsInterfaceEntry ::=
+            SEQUENCE { 
+                hwMplsInterfaceIndex
+                    InterfaceIndex,
+                hwMplsMtu
+                    Integer32,
+                hwMplsInterfaceRowStatus
+                    RowStatus
+             }
+             
+        hwMplsInterfaceIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the interface index. You can get the correct interface index based on the ifIndex of ifTable."
+            ::= { hwMplsInterfaceEntry 1 }
+            
+
+        hwMplsMtu OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the MPLS MTU of an interface. If the value of the MPLS MTU is set as 0, it indicates that the MPLS MTU is deleted."
+            ::= { hwMplsInterfaceEntry 11 }
+
+            
+        hwMplsInterfaceRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether one entry is created or deleted in hwMplsInterfaceTable. The value of the object can be CreatAndGo and Destroy. When the value is set as CreatAndGo, and the entry is created, the status of the object will change into active."
+            ::= { hwMplsInterfaceEntry 51 }
+            
+-- Ldp Static FRR interface Table
+
+         hwLdpStaticFrrInterfaceTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwLdpStaticFrrInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure or delete static LDP FRR entries on the interface."
+            ::= { hwMplsLsrExtObject 52 }
+
+        hwLdpStaticFrrInterfaceEntry OBJECT-TYPE
+            SYNTAX HwLdpStaticFrrInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry of this table."
+            INDEX {hwMplsInterfaceIndex,
+                             hwLdpStaticFrrPriority }
+            ::= { hwLdpStaticFrrInterfaceTable 1 }
+
+        
+        HwLdpStaticFrrInterfaceEntry ::=
+            SEQUENCE { 
+                hwLdpStaticFrrPriority
+                    Integer32,
+                hwLdpStaticFrrNextHop
+                    IpAddress,
+                hwLdpStaticFrrIpPrefix
+                    DisplayString,
+                hwLdpStaticFrrInterfaceRowStatus
+                    RowStatus
+             }
+             
+          
+            
+        hwLdpStaticFrrPriority OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the priority of a static FRR entry."
+            ::= { hwLdpStaticFrrInterfaceEntry 1 }
+
+        hwLdpStaticFrrNextHop OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the next hop of the static FRR."
+            ::= { hwLdpStaticFrrInterfaceEntry 11 }
+           
+        hwLdpStaticFrrIpPrefix OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP prefix policy. The valid prefix length ranges from 1 to 169 characters. When the length is 0, it indicates that the policy is deleted."
+            ::= { hwLdpStaticFrrInterfaceEntry 12 }
+            
+        hwLdpStaticFrrInterfaceRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether one entry is created or deleted in hwLdpStaticFrrInterfaceTable. The value of the object can be CreatAndGo or Destroy. When the value is set as CreatAndGo, and the entry is created, the status of the object will change into active."
+            ::= { hwLdpStaticFrrInterfaceEntry 51 }           
+
+
+        hwMplsLsrExtConformance OBJECT IDENTIFIER ::= { hwMplsLsrExtMIB 2 }
+        
+        hwMplsLsrExtCompliances OBJECT IDENTIFIER ::= { hwMplsLsrExtConformance 1 }
+        
+        hwMplsModuleCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION
+                "hwMplsModuleCompliance"
+            MODULE HUAWEI-MPLSLSR-EXT-MIB
+                MANDATORY-GROUPS { hwMplsBasicGroup, hwMplsInterfaceGroup }
+                ::= { hwMplsLsrExtCompliances 1 }
+            
+            hwMplsLsrExtGroup OBJECT IDENTIFIER ::= { hwMplsLsrExtConformance 2 }
+            
+            hwMplsBasicGroup OBJECT-GROUP
+                OBJECTS { hwMplsLsrId, hwMplsCapabilityConfig, hwMplsLabelAdvertise, hwMplsStatisticsIntervalTimer
+                }
+                STATUS current
+                DESCRIPTION
+                    "Objects required for MPLS basic configuration management."
+                ::= { hwMplsLsrExtGroup 1 }
+            hwMplsBfdGroup OBJECT-GROUP
+                OBJECTS { hwMplsBfdCapabilityConfig, hwMplsBfdMinTx, hwMplsBfdMinRx, hwMplsBfdDetectMultiplier, hwMplsFecListName, 
+                hwMplsBfdTrigger, hwMplsBfdTriggerNextHop, hwMplsBfdTriggerInterface, hwMplsBfdTriggerFecListName, 
+                hwMplsFecListRowStatus }
+                STATUS current
+                DESCRIPTION
+                    "Objects required for MPLS BFD configuration management."
+                ::= { hwMplsLsrExtGroup 2 }
+
+            hwLdpStaticFrrGroup OBJECT-GROUP
+                OBJECTS { hwLdpStaticFrrNextHop, hwLdpStaticFrrIpPrefix, hwLdpStaticFrrInterfaceRowStatus }
+                STATUS current
+                DESCRIPTION
+                    "Objects required for LDP static FRR configuration management."
+                ::= { hwMplsLsrExtGroup 3 }
+
+             
+            hwMplsInterfaceGroup OBJECT-GROUP
+                OBJECTS { hwMplsMtu, hwMplsInterfaceRowStatus }
+                STATUS current
+                DESCRIPTION
+                    "Objects required for MPLS configuration management on interface."
+                ::= { hwMplsLsrExtGroup 4 }
+                
+              
+            
+            
+    END
+
+--
+-- HUAWEI-MPLSLSR-EXT-MIB.mib
+--

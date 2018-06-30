@@ -1,0 +1,15 @@
+os: open-e
+text: Open-E
+group: unix
+type: storage
+icon: open-e
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_diskio, text: 'Disk I/O' }
+discovery:
+    - sysDescr: Open-E
+processor_stacked: true
+ignore_mount_string:
+    - /mnt/live
+    - /RAMDISK

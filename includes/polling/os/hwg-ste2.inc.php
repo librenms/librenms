@@ -10,5 +10,5 @@
  * the source code distribution for details.
  */
 
-preg_match_all('/STE2/', $poll_device['sysDescr'], $matches);
+preg_match_all('/STE2/', $device['sysDescr'], $matches);
 $hardware = $matches[0][0];

@@ -1,0 +1,13 @@
+os: netgear
+text: 'Netgear ProSafe'
+type: network
+ifname: true
+bad_if:
+    - cpu
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.4526
+        - .1.3.6.1.4.1.89.1.1.1.3.6.1.4.1.4526.100.4
+    - sysDescr: ProSafe

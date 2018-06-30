@@ -1,0 +1,8 @@
+os: papouch-tme
+text: 'Papouch TME'
+type: environment
+over:
+    - { graph: device_temperature, text: temperature }
+discovery:
+    - sysDescr:
+        - TME

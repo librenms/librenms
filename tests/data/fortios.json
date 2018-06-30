@@ -1,0 +1,146 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.12356.103",
+                    "sysDescr": null,
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": "",
+                    "features": null,
+                    "location": null,
+                    "os": "fortios",
+                    "type": "appliance",
+                    "serial": null,
+                    "icon": "fortinet.svg"
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.12356.103",
+                    "sysDescr": null,
+                    "sysContact": "<private>",
+                    "version": "v5.6.0-build1557 170727 (GA)",
+                    "hardware": "",
+                    "features": "with Analyzer features",
+                    "location": "<private>",
+                    "os": "fortios",
+                    "type": "appliance",
+                    "serial": "FMG-VM0000000000",
+                    "icon": "fortinet.svg"
+                }
+            ]
+        }
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "0",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "fortios",
+                    "mempool_precision": "1",
+                    "mempool_descr": "Main Memory",
+                    "mempool_perc": "0",
+                    "mempool_used": "0",
+                    "mempool_free": "0",
+                    "mempool_total": "0",
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": "0",
+                    "mempool_perc_warn": "75"
+                },
+                {
+                    "mempool_index": "1",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": "1024",
+                    "mempool_descr": "Physical Memory",
+                    "mempool_perc": "0",
+                    "mempool_used": "0",
+                    "mempool_free": "0",
+                    "mempool_total": "0",
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": "0",
+                    "mempool_perc_warn": "75"
+                },
+                {
+                    "mempool_index": "2",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": "1024",
+                    "mempool_descr": "Swap Memory",
+                    "mempool_perc": "0",
+                    "mempool_used": "0",
+                    "mempool_free": "0",
+                    "mempool_total": "0",
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": "0",
+                    "mempool_perc_warn": "75"
+                }
+            ]
+        },
+        "poller": {
+            "mempools": [
+                {
+                    "mempool_index": "0",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "fortios",
+                    "mempool_precision": "1",
+                    "mempool_descr": "Main Memory",
+                    "mempool_perc": "14",
+                    "mempool_used": "1504100352",
+                    "mempool_free": "9007087616",
+                    "mempool_total": "10511187968",
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": "0",
+                    "mempool_perc_warn": "75"
+                },
+                {
+                    "mempool_index": "1",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": "1024",
+                    "mempool_descr": "Physical Memory",
+                    "mempool_perc": "43",
+                    "mempool_used": "3639119872",
+                    "mempool_free": "4745695232",
+                    "mempool_total": "8384815104",
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": "0",
+                    "mempool_perc_warn": "75"
+                },
+                {
+                    "mempool_index": "2",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": "1024",
+                    "mempool_descr": "Swap Memory",
+                    "mempool_perc": "0",
+                    "mempool_used": "0",
+                    "mempool_free": "2126372864",
+                    "mempool_total": "2126372864",
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": "0",
+                    "mempool_perc_warn": "75"
+                }
+            ]
+        }
+    }
+}

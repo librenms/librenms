@@ -1,0 +1,1 @@
+ALTER TABLE ports MODIFY ifTrunk VARCHAR(16);

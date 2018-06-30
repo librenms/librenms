@@ -1,0 +1,12 @@
+os: raritan-pdu
+text: 'Raritan PDU'
+type: power
+over:
+    - { graph: device_current, text: Current }
+    - { graph: device_temperature, text: Temperature }
+    - { graph: device_voltage, text: Voltage }
+mib_dir:
+    - raritan
+icon: raritan
+discovery:
+    - sysObjectID_regex: '/^.1.3.6.1.4.1.13742.[4|6]/'

@@ -1,0 +1,2633 @@
+TRIPPLITE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  DisplayString,
+  TruthValue,
+  TimeStamp,
+  TimeInterval,
+  DateAndTime,
+  AutonomousType,
+  VariablePointer,
+  RowStatus
+    FROM SNMPv2-TC
+  OBJECT-GROUP,
+  NOTIFICATION-GROUP
+    FROM SNMPv2-CONF
+  MODULE-IDENTITY,
+  OBJECT-IDENTITY,
+  OBJECT-TYPE,
+  NOTIFICATION-TYPE,
+  Gauge32,
+  Integer32,
+  enterprises,
+  IpAddress
+    FROM SNMPv2-SMI
+  PositiveInteger,
+  NonNegativeInteger
+    FROM UPS-MIB;
+
+tripplite MODULE-IDENTITY
+  LAST-UPDATED "200904270000Z"
+  ORGANIZATION "Tripplite Inc"
+  CONTACT-INFO
+    "Mike Delgroso
+    Tripplite, Inc.
+    1111 W. 35th St.
+    Chicago, IL 60609"
+  DESCRIPTION
+    "This MIB module defines MIB objects which provide mechanisms for
+    remote management capabilities of Tripplite PowerAlert and related
+    software."
+  REVISION "200904270000Z"
+  DESCRIPTION
+    "Added tlUpsAlarmOutputCurrentChanged well known alarm trap"
+  REVISION "200810140000Z"
+  DESCRIPTION
+    "Added tlUpsOutletCurrentTable and tlUpsOutletPowerTable to publish load-specific variables"
+  REVISION "200809250000Z"
+  DESCRIPTION
+    "Added tlUpsOutletGroupTable."
+  REVISION "200802010000Z"
+  DESCRIPTION
+	"V1 trap decode support."
+  REVISION "200711300000Z"
+  DESCRIPTION
+	"Changed tlUpsAlarmTime to int to match implementation, same for tlUpsAlarmDescr to string"
+  REVISION "200711290000Z"
+  DESCRIPTION
+	"Changed tlUpsConfigBattReplDate and tlUpsTestDate from integer back to string."
+  REVISION "200708260000Z"
+  DESCRIPTION
+    "Migrated changes from 12.04.0034, which included Load -> Outlet."
+  REVISION "200702280000Z"
+  DESCRIPTION
+    "Renamed Load to Outlet. Cleaned up MIB compilation errors."
+  REVISION "200612120000Z"
+  DESCRIPTION
+    "Changed tlUpsConfigBattReplDate and tlUpsTestDate from string to integer."
+  REVISION "200612060000Z"
+  DESCRIPTION
+    "Implement tlUpsOutletTable."
+  REVISION "200606200000Z"
+  DESCRIPTION
+    "Implemented tlUpsAlarmTable to coincide with upsAlarmTable, but
+    all for additional variables."
+  REVISION "200507130000Z"
+  DESCRIPTION
+    "Modifications to bring MIB into compliance.  Changed OID name from
+    upsLoadNumLoads to tlUpsLoadNumLoads."
+  REVISION "200305160000Z"
+  DESCRIPTION
+    "Initial release, for PowerAlert Version 12."
+  ::= { enterprises 850 }
+
+
+--------------------------------------------------------------------------
+-- Enumerations
+--------------------------------------------------------------------------
+
+tlEnumerations OBJECT IDENTIFIER  ::= { tripplite 2 }
+
+tlOperatingSystems OBJECT IDENTIFIER ::= { tlEnumerations 1 }
+
+hpux9 OBJECT IDENTIFIER   ::= { tlOperatingSystems 1 }
+
+sunos4 OBJECT IDENTIFIER  ::= { tlOperatingSystems 2 }
+
+solaris OBJECT IDENTIFIER   ::= { tlOperatingSystems 3 }
+
+osf OBJECT IDENTIFIER   ::= { tlOperatingSystems 4 }
+
+ultrix OBJECT IDENTIFIER  ::= { tlOperatingSystems 5 }
+
+hpux10 OBJECT IDENTIFIER  ::= { tlOperatingSystems 6 }
+
+netbsd1 OBJECT IDENTIFIER   ::= { tlOperatingSystems 7 }
+
+freebsd OBJECT IDENTIFIER   ::= { tlOperatingSystems 8 }
+
+irix OBJECT IDENTIFIER  ::= { tlOperatingSystems 9 }
+
+linux OBJECT IDENTIFIER   ::= { tlOperatingSystems 10 }
+
+bsdi OBJECT IDENTIFIER  ::= { tlOperatingSystems 11 }
+
+openbsd OBJECT IDENTIFIER   ::= { tlOperatingSystems 12 }
+
+win32 OBJECT IDENTIFIER   ::= { tlOperatingSystems 13 }
+
+hpux11 OBJECT IDENTIFIER  ::= { tlOperatingSystems 14 }
+
+win9x OBJECT IDENTIFIER   ::= { tlOperatingSystems 50 }
+
+winnt OBJECT IDENTIFIER   ::= { tlOperatingSystems 51 }
+
+solspark OBJECT IDENTIFIER  ::= { tlOperatingSystems 52 }
+
+solintel OBJECT IDENTIFIER  ::= { tlOperatingSystems 53 }
+
+aix OBJECT IDENTIFIER   ::= { tlOperatingSystems 54 }
+
+sco OBJECT IDENTIFIER   ::= { tlOperatingSystems 55 }
+
+osx OBJECT IDENTIFIER   ::= { tlOperatingSystems 56 }
+
+unknown OBJECT IDENTIFIER   ::= { tlOperatingSystems 255 }
+
+
+--------------------------------------------------------------------------
+-- UPS Device
+--------------------------------------------------------------------------
+
+tlUPS OBJECT IDENTIFIER   ::= { tripplite 100 }
+
+tlUpsObjects OBJECT IDENTIFIER  ::= { tlUPS 1 }
+
+tlUpsIdent OBJECT IDENTIFIER  ::= { tlUpsObjects 1 }
+
+tlUpsIdentUpsSoftwareChecksum OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "A checksum for the UPS fostware."
+  ::= { tlUpsIdent 1 }
+
+tlUpsIdentSerialNum OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Serial number for the UPS."
+  ::= { tlUpsIdent 2 }
+
+tlUpsIdentID OBJECT-TYPE
+  SYNTAX Integer32 (0..65535)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "A user-supplied ID for the UPS."
+  ::= { tlUpsIdent 3 }
+
+tlUpsSnmpCardSerialNum OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Serial number for the UPS."
+  ::= { tlUpsIdent 4 }
+
+
+tlUpsBattery OBJECT IDENTIFIER  ::= { tlUpsObjects 2 }
+
+tlUpsBatteryAge OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The age of the battery, in the format YYYYMMDD.  This is equal to
+    the current date minus tlConfigBattReplDate."
+  ::= { tlUpsBattery 1 }
+
+
+tlUpsTemperatureF OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The temperature of the battery, in Farenheight degrees.  This is
+    calculated from upsBatteryTemperature, which is in Celsius degrees."
+  ::= { tlUpsBattery 2 }
+
+
+tlUpsInput OBJECT IDENTIFIER  ::= { tlUpsObjects 3 }
+
+tlUpsOutput OBJECT IDENTIFIER   ::= { tlUpsObjects 4 }
+
+tlUpsBypass OBJECT IDENTIFIER   ::= { tlUpsObjects 5 }
+
+tlUpsAlarm OBJECT IDENTIFIER  ::= { tlUpsObjects 6 }
+
+tlUpsAlarmsPresent OBJECT-TYPE
+  SYNTAX Gauge32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The present number of active alarm conditions."
+  ::= { tlUpsAlarm 1 }
+  
+tlUpsAlarmTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF TlUpsAlarmEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "A list of alarm table entries."
+  ::= { tlUpsAlarm 2 }
+  
+tlUpsAlarmEntry OBJECT-TYPE
+  SYNTAX TlUpsAlarmEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "An entry containing information applicable to a particular alarm."
+  INDEX { tlUpsAlarmId }
+  ::= { tlUpsAlarmTable 1 }
+    
+TlUpsAlarmEntry ::= SEQUENCE {
+  tlUpsAlarmId         PositiveInteger,
+  tlUpsAlarmDescr      AutonomousType,
+  tlUpsAlarmTime       TimeStamp,
+  tlUpsAlarmDetail     DisplayString,
+  tlUpsAlarmDeviceId   PositiveInteger,
+  tlUpsAlarmDeviceName DisplayString,
+  tlUpsAlarmLocation   DisplayString,
+  tlUpsAlarmGroup      INTEGER,
+  tlUpsAlarmIp         IpAddress,
+  tlUpsAlarmMac        DisplayString
+}
+
+tlUpsAlarmId OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "A unique identifier for an alarm condition."
+  ::= { tlUpsAlarmEntry 1 }
+  
+tlUpsAlarmDescr OBJECT-TYPE
+  SYNTAX STRING
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "A description of the alarm condition."
+  ::= { tlUpsAlarmEntry 2 }
+  
+tlUpsAlarmTime OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The value of sysUpTime when the alarm condition was detected."
+  ::= { tlUpsAlarmEntry 3 }
+  
+tlUpsAlarmDetail OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "A textual description of the alarm condition."
+  ::= { tlUpsAlarmEntry 4 }
+  
+tlUpsAlarmDeviceId OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "A numeric identifier for the device on which the alarm is active."
+  ::= { tlUpsAlarmEntry 5 }
+  
+tlUpsAlarmDeviceName OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "A string identifier for the device on which the alarm is active."
+  ::= { tlUpsAlarmEntry 6 }
+  
+tlUpsAlarmLocation OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The location of the device on which the alarm is active."
+  ::= { tlUpsAlarmEntry 7 }
+  
+tlUpsAlarmGroup OBJECT-TYPE
+  SYNTAX INTEGER {
+      critical(1),
+      warning(2),
+      info(3),
+      status(4),
+      offline(5),
+      custom(6) }
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The category/group of this alarm."
+  ::= { tlUpsAlarmEntry 8 }
+
+tlUpsAlarmIp OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The originating IP address associated with this alarm."
+  ::= { tlUpsAlarmEntry 9 }
+
+tlUpsAlarmMac OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The originating mac address associated with this alarm."
+  ::= { tlUpsAlarmEntry 10 }
+
+tlUpsWellKnownAlarms OBJECT IDENTIFIER  ::= { tlUpsAlarm 3 }
+
+tlUpsAlarmPrimaryPowerOutage OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The primary power source is not present."
+    ::= { tlUpsWellKnownAlarms 1 }
+
+tlUpsAlarmSecondaryPowerOutage OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The secondary power source is not present."
+    ::= { tlUpsWellKnownAlarms 2 }
+    
+tlUpsAlarmLoadLevelAboveThreshold OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The load level is above the designated threshold."
+  ::= { tlUpsWellKnownAlarms 3 }
+
+tlUpsAlarmOutputCurrentChanged OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The output current changed from its last known value."
+  ::= { tlUpsWellKnownAlarms 4 }
+
+tlUpsAlarmDevName OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS deprecated
+  DESCRIPTION
+    "The name of the device, tlDevName, corresponding to the device that is
+    associated with this alarm."
+  ::= { tlUpsAlarm 7 }
+
+tlUpsAlarmDevLocation OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS deprecated
+  DESCRIPTION
+    "The location of the device, tlDevLocation, corresponding to the device
+    that is associated with this alarm."
+  ::= { tlUpsAlarm 8 }
+
+tlUpsAlarmCategory OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS deprecated
+  DESCRIPTION
+    "The category, tlDevEvtCategory, of this alarm."
+  ::= { tlUpsAlarm 9 }
+
+
+
+tlUpsTest OBJECT IDENTIFIER   ::= { tlUpsObjects 7 }
+
+tlUpsTestDate OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The date of the last self-test run on the ups, in the
+    format YYYYMMDD."
+  ::= { tlUpsTest 1 }
+
+tlUpsTestResultsDetail OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Result of the last self-test run on the ups."
+  ::= { tlUpsTest 2 }
+
+tlUpsControl OBJECT IDENTIFIER  ::= { tlUpsObjects 8 }
+
+tlUpsWatchdogSupported OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Indicates whether or not this UPS supports a watchdog reboot."
+  ::= { tlUpsControl 1 }
+
+
+tlUpsWatchdogSecsBeforeReboot OBJECT-TYPE
+  SYNTAX NonNegativeInteger
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The maximum number of seconds that can expire between polls that
+    the engine makes to the UPS for data.  If this time runs out, then
+    the UPS will cycle its outputs.  Set this to zero to turns disable
+    this feature."
+  ::= { tlUpsControl 2 }
+
+tlUpsWellKnownControls OBJECT IDENTIFIER  ::= { tlUpsControl 3 }
+
+tlUpsControlSelfTest OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Set to TRUE to initiate Self Test"
+  ::= { tlUpsWellKnownControls 1 }
+  
+tlUpsControlRamp OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Set to TRUE to initiate Ramp"
+  ::= { tlUpsWellKnownControls 2 }
+  
+tlUpsControlShed OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Set to TRUE to initiate Shed"
+  ::= { tlUpsWellKnownControls 3 }
+  
+tlUpsControlUpsOn OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Set to TRUE to turn UPS on"
+  ::= { tlUpsWellKnownControls 4 }
+
+tlUpsControlUpsOff OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Set to TRUE to turn UPS off"
+  ::= { tlUpsWellKnownControls 5 }
+  
+tlUpsConfig OBJECT IDENTIFIER   ::= { tlUpsObjects 9 }
+
+tlUpsConfigBattReplDate OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The date on which the battery was last replaced, in the format
+    YYYYMMDD."
+  ::= { tlUpsConfig 1 }
+
+tlUpsConfigTftpGetAddr OBJECT-TYPE
+  SYNTAX IpAddress
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The IP address of the TFTP server you wish to acquire a config ini file from, non persistent, 0.0.0.0 when empty"
+  ::= { tlUpsConfig 2 }
+
+tlUpsConfigTftpGetAcction OBJECT-TYPE
+  SYNTAX INTEGER {
+      get(1),
+      getting(2),
+      idle(3) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "setting this entry to get(1) will start a down load from the specified address, during the download this entry
+    will read getting(2), when finished, the card will reboot to the new ini supplied parms. At all other times this 
+    entry will read idle(3)"
+  ::= { tlUpsConfig 3 }
+
+
+tlUpsOutlet OBJECT IDENTIFIER   ::= { tlUpsObjects 10 }
+
+tlUpsOutletNumOutlets OBJECT-TYPE
+  SYNTAX NonNegativeInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The number of available Outlets in this device."
+  ::= { tlUpsOutlet 1 }
+
+tlUpsOutletTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF TlUpsOutletEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "A list of all device Outlets for all devices."
+  ::= { tlUpsOutlet 2 }
+
+tlUpsOutletEntry OBJECT-TYPE
+  SYNTAX TlUpsOutletEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "An entry containing Outlet information applicable to a particular
+    device managed by this agent."
+  INDEX {
+    tlUpsOutletIndex }
+  ::= { tlUpsOutletTable 1 }
+
+TlUpsOutletEntry ::= SEQUENCE {
+  tlUpsOutletIndex        PositiveInteger,
+  tlUpsOutletState        INTEGER,
+  tlUpsOutletType         Integer32,
+  tlUpsOutletControl      INTEGER,
+  tlUpsOutletName         DisplayString,
+  tlUpsOutletRampAction   INTEGER,
+  tlUpsOutletRampDataType INTEGER,
+  tlUpsOutletRampData     Integer32,
+  tlUpsOutletShedAction   INTEGER,
+  tlUpsOutletShedDataType INTEGER,
+  tlUpsOutletShedData     Integer32,
+  tlUpsOutletGroupNdx     Integer32 }
+
+tlUpsOutletIndex OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "This is the index number of this Outlet for the device
+    indicated by tlDeviceIndex."
+  ::= { tlUpsOutletEntry 1 }
+
+tlUpsOutletState OBJECT-TYPE
+  SYNTAX INTEGER {
+      unknown(0),
+      off(1),
+      on(2) }
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The current state of the Outlet."
+  ::= { tlUpsOutletEntry 2 }
+
+tlUpsOutletType OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "This is a bit field that indicates the type of this Outlet.
+
+    Bit   Display
+     0    Battery Protected
+     1    Controllable
+     2
+     3
+     4
+     5
+     6
+     7
+     8
+     9
+    10
+    11
+    12
+    13
+    14
+    15
+    "
+  ::= { tlUpsOutletEntry 3 }
+
+tlUpsOutletControl OBJECT-TYPE
+  SYNTAX INTEGER {
+      turnOff(1),
+      turnOn(2),
+      cycle(3) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Controls the state of the Outlet."
+  ::= { tlUpsOutletEntry 4 }
+
+tlUpsOutletName OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "A string identifying the devices attached to the
+    output(s) of the device."
+  ::= { tlUpsOutletEntry 5 }
+
+
+tlUpsOutletRampAction OBJECT-TYPE
+  SYNTAX INTEGER {
+      remainOff(0),
+      turnOnAfterDelay(1)
+   }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The ramp action to take on the Outlet."
+  ::= { tlUpsOutletEntry 6 }
+
+tlUpsOutletRampDataType OBJECT-TYPE
+  SYNTAX INTEGER {
+      delayInSeconds(0)
+   }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The type of data associated with ramp action."
+  ::= { tlUpsOutletEntry 7 }
+
+tlUpsOutletRampData OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The data value associated with type of ramp data."
+  ::= { tlUpsOutletEntry 8 }
+
+tlUpsOutletShedAction OBJECT-TYPE
+  SYNTAX INTEGER {
+      remainOn(0),
+      turnOffAfterDelay(1)
+   }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The shed action to take on the Outlet."
+  ::= { tlUpsOutletEntry 9 }
+
+tlUpsOutletShedDataType OBJECT-TYPE
+  SYNTAX INTEGER {
+      delayInSeconds(0)
+   }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The type of data associated with shed action."
+  ::= { tlUpsOutletEntry 10 }
+
+tlUpsOutletShedData OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The data value associated with type of shed data."
+  ::= { tlUpsOutletEntry 11 }
+
+tlUpsOutletGroupNdx OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "tlUpsOutletGroupIndex of corresponding outlet group, or 0 if ungrouped."
+  ::= { tlUpsOutletEntry 12 }
+
+
+tlUpsOutletCurrentTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF TlUpsOutletCurrentEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "A list of load currents."
+  ::= { tlUpsOutlet 3 }
+  
+tlUpsOutletCurrentEntry OBJECT-TYPE
+  SYNTAX TlUpsOutletCurrentEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "An entry containing Outlet current information applicable to a particular
+    device managed by this agent."
+  INDEX {
+    tlUpsOutletCurrentIndex }
+  ::= { tlUpsOutletCurrentTable 1 }
+
+TlUpsOutletCurrentEntry ::= SEQUENCE {
+  tlUpsOutletCurrentIndex      PositiveInteger,
+  tlUpsOutletCurrentValue      PositiveInteger }
+
+tlUpsOutletCurrentIndex OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "This is the index number of this Outlet."
+  ::= { tlUpsOutletCurrentEntry 1 }
+
+tlUpsOutletCurrentValue OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The value of this outlet's current, represented as 0.1A"
+  ::= { tlUpsOutletCurrentEntry 2 }
+
+
+tlUpsOutletPowerTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF TlUpsOutletPowerEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "A list of load power."
+  ::= { tlUpsOutlet 4 }
+  
+tlUpsOutletPowerEntry OBJECT-TYPE
+  SYNTAX TlUpsOutletPowerEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "An entry containing Outlet power information applicable to a particular
+    device managed by this agent."
+  INDEX {
+    tlUpsOutletPowerIndex }
+  ::= { tlUpsOutletPowerTable 1 }
+
+TlUpsOutletPowerEntry ::= SEQUENCE {
+  tlUpsOutletPowerIndex      PositiveInteger,
+  tlUpsOutletPowerValue      PositiveInteger }
+
+tlUpsOutletPowerIndex OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "This is the index number of this Outlet."
+  ::= { tlUpsOutletPowerEntry 1 }
+
+tlUpsOutletPowerValue OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The value of this outlet's power in watts."
+  ::= { tlUpsOutletPowerEntry 2 }
+
+
+tlUpsOutletGroup OBJECT IDENTIFIER   ::= { tlUpsObjects 11 }
+
+tlUpsOutletNumOutletGroups OBJECT-TYPE
+  SYNTAX NonNegativeInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The number of available Outlet Groups in this device."
+  ::= { tlUpsOutletGroup 1 }
+
+tlUpsOutletGroupTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF TlUpsOutletGroupEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "A list of device outlet group entries. The number of entries is
+    given by the value of tlUpsOutletNumOutletGroups."
+  ::= { tlUpsOutletGroup 2 }
+  
+tlUpsOutletGroupEntry OBJECT-TYPE
+  SYNTAX TlUpsOutletGroupEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "An entry containing outlet group information applicable
+     to a particular device managed by this agent"
+  INDEX { tlUpsOutletGroupIndex }
+  ::= { tlUpsOutletGroupTable 1 }
+
+TlUpsOutletGroupEntry ::= SEQUENCE {
+  tlUpsOutletGroupIndex     PositiveInteger,
+  tlUpsOutletGroupUnused	Integer32,
+  tlUpsOutletGroupName      DisplayString,
+  tlUpsOutletGroupDesc      DisplayString,
+  tlUpsOutletGroupState     INTEGER,
+  tlUpsOutletGroupControl   INTEGER }
+
+tlUpsOutletGroupIndex OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "This is the index number of this load group for the device."
+  ::= { tlUpsOutletGroupEntry 1 }
+
+tlUpsOutletGroupUnused OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Unused placeholder"
+  ::= { tlUpsOutletGroupEntry 2 }
+
+tlUpsOutletGroupName OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The name of this outlet group."
+  ::= { tlUpsOutletGroupEntry 3 }
+
+tlUpsOutletGroupDesc OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "A description for this outlet group."
+  ::= { tlUpsOutletGroupEntry 4 }
+
+tlUpsOutletGroupState OBJECT-TYPE
+  SYNTAX INTEGER {
+      unknown(0),
+      off(1),
+      on(2),
+      mixed(3) }
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The current state of the outlet group."
+  ::= { tlUpsOutletGroupEntry 5 }
+
+tlUpsOutletGroupControl OBJECT-TYPE
+  SYNTAX INTEGER {
+      turnOff(1),
+      turnOn(2),
+      cycle(3) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Controls the state of every outlet associated with the group."
+  ::= { tlUpsOutletGroupEntry 6 }
+
+
+tlUpsTraps              OBJECT IDENTIFIER ::= { tlUPS 2 }
+
+tlUpsTrapAlarmEntryAddedV1 TRAP-TYPE
+    ENTERPRISE tlUpsTraps
+    VARIABLES { tlUpsAlarmId, tlUpsAlarmDescr, tlUpsAlarmDetail, tlUpsAlarmDeviceId,
+                tlUpsAlarmDeviceName, tlUpsAlarmLocation, tlUpsAlarmGroup }
+    DESCRIPTION
+            "This trap is sent each time an alarm is inserted into
+            to the alarm table."
+    --#SUMMARY "UPS Alarm: %s - %s."
+    --#ARGUMENTS {6, 2}
+    --#SEVERITY WARNING
+ ::= 3
+
+tlUpsTrapAlarmEntryAdded NOTIFICATION-TYPE
+    OBJECTS { tlUpsAlarmId, tlUpsAlarmDescr, tlUpsAlarmDetail, tlUpsAlarmDeviceId,
+              tlUpsAlarmDeviceName, tlUpsAlarmLocation, tlUpsAlarmGroup }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time an alarm is inserted into
+            to the alarm table."
+    --#SUMMARY "UPS Alarm: %s - %s."
+    --#ARGUMENTS {6, 2}
+    --#SEVERITY WARNING
+    ::= { tlUpsTraps 3 }
+
+tlUpsTrapAlarmEntryRemovedV1 TRAP-TYPE
+    ENTERPRISE tlUpsTraps
+    VARIABLES { tlUpsAlarmId, tlUpsAlarmDescr, tlUpsAlarmDetail, tlUpsAlarmDeviceId,
+                tlUpsAlarmDeviceName, tlUpsAlarmLocation, tlUpsAlarmGroup }
+    DESCRIPTION
+            "This trap is sent each time an alarm is removed from
+            the alarm table."
+    --#SUMMARY "UPS Alarm: %s - %s."
+    --#ARGUMENTS {6, 2}
+    --#SEVERITY WARNING
+ ::= 4
+
+tlUpsTrapAlarmEntryRemoved NOTIFICATION-TYPE
+    OBJECTS { tlUpsAlarmId, tlUpsAlarmDescr, tlUpsAlarmDetail, tlUpsAlarmDeviceId,
+              tlUpsAlarmDeviceName, tlUpsAlarmLocation, tlUpsAlarmGroup }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time an alarm is removed from
+            the alarm table."
+    --#SUMMARY "UPS Alarm: %s - %s."
+    --#ARGUMENTS {6, 2}
+    --#SEVERITY WARNING
+    ::= { tlUpsTraps 4 }
+
+
+--------------------------------------------------------------------------
+-- EnviroSense Device
+--------------------------------------------------------------------------
+
+tlEnviroSense OBJECT IDENTIFIER   ::= { tripplite 101 }
+
+tlEnvEnvironment OBJECT IDENTIFIER   ::= { tlEnviroSense 1 }
+
+tlEnvTemperatureData OBJECT IDENTIFIER   ::= { tlEnvEnvironment 1 }
+
+tlEnvTemperatureC OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The ambient temperature (C)."
+  ::= { tlEnvTemperatureData 1 }
+
+tlEnvTemperatureF OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The ambient temperature (F)."
+  ::= { tlEnvTemperatureData 2 }
+
+tlEnvTemperatureLowLimit OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The lower alarm limit for ambient temperature (F)."
+  ::= { tlEnvTemperatureData 3 }
+
+tlEnvTemperatureHighLimit OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The upper alarm limit for ambient temperature (F)."
+  ::= { tlEnvTemperatureData 4 }
+
+tlEnvTemperatureInAlarm OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Indicates whether or not temperature is in alarm."
+  ::= { tlEnvTemperatureData 5 }
+
+tlEnvHumidityData OBJECT IDENTIFIER   ::= { tlEnvEnvironment 2 }
+
+tlEnvHumidity OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The ambient humidity (%)."
+  ::= { tlEnvHumidityData 1 }
+
+tlEnvHumidityLowLimit OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The lower alarm limit for ambient humidity (%)."
+  ::= { tlEnvHumidityData 2 }
+
+tlEnvHumidityHighLimit OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The upper alarm limit for ambient humidity (%)."
+  ::= { tlEnvHumidityData 3 }
+
+tlEnvHumidityInAlarm OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Indicates whether or not humidity is in alarm."
+  ::= { tlEnvHumidityData 4 }
+
+tlEnvContacts OBJECT IDENTIFIER  ::= { tlEnviroSense 2 }
+
+tlEnvContactTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF TlEnvContactEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "A table of contacts."
+  ::= { tlEnvContacts 1 }
+
+tlEnvContactEntry OBJECT-TYPE
+  SYNTAX TlEnvContactEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "An entry containing information applicable to a particular contact."
+  INDEX {
+    tlEnvContactIndex }
+  ::= { tlEnvContactTable 1 }
+
+TlEnvContactEntry ::= SEQUENCE {
+  tlEnvContactIndex    PositiveInteger,
+  tlEnvContactName     DisplayString,
+  tlEnvContactStatus   INTEGER,
+  tlEnvContactConfig   INTEGER }
+
+tlEnvContactIndex OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The table row index for the contact."
+  ::= { tlEnvContactEntry 1 }
+
+tlEnvContactName OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The name or description of the contact."
+  ::= { tlEnvContactEntry 2 }
+
+tlEnvContactStatus OBJECT-TYPE
+  SYNTAX INTEGER {
+      normal(0),
+      alarm(1) }
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The current status of the contact."
+  ::= { tlEnvContactEntry 3 }
+
+tlEnvContactConfig OBJECT-TYPE
+  SYNTAX INTEGER {
+      normallyOpen(0),
+      normallyClosed(1) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The configuration of the contact."
+  ::= { tlEnvContactEntry 4 }
+
+
+--------------------------------------------------------------------------
+-- KVM over IP Device
+--------------------------------------------------------------------------
+
+-- this is a 3rd party MIB structure located at { tripplite 102 }
+
+--------------------------------------------------------------------------
+-- Conformance definitions
+--------------------------------------------------------------------------
+
+tlConformance OBJECT IDENTIFIER   ::= { tripplite 20 }
+
+tlCompliances OBJECT IDENTIFIER   ::= { tlConformance 1 }
+
+tlGroups OBJECT IDENTIFIER  ::= { tlConformance 2 }
+
+tlSubsetGroups OBJECT IDENTIFIER  ::= { tlGroups 1 }
+
+tlBasicGroups OBJECT IDENTIFIER   ::= { tlGroups 2 }
+
+tlFullGroups OBJECT IDENTIFIER  ::= { tlGroups 3 }
+
+
+tlV11Groups OBJECT IDENTIFIER  ::= { tlGroups 4 }
+
+tlDeprecatedV11Group OBJECT-GROUP
+  OBJECTS {
+    upsTrapCode,
+    upsTrapDescription }
+  STATUS obsolete
+  DESCRIPTION
+    "The tlDeprecatedV11Group defines objects which were used by
+    Sinetica SNMP cards on Tripplite UPSs and PowerAlert version 11.
+    These objects are currently only used when
+    tlEngineLegacySNMPSupport == true."
+  ::= { tlV11Groups 1 }
+
+tlDeprecatedV11NotificationsGroup NOTIFICATION-GROUP
+  NOTIFICATIONS {
+    tlV11upsCritical,
+    tlV11upsWarning,
+    tlV11upsInformation,
+    tlV11upsAlarmCleared,
+    tlV11upsAgentStarted,
+    tlV11upsAgentStopped }
+  STATUS obsolete
+  DESCRIPTION
+    "The tlDeprecatedV11NotificationsGroup defines PowerAlert version 11
+    notifications.  These notifications are being deprecated, but may
+    still be used when tlEngineLegacySNMPSupport = true."
+  ::= { tlV11Groups 2 }
+
+tlObsoleteV11Group OBJECT-GROUP
+  OBJECTS {
+    upsReceptaclesNumReceptacles,
+    upsReceptacleIndex,
+    upsReceptacleType,
+    upsReceptacleStatus,
+    upsReceptacleControl,
+    upsEnvTemperature,
+    upsEnvHumidity,
+    upsContactIndex,
+    upsContactName,
+    upsContactStatus,
+    upsContactConfig }
+  STATUS obsolete
+  DESCRIPTION
+    "The tlObsoleteV11Group defines objects which were used by
+    Sinetica SNMP cards on Tripplite UPSs.  Most of these objects are obsolete."
+  ::= { tlV11Groups 3 }
+
+
+-- tlUpsCompliances OBJECT IDENTIFIER ::= { tlCompliances 1 }
+--
+-- tlUpsSubsetCompliance MODULE-COMPLIANCE
+--   STATUS current
+--   DESCRIPTION
+--     "Description"
+--   MODULE == this module
+--     MANDATORY-GROUPS {
+--       groups}
+--
+--   OBJECT tlUpsOBJECT1
+--   SYNTAX INTEGER {
+--     enum1(1),
+--     enum2(2)
+--   }
+--   DESCRIPTION
+--     "Description"
+--
+--   OBJECT tlUpsOBJECT2
+--   DESCRIPTION
+--     "Description"
+--
+--   OBJECT tlUpsOBJECT3
+--   MIN-ACCESS read-only
+--   DESCRIPTION
+--     "Description"
+--   ::= { tlUpsCompliances 1 }
+--
+-- tlUpsBasicCompliance MODULE-COMPLIANCE
+--   ...
+--   ::= { tlUpsCompliances 2 }
+--
+-- tlUpsFullCompliance MODULE-COMPLIANCE
+--   ...
+--   ::= { tlUpsCompliances 3 }
+--
+-- units of conformance
+--
+-- summary at a glance:
+--                                      subset  basic   full
+--tlUpsIdentUPSSoftwareChecksum                         x
+--tlUpsIdentSerialNum                                   x
+--tlUpsIdentID                                          x
+--
+--tlUpsBatteryAge                                       x
+--tlUpsBatteryTemperatureF                              x
+--
+--tlUpsAlarm
+--
+--tlUpsTestDate                                         x
+--
+--tlUpsWatchdogSupported                                x
+--tlUpsWatchdogSecsBeforeReboot                         x
+--
+--tlUpsConfigBattReplDate                               x
+--
+--tlUpsLoadNumLoads                                     x
+--
+--tlUpsNotificationCode                                         x
+--tlUpsNotificationDescription                                  x
+--
+--tlUpsCritical                                         x
+--tlUpsWarning                                          x
+--tlUpsInformation                                      x
+--tlUpsAlarmCleared                                     x
+--tlUpsAgentStarted                                     x
+--tlUpsAgentStopped                                     x
+--
+--tlUpsSubsetGroups OBJECT IDENTIFIER   ::= { tlSubsetGroups 100 }
+--
+--tlUpsBasicGroups OBJECT IDENTIFIER  ::= { tlBasicGroups 100 }
+
+tlUpsFullGroups OBJECT IDENTIFIER   ::= { tlFullGroups 100 }
+
+tlUpsFullIdentGroup OBJECT-GROUP
+  OBJECTS {
+    tlUpsIdentUpsSoftwareChecksum,
+    tlUpsIdentSerialNum,
+    tlUpsIdentID }
+  STATUS current
+  DESCRIPTION
+    "The tlUpsFullIdentGroup defines objects which are common to the Ident
+    group of fully compliant Tripplite UPS's"
+  ::= { tlUpsFullGroups 1 }
+
+tlUpsFullBatteryGroup OBJECT-GROUP
+  OBJECTS {
+    tlUpsBatteryAge,
+    tlUpsTemperatureF }
+  STATUS current
+  DESCRIPTION
+    "The tlUpsFullBatteryGroup defines objects which are common to the Battery
+    group of fully compliant Tripplite UPS's"
+  ::= { tlUpsFullGroups 2 }
+
+tlUpsFullAlarmGroup OBJECT IDENTIFIER   ::= { tlUpsFullGroups 6 }
+
+tlUpsFullAlarmObjsGroup OBJECT-GROUP
+  OBJECTS {
+    tlUpsAlarmDevName,
+    tlUpsAlarmDevLocation,
+    tlUpsAlarmCategory }
+  STATUS current
+  DESCRIPTION
+    "The tlUpsFullAlarmObjsGroup defines objects which are common to
+    the Alarm group of fully compliant Tripplite UPS's"
+  ::= { tlUpsFullAlarmGroup 1 }
+
+--tlUpsFullAlarmsGroup NOTIFICATION-GROUP
+--  NOTIFICATIONS { }
+--  STATUS current
+--  DESCRIPTION
+--    "The tlUpsFullAlarmGroup defines notifications which are
+--    common to the Alarm group of fully compliant Tripplite UPS's"
+--  ::= { tlUpsFullAlarmGroup 2 }
+
+tlUpsFullTestGroup OBJECT-GROUP
+  OBJECTS {
+    tlUpsTestDate,
+    tlUpsTestResultsDetail }
+  STATUS current
+  DESCRIPTION
+    "The tlUpsFullTestGroup defines objects which are common to the Test
+    group of fully compliant Tripplite UPS's"
+  ::= { tlUpsFullGroups 7 }
+
+tlUpsFullControlGroup OBJECT-GROUP
+  OBJECTS {
+    tlUpsWatchdogSupported,
+    tlUpsWatchdogSecsBeforeReboot }
+  STATUS current
+  DESCRIPTION
+    "The tlUpsFullControlGroup defines objects which are common to the Control
+    group of fully compliant Tripplite UPS's"
+  ::= { tlUpsFullGroups 8 }
+
+tlUpsFullConfigGroup OBJECT-GROUP
+  OBJECTS {
+    tlUpsConfigBattReplDate }
+  STATUS current
+  DESCRIPTION
+    "The tlUpsFullConfigGroup defines objects which are common to the Config
+    group of fully compliant Tripplite UPS's"
+  ::= { tlUpsFullGroups 9 }
+
+tlUpsFullOutletGroup OBJECT-GROUP
+  OBJECTS {
+    tlUpsOutletNumOutlets }
+  STATUS current
+  DESCRIPTION
+    "The tlUpsFullOutletGroup defines objects which are common to the Outlet
+    group of fully compliant Tripplite UPS's"
+  ::= { tlUpsFullGroups 10 }
+
+--------------------------------------------------------------------------
+-- Legacy (PowerAlert version 11) objects
+--
+-- These objects have been published in previous Tripplite MIBs and are
+-- no longer supported, except where otherwise indicated.
+--------------------------------------------------------------------------
+
+trippUPS OBJECT IDENTIFIER  ::= { tripplite 1 }
+
+trippUpsReceptacles OBJECT IDENTIFIER   ::= { trippUPS 1 }
+
+upsReceptaclesNumReceptacles OBJECT-TYPE
+  SYNTAX NonNegativeInteger
+  MAX-ACCESS read-only
+  STATUS obsolete
+  DESCRIPTION
+    "The number of available receptacles in this device.
+    This variable indicates the number of rows in the
+    receptacle table."
+  ::= { trippUpsReceptacles 1 }
+
+
+upsReceptacleTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF UpsReceptacleEntry
+  MAX-ACCESS not-accessible
+  STATUS obsolete
+  DESCRIPTION
+    "A list of receptacle table entries.  The number of entries
+    is given by the value of upsReceptaclesNumReceptacles."
+  ::= { trippUpsReceptacles 2 }
+
+
+upsReceptacleEntry OBJECT-TYPE
+  SYNTAX UpsReceptacleEntry
+  MAX-ACCESS not-accessible
+  STATUS obsolete
+  DESCRIPTION
+    "An entry containing information applicable to a
+    particular receptacle."
+  INDEX {
+    upsReceptacleIndex }
+  ::= { upsReceptacleTable 1 }
+
+
+UpsReceptacleEntry ::= SEQUENCE {
+  upsReceptacleIndex   PositiveInteger,
+  upsReceptacleType    INTEGER,
+  upsReceptacleStatus  INTEGER,
+  upsReceptacleControl INTEGER }
+
+
+upsReceptacleIndex OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-only
+  STATUS obsolete
+  DESCRIPTION
+    "The receptacle identifier."
+  ::= { upsReceptacleEntry 1 }
+
+
+upsReceptacleType OBJECT-TYPE
+  SYNTAX INTEGER {
+      surgeOnly(1),
+      batteryProtected(2),
+      controllableBatteryProtected(3) }
+  MAX-ACCESS read-only
+  STATUS obsolete
+  DESCRIPTION
+    "The type of receptacle."
+  ::= { upsReceptacleEntry 2 }
+
+
+upsReceptacleStatus OBJECT-TYPE
+  SYNTAX INTEGER {
+      on(1),
+      off(2),
+      unknown(3) }
+  MAX-ACCESS read-only
+  STATUS obsolete
+  DESCRIPTION
+    "The status of receptacle."
+  ::= { upsReceptacleEntry 3 }
+
+
+upsReceptacleControl OBJECT-TYPE
+  SYNTAX INTEGER {
+      on(1),
+      off(2),
+      cycle(3) }
+  MAX-ACCESS read-write
+  STATUS obsolete
+  DESCRIPTION
+    "Setting this object to 'on' will turn on the receptacle.
+    Setting this object to 'off' will turn off the receptacle.
+    Setting this object to 'cycle' will turn off and then turn
+    on the receptacle.  This action will only take place if the
+    receptacle is controllable
+    (upsReceptacleType = controllableBatteryProtected(3))."
+  ::= { upsReceptacleEntry 4 }
+
+
+trippUpsTrapInfo OBJECT IDENTIFIER  ::= { trippUPS 2 }
+
+upsTrapCode OBJECT-TYPE
+  SYNTAX INTEGER (0..2147483647)
+  MAX-ACCESS read-only
+  STATUS deprecated
+  DESCRIPTION
+    "A numeric code identifiying the condition that caused the trap to be sent.
+    If the trap number is 104 (upsAgentStarted) or 105 (upsAgentStopped), this
+    code will indicate whether the SNMP agent is software (1) or hardware (2)."
+  ::= { trippUpsTrapInfo 1 }
+
+
+upsTrapDescription OBJECT-TYPE
+  SYNTAX DisplayString (SIZE (0..63))
+  MAX-ACCESS read-only
+  STATUS deprecated
+  DESCRIPTION
+    "The description of the trap."
+  ::= { trippUpsTrapInfo 2 }
+
+
+trippUpsEnvironment OBJECT IDENTIFIER   ::= { trippUPS 3 }
+
+upsEnvTemperature OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS obsolete
+  DESCRIPTION
+    "The ambient temperature of the EnviroSense unit (1/10 Deg C)."
+  ::= { trippUpsEnvironment 1 }
+
+
+upsEnvHumidity OBJECT-TYPE
+  SYNTAX INTEGER (0..100)
+  MAX-ACCESS read-only
+  STATUS obsolete
+  DESCRIPTION
+    "The ambient humidity of the EnviroSense unit (% Humidity)."
+  ::= { trippUpsEnvironment 2 }
+
+
+trippUpsContacts OBJECT IDENTIFIER  ::= { trippUPS 4 }
+
+upsContactTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF UpsContactEntry
+  MAX-ACCESS not-accessible
+  STATUS obsolete
+  DESCRIPTION
+    "A table of contacts attached to the EnviroSense unit."
+  ::= { trippUpsContacts 1 }
+
+
+upsContactEntry OBJECT-TYPE
+  SYNTAX UpsContactEntry
+  MAX-ACCESS not-accessible
+  STATUS obsolete
+  DESCRIPTION
+    "An entry containing information applicable to a
+    particular contact."
+  INDEX {
+    upsContactIndex }
+  ::= { upsContactTable 1 }
+
+
+UpsContactEntry ::= SEQUENCE {
+  upsContactIndex  PositiveInteger,
+  upsContactName   DisplayString,
+  upsContactStatus INTEGER,
+  upsContactConfig INTEGER }
+
+
+upsContactIndex OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-only
+  STATUS obsolete
+  DESCRIPTION
+    "The contact identifier."
+  ::= { upsContactEntry 1 }
+
+
+upsContactName OBJECT-TYPE
+  SYNTAX DisplayString (SIZE (0..15))
+  MAX-ACCESS read-write
+  STATUS obsolete
+  DESCRIPTION
+    "The contact name."
+  ::= { upsContactEntry 2 }
+
+
+upsContactStatus OBJECT-TYPE
+  SYNTAX INTEGER {
+      unknown(0),
+      normal(1),
+      alarm(2) }
+  MAX-ACCESS read-only
+  STATUS obsolete
+  DESCRIPTION
+    "The current status of the contact."
+  ::= { upsContactEntry 3 }
+
+
+upsContactConfig OBJECT-TYPE
+  SYNTAX INTEGER {
+      normallyClosed(0),
+      normallyOpen(1) }
+  MAX-ACCESS read-write
+  STATUS obsolete
+  DESCRIPTION
+    "The default configuration of the contact."
+  ::= { upsContactEntry 4 }
+
+
+--------------------------------------------------------------------------
+-- Legacy (PowerAlert version 11) traps, redefined as notifications.
+--
+-- These notifications define the traps used in previous Tripplite MIBs and
+-- are only supported when legacy support is enabled, as indicated by
+-- tlEngineLegacySNMPSupport
+--------------------------------------------------------------------------
+
+tlV11TrapsPrefix OBJECT IDENTIFIER  ::= { trippUPS 0 }
+
+tlV11upsCritical NOTIFICATION-TYPE
+  OBJECTS {
+    upsTrapCode,
+    upsTrapDescription }
+  STATUS obsolete
+  DESCRIPTION
+    "UPS Critical Alarm."
+  ::= { tlV11TrapsPrefix 100 }
+
+
+tlV11upsWarning NOTIFICATION-TYPE
+  OBJECTS {
+    upsTrapCode,
+    upsTrapDescription}
+  STATUS obsolete
+  DESCRIPTION
+    "UPS Warning."
+  ::= { tlV11TrapsPrefix 101 }
+
+
+tlV11upsInformation NOTIFICATION-TYPE
+  OBJECTS {
+    upsTrapCode,
+    upsTrapDescription}
+  STATUS obsolete
+  DESCRIPTION
+    "UPS Information."
+  ::= { tlV11TrapsPrefix 102 }
+
+
+tlV11upsAlarmCleared NOTIFICATION-TYPE
+  OBJECTS {
+    upsTrapCode,
+    upsTrapDescription}
+  STATUS obsolete
+  DESCRIPTION
+    "UPS Alarm Cleared."
+  ::= { tlV11TrapsPrefix 103 }
+
+
+tlV11upsAgentStarted NOTIFICATION-TYPE
+  OBJECTS {
+    upsTrapCode,
+    upsTrapDescription}
+  STATUS obsolete
+  DESCRIPTION
+    "Agent started."
+  ::= { tlV11TrapsPrefix 104 }
+
+
+tlV11upsAgentStopped NOTIFICATION-TYPE
+  OBJECTS {
+    upsTrapCode,
+    upsTrapDescription}
+  STATUS obsolete
+  DESCRIPTION
+    "Agent stopped."
+  ::= { tlV11TrapsPrefix 105 }
+
+
+--------------------------------------------------------------------------
+-- This is an excerpt from the TRIPPUPS-MIB used for Delta SNMP cards in
+-- Tripplite UPSs.  It has major fundamental problems with OID collisions
+-- and naming collosions, so it's commented out in its entirety.  It's
+-- only included for historical documentation purposes.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+-- BEGIN Delta SNMP MIB
+--------------------------------------------------------------------------
+-- ups OBJECT IDENTIFIER   ::= { trippUPS 1 }
+--
+-- upsIdent OBJECT IDENTIFIER  ::= { ups 1 }
+--
+-- upsBattery OBJECT IDENTIFIER  ::= { ups 2 }
+--
+-- upsInput OBJECT IDENTIFIER  ::= { ups 3 }
+--
+-- upsOutput OBJECT IDENTIFIER   ::= { ups 4 }
+--
+-- upsAlarm OBJECT IDENTIFIER  ::= { ups 6 }
+--
+-- upsWellKnownAlarms OBJECT IDENTIFIER  ::= { ups 7 }
+--
+-- upsTest OBJECT IDENTIFIER   ::= { ups 8 }
+--
+-- upsControl OBJECT IDENTIFIER  ::= { ups 9 }
+--
+-- upsConfig OBJECT IDENTIFIER   ::= { ups 10 }
+--
+-- The Device Identification group.
+-- All objects in this group are set at device initialization and remain static.
+--
+-- upsIdentManufacturer OBJECT-TYPE
+--   SYNTAX DisplayString (SIZE (0..31))
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The name of the UPS manufacturer."
+--   ::= { upsIdent 1 }
+--
+--
+-- upsIdentModel OBJECT-TYPE
+--   SYNTAX DisplayString (SIZE (0..63))
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The UPS Model designation."
+--   ::= { upsIdent 2 }
+--
+--
+-- upsIdentUPSSoftwareVersion OBJECT-TYPE
+--   SYNTAX DisplayString (SIZE (0..63))
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The UPS Firmware software version(s).  This variable
+--     may or may not have the same value as
+--     upsIdentAgentSoftwareVersion in some implementations."
+--   ::= { upsIdent 3 }
+--
+--
+-- upsIdentAgentSoftwareVersion OBJECT-TYPE
+--   SYNTAX DisplayString (SIZE (0..63))
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The UPS agent software version.  This variable may or
+--     may not have the same value as
+--     upsIdentUPSSoftwareVersion in some implementations."
+--   ::= { upsIdent 4 }
+--
+--
+-- upsIdentName OBJECT-TYPE
+--   SYNTAX DisplayString (SIZE (0..63))
+--   ACCESS read-write
+--   STATUS obsolete
+--   DESCRIPTION
+--     "A string identifying the UPS.  This object should be
+--     set by the administrator."
+--   ::= { upsIdent 5 }
+--
+--
+-- upsIdentAttachedDevices OBJECT-TYPE
+--   SYNTAX DisplayString (SIZE (0..63))
+--   ACCESS read-write
+--   STATUS obsolete
+--   DESCRIPTION
+--     "A string identifying the devices attached to the
+--     output(s) of the UPS.  This object should be set by
+--     the administrator."
+--   ::= { upsIdent 6 }
+--
+--
+-- The Battery group.
+-- Implementation of this group is mandatory for all systems.
+--
+-- upsBatteryStatus OBJECT-TYPE
+--   SYNTAX INTEGER {
+--       unknown(1),
+--       batteryNormal(2),
+--       batteryLow(3),
+--       batteryDepleted(4) }
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The indication of the capacity remaining in the UPS
+--     system's batteries.  A value of batteryNormal
+--     indicates that the batteries are fully charged.  A
+--     value of batteryLow indicates that the remaining battery
+--     run-time is less than or equal to
+--     upsConfigMinutesRemaining.  A value of batteryDepleted
+--     indicates that the UPS will be unable to sustain the
+--     present load when and if the utility power is lost."
+--   ::= { upsBattery 1 }
+--
+--
+-- upsSecondsOnBattery OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "If the unit is on battery power, the elapsed time
+--     since the UPS last switched to battery power, or the
+--     time since the network management subsystem was last
+--     restarted, whichever is less.  Zero shall be returned
+--     if the unit is not on battery power. UNITS - seconds"
+--   ::= { upsBattery 2 }
+--
+--
+-- upsEstimatedMinutesRemaining OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "An estimate of the time to battery charge depletion
+--     under the present load conditions if the utility power
+--     were to be lost and remain off. UNITS - minutes"
+--   ::= { upsBattery 3 }
+--
+--
+-- upsBatteryChargeRemaining OBJECT-TYPE
+--   SYNTAX INTEGER (0..100)
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The estimate of the battery charge remaining expressed
+--     as a percent of full charge."
+--   ::= { upsBattery 4 }
+--
+--
+-- upsBatteryVoltage OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The magnitude of the present battery voltage.   UNITS  0.1 Volt DC."
+--   ::= { upsBattery 5 }
+--
+--
+--------------------------------------------------------------------------
+-- Note : upsBatteryCurrent MIB variable removed by Dave Cole (SEC) on 4/24/95
+-- To conform with older versions of this MIB,  {upsBattery 6 }  is reserved.
+--------------------------------------------------------------------------
+--
+-- upsBatteryTemperature OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The ambient temperature at or near the UPS Battery.
+--     UNITS degrees Centigrade"
+--   ::= { upsBattery 7 }
+--
+--
+-- the table group has one attribute of its own - the number of rows in the
+-- contained table.  It also contains the table of names.
+-- The Input group.
+-- Implementation of this group is mandatory for all systems.
+--
+-- upsInputFrequency OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The present input frequency.  UNITS  0.1 Hertz"
+--   ::= { upsInput 1 }
+--
+--
+-- upsInputLineBads OBJECT-TYPE
+--   SYNTAX Counter
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "A count of the number of times the input entered an
+--     out-of-tolerance condition as defined by the manufacturer."
+--   ::= { upsInput 2 }
+--
+--
+-- upsInputNumLines OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The number of input lines utilized in this device.
+--     This variable indicates the number of rows in the input table."
+--   ::= { upsInput 3 }
+--
+--
+-- upsInputVolt OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The magnitude of the present input voltage.
+--     UNITS     RMS Volts"
+--   ::= { upsInput 4 }
+--
+--
+-- upsInputTable OBJECT-TYPE
+--   SYNTAX SEQUENCE OF UpsInputEntry
+--   ACCESS not-accessible
+--   STATUS obsolete
+--   DESCRIPTION
+--     "A list of input table entries.  The number of entries
+--     is given by the value of upsInputNumLines."
+--   ::= { upsInput 5 }
+--
+--
+-- upsInputEntry OBJECT-TYPE
+--   SYNTAX UpsInputEntry
+--   ACCESS not-accessible
+--   STATUS obsolete
+--   DESCRIPTION
+--     "An entry containing information applicable to a
+--     particular input line."
+--   INDEX {
+--     upsInputLineIndex }
+--   ::= { upsInputTable 1 }
+--
+--
+-- UpsInputEntry ::= SEQUENCE {
+--   upsInputLineIndex INTEGER,
+--   upsInputVoltage   INTEGER }
+--
+--
+-- upsInputLineIndex OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The input line identifier."
+--   ::= { upsInputEntry 1 }
+--
+--
+-- upsInputVoltage OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The magnitude of the present input voltage.
+--     UNITS     RMS Volts"
+--   ::= { upsInputEntry 2 }
+--
+--
+-- The Output group.
+-- Implementation of this group is mandatory for all systems.
+--
+-- upsOutputSource OBJECT-TYPE
+--   SYNTAX INTEGER {
+--       other(1),
+--       none(2),
+--       normal(3),
+--       bypass(4),
+--       battery(5),
+--       booster(6),
+--       reducer(7) }
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The present source of output power."
+--   ::= { upsOutput 1 }
+--
+--
+-- upsOutputFrequency OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The present output frequency.
+--     UNITS     0.1 Hertz"
+--   ::= { upsOutput 2 }
+--
+--
+-- upsOutputNumLines OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The number of output lines utilized in this device.
+--     This variable indicates the number of rows in the output table."
+--   ::= { upsOutput 3 }
+--
+--
+-- upsOutputPercLoad OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The percentage of true power capacity presently being used.
+--     UNITS     percent"
+--   ::= { upsOutput 4 }
+--
+--
+-- upsOutputTable OBJECT-TYPE
+--   SYNTAX SEQUENCE OF UpsOutputEntry
+--   ACCESS not-accessible
+--   STATUS obsolete
+--   DESCRIPTION
+--     "A list of output table entries.  The number of
+--     entries is given by the value of upsOutputNumLines."
+--   ::= { upsOutput 5 }
+--
+--
+-- upsOutputEntry OBJECT-TYPE
+--   SYNTAX UpsOutputEntry
+--   ACCESS not-accessible
+--   STATUS obsolete
+--   DESCRIPTION
+--     "An entry containing information applicable to a
+--     particular output line."
+--   INDEX {
+--     upsOutputLineIndex }
+--   ::= { upsOutputTable 1 }
+--
+--
+-- UpsOutputEntry ::= SEQUENCE {
+--   upsOutputLineIndex   INTEGER,
+--   upsOutputVoltage     INTEGER,
+--   upsOutputCurrent     INTEGER,
+--   upsOutputPower       INTEGER,
+--   upsOutputPercentLoad INTEGER }
+--
+--
+-- upsOutputLineIndex OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The output line identifier."
+--   ::= { upsOutputEntry 1 }
+--
+--
+-- upsOutputVoltage OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The present output voltage.
+--     UNITS     RMS Volts"
+--   ::= { upsOutputEntry 2 }
+--
+--
+-- upsOutputCurrent OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The present output mandatory.
+--     UNITS     0.1 Amp"
+--   ::= { upsOutputEntry 3 }
+--
+--
+-- upsOutputPower OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The present output true power.
+--     UNITS     Watts"
+--   ::= { upsOutputEntry 4 }
+--
+--
+-- upsOutputPercentLoad OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The percentage of true power capacity presently being used.
+--     UNITS     percent"
+--   ::= { upsOutputEntry 5 }
+--
+--
+-- Alarm Group
+--
+-- upsAlarmsPresent OBJECT-TYPE
+--   SYNTAX Gauge
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The present number of active alarm conditions."
+--   ::= { upsAlarm 1 }
+--
+--
+-- upsAlarmID OBJECT-TYPE
+--   SYNTAX INTEGER {
+--       upsAlarmBatteryBad(1),
+--       upsAlarmOnBattery(2),
+--       upsAlarmLowBattery(3),
+--       upsAlarmDepletedBattery(4),
+--       upsAlarmTempBad(5),
+--       upsAlarmOutputOverload(6),
+--       upsAlarmOutputOffAsRequested(7),
+--       upsAlarmOutputOff(8),
+--       upsAlarmDiagnosticTestFailed(9),
+--       upsAlarmCommunicationsLost(10),
+--       upsAlarmShutdownPending(11),
+--       upsAlarmShutdownImminent(12),
+--       upsAlarmTestInProgress(13) }
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "A unique identifier for an alarm condition.  This
+--     value must remain constant."
+--   ::= { upsAlarm 2 }
+--
+--
+-- upsAlarmDESCR OBJECT-TYPE
+--   SYNTAX DisplayString (SIZE (0..31))
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "A reference to an alarm description object.  The
+--     object references should not be accessible, but rather
+--     be used to provide a unique description of the alarm
+--     condition."
+--   ::= { upsAlarm 3 }
+--
+--
+-- upsAlarmTable OBJECT-TYPE
+--   SYNTAX SEQUENCE OF UpsAlarmEntry
+--   ACCESS not-accessible
+--   STATUS obsolete
+--   DESCRIPTION
+--     "A list of alarm table entries.  The table consists of
+--     zero, one, or may rows at any moment, depending upon
+--     the number of alarm conditions in effect.  The table
+--     is initially empty at agent startup.  The agent
+--     creates a row in the table each time a condition is
+--     detected and deletes that row when that condition no
+--     longer pertains.  The agent creates the first row with
+--     upsAlarmId equal to 1, and increments the value fo
+--     upsAlarmId each time a new row is created, wrapping to
+--     the first free value greater than or equal to 1 when
+--     the maximum value of upsAlarmId would otherwise be
+--     exceeded.  Consequently, after multiple operations,
+--     the table may become sparse, e.g., containing entries
+--     for rows 95, 100, 101, and 203 and the entries are in
+--     chronological order until upsAlarmId wraps.
+--
+--     Alarms are named by and OBJECT IDENTIFIER,
+--     upsAlarmDescr, to allow a single table to reflect well
+--     known alarms plus alarms defined by a particular
+--     implementation, i.e., as documented in the private
+--     enterprise MIB definition for the device.  No two rows
+--     will have the same value of upsAlarmDescr, since
+--     alarms define conditions.  In order to meet this
+--     requirement, care should be take in the definition of
+--     the number of active rows in the table at any given
+--     time is reflected by the value fo upsAlarms."
+--   ::= { upsAlarm 4 }
+--
+--
+-- upsAlarmEntry OBJECT-TYPE
+--   SYNTAX UpsAlarmEntry
+--   ACCESS not-accessible
+--   STATUS obsolete
+--   DESCRIPTION
+--     "An entry containing information applicable to a
+--     particular alarm."
+--   INDEX {
+--     upsAlarmId }
+--   ::= { upsAlarmTable 1 }
+--
+--
+-- UpsAlarmEntry ::= SEQUENCE {
+--   upsAlarmId    INTEGER,
+--   upsAlarmDescr DisplayString,
+--   upsAlarmTime  TimeTicks }
+--
+--
+-- upsAlarmId OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "A unique identifier for an alarm condition.  This
+--     value must remain constant."
+--   ::= { upsAlarmEntry 1 }
+--
+--
+-- upsAlarmDescr OBJECT-TYPE
+--   SYNTAX DisplayString (SIZE (0..31))
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "A reference to an alarm description object.  The
+--     object references should not be accessible, but rather
+--     be used to provide a unique description of the alarm
+--     condition."
+--   ::= { upsAlarmEntry 2 }
+--
+--
+-- upsAlarmTime OBJECT-TYPE
+--   SYNTAX TimeTicks
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The value of sysUpTime when the alarm condition was
+--     detected.  If the alarm condition was detected at the
+--     time of agent startup and presumable existed before
+--     agent startup, the value of upsAlarmTime shall equal
+--     0."
+--   ::= { upsAlarmEntry 3 }
+--
+--
+-- upsAlarmBatteryBad OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "One or more batteries have been determined to require
+--     replacement."
+--   ::= { upsWellKnownAlarms 1 }
+--
+--
+-- upsAlarmOnBattery OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The UPS is drawing power from the batteries."
+--   ::= { upsWellKnownAlarms 2 }
+--
+--
+-- upsAlarmLowBattery OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The remaining battery run-time is less than or equal
+--     to upsConfigMinutesRemaining."
+--   ::= { upsWellKnownAlarms 3 }
+--
+--
+-- upsAlarmDepletedBattery OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The UPS will be unable to sustain the present load
+--     when and if the utility power is lost."
+--   ::= { upsWellKnownAlarms 4 }
+--
+--
+-- upsAlarmTempBad OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "A temperature is out of tolerance."
+--   ::= { upsWellKnownAlarms 5 }
+--
+--
+-- upsAlarmOutputOverload OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The output load exceeds the UPS output capacity."
+--   ::= { upsWellKnownAlarms 6 }
+--
+--
+-- upsAlarmOutputOffAsRequested OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The UPS has shutdown as commanded, i.e., the output is off."
+--   ::= { upsWellKnownAlarms 7 }
+--
+--
+-- upsAlarmUpsOutputOff OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The UPS is in the off state."
+--   ::= { upsWellKnownAlarms 8 }
+--
+--
+-- upsAlarmDiagnosticTestFailed OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The result of the last diagnostic test indicates a
+--     failure."
+--   ::= { upsWellKnownAlarms 9 }
+--
+--
+-- upsAlarmCommunicationsLost OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "A problem has been encountered in the
+--     communications between the agent and the UPS."
+--   ::= { upsWellKnownAlarms 10 }
+--
+--
+-- upsAlarmShutdownPending OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "A upsShutdownAfterDelay countdown is underway."
+--   ::= { upsWellKnownAlarms 11 }
+--
+--
+-- upsAlarmShutdownImminent OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "A upsShutdownAfterDelay countdown is underway."
+--   ::= { upsWellKnownAlarms 12 }
+--
+--
+-- upsAlarmTestInProgress OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "A upsShutdownAfterDelay countdown is underway."
+--   ::= { upsWellKnownAlarms 13 }
+--
+-- Test Group
+--
+-- upsTestId OBJECT-TYPE
+--   SYNTAX INTEGER {
+--       noTestsInitiated(1),
+--       abortTestInProgress(2),
+--       generalSystemsTest(3),
+--       checkBatteryTest(4),
+--       deepBatteryCalibration(5) }
+--   ACCESS read-write
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The test named by an OBJECT IDENTIFIER which
+--     allows a standard mechanism for the initiation of
+--     test, including the well known tests identified in
+--     this document as well as those introduced by a
+--     particular implementation, i.e., as
+--     documented in the private enterprise MIB definition
+--     for the device.
+--
+--     Setting this variable initiates the named test.  Sets
+--     to this variable require the presence of
+--     upsTestSpinLock in the same SNMP message.
+--
+--     The set request will be rejected with an appropriate
+--     error message if the requested test cannot be
+--     performed, including attempts to start a test when
+--     another test is already in progress.  Tests in
+--     progress may be aborted by setting this variable to
+--     upsTestAbortTestInProgress.
+--
+--     Read operations return the value of the name of the
+--     test in progress if a test is in progress or the name
+--     of the last test performed if no test is in progress,
+--     unless no test has bee run, in which case the well
+--     known value upsTestNoTestsInitiated is returned."
+--   ::= { upsTest 1 }
+--
+--
+-- upsTestResultsSummary OBJECT-TYPE
+--   SYNTAX INTEGER {
+--       donePass(1),
+--       doneWarning(2),
+--       doneError(3),
+--       aborted(4),
+--       inProgress(5),
+--       noTestsInitiated(6) }
+--   ACCESS read-only
+--   STATUS obsolete
+--   DESCRIPTION
+--     "The results of the mandatory or last UPS diagnostics
+--     test performed.  The values for donePass(1),
+--     doneWarning(2), and doneError(3) are self-documenting.
+--     The value aborted(4) is returned for tests which are
+--     aborted by setting the value of upsTestId to
+--     upsTestAbortTestInProgress.  Tests which have not yet
+--     concluded are indicated by inProgress(5).  The value
+--     noTestsInitiated(4) indicates that no previous test
+--     results are available, such as in the case when no
+--     tests have been run since the last reinitialization of
+--     the network management subsystem and the system has no
+--     provision for non-volatile storage of test results."
+--   ::= { upsTest 2 }
+--
+--
+--------------------------------------------------------------------------
+-- Note : upsTestResultsDetail MIB variable removed by Dave Cole (SEC) on 4/24/95
+-- To conform with older versions of this MIB, {upsTest 3 } is reserved.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+-- Note : upsTestStartTime MIB variable removed by Dave Cole (SEC) on 4/24/95
+-- To conform with older versions of this MIB, {upsTest 4 } is reserved.
+--------------------------------------------------------------------------
+-- Control Group
+--
+-- upsShutdownType OBJECT-TYPE
+--   SYNTAX INTEGER {
+--       output(1),
+--       system(2) }
+--   ACCESS read-write
+--   STATUS obsolete
+--   DESCRIPTION
+--     "Setting this object will start the output after the
+--     indicated number of seconds.  Setting this object to 0
+--     will cause the UPS to start the output immediately.
+--     If the output is already on at the time the delay has
+--     counted down, nothing will happen."
+--   ::= { upsControl 1 }
+--
+--
+-- upsShutdownAfterDelay OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-write
+--   STATUS obsolete
+--   DESCRIPTION
+--     "Setting this object will shutdown (i.e., turn off)
+--     either the UPS output or the UPS system (as determined
+--     by the value of upsShhutdownType at the time of
+--     shutdown) after the indicated number of seconds, or
+--     less if the UPS batteries become depleted.  Setting
+--     this object to 0 will cause the shutdown to occur
+--     immediately.  Setting this object to -1 will abort the
+--     countdown.  If the system is already in the desired
+--     state at the time the countdown reaches 0, then
+--     nothing will happen.  That is, there is no additional
+--     action at that time if upsShutdownType = system and
+--     the system is already off.  Similarly, there is no
+--     additional action at that time if upsShutdownType =
+--     output and the output is already off.  When read,
+--     upsShutdownAfterDelay will return the number of
+--     seconds remaining until shutdown, or -1 if no shutdown
+--     countdown is in effect.  On some systems, if the agent
+--     is restarted while a shutdown countdown is in effect,
+--     the countdown may be aborted.  Sets to this object
+--     override any upsShutdownAfterDelay already in effect.
+--     UNITS seconds"
+--   ::= { upsControl 2 }
+--
+--
+-- upsStartupAfterDelay OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-write
+--   STATUS obsolete
+--   DESCRIPTION
+--     "Setting this object will start the output after the
+--     indicated number of seconds, includeing starting the
+--     UPS, if necessary.  Setting this object to 0 will
+--     cause the start to occur immediately.  Setting this
+--     object to -1 will abort the countdown.  If the output
+--     is already on at the time the countdown reaches 0,
+--     nothing will happen.  Sets to this object
+--     override the effect of any upsStartupAfterDelay
+--     countdown or upsRebootDuration countdown in progress.
+--     When read, upsStartupAfterDelay will return the number
+--     of seconds until start, or -1 if no startup
+--     countdown is in effect.  If the countdown expires
+--     during a utility failure, the startup shall depend
+--     upon the value of upsAutoRestart at that time.  On
+--     some systems, if the agent is restarted while a
+--     startup countdown is in effect, the countdown is
+--     aborted.
+--     UNITS seconds"
+--   ::= { upsControl 3 }
+--
+--
+-- upsRebootDuration OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-write
+--   STATUS obsolete
+--   DESCRIPTION
+--     "Setting this object will immediately shutdown (i.e.,
+--     turn off) either the UPS output or the UPS system (as
+--     determined by the value of the upsShutdownType at the time
+--     of shutdown)  for a period equal to the indicated
+--     number of seconds, after which time the output will be
+--     started, including starting the UPS, if necessary.  If
+--     the number of seconds required to perform the request
+--     is greater than the requested duration, then the
+--     requested shutdown and startup cycle shall be
+--     performed in the minimum time possible, but in no case
+--     shall this require more than the requested duration
+--     plus 60 seconds.  When read, upsRebootDuration shall
+--     return the number of seconds remaining in the
+--     countdown, or -1 if no countdown is in progress.  If
+--     the startup should occur during a utility failure, the
+--     startup shall depend on the value of upsAutoRestart
+--     at that time.
+--     UNITS seconds"
+--   ::= { upsControl 4 }
+--
+--
+-- upsAutoRestart OBJECT-TYPE
+--   SYNTAX INTEGER {
+--       on(1),
+--       off(2) }
+--   ACCESS read-write
+--   STATUS obsolete
+--   DESCRIPTION
+--     "Setting this object to 'on' will cause the UPS system
+--     to restart after a shutdown if/when utility power is present."
+--   ::= { upsControl 5 }
+--
+--
+-- upsConfig group
+--------------------------------------------------------------------------
+-- Note : upsConfigInputVoltage MIB variable removed by Dave Cole (SEC) on 4/24/95
+-- To conform with older versions of this MIB, {upsConfig 1 } is reserved.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+-- Note : upsInputFreq MIB variable removed by Dave Cole (SEC) on 4/24/95
+-- To conform with older versions of this MIB, {upsConfig 2 } is reserved.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+-- Note : upsConfigOutputVoltage MIB variable removed by Dave Cole (SEC) on 4/24/95
+-- To conform with older versions of this MIB, {upsConfig 3 } is reserved.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+-- Note : upsConfigOutputFreq MIB variable removed by Dave Cole (SEC) on 4/24/95
+-- To conform with older versions of this MIB, {upsConfig 4 } is reserved.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+-- Note : upsConfigOutputVA MIB variable removed by Dave Cole (SEC) on 4/24/95
+-- To conform with older versions of this MIB, {upsConfig 5 } is reserved.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+-- Note : upsConfigOutputPower MIB variable removed by Dave Cole (SEC) on 4/24/95
+-- To conform with older versions of this MIB, {upsConfig 6 } is reserved.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+-- Note : upsConfigLowBattTime MIB variable removed by Dave Cole (SEC) on 4/24/95
+-- To conform with older versions of this MIB, {upsConfig 7 } is reserved.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+-- Note : upsConfigAudibleStatus MIB variable removed by Dave Cole (SEC) on 4/24/95
+-- To conform with older versions of this MIB, {upsConfig 8 } is reserved.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+-- Note : upsConfigLowVoltageTransferPoint MIB variable removed by Dave Cole (SEC) on
+-- 4/24/95.  To conform with older versions of this MIB, {upsConfig 9 } is reserved.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+-- Note : upsConfigHighVoltageTransferPoint MIB variable removed by Dave Cole (SEC) on
+-- 4/24/95.  To conform with older versions of this MIB, {upsConfig 10 } is reserved.
+--------------------------------------------------------------------------
+-- upsConfigInputVoltageHigh OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-write
+--   STATUS obsolete
+--   DESCRIPTION
+--     "If the value of the input voltage (in Volts) exceeds this value, a
+--     utilityVoltageHigh trap will be triggered."
+--   ::= { upsConfig 11 }
+--
+--
+-- upsConfigInputVoltageLow OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-write
+--   STATUS obsolete
+--   DESCRIPTION
+--     "If the value of the input voltage (in Volts) falls below this value, a
+--     utilityVoltageLow trap will be triggered."
+--   ::= { upsConfig 12 }
+--
+--
+-- upsConfigOutputPercLoadHigh OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-write
+--   STATUS obsolete
+--   DESCRIPTION
+--     "If the value of the output percent load exceeds this value, a upsOverload trap
+--     will be triggered."
+--   ::= { upsConfig 13 }
+--
+--
+-- upsConfigBatteryPercLow OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-write
+--   STATUS obsolete
+--   DESCRIPTION
+--     "If the value of the battery percent capacity falls below this value, a lowBattery
+--     trap will be triggered."
+--   ::= { upsConfig 14 }
+--
+--
+-- upsConfigBatteryTemperatureHigh OBJECT-TYPE
+--   SYNTAX INTEGER
+--   ACCESS read-write
+--   STATUS obsolete
+--   DESCRIPTION
+--     "If the value of the battery temperature exceeds this value, a
+--     batteryTemperatureHigh trap will be triggered."
+--   ::= { upsConfig 15 }
+--
+--
+--
+-- Traps
+--------------------------------------------------------------------------
+-- Note : upsOnBattery trap modified by Dave Cole (SEC) on 4/24/95
+-- To conform with older versions of this MIB, trap 1 is reserved.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+-- Note : upsTestCompleted trap removed by Dave Cole (SEC) on 4/24/95
+-- To conform with older versions of this MIB, trap 2 is reserved.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+-- Note : upsAlarmEntryAdded trap removed by Dave Cole (SEC) on 4/24/95
+-- To conform with older versions of this MIB, trap 3 is reserved.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+-- Note : upsAlarmEntryDeleted trap removed by Dave Cole (SEC) on 4/24/95
+-- To conform with older versions of this MIB, trap 4 is reserved.
+--------------------------------------------------------------------------
+--
+-- upsOnBattery TRAP-TYPE
+--   ENTERPRISE tripplite
+--   VARIABLES {
+--     upsIdentAttachedDevices,
+--     upsEstimatedMinutesRemaining}
+--   DESCRIPTION
+--     "The UPS is on battery."
+--  ::= 5
+--
+--
+-- powerRestored TRAP-TYPE
+--   ENTERPRISE tripplite
+--   DESCRIPTION
+--     "Utility power has been restored."
+--  ::= 6
+--
+--
+-- lowBattery TRAP-TYPE
+--   ENTERPRISE tripplite
+--   DESCRIPTION
+--     "The UPS batteries are low and will soon be exhausted."
+--  ::= 7
+--
+--
+-- returnFromLowBattery TRAP-TYPE
+--   ENTERPRISE tripplite
+--   DESCRIPTION
+--     "The UPS has returned from a low battery condition."
+--  ::= 8
+--
+--
+-- communicationEstablished TRAP-TYPE
+--   ENTERPRISE tripplite
+--   DESCRIPTION
+--     "Communication with the UPS has been established.  This trap will be sent
+--     each time there is a transition from a power off condition to a power on condition."
+--  ::= 9
+--
+--
+-- communicationLost TRAP-TYPE
+--   ENTERPRISE tripplite
+--   DESCRIPTION
+--     "Communication with the UPS has been lost."
+--  ::= 10
+--
+--
+-- upsOverload TRAP-TYPE
+--   ENTERPRISE tripplite
+--   DESCRIPTION
+--     "The UPS has sensed a load greater than the value of the
+--     upsConfigOutputPercLoadHigh MIB variable."
+--  ::= 11
+--
+--
+-- upsDiagnosticsFailed TRAP-TYPE
+--   ENTERPRISE tripplite
+--   DESCRIPTION
+--     "The UPS failed its self-test."
+--  ::= 12
+--
+--
+-- upsDiagnosticsPassed TRAP-TYPE
+--   ENTERPRISE tripplite
+--   DESCRIPTION
+--     "The UPS passed its internal self-test."
+--  ::= 13
+--
+--
+-- utilityVoltageHigh TRAP-TYPE
+--   ENTERPRISE tripplite
+--   DESCRIPTION
+--     "The UPS input voltage greater than or equal to the value of
+--     the upsConfigInputVoltageHigh MIB variable."
+--  ::= 14
+--
+--
+-- utilityVoltageLow TRAP-TYPE
+--   ENTERPRISE tripplite
+--   DESCRIPTION
+--     "The UPS input voltage is less than or equal to the value of
+--     the upsConfigInputVoltageLow MIB variable."
+--  ::= 15
+--
+--
+-- utilityVoltageReturnToNormal TRAP-TYPE
+--   ENTERPRISE tripplite
+--   DESCRIPTION
+--     "The UPS has returned from a utility voltage high or low condition."
+--  ::= 16
+--
+--
+-- batteryTemperatureHigh TRAP-TYPE
+--   ENTERPRISE tripplite
+--   DESCRIPTION
+--     "The UPS battery temperature has exceeded the value of the
+--     upsConfigBatteryTemperatureHigh MIB variable."
+--  ::= 17
+--
+--
+-- shutdownPending TRAP-TYPE
+--   ENTERPRISE tripplite
+--   DESCRIPTION
+--     "A UPS shutdown countdown is underway."
+--  ::= 18
+--
+--
+-- upsSleeping TRAP-TYPE
+--   ENTERPRISE tripplite
+--   DESCRIPTION
+--     "The output of the UPS has been turned off."
+--  ::= 19
+--
+--
+-- upsWokeup TRAP-TYPE
+--   ENTERPRISE tripplite
+--   DESCRIPTION
+--     "The output of the UPS has been turned on."
+--  ::= 20
+--
+--
+-- upsBatteryNeedsReplacement TRAP-TYPE
+--   ENTERPRISE tripplite
+--   DESCRIPTION
+--     "The UPS battery needs to be replaced."
+--  ::= 21
+--------------------------------------------------------------------------
+-- END Delta SNMP MIB
+--------------------------------------------------------------------------
+
+
+END

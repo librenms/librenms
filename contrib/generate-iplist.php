@@ -11,10 +11,10 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-require 'includes/defaults.inc.php';
-require 'config.php';
-require 'includes/definitions.inc.php';
-require 'includes/functions.php';
+$init_modules = array();
+require realpath(__DIR__ . '/..') . '/includes/init.php';
+
+include_once 'Net/IPv4.php';
 
 $handle = fopen('ips.txt', 'w');
 
@@ -24,7 +24,7 @@ foreach (dbFetchRows('SELECT * FROM `ipv4_networks`') as $data) {
     if ($bits != '32' && $bits != '32' && $bits > '22') {
         $addr      = Net_IPv4::parseAddress($cidr);
         $broadcast = $addr->broadcast;
-        $ip        = ip2long($network) + '1';
+        $ip        = ip2long($network) + 1;
         $end       = ip2long($broadcast);
         while ($ip < $end) {
             $ipdotted = long2ip($ip);
@@ -39,4 +39,4 @@ foreach (dbFetchRows('SELECT * FROM `ipv4_networks`') as $data) {
 
 fclose($handle);
 
-shell_exec('fping -t 100 -f ips.txt > ips-scanned.txt');
+shell_exec($config['fping'] . ' -t 100 -f ips.txt > ips-scanned.txt');

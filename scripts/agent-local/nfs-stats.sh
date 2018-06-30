@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ############################################################
 # copy this file somewhere like /opt and chmod +x it       #
 # edit your snmpd.conf and add the below line and restart: #

@@ -1,0 +1,575 @@
+
+F5-BIGIP-WAM-MIB DEFINITIONS ::= BEGIN
+--================================================================
+-- F5-BIGIP-WAM-MIB 
+--     A private enterprise MIB for F5 wam traffic management 
+--     systems.
+--     VERSION: 11.6.1
+--================================================================
+
+IMPORTS
+    OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY,
+    Integer32, Opaque, enterprises, Counter32, Counter64, TimeTicks
+        FROM SNMPv2-SMI
+
+    Gauge 
+        FROM RFC1155-SMI 
+
+    TEXTUAL-CONVENTION, MacAddress 
+        FROM SNMPv2-TC 
+
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+
+    InetAddress, InetAddressType, InetPortNumber
+      FROM INET-ADDRESS-MIB
+
+    bigipTrafficMgmt, bigipCompliances, bigipGroups, LongDisplayString
+      FROM F5-BIGIP-COMMON-MIB;
+
+--================================================================
+bigipWAM MODULE-IDENTITY
+    LAST-UPDATED "201507231522Z" -- Thu Jul 23 15:22:52 UTC 2015 
+    ORGANIZATION "F5 Networks, Inc."
+    CONTACT-INFO
+         "postal: F5 Networks, Inc. 
+	 	  401 Elliott Ave. West 
+                  Seattle, WA 98119
+          phone:  (206) 272-5555
+          email:  support@f5.com"
+
+    DESCRIPTION
+        "Top-level infrastructure of the F5 enterprise MIB tree." 
+    ::= { bigipTrafficMgmt 7 }
+
+--================================================================
+
+--bigipWAM
+wamAppStat               OBJECT IDENTIFIER ::= { bigipWAM 1 }
+
+
+--==================================================================
+-- Wam_application_stat
+--==================================================================
+wamAppStatResetStats OBJECT-TYPE 
+	SYNTAX INTEGER
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The action to reset resetable statistics data in  wamAppStat. 
+		 Setting this value to 1 will reset statistics data. 
+		 Note, some statistics data may not be reset including data that are incremental counters."
+	::= { wamAppStat 1 } 
+
+wamAppStatNumber OBJECT-TYPE 
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of wamAppStat entries in the table."
+	::= { wamAppStat 2 } 
+
+wamAppStatTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF WamAppStatEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A table containing per application statistics for the web accelerator module"
+	::= { wamAppStat 3 } 
+
+wamAppStatEntry OBJECT-TYPE
+	SYNTAX  WamAppStatEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Columns in the wamAppStat Table"
+	INDEX {
+		wamAppStatName
+	}
+	::= { wamAppStatTable 1 } 
+
+WamAppStatEntry ::= 
+	SEQUENCE {
+        	wamAppStatName                                         LongDisplayString,
+        	wamAppStatVsName                                       LongDisplayString,
+        	wamAppStatRqstTotal                                    Counter64,
+        	wamAppStatProxied                                      Counter64,
+        	wamAppStatProxiedBytes                                 Counter64,
+        	wamAppStatProxied1500                                  Counter64,
+        	wamAppStatProxied10k                                   Counter64,
+        	wamAppStatProxied50k                                   Counter64,
+        	wamAppStatProxied100k                                  Counter64,
+        	wamAppStatProxied500k                                  Counter64,
+        	wamAppStatProxied1m                                    Counter64,
+        	wamAppStatProxied5m                                    Counter64,
+        	wamAppStatProxiedLarge                                 Counter64,
+        	wamAppStatProxiedNew                                   Counter64,
+        	wamAppStatProxiedExpired                               Counter64,
+        	wamAppStatProxiedPerPolicy                             Counter64,
+        	wamAppStatProxiedPerIrule                              Counter64,
+        	wamAppStatProxiedPerInvalidation                       Counter64,
+        	wamAppStatProxiedPerClientRequest                      Counter64,
+        	wamAppStatProxiedBypass                                Counter64,
+        	wamAppStatFromCache                                    Counter64,
+        	wamAppStatFromCacheBytes                               Counter64,
+        	wamAppStatFromCache1500                                Counter64,
+        	wamAppStatFromCache10k                                 Counter64,
+        	wamAppStatFromCache50k                                 Counter64,
+        	wamAppStatFromCache100k                                Counter64,
+        	wamAppStatFromCache500k                                Counter64,
+        	wamAppStatFromCache1m                                  Counter64,
+        	wamAppStatFromCache5m                                  Counter64,
+        	wamAppStatFromCacheLarge                               Counter64,
+        	wamAppStatOws2xx                                       Counter64,
+        	wamAppStatOws3xx                                       Counter64,
+        	wamAppStatOws4xx                                       Counter64,
+        	wamAppStatOws5xx                                       Counter64,
+        	wamAppStatOwsDropped                                   Counter64,
+        	wamAppStatOwsRejected                                  Counter64,
+        	wamAppStatWam2xx                                       Counter64,
+        	wamAppStatWam3xx                                       Counter64,
+        	wamAppStatWam4xx                                       Counter64,
+        	wamAppStatWam5xx                                       Counter64,
+        	wamAppStatWam503                                       Counter64,
+        	wamAppStatWamDropped                                   Counter64
+	}
+
+wamAppStatName OBJECT-TYPE 
+	SYNTAX LongDisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of the web accelerator application."
+	::= { wamAppStatEntry 1 } 
+
+wamAppStatVsName OBJECT-TYPE 
+	SYNTAX LongDisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of the virtual server."
+	::= { wamAppStatEntry 2 } 
+
+wamAppStatRqstTotal OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests made to this web accelerator
+	     application."
+	::= { wamAppStatEntry 3 } 
+
+wamAppStatProxied OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests proxied by this web accelerator
+	     application."
+	::= { wamAppStatEntry 4 } 
+
+wamAppStatProxiedBytes OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests proxied by this web accelerator
+	     application measured in bytes."
+	::= { wamAppStatEntry 5 } 
+
+wamAppStatProxied1500 OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests between 0 and 1500 bytes proxied
+	     by this web accelerator application."
+	::= { wamAppStatEntry 6 } 
+
+wamAppStatProxied10k OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests between 1500 and 10K bytes proxied
+	     by this web accelerator application."
+	::= { wamAppStatEntry 7 } 
+
+wamAppStatProxied50k OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests between 10K and 50K bytes proxied
+	     by this web accelerator application."
+	::= { wamAppStatEntry 8 } 
+
+wamAppStatProxied100k OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests between 50K and 100K bytes proxied
+	     by this web accelerator application."
+	::= { wamAppStatEntry 9 } 
+
+wamAppStatProxied500k OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests between 100K and 500K bytes proxied
+	     by this web accelerator application."
+	::= { wamAppStatEntry 10 } 
+
+wamAppStatProxied1m OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests between 500k and 1M bytes proxied
+	     by this web accelerator application."
+	::= { wamAppStatEntry 11 } 
+
+wamAppStatProxied5m OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests between 1M and 5M bytes proxied
+	     by this web accelerator application."
+	::= { wamAppStatEntry 12 } 
+
+wamAppStatProxiedLarge OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests larger than 5M bytes proxied
+	     by this web accelerator application."
+	::= { wamAppStatEntry 13 } 
+
+wamAppStatProxiedNew OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of new requests proxied by this
+	     web accelerator application."
+	::= { wamAppStatEntry 14 } 
+
+wamAppStatProxiedExpired OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of expired requests proxied by this
+	     web accelerator application."
+	::= { wamAppStatEntry 15 } 
+
+wamAppStatProxiedPerPolicy OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests proxied per policy by this
+	     web accelerator application."
+	::= { wamAppStatEntry 16 } 
+
+wamAppStatProxiedPerIrule OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests proxied per iRule by this
+	     web accelerator application."
+	::= { wamAppStatEntry 17 } 
+
+wamAppStatProxiedPerInvalidation OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests proxied by invalidation rules by this
+	     web accelerator application."
+	::= { wamAppStatEntry 18 } 
+
+wamAppStatProxiedPerClientRequest OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests proxied by client request headers by this
+	    web accelerator application."
+	::= { wamAppStatEntry 19 } 
+
+wamAppStatProxiedBypass OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of proxy requests bypassed by this
+	     web accelerator application."
+	::= { wamAppStatEntry 20 } 
+
+wamAppStatFromCache OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests served from cache by this
+	     web accelerator application."
+	::= { wamAppStatEntry 21 } 
+
+wamAppStatFromCacheBytes OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of request bytes served from cache by this
+	     web accelerator application."
+	::= { wamAppStatEntry 22 } 
+
+wamAppStatFromCache1500 OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests between 0 and 1500 bytes served
+	     from cache by this web accelerator application."
+	::= { wamAppStatEntry 23 } 
+
+wamAppStatFromCache10k OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests between 1500 and 10K bytes served
+	     from cache by this web accelerator application."
+	::= { wamAppStatEntry 24 } 
+
+wamAppStatFromCache50k OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests between 10K and 50K bytes served
+	     from cache by this web accelerator application."
+	::= { wamAppStatEntry 25 } 
+
+wamAppStatFromCache100k OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests between 50K and 100K bytes served
+	     from cache by this web accelerator application."
+	::= { wamAppStatEntry 26 } 
+
+wamAppStatFromCache500k OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests between 100K and 500K bytes served
+	     from cache by this web accelerator application."
+	::= { wamAppStatEntry 27 } 
+
+wamAppStatFromCache1m OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests between 500k and 1M bytes served
+	     from cache by this web accelerator application."
+	::= { wamAppStatEntry 28 } 
+
+wamAppStatFromCache5m OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests between 1M and 5M bytes served
+	     from cache by this web accelerator application."
+	::= { wamAppStatEntry 29 } 
+
+wamAppStatFromCacheLarge OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of requests larger than 5M bytes served
+	     from cache by this web accelerator application."
+	::= { wamAppStatEntry 30 } 
+
+wamAppStatOws2xx OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of origin web server responses in the range of
+	     200 to 206 (successful responses)."
+	::= { wamAppStatEntry 31 } 
+
+wamAppStatOws3xx OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of origin web server responses in the range of
+	     300 to 307 (redirection responses)."
+	::= { wamAppStatEntry 32 } 
+
+wamAppStatOws4xx OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of origin web server responses in the range of
+	     400 to 417 (client errors)."
+	::= { wamAppStatEntry 33 } 
+
+wamAppStatOws5xx OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of origin web server responses in the range of
+	    500 to 505 (server errors)."
+	::= { wamAppStatEntry 34 } 
+
+wamAppStatOwsDropped OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of requests dropped by origin web server."
+	::= { wamAppStatEntry 35 } 
+
+wamAppStatOwsRejected OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of requests rejected by origin web server."
+	::= { wamAppStatEntry 36 } 
+
+wamAppStatWam2xx OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of responses in the range of 200 to 206 
+	     (successful responses) served by this web accelerator application."
+	::= { wamAppStatEntry 37 } 
+
+wamAppStatWam3xx OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of responses in the range of 300 to 307
+	     (redirection responses) served by this web accelerator application."
+	::= { wamAppStatEntry 38 } 
+
+wamAppStatWam4xx OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of responses in the range of 400 to 417
+	     (client errors) served by this web accelerator application."
+	::= { wamAppStatEntry 39 } 
+
+wamAppStatWam5xx OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of responses in the range of 500 to 505
+	     (server errors) served by this web accelerator application."
+	::= { wamAppStatEntry 40 } 
+
+wamAppStatWam503 OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of 503 response served by this web accelerator application."
+	::= { wamAppStatEntry 41 } 
+
+wamAppStatWamDropped OBJECT-TYPE 
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of requests dropped by this web accelerator application."
+	::= { wamAppStatEntry 42 } 
+
+--================================================================
+ -- Compliance and Group
+--================================================================
+
+bigipWAMCompliance	MODULE-COMPLIANCE 
+	STATUS current
+	DESCRIPTION
+		"This specifies the objects that are required to claim 
+                 compliance to F5 Traffic Management System."
+	MODULE
+	  MANDATORY-GROUPS { bigipWAMGroups } 
+	::= { bigipCompliances 7 } 
+
+bigipWAMGroups  OBJECT IDENTIFIER ::= {  bigipGroups 7 }
+
+wamAppStatGroup OBJECT-GROUP
+	 OBJECTS {
+		wamAppStatResetStats,
+		wamAppStatNumber,
+		wamAppStatName,
+		wamAppStatVsName,
+		wamAppStatRqstTotal,
+		wamAppStatProxied,
+		wamAppStatProxiedBytes,
+		wamAppStatProxied1500,
+		wamAppStatProxied10k,
+		wamAppStatProxied50k,
+		wamAppStatProxied100k,
+		wamAppStatProxied500k,
+		wamAppStatProxied1m,
+		wamAppStatProxied5m,
+		wamAppStatProxiedLarge,
+		wamAppStatProxiedNew,
+		wamAppStatProxiedExpired,
+		wamAppStatProxiedPerPolicy,
+		wamAppStatProxiedPerIrule,
+		wamAppStatProxiedPerInvalidation,
+		wamAppStatProxiedPerClientRequest,
+		wamAppStatProxiedBypass,
+		wamAppStatFromCache,
+		wamAppStatFromCacheBytes,
+		wamAppStatFromCache1500,
+		wamAppStatFromCache10k,
+		wamAppStatFromCache50k,
+		wamAppStatFromCache100k,
+		wamAppStatFromCache500k,
+		wamAppStatFromCache1m,
+		wamAppStatFromCache5m,
+		wamAppStatFromCacheLarge,
+		wamAppStatOws2xx,
+		wamAppStatOws3xx,
+		wamAppStatOws4xx,
+		wamAppStatOws5xx,
+		wamAppStatOwsDropped,
+		wamAppStatOwsRejected,
+		wamAppStatWam2xx,
+		wamAppStatWam3xx,
+		wamAppStatWam4xx,
+		wamAppStatWam5xx,
+		wamAppStatWam503,
+		wamAppStatWamDropped
+	}
+	STATUS	 current
+	DESCRIPTION
+		"A collection of objects of wamAppStat MIB."
+	::= { bigipWAMGroups 1 }
+END

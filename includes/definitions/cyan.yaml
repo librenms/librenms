@@ -1,0 +1,9 @@
+os: cyan
+text: 'Ciena Z-Series'
+icon: ciena
+over:
+    - { graph: device_bits, text: Traffic }
+type: network
+discovery:
+    - sysObjectID:
+      - .1.3.6.1.4.1.28533.

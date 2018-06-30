@@ -1,0 +1,128 @@
+NETGEAR-LOOPBACK-MIB DEFINITIONS ::= BEGIN
+
+-- Netgear Loopback MIB
+-- Copyright Netgear Inc (2001-2007) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property.  Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, IpAddress,
+    mib-2, Unsigned32, Integer32          FROM SNMPv2-SMI
+    RowStatus, DisplayString, PhysAddress, TruthValue
+                                          FROM SNMPv2-TC
+    InetAddressIPv4			                  FROM INET-ADDRESS-MIB
+    lb6m                              FROM QUANTA-LB6M-REF-MIB;
+    
+    fastPathLoopback MODULE-IDENTITY
+        LAST-UPDATED "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "The Netgear Private MIB for FastPath Loopback"
+
+      -- Revision history.
+        REVISION
+          "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        DESCRIPTION
+          "Postal address updated."
+        REVISION
+          "200705230000Z" -- 23 May 2007 12:00:00 GMT
+        DESCRIPTION
+          "Netgear branding related changes."
+
+
+    ::= { lb6m 22 }
+    --**************************************************************************************
+    -- agentLoopbackIPV6Group
+    --
+    --**************************************************************************************
+
+    agentLoopbackGroup       OBJECT IDENTIFIER ::= { fastPathLoopback 1 }
+
+    agentLoopbackTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentLoopbackEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A summary table of the Loopback instances"
+         ::= { agentLoopbackGroup 1 }
+
+    agentLoopbackEntry OBJECT-TYPE
+         SYNTAX      AgentLoopbackEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     ""
+         INDEX       { agentLoopbackID }
+         ::= { agentLoopbackTable 1 }
+
+    AgentLoopbackEntry ::= SEQUENCE {
+                        agentLoopbackID
+                           Integer32,
+                        agentLoopbackIfIndex
+                           Integer32,
+                        agentLoopbackIPAddress
+                           InetAddressIPv4,
+                        agentLoopbackIPSubnet
+                           InetAddressIPv4,
+                        agentLoopbackStatus
+                           RowStatus
+           }
+
+    agentLoopbackID      OBJECT-TYPE
+         SYNTAX          Integer32 (0..2147483647)
+         MAX-ACCESS      not-accessible
+         STATUS          current
+         DESCRIPTION
+                         "The  Loopback ID is associated with Internal Interface number
+                         which will be generated when we create a loopback."
+         ::= { agentLoopbackEntry 1 }
+
+    agentLoopbackIfIndex OBJECT-TYPE
+         SYNTAX          Integer32
+         MAX-ACCESS      read-only
+         STATUS          current
+         DESCRIPTION
+                         "This is external interface associated with inetrnal interface of loopback.
+                          The  Loopback ID is associated with Internal Interface number
+                         which will be generated when we create a loopback."
+         ::= { agentLoopbackEntry 2 }
+
+    agentLoopbackIPAddress OBJECT-TYPE
+         SYNTAX            InetAddressIPv4
+         MAX-ACCESS        read-write
+         STATUS            current
+         DESCRIPTION
+                           "The IP Address configured for the respective loopback"
+         ::= { agentLoopbackEntry 3 }
+
+    agentLoopbackIPSubnet  OBJECT-TYPE
+         SYNTAX            InetAddressIPv4
+         MAX-ACCESS        read-write
+         STATUS            current
+         DESCRIPTION
+                           "The Subnet mask configured for the respective loopback"
+         ::= { agentLoopbackEntry 4 }
+
+    agentLoopbackStatus OBJECT-TYPE
+         SYNTAX         RowStatus
+         MAX-ACCESS     read-create
+         STATUS         current
+         DESCRIPTION
+                        "Status of this instance.  The rows can be added/deleted in the table by setting createAndGo/destroy respectively
+
+                     active(1)      - this loopback instance is active
+                     createAndGo(4) - set to this value to create an instance
+                     destroy(6)     - set to this value to delete an instance"
+         ::= { agentLoopbackEntry 5 }
+
+END

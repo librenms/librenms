@@ -1,0 +1,2881 @@
+--  =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description:HUAWEI-BRAS-QOS-MIB DEFINITIONS
+-- Reference:
+-- Version: V1.0
+-- History:
+--  
+-- =================================================================
+
+    HUAWEI-BRAS-QOS-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwBRASMib            
+                FROM HUAWEI-MIB            
+            InterfaceIndex            
+                FROM IF-MIB            
+            VlanIndex            
+                FROM Q-BRIDGE-MIB            
+            Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            RowStatus, TruthValue, TEXTUAL-CONVENTION            
+                FROM SNMPv2-TC;
+    
+    
+        hwBRASQoS MODULE-IDENTITY 
+            LAST-UPDATED "200504181334Z"        -- April 18, 2005 at 13:34 GMT
+            ORGANIZATION 
+                "Organization."
+            CONTACT-INFO 
+                "Floor 5, Block 4, R&D Building,
+                Huawei Longgang Production Base,
+                Shenzhen,   P.R.C.
+                http://www.huawei.com
+                Zip:518057
+                "
+            DESCRIPTION 
+                "The MIB contains objects of module QOS."
+            ::= { hwBRASMib 18 }
+        
+
+
+        SchedulerStyle ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "QoS scheduler style,with sp and wrr."
+            SYNTAX INTEGER
+                {
+                sp(1),
+                wrr(2)
+                }
+            
+        QueueClass ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "QoS Queue service class,from ef to cs7."
+            SYNTAX INTEGER
+                {
+                be(1),
+                af1(2),
+                af2(3),
+                af3(4),
+                af4(5),
+                ef(6),
+                cs6(7),
+                cs7(8)
+                }
+            
+        SchedulerService ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "QoS scheduler service style,with pq,lpq and wfq."
+            SYNTAX INTEGER
+                {
+                pq(1),
+                wfq(2),
+                lpq(3)
+                }
+            
+        InterfaceScheduler ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Interface scheduler service type,with location,none and service group."
+            SYNTAX INTEGER
+                {
+                location(1),
+                none(2),
+                servicegroup(3)
+                }
+            
+        LinkMode ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Remote Qos link mode,with frame and cell."
+            SYNTAX INTEGER
+                {
+                none(1),
+                frame(2),
+                cell(3)
+                }
+            
+        StatMode ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Interface statistics mode,with before,all and after."
+            SYNTAX INTEGER
+                {
+                none(1),
+                before(2),
+                after(3),
+                both(4)
+                }
+            
+    
+        hwBRASQoSObjects OBJECT IDENTIFIER ::= { hwBRASQoS 1 }
+        
+        hwBRASQoSQoSProfileTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBRASQoSQoSProfileEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS profile config info."
+            ::= { hwBRASQoSObjects 1 }
+        
+        hwBRASQoSQoSProfileEntry OBJECT-TYPE
+            SYNTAX HwBRASQoSQoSProfileEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS Profile Configuration Information Entry."
+            INDEX { hwBRASQoSQoSProfileIndex }
+            ::= { hwBRASQoSQoSProfileTable 1 }
+        
+        HwBRASQoSQoSProfileEntry ::=
+            SEQUENCE { 
+                hwBRASQoSQoSProfileIndex
+                    Integer32,
+                hwBRASQoSQoSProfileName
+                    OCTET STRING,
+                hwBRASQoSQoSProfileQueueName
+                    OCTET STRING,
+                hwBRASQoSQoSProfileDropName
+                    OCTET STRING,
+                hwBRASQoSQoSProfileSchedulerName
+                    OCTET STRING,
+                hwBRASQoSQoSFlowMappingName
+                    OCTET STRING,
+                hwBRASQoSQoSLinkAjustLength
+                    OCTET STRING,
+                hwBRASQoSQoSProfileRowStatus
+                    RowStatus
+             }
+
+        hwBRASQoSQoSProfileIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..1023)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "QoS profile entry index."
+            ::= { hwBRASQoSQoSProfileEntry 1 }
+        
+        hwBRASQoSQoSProfileName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "QoS profile name."
+            ::= { hwBRASQoSQoSProfileEntry 2 }
+        
+        hwBRASQoSQoSProfileQueueName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "QoS queue profile name."
+            DEFVAL { "default" }
+            ::= { hwBRASQoSQoSProfileEntry 3 }
+        
+        hwBRASQoSQoSProfileDropName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "QoS drop profile name."
+            DEFVAL { "default" }
+            ::= { hwBRASQoSQoSProfileEntry 4 }
+        
+        hwBRASQoSQoSProfileSchedulerName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "QoS scheduler profile name."
+            DEFVAL { "default" }
+            ::= { hwBRASQoSQoSProfileEntry 5 }
+        
+        hwBRASQoSQoSFlowMappingName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "QoS flow mapping name."
+            DEFVAL { "default" }
+            ::= { hwBRASQoSQoSProfileEntry 6 }
+        
+        hwBRASQoSQoSLinkAjustLength OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Exact link ajustment length fo SQ."
+            ::= { hwBRASQoSQoSProfileEntry 7 }
+        
+        hwBRASQoSQoSProfileRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row status,two actions are used: active and destroy."
+            ::= { hwBRASQoSQoSProfileEntry 8 }
+        
+        hwBRASQoSSchedulerProfileTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBRASQoSSchedulerProfileEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS scheduler profile config info."
+            ::= { hwBRASQoSObjects 2 }
+        
+
+        hwBRASQoSSchedulerProfileEntry OBJECT-TYPE
+            SYNTAX HwBRASQoSSchedulerProfileEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS Scheduler Profile Configuration Information Entry."
+            INDEX { hwBRASQoSSchedulerProfileIndex }
+            ::= { hwBRASQoSSchedulerProfileTable 1 }
+        
+        HwBRASQoSSchedulerProfileEntry ::=
+            SEQUENCE { 
+                hwBRASQoSSchedulerProfileIndex
+                    Integer32,
+                hwBRASQoSSchedulerProfileName
+                    OCTET STRING,
+                hwBRASQoSSchedulerProfileGtsUpCir
+                    Integer32,
+                hwBRASQoSSchedulerProfileGtsUpPir
+                    Integer32,
+                hwBRASQoSSchedulerProfileGtsUpLength
+                    Integer32,
+                hwBRASQoSSchedulerProfileGtsDownCir
+                    Integer32,
+                hwBRASQoSSchedulerProfileGtsDownPir
+                    Integer32,
+                hwBRASQoSSchedulerProfileGtsDownLength
+                    Integer32,
+                hwBRASQoSSchedulerProfileUpCir
+                    Integer32,
+                hwBRASQoSSchedulerProfileUpCbs
+                    Integer32,
+                hwBRASQoSSchedulerProfileUpPir
+                    Integer32,
+                hwBRASQoSSchedulerProfileUpPbs
+                    Integer32,
+                hwBRASQoSSchedulerProfileDownCir
+                    Integer32,
+                hwBRASQoSSchedulerProfileDownCbs
+                    Integer32,
+                hwBRASQoSSchedulerProfileDownPir
+                    Integer32,
+                hwBRASQoSSchedulerProfileDownPbs
+                    Integer32,
+                hwBRASQoSSchedulerProfileWfqWeight
+                    Integer32,
+                hwBRASQoSSchedulerRowStatus
+                    RowStatus
+             }
+
+        hwBRASQoSSchedulerProfileIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..1023)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Scheduler profile entry index."
+            ::= { hwBRASQoSSchedulerProfileEntry 1 }
+        
+        hwBRASQoSSchedulerProfileName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Scheduler profile name."
+            ::= { hwBRASQoSSchedulerProfileEntry 2 }
+        
+        hwBRASQoSSchedulerProfileGtsUpCir OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 70..10000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "GTS upstream cir (Unit:Kbps)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSSchedulerProfileEntry 3 }
+        
+        hwBRASQoSSchedulerProfileGtsUpPir OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 0..10000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "GTS upstream pir (Unit:Kbps)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSSchedulerProfileEntry 4 }
+        
+        hwBRASQoSSchedulerProfileGtsUpLength OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 2000..128000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "GTS upstream queue length (Unit:Kbyte)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSSchedulerProfileEntry 5 }
+        
+        hwBRASQoSSchedulerProfileGtsDownCir OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 70..1000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "GTS downstream cir (Unit:Kbps)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSSchedulerProfileEntry 6 }
+        
+        hwBRASQoSSchedulerProfileGtsDownPir OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 0..1000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "GTS downstream pir (Unit:Kbps)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSSchedulerProfileEntry 7 }
+        
+        hwBRASQoSSchedulerProfileGtsDownLength OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 2000..128000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "GTS downstream queue length (Unit:Kbyte)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSSchedulerProfileEntry 8 }
+        
+        hwBRASQoSSchedulerProfileUpCir OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 70..1000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Upstream cir (Unit:Kbps)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSSchedulerProfileEntry 9 }
+        
+        hwBRASQoSSchedulerProfileUpCbs OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 10000..8388608)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Upstream cbs (Unit:byte)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSSchedulerProfileEntry 10 }
+        
+        hwBRASQoSSchedulerProfileUpPir OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 70..1000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Upstream pir (Unit:Kbps)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSSchedulerProfileEntry 11 }
+        
+
+        hwBRASQoSSchedulerProfileUpPbs OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 10000..8388608)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Upstream pbs (Unit:byte)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSSchedulerProfileEntry 12 }
+        
+        hwBRASQoSSchedulerProfileDownCir OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 70..10000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Downstream cir (Unit:Kbps)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSSchedulerProfileEntry 13 }
+        
+        hwBRASQoSSchedulerProfileDownCbs OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 10000..8388608)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Downstream cbs (Unit:byte)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSSchedulerProfileEntry 14 }
+        
+
+        hwBRASQoSSchedulerProfileDownPir OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 70..1000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Downstream cir (Unit:Kbps)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSSchedulerProfileEntry 15 }
+        
+        hwBRASQoSSchedulerProfileDownPbs OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 10000..8388608)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Downstream pbs (Unit:byte)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSSchedulerProfileEntry 16 }
+        
+        hwBRASQoSSchedulerProfileWfqWeight OBJECT-TYPE
+            SYNTAX Integer32 (1..63)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Scheduler WFQ Weight."
+            DEFVAL { 10 }
+            ::= { hwBRASQoSSchedulerProfileEntry 17 }
+        
+        hwBRASQoSSchedulerRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row status,two actions are used: active and destroy."
+            ::= { hwBRASQoSSchedulerProfileEntry 18 }
+        
+        hwBRASQoSDropProfileTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBRASQoSDropProfileEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS drop profile config info."
+            ::= { hwBRASQoSObjects 3 }
+        
+        hwBRASQoSDropProfileEntry OBJECT-TYPE
+            SYNTAX HwBRASQoSDropProfileEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS Drop Profile Configuration Information Entry."
+            INDEX { hwBRASQoSDropProfileIndex }
+            ::= { hwBRASQoSDropProfileTable 1 }
+        
+        HwBRASQoSDropProfileEntry ::=
+            SEQUENCE { 
+                hwBRASQoSDropProfileIndex
+                    Integer32,
+                hwBRASQoSDropProfileName
+                    OCTET STRING,
+                hwBRASQoSDropProfileTailBeThreshold
+                    Integer32,
+                hwBRASQoSDropProfileTailAf1Threshold
+                    Integer32,
+                hwBRASQoSDropProfileTailAf2Threshold
+                    Integer32,
+                hwBRASQoSDropProfileTailAf3Threshold
+                    Integer32,
+                hwBRASQoSDropProfileTailAf4Threshold
+                    Integer32,
+                hwBRASQoSDropProfileTailEfThreshold
+                    Integer32,
+                hwBRASQoSDropProfileTailCs6Threshold
+                    Integer32,
+                hwBRASQoSDropProfileTailCs7Threshold
+                    Integer32,
+                hwBRASQoSDropProfileWredMaxThreshold
+                    Integer32,
+                hwBRASQoSDropProfileWredMinThreshold
+                    Integer32,
+                hwBRASQoSDropProfileWredGreenHighValue
+                    Integer32,
+                hwBRASQoSDropProfileWredGreenLowValue
+                    Integer32,
+                hwBRASQoSDropProfileWredGreenMaxDrop
+                    Integer32,
+                hwBRASQoSDropProfileWredYellowHighValue
+                    Integer32,
+                hwBRASQoSDropProfileWredYellowLowValue
+                    Integer32,
+                hwBRASQoSDropProfileWredYellowMaxDrop
+                    Integer32,
+                hwBRASQoSDropProfileWredRedHighValue
+                    Integer32,
+                hwBRASQoSDropProfileWredRedLowValue
+                    Integer32,
+                hwBRASQoSDropProfileWredRedMaxDrop
+                    Integer32,
+                hwBRASQoSDropProfileWredUserDefHighValue
+                    Integer32,
+                hwBRASQoSDropProfileWredUserDefLowValue
+                    Integer32,
+                hwBRASQoSDropProfileWredUserDefMaxDrop
+                    Integer32,
+                hwBRASQoSDropProfileRowStatus
+                    RowStatus
+             }
+
+        hwBRASQoSDropProfileIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..63)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Drop profile entry index."
+            ::= { hwBRASQoSDropProfileEntry 1 }
+        
+        hwBRASQoSDropProfileName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Drop profile name."
+            ::= { hwBRASQoSDropProfileEntry 2 }
+        
+        hwBRASQoSDropProfileTailBeThreshold OBJECT-TYPE
+            SYNTAX Integer32 (1..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Tail-drop Threshold for BE,in percentage.
+                "
+            DEFVAL { 55 }
+            ::= { hwBRASQoSDropProfileEntry 3 }
+        
+        hwBRASQoSDropProfileTailAf1Threshold OBJECT-TYPE
+            SYNTAX Integer32 (1..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Tail-drop Threshold for AF1,in percentage.
+                "
+            DEFVAL { 55 }
+            ::= { hwBRASQoSDropProfileEntry 4 }
+        
+        hwBRASQoSDropProfileTailAf2Threshold OBJECT-TYPE
+            SYNTAX Integer32 (1..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Tail-drop Threshold for AF2,in percentage.
+                "
+            DEFVAL { 60 }
+            ::= { hwBRASQoSDropProfileEntry 5 }
+        
+        hwBRASQoSDropProfileTailAf3Threshold OBJECT-TYPE
+            SYNTAX Integer32 (1..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Tail-drop Threshold for AF3,in percentage.
+                "
+            DEFVAL { 60 }
+            ::= { hwBRASQoSDropProfileEntry 6 }
+        
+        hwBRASQoSDropProfileTailAf4Threshold OBJECT-TYPE
+            SYNTAX Integer32 (1..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Tail-drop Threshold for AF4,in percentage.
+                "
+            DEFVAL { 70 }
+            ::= { hwBRASQoSDropProfileEntry 7 }
+        
+        hwBRASQoSDropProfileTailEfThreshold OBJECT-TYPE
+            SYNTAX Integer32 (1..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Tail-drop Threshold for EF,in percentage.
+                "
+            DEFVAL { 80 }
+            ::= { hwBRASQoSDropProfileEntry 8 }
+        
+        hwBRASQoSDropProfileTailCs6Threshold OBJECT-TYPE
+            SYNTAX Integer32 (1..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Tail-drop Threshold for CS6,in percentage.
+                "
+            DEFVAL { 90 }
+            ::= { hwBRASQoSDropProfileEntry 9 }
+        
+        hwBRASQoSDropProfileTailCs7Threshold OBJECT-TYPE
+            SYNTAX Integer32 (1..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Tail-drop Threshold for CS7,in percentage.
+                "
+            DEFVAL { 100 }
+            ::= { hwBRASQoSDropProfileEntry 10 }
+        
+        hwBRASQoSDropProfileWredMaxThreshold OBJECT-TYPE
+            SYNTAX Integer32 (1..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Max threshold for WRED."
+            DEFVAL { 90 }
+            ::= { hwBRASQoSDropProfileEntry 11 }
+        
+
+        hwBRASQoSDropProfileWredMinThreshold OBJECT-TYPE
+            SYNTAX Integer32 (1..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Minimum threshold for WRED."
+            DEFVAL { 2 }
+            ::= { hwBRASQoSDropProfileEntry 12 }
+        
+        hwBRASQoSDropProfileWredGreenHighValue OBJECT-TYPE
+            SYNTAX Integer32 (0..4095)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "WRED green high threshold (Unit:256byte)."
+            DEFVAL { 4095 }
+            ::= { hwBRASQoSDropProfileEntry 13 }
+        
+        hwBRASQoSDropProfileWredGreenLowValue OBJECT-TYPE
+            SYNTAX Integer32 (0..4095)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "WRED green low threshold (Unit:256byte)."
+            DEFVAL { 4095 }
+            ::= { hwBRASQoSDropProfileEntry 14 }
+        
+        hwBRASQoSDropProfileWredGreenMaxDrop OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "WRED green max drop,in percentage."
+            DEFVAL { '100'b }
+            ::= { hwBRASQoSDropProfileEntry 15 }
+        
+        hwBRASQoSDropProfileWredYellowHighValue OBJECT-TYPE
+            SYNTAX Integer32 (0..4095)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "WRED yellow high threshold (Unit:256byte)."
+            DEFVAL { 4095 }
+            ::= { hwBRASQoSDropProfileEntry 16 }
+        
+
+        hwBRASQoSDropProfileWredYellowLowValue OBJECT-TYPE
+            SYNTAX Integer32 (0..4095)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "WRED yellow low threshold (Unit:256byte)."
+            DEFVAL { 4095 }
+            ::= { hwBRASQoSDropProfileEntry 17 }
+        
+        hwBRASQoSDropProfileWredYellowMaxDrop OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "WRED yellow max drop,in percentage."
+            DEFVAL { 100 }
+            ::= { hwBRASQoSDropProfileEntry 18 }
+        
+        hwBRASQoSDropProfileWredRedHighValue OBJECT-TYPE
+            SYNTAX Integer32 (0..4095)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "WRED red high threshold (Unit:256byte)."
+            DEFVAL { 4095 }
+            ::= { hwBRASQoSDropProfileEntry 19 }
+        
+        hwBRASQoSDropProfileWredRedLowValue OBJECT-TYPE
+            SYNTAX Integer32 (0..4095)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "WRED red low threshold (Unit:256byte)."
+            DEFVAL { 4095 }
+            ::= { hwBRASQoSDropProfileEntry 20 }
+        
+        hwBRASQoSDropProfileWredRedMaxDrop OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "WRED red max drop,in percentage."
+            DEFVAL { 100 }
+            ::= { hwBRASQoSDropProfileEntry 21 }
+        
+        hwBRASQoSDropProfileWredUserDefHighValue OBJECT-TYPE
+            SYNTAX Integer32 (0..4095)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "User defined WRED high threshold (Unit:256byte)."
+            DEFVAL { 4095 }
+            ::= { hwBRASQoSDropProfileEntry 22 }
+        
+        hwBRASQoSDropProfileWredUserDefLowValue OBJECT-TYPE
+            SYNTAX Integer32 (0..4095)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "User defined WRED low threshold (Unit:256byte)."
+            DEFVAL { 4095 }
+            ::= { hwBRASQoSDropProfileEntry 23 }
+        
+        hwBRASQoSDropProfileWredUserDefMaxDrop OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "User defined WRED max drop,in percentage."
+            DEFVAL { 100 }
+            ::= { hwBRASQoSDropProfileEntry 24 }
+        
+        hwBRASQoSDropProfileRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row status,two actions are used: active and destroy."
+            ::= { hwBRASQoSDropProfileEntry 25 }
+        
+
+        hwBRASQoSQueueProfileTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBRASQoSQueueProfileEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS queue profile config info."
+            ::= { hwBRASQoSObjects 4 }
+        
+        hwBRASQoSQueueProfileEntry OBJECT-TYPE
+            SYNTAX HwBRASQoSQueueProfileEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS Queue Profile Configuration Information Entry."
+            INDEX { hwBRASQoSQueueProfileIndex }
+            ::= { hwBRASQoSQueueProfileTable 1 }
+        
+        HwBRASQoSQueueProfileEntry ::=
+            SEQUENCE { 
+                hwBRASQoSQueueProfileIndex
+                    Integer32,
+                hwBRASQoSQueueProfileName
+                    OCTET STRING,
+                hwBRASQoSQueueProfileBeStyle
+                    SchedulerStyle,
+                hwBRASQoSQueueProfileAf1Style
+                    SchedulerStyle,
+                hwBRASQoSQueueProfileAf2Style
+                    SchedulerStyle,
+                hwBRASQoSQueueProfileAf3Style
+                    SchedulerStyle,
+                hwBRASQoSQueueProfileAf4Style
+                    SchedulerStyle,
+                hwBRASQoSQueueProfileEfStyle
+                    SchedulerStyle,
+                hwBRASQoSQueueProfileCs6Style
+                    SchedulerStyle,
+                hwBRASQoSQueueProfileCs7Style
+                    SchedulerStyle,
+                hwBRASQoSQueueProfileRowStatus
+                    RowStatus
+             }
+
+        hwBRASQoSQueueProfileIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..63)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Queue profile entry index."
+            ::= { hwBRASQoSQueueProfileEntry 1 }
+        
+        hwBRASQoSQueueProfileName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Queue profile name."
+            ::= { hwBRASQoSQueueProfileEntry 2 }
+        
+        hwBRASQoSQueueProfileBeStyle OBJECT-TYPE
+            SYNTAX SchedulerStyle
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "BE queue schedule style."
+            DEFVAL { sp }
+            ::= { hwBRASQoSQueueProfileEntry 3 }
+        
+        hwBRASQoSQueueProfileAf1Style OBJECT-TYPE
+            SYNTAX SchedulerStyle
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "AF1 queue schedule style."
+            DEFVAL { sp }
+            ::= { hwBRASQoSQueueProfileEntry 4 }
+        
+        hwBRASQoSQueueProfileAf2Style OBJECT-TYPE
+            SYNTAX SchedulerStyle
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "AF2 queue schedule style."
+            DEFVAL { sp }
+            ::= { hwBRASQoSQueueProfileEntry 5 }
+        
+        hwBRASQoSQueueProfileAf3Style OBJECT-TYPE
+            SYNTAX SchedulerStyle
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "AF3 queue schedule style."
+            DEFVAL { sp }
+            ::= { hwBRASQoSQueueProfileEntry 6 }
+        
+        hwBRASQoSQueueProfileAf4Style OBJECT-TYPE
+            SYNTAX SchedulerStyle
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "AF4 queue schedule style."
+            DEFVAL { sp }
+            ::= { hwBRASQoSQueueProfileEntry 7 }
+        
+        hwBRASQoSQueueProfileEfStyle OBJECT-TYPE
+            SYNTAX SchedulerStyle
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "EF queue schedule style."
+            DEFVAL { sp }
+            ::= { hwBRASQoSQueueProfileEntry 8 }
+        
+        hwBRASQoSQueueProfileCs6Style OBJECT-TYPE
+            SYNTAX SchedulerStyle
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "CS6 queue schedule style."
+            DEFVAL { sp }
+            ::= { hwBRASQoSQueueProfileEntry 9 }
+        
+        hwBRASQoSQueueProfileCs7Style OBJECT-TYPE
+            SYNTAX SchedulerStyle
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "CS7 queue schedule style."
+            DEFVAL { sp }
+            ::= { hwBRASQoSQueueProfileEntry 10 }
+        
+        hwBRASQoSQueueProfileRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row status,two actions are used: active and destroy."
+            ::= { hwBRASQoSQueueProfileEntry 11 }
+        
+        hwBRASQoSQueueClassTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBRASQoSQueueClassEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS queue schedule class info."
+            ::= { hwBRASQoSObjects 5 }
+        
+        hwBRASQoSQueueClassEntry OBJECT-TYPE
+            SYNTAX HwBRASQoSQueueClassEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS Queue Class Configuration Information Entry."
+            INDEX { hwBRASQoSQueueClassProfileName, hwBRASQoSQueueClassServiceId }
+            ::= { hwBRASQoSQueueClassTable 1 }
+        
+        HwBRASQoSQueueClassEntry ::=
+            SEQUENCE { 
+                hwBRASQoSQueueClassProfileName
+                    OCTET STRING,
+                hwBRASQoSQueueClassServiceId
+                    QueueClass,
+                hwBRASQoSQueueClassWredEnableStatus
+                    TruthValue,
+                hwBRASQoSQueueClassWredWeight
+                    Integer32,
+                hwBRASQoSQueueClassWrrWeight
+                    Integer32,
+                hwBRASQoSQueueClassLength
+                    Integer32,
+                hwBRASQoSQueueClassCir
+                    Integer32,
+                hwBRASQoSQueueClassCbs
+                    Integer32,
+                hwBRASQoSQueueClassPir
+                    Integer32,
+                hwBRASQoSQueueClassPbs
+                    Integer32,
+                hwBRASQoSQueueClassWfqWeight
+                    Integer32,
+                hwBRASQoSQueueClassShaping
+                    Integer32,
+                hwBRASQoSQueueClassScheduler
+                    SchedulerService,
+                hwBRASQoSQueueClassDropName
+                    OCTET STRING
+             }
+
+        hwBRASQoSQueueClassProfileName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Queue profile name."
+            ::= { hwBRASQoSQueueClassEntry 1 }
+        
+        hwBRASQoSQueueClassServiceId OBJECT-TYPE
+            SYNTAX QueueClass
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Service queue class id."
+            ::= { hwBRASQoSQueueClassEntry 2 }
+        
+        hwBRASQoSQueueClassWredEnableStatus OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "WRED enable status."
+            DEFVAL { false }
+            ::= { hwBRASQoSQueueClassEntry 3 }
+        
+        hwBRASQoSQueueClassWredWeight OBJECT-TYPE
+            SYNTAX Integer32 (0..15)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "WRED weight value."
+            DEFVAL { 0 }
+            ::= { hwBRASQoSQueueClassEntry 4 }
+        
+        hwBRASQoSQueueClassWrrWeight OBJECT-TYPE
+            SYNTAX Integer32 (0..63)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "WRR weight value."
+            ::= { hwBRASQoSQueueClassEntry 5 }
+        
+        hwBRASQoSQueueClassLength OBJECT-TYPE
+            SYNTAX Integer32 (20..64)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Queue length (Unit:Kbyte)."
+            DEFVAL { 20 }
+            ::= { hwBRASQoSQueueClassEntry 6 }
+        
+        hwBRASQoSQueueClassCir OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 100..3000000)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Queue cir (Unit:Kbps)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSQueueClassEntry 7 }
+        
+        hwBRASQoSQueueClassCbs OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 64..131071)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Queue cbs (Unit:byte)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSQueueClassEntry 8 }
+        
+        hwBRASQoSQueueClassPir OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 100..3000000)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Queue pir (Unit:Kbps)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSQueueClassEntry 9 }
+        
+        hwBRASQoSQueueClassPbs OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 64..4000000)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Queue pbs (Unit:byte)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSQueueClassEntry 10 }
+        
+        hwBRASQoSQueueClassWfqWeight OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "WFQ weight value."
+            ::= { hwBRASQoSQueueClassEntry 11 }
+        
+        hwBRASQoSQueueClassShaping OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Queue shaping value,in percentage."
+            DEFVAL { 0 }
+            ::= { hwBRASQoSQueueClassEntry 12 }
+        
+        hwBRASQoSQueueClassScheduler OBJECT-TYPE
+            SYNTAX SchedulerService
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Queue scheduler style."
+            ::= { hwBRASQoSQueueClassEntry 13 }
+        
+        hwBRASQoSQueueClassDropName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Drop profile name."
+            ::= { hwBRASQoSQueueClassEntry 14 }
+        
+        hwBRASQoSFlowMappingTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBRASQoSFlowMappingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS queue flow mapping info."
+            ::= { hwBRASQoSObjects 6 }
+        
+        hwBRASQoSFlowMappingEntry OBJECT-TYPE
+            SYNTAX HwBRASQoSFlowMappingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS FlowMapping Configuration Information Entry."
+            INDEX { hwBRASQoSFlowMappingName }
+            ::= { hwBRASQoSFlowMappingTable 1 }
+        
+        HwBRASQoSFlowMappingEntry ::=
+            SEQUENCE { 
+                hwBRASQoSFlowMappingName
+                    OCTET STRING,
+                hwBRASQoSBeMapping
+                    QueueClass,
+                hwBRASQoSAf1Mapping
+                    QueueClass,
+                hwBRASQoSAf2Mapping
+                    QueueClass,
+                hwBRASQoSAf3Mapping
+                    QueueClass,
+                hwBRASQoSAf4Mapping
+                    QueueClass,
+                hwBRASQoSEfMapping
+                    QueueClass,
+                hwBRASQoSCs6Mapping
+                    QueueClass,
+                hwBRASQoSCs7Mapping
+                    QueueClass,
+                hwBRASQoSFlowMappingRowStatus
+                    RowStatus
+             }
+
+        hwBRASQoSFlowMappingName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Flow mapping entry name."
+            ::= { hwBRASQoSFlowMappingEntry 1 }
+        
+        hwBRASQoSBeMapping OBJECT-TYPE
+            SYNTAX QueueClass
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "BE mapping vlue."
+            DEFVAL { be }
+            ::= { hwBRASQoSFlowMappingEntry 2 }
+        
+        hwBRASQoSAf1Mapping OBJECT-TYPE
+            SYNTAX QueueClass
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "AF1 mapping vlue."
+            DEFVAL { af1 }
+            ::= { hwBRASQoSFlowMappingEntry 3 }
+        
+        hwBRASQoSAf2Mapping OBJECT-TYPE
+            SYNTAX QueueClass
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "AF2 mapping vlue."
+            DEFVAL { af2 }
+            ::= { hwBRASQoSFlowMappingEntry 4 }
+        
+        hwBRASQoSAf3Mapping OBJECT-TYPE
+            SYNTAX QueueClass
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "AF3 mapping vlue."
+            DEFVAL { af3 }
+            ::= { hwBRASQoSFlowMappingEntry 5 }
+        
+        hwBRASQoSAf4Mapping OBJECT-TYPE
+            SYNTAX QueueClass
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "AF4 mapping vlue."
+            DEFVAL { af4 }
+            ::= { hwBRASQoSFlowMappingEntry 6 }
+        
+        hwBRASQoSEfMapping OBJECT-TYPE
+            SYNTAX QueueClass
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "EF mapping vlue."
+            DEFVAL { ef }
+            ::= { hwBRASQoSFlowMappingEntry 7 }
+        
+        hwBRASQoSCs6Mapping OBJECT-TYPE
+            SYNTAX QueueClass
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "CS6 mapping vlue."
+            DEFVAL { cs6 }
+            ::= { hwBRASQoSFlowMappingEntry 8 }
+        
+        hwBRASQoSCs7Mapping OBJECT-TYPE
+            SYNTAX QueueClass
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "CS7 mapping vlue."
+            DEFVAL { cs7 }
+            ::= { hwBRASQoSFlowMappingEntry 9 }
+        
+        hwBRASQoSFlowMappingRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row status,two actions are used: active and destroy."
+            ::= { hwBRASQoSFlowMappingEntry 10 }
+        
+        hwBRASQoSIfTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBRASQoSIfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS interface info table."
+            ::= { hwBRASQoSObjects 7 }
+        
+        hwBRASQoSIfEntry OBJECT-TYPE
+            SYNTAX HwBRASQoSIfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS interface Configuration Information Entry."
+            INDEX { hwBRASQoSIfIndex }
+            ::= { hwBRASQoSIfTable 1 }
+        
+        HwBRASQoSIfEntry ::=
+            SEQUENCE { 
+                hwBRASQoSIfIndex
+                    InterfaceIndex,
+                hwBRASQoSIfName
+                    OCTET STRING,
+                hwBRASQoSIfQoSProfileName
+                    OCTET STRING,
+                hwBRASQoSIfScheduleId
+                    InterfaceScheduler,
+                hwBRASQoSIfServiceGroupName
+                    OCTET STRING,
+                hwBRASQoSIfShapingValue
+                    Integer32,
+                hwBRASQoSIfVpGroupName
+                    OCTET STRING,
+                hwBRASQoSIfInboundVcGroupName
+                    OCTET STRING,
+                hwBRASQoSIfOutboundAVcGroupName
+                    OCTET STRING,
+                hwBRASQoSIfOutboundBVcGroupName
+                    OCTET STRING,
+                hwBRASQoSIfInboundGVpGroupName
+                    OCTET STRING,
+                hwBRASQoSIfOutboundAGVpGroupName
+                    OCTET STRING,
+                hwBRASQoSIfPacketAjustOverhead
+                    Integer32,
+                hwBRASQoSIfRemoteLinkMode
+                    LinkMode,
+                hwBRASQoSIfInCarProfileName
+                    OCTET STRING,
+                hwBRASQoSIfInStatistics
+                    StatMode,
+                hwBRASQoSIfOutCarProfileName
+                    OCTET STRING,
+                hwBRASQoSIfOutStatistics
+                    StatMode,
+                hwBRASQoSIfVplsCarStatus
+                    TruthValue,
+                hwBRASQoSIfMultiShapingStatus
+                    TruthValue,
+                hwBRASQoSIfActiveStatus
+                    TruthValue
+             }
+
+        hwBRASQoSIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Interface index."
+            ::= { hwBRASQoSIfEntry 1 }
+        
+        hwBRASQoSIfName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..47))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Interface name."
+            ::= { hwBRASQoSIfEntry 2 }
+        
+        hwBRASQoSIfQoSProfileName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "QoS profile name."
+            ::= { hwBRASQoSIfEntry 3 }
+        
+
+        hwBRASQoSIfScheduleId OBJECT-TYPE
+            SYNTAX InterfaceScheduler
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "QoS schedule ID."
+            ::= { hwBRASQoSIfEntry 4 }
+        
+        hwBRASQoSIfServiceGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Service group name."
+            ::= { hwBRASQoSIfEntry 5 }
+        
+        hwBRASQoSIfShapingValue OBJECT-TYPE
+            SYNTAX Integer32 (1..10000)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Port shaping value (Unit:Kbps)."
+            ::= { hwBRASQoSIfEntry 6 }
+        
+        hwBRASQoSIfVpGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "VP-Group name."
+            ::= { hwBRASQoSIfEntry 7 }
+        
+        hwBRASQoSIfInboundVcGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Inbound VC-Group name."
+            ::= { hwBRASQoSIfEntry 8 }
+        
+        hwBRASQoSIfOutboundAVcGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Outbound-A VC-Group name."
+            ::= { hwBRASQoSIfEntry 9 }
+        
+        hwBRASQoSIfOutboundBVcGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Outbound-B VC-Group name."
+            ::= { hwBRASQoSIfEntry 10 }
+        
+        hwBRASQoSIfInboundGVpGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Inbound GVP-Group name."
+            ::= { hwBRASQoSIfEntry 11 }
+        
+        hwBRASQoSIfOutboundAGVpGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Outbound-A GVP-Group name."
+            ::= { hwBRASQoSIfEntry 12 }
+        
+        hwBRASQoSIfPacketAjustOverhead OBJECT-TYPE
+            SYNTAX Integer32 (-34..34)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Packet ajustment overhead value."
+            DEFVAL { 0 }
+            ::= { hwBRASQoSIfEntry 13 }
+        
+        hwBRASQoSIfRemoteLinkMode OBJECT-TYPE
+            SYNTAX LinkMode
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Remote QoS link mode."
+            DEFVAL { none }
+            ::= { hwBRASQoSIfEntry 14 }
+        
+        hwBRASQoSIfInCarProfileName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Inbound CAR profile name."
+            ::= { hwBRASQoSIfEntry 15 }
+        
+
+        hwBRASQoSIfInStatistics OBJECT-TYPE
+            SYNTAX StatMode
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Inbound statistics style."
+            DEFVAL { none }
+            ::= { hwBRASQoSIfEntry 16 }
+        
+        hwBRASQoSIfOutCarProfileName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Outbound CAR profile name."
+            ::= { hwBRASQoSIfEntry 17 }
+        
+        hwBRASQoSIfOutStatistics OBJECT-TYPE
+            SYNTAX StatMode
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Outbound statistics style."
+            DEFVAL { none }
+            ::= { hwBRASQoSIfEntry 18 }
+        
+        hwBRASQoSIfVplsCarStatus OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "VPLS broadcast CAR enable status."
+            DEFVAL { false }
+            ::= { hwBRASQoSIfEntry 19 }
+        
+        hwBRASQoSIfMultiShapingStatus OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Multicast shaping enable status."
+            DEFVAL { false }
+            ::= { hwBRASQoSIfEntry 20 }
+        
+        hwBRASQoSIfActiveStatus OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Interface active status."
+            ::= { hwBRASQoSIfEntry 21 }
+        
+        hwBRASQoSIfVcTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBRASQoSIfVcEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS interface VC info table."
+            ::= { hwBRASQoSObjects 8 }
+        
+        hwBRASQoSIfVcEntry OBJECT-TYPE
+            SYNTAX HwBRASQoSIfVcEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS interface VC Configuration Information Entry."
+            INDEX { hwBRASQoSIfVcIfIndex, hwBRASQoSIfVcVlanId, hwBRASQoSIfVcQinqVlanId }
+            ::= { hwBRASQoSIfVcTable 1 }
+        
+        HwBRASQoSIfVcEntry ::=
+            SEQUENCE { 
+                hwBRASQoSIfVcIfIndex
+                    InterfaceIndex,
+                hwBRASQoSIfVcVlanId
+                    VlanIndex,
+                hwBRASQoSIfVcQinqVlanId
+                    VlanIndex,
+                hwBRASQoSIfVcVlanEndId
+                    VlanIndex,
+                hwBRASQoSIfVcQinqVlanEndId
+                    VlanIndex,
+                hwBRASQoSIfVcVcGroupName
+                    OCTET STRING,
+                hwBRASQoSIfVcServiceGroupName
+                    OCTET STRING,
+                hwBRASQoSIfVcInCarProfileName
+                    OCTET STRING,
+                hwBRASQoSIfVcInStatistics
+                    StatMode,
+                hwBRASQoSIfVcInCarEachVlanStatus
+                    TruthValue,
+                hwBRASQoSIfVcOutCarProfileName
+                    OCTET STRING,
+                hwBRASQoSIfVcOutStatistics
+                    StatMode,
+                hwBRASQoSIfVcOutCarEachVlanStatus
+                    TruthValue
+             }
+
+
+        hwBRASQoSIfVcIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Interface index."
+            ::= { hwBRASQoSIfVcEntry 1 }
+        
+        hwBRASQoSIfVcVlanId OBJECT-TYPE
+            SYNTAX VlanIndex (1..4096)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "VLAN ID."
+            ::= { hwBRASQoSIfVcEntry 2 }
+        
+
+        hwBRASQoSIfVcQinqVlanId OBJECT-TYPE
+            SYNTAX VlanIndex (0..4096)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Qinq VLAN ID."
+            ::= { hwBRASQoSIfVcEntry 3 }
+        
+        hwBRASQoSIfVcVlanEndId OBJECT-TYPE
+            SYNTAX VlanIndex (2..4096)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "End VLAN ID."
+            ::= { hwBRASQoSIfVcEntry 4 }
+        
+        hwBRASQoSIfVcQinqVlanEndId OBJECT-TYPE
+            SYNTAX VlanIndex (2..4096)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "End Qinq VLAN ID."
+            ::= { hwBRASQoSIfVcEntry 5 }
+        
+        hwBRASQoSIfVcVcGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..47))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "VC-Group name."
+            ::= { hwBRASQoSIfVcEntry 6 }
+        
+        hwBRASQoSIfVcServiceGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..47))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Service group name."
+            ::= { hwBRASQoSIfVcEntry 7 }
+        
+        hwBRASQoSIfVcInCarProfileName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Inbound CAR profile name."
+            ::= { hwBRASQoSIfVcEntry 8 }
+        
+        hwBRASQoSIfVcInStatistics OBJECT-TYPE
+            SYNTAX StatMode
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Inbound statistics style."
+            DEFVAL { none }
+            ::= { hwBRASQoSIfVcEntry 9 }
+        
+        hwBRASQoSIfVcInCarEachVlanStatus OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Inbound each vlan car enable status."
+            DEFVAL { false }
+            ::= { hwBRASQoSIfVcEntry 10 }
+        
+        hwBRASQoSIfVcOutCarProfileName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Outbound statistics style."
+            ::= { hwBRASQoSIfVcEntry 11 }
+        
+        hwBRASQoSIfVcOutStatistics OBJECT-TYPE
+            SYNTAX StatMode
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Outbound statistics style."
+            DEFVAL { none }
+            ::= { hwBRASQoSIfVcEntry 12 }
+        
+        hwBRASQoSIfVcOutCarEachVlanStatus OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Outbound each vlan car enable status."
+            DEFVAL { false }
+            ::= { hwBRASQoSIfVcEntry 13 }
+        
+        hwBRASQoSVpGroupTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBRASQoSVpGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "VP-Group config info."
+            ::= { hwBRASQoSObjects 9 }
+        
+        hwBRASQoSVpGroupEntry OBJECT-TYPE
+            SYNTAX HwBRASQoSVpGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS VP-Group Configuration Information Entry."
+            INDEX { hwBRASQoSVpGroupIfIndex, hwBRASQoSVpGroupName }
+            ::= { hwBRASQoSVpGroupTable 1 }
+        
+        HwBRASQoSVpGroupEntry ::=
+            SEQUENCE { 
+                hwBRASQoSVpGroupIfIndex
+                    Unsigned32,
+                hwBRASQoSVpGroupName
+                    OCTET STRING,
+                hwBRASQoSVpGroupQosProfileName
+                    OCTET STRING,
+                hwBRASQoSVpGroupRowStatus
+                    RowStatus
+             }
+
+        hwBRASQoSVpGroupIfIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Interface index."
+            ::= { hwBRASQoSVpGroupEntry 1 }
+        
+
+        hwBRASQoSVpGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "VP-Group name."
+            ::= { hwBRASQoSVpGroupEntry 2 }
+        
+        hwBRASQoSVpGroupQosProfileName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "QoS profile name."
+            ::= { hwBRASQoSVpGroupEntry 3 }
+        
+        hwBRASQoSVpGroupRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row status,two actions are used: active and destroy."
+            ::= { hwBRASQoSVpGroupEntry 4 }
+        
+
+        hwBRASQoSVcGroupTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBRASQoSVcGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "VC-Group config info."
+            ::= { hwBRASQoSObjects 10 }
+        
+        hwBRASQoSVcGroupEntry OBJECT-TYPE
+            SYNTAX HwBRASQoSVcGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS VC-Group Configuration Information Entry."
+            INDEX { hwBRASQoSVcGroupIfIndex, hwBRASQoSVcGroupName }
+            ::= { hwBRASQoSVcGroupTable 1 }
+        
+        HwBRASQoSVcGroupEntry ::=
+            SEQUENCE { 
+                hwBRASQoSVcGroupIfIndex
+                    Unsigned32,
+                hwBRASQoSVcGroupName
+                    OCTET STRING,
+                hwBRASQoSVcGroupQosProfileName
+                    OCTET STRING,
+                hwBRASQoSVcGroupRowStatus
+                    RowStatus
+             }
+
+
+        hwBRASQoSVcGroupIfIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Interface index."
+            ::= { hwBRASQoSVcGroupEntry 1 }
+        
+        hwBRASQoSVcGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "VC-Group name."
+            ::= { hwBRASQoSVcGroupEntry 2 }
+        
+        hwBRASQoSVcGroupQosProfileName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "QoS profile name."
+            ::= { hwBRASQoSVcGroupEntry 3 }
+        
+        hwBRASQoSVcGroupRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row status."
+            ::= { hwBRASQoSVcGroupEntry 4 }
+        
+        hwBRASQoSGVpGroupTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBRASQoSGVpGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Global VP-Group config info."
+            ::= { hwBRASQoSObjects 11 }
+        
+        hwBRASQoSGVpGroupEntry OBJECT-TYPE
+            SYNTAX HwBRASQoSGVpGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS GVP-Group Configuration Information Entry."
+            INDEX { hwBRASQoSVpGroupName }
+            ::= { hwBRASQoSGVpGroupTable 1 }
+        
+        HwBRASQoSGVpGroupEntry ::=
+            SEQUENCE { 
+                hwBRASQoSGVpGroupSlotId
+                    Integer32,
+                hwBRASQoSGVpGroupName
+                    OCTET STRING,
+                hwBRASQoSGVpGroupQosProfileName
+                    OCTET STRING,
+                hwBRASQoSGVpGroupRowStatus
+                    RowStatus
+             }
+
+        hwBRASQoSGVpGroupSlotId OBJECT-TYPE
+            SYNTAX Integer32 (0..16)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Slot ID."
+            ::= { hwBRASQoSGVpGroupEntry 1 }
+        
+        hwBRASQoSGVpGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "GVP-Group name."
+            ::= { hwBRASQoSGVpGroupEntry 2 }
+        
+        hwBRASQoSGVpGroupQosProfileName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "QoS profile name."
+            ::= { hwBRASQoSGVpGroupEntry 3 }
+        
+
+        hwBRASQoSGVpGroupRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row status,two actions are used: active and destroy."
+            ::= { hwBRASQoSGVpGroupEntry 4 }
+        
+
+        hwBRASQoSServiceGroupTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBRASQoSServiceGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Service group table info."
+            ::= { hwBRASQoSObjects 12 }
+        
+        hwBRASQoSServiceGroupEntry OBJECT-TYPE
+            SYNTAX HwBRASQoSServiceGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS Service Group Configuration Information Entry."
+            INDEX { hwBRASQoSServiceGroupIndex }
+            ::= { hwBRASQoSServiceGroupTable 1 }
+        
+        HwBRASQoSServiceGroupEntry ::=
+            SEQUENCE { 
+                hwBRASQoSServiceGroupIndex
+                    Integer32,
+                hwBRASQoSServiceGroupName
+                    OCTET STRING,
+                hwBRASQoSServiceGroupRowStatus
+                    RowStatus
+             }
+
+        hwBRASQoSServiceGroupIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..499)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Service group entry index."
+            ::= { hwBRASQoSServiceGroupEntry 1 }
+        
+        hwBRASQoSServiceGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Service group name."
+            ::= { hwBRASQoSServiceGroupEntry 2 }
+        
+        hwBRASQoSServiceGroupRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row status,two actions are used: active and destroy."
+            ::= { hwBRASQoSServiceGroupEntry 4 }
+        
+        hwBRASQoSPortQueueTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBRASQoSPortQueueEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Port queue config info."
+            ::= { hwBRASQoSObjects 13 }
+        
+        hwBRASQoSPortQueueEntry OBJECT-TYPE
+            SYNTAX HwBRASQoSPortQueueEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS Port Queue Configuration Information Entry."
+            INDEX { hwBRASQoSPortQueueIfIndex, hwBRASQoSPortQueueServiceId }
+            ::= { hwBRASQoSPortQueueTable 1 }
+        
+        HwBRASQoSPortQueueEntry ::=
+            SEQUENCE { 
+                hwBRASQoSPortQueueIfIndex
+                    Unsigned32,
+                hwBRASQoSPortQueueServiceId
+                    QueueClass,
+                hwBRASQoSPortQueueScheduleStyle
+                    SchedulerService,
+                hwBRASQoSPortQueueWfqWeight
+                    Integer32,
+                hwBRASQoSPortQueueShapingValue
+                    Integer32,
+                hwBRASQoSPortQueueShaingPercentage
+                    Integer32,
+                hwBRASQoSPortQueuePortWredName
+                    OCTET STRING,
+                hwBRASQoSPortQueueRowStatus
+                    RowStatus
+             }
+
+        hwBRASQoSPortQueueIfIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Interface index."
+            ::= { hwBRASQoSPortQueueEntry 1 }
+        
+        hwBRASQoSPortQueueServiceId OBJECT-TYPE
+            SYNTAX QueueClass
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Port queue service class ID."
+            ::= { hwBRASQoSPortQueueEntry 2 }
+        
+        hwBRASQoSPortQueueScheduleStyle OBJECT-TYPE
+            SYNTAX SchedulerService
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Queue schedule style."
+            ::= { hwBRASQoSPortQueueEntry 3 }
+        
+        hwBRASQoSPortQueueWfqWeight OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 1..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "WFQ schedule weight."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSPortQueueEntry 4 }
+        
+        hwBRASQoSPortQueueShapingValue OBJECT-TYPE
+            SYNTAX Integer32 (0..10000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Port queue shaping bandwidth."
+            ::= { hwBRASQoSPortQueueEntry 5 }
+        
+        hwBRASQoSPortQueueShaingPercentage OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Port queue shaping value,in percentage."
+            DEFVAL { 100 }
+            ::= { hwBRASQoSPortQueueEntry 6 }
+        
+        hwBRASQoSPortQueuePortWredName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Port WRED entry name. "
+            ::= { hwBRASQoSPortQueueEntry 7 }
+        
+        hwBRASQoSPortQueueRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row status,two actions are used: active and destroy.
+                "
+            ::= { hwBRASQoSPortQueueEntry 8 }
+        
+        hwBRASQoSPortWredTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBRASQoSPortWredEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Port WRED config info."
+            ::= { hwBRASQoSObjects 14 }
+        
+        hwBRASQoSPortWredEntry OBJECT-TYPE
+            SYNTAX HwBRASQoSPortWredEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS Port Wred Configuration Information Entry."
+            INDEX { hwBRASQoSPortWredName }
+            ::= { hwBRASQoSPortWredTable 1 }
+        
+        HwBRASQoSPortWredEntry ::=
+            SEQUENCE { 
+                hwBRASQoSPortWredName
+                    OCTET STRING,
+                hwBRASQoSPortWredGreenLowLimitValue
+                    Integer32,
+                hwBRASQoSPortWredGreenHighLimitValue
+                    Integer32,
+                hwBRASQoSPortWredGreenDiscardValue
+                    Integer32,
+                hwBRASQoSPortWredYellowLowLimitValue
+                    Integer32,
+                hwBRASQoSPortWredYellowHighLimitValue
+                    Integer32,
+                hwBRASQoSPortWredYellowDiscardValue
+                    Integer32,
+                hwBRASQoSPortWredRedLowLimitValue
+                    Integer32,
+                hwBRASQoSPortWredRedHighLimitValue
+                    Integer32,
+                hwBRASQoSPortWredRedDiscardValue
+                    Integer32,
+                hwBRASQoSPortWredRowStatus
+                    RowStatus
+             }
+
+        hwBRASQoSPortWredName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Port WRED name."
+            ::= { hwBRASQoSPortWredEntry 1 }
+        
+        hwBRASQoSPortWredGreenLowLimitValue OBJECT-TYPE
+            SYNTAX Integer32 (0..2047)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "WRED green low threshold (Unit:8192Byte)."
+            DEFVAL { 2047 }
+            ::= { hwBRASQoSPortWredEntry 2 }
+        
+        hwBRASQoSPortWredGreenHighLimitValue OBJECT-TYPE
+            SYNTAX Integer32 (0..2047)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "WRED green high threshold (Unit:8192Byte)."
+            DEFVAL { 2047 }
+            ::= { hwBRASQoSPortWredEntry 3 }
+        
+        hwBRASQoSPortWredGreenDiscardValue OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "WRED green max discard,in percentage."
+            DEFVAL { 100 }
+            ::= { hwBRASQoSPortWredEntry 4 }
+        
+        hwBRASQoSPortWredYellowLowLimitValue OBJECT-TYPE
+            SYNTAX Integer32 (0..2047)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "WRED yellow low threshold (Unit:8192Byte)."
+            DEFVAL { 2047 }
+            ::= { hwBRASQoSPortWredEntry 5 }
+        
+        hwBRASQoSPortWredYellowHighLimitValue OBJECT-TYPE
+            SYNTAX Integer32 (0..2047)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "WRED yellow high threshold (Unit:8192Byte)."
+            DEFVAL { 2047 }
+            ::= { hwBRASQoSPortWredEntry 6 }
+        
+        hwBRASQoSPortWredYellowDiscardValue OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "WRED yellow max discard,in percentage."
+            DEFVAL { 100 }
+            ::= { hwBRASQoSPortWredEntry 7 }
+        
+        hwBRASQoSPortWredRedLowLimitValue OBJECT-TYPE
+            SYNTAX Integer32 (0..2047)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "WRED red low threshold (Unit:8192Byte)."
+            DEFVAL { 2047 }
+            ::= { hwBRASQoSPortWredEntry 8 }
+        
+        hwBRASQoSPortWredRedHighLimitValue OBJECT-TYPE
+            SYNTAX Integer32 (0..2047)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "WRED red high threshold (Unit:8192Byte)."
+            DEFVAL { 2047 }
+            ::= { hwBRASQoSPortWredEntry 9 }
+        
+        hwBRASQoSPortWredRedDiscardValue OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "WRED red max discard,in percentage."
+            DEFVAL { 100 }
+            ::= { hwBRASQoSPortWredEntry 10 }
+        
+
+        hwBRASQoSPortWredRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row status,two actions are used: active and destroy."
+            ::= { hwBRASQoSPortWredEntry 11 }
+        
+        hwBRASQoSCarProfileTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBRASQoSCarProfileEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "CAR profile config info."
+            ::= { hwBRASQoSObjects 15 }
+        
+        hwBRASQoSCarProfileEntry OBJECT-TYPE
+            SYNTAX HwBRASQoSCarProfileEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "CAR Profile Configuration Information Entry."
+            INDEX { hwBRASQoSCarProfileIndex }
+            ::= { hwBRASQoSCarProfileTable 1 }
+        
+        HwBRASQoSCarProfileEntry ::=
+            SEQUENCE { 
+                hwBRASQoSCarProfileIndex
+                    Integer32,
+                hwBRASQoSCarProfileName
+                    OCTET STRING,
+                hwBRASQoSCarProfileCir
+                    Integer32,
+                hwBRASQoSCarProfilePir
+                    Integer32,
+                hwBRASQoSCarProfileCbs
+                    Integer32,
+                hwBRASQoSCarProfilePbs
+                    Integer32,
+                hwBRASQoSCarProfileRowStatus
+                    RowStatus
+             }
+
+        hwBRASQoSCarProfileIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..1023)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "CAR profile entry index."
+            ::= { hwBRASQoSCarProfileEntry 1 }
+        
+        hwBRASQoSCarProfileName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "CAR profile name."
+            ::= { hwBRASQoSCarProfileEntry 2 }
+        
+
+        hwBRASQoSCarProfileCir OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 100..10000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "CAR cir (Unit:Kbps)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSCarProfileEntry 3 }
+        
+        hwBRASQoSCarProfilePir OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 100..10000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "CAR pir (Unit:Kbps)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSCarProfileEntry 4 }
+        
+        hwBRASQoSCarProfileCbs OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 2000..33554432)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "CAR cbs (Unit:bit)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSCarProfileEntry 5 }
+        
+        hwBRASQoSCarProfilePbs OBJECT-TYPE
+            SYNTAX Integer32 (0..33554432)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "CAR pbs (Unit:bit)."
+            DEFVAL { -1 }
+            ::= { hwBRASQoSCarProfileEntry 6 }
+        
+        hwBRASQoSCarProfileRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row status,two actions are used: active and destroy."
+            ::= { hwBRASQoSCarProfileEntry 7 }
+        
+        hwBRASQoSSlotTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBRASQoSSlotEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS slot config table."
+            ::= { hwBRASQoSObjects 16 }
+        
+
+        hwBRASQoSSlotEntry OBJECT-TYPE
+            SYNTAX HwBRASQoSSlotEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QoS Slot Configuration Information Entry."
+            INDEX { hwBRASQoSSlotId }
+            ::= { hwBRASQoSSlotTable 1 }
+        
+        HwBRASQoSSlotEntry ::=
+            SEQUENCE { 
+                hwBRASQoSSlotId
+                    Integer32,
+                hwBRASQoSSlotLinkLayerExclude
+                    TruthValue,
+                hwBRASQoSSlotEtherAjustOverhead
+                    Integer32,
+                hwBRASQoSSlotRemoteAdjustEnableStatus
+                    TruthValue,
+                hwBRASQoSSlotInboundGqUsedNum
+                    Integer32,
+                hwBRASQoSSlotInboundSqUsedNum
+                    Integer32,
+                hwBRASQoSSlotInboundGqFreeNum
+                    Integer32,
+                hwBRASQoSSlotInboundSqFreeNum
+                    Integer32,
+                hwBRASQoSSlotOutboundGqUsedNum
+                    Integer32,
+                hwBRASQoSSlotOutboundSqUsedNum
+                    Integer32,
+                hwBRASQoSSlotOutboundGqFreeNum
+                    Integer32,
+                hwBRASQoSSlotOutboundSqFreeNum
+                    Integer32,
+                hwBRASQoSSlotActiveStatus
+                    TruthValue
+             }
+
+        hwBRASQoSSlotId OBJECT-TYPE
+            SYNTAX Integer32 (1..16)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Slot ID."
+            ::= { hwBRASQoSSlotEntry 1 }
+        
+        hwBRASQoSSlotLinkLayerExclude OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Whether exclude link-layer bit for CAR or statistics."
+            DEFVAL { false }
+            ::= { hwBRASQoSSlotEntry 2 }
+        
+
+        hwBRASQoSSlotEtherAjustOverhead OBJECT-TYPE
+            SYNTAX Integer32 (-35..50)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Ethernet packet adustment overhead (Unit:byte)."
+            DEFVAL { 0 }
+            ::= { hwBRASQoSSlotEntry 3 }
+        
+        hwBRASQoSSlotRemoteAdjustEnableStatus OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Remote QoS adjustment enable status."
+            DEFVAL { false }
+            ::= { hwBRASQoSSlotEntry 4 }
+        
+        hwBRASQoSSlotInboundGqUsedNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Inbound GQ resource used-number."
+            ::= { hwBRASQoSSlotEntry 5 }
+        
+        hwBRASQoSSlotInboundSqUsedNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Inbound SQ resource used-number."
+            ::= { hwBRASQoSSlotEntry 6 }
+        
+        hwBRASQoSSlotInboundGqFreeNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Inbound GQ resource free-number."
+            ::= { hwBRASQoSSlotEntry 7 }
+        
+        hwBRASQoSSlotInboundSqFreeNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Inbound SQ resource free-number."
+            ::= { hwBRASQoSSlotEntry 8 }
+        
+        hwBRASQoSSlotOutboundGqUsedNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Outbound GQ resource used-number."
+            ::= { hwBRASQoSSlotEntry 9 }
+        
+        hwBRASQoSSlotOutboundSqUsedNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Outbound SQ resource used-number."
+            ::= { hwBRASQoSSlotEntry 10 }
+        
+
+        hwBRASQoSSlotOutboundGqFreeNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Outbound GQ resource free-number."
+            ::= { hwBRASQoSSlotEntry 11 }
+        
+        hwBRASQoSSlotOutboundSqFreeNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Outbound SQ resource free-number."
+            ::= { hwBRASQoSSlotEntry 12 }
+        
+        hwBRASQoSSlotActiveStatus OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Slot active status."
+            ::= { hwBRASQoSSlotEntry 13 }
+        
+        hwBRASQoSMultiShapingTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBRASQoSMultiShapingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Multicast QoS shaping list info."
+            ::= { hwBRASQoSObjects 17 }
+        
+        hwBRASQoSMultiShapingEntry OBJECT-TYPE
+            SYNTAX HwBRASQoSMultiShapingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Multicast QoS Shaping Configuration Information Entry."
+            INDEX { hwBRASQoSMultiShapingIndex }
+            ::= { hwBRASQoSMultiShapingTable 1 }
+        
+        HwBRASQoSMultiShapingEntry ::=
+            SEQUENCE { 
+                hwBRASQoSMultiShapingIndex
+                    Integer32,
+                hwBRASQoSMultiShapingName
+                    OCTET STRING,
+                hwBRASQoSMultiShapingEndIndex
+                    Integer32,
+                hwBRASQoSMultiShapingCir
+                    Integer32,
+                hwBRASQoSMultiShapingPir
+                    Integer32,
+                hwBRASQoSMultiShapingQueueLength
+                    Integer32,
+                hwBRASQoSMultiShapingRowStatus
+                    RowStatus
+             }
+
+        hwBRASQoSMultiShapingIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..8191)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Multicast shaping list index."
+            ::= { hwBRASQoSMultiShapingEntry 1 }
+        
+        hwBRASQoSMultiShapingName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Multicast shaping entry name."
+            ::= { hwBRASQoSMultiShapingEntry 2 }
+        
+        hwBRASQoSMultiShapingEndIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..8191)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Multicast shaping list end-index."
+            ::= { hwBRASQoSMultiShapingEntry 3 }
+        
+
+        hwBRASQoSMultiShapingCir OBJECT-TYPE
+            SYNTAX Integer32 (70..1000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "QoS multicast shaping CIR,Unit(Kbps)."
+            ::= { hwBRASQoSMultiShapingEntry 4 }
+        
+        hwBRASQoSMultiShapingPir OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 70..10000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "QoS multicast shaping PIR,Unit(Kbps)."
+            ::= { hwBRASQoSMultiShapingEntry 5 }
+        
+        hwBRASQoSMultiShapingQueueLength OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 2000..128000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "QoS multicast shaping queue length,Unit(byte)."
+            ::= { hwBRASQoSMultiShapingEntry 6 }
+        
+        hwBRASQoSMultiShapingRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row status,two actions are used: active and destroy."
+            ::= { hwBRASQoSMultiShapingEntry 7 }
+        
+        hwBRASQoSMibTrap OBJECT IDENTIFIER ::= { hwBRASQoS 2 }
+        
+        hwBRASQoSTrapOid OBJECT IDENTIFIER ::= { hwBRASQoSMibTrap 1 }
+        
+        hwBRASQoSTrapSlotID OBJECT-TYPE
+            SYNTAX Integer32 (1..16)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Slot ID relating QoS resource."
+            ::= { hwBRASQoSTrapOid 1 }
+        
+        hwBRASQoSFailBandwidth OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Bandwidth value with alloced failure."
+            ::= { hwBRASQoSTrapOid 2 }
+        
+        hwBRASQoSTrapUserBehavior OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                alloc(1),
+                update(2),
+                free(3)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "User behavior when operatiing with QoS resource."
+            ::= { hwBRASQoSTrapOid 3 }
+        
+        hwBRASQoSTrapUserID OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "User ID with QoS resource. "
+            ::= { hwBRASQoSTrapOid 4 }
+        
+        hwBRASQoSTrapTunnelID OBJECT-TYPE
+            SYNTAX Integer32 (1..65536)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "QoS tunnel ID."
+            ::= { hwBRASQoSTrapOid 5 }
+        
+        hwBRASQoSTrapQinqVlan OBJECT-TYPE
+            SYNTAX VlanIndex (0..4096)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "QINQ VLAN ID in QoS sub-interface."
+            ::= { hwBRASQoSTrapOid 6 }
+        
+
+        hwBRASQoSTrapVlan OBJECT-TYPE
+            SYNTAX VlanIndex (1..4096)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "VLAN ID in QoS sub-interface."
+            ::= { hwBRASQoSTrapOid 7 }
+        
+        hwBRASQoSTrapIfindex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "QoS interface index. "
+            ::= { hwBRASQoSTrapOid 8 }
+        
+        hwBRASQoSTrapDefine OBJECT IDENTIFIER ::= { hwBRASQoSMibTrap 2 }
+        
+        hwBRASQoSTraps OBJECT IDENTIFIER ::= { hwBRASQoSTrapDefine 1 }
+        
+        hwBRASQoSIfResFail NOTIFICATION-TYPE
+            OBJECTS { hwBRASQoSTrapIfindex }
+            STATUS current
+            DESCRIPTION 
+                "QoS interface or subinterface resource opration fail."
+            ::= { hwBRASQoSTraps 1 }
+        
+        hwBRASQoSIfVlanResFail NOTIFICATION-TYPE
+            OBJECTS { hwBRASQoSTrapIfindex, hwBRASQoSTrapVlan, hwBRASQoSTrapQinqVlan }
+            STATUS current
+            DESCRIPTION 
+                "QoS VLAN resource opration fail."
+            ::= { hwBRASQoSTraps 2 }
+        
+        hwBRASQoSTunnelResFail NOTIFICATION-TYPE
+            OBJECTS { hwBRASQoSTrapTunnelID }
+            STATUS current
+            DESCRIPTION 
+                "QoS tunnel resource opration fail."
+            ::= { hwBRASQoSTraps 3 }
+        
+        hwBRASQoSUserResFail NOTIFICATION-TYPE
+            OBJECTS { hwBRASQoSTrapUserID, hwBRASQoSTrapUserBehavior }
+            STATUS current
+            DESCRIPTION 
+                "QoS user resource opration fail."
+            ::= { hwBRASQoSTraps 4 }
+        
+        hwBRASQoSTrunkFail NOTIFICATION-TYPE
+            OBJECTS { hwBRASQoSTrapIfindex }
+            STATUS current
+            DESCRIPTION 
+                "QoS Trunk resource exception."
+            ::= { hwBRASQoSTraps 5 }
+        
+        hwBRASQoSUserBandwidthOverflow NOTIFICATION-TYPE
+            OBJECTS { hwBRASQoSTrapIfindex, hwBRASQoSTrapUserID, hwBRASQoSFailBandwidth }
+            STATUS current
+            DESCRIPTION 
+                "User's bandwidth to be alloced has exceeded the limit of current intface."
+            ::= { hwBRASQoSTraps 6 }
+        
+        hwBRASQoSTMExcepion NOTIFICATION-TYPE
+            OBJECTS { hwBRASQoSTrapSlotID }
+            STATUS current
+            DESCRIPTION 
+                "TM exception in current slot."
+            ::= { hwBRASQoSTraps 7 }
+
+    --  ============== conformance information ==============
+        hwBrasQosConformance OBJECT IDENTIFIER ::= { hwBRASQoS 3 }
+        
+        
+        hwBrasQosCompliances OBJECT IDENTIFIER ::= { hwBrasQosConformance 1 }
+        hwBrasQosCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hwBrasQosQosProfileGroup, hwBrasQosSchedulerProfileGroup,hwBrasQosDropProfileGroup,
+                                    hwBrasQosQueueProfileGroup, hwBrasQosQueueClassGroup, hwBrasQosFlowMappingGroup,
+                                    hwBrasQosIfGroup, hwBrasQosIfVcGroup, hwBrasQosVpGroupGroup,
+                                    hwBrasQosVcGroupGroup, hwBrasQosGVpGroupGroup, hwBrasQosServiceGroupGroup,
+                                    hwBrasQosPortQueueGroup, hwBrasQosPortWredGroup, hwBrasQosCarProfileGroup,
+                                    hwBrasQosSlotGroup, hwBrasQosMultiShapingGroup, hwBrasQosTrapOidGroup, 
+                                    hwBrasQosTrapDefineGroup}  
+                                               
+              ::= { hwBrasQosCompliances 1 }  
+              
+          
+        --  ============== groups ==============  
+        hwBrasQosGroups OBJECT IDENTIFIER ::= { hwBrasQosConformance 2 } 
+        
+        hwBrasQosQosProfileGroup OBJECT-GROUP
+            OBJECTS { hwBRASQoSQoSProfileIndex, hwBRASQoSQoSProfileName, hwBRASQoSQoSProfileQueueName, 
+                                  hwBRASQoSQoSProfileDropName, hwBRASQoSQoSProfileSchedulerName, hwBRASQoSQoSFlowMappingName,
+                                  hwBRASQoSQoSLinkAjustLength, hwBRASQoSQoSProfileRowStatus }       
+            STATUS current
+            DESCRIPTION 
+                "The BRAS QoS Qos Profile group."
+            ::= { hwBrasQosGroups 1 }
+
+
+        hwBrasQosSchedulerProfileGroup OBJECT-GROUP
+            OBJECTS { hwBRASQoSSchedulerProfileIndex, hwBRASQoSSchedulerProfileName, hwBRASQoSSchedulerProfileGtsUpCir,
+                hwBRASQoSSchedulerProfileGtsUpPir, hwBRASQoSSchedulerProfileGtsUpLength, hwBRASQoSSchedulerProfileGtsDownCir,
+                hwBRASQoSSchedulerProfileGtsDownPir, hwBRASQoSSchedulerProfileGtsDownLength, hwBRASQoSSchedulerProfileUpCir,
+                hwBRASQoSSchedulerProfileUpCbs, hwBRASQoSSchedulerProfileUpPir, hwBRASQoSSchedulerProfileUpPbs,
+                hwBRASQoSSchedulerProfileDownCir, hwBRASQoSSchedulerProfileDownCbs, hwBRASQoSSchedulerProfileDownPir,
+                hwBRASQoSSchedulerProfileDownPbs, hwBRASQoSSchedulerProfileWfqWeight, hwBRASQoSSchedulerRowStatus }            
+            STATUS current
+            DESCRIPTION 
+                "The BRAS QoS Scheduler Profile group."
+            ::= { hwBrasQosGroups 2 }
+
+
+        hwBrasQosDropProfileGroup OBJECT-GROUP
+            OBJECTS {hwBRASQoSDropProfileIndex,
+                hwBRASQoSDropProfileName,
+                hwBRASQoSDropProfileTailBeThreshold,
+                hwBRASQoSDropProfileTailAf1Threshold,
+                hwBRASQoSDropProfileTailAf2Threshold,
+                hwBRASQoSDropProfileTailAf3Threshold,
+                hwBRASQoSDropProfileTailAf4Threshold,
+                hwBRASQoSDropProfileTailEfThreshold,
+                hwBRASQoSDropProfileTailCs6Threshold,
+                hwBRASQoSDropProfileTailCs7Threshold,
+                hwBRASQoSDropProfileWredMaxThreshold,
+                hwBRASQoSDropProfileWredMinThreshold,
+                hwBRASQoSDropProfileWredGreenHighValue,
+                hwBRASQoSDropProfileWredGreenLowValue,
+                hwBRASQoSDropProfileWredGreenMaxDrop,
+                hwBRASQoSDropProfileWredYellowHighValue,
+                hwBRASQoSDropProfileWredYellowLowValue,
+                hwBRASQoSDropProfileWredYellowMaxDrop,
+                hwBRASQoSDropProfileWredRedHighValue,
+                hwBRASQoSDropProfileWredRedLowValue,
+                hwBRASQoSDropProfileWredRedMaxDrop,
+                hwBRASQoSDropProfileWredUserDefHighValue,
+                hwBRASQoSDropProfileWredUserDefLowValue,
+                hwBRASQoSDropProfileWredUserDefMaxDrop,
+                hwBRASQoSDropProfileRowStatus }            
+            STATUS current
+            DESCRIPTION 
+                "The BRAS QoS Drop Profile group."
+            ::= { hwBrasQosGroups 3 }
+            
+            
+        hwBrasQosQueueProfileGroup OBJECT-GROUP
+            OBJECTS { hwBRASQoSQueueProfileIndex,
+                hwBRASQoSQueueProfileName,
+                hwBRASQoSQueueProfileBeStyle,
+                hwBRASQoSQueueProfileAf1Style,
+                hwBRASQoSQueueProfileAf2Style,
+                hwBRASQoSQueueProfileAf3Style,
+                hwBRASQoSQueueProfileAf4Style,
+                hwBRASQoSQueueProfileEfStyle,
+                hwBRASQoSQueueProfileCs6Style,
+                hwBRASQoSQueueProfileCs7Style,
+                hwBRASQoSQueueProfileRowStatus
+                }            
+            STATUS current
+            DESCRIPTION 
+                "The BRAS QoS Queue Profile group."
+            ::= { hwBrasQosGroups 4 }
+            
+            
+        hwBrasQosQueueClassGroup OBJECT-GROUP
+            OBJECTS { hwBRASQoSQueueClassProfileName,
+                hwBRASQoSQueueClassServiceId,
+                hwBRASQoSQueueClassWredEnableStatus,
+                hwBRASQoSQueueClassWredWeight,
+                hwBRASQoSQueueClassWrrWeight,
+                hwBRASQoSQueueClassLength,
+                hwBRASQoSQueueClassCir,
+                hwBRASQoSQueueClassCbs,
+                hwBRASQoSQueueClassPir,
+                hwBRASQoSQueueClassPbs,
+                hwBRASQoSQueueClassWfqWeight,
+                hwBRASQoSQueueClassShaping,
+                hwBRASQoSQueueClassScheduler,
+                hwBRASQoSQueueClassDropName }            
+            STATUS current
+            DESCRIPTION 
+                "The BRAS QoS Queue Class group."
+            ::= { hwBrasQosGroups 5 }
+    
+
+        hwBrasQosFlowMappingGroup OBJECT-GROUP
+            OBJECTS {hwBRASQoSFlowMappingName,
+                hwBRASQoSBeMapping,
+                hwBRASQoSAf1Mapping,
+                hwBRASQoSAf2Mapping,
+                hwBRASQoSAf3Mapping,
+                hwBRASQoSAf4Mapping,
+                hwBRASQoSEfMapping,
+                hwBRASQoSCs6Mapping,
+                hwBRASQoSCs7Mapping,
+                hwBRASQoSFlowMappingRowStatus }            
+            STATUS current
+            DESCRIPTION 
+                "The BRAS QoS Flow Mapping group."
+            ::= { hwBrasQosGroups 6 }
+
+
+        hwBrasQosIfGroup OBJECT-GROUP
+            OBJECTS { hwBRASQoSIfIndex,
+                hwBRASQoSIfName,
+                hwBRASQoSIfQoSProfileName,
+                hwBRASQoSIfScheduleId,
+                hwBRASQoSIfServiceGroupName,
+                hwBRASQoSIfShapingValue,
+                hwBRASQoSIfVpGroupName,
+                hwBRASQoSIfInboundVcGroupName,
+                hwBRASQoSIfOutboundAVcGroupName,
+                hwBRASQoSIfOutboundBVcGroupName,
+                hwBRASQoSIfInboundGVpGroupName,
+                hwBRASQoSIfOutboundAGVpGroupName,
+                hwBRASQoSIfPacketAjustOverhead,
+                hwBRASQoSIfRemoteLinkMode,
+                hwBRASQoSIfInCarProfileName,
+                hwBRASQoSIfInStatistics,
+                hwBRASQoSIfOutCarProfileName,
+                hwBRASQoSIfOutStatistics,
+                hwBRASQoSIfVplsCarStatus,
+                hwBRASQoSIfMultiShapingStatus,
+                hwBRASQoSIfActiveStatus }            
+            STATUS current
+            DESCRIPTION 
+                "The BRAS QoS If group."
+            ::= { hwBrasQosGroups 7 }
+
+
+        hwBrasQosIfVcGroup OBJECT-GROUP
+            OBJECTS { hwBRASQoSIfVcIfIndex,
+                hwBRASQoSIfVcVlanId,
+                hwBRASQoSIfVcQinqVlanId,
+                hwBRASQoSIfVcVlanEndId,
+                hwBRASQoSIfVcQinqVlanEndId,
+                hwBRASQoSIfVcVcGroupName,
+                hwBRASQoSIfVcServiceGroupName,
+                hwBRASQoSIfVcInCarProfileName,
+                hwBRASQoSIfVcInStatistics,
+                hwBRASQoSIfVcInCarEachVlanStatus,
+                hwBRASQoSIfVcOutCarProfileName,
+                hwBRASQoSIfVcOutStatistics,
+                hwBRASQoSIfVcOutCarEachVlanStatus}            
+            STATUS current
+            DESCRIPTION 
+                "The BRAS QoS If Vc group."
+            ::= { hwBrasQosGroups 8 }
+            
+            
+        hwBrasQosVpGroupGroup OBJECT-GROUP
+            OBJECTS {hwBRASQoSVpGroupIfIndex,
+                hwBRASQoSVpGroupName,
+                hwBRASQoSVpGroupQosProfileName,
+                hwBRASQoSVpGroupRowStatus }            
+            STATUS current
+            DESCRIPTION 
+                "The BRAS QoS Vp Group group."
+            ::= { hwBrasQosGroups 9 }
+            
+            
+        hwBrasQosVcGroupGroup OBJECT-GROUP
+            OBJECTS { hwBRASQoSVcGroupIfIndex,
+                hwBRASQoSVcGroupName,
+                hwBRASQoSVcGroupQosProfileName,
+                hwBRASQoSVcGroupRowStatus }            
+            STATUS current
+            DESCRIPTION 
+                "The BRAS QoS Vc Group group."
+            ::= { hwBrasQosGroups 10 }
+            
+            
+        hwBrasQosGVpGroupGroup OBJECT-GROUP
+            OBJECTS {hwBRASQoSGVpGroupSlotId,
+                hwBRASQoSGVpGroupName,
+                hwBRASQoSGVpGroupQosProfileName,
+                hwBRASQoSGVpGroupRowStatus }            
+            STATUS current
+            DESCRIPTION 
+                "The BRAS QoS GVp Group group."
+            ::= { hwBrasQosGroups 11 }
+            
+            
+        hwBrasQosServiceGroupGroup OBJECT-GROUP
+            OBJECTS {hwBRASQoSServiceGroupIndex,
+                hwBRASQoSServiceGroupName,
+                hwBRASQoSServiceGroupRowStatus }            
+            STATUS current
+            DESCRIPTION 
+                "The BRAS QoS Service Group group."
+            ::= { hwBrasQosGroups 12 }
+            
+            
+        hwBrasQosPortQueueGroup OBJECT-GROUP
+            OBJECTS { hwBRASQoSPortQueueIfIndex,
+                hwBRASQoSPortQueueServiceId,
+                hwBRASQoSPortQueueScheduleStyle,
+                hwBRASQoSPortQueueWfqWeight,
+                hwBRASQoSPortQueueShapingValue,
+                hwBRASQoSPortQueueShaingPercentage,
+                hwBRASQoSPortQueuePortWredName,
+                hwBRASQoSPortQueueRowStatus }            
+            STATUS current
+            DESCRIPTION 
+                "The BRAS QoS Port Queue group."
+            ::= { hwBrasQosGroups 13 }
+
+
+        hwBrasQosPortWredGroup OBJECT-GROUP
+            OBJECTS { hwBRASQoSPortWredName,
+                hwBRASQoSPortWredGreenLowLimitValue,
+                hwBRASQoSPortWredGreenHighLimitValue,
+                hwBRASQoSPortWredGreenDiscardValue,
+                hwBRASQoSPortWredYellowLowLimitValue,
+                hwBRASQoSPortWredYellowHighLimitValue,
+                hwBRASQoSPortWredYellowDiscardValue,
+                hwBRASQoSPortWredRedLowLimitValue,
+                hwBRASQoSPortWredRedHighLimitValue,
+                hwBRASQoSPortWredRedDiscardValue,
+                hwBRASQoSPortWredRowStatus}            
+            STATUS current
+            DESCRIPTION 
+                "The BRAS QoS Port Wred group."
+            ::= { hwBrasQosGroups 14 }
+
+
+        hwBrasQosCarProfileGroup OBJECT-GROUP
+            OBJECTS { hwBRASQoSCarProfileIndex,
+                hwBRASQoSCarProfileName,
+                hwBRASQoSCarProfileCir,
+                hwBRASQoSCarProfilePir,
+                hwBRASQoSCarProfileCbs,
+                hwBRASQoSCarProfilePbs,
+                hwBRASQoSCarProfileRowStatus}            
+            STATUS current
+            DESCRIPTION 
+                "The BRAS QoS Car Profile group."
+            ::= { hwBrasQosGroups 15 }
+            
+            
+        hwBrasQosSlotGroup OBJECT-GROUP
+            OBJECTS { hwBRASQoSSlotId,
+                hwBRASQoSSlotLinkLayerExclude,
+                hwBRASQoSSlotEtherAjustOverhead,
+                hwBRASQoSSlotRemoteAdjustEnableStatus,
+                hwBRASQoSSlotInboundGqUsedNum,
+                hwBRASQoSSlotInboundSqUsedNum,
+                hwBRASQoSSlotInboundGqFreeNum,
+                hwBRASQoSSlotInboundSqFreeNum,
+                hwBRASQoSSlotOutboundGqUsedNum,
+                hwBRASQoSSlotOutboundSqUsedNum,
+                hwBRASQoSSlotOutboundGqFreeNum,
+                hwBRASQoSSlotOutboundSqFreeNum,
+                hwBRASQoSSlotActiveStatus}            
+            STATUS current
+            DESCRIPTION 
+                "The BRAS QoS Slot group."
+            ::= { hwBrasQosGroups 16 }
+            
+            
+        hwBrasQosMultiShapingGroup OBJECT-GROUP
+            OBJECTS { hwBRASQoSMultiShapingIndex,
+                hwBRASQoSMultiShapingName,
+                hwBRASQoSMultiShapingEndIndex,
+                hwBRASQoSMultiShapingCir,
+                hwBRASQoSMultiShapingPir,
+                hwBRASQoSMultiShapingQueueLength,
+                hwBRASQoSMultiShapingRowStatus }            
+            STATUS current
+            DESCRIPTION 
+                "The BRAS QoS Multi Shaping group."
+            ::= { hwBrasQosGroups 17 }    
+            
+            
+        hwBrasQosTrapOidGroup OBJECT-GROUP
+            OBJECTS { hwBRASQoSTrapSlotID,
+                hwBRASQoSFailBandwidth,
+                hwBRASQoSTrapUserBehavior,
+                hwBRASQoSTrapUserID,
+                hwBRASQoSTrapTunnelID,
+                hwBRASQoSTrapQinqVlan,
+                hwBRASQoSTrapVlan,
+                hwBRASQoSTrapIfindex }            
+            STATUS current
+            DESCRIPTION 
+                "The BRAS QoS Trap Oid group."
+            ::= { hwBrasQosGroups 18 }
+            
+            
+        hwBrasQosTrapDefineGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwBRASQoSIfResFail,
+                hwBRASQoSIfVlanResFail,
+                hwBRASQoSTunnelResFail,
+                hwBRASQoSUserResFail,
+                hwBRASQoSTrunkFail,
+                hwBRASQoSUserBandwidthOverflow,
+                hwBRASQoSTMExcepion }            
+            STATUS current
+            DESCRIPTION 
+                "The BRAS QoS Trap Define group."
+            ::= { hwBrasQosGroups 19 }                                
+        
+        
+             
+                    
+        --  ============== conformance information define end ==============        
+    
+    END
+
+--
+-- HUAWEI-BRAS-QOS-MIB.mib
+--

@@ -13,14 +13,8 @@
  * the source code distribution for details.
  */
 
-chdir(dirname($argv[0]));
-
-require 'includes/defaults.inc.php';
-require 'config.php';
-require 'includes/definitions.inc.php';
-require 'includes/functions.php';
-require 'includes/polling/functions.inc.php';
-require 'includes/alerts.inc.php';
+$init_modules = array('polling', 'alerts');
+require __DIR__ . '/includes/init.php';
 
 $options = getopt('l:u:r::');
 

@@ -1,0 +1,103 @@
+-- ----------------------------------------------------------------------------
+-- File Main Owner:   
+-- File Peer Owner:
+-- File Description:  hp root MIB interface.
+--
+-- { COPYRIGHT / HISTORY
+--
+-- COPYRIGHT NOTICE
+-- Copyright (c) Blade Network Technologies, Inc.  2006 -
+-- All rights reserved
+--
+--
+-- PORTING HISTORY
+--
+-- } COPYRIGHT / HISTORY (end)
+
+-- MIB_INSERT_START
+-- ----------------------------------------------------------------------------
+-- { INSERT:  hp
+-- ----------------------------------------------------------------------------
+
+HP-SWITCH-PL-MIB    DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, Integer32, Unsigned32, Counter32, Gauge32,
+    Counter64, TimeTicks, IpAddress
+        FROM SNMPv2-SMI
+    DisplayString, PhysAddress, MacAddress
+        FROM SNMPv2-TC
+    BridgeId
+        FROM BRIDGE-MIB
+    sysName, sysLocation, sysContact, ifIndex
+        FROM RFC1213-MIB
+    enterprises    
+        FROM RFC1155-SMI;
+
+-- hp OID reference http://www.iana.org/assignments/enterprise-numbers
+
+hp                                     OBJECT IDENTIFIER ::= { enterprises 11 }
+nm                                     OBJECT IDENTIFIER ::= { hp 2 }
+system                               OBJECT IDENTIFIER ::= { nm 3 }
+netElement                             OBJECT IDENTIFIER ::= { system 7 }
+hpEtherSwitch                          OBJECT IDENTIFIER ::= { netElement 11 }
+hpSwitchProliant                       OBJECT IDENTIFIER ::= { hpEtherSwitch 33 }
+
+hpSwitchModuleBladetype2               OBJECT IDENTIFIER 
+     ::= { hpSwitchProliant 1 }
+hpSwitchBladeType2-Products            OBJECT IDENTIFIER
+     ::= { hpSwitchModuleBladetype2 1 }
+hpSwitchBladeType2-Mgmt                OBJECT IDENTIFIER
+     ::= { hpSwitchModuleBladetype2 2 } 
+--   SysObjId for p-GbE2 Interconnect Switch (1.3.6.1.4.1.11.2.3.7.11.33.1.1.1)
+--   hpProLiant-p-GbE2-InterconnectSwitch   OBJECT IDENTIFIER 
+--     ::= { hpSwitchBladeType2-Products 1 } 
+--   SysObjId for e-GbE2 Interconnect Switch (1.3.6.1.4.1.11.2.3.7.11.33.1.1.2)
+--   hpProLiant-e-GbE2-InterconnectSwitch   OBJECT IDENTIFIER 
+--     ::= { hpSwitchBladeType2-Products 2 }
+
+hpSwitchModuleBladetype4               OBJECT IDENTIFIER
+     ::= { hpSwitchProliant 4 }
+hpSwitchBladeType4-Products            OBJECT IDENTIFIER
+     ::= { hpSwitchModuleBladetype4 1 }
+hpSwitchBladeType4-Mgmt                OBJECT IDENTIFIER
+     ::= { hpSwitchModuleBladetype4 2 } 
+--   SysObjId for GbE2c  Interconnect Switch (1.3.6.1.4.1.11.2.3.7.11.33.4.1.1)
+--   hpProLiant-GbE2c-InterconnectSwitch    OBJECT IDENTIFIER 
+--     ::= { hpSwitchBladeType4-Products 1 }
+
+hpSwitchModuleBladetype5               OBJECT IDENTIFIER 
+     ::= { hpSwitchProliant 5 }
+hpSwitchBladeType5-Products            OBJECT IDENTIFIER
+     ::= { hpSwitchModuleBladetype5 1 }
+hpSwitchBladeType5-Mgmt                OBJECT IDENTIFIER
+     ::= { hpSwitchModuleBladetype5 2 } 
+--   SysObjId for GbE2c-1-10G Interconnect Switch (1.3.6.1.4.1.11.2.3.7.11.33.5.1.1)
+--   hpProLiant-GbE2c-1-10G-InterconnectSwitch    OBJECT IDENTIFIER 
+--     ::= { hpSwitchBladeType5-Products 1 }
+
+hpSwitchModuleBladetype6               OBJECT IDENTIFIER 
+     ::= { hpSwitchProliant 6 }
+hpSwitchBladeType6-Products            OBJECT IDENTIFIER
+     ::= { hpSwitchModuleBladetype6 1 }
+hpSwitchBladeType6-Mgmt                OBJECT IDENTIFIER
+     ::= { hpSwitchModuleBladetype6 2 } 
+--   SysObjId for GbE2c-10G Interconnect Switch (1.3.6.1.4.1.11.2.3.7.11.33.6.1.1)
+--   hpProLiant-GbE2c-10G-InterconnectSwitch    OBJECT IDENTIFIER 
+--     ::= { hpSwitchBladeType6-Products 1 }
+
+hpSwitchModuleBladetype7               OBJECT IDENTIFIER
+     ::= { hpSwitchProliant 7 }
+hpSwitchBladeType7-Products            OBJECT IDENTIFIER
+     ::= { hpSwitchModuleBladetype7 1 }
+hpSwitchBladeType7-Mgmt                OBJECT IDENTIFIER
+     ::= { hpSwitchModuleBladetype7 2 }
+--   SysObjId for GbE2c Interconnect Switch (1.3.6.1.4.1.11.2.3.7.11.33.7.1.1)
+--   hpProLiant-GbE2c-InterconnectSwitch-SmartPanel    OBJECT IDENTIFIER
+--     ::= { hpSwitchBladeType7-Products 1 }
+
+-- ----------------------------------------------------------------------------
+-- } INSERT:  hp
+-- ----------------------------------------------------------------------------
+
+END

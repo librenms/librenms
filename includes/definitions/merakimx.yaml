@@ -1,0 +1,10 @@
+os: merakimx
+text: 'Meraki MX Appliance'
+type: firewall
+icon: meraki
+ifname: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysDescr_regex:
+        - '/^Meraki MX/'

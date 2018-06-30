@@ -11,9 +11,12 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+
+use LibreNMS\Authentication\Auth;
+
 header('Content-type: text/plain');
 
-if (is_admin() === false) {
+if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
@@ -22,12 +25,7 @@ if (!is_numeric($_POST['group_id'])) {
     exit;
 } else {
     if (dbDelete('device_groups', '`id` =  ?', array($_POST['group_id']))) {
-        if (dbFetchCell('SELECT COUNT(id) FROM alert_map WHERE target = ?', array('g'.$_POST['group_id'])) >= 1) {
-            foreach (dbFetchRows('SELECT id FROM alert_map WHERE target = ?', array('g'.$_POST['group_id'])) as $map) {
-                $_POST['map_id'] = $map['id'];
-                include 'forms/delete-alert-map.inc.php';
-            }
-        }
+        dbDelete('alert_group_map', 'group_id=?', [$_POST['group_id']]);
 
         echo 'Group has been deleted.';
         exit;

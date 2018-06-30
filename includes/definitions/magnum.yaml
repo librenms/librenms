@@ -1,0 +1,9 @@
+os: magnum
+text: 'Tandberg Magnum'
+type: storage
+icon: tandberg
+over:
+    - { graph: device_ping_perf, text: 'ICMP Response' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.3073.2.

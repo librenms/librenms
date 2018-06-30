@@ -1,0 +1,16 @@
+os: onefs
+text: 'EMC Isilon OneFS'
+type: storage
+icon: emc
+mib_dir:
+    - emc
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_storage, text: 'Storage Usage' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.12124.1
+    - sysDescr:
+        - 'Isilon OneFS'

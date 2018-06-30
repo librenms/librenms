@@ -1,0 +1,2367 @@
+--PPC-MIB { iso(1) org(3) dod(6) internet(1) private(4)
+-- enterprises(1) ppc(935) }
+-- Title: PPC TOP LEVEL MIB
+-- Date: January 07, 1994    Version 1.00
+--
+-- Date: January 17, 1994    Version 1.01
+--
+-- Date: July 14, 1994    Version 1.02
+--
+-- Date: May 16, 2003    Version 2.00
+
+XPPC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        TRAP-TYPE
+                FROM RFC-1215
+        DisplayString
+                FROM RFC1213-MIB
+        OBJECT-TYPE
+                FROM RFC-1212
+        enterprises,
+        IpAddress
+                FROM RFC1155-SMI;
+
+
+ppc OBJECT IDENTIFIER 
+   ::= { enterprises 935 }
+
+products OBJECT IDENTIFIER 
+   ::= { ppc 1 }
+
+ppcmgmt OBJECT IDENTIFIER 
+   ::= { ppc 2 }
+
+hardware OBJECT IDENTIFIER 
+   ::= { products 1 }
+
+mconfig OBJECT IDENTIFIER 
+   ::= { ppcmgmt 1 }
+
+ups OBJECT IDENTIFIER 
+   ::= { hardware 1 }
+
+upsIdentp OBJECT IDENTIFIER 
+   ::= { ups 1 }
+
+upsBatteryp OBJECT IDENTIFIER 
+   ::= { ups 2 }
+
+upsInputp OBJECT IDENTIFIER 
+   ::= { ups 3 }
+
+upsOutputp OBJECT IDENTIFIER 
+   ::= { ups 4 }
+
+upsConfigp OBJECT IDENTIFIER 
+   ::= { ups 5 }
+
+upsControlp OBJECT IDENTIFIER 
+   ::= { ups 6 }
+
+upsTestp OBJECT IDENTIFIER 
+   ::= { ups 7 }
+
+upsThreePhase OBJECT IDENTIFIER 
+   ::= { ups 8 }
+
+upsEnvironment OBJECT IDENTIFIER 
+   ::= { ups 9 }
+
+upsBaseIdent OBJECT IDENTIFIER 
+   ::= { upsIdentp 1 }
+
+upsSmartIdent OBJECT IDENTIFIER 
+   ::= { upsIdentp 2 }
+
+upsBaseBattery OBJECT IDENTIFIER 
+   ::= { upsBatteryp 1 }
+
+upsSmartBattery OBJECT IDENTIFIER 
+   ::= { upsBatteryp 2 }
+
+upsBaseInput OBJECT IDENTIFIER 
+   ::= { upsInputp 1 }
+
+upsSmartInput OBJECT IDENTIFIER 
+   ::= { upsInputp 2 }
+
+upsBaseOutput OBJECT IDENTIFIER 
+   ::= { upsOutputp 1 }
+
+upsSmartOutput OBJECT IDENTIFIER 
+   ::= { upsOutputp 2 }
+
+upsBaseConfig OBJECT IDENTIFIER 
+   ::= { upsConfigp 1 }
+
+upsSmartConfig OBJECT IDENTIFIER 
+   ::= { upsConfigp 2 }
+
+upsBaseControl OBJECT IDENTIFIER 
+   ::= { upsControlp 1 }
+
+upsSmartControl OBJECT IDENTIFIER 
+   ::= { upsControlp 2 }
+
+upsBaseTest OBJECT IDENTIFIER 
+   ::= { upsTestp 1 }
+
+upsSmartTest OBJECT IDENTIFIER 
+   ::= { upsTestp 2 }
+
+upsThreePhaseBatteryGrp OBJECT IDENTIFIER 
+   ::= { upsThreePhase 1 }
+
+upsThreePhaseInputGrp OBJECT IDENTIFIER 
+   ::= { upsThreePhase 2 }
+
+upsThreePhaseOutputGrp OBJECT IDENTIFIER 
+   ::= { upsThreePhase 3 }
+
+upsThreePhaseBypassGrp OBJECT IDENTIFIER 
+   ::= { upsThreePhase 4 }
+
+upsThreePhaseDCandRectifierStatusGrp OBJECT IDENTIFIER 
+   ::= { upsThreePhase 5 }
+
+upsThreePhaseUPSStatusGrp OBJECT IDENTIFIER 
+   ::= { upsThreePhase 6 }
+
+upsThreePhaseFaultStatusGrp OBJECT IDENTIFIER 
+   ::= { upsThreePhase 7 }
+
+upsThreePhaseRatingGrp OBJECT IDENTIFIER 
+   ::= { upsThreePhase 8 }
+
+-- object types
+-- the ppcmgmt group
+-- the mconfig group
+
+mconfigTrapsReceiversNum OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The number of managers to send traps to."
+   ::= { mconfig 1 }
+
+
+mconfigTrapsReceiversTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MconfigTrapsReceiversEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of managers to send traps to.  The number of
+                entries is given by the value of mconfigNumTrapReceivers"
+   ::= { mconfig 2 }
+
+
+mconfigTrapsReceiversEntry OBJECT-TYPE
+        SYNTAX MconfigTrapsReceiversEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The managers to send traps to."
+        INDEX {
+                trapsIndex }
+   ::= { mconfigTrapsReceiversTable 1 }
+
+
+MconfigTrapsReceiversEntry ::= SEQUENCE {
+        trapsIndex              INTEGER,
+        trapsReceiverAddr       IpAddress,
+        receiverCommunityString DisplayString,
+        severityLevel           INTEGER,
+        receiverAccept          INTEGER }
+
+
+trapsIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a trap receiver entry."
+   ::= { mconfigTrapsReceiversEntry 1 }
+
+
+trapsReceiverAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The IP address of the manager to send a trap to."
+   ::= { mconfigTrapsReceiversEntry 2 }
+
+
+receiverCommunityString OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The community name to use in the trap when
+                sent to the manager."
+   ::= { mconfigTrapsReceiversEntry 3 }
+
+
+severityLevel OBJECT-TYPE
+        SYNTAX INTEGER {
+                        information(1),
+                        warning(2),
+                        severe(3) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The severity threshold of traps to send to the manager.
+                traps are labeled in severity as informational(1), warning(2),
+                severe(3).  Only traps of equal or greater severity than
+                this value are sent to the manager."
+   ::= { mconfigTrapsReceiversEntry 4 }
+
+
+receiverAccept OBJECT-TYPE
+        SYNTAX INTEGER {
+                        yes(1),
+                        no(2) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "An entry will become active if yes, and will
+                be deleted if no."
+   ::= { mconfigTrapsReceiversEntry 5 }
+
+
+-- the ups group
+-- the upsBaseIdent group
+
+upsBaseIdentModel OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The UPS model name (e.g. 'Intelligent 8000E 900VA')."
+   ::= { upsBaseIdent 1 }
+
+
+upsBaseIdentUpsName OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "An 8 byte ID string identifying the UPS.  This object
+                can be set by the administrator."
+   ::= { upsBaseIdent 2 }
+
+
+-- the upsSmartIdent group
+
+upsSmartIdentFirmwareRevision OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The firmware revision of the UPS system."
+   ::= { upsSmartIdent 1 }
+
+
+upsSmartIdentDateOfManufacture OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The date when the UPS was manufactured in mm/dd/yy format."
+   ::= { upsSmartIdent 2 }
+
+
+upsSmartIdentUpsSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "An 8-character string identifying the serial number of
+                the UPS internal microprocessor.  This number is set at
+                the factory.  NOTE: This number does NOT correspond to
+                the serial number on the rear of the UPS."
+   ::= { upsSmartIdent 3 }
+
+
+upsSmartIdentAgentFirmwareRevision OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The firmware revision of the UPS SNMP Proxy agent."
+   ::= { upsSmartIdent 4 }
+
+
+-- the upsBaseBattery group
+
+upsBaseBatteryStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+                        unknown(1),
+                        batteryNormal(2),
+                        batteryLow(3) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The status of the UPS batteries.  A batteryLow(3)
+                value indicates the UPS will be unable to sustain the
+                current load, and its services will be lost if power is
+                not restored.  The amount of run time in reserve at the
+                time of low battery can be configured by the
+                upsSmartConfigLowBatteryRunTime."
+   ::= { upsBaseBattery 1 }
+
+
+upsBaseBatteryTimeOnBattery OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The elapsed time in seconds since the UPS has switched
+                to battery power."
+   ::= { upsBaseBattery 2 }
+
+
+upsBaseBatteryLastReplaceDate OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The date when the UPS system's batteries were last replaced
+                in mm/dd/yy format.   For UPS models, this value is originally
+                set in the factory.  When the UPS batteries are replaced,
+                this value should be reset by the administrator."
+   ::= { upsBaseBattery 3 }
+
+
+-- the upsSmartBattery group
+
+upsSmartBatteryCapacity OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The remaining battery capacity expressed in
+                percent of full capacity."
+   ::= { upsSmartBattery 1 }
+
+
+upsSmartBatteryVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The current battery voltage expressed in 1/10 VDC."
+   ::= { upsSmartBattery 2 }
+
+
+upsSmartBatteryTemperature OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The current internal UPS temperature expressed in tenths of
+                a Celsius degree."
+   ::= { upsSmartBattery 3 }
+
+
+upsSmartBatteryRunTimeRemaining OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The UPS battery run time remaining before battery
+                exhaustion, in seconds."
+   ::= { upsSmartBattery 4 }
+
+
+upsSmartBatteryReplaceIndicator OBJECT-TYPE
+        SYNTAX INTEGER {
+                        noBatteryNeedsReplacing(1),
+                        batteryNeedsReplacing(2) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Indicates whether the UPS batteries need replacing."
+   ::= { upsSmartBattery 5 }
+
+
+upsSmartBatteryFullChargeVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The fully charged battery voltage of the battery system
+                used in the UPS, expressed in tenths of a volt."
+   ::= { upsSmartBattery 6 }
+
+
+upsSmartBatteryCurrent OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The current battery current expressed in percent of
+                maximum current."
+   ::= { upsSmartBattery 7 }
+
+
+-- the upsBaseInput group
+
+upsBaseInputPhase OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The current AC input phase."
+   ::= { upsBaseInput 1 }
+
+
+-- the upsSmartInput group
+
+upsSmartInputLineVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The current utility line voltage in 1/10 VAC."
+   ::= { upsSmartInput 1 }
+
+
+upsSmartInputMaxLineVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The maximum utility line voltage in 1/10 VAC over the
+                previous 1 minute period."
+   ::= { upsSmartInput 2 }
+
+
+upsSmartInputMinLineVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The minimum utility line voltage in 1/10 VAC over the
+                previous 1 minute period."
+   ::= { upsSmartInput 3 }
+
+
+upsSmartInputFrequency OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The current input frequency to the UPS system in 1/10 Hz."
+   ::= { upsSmartInput 4 }
+
+
+upsSmartInputLineFailCause OBJECT-TYPE
+        SYNTAX INTEGER {
+                        noTransfer(1),
+                        highLineVoltage(2),
+                        brownout(3),
+                        blackout(4),
+                        smallMomentarySag(5),
+                        deepMomentarySag(6),
+                        smallMomentarySpike(7),
+                        largeMomentarySpike(8) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The reason for the occurrence of the last transfer
+                to UPS battery power.  The variable is set to
+                noTransfer(1) if there is no transfer yet.   The variable
+                is set to highLineVoltage(2) if the transfer to battery is
+                caused by an over voltage greater than the high transfer
+                voltage. The variable is set to brownout(3) if the duration
+                of the outage is greater than five seconds and the line
+                voltage is between 40 percent of the rated output voltage and
+                the low transfer voltage. The variable is set to blackout(4)
+                if the duration of the outage is greater than five seconds and
+                the line voltage is between 40 percent of the rated output voltage
+                and ground.  The variable is set to smallMomentarySag(5)
+                if the duration of the outage is less than five seconds and
+                the line voltage is between 40 percent of the rated output voltage
+                and the low transfer voltage.  The variable is set to
+                deepMomentarySag(6) if the duration of the outage is less
+                than five seconds and the line voltage is between 40 percent of the
+                rated output voltage and ground."
+   ::= { upsSmartInput 5 }
+
+
+-- the upsBaseOutput group
+
+upsBaseOutputStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+                        unknown(1),
+                        onLine(2),
+                        onBattery(3),
+                        onBoost(4),
+                        sleeping(5),
+                        onBypass(6),
+                        rebooting(7),
+                        standBy(8),
+                        onBuck(9) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The current state of the UPS.  If the UPS is unable
+                to determine the state of the UPS this variable is set
+                to unknown(1)."
+   ::= { upsBaseOutput 1 }
+
+
+upsBaseOutputPhase OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The current output phase."
+   ::= { upsBaseOutput 2 }
+
+
+-- the upsSmartOutput group
+
+upsSmartOutputVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The output voltage of the UPS system in 1/10 VAC."
+   ::= { upsSmartOutput 1 }
+
+
+upsSmartOutputFrequency OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The current output frequency of the UPS system in 1/10 Hz."
+   ::= { upsSmartOutput 2 }
+
+
+upsSmartOutputLoad OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The current UPS load expressed in percent
+                of rated capacity."
+   ::= { upsSmartOutput 3 }
+
+
+-- the upsBaseConfig group
+
+upsBaseConfigNumDevices OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The number of devices that are plugged into the UPS."
+   ::= { upsBaseConfig 1 }
+
+
+upsBaseConfigDeviceTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF UpsBaseConfigDeviceEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of devices that are plugged into the UPS.  The
+                number of entries is given by the value of
+                upsBaseConfigNumDevices."
+   ::= { upsBaseConfig 2 }
+
+
+upsBaseConfigDeviceEntry OBJECT-TYPE
+        SYNTAX UpsBaseConfigDeviceEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The devices plugged in to the UPS."
+        INDEX {
+                indexOfDevice }
+   ::= { upsBaseConfigDeviceTable 1 }
+
+
+UpsBaseConfigDeviceEntry ::= SEQUENCE {
+        indexOfDevice    INTEGER,
+        nameOfDevice     DisplayString,
+        vaRatingOfDevice INTEGER,
+        deviceAccept     INTEGER }
+
+
+indexOfDevice OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index of the device that is plugged into the UPS."
+   ::= { upsBaseConfigDeviceEntry 1 }
+
+
+nameOfDevice OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The name/description of the device plugged into the UPS."
+   ::= { upsBaseConfigDeviceEntry 2 }
+
+
+vaRatingOfDevice OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The volt-amp rating of the device plugged into the UPS."
+   ::= { upsBaseConfigDeviceEntry 3 }
+
+
+deviceAccept OBJECT-TYPE
+        SYNTAX INTEGER {
+                        yes(1),
+                        no(2) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "An entry is added if yes, the entry is deleted if no."
+   ::= { upsBaseConfigDeviceEntry 4 }
+
+
+-- the upsSmartConfig group
+
+upsSmartConfigRatedOutputVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The nominal output voltage from the UPS in 1/10 VAC.
+                Possible values are 1000, 1200, 2080, 2200, 2250, 2300
+                and 2400.
+                                
+                NOTE: Only units that are 2200, 2250, 2300 and 2400 can
+                be changed.  Allowable values are 2200, 2250, 2300 and
+                2400.
+                                
+                For these adjustable units, if a value other than
+                a supported value is provided in a set request, the
+                UPS interprets it as the next lower acceptable value.
+                If the provided value is lower than the lowest acceptable
+                value, the lowest acceptable value is used."
+   ::= { upsSmartConfig 1 }
+
+
+upsSmartConfigHighTransferVolt OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The maximum line voltage in 1/10 VAC allowed before the
+                UPS system transfers to battery backup.
+                                
+                Allowed value depend on the UPS used:
+                120 Volt units allow settings of 1290, 1320, 1350, 1380.
+                100 Volt units allow settings of 1080, 1100, 1120, 1140.
+                230 Volt units allow settings of 2530, 2640, 2710, 2800.
+                208 Volt units allow settings of 2240, 2290, 2340, 2390.
+                                
+                If a value other than a supported value is provided in a
+                set request, the UPS interprets it as the next lower
+                acceptable value.  If the provided value is lower than
+                the lowest acceptable value, the lowest acceptable
+                value is used."
+   ::= { upsSmartConfig 2 }
+
+
+upsSmartConfigLowTransferVolt OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The minimum line voltage in 1/10 VAC allowed before the
+                UPS system transfers to battery backup.
+                                
+                Allowable values depend on the UPS used:
+                120 Volt units allow settings of  970, 1000, 1030, 1060.
+                100 Volt units allow settings of 810, 830, 850, 870.
+                230 Volt units allow settings of 1880, 1960, 2040, 2080.
+                208 Volt units allow settings of 1680, 1720, 1770, 1820.
+                                
+                If a value other than a supported value is provided in a
+                set request, the UPS interprets it as a the next higher
+                acceptable value.  If the provided value is higher than
+                the highest acceptable value, the highest acceptable
+                value is used."
+   ::= { upsSmartConfig 3 }
+
+
+upsSmartConfigAlarm OBJECT-TYPE
+        SYNTAX INTEGER {
+                        timed(1),
+                        atLowBattery(2),
+                        never(3) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A flag indicating how the UPS should handle audible line fail
+                alarms."
+   ::= { upsSmartConfig 4 }
+
+
+upsSmartConfigAlarmTimer OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The time in seconds after initial line failure at which the
+                UPS begins emitting audible alarms (beeping).  This timer is
+                observerd only if the value of extControlAlarm is timed(2).
+                Allowed values are 0 or 30 seconds.
+                                
+                If a value other than a supported value is provided in a
+                set request, the UPS interprets it as a the next lower
+                acceptable value.  If the provided value is lower than
+                the lowest acceptable value, the lowest acceptable
+                value is used."
+   ::= { upsSmartConfig 5 }
+
+
+upsSmartConfigMinReturnCapacity OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The minimum battery capacity as a percent of full capacity
+                required before the UPS will return from a low battery
+                shutdown condition.  In other words, the UPS will not
+                re-energize the output until the battery capacity is equal
+                to this value. Allowed values are 0, 10, 25, or 90  percent.
+                                
+                If a value other than a supported value is provided in a
+                set request, the UPS interprets it as a the next higher
+                acceptable value.  If the provided value is higher than
+                the highest acceptable value, the highest acceptable
+                value is used."
+   ::= { upsSmartConfig 6 }
+
+
+upsSmartConfigSensitivity OBJECT-TYPE
+        SYNTAX INTEGER {
+                        auto(1),
+                        low(2),
+                        medium(3),
+                        high(4) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The sensitivity of the UPS to utility line abnormalities
+                or noises."
+   ::= { upsSmartConfig 7 }
+
+
+upsSmartConfigLowBatteryRunTime OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The desired run time in seconds once the low battery
+                condition is reached.  Allowed values are 120, 300, 420,
+                or 600 seconds.  During this time the UPS will produce a
+                constant warning tone which can not be disabled.
+                                
+                If a value other than a supported value is provided in a
+                set request, the UPS interprets it as a the next higher
+                acceptable value.  If the provided value is higher than
+                the highest acceptable value, the highest acceptable
+                value is used."
+   ::= { upsSmartConfig 8 }
+
+
+upsSmartConfigReturnDelay OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay in seconds after utility line power returns
+                before the UPS will turn on.  This value is also used
+                when the UPS comes out of a reboot and before the UPS
+                wakes up from 'sleep' mode.  Allowed values are 0, 60,
+                180 and 300 seconds.
+                                
+                If a value other than a supported value is provided in a
+                set request, the UPS interprets it as a the next higher
+                acceptable value.  If the provided value is higher than
+                the highest acceptable value, the highest acceptable
+                value is used."
+   ::= { upsSmartConfig 9 }
+
+
+upsSmartConfigShutoffDelay OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay in seconds the UPS remains on after being told
+                to turn off.  Allowed values are 12, 18, 24, 30, 36, 42,
+                48, 54, 60, 120, 180, 240, 300, 360, 420, 480, 540, and
+                600 seconds.
+                                
+                If a value other than a supported value is provided in a
+                set request, the UPS interprets it as next higher acceptable
+                value.  If the provided value is higher than the highest
+                acceptable value, the highest acceptable value is used."
+   ::= { upsSmartConfig 10 }
+
+
+upsSmartConfigUpsSleepTime OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The time in minutes for the UPS to go to 'sleep' when
+                instructed.  When in sleep mode, the UPS will not provide
+                output power regardless of the input line state.  Once the
+                specified time has elapsed, output power will be restored.
+                                
+                This is a configuration setting.  The UPS will not go to
+                sleep until told to do so by the manager from a management
+                station.
+                                
+                Any input value is allowed, however the UPS only recognizes
+                0 - 9999 minutes in one minute increments.
+                                
+                If the provided value is higher than the highest acceptable
+                value, the highest acceptable value is used."
+   ::= { upsSmartConfig 11 }
+
+
+upsSmartConfigSetEEPROMDefaults OBJECT-TYPE
+        SYNTAX INTEGER {
+                        noSetEEPROMDefaults(1),
+                        setEEPROMDefaults(2) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "WRITE: Resets the UPS EEPROM variables to default values.
+                READ: returns 0"
+   ::= { upsSmartConfig 12 }
+
+
+-- the upsBaseControl group
+
+upsBaseControlConserveBattery OBJECT-TYPE
+        SYNTAX INTEGER {
+                        noTurnOffUps(1),
+                        turnUpsOffToConserveBattery(2),
+                        turnUpsOffToConserveBatteryDelay(3) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Setting this variable to turnUpsOffToConserveBattery(2)
+                causes a UPS on battery to be put into 'sleep' mode immediately.
+                The (10) means suspending time(10 minutes) before turn off UPS.
+                UPS will turn back on when utility power is restored.
+                Attempting to turn off a UPS that is not on battery will
+                result in a badValue error.
+                                
+                Setting this value to noTurnOffUps(1) has no
+                effect.
+                                
+                The value noTurnOffUps(1) will always be returned
+                when the variable is read."
+   ::= { upsBaseControl 1 }
+
+
+-- the upsSmartControl group
+
+upsSmartControlUpsOff OBJECT-TYPE
+        SYNTAX INTEGER {
+                        noTurnUpsOff(1),
+                        turnUpsOff(2) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Setting this variable to turnUpsOff(2) causes
+                the UPS to shut off.  When in this state, the UPS
+                will not provide output power regardless of the input
+                line state.  The on/off switch on the UPS
+                must be toggled for the UPS to return to operation.
+                                
+                Setting this value to noTurnUpsOff(1) has no
+                effect.
+                                
+                The value noTurnUpsOff(1) will always be returned
+                when the variable is read."
+   ::= { upsSmartControl 1 }
+
+
+upsSmartControlRebootUps OBJECT-TYPE
+        SYNTAX INTEGER {
+                        noRebootUps(1),
+                        rebootUps(2) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Setting this variable to rebootUps(2) causes the
+                UPS to shut off and turn back on.
+                                
+                Setting this value to noRebootUps(1) has no effect.
+                                
+                The value noRebootUps(1) will always be returned
+                when the variable is read."
+   ::= { upsSmartControl 2 }
+
+
+upsSmartControlUpsSleep OBJECT-TYPE
+        SYNTAX INTEGER {
+                        noPutUpsToSleep(1),
+                        putUpsToSleep(2) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Setting this variable to putUpsToSleep(2) causes
+                the UPS to go to sleep for the time specified by
+                upsSmartConfigUpsSleepTime.
+                                
+                When in sleep mode, the UPS will not provide output
+                power regardless of the input line state.  Once the
+                specified time has elapsed, output power will be
+                restored.
+                                
+                Setting this value to noPutUpsToSleep(1) has no
+                effect.
+                                
+                The value noPutUpsToSleep(1) will always be returned
+                when the variable is read."
+   ::= { upsSmartControl 3 }
+
+
+upsSmartControlSimulatePowerFail OBJECT-TYPE
+        SYNTAX INTEGER {
+                        noSimulatePowerFailure(1),
+                        simulatePowerFailure(2) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Setting this variable to simulatePowerFailure(2) causes
+                the UPS switch to battery power.
+                                
+                Setting this value to noSimulatePowerFailure(1) has no
+                effect.
+                                
+                The value noSimulatePowerFailure(1) will always be returned
+                when the variable is read."
+   ::= { upsSmartControl 4 }
+
+
+upsSmartControlFlashAndBeep OBJECT-TYPE
+        SYNTAX INTEGER {
+                        noFlashAndBeep(1),
+                        flashAndBeep(2) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "UPS to identify itself by lighting all indicators
+                and beeping.
+                                
+                Setting this variable to FlashAndBeep(2) causes
+                the UPS lights all panel indicators and beeps.
+                                
+                Setting this value to noFlashAndBeep(1) has no
+                effect.
+                                
+                The value noFlashAndBeep(1) will always be returned
+                when the variable is read."
+   ::= { upsSmartControl 5 }
+
+
+upsSmartControlTurnOnUpsLoad OBJECT-TYPE
+        SYNTAX INTEGER {
+                        noUpsSmartControlTurnOnUpsLoad(1),
+                        upsSmartControlTurnOnUpsLoad(2) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Setting this variable to upsSmartControlTurnOnUpsLoad(2)
+                causes the UPS switch back to utility power if utility
+                power is present.
+                                
+                Setting this value to noUpsSmartControlTurnOnUpsLoad(1)
+                has no effect.
+                                
+                The value noUpsSmartControlTurnOnUpsLoad(1) will always
+                be returned when the variable is read."
+   ::= { upsSmartControl 6 }
+
+
+-- the upsBaseTest group
+-- the upsSmartTest group
+
+upsSmartTestDiagnosticSchedule OBJECT-TYPE
+        SYNTAX INTEGER {
+                        unknown(1),
+                        biweekly(2),
+                        weekly(3),
+                        never(4) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The UPS system's automatic battery test schedule."
+  ::= { upsSmartTest 1 }
+
+
+upsSmartTestDiagnostics OBJECT-TYPE
+        SYNTAX INTEGER {
+                        noTestDiagnostics(1),
+                        testDiagnostics(2) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Setting this variable to testDiagnostics(2) causes
+                the UPS to perform a diagnostic self test.
+                                
+                Setting this value to noTestDiagnostics(1) has no
+                effect.
+                                
+                The value noTestDiagnostics(1) will always be returned
+                when the variable is read."
+   ::= { upsSmartTest 2 }
+
+
+upsSmartTestDiagnosticsResults OBJECT-TYPE
+        SYNTAX INTEGER {
+                        ok(1),
+                        failed(2),
+                        invalidTest(3),
+                        testInProgress(4) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The results of the last UPS diagnostics test performed."
+   ::= { upsSmartTest 3 }
+
+
+upsSmartTestLastDiagnosticsDate OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The date the last UPS diagnostics test was performed in
+                mm/dd/yy format."
+   ::= { upsSmartTest 4 }
+
+
+upsSmartTestIndicators OBJECT-TYPE
+        SYNTAX INTEGER {
+                        noTestIndicators(1),
+                        testIndicators(2) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Setting this variable to testIndicators(2) causes
+                the UPS to perform a front panel indicator (lights) test.
+                                
+                Setting this value to noTestIndicators(1) has no effect.
+                                
+                The value noTestIndicators(1) will always be returned
+                when the variable is read."
+   ::= { upsSmartTest 5 }
+
+
+upsSmartTestRuntimeCalibration OBJECT-TYPE
+        SYNTAX INTEGER {
+                        noPerformCalibration(1),
+                        performCalibration(2),
+                        cancelCurrentCalibration(3) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Setting this variable to performCalibration(2) causes
+                the UPS to discharge to calibrate the UPS.
+                The test will only start if the battery capacity is 100 percent.
+                The test runs until capacity is less than 25 percent.
+                                
+                Setting this variable to cancelCurrentCalibration(3)
+                after setting performCalibration(2) will cancel the
+                current discharge.
+                                
+                Setting this variable to noPerformCalibration(1)
+                will have no effect.
+                                
+                The value noPerformCalibration(1) will always be returned
+                when the variable is read.
+                                
+                The result of the calibration will be saved in
+                upsSmartTestCalibrationResult."
+   ::= { upsSmartTest 6 }
+
+
+upsSmartTestCalibrationResults OBJECT-TYPE
+        SYNTAX INTEGER {
+                        ok(1),
+                        invalidTest(2),
+                        calibrationInProgress(3) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The results of the last runtime calibration.
+                                
+                Value ok(1) means a successful runtime calibration.
+                                
+                Value invalidTest(2) indicates last calibration did
+                not take place since the battery capacity was below
+                100 percent.
+                                
+                Value calibrationInProgress(3) means a calibration
+                is occurring now."
+   ::= { upsSmartTest 7 }
+
+
+upsSmartTestCalibrationDate OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The date the last UPS runtime calibration was
+                performed in mm/dd/yy format."
+   ::= { upsSmartTest 8 }
+
+
+-----------------------
+--ups ThreePhase group-
+-----------------------
+upsThreePhaseBatteryVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Battery Voltage"
+   ::= { upsThreePhaseBatteryGrp 1 }
+
+
+upsThreePhaseBatteryCapacityPercentage OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Battery Capacity Percentage"
+   ::= { upsThreePhaseBatteryGrp 2 }
+
+
+upsThreePhaseBatteryTimeRemain OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Battery Time Remain (unit is Minute)"
+   ::= { upsThreePhaseBatteryGrp 3 }
+
+
+upsThreePhaseBatteryCurrent OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Battery Electric Current"
+   ::= { upsThreePhaseBatteryGrp 4 }
+
+
+upsThreePhaseBatteryTemperature OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Battery Temperature"
+   ::= { upsThreePhaseBatteryGrp 5 }
+
+
+upsThreePhaseInputFrequency OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Input Frequency"
+   ::= { upsThreePhaseInputGrp 1 }
+
+
+upsThreePhaseInputVoltageR OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Input VoltageR"
+   ::= { upsThreePhaseInputGrp 2 }
+
+
+upsThreePhaseInputVoltageS OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Input VoltageS"
+   ::= { upsThreePhaseInputGrp 3 }
+
+
+upsThreePhaseInputVoltageT OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Input VoltageT"
+   ::= { upsThreePhaseInputGrp 4 }
+
+
+upsThreePhaseOutputFrequency OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Output Frequency"
+   ::= { upsThreePhaseOutputGrp 1 }
+
+
+upsThreePhaseOutputVoltageR OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Output VoltageR"
+   ::= { upsThreePhaseOutputGrp 2 }
+
+
+upsThreePhaseOutputVoltageS OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Output VoltageS"
+   ::= { upsThreePhaseOutputGrp 3 }
+
+
+upsThreePhaseOutputVoltageT OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Output VoltageT"
+   ::= { upsThreePhaseOutputGrp 4 }
+
+
+upsThreePhaseOutputLoadPercentageR OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Load PercentageR"
+   ::= { upsThreePhaseOutputGrp 5 }
+
+
+upsThreePhaseOutputLoadPercentageS OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Load PercentageS"
+   ::= { upsThreePhaseOutputGrp 6 }
+
+
+upsThreePhaseOutputLoadPercentageT OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Load PercentageT"
+   ::= { upsThreePhaseOutputGrp 7 }
+
+
+upsThreePhaseBypassSourceFrequency OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Bypass Frequency"
+   ::= { upsThreePhaseBypassGrp 1 }
+
+
+upsThreePhaseBypssSourceVoltageR OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Bypass VoltageR"
+   ::= { upsThreePhaseBypassGrp 2 }
+
+
+upsThreePhaseBypssSourceVoltageS OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Bypass VoltageS"
+   ::= { upsThreePhaseBypassGrp 3 }
+
+
+upsThreePhaseBypssSourceVoltageT OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Bypass VoltageT"
+   ::= { upsThreePhaseBypassGrp 4 }
+
+
+upsThreePhaseDCandRectifierStatusRecRotError OBJECT-TYPE
+        SYNTAX INTEGER {
+                        yes(14),
+                        no(16) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Rectifier Rotation Error"
+   ::= { upsThreePhaseDCandRectifierStatusGrp 1 }
+
+
+upsThreePhaseDCandRectifierStatusLowBatteryShutdown OBJECT-TYPE
+        SYNTAX INTEGER {
+                        yes(14),
+                        no(16) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Low Battery Shutdown"
+   ::= { upsThreePhaseDCandRectifierStatusGrp 2 }
+
+
+upsThreePhaseDCandRectifierStatusLowBattery OBJECT-TYPE
+        SYNTAX INTEGER {
+                        yes(14),
+                        no(16) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Low Battery"
+   ::= { upsThreePhaseDCandRectifierStatusGrp 3 }
+
+
+upsThreePhaseDCandRectifierStatusInAndOut OBJECT-TYPE
+        SYNTAX INTEGER {
+                        threeInOneOut(2),
+                        threeInThreeOut(3) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "In And Put"
+   ::= { upsThreePhaseDCandRectifierStatusGrp 4 }
+
+
+upsThreePhaseDCandRectifierStatusBatteryStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+                        backup(4),
+                        acnormal(5) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Back Status"
+   ::= { upsThreePhaseDCandRectifierStatusGrp 5 }
+
+
+upsThreePhaseDCandRectifierStatusChargeStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+                        boost(6),
+                        float(7),
+                        no(16) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Charge Status"
+   ::= { upsThreePhaseDCandRectifierStatusGrp 6 }
+
+
+upsThreePhaseDCandRectifierStatusRecOperating OBJECT-TYPE
+        SYNTAX INTEGER {
+                        yes(14),
+                        no(16) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Rectifier Operating"
+   ::= { upsThreePhaseDCandRectifierStatusGrp 7 }
+
+
+upsThreePhaseUPSStatusBypassFreqFail OBJECT-TYPE
+        SYNTAX INTEGER {
+                        yes(14),
+                        no(16) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Bypass Status"
+   ::= { upsThreePhaseUPSStatusGrp 1 }
+
+
+upsThreePhaseUPSStatusManualBypassBreaker OBJECT-TYPE
+        SYNTAX INTEGER {
+                        close(8),
+                        open(9) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Breaker Status"
+   ::= { upsThreePhaseUPSStatusGrp 2 }
+
+
+upsThreePhaseUPSStatusACStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+                        normal(10),
+                        abnormal(11) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "AC Status"
+   ::= { upsThreePhaseUPSStatusGrp 3 }
+
+
+upsThreePhaseUPSStaticSwitchMode OBJECT-TYPE
+        SYNTAX INTEGER {
+                        invermode(12),
+                        bypassmode(13) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Switch Mode"
+   ::= { upsThreePhaseUPSStatusGrp 4 }
+
+
+upsThreePhaseUPSStatusInverterOperating OBJECT-TYPE
+        SYNTAX INTEGER {
+                        yes(14),
+                        no(16) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Operating"
+   ::= { upsThreePhaseUPSStatusGrp 5 }
+
+
+upsThreePhaseFaultStatusEmergencyStop OBJECT-TYPE
+        SYNTAX INTEGER {
+                        yes(14),
+                        no(16) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Emergency Stop"
+   ::= { upsThreePhaseFaultStatusGrp 1 }
+
+
+upsThreePhaseFaultStatusHighDCShutdown OBJECT-TYPE
+        SYNTAX INTEGER {
+                        yes(14),
+                        no(16) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "High DC Shutdown"
+   ::= { upsThreePhaseFaultStatusGrp 2 }
+
+
+upsThreePhaseFaultStatusBypassBreaker OBJECT-TYPE
+        SYNTAX INTEGER {
+                        yes(14),
+                        no(16) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Bypass Breaker"
+   ::= { upsThreePhaseFaultStatusGrp 3 }
+
+
+upsThreePhaseFaultStatusOverLoad OBJECT-TYPE
+        SYNTAX INTEGER {
+                        yes(14),
+                        no(16) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Over Load"
+   ::= { upsThreePhaseFaultStatusGrp 4 }
+
+
+upsThreePhaseFaultStatusInverterOutputFail OBJECT-TYPE
+        SYNTAX INTEGER {
+                        yes(14),
+                        no(16) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Output Fail"
+   ::= { upsThreePhaseFaultStatusGrp 5 }
+
+
+upsThreePhaseFaultStatusOverTemperature OBJECT-TYPE
+        SYNTAX INTEGER {
+                        yes(14),
+                        no(16) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Over Temperature"
+   ::= { upsThreePhaseFaultStatusGrp 6 }
+
+
+upsThreePhaseFaultStatusShortCircuit OBJECT-TYPE
+        SYNTAX INTEGER {
+                        yes(14),
+                        no(16) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Short Circuit"
+   ::= { upsThreePhaseFaultStatusGrp 7 }
+
+
+upsThreePhaseRatingRectifierVoltage OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Rectifier Voltage"
+   ::= { upsThreePhaseRatingGrp 1 }
+
+
+upsThreePhaseRatingRectifierFrequency OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Rectifier Frequency"
+   ::= { upsThreePhaseRatingGrp 2 }
+
+
+upsThreePhaseRatingBypassVoltage OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Bypass Voltage"
+   ::= { upsThreePhaseRatingGrp 3 }
+
+
+upsThreePhaseRatingBypassFrequency OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Bypass Frequency"
+   ::= { upsThreePhaseRatingGrp 4 }
+
+
+upsThreePhaseRatingOutputVoltage OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Output Voltage"
+   ::= { upsThreePhaseRatingGrp 5 }
+
+
+upsThreePhaseRatingOutputFrequency OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Output Frequency"
+   ::= { upsThreePhaseRatingGrp 6 }
+
+
+upsThreePhaseRatingBatteryVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Battery Voltage"
+   ::= { upsThreePhaseRatingGrp 7 }
+
+
+upsThreePhaseRatingPower OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Power Rating"
+   ::= { upsThreePhaseRatingGrp 8 }
+
+
+-----------------------
+-----------------------
+
+upsEnvStatus OBJECT IDENTIFIER  ::= { upsEnvironment 1 }
+
+upsEnvTemperature OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The ambient environment temperature."
+        ::= { upsEnvStatus 1 }
+
+
+upsEnvHumidity OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The environment humidity."
+        ::= { upsEnvStatus 2 }
+
+
+upsEnvOverTemperature OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Alarm dupsAlarmOverTemperature on when the environment
+                temperature over the value."
+        ::= { upsEnvSetting 1 }
+
+
+upsEnvOverHumidity OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Alarm dupsAlarmOverHumidity on when the environment
+                humidity over the value."
+        ::= { upsEnvSetting 3 }
+
+
+upsEnvSecurity1 OBJECT-TYPE
+        SYNTAX INTEGER {
+                        normal(1),
+                        abnormal(2) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Security status"
+        ::= { upsEnvStatus 5 }
+
+
+upsEnvSecurity2 OBJECT-TYPE
+        SYNTAX INTEGER {
+                        normal(1),
+                        abnormal(2) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Security status"
+        ::= { upsEnvStatus 6 }
+
+
+upsEnvSecurity3 OBJECT-TYPE
+        SYNTAX INTEGER {
+                        normal(1),
+                        abnormal(2) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Security status"
+        ::= { upsEnvStatus 7 }
+
+
+upsEnvSecurity4 OBJECT-TYPE
+        SYNTAX INTEGER {
+                        normal(1),
+                        abnormal(2) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Security status"
+        ::= { upsEnvStatus 8 }
+
+
+upsEnvSecurity5 OBJECT-TYPE
+        SYNTAX INTEGER {
+                        normal(1),
+                        abnormal(2) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Security status"
+        ::= { upsEnvStatus 9 }
+
+
+upsEnvSecurity6 OBJECT-TYPE
+        SYNTAX INTEGER {
+                        normal(1),
+                        abnormal(2) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Security status"
+        ::= { upsEnvStatus 10 }
+
+
+upsEnvSecurity7 OBJECT-TYPE
+        SYNTAX INTEGER {
+                        normal(1),
+                        abnormal(2) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Security status"
+        ::= { upsEnvStatus 11 }
+
+
+upsEnvWater OBJECT-TYPE
+        SYNTAX INTEGER {
+                        normal(1),
+                        abnormal(2) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Water status"
+        ::= { upsEnvStatus 3 }
+
+
+upsEnvSmoke OBJECT-TYPE
+        SYNTAX INTEGER {
+                        normal(1),
+                        abnormal(2) }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Smoke status"
+        ::= { upsEnvStatus 4 }
+
+
+upsEnvSetting OBJECT IDENTIFIER         ::= { upsEnvironment 2 }
+
+upsEnvUnderTemperature OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Alarm dupsAlarmUnderTemperature on when the environment
+                temperature below the value."
+        ::= { upsEnvSetting 2 }
+
+
+upsEnvUnderHumidity OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Alarm dupsAlarmUnderHumidity on when the environment
+                humidity below the value."
+        ::= { upsEnvSetting 4 }
+
+
+
+communicationLost TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "SEVERE: Communication to the UPS has been lost.  Steps
+                to reestablish communication are in progress."
+        --#TYPE "PPC UPS: Communication failure"
+        --#SUMMARY "Communication to the UPS has been lost."
+        --#ARGUMENTS { }
+        --#SEVERITY CRITICAL
+        --#TIMEINDEX 1
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE DEGRADED
+ ::= 1
+
+
+
+upsOverLoad TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "SEVERE: The UPS has sensed a load greater than 100 percent
+                of its rated capacity."
+        --#TYPE "PPC UPS: UPS overload"
+        --#SUMMARY "The UPS has sensed a load greater than 100 percent of its rated capacity."
+        --#ARGUMENTS { }
+        --#SEVERITY CRITICAL
+        --#TIMEINDEX 1
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE DEGRADED
+ ::= 2
+
+
+
+upsDiagnosticsFailed TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "SEVERE: The UPS failed its internal diagnostic self-test."
+        --#TYPE "PPC UPS: Failed self-test"
+        --#SUMMARY "The UPS has failed its internal diagnostic self-test."
+        --#ARGUMENTS { }
+        --#SEVERITY CRITICAL
+        --#TIMEINDEX 1
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE DEGRADED
+ ::= 3
+
+
+
+upsDischarged TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "SEVERE: The UPS just started a runtime calibration
+                discharge.  The UPS batteries are being discharged."
+        --#TYPE "PPC UPS: Deep discharge"
+        --#SUMMARY "The UPS has just started a runtime calibration discharge."
+        --#ARGUMENTS { }
+        --#SEVERITY CRITICAL
+        --#TIMEINDEX 1
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE DEGRADED
+ ::= 4
+
+
+
+upsOnBattery TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: The UPS has switched to battery backup power."
+        --#TYPE "PPC UPS: On battery"
+        --#SUMMARY "The UPS has switched to battery backup power."
+        --#ARGUMENTS { }
+        --#SEVERITY MAJOR
+        --#TIMEINDEX 1
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE OPERATIONAL
+ ::= 5
+
+
+
+boostOn TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: The UPS has enabled Boost."
+        --#TYPE "PPC UPS: SmartBoost"
+        --#SUMMARY "The UPS has enabled Boost."
+        --#ARGUMENTS { }
+        --#SEVERITY MINOR
+        --#TIMEINDEX 1
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE OPERATIONAL
+ ::= 6
+
+
+
+lowBattery TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "SEVERE: The UPS batteries are low and will soon be exhausted.
+                If utility power is not restored the UPS will put itself
+                to 'sleep' and immediately cut power to the load."
+        --#TYPE "PPC UPS: Low battery"
+        --#SUMMARY "The UPS batteries are low and will soon be exhausted."
+        --#ARGUMENTS { }
+        --#SEVERITY CRITICAL
+        --#TIMEINDEX 1
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE DEGRADED
+ ::= 7
+
+
+
+communicationEstablished TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "INFORMATION: Communication with the UPS has been
+                established."
+        --#TYPE "PPC UPS: Communication established"
+        --#SUMMARY "Communication with the UPS has been established."
+        --#ARGUMENTS { }
+        --#SEVERITY INFORMATIONAL
+        --#TIMEINDEX 1
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE OPERATIONAL
+ ::= 8
+
+
+
+powerRestored TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "INFORMATION: Utility power has been restored."
+        --#TYPE "PPC UPS: Utility restored"
+        --#SUMMARY "Normal power has been restored to the UPS."
+        --#ARGUMENTS { }
+        --#SEVERITY INFORMATIONAL
+        --#TIMEINDEX 1
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE OPERATIONAL
+ ::= 9
+
+
+
+upsDiagnosticsPassed TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "INFORMATION: The UPS passed its internal self-test."
+        --#TYPE "PPC UPS: Passed self-test"
+        --#SUMMARY "The UPS has passed its internal self-test."
+        --#ARGUMENTS { }
+        --#SEVERITY INFORMATIONAL
+        --#TIMEINDEX 1
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE OPERATIONAL
+ ::= 10
+
+
+
+returnFromLowBattery TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "INFORMATION: The UPS has returned from a low battery
+                condition."
+        --#TYPE "PPC UPS: Battery normal"
+        --#SUMMARY "The UPS has returned from a low battery condition."
+        --#ARGUMENTS { }
+        --#SEVERITY INFORMATIONAL
+        --#TIMEINDEX 1
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE OPERATIONAL
+ ::= 11
+
+
+
+upsTurnedOff TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: The UPS has been turned 'off' by the
+                management station."
+        --#TYPE "PPC UPS: Switching off"
+        --#SUMMARY "The UPS is being switched off by a management station."
+        --#ARGUMENTS { }
+        --#SEVERITY MAJOR
+        --#TIMEINDEX 1
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE NONOPERATIONAL
+ ::= 12
+
+
+
+upsSleeping TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: The UPS is entering 'sleep' mode.  Power
+                to the load will be cut off."
+        --#TYPE "PPC UPS: Going to sleep"
+        --#SUMMARY "The UPS is going into sleep mode."
+        --#ARGUMENTS { }
+        --#SEVERITY MAJOR
+        --#TIMEINDEX 1
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE NONOPERATIONAL
+ ::= 13
+
+
+
+upsWokeUp TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "INFORMATION: The UPS woke up from 'sleep' mode.  Power
+                to the load has been restored."
+        --#TYPE "PPC UPS: Wake up"
+        --#SUMMARY "The UPS has woke up from sleep mode."
+        --#ARGUMENTS { }
+        --#SEVERITY INFORMATIONAL
+        --#TIMEINDEX 1
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE OPERATIONAL
+ ::= 14
+
+
+
+upsRebootStarted TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: The UPS has started its reboot sequence.  After
+                the specified delay the UPS will perform a reboot."
+        --#TYPE "PPC UPS: Starting reboot"
+        --#SUMMARY "The UPS has started its reboot sequence."
+        --#ARGUMENTS { }
+        --#SEVERITY MAJOR
+        --#TIMEINDEX 1
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE NONOPERATIONAL
+ ::= 15
+
+
+envOverTemperature TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: The environment temperature exceed the normal value."
+ ::= 16
+
+
+envTemperatureNormal TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "INFORMATION: The environment temperature is normal."
+ ::= 17
+
+
+envOverHumidity TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: The environment humidity exceed the normal value."
+ ::= 18
+
+
+envHumidityNormal TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "INFORMATION: The environment humidity is normal."
+ ::= 19
+
+
+envSmokeAbnormal TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: Smoke is abnormal."
+ ::= 20
+
+
+envWaterAbnormal TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: Water is abnormal."
+ ::= 21
+
+
+envSecurityAbnormal TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: Security is abnormal."
+ ::= 22
+
+
+--envSmokeNormal TRAP-TYPE
+--      ENTERPRISE ppc
+--      DESCRIPTION 
+--              "INFORMATION: Smoke is normal."
+-- ::= 23
+
+
+envWaterNormal TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "INFORMATION: Water is normal."
+ ::= 24
+
+
+--envSecurityNormal TRAP-TYPE
+--      ENTERPRISE ppc
+--      DESCRIPTION 
+--              "INFORMATION: Security is normal."
+-- ::= 25
+
+
+envGasAbnormal TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: Gas Alarm"
+ ::= 26
+
+
+upsTemp TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: UPS Temperature Overrun"
+ ::= 27
+
+
+upsLoadNormal TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: UPS Load Normal"
+ ::= 28
+
+
+upsTempNormal TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: UPS temperature Normal"
+ ::= 29
+
+
+envUnderTemperature TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: The environment temperature below the normal value."
+ ::= 30
+
+
+envUnderHumidity TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: The environment humidity below the normal value."
+ ::= 31
+
+
+upsBypass TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: The UPS is entering 'bypass' mode."
+ ::= 32
+
+
+envSecurity1 TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: Security1 Alarm."
+ ::= 33
+
+
+envSecurity2 TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: Security2 Alarm."
+ ::= 34
+
+
+envSecurity3 TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: Security3 Alarm."
+ ::= 35
+
+
+envSecurity4 TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: Security4 Alarm."
+ ::= 36
+
+
+envSecurity5 TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: Security5 Alarm."
+ ::= 37
+
+
+envSecurity6 TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: Security6 Alarm."
+ ::= 38
+
+
+envSecurity7 TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: Security7 Alarm."
+ ::= 39
+
+
+--envSecurity1Return TRAP-TYPE
+--      ENTERPRISE ppc
+--      DESCRIPTION 
+--              "WARNING: Security1 Normal."
+-- ::= 40
+
+
+--envSecurity2Return TRAP-TYPE
+--      ENTERPRISE ppc
+--      DESCRIPTION 
+--              "WARNING: Security2 Normal"
+-- ::= 41
+
+
+--envSecurity3Return TRAP-TYPE
+--      ENTERPRISE ppc
+--      DESCRIPTION 
+--              "WARNING: Security3 Normal."
+-- ::= 42
+
+
+--envSecurity4Return TRAP-TYPE
+--      ENTERPRISE ppc
+--      DESCRIPTION 
+--              "WARNING: Security4 Normal."
+-- ::= 43
+
+
+--envSecurity5Return TRAP-TYPE
+--      ENTERPRISE ppc
+--      DESCRIPTION 
+--              "WARNING: Security5 Normal."
+-- ::= 44
+
+
+--envSecurity6Return TRAP-TYPE
+--      ENTERPRISE ppc
+--      DESCRIPTION 
+--              "WARNING: Security6 Normal."
+-- ::= 45
+
+
+--envSecurity7Return TRAP-TYPE
+--      ENTERPRISE ppc
+--      DESCRIPTION 
+--              "WARNING: Security7 Normal."
+-- ::= 46
+
+
+upsRecroterror TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: Rectifier Rotation Error"
+ ::= 47
+
+
+upsBypassFreFail TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: Bypass Frequency Fail"
+ ::= 48
+
+
+upsBypassacnormal TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: Bypass AC Normal"
+ ::= 49
+
+
+upsBypassacabnormal TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: Bypass AC Abnormal"
+ ::= 50
+
+
+upsTest TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: UPS Test"
+ ::= 51
+
+
+upsScheduleShutdown TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: UPS Schedule Shutdown"
+ ::= 52
+
+upsBypassReturn TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "The UPS return from Bypass Mode"
+ ::= 53
+
+upsShortCircuitShutdown TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "The UPS Short Circuit Shutdown"
+ ::= 54
+ 
+upsInverterOutputFailShutdown TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "The UPS Inverter Output Fail Shutdown"
+ ::= 55
+ 
+upsBypassBreadkerOnShutdown TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "The UPS Manual Bypass Breaker on Shutdown"
+ ::= 56
+ 
+upsHighDCShutdown TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "The UPS High DC Shutdown"
+ ::= 57
+ 
+upsEmergencyStop TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "The UPS Emergency Stop"
+ ::= 58
+ 
+upsInverterMode TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "The UPS Static Switch in Inverter Mode"
+ ::= 59
+ 
+upsBypassMode TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "The UPS Static Switch in Bypass Mode"
+ ::= 60
+ 
+upsOverTemperatureShutdown TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "The UPS Over Temperature Shutdown"
+ ::= 61
+ 
+upsOverLoadShutdown TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "The UPS Overload Shutdown"
+ ::= 62
+ 
+upsCapacityUnderrun TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "The UPS Capacity Underrun"
+ ::= 63
+ 
+upsCapacityNormal TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "The UPS Capacity Normal"
+ ::= 64
+ 
+upsLowBatteryShutdown TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "The UPS Low Battery Shutdown"
+ ::= 67
+ 
+buckOn TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: The UPS has enabled Buck."
+ ::= 68
+ 
+returnFromBuck TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: The UPS has return from Buck."
+ ::= 69
+ 
+returnFromBoost TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: The UPS has return from Boost."
+ ::= 70
+ 
+END

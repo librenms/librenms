@@ -1,0 +1,9 @@
+os: avtech
+text: 'Avtech Environment Sensor'
+type: environment
+icon: avtech
+over:
+    - { graph: device_temperature, text: Temperature }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.20916.1.

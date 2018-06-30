@@ -1,0 +1,172 @@
+NBS-USER-SESSION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, RowStatus
+        FROM SNMPv2-TC
+    nbs
+        FROM NBS-MIB
+    ;
+
+nbsUserSessionMib MODULE-IDENTITY
+    LAST-UPDATED "201504290000Z"  -- April 29, 2015
+    ORGANIZATION  "MRV"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+
+    DESCRIPTION
+      "MIB for representing MRV User Session information"
+
+    ::= { nbs 218 }
+
+nbsUserSessionGrp OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "User Session MIB"
+        ::= { nbsUserSessionMib 1 }
+
+nbsUserSessionTableSize OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of rows in the nbsUserSession table"
+        ::= { nbsUserSessionGrp 1 }
+
+nbsUserSessionTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsUserSessionEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "A table describing the user sessions"
+
+        ::= { nbsUserSessionGrp 2 }
+
+nbsUserSessionEntry  OBJECT-TYPE
+        SYNTAX      NbsUserSessionEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Contains the information describing a UI Session"
+        INDEX { nbsUserSessionPID }
+
+        ::= { nbsUserSessionTable 1 }
+
+NbsUserSessionEntry ::= SEQUENCE {
+        nbsUserSessionPID         Unsigned32,
+        nbsUserSessionRowStatus   RowStatus,
+        nbsUserSessionType        INTEGER,
+        nbsUserSessionLine        DisplayString,
+        nbsUserSessionId          DisplayString,
+        nbsUserSessionUser        DisplayString,
+        nbsUserSessionHost        DisplayString,
+        nbsUserSessionConnectTime Unsigned32,
+        nbsUserSessionVia         INTEGER
+}
+
+nbsUserSessionPID     OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "The process id of the task servicing this session."
+
+        ::= { nbsUserSessionEntry 1 }
+
+nbsUserSessionRowStatus     OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Writing destroy(6) to this object will destroy the session.
+           It is only allowed when nbsUserSessionType is
+           userProcess(7)."
+
+        ::= { nbsUserSessionEntry 2 }
+
+nbsUserSessionType     OBJECT-TYPE
+        SYNTAX      INTEGER {
+                runLvl       (1),
+                bootTime     (2),
+                newTime      (3),
+                oldTime      (4),
+                initProcess  (5),
+                loginProcess (6),
+                userProcess  (7),
+                deadProcess  (8),
+                accounting   (9)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "This object follows the ut_type entry in struct utmp."
+
+        ::= { nbsUserSessionEntry 3 }
+
+nbsUserSessionLine    OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Device name of the tty being used by this session."
+
+        ::= { nbsUserSessionEntry 4 }
+
+nbsUserSessionId    OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..4))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "This object follows the ut_type entry in struct utmp."
+
+        ::= { nbsUserSessionEntry 5 }
+
+nbsUserSessionUser    OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The name of the user using this session."
+
+        ::= { nbsUserSessionEntry 6 }
+
+nbsUserSessionHost    OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Hostname of the remote IP from which the user is originating."
+
+        ::= { nbsUserSessionEntry 7 }
+
+nbsUserSessionConnectTime    OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "This object indicates the time the entry was created, in
+           seconds, since the Epoch, 1970-01-01 00:00:00 (UTC). It will
+           wrap around at 03:14:07 2038-01-19 (UTC)."
+
+        ::= { nbsUserSessionEntry 8 }
+
+nbsUserSessionVia    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                notSupported  (0),
+                console       (1),
+                ssh           (2),
+                telnet        (3),
+                api           (4),
+                snmp          (5),
+                gui           (6)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "This object indicates the type of session. Note that this
+           field is decided by the system, and is not stored in the
+           utmp file."
+
+        ::= { nbsUserSessionEntry 9 }
+
+END

@@ -1,0 +1,74 @@
+HP-ICF-TC DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        hpicfAdmin
+            FROM HP-ICF-OID;
+
+    hpicfTextualConventions MODULE-IDENTITY
+        LAST-UPDATED "200402182305Z"  -- February 18, 2004
+        ORGANIZATION "Hewlett Packard Company,
+                      Network Infrastructure Solutions"
+        CONTACT-INFO "Hewlett-Packard Company
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+        DESCRIPTION  "This module contains common textual convention
+                     definitons used by various HP ICF MIB modules."
+
+        REVISION     "200402182305Z"  -- February 18, 2004
+        DESCRIPTION  "Added gigabitEthernetESP and tenGigabitEthernetCX 
+                      type for HpSwitchPortType."
+
+        REVISION     "200011030717Z"  -- November 3, 2000
+        DESCRIPTION  "Initial revision."
+        ::= { hpicfAdmin 4 }
+
+    ConfigStatus ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "Used to indicate the configuration status for
+                    a group of objects.  'active' means that the
+                    values of the related objects are currently in
+                    use by the device.  'notInService' indicates that
+                    the objects have been reconfigured in such a way
+                    that the values cannot take effect until after the
+                    next reboot of the device.  'notReady' indicates
+                    that the objects are not consistent with each other."
+        SYNTAX      INTEGER {
+                        active(1),
+                        notInService(2),
+                        notReady(3)
+                    }
+
+    HpSwitchPortType ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "Used to indicate the type of port."
+        SYNTAX      INTEGER {
+                        other(1),
+                        none(2),
+                        unknown(3),
+                        ethernetCsmacd(6),
+                        iso88023Csmacd(7),
+                        fddi(15),
+                        atm(37),
+                        propMultiplexor(54),
+                        ieee80212(55),
+                        fastEther(62),
+                        fastEtherFX(69),
+                        fastEtherFX-sfp(70),
+                        gigabitEthernetSX (117),
+		        gigabitEthernetLX (118),
+		        gigabitEthernetT (119),
+		        gigabitEthernetStk (120),
+		        gigabitEthernetLH (121),
+                        tenGbE-CX4 (122),
+                        gigabitEthernetESP (123),
+                        tenGbE-SR (124),
+                        tenGbE-ER (125),
+                        tenGbE-LR (126),
+		        gigabitEthernetT-sfp (127)
+                    }
+
+END

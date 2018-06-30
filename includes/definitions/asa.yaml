@@ -1,0 +1,35 @@
+os: asa
+group: cisco
+text: 'Cisco ASA'
+ifname: true
+type: firewall
+icon: cisco
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+poller_modules:
+    applications: false
+    bgp-peers: false
+    cipsec-tunnels: true
+    cisco-asa-firewall: true
+    cisco-ipsec-flow-monitor: true
+    cisco-remote-access-monitor: true
+    hr-mib: false
+    ipSystemStats: false
+    ipmi: false
+    ntp: false
+    ospf: false
+    stp: false
+    ucd-diskio: false
+    ucd-mib: false
+discovery_modules:
+    arp-table: false
+    bgp-peers: false
+    cisco-vrf-lite: false
+    ntp: false
+    stp: false
+    ucd-diskio: false
+    vlans: false
+discovery:
+    - sysDescr_regex:
+        - '/^Cisco Adaptive Security Appliance/'

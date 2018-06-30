@@ -1,0 +1,12 @@
+os: ironware
+text: 'Brocade IronWare'
+type: network
+icon: brocade
+group: brocade
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysDescr:
+        - IronWare

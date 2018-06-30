@@ -1,0 +1,10 @@
+os: fabos
+text: 'Brocade FabricOS'
+type: network
+icon: brocade
+group: brocade
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.1588.2.1.1.

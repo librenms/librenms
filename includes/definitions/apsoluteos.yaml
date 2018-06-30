@@ -1,0 +1,14 @@
+os: apsoluteos
+text: ApsoluteOS
+type: network
+icon: radware
+group: radware
+mib_dir:
+    - radware
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.89.1.1.62

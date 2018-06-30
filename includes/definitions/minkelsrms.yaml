@@ -1,0 +1,8 @@
+os: minkelsrms
+text: 'Minkels RMS'
+type: environment
+over:
+    - { graph: device_temperature, text: temperature }
+discovery:
+    - sysDescr:
+        - 8VD-X20

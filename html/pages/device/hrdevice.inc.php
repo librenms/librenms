@@ -31,6 +31,7 @@ foreach (dbFetchRows('SELECT * FROM `hrDevice` WHERE `device_id` = ? ORDER BY `h
     } elseif ($hrdevice['hrDeviceType'] == 'hrDeviceNetwork') {
         $int       = str_replace('network interface ', '', $hrdevice['hrDeviceDescr']);
         $interface = dbFetchRow('SELECT * FROM ports WHERE device_id = ? AND ifDescr = ?', array($device['device_id'], $int));
+        $interface = cleanPort($interface);
         if ($interface['ifIndex']) {
             echo '<td>'.generate_port_link($interface).'</td>';
 

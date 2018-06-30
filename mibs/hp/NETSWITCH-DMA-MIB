@@ -1,0 +1,222 @@
+-- HP Enterprise NETSWITCH DMA MIB 
+
+
+          NETSWITCH-DMA-MIB DEFINITIONS ::= BEGIN
+
+          IMPORTS
+                       enterprises, Counter
+                           FROM RFC1155-SMI
+                       OBJECT-TYPE
+			   FROM RFC-1212;
+
+          hp		OBJECT IDENTIFIER ::= { enterprises 11 }
+          nm		OBJECT IDENTIFIER ::= { hp 2 }
+	  icf		OBJECT IDENTIFIER ::= { nm 14 }
+
+
+          -- Icf Devices 
+
+          hpicfObjects  OBJECT IDENTIFIER ::= { icf 11 }
+          hpicfSwitch   OBJECT IDENTIFIER ::= { hpicfObjects 5 }
+          hpSwitch      OBJECT IDENTIFIER ::= { hpicfSwitch  1 }
+
+          -- Icf Switch Specific 
+          hpOpSystem    OBJECT IDENTIFIER ::= { hpSwitch 1 }
+          hpHwSystem    OBJECT IDENTIFIER ::= { hpSwitch 2 }
+
+          -- ###########################################################
+          -- the hpDMAStats Group
+
+          -- ###########################################################
+
+          hpDMAStats    OBJECT IDENTIFIER ::= { hpHwSystem 2 }
+
+          hpDMAReset OBJECT-TYPE 
+              SYNTAX     INTEGER {
+		         reset(1)
+		      }
+              ACCESS     read-write
+              STATUS     mandatory
+              DESCRIPTION
+                      "Reset all DMA counters to 0 by providing 1"
+              ::= { hpDMAStats 1 }
+
+          hpDMAFrameRcvcnt OBJECT-TYPE
+              SYNTAX     Counter
+              ACCESS     read-only
+              STATUS     mandatory
+              DESCRIPTION
+                      "This object is a count of frames that have been 
+		              received by the switch. Only good CRC frames are included."
+              ::= { hpDMAStats 2 }
+
+          hpDMAOctetsRcvcnt OBJECT-TYPE
+              SYNTAX     Counter
+              ACCESS     read-only
+              STATUS     mandatory
+              DESCRIPTION
+                      "This object is a count of the number of octets
+         		      that have been received by the switch. This counter is
+                      incremented by the size of each frame received
+		              by the switch."
+              ::= { hpDMAStats 3 }
+
+          hpDMAPrevRcvFrames OBJECT-TYPE
+              SYNTAX     Counter
+              ACCESS     read-only
+              STATUS     mandatory
+              DESCRIPTION
+                      "This object is a copy of hpDMARcvFrames sampled 
+					  every second."
+              ::= { hpDMAStats 4 }
+
+          hpDMAFrameRcvPerSec OBJECT-TYPE
+              SYNTAX     Counter
+              ACCESS     read-only
+              STATUS     mandatory
+              DESCRIPTION
+                      "This object is a count of the number of frame
+		              that were received by the switch in one second. It 
+                      is updated every second."
+              ::= { hpDMAStats 5 }
+
+          hpDMAPeakRcvFrames  OBJECT-TYPE
+              SYNTAX     Counter
+              ACCESS     read-only
+              STATUS     mandatory
+              DESCRIPTION
+                      "This object is a count of the highest 
+					  hpDMAFrameRcvPerSec that has been seen by the switch." 
+              ::= { hpDMAStats 6 }
+
+          hpDMAPrevRcvOctets OBJECT-TYPE
+              SYNTAX     Counter
+              ACCESS     read-only
+              STATUS     mandatory
+              DESCRIPTION
+                      "This object is a copy of hpDMAPrevRcvFrames sampled 
+					  every second."
+              ::= { hpDMAStats 7 }
+
+          hpDMAOctetsRcvPerSec OBJECT-TYPE
+              SYNTAX     Counter
+              ACCESS     read-only
+              STATUS     mandatory
+              DESCRIPTION
+                      "This object is a count of the number of octets
+		              that were received by the switch in one second. It 
+                      is updated every second."
+              ::= { hpDMAStats 8 }
+
+          hpDMAPeakRcvOctets OBJECT-TYPE
+              SYNTAX     Counter
+              ACCESS     read-only
+              STATUS     mandatory
+              DESCRIPTION
+                      "This object is a count of the highest 
+					  hpDMARcvOctets that has been seen by the switch." 
+              ::= { hpDMAStats 9 }
+
+          hpDMAFrameXmtcnt OBJECT-TYPE
+              SYNTAX     Counter
+              ACCESS     read-only
+              STATUS     mandatory
+              DESCRIPTION
+                      "This counter is incremented by one for each frame
+        		      successfully transmitted from the switch."
+              ::= { hpDMAStats 10 }
+
+          hpDMAOctetsXmtcnt OBJECT-TYPE
+              SYNTAX     Counter
+              ACCESS     read-only
+              STATUS     mandatory
+              DESCRIPTION
+                      "This object is a count of the number of octets that
+					  have benn transmitted by the switch."
+              ::= { hpDMAStats 11 }
+
+          hpDMAPrevXmtFrames OBJECT-TYPE
+              SYNTAX     Counter
+              ACCESS     read-only
+              STATUS     mandatory
+              DESCRIPTION
+                      "This object is a copy of hpDMAXmtFrames sampled 
+					  every second."
+              ::= { hpDMAStats 12 }
+
+          hpDMAFrameXmtPerSec OBJECT-TYPE
+              SYNTAX     Counter
+              ACCESS     read-only
+              STATUS     mandatory
+              DESCRIPTION
+                      "This object is a count of the number of frame
+		              that were transmitted by the switch in one second. It 
+                      is updated every second."
+              ::= { hpDMAStats 13 }
+
+          hpDMAPeakXmtFrames  OBJECT-TYPE
+              SYNTAX     Counter
+              ACCESS     read-only
+              STATUS     mandatory
+              DESCRIPTION
+                      "This object is a count of the highest 
+					  hpDMAFrameXmtPerSec that has been seen by the switch." 
+              ::= { hpDMAStats 14 }
+
+          hpDMAPrevXmtOctets OBJECT-TYPE
+              SYNTAX     Counter
+              ACCESS     read-only
+              STATUS     mandatory
+              DESCRIPTION
+                      "This object is a copy of hpDMAPrevXmtFrames sampled 
+					  every second."
+              ::= { hpDMAStats 15 }
+
+          hpDMAOctetsXmtPerSec OBJECT-TYPE
+              SYNTAX     Counter
+              ACCESS     read-only
+              STATUS     mandatory
+              DESCRIPTION
+                      "This object is a count of the number of octets
+		              that were transmitted by the switch in one second. It 
+                      is updated every second."
+              ::= { hpDMAStats 16 }
+
+          hpDMAPeakXmtOctets OBJECT-TYPE
+              SYNTAX     Counter
+              ACCESS     read-only
+              STATUS     mandatory
+              DESCRIPTION
+                      "This object is a count of the highest 
+					  hpDMAXmtOctets that has been seen by the switch." 
+              ::= { hpDMAStats 17 }
+
+          hpDMAFrameClippedcnt OBJECT-TYPE
+              SYNTAX     Counter
+              ACCESS     read-only
+              STATUS     mandatory
+              DESCRIPTION
+                      "This object is a count of number of outbound frames 
+		      dropped by the switch due to transmit ring overflow."
+              ::= { hpDMAStats 18 }
+
+          hpDMAFrameClippedOccurance OBJECT-TYPE
+              SYNTAX     Counter
+              ACCESS     read-only
+              STATUS     mandatory
+              DESCRIPTION
+                      "This object is a count of number of times that
+					  transmit ring overflowed."
+              ::= { hpDMAStats 19 }
+
+          hpDMAMissBufCnt OBJECT-TYPE
+              SYNTAX     Counter
+              ACCESS     read-only
+              STATUS     mandatory
+              DESCRIPTION
+                      "This counter is incremented when buffer allocation
+					  failed."
+              ::= { hpDMAStats 20 }
+
+
+          END

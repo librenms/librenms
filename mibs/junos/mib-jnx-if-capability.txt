@@ -1,0 +1,84 @@
+-- *****************************************************************
+-- JNX-IF-CAPABILITY.mib: Juniper IF-MIB AGENT-CAPABILITIES
+--
+-- Copyright (c) 2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+JNX-IF-CAPABILITY DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        jnxAgentCapability
+                FROM JUNIPER-SMI;   
+
+jnxIfCapability MODULE-IDENTITY
+    LAST-UPDATED "201306180000Z"
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+             E-mail: support@juniper.net"
+
+    DESCRIPTION
+       "Agent capabilities for IF-MIB (RFC2863)"
+    ::= { jnxAgentCapability 1 }
+
+
+jnxIfCapJunos AGENT-CAPABILITIES
+
+    PRODUCT-RELEASE "All JUNOS Version"
+    STATUS          current
+    DESCRIPTION     "IF MIB capabilities"
+
+    SUPPORTS        IF-MIB
+    INCLUDES        { ifGeneralInformationGroup, ifStackGroup2,
+                      ifOldObjectsGroup, linkUpDownNotificationsGroup,
+                      ifVHCPacketGroup, ifCounterDiscontinuityGroup}
+
+    VARIATION       ifDescr
+    ACCESS          read-only
+    DESCRIPTION     "The ifDescr showed interface name by default."
+
+    VARIATION       ifAdminStatus
+    SYNTAX          INTEGER {
+                        up(1),       -- ready to pass packets
+                        down(2)
+                    }
+    -- no           { testing(3)}  in some test mode
+    ACCESS          read-only
+    DESCRIPTION     "status testing is not supported."
+
+    VARIATION       ifOperStatus
+    SYNTAX          INTEGER { 
+                        up(1),
+                        down(2),
+                        lowerLayerDown(7)
+                    
+                    }
+    -- no           { testing(3), unknown(4), dormant(5), notPresent(6)}
+    ACCESS          read-only
+    DESCRIPTION     "support up, down, lowerlayerDown states."
+
+    VARIATION       ifLinkUpDownTrapEnable
+    ACCESS          read-only
+    DESCRIPTION
+            "Write access is not supported."
+
+    VARIATION       ifPromiscuousMode
+    ACCESS          read-only
+    DESCRIPTION     "Write access is not supported."
+
+    VARIATION       ifStackStatus
+    ACCESS          read-only
+    DESCRIPTION     "Write or create access is not supported."
+
+    ::= { jnxIfCapability 1 } 
+ 
+END

@@ -1,0 +1,655 @@
+-- *****************************************************************
+-- ELITECORE-MIB
+--
+-- Copyright (c) 2006 by Elitecore Technologies.
+-- All rights reserved.
+-- *****************************************************************
+
+
+CYBEROAM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	IpAddress,
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	snmpModules,
+	OBJECT-IDENTITY,
+	enterprises,
+	Gauge32,
+	Counter32,
+	Counter64,
+	Integer32
+		FROM SNMPv2-SMI
+	DisplayString,
+	TEXTUAL-CONVENTION,
+	TruthValue,
+	DateAndTime
+		FROM SNMPv2-TC;
+
+
+elitecore	MODULE-IDENTITY
+	  LAST-UPDATED	"200607140000Z"
+	  ORGANIZATION	"Elitecore Technologies"
+	  CONTACT-INFO
+						"
+						Postal:	904,Silicon Tower,
+						Off C.G.Road, Nr. Lal Bunglow,
+						Ahmedabad 380 006. INDIA.
+
+						Phone:	+91-79-26405600
+						Fax:		+91-79-26407640
+						Website:	http://www.elitecore.com
+									http://www.cyberoam.com
+						E-mail:	info@cyberoam.com
+						"
+	  DESCRIPTION		
+						"
+						This MIB module defines MIB objects	which provide
+					        mechanisms to remotely configure the parameters used
+					        by Cyberoam Agent for the generation of SNMP messages.
+						"
+	::= { enterprises 21067 }
+
+cyberoam OBJECT-IDENTITY
+	STATUS			current
+	DESCRIPTION	""
+	::= { elitecore 2 }
+
+-- Enumerations used in cyberoam system
+
+HaModeType ::= TEXTUAL-CONVENTION
+        STATUS				current
+        DESCRIPTION		"enumerated type for HA Modes"
+        SYNTAX INTEGER	{
+							standalone     ( 1 ),
+							active-passive ( 2 ),
+							active-active  ( 3 )
+						}
+ServiceStatsType ::= TEXTUAL-CONVENTION
+        STATUS				current
+        DESCRIPTION		"enumerated type for service status"
+        SYNTAX INTEGER	{
+							untouched	( 1 ),
+							stopped		( 2 ),
+							initializing	( 3 ),
+							running		( 4 ),
+							exiting		( 5 ),
+							dead		( 6 ),
+							unregistered	( 7 )
+						}
+RegistrationStatusType ::= TEXTUAL-CONVENTION
+        STATUS				current
+        DESCRIPTION		"enumerated type for subscription status"
+        SYNTAX INTEGER	{
+							registered		( 1 ),
+							unregistered	( 2 )
+						}
+
+SubscriptionStatusType ::= TEXTUAL-CONVENTION
+        STATUS				current
+        DESCRIPTION		"enumerated type for subscription status"
+        SYNTAX INTEGER	{
+							trial			( 1 ),
+							unsubscribed	( 2 ),
+							subscribed		( 3 ),
+							expired			( 4 )
+						}
+
+SupportStatusType ::= TEXTUAL-CONVENTION
+        STATUS				current
+        DESCRIPTION		"enumerated type for subscription status"
+        SYNTAX INTEGER	{
+							support8x5	( 1 ),
+							support24x7	( 2 )
+						}
+
+-- End of enums
+
+-- cyberoam
+crSystem		OBJECT IDENTIFIER ::= { cyberoam 1 }
+
+-- cyberoam.system
+sysInstall		OBJECT IDENTIFIER ::= { crSystem 1 }
+sysStatus		OBJECT IDENTIFIER ::= { crSystem 2 }
+sysLicense		OBJECT IDENTIFIER ::= { crSystem 3 }
+sysAlerts		OBJECT IDENTIFIER ::= { crSystem 4 }
+
+
+-- crSystem.sysInstall
+
+applianceKey OBJECT-TYPE
+	SYNTAX			DisplayString (SIZE(0..128))
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	""
+    ::= { sysInstall 1 }
+
+applianceModel OBJECT-TYPE
+    SYNTAX			DisplayString (SIZE(0..128))
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		""
+    ::= { sysInstall 2 }
+
+cyberoamVersion OBJECT-TYPE
+    SYNTAX			DisplayString (SIZE(0..128))
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		""
+    ::= { sysInstall 3 }
+
+webcatVersion OBJECT-TYPE
+    SYNTAX			DisplayString (SIZE(0..128))
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		""
+    ::= { sysInstall 4 }
+
+avVersion OBJECT-TYPE
+    SYNTAX			DisplayString (SIZE(0..128))
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		""
+    ::= { sysInstall 5 }
+
+asVersion OBJECT-TYPE
+    SYNTAX			DisplayString (SIZE(0..128))
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		""
+    ::= { sysInstall 6 }
+
+idpVersion OBJECT-TYPE
+    SYNTAX			DisplayString (SIZE(0..128))
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		""
+    ::= { sysInstall 7 }
+
+-- crSystem.sysStatus
+
+systemDate  OBJECT-TYPE
+    SYNTAX			DateAndTime
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sysStatus 1 }
+
+cpuStatus		OBJECT IDENTIFIER ::= { sysStatus 2 }
+
+cpuPercentUsage  OBJECT-TYPE
+    SYNTAX			Integer32
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"% cpu usage"
+    ::= { cpuStatus 1 }
+
+diskStatus		OBJECT IDENTIFIER ::= { sysStatus 3 }
+
+diskCapacity  OBJECT-TYPE
+    SYNTAX			Gauge32
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"Disk capacity in MB"
+    ::= { diskStatus 1 }
+
+diskPercentUsage  OBJECT-TYPE
+    SYNTAX			Gauge32
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"% Disk usage"
+    ::= { diskStatus 2 }
+
+memoryStatus		OBJECT IDENTIFIER ::= { sysStatus 4 }
+
+memoryCapacity  OBJECT-TYPE
+    SYNTAX		Gauge32
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"Memory capacity in MB"
+    ::= { memoryStatus 1 }
+
+memoryPercentUsage  OBJECT-TYPE
+    SYNTAX			Gauge32
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"% usage of main memory"
+    ::= { memoryStatus 2 }
+ 
+swapCapacity  OBJECT-TYPE
+    SYNTAX			Gauge32
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"Swap Capacity in MB"
+    ::= { memoryStatus 3 }
+
+swapPercentUsage  OBJECT-TYPE
+    SYNTAX			Gauge32
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"% usage of swap"
+    ::= { memoryStatus 4 }
+
+haMode  OBJECT-TYPE
+    SYNTAX			HaModeType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sysStatus 5 }
+
+liveUsers OBJECT-TYPE
+    SYNTAX			Gauge32
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		""
+    ::= { sysStatus 6 }
+
+httpHits OBJECT-TYPE
+    SYNTAX			Counter64
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sysStatus 7 }    
+    
+ftpHits OBJECT-TYPE
+    SYNTAX			Counter64
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sysStatus 8 }
+
+mailHits	OBJECT IDENTIFIER ::= { sysStatus 9 }
+serviceStats	OBJECT IDENTIFIER ::= { sysStatus 10 }
+
+-- sysStatus.mailHits
+pop3Hits	OBJECT-TYPE
+    SYNTAX			Counter64
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { mailHits 1 }
+
+imapHits	OBJECT-TYPE
+    SYNTAX			Counter64
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { mailHits 2 }
+
+smtpHits	OBJECT-TYPE
+    SYNTAX			Counter64
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { mailHits 3 }
+
+-- sysStatus.serviceStats
+
+pop3Service OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { serviceStats 1 }
+
+imap4Service OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { serviceStats 2 }
+
+smtpService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { serviceStats 3 }
+
+ftpService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { serviceStats 4 }
+
+httpService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { serviceStats 5 }
+
+avService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { serviceStats 6 }
+
+asService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { serviceStats 7 }
+
+dnsService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { serviceStats 8 }
+
+haService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { serviceStats 9 }
+
+idpService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { serviceStats 10 }
+
+apacheService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { serviceStats 11 }
+
+ntpService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { serviceStats 12 }
+
+tomcatService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { serviceStats 13 }
+
+sslvpnService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { serviceStats 14 }
+
+DataBaseService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { serviceStats 15 }
+
+networkService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { serviceStats 16 }
+
+garnerService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { serviceStats 17 }
+
+droutingService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { serviceStats 18 }
+
+sshdService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { serviceStats 19 }
+
+dgdService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { serviceStats 20 }
+
+-- crSystem.sysLicense
+
+liAppliance		OBJECT IDENTIFIER ::= { sysLicense 1 }
+liSupport		OBJECT IDENTIFIER ::= { sysLicense 2 }
+liAntivirus		OBJECT IDENTIFIER ::= { sysLicense 3 }
+liAntispam		OBJECT IDENTIFIER ::= { sysLicense 4 }
+liIdp			OBJECT IDENTIFIER ::= { sysLicense 5 }
+liWebcat		OBJECT IDENTIFIER ::= { sysLicense 6 }
+
+-- sysLicense.liAppliance
+
+appRegStatus OBJECT-TYPE
+    SYNTAX			RegistrationStatusType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { liAppliance 1 }
+
+appExpiryDate OBJECT-TYPE
+    SYNTAX			DateAndTime
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { liAppliance 2 }
+
+-- sysLicense.liSupport
+
+supportSubStatus OBJECT-TYPE
+    SYNTAX			SupportStatusType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { liSupport 1 }
+
+supportExpiryDate OBJECT-TYPE
+    SYNTAX			DateAndTime	
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { liSupport 2 }
+
+-- sysLicense.liAntivirus
+
+avSubStatus OBJECT-TYPE
+    SYNTAX			SubscriptionStatusType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { liAntivirus 1 }
+
+avExpiryDate OBJECT-TYPE
+    SYNTAX			DateAndTime	
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { liAntivirus 2 }
+
+-- sysLicense.antispam
+
+asSubStatus OBJECT-TYPE
+    SYNTAX			SubscriptionStatusType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { liAntispam 1 }
+
+asExpiryDate OBJECT-TYPE
+    SYNTAX			DateAndTime
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { liAntispam 2 }
+
+-- sysLicense.idp
+
+idpSubStatus OBJECT-TYPE
+    SYNTAX			SubscriptionStatusType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { liIdp 1 }
+
+idpExpiryDate OBJECT-TYPE
+    SYNTAX			DateAndTime
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { liIdp 2 }
+
+-- sysLicense.liWebcat
+
+webcatSubStatus OBJECT-TYPE
+    SYNTAX			SubscriptionStatusType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { liWebcat 1 }
+
+webcatExpiryDate OBJECT-TYPE
+    SYNTAX			DateAndTime
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { liWebcat 2 }
+
+
+-- crSystem.sysAlerts
+
+highCpuUsage NOTIFICATION-TYPE
+    STATUS			current
+    DESCRIPTION		""
+   ::= { sysAlerts 1 }
+
+highDiskUsage OBJECT IDENTIFIER ::=  { sysAlerts 2 }
+highMemUsage OBJECT IDENTIFIER ::=  { sysAlerts 3 }
+ 
+highConfDiskUsage NOTIFICATION-TYPE
+    STATUS			current
+    DESCRIPTION		""
+    ::= { highDiskUsage 1 }
+
+ highSigDiskUsage NOTIFICATION-TYPE
+    STATUS			current
+    DESCRIPTION		""
+    ::= { highDiskUsage 2 }
+
+ highReportDiskUsage NOTIFICATION-TYPE
+    STATUS			current
+    DESCRIPTION		""
+    ::= { highDiskUsage 3 }
+
+highPhyMemUsage NOTIFICATION-TYPE
+    STATUS			current
+    DESCRIPTION		""
+    ::= { highMemUsage 1 }
+
+highSwapMemUsage NOTIFICATION-TYPE
+    STATUS			current
+    DESCRIPTION		""
+    ::= { highMemUsage 2 }
+
+avAlerts		OBJECT IDENTIFIER ::=  { sysAlerts 4 }
+dgdAlerts		OBJECT IDENTIFIER ::=  { sysAlerts 5 }
+idpAlerts		OBJECT IDENTIFIER ::=  { sysAlerts 6 }
+dosAlerts		OBJECT IDENTIFIER ::=  { sysAlerts 7 }
+cscAlerts		OBJECT IDENTIFIER ::=  { sysAlerts 8 }
+
+-- sysAlerts.avAlerts
+
+httpVirus NOTIFICATION-TYPE
+    STATUS			current
+    DESCRIPTION		""
+    ::= { avAlerts 1 }
+
+smtpVirus  NOTIFICATION-TYPE
+    STATUS			current
+    DESCRIPTION		""
+    ::= { avAlerts 2 }
+
+pop3Virus NOTIFICATION-TYPE
+    STATUS			current
+    DESCRIPTION		""
+    ::= { avAlerts 3 }
+
+imap4Virus NOTIFICATION-TYPE
+    STATUS			current
+    DESCRIPTION		""
+    ::= { avAlerts 4 }
+
+ftpVirus NOTIFICATION-TYPE
+    STATUS			current
+    DESCRIPTION		""
+    ::= { avAlerts 5 }
+
+-- sysAlert.dgdAlerts
+
+gwLiveDead NOTIFICATION-TYPE
+    STATUS			current
+    DESCRIPTION		""
+    ::= { dgdAlerts 1 }
+
+-- sysAlert.idpAlerts
+
+idpAlert NOTIFICATION-TYPE
+    STATUS			current
+    DESCRIPTION		""
+    ::= { idpAlerts 1 }
+
+-- sysAlert.dosAlerts
+
+synFlood NOTIFICATION-TYPE
+    STATUS			current
+    DESCRIPTION		""
+    ::= { dosAlerts 1 }
+
+tcpFlood NOTIFICATION-TYPE
+    STATUS			current
+    DESCRIPTION		""
+    ::= { dosAlerts 2 }
+
+udpFlood NOTIFICATION-TYPE
+    STATUS			current
+    DESCRIPTION		""
+    ::= { dosAlerts 3 }
+
+icmpFlood NOTIFICATION-TYPE
+    STATUS			current
+    DESCRIPTION		""
+    ::= { dosAlerts 4 }
+
+ -- sysAlerts.cscAlerts
+
+opcodeFail NOTIFICATION-TYPE
+    STATUS			current
+    DESCRIPTION		""
+    ::= { cscAlerts 1 }
+
+serviceFail NOTIFICATION-TYPE
+    STATUS			current
+    DESCRIPTION		""
+    ::= { cscAlerts 2 }
+
+END
+
+
+
+

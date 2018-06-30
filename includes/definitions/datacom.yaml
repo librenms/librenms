@@ -1,0 +1,10 @@
+os: datacom
+text: Datacom
+type: network
+icon: datacom
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.3709
+    -
+      sysObjectID: .1.3.6.1.4.1.4413
+      sysDescr: DM1200E

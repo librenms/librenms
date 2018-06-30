@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Cronic v2 - cron job report wrapper
 # Copyright 2007 Chuck Houpt. No rights reserved, whatsoever.

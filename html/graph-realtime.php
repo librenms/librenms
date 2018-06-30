@@ -13,20 +13,11 @@
  *
  */
 
-require_once '../includes/defaults.inc.php';
-require_once '../config.php';
-require_once '../includes/definitions.inc.php';
-
-require_once '../includes/common.php';
-require_once '../includes/dbFacile.php';
-require_once '../includes/rewrites.php';
-require_once 'includes/functions.inc.php';
-require_once 'includes/authenticate.inc.php';
-
-require_once '../includes/snmp.inc.php';
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 if (is_numeric($_GET['id']) && ($config['allow_unauth_graphs'] || port_permitted($_GET['id']))) {
-    $port   = get_port_by_id($_GET['id']);
+    $port   = cleanPort(get_port_by_id($_GET['id']));
     $device = device_by_id_cache($port['device_id']);
     $title  = generate_device_link($device);
     $title .= " :: Port  ".generate_port_link($port);
@@ -40,12 +31,11 @@ header("Content-type: image/svg+xml");
 
 /********** HTTP GET Based Conf ***********/
 $ifnum=@$port['ifIndex'];  // BSD / SNMP interface name / number
-$ifname=ifLabel($port);
-$ifname=$ifname['label']; //Interface name that will be showed on top right of graph
+$ifname=$port['label']; //Interface name that will be showed on top right of graph
 $hostname=shorthost($device['hostname']);
 
 if ($_GET['title']) {
-    $ifname = $_GET['title'];
+    $ifname = display($_GET['title']);
 }
 
 /********* Other conf *******/
@@ -84,7 +74,8 @@ $width=300;             //SVG internal width : do not modify
 
 /********* Graph DATA **************/
 print('<?xml version="1.0" encoding="iso-8859-1"?>' . "\n");?>
-<svg width="100%" height="100%" viewBox="0 0 <?php echo("$width $height") ?>" preserveAspectRatio="none" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" onload="init(evt)">
+<svg width="100%" height="100%" viewBox="0 0 <?php echo("$width $height") ?>" preserveAspectRatio="none" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"
+     onload="init(evt)">
   <g id="graph">
     <rect id="bg" x1="0" y1="0" width="100%" height="100%" fill="white"/>
     <line id="axis_x" x1="0" y1="0" x2="0" y2="100%" <?php echo ($attribs['axis']) ?>/>
@@ -101,10 +92,10 @@ print('<?xml version="1.0" encoding="iso-8859-1"?>' . "\n");?>
     <text id="graph_out_txt" x="20" y="16" <?php echo($attribs['out']) ?>> </text>
     <text id="ifname" x="<?php echo($width-2) ?>" y="8" <?php echo($attribs['graphname']) ?> text-anchor="end"><?php echo($ifname) ?></text>
     <text id="hostname" x="<?php echo($width-2) ?>" y="14" <?php echo($attribs['hostname']) ?> text-anchor="end"><?php echo($hostname) ?></text>
-    <text id="switch_unit" x="<?php echo($width*0.55) ?>" y="5" <?php echo($attribs['switch_unit']) ?>>Switch to bytes/s</text>
-    <text id="switch_scale" x="<?php echo($width*0.55) ?>" y="11" <?php echo($attribs['switch_scale']) ?>>AutoScale (<?php echo($scale_type) ?>)</text>
+    <text id="switch_unit" x="<?php echo($width*0.48) ?>" y="5" <?php echo($attribs['switch_unit']) ?>>Switch to bytes/s</text>
+    <text id="switch_scale" x="<?php echo($width*0.48) ?>" y="11" <?php echo($attribs['switch_scale']) ?>>AutoScale (<?php echo($scale_type) ?>)</text>
     <text id="datetime" x="<?php echo($width*0.33) ?>" y="5" <?php echo($attribs['legend']) ?>> </text>
-    <text id="graphlast" x="<?php echo($width*0.55) ?>" y="17" <?php echo($attribs['legend']) ?>>Graph shows last <?php echo($time_interval*$nb_plot) ?> seconds</text>
+    <text id="graphlast" x="<?php echo($width*0.48) ?>" y="17" <?php echo($attribs['legend']) ?>>Graph shows last <?php echo($time_interval*$nb_plot) ?> seconds</text>
     <polygon id="axis_arrow_x" <?php echo($attribs['axis']) ?> points="<?php echo($width . "," . $height) ?> <?php echo(($width-2) . "," . ($height-2)) ?> <?php echo(($width-2) . "," . $height) ?>"/>
     <text id="error" x="<?php echo($width*0.5) ?>" y="<?php echo($height*0.5) ?>"  visibility="hidden" <?php echo($attribs['error']) ?> text-anchor="middle"><?php echo($error_text) ?></text>
     <text id="collect_initial" x="<?php echo($width*0.5) ?>" y="<?php echo($height*0.5) ?>"  visibility="hidden" <?php echo($attribs['collect_initial']) ?> text-anchor="middle">Collecting initial data, please wait...</text>

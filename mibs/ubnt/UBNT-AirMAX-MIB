@@ -1,0 +1,914 @@
+UBNT-AirMAX-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32, Counter64,
+        IpAddress, TimeTicks FROM SNMPv2-SMI
+        DisplayString, TruthValue, MacAddress FROM SNMPv2-TC
+        OBJECT-GROUP, MODULE-COMPLIANCE FROM SNMPv2-CONF
+        ubntAirosGroups, ubntMIB FROM UBNT-MIB;
+
+    ubntAirMAX MODULE-IDENTITY
+    LAST-UPDATED "201710030000Z"
+    ORGANIZATION "Ubiquiti Networks, Inc."
+    CONTACT-INFO "support@ubnt.com"
+    DESCRIPTION  "The AirMAX MIB module for Ubiquiti Networks, Inc. entities"
+    REVISION "201710030000Z"
+    DESCRIPTION "ubntAirMAX revision"
+    ::= { ubntMIB 4 }
+
+    -- --------------------------------------------------------------------------------
+    --                            radio table
+    -- --------------------------------------------------------------------------------
+
+    ubntRadioTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF UbntRadioEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "Radio status & statistics"
+        ::= { ubntAirMAX 1 }
+
+    ubntRadioEntry OBJECT-TYPE
+       SYNTAX     UbntRadioEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION "An entry in the ubntRadioTable"
+       INDEX      { ubntRadioIndex }
+       ::= { ubntRadioTable 1 }
+
+    UbntRadioEntry ::= SEQUENCE {
+        ubntRadioIndex      Integer32,
+        ubntRadioMode       INTEGER,
+        ubntRadioCCode      Integer32,
+        ubntRadioFreq       Integer32,
+        ubntRadioDfsEnabled TruthValue,
+        ubntRadioTxPower    Integer32,
+        ubntRadioDistance   Integer32,
+        ubntRadioChainmask  Integer32,
+        ubntRadioAntenna    DisplayString
+    }
+
+    ubntRadioIndex OBJECT-TYPE
+        SYNTAX     Integer32 (1..255)
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "Index for the ubntRadioTable"
+        ::= { ubntRadioEntry 1 }
+
+    ubntRadioMode OBJECT-TYPE
+        SYNTAX     INTEGER {
+		sta(1),
+		ap(2),
+		aprepeater(3),
+		apwds(4)
+	}
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Radio mode"
+        ::= { ubntRadioEntry 2 }
+
+    ubntRadioCCode OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Country code"
+        ::= { ubntRadioEntry 3 }
+
+    ubntRadioFreq OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Operating frequency"
+        ::= { ubntRadioEntry 4 }
+
+    ubntRadioDfsEnabled OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "DFS status"
+        ::= { ubntRadioEntry 5 }
+
+    ubntRadioTxPower OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Transmit power"
+        ::= { ubntRadioEntry 6 }
+
+    ubntRadioDistance OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Distance"
+        ::= { ubntRadioEntry 7 }
+
+    ubntRadioChainmask OBJECT-TYPE
+        SYNTAX Integer32 (1..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Chainmask"
+        ::= { ubntRadioEntry 8 }
+
+    ubntRadioAntenna OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Antenna"
+        ::= { ubntRadioEntry 9 }
+
+    ubntRadioRssiTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF UbntRadioRssiEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "Radio RSSI per chain"
+        ::= { ubntAirMAX 2 }
+
+    ubntRadioRssiEntry OBJECT-TYPE
+       SYNTAX     UbntRadioRssiEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION "An entry in the ubntRadioRssiTable"
+       INDEX      { ubntRadioIndex, ubntRadioRssiIndex }
+       ::= { ubntRadioRssiTable 1 }
+
+    UbntRadioRssiEntry ::= SEQUENCE {
+        ubntRadioRssiIndex Integer32,
+        ubntRadioRssi      Integer32,
+        ubntRadioRssiMgmt  Integer32,
+        ubntRadioRssiExt   Integer32
+    }
+
+    ubntRadioRssiIndex OBJECT-TYPE
+        SYNTAX     Integer32 (1..255)
+        MAX-ACCESS not-accessible 
+        STATUS     current
+        DESCRIPTION "Index for the ubntRadioRssiTable"
+        ::= { ubntRadioRssiEntry 1 }
+
+    ubntRadioRssi OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Data frames rssi per chain"
+        ::= { ubntRadioRssiEntry 2 }
+
+    ubntRadioRssiMgmt OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Management frames rssi per chain"
+        ::= { ubntRadioRssiEntry 3 }
+
+    ubntRadioRssiExt OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Extension channel rssi per chain"
+        ::= { ubntRadioRssiEntry 4 }
+
+    -- --------------------------------------------------------------------------------
+    --                            airMAX table
+    -- --------------------------------------------------------------------------------
+
+    ubntAirMaxTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF UbntAirMaxEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "airMAX protocol statistics"
+        ::= { ubntAirMAX 6 }
+
+    ubntAirMaxEntry OBJECT-TYPE
+       SYNTAX     UbntAirMaxEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION "An entry in the ubntAirMaxTable"
+       INDEX      { ubntAirMaxIfIndex }
+       ::= { ubntAirMaxTable 1 }
+
+    UbntAirMaxEntry ::= SEQUENCE {
+        ubntAirMaxIfIndex     Integer32,
+        ubntAirMaxEnabled     TruthValue,
+        ubntAirMaxQuality     Integer32,
+        ubntAirMaxCapacity    Integer32,
+        ubntAirMaxPriority    INTEGER,
+        ubntAirMaxNoAck       TruthValue,
+        ubntAirMaxAirtime     Integer32,
+        ubntAirMaxGpsSync     TruthValue,
+        ubntAirMaxTdd         TruthValue
+    }
+
+    ubntAirMaxIfIndex OBJECT-TYPE
+        SYNTAX     Integer32 (1..255)
+        MAX-ACCESS not-accessible 
+        STATUS     current
+        DESCRIPTION "Index for the ubntAirMaxTable"
+        ::= { ubntAirMaxEntry 1 }
+
+    ubntAirMaxEnabled OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "airMAX status - on/off"
+        ::= { ubntAirMaxEntry 2 }
+
+    ubntAirMaxQuality OBJECT-TYPE
+        SYNTAX Integer32 (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "airMAX quality - percentage"
+        ::= { ubntAirMaxEntry 3 }
+
+    ubntAirMaxCapacity OBJECT-TYPE
+        SYNTAX Integer32 (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "airMAX capacity - percentage"
+        ::= { ubntAirMaxEntry 4 }
+
+    ubntAirMaxPriority OBJECT-TYPE
+        SYNTAX INTEGER {
+        high(0),
+        medium(1),
+        low(2),
+        none(3)
+    }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "airMAX priority - none/high/low/medium"
+        ::= { ubntAirMaxEntry 5 }
+
+    ubntAirMaxNoAck OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "airMAX NoACK mode - on/off"
+        ::= { ubntAirMaxEntry 6 }
+
+    ubntAirMaxAirtime OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "airMAX Airtime in % multiplied by 10"
+        ::= { ubntAirMaxEntry 7 }
+
+    ubntAirMaxGpsSync OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "airMAX GPS sync - on/off"
+        ::= { ubntAirMaxEntry 8 }
+
+    ubntAirMaxTdd OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "airMAX TDD framing - on/off"
+        ::= { ubntAirMaxEntry 9 }
+
+    -- --------------------------------------------------------------------------------
+    --                            airSync table
+    -- --------------------------------------------------------------------------------
+
+    ubntAirSyncTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF UbntAirSyncEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "airSync protocol statistics"
+        ::= { ubntAirMAX 3 }
+
+    ubntAirSyncEntry OBJECT-TYPE
+       SYNTAX     UbntAirSyncEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION "An entry in the ubntAirSyncTable"
+       INDEX      { ubntAirSyncIfIndex }
+       ::= { ubntAirSyncTable 1 }
+
+    UbntAirSyncEntry ::= SEQUENCE {
+        ubntAirSyncIfIndex    Integer32,
+        ubntAirSyncMode       INTEGER,
+        ubntAirSyncCount      Integer32,
+        ubntAirSyncDownUtil   Integer32,
+        ubntAirSyncUpUtil     Integer32
+    }
+
+    ubntAirSyncIfIndex OBJECT-TYPE
+        SYNTAX     Integer32 (1..255)
+        MAX-ACCESS not-accessible 
+        STATUS     current
+        DESCRIPTION "Index for the ubntAirSyncTable"
+        ::= { ubntAirSyncEntry 1 }
+
+    ubntAirSyncMode OBJECT-TYPE
+        SYNTAX     INTEGER {
+        disabled(0),
+        master(1),
+        slave(2)
+    }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "airSync mode - master/slave"
+        ::= { ubntAirSyncEntry 2 }
+
+    ubntAirSyncCount OBJECT-TYPE
+        SYNTAX     Integer32 (0..255)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "airSync client count"
+        ::= { ubntAirSyncEntry 3 }
+
+    ubntAirSyncDownUtil OBJECT-TYPE
+        SYNTAX     Integer32 (0..100)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "airSync down utilization"
+        ::= { ubntAirSyncEntry 4 }
+
+    ubntAirSyncUpUtil OBJECT-TYPE
+        SYNTAX     Integer32 (0..100)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "airSync up utilization"
+        ::= { ubntAirSyncEntry 5 }
+
+    -- --------------------------------------------------------------------------------
+    --                            airSelect table
+    -- --------------------------------------------------------------------------------
+
+    ubntAirSelTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF UbntAirSelEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "airSelect protocol statistics"
+        ::= { ubntAirMAX 4 }
+
+    ubntAirSelEntry OBJECT-TYPE
+       SYNTAX     UbntAirSelEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION "An entry in the ubntAirSelTable"
+       INDEX      { ubntAirSelIfIndex }
+       ::= { ubntAirSelTable 1 }
+
+    UbntAirSelEntry ::= SEQUENCE {
+        ubntAirSelIfIndex    Integer32,
+        ubntAirSelEnabled    TruthValue,
+        ubntAirSelInterval   Integer32
+    }
+
+    ubntAirSelIfIndex OBJECT-TYPE
+        SYNTAX     Integer32 (1..255)
+        MAX-ACCESS not-accessible 
+        STATUS     current
+        DESCRIPTION "Index for the ubntAirSelTable"
+        ::= { ubntAirSelEntry 1 }
+
+    ubntAirSelEnabled OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "airSelect status - on/off"
+        ::= { ubntAirSelEntry 2 }
+
+    ubntAirSelInterval OBJECT-TYPE
+        SYNTAX     Integer32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "airSelect hop interval (miliseconds)"
+        ::= { ubntAirSelEntry 3 }
+
+    -- --------------------------------------------------------------------------------
+    --                            wireless statistics table
+    -- --------------------------------------------------------------------------------
+
+    ubntWlStatTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF UbntWlStatEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "Wireless statistics"
+        ::= { ubntAirMAX 5 }
+
+    ubntWlStatEntry OBJECT-TYPE
+       SYNTAX     UbntWlStatEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION "An entry in the ubntWlStatTable"
+       INDEX      { ubntWlStatIndex }
+       ::= { ubntWlStatTable 1 }
+
+    UbntWlStatEntry ::= SEQUENCE {
+        ubntWlStatIndex      Integer32,
+        ubntWlStatSsid       DisplayString,
+        ubntWlStatHideSsid   TruthValue,
+        ubntWlStatApMac      MacAddress,
+        ubntWlStatSignal     Integer32,
+        ubntWlStatRssi       Integer32,
+        ubntWlStatCcq        Integer32,
+        ubntWlStatNoiseFloor Integer32,
+        ubntWlStatTxRate     Integer32,
+        ubntWlStatRxRate     Integer32,
+        ubntWlStatSecurity   DisplayString,
+        ubntWlStatWdsEnabled TruthValue,
+        ubntWlStatApRepeater TruthValue,
+        ubntWlStatChanWidth  Integer32,
+        ubntWlStatStaCount   Gauge32
+    }
+
+    ubntWlStatIndex OBJECT-TYPE
+        SYNTAX     Integer32 (1..255)
+        MAX-ACCESS not-accessible 
+        STATUS     current
+        DESCRIPTION "Index for the ubntWlStatTable"
+        ::= { ubntWlStatEntry 1 }
+
+    ubntWlStatSsid OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "SSID"
+        ::= { ubntWlStatEntry 2 }
+
+    ubntWlStatHideSsid OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Hide SSID - on/off"
+        ::= { ubntWlStatEntry 3 }
+
+    ubntWlStatApMac OBJECT-TYPE
+        SYNTAX     MacAddress
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "AP MAC address"
+        ::= { ubntWlStatEntry 4 }
+
+    ubntWlStatSignal OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Signal strength, dBm"
+        ::= { ubntWlStatEntry 5 }
+
+    ubntWlStatRssi OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "RSSI, dBm"
+        ::= { ubntWlStatEntry 6 }
+
+    ubntWlStatCcq OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "CCQ in %"
+        ::= { ubntWlStatEntry 7 }
+
+    ubntWlStatNoiseFloor OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Noise floor"
+        ::= { ubntWlStatEntry 8 }
+
+    ubntWlStatTxRate OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "TX rate"
+        ::= { ubntWlStatEntry 9 }
+
+    ubntWlStatRxRate OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "RX rate"
+        ::= { ubntWlStatEntry 10 }
+
+    ubntWlStatSecurity OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Wireless security mode"
+        ::= { ubntWlStatEntry 11 }
+
+    ubntWlStatWdsEnabled OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "WDS - on/off"
+        ::= { ubntWlStatEntry 12 }
+
+    ubntWlStatApRepeater OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "AP repeater - on/off"
+        ::= { ubntWlStatEntry 13 }
+
+    ubntWlStatChanWidth OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Channel Width"
+        ::= { ubntWlStatEntry 14 }
+
+    ubntWlStatStaCount OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Station count"
+        ::= { ubntWlStatEntry 15 }
+
+    -- --------------------------------------------------------------------------------
+    --                            station list table
+    -- --------------------------------------------------------------------------------
+
+    ubntStaTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF UbntStaEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "Station list"
+        ::= { ubntAirMAX 7 }
+
+    ubntStaEntry OBJECT-TYPE
+        SYNTAX     UbntStaEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "An entry in the ubntStaEntry"
+        INDEX      { ubntWlStatIndex, ubntStaMac }
+        ::= { ubntStaTable 1 }
+
+    UbntStaEntry ::= SEQUENCE {
+        ubntStaMac        MacAddress,
+        ubntStaName       DisplayString,
+        ubntStaSignal     Integer32,
+        ubntStaNoiseFloor Integer32,
+        ubntStaDistance   Integer32,
+        ubntStaCcq        Integer32,
+        ubntStaAmp        Integer32,
+        ubntStaAmq        Integer32,
+        ubntStaAmc        Integer32,
+        ubntStaLastIp     IpAddress,
+        ubntStaTxRate     Integer32,
+        ubntStaRxRate     Integer32,
+        ubntStaTxBytes    Counter64,
+        ubntStaRxBytes    Counter64,
+        ubntStaConnTime   TimeTicks,
+        ubntStaLocalCINR  Integer32,
+        ubntStaTxCapacity Integer32,
+        ubntStaRxCapacity Integer32,
+        ubntStaTxAirtime  Integer32,
+        ubntStaRxAirtime  Integer32,
+        ubntStaTxLatency  Integer32
+    }
+
+    ubntStaMac OBJECT-TYPE
+        SYNTAX     MacAddress
+        MAX-ACCESS not-accessible 
+        STATUS     current
+        DESCRIPTION "Station MAC address"
+        ::= { ubntStaEntry 1 }
+
+    ubntStaName OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Station name"
+        ::= { ubntStaEntry 2 }
+
+    ubntStaSignal OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Signal strength, dBm"
+        ::= { ubntStaEntry 3 }
+
+    ubntStaNoiseFloor OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Noise floor"
+        ::= { ubntStaEntry 4 }
+
+    ubntStaDistance OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Distance"
+        ::= { ubntStaEntry 5 }
+
+    ubntStaCcq OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "CCQ in %"
+        ::= { ubntStaEntry 6 }
+
+
+    ubntStaAmp OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "airMAX priority"
+        ::= { ubntStaEntry 7 }
+
+    ubntStaAmq OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "airMAX quality"
+        ::= { ubntStaEntry 8 }
+
+    ubntStaAmc OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "airMAX capacity"
+        ::= { ubntStaEntry 9 }
+
+    ubntStaLastIp OBJECT-TYPE
+        SYNTAX     IpAddress
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Last known IP address"
+        ::= { ubntStaEntry 10 }
+
+    ubntStaTxRate OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "TX rate"
+        ::= { ubntStaEntry 11 }
+
+    ubntStaRxRate OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "RX rate"
+        ::= { ubntStaEntry 12 }
+
+    ubntStaTxBytes OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "TX bytes"
+        ::= { ubntStaEntry 13 }
+
+    ubntStaRxBytes OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "TX rate"
+        ::= { ubntStaEntry 14 }
+
+    ubntStaConnTime OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Connection Time in seconds"
+        ::= { ubntStaEntry 15 }
+
+    ubntStaLocalCINR OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Local CINR"
+        ::= { ubntStaEntry 16 }
+
+    ubntStaTxCapacity OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Uplink Capacity in Kbps"
+        ::= { ubntStaEntry 17 }
+
+    ubntStaRxCapacity OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Downlink Capacity in Kbps"
+        ::= { ubntStaEntry 18 }
+
+    ubntStaTxAirtime OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Uplink Airtime in % multiplied by 10"
+        ::= { ubntStaEntry 19 }
+
+    ubntStaRxAirtime OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Downlink Airtime in % multiplied by 10"
+        ::= { ubntStaEntry 20 }
+
+    ubntStaTxLatency OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Uplink Latency in milliseconds"
+        ::= { ubntStaEntry 21 }
+
+    -- --------------------------------------------------------------------------------
+    --                            host stats table
+    -- --------------------------------------------------------------------------------
+
+    ubntHostInfo OBJECT IDENTIFIER ::= { ubntAirMAX 8 }
+
+    ubntHostLocaltime OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Host local time"
+        ::= { ubntHostInfo 1 }
+
+    ubntHostNetrole OBJECT-TYPE
+        SYNTAX     INTEGER {
+        unknown(0),
+        bridge(1),
+        router(2),
+        soho(3)
+    }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Radio mode"
+        ::= { ubntHostInfo 2 }
+
+    ubntHostCpuLoad OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Host CPU load"
+        ::= { ubntHostInfo 3 }
+
+    ubntHostTemperature OBJECT-TYPE
+        SYNTAX     Integer32 (0..255)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Host system temperature"
+        ::= { ubntHostInfo 4 }
+
+    -- --------------------------------------------------------------------------------
+    --                            gps stats table
+    -- --------------------------------------------------------------------------------
+
+    ubntGpsInfo OBJECT IDENTIFIER ::= { ubntAirMAX 9 }
+
+    ubntGpsStatus OBJECT-TYPE
+        SYNTAX     INTEGER {
+        absent(0),
+        off(1),
+        on(2)
+    }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS status"
+        ::= { ubntGpsInfo 1 }
+
+    ubntGpsFix OBJECT-TYPE
+        SYNTAX     INTEGER {
+        unknown(0),
+        nofix(1),
+        fix2d(2),
+        fix3d(3)
+    }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Fix Obtained"
+        ::= { ubntGpsInfo 2 }
+
+    ubntGpsLat OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Latitude"
+        ::= { ubntGpsInfo 3 }
+
+    ubntGpsLon OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Longitude"
+        ::= { ubntGpsInfo 4 }
+
+    ubntGpsAltMeters OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Altitude (m)"
+        ::= { ubntGpsInfo 5 }
+
+    ubntGpsAltFeet OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Altitude (ft)"
+        ::= { ubntGpsInfo 6 }
+
+    ubntGpsSatsVisible OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Satellites Visible"
+        ::= { ubntGpsInfo 7 }
+
+    ubntGpsSatsTracked OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Satellites Tracked"
+        ::= { ubntGpsInfo 8 }
+
+    ubntGpsHDOP OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Horizontal Dilution of Precision"
+        ::= { ubntGpsInfo 9 }
+
+
+    ubntAirMAXStatusGroup OBJECT-GROUP OBJECTS {
+        ubntStaName,
+        ubntStaSignal,
+        ubntStaNoiseFloor,
+        ubntStaDistance,
+        ubntStaCcq,
+        ubntStaAmp,
+        ubntStaAmq,
+        ubntStaAmc,
+        ubntStaLastIp,
+        ubntStaTxRate,
+        ubntStaRxRate,
+        ubntStaTxBytes,
+        ubntStaRxBytes,
+        ubntStaConnTime,
+        ubntStaLocalCINR,
+        ubntStaTxCapacity,
+        ubntStaRxCapacity,
+        ubntStaTxAirtime,
+        ubntStaRxAirtime,
+        ubntStaTxLatency,
+        ubntRadioMode,
+        ubntRadioCCode,
+        ubntRadioFreq,
+        ubntRadioDfsEnabled,
+        ubntRadioTxPower,
+        ubntRadioDistance,
+        ubntRadioChainmask,
+        ubntRadioAntenna,
+        ubntRadioRssi,
+        ubntRadioRssiMgmt,
+        ubntRadioRssiExt,
+        ubntAirMaxEnabled,
+        ubntAirMaxQuality,
+        ubntAirMaxCapacity,
+        ubntAirMaxPriority,
+        ubntAirMaxNoAck,
+        ubntAirMaxAirtime,
+        ubntAirMaxGpsSync,
+        ubntAirMaxTdd,
+        ubntAirSyncMode,
+        ubntAirSyncCount,
+        ubntAirSyncDownUtil,
+        ubntAirSyncUpUtil,
+        ubntAirSelEnabled,
+        ubntAirSelInterval,
+        ubntWlStatSsid,
+        ubntWlStatHideSsid,
+        ubntWlStatApMac,
+        ubntWlStatSignal,
+        ubntWlStatRssi,
+        ubntWlStatCcq,
+        ubntWlStatNoiseFloor,
+        ubntWlStatTxRate,
+        ubntWlStatRxRate,
+        ubntWlStatSecurity,
+        ubntWlStatWdsEnabled,
+        ubntWlStatApRepeater,
+        ubntWlStatChanWidth,
+        ubntWlStatStaCount,
+        ubntHostLocaltime,
+        ubntHostNetrole,
+        ubntHostCpuLoad,
+        ubntHostTemperature,
+        ubntGpsStatus,
+        ubntGpsFix,
+        ubntGpsLat,
+        ubntGpsLon,
+        ubntGpsAltMeters,
+        ubntGpsAltFeet,
+        ubntGpsSatsVisible,
+        ubntGpsSatsTracked,
+        ubntGpsHDOP}
+        STATUS current
+        DESCRIPTION "Status and statistics for AirMax monitoring"
+        ::= { ubntAirosGroups 1 }
+
+    ubntAirMAXStatusCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION "The compliance statement for Ubiquiti AirMax entities."
+        MODULE
+            GROUP ubntAirMAXStatusGroup
+            DESCRIPTION "This group is for Ubiquiti systems."
+        ::= { ubntAirosGroups 2 }
+
+END

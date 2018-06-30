@@ -1,0 +1,4462 @@
+--==================================================================
+-- Copyright (C) 2006 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI Hierarchy Quality Of Service MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- <author>,  <date>,  <contents>
+-- CaiLi,LiuJun   2006-05-13 
+-- Liguoshuang	  2007-08-23	for BT HQoS alarm
+-- ==================================================================
+
+-- ==================================================================
+-- 
+-- Variables and types are imported
+--
+-- ==================================================================
+
+	HUAWEI-HQOS-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			hwDatacomm			
+				FROM HUAWEI-MIB			
+			OBJECT-GROUP			
+				FROM SNMPv2-CONF			
+			TimeTicks, Integer32, Counter64, OBJECT-TYPE, MODULE-IDENTITY			
+				FROM SNMPv2-SMI	
+			InterfaceIndex
+				FROM IF-MIB		
+			RowStatus			
+				FROM SNMPv2-TC;
+	
+	
+		hwHQOS MODULE-IDENTITY 
+			LAST-UPDATED "200709101116Z"		-- September 10, 2007 at 11:16 GMT
+			ORGANIZATION 
+				"Huawei Technologies Co., Ltd."
+			CONTACT-INFO 
+				"cx Team Huawei Technologies co.,Ltd.
+				Huawei Bld.,NO.3 Xinxi Rd., 
+				Shang-Di Information Industry Base,
+				Hai-Dian District Beijing P.R. China
+				http://www.huawei.com
+				Zip:100085
+				   "
+			DESCRIPTION 
+				"mib of Hierarchy Quality Of Service module  
+				the huawei-hqos-mib is only defined about statistic information now. 
+				"
+			::= { hwDatacomm 132 }
+
+-- 
+-- Textual conventions
+-- 
+-- 
+-- type definitions in the interface queue
+-- 
+--    COS Type
+    CosType ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION 
+            "
+            BE(1)
+            AF1(2)
+            AF2(3)
+            AF3(4)
+            AF4(5)
+            EF(6)
+            CS6(7)
+            CS7(8)
+            "
+        SYNTAX INTEGER
+            {
+            be(1),
+            af1(2),
+            af2(3),
+            af3(4),
+            af4(5),
+            ef(6),
+            cs6(7),
+            cs7(8)
+            }			
+	
+--
+-- Node definitions
+--
+	
+		hwhqosStat OBJECT IDENTIFIER ::= { hwHQOS 1 }
+
+		hwhqosIfStatTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwhqosIfStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Table of Hierarchy QoS's statistic information."
+			::= { hwhqosStat 1 }
+
+		hwhqosIfStatEntry OBJECT-TYPE
+			SYNTAX HwhqosIfStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The table have multilevel index
+				if don't have some or other index. please fill the MAX value 2147483647
+				for example : MA52 don't have statistic of user's queue, but have statistic of user.
+				              please set QueueIndex the MAX value 2147483647.
+				"
+			INDEX { hwhqosIfIndex, hwhqosDirection, hwhqosUserLayer1, hwhqosUserLayer2, hwhqosQueueIndex
+				 }
+			::= { hwhqosIfStatTable 1 }
+
+		HwhqosIfStatEntry ::=
+			SEQUENCE { 
+				hwhqosIfIndex
+          Integer32,
+				hwhqosDirection
+					INTEGER,
+				hwhqosUserLayer1
+          Integer32,
+				hwhqosUserLayer2
+          Integer32,
+				hwhqosQueueIndex
+          Integer32,
+				hwhqosQueueForwardPackets
+					Counter64,
+				hwhqosQueueForwardBytes
+					Counter64,
+				hwhqosQueueDropPackets
+					Counter64,
+				hwhqosQueueDropBytes
+					Counter64,
+				hwhqosQueueRemarkPackets
+					Counter64,
+				hwhqosQueueRemarkBytes
+					Counter64,
+				hwhqosSetZero
+					INTEGER,
+				hwhqosQueueForwardPacketRate
+					Counter64,
+				hwhqosQueueForwardByteRate
+					Counter64,
+				hwhqosQueueDropPacketRate
+					Counter64,
+				hwhqosQueueDropByteRate
+					Counter64
+			 }
+
+		hwhqosIfIndex OBJECT-TYPE
+                        SYNTAX Integer32 (0..2147483647)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"interfaceindex, include physics interface and logic interface.
+				"
+			::= { hwhqosIfStatEntry 1 }
+
+		hwhqosDirection OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				inbound(1),
+				outbound(2),
+				absent(255)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Direction: inbound;outbound.
+				if don't have, please fill 255.
+				"
+			::= { hwhqosIfStatEntry 2 }
+
+		hwhqosUserLayer1 OBJECT-TYPE
+                        SYNTAX Integer32 (0..2147483647)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Usergroupid: just the Usergroup's configure sequence 
+				Usergroupname is identifier in Hierarchy QoS.
+				"
+			::= { hwhqosIfStatEntry 3 }
+
+		hwhqosUserLayer2 OBJECT-TYPE
+                        SYNTAX Integer32 (0..2147483647)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Userid: just the User's configure sequence 
+				Username is identifier in Hierarchy QoS.
+				"
+			::= { hwhqosIfStatEntry 4 }
+
+		hwhqosQueueIndex OBJECT-TYPE
+                        SYNTAX Integer32 (0..2147483647)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"index of user's queue.
+				8031: everyuser have 4 queues
+				MA52: everyuser have 8 queues
+				8090: everyuser have 8 queues
+				
+				if don't have, please fill 0.                
+				"
+			::= { hwhqosIfStatEntry 5 }
+
+		hwhqosQueueForwardPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"ForwardPackets number of queue.
+				if not support, please fill 0.
+				"
+			::= { hwhqosIfStatEntry 6 }
+
+		hwhqosQueueForwardBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"ForwardBytes number of queue.
+				if not support, please fill 0.
+				"
+			::= { hwhqosIfStatEntry 7 }
+
+		hwhqosQueueDropPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DropPackets number of queue.
+				if not support, please fill 0.
+				"
+			::= { hwhqosIfStatEntry 8 }
+
+		hwhqosQueueDropBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DropBytes number of queue.
+				if not support, please fill 0.
+				"
+			::= { hwhqosIfStatEntry 9 }
+
+		hwhqosQueueRemarkPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"RemarkPackets number of queue.
+				if not support, please fill 0.
+				"
+			::= { hwhqosIfStatEntry 10 }
+
+		hwhqosQueueRemarkBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"RemarkBytes number of queue.
+				if not support, please fill 0.
+				"
+			::= { hwhqosIfStatEntry 11 }
+
+
+		hwhqosSetZero OBJECT-TYPE
+			SYNTAX INTEGER
+			        {
+				setZero(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Reset operation to zero."
+			::= { hwhqosIfStatEntry 12 }
+
+		hwhqosQueueForwardPacketRate OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Forward packet rate of queue. Unit: pps"
+			::= { hwhqosIfStatEntry 13 }
+
+		hwhqosQueueForwardByteRate OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Forward byte rate of queue. Unit: Bps"
+			::= { hwhqosIfStatEntry 14 }
+
+		hwhqosQueueDropPacketRate OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Drop Packet Rate of queue. Unit: pps"
+			::= { hwhqosIfStatEntry 15 }
+
+		hwhqosQueueDropByteRate OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Drop byte rate of queue. Unit: Bps"
+			::= { hwhqosIfStatEntry 16 }
+		
+-- ATM PVC table
+
+		hwhqosAtmPvcStatTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwhqosAtmPvcStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Table of Hierarchy QoS's statistic information."
+			::= { hwhqosStat 2 }
+
+		hwhqosAtmPvcStatEntry OBJECT-TYPE
+			SYNTAX HwhqosAtmPvcStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The table have multilevel index
+				if don't have some or other index. please fill the MAX value 2147483647
+				for example : MA52 don't have statistic of user's queue, but have statistic of user.
+				              please set QueueIndex the MAX value 2147483647.
+				"
+			INDEX { hwhqosAtmPvcIfIndex, hwhqosAtmPvcVPI, hwhqosAtmPvcVCI, hwhqosAtmPvcDirection, hwhqosAtmPvcUserLayer1, 
+				hwhqosAtmPvcUserLayer2, hwhqosAtmPvcQueueIndex }
+			::= { hwhqosAtmPvcStatTable 1 }
+
+		
+		HwhqosAtmPvcStatEntry ::=
+			SEQUENCE { 
+				hwhqosAtmPvcIfIndex
+                                        Integer32,
+				hwhqosAtmPvcVPI
+                                        Integer32,
+				hwhqosAtmPvcVCI
+                                        Integer32,
+				hwhqosAtmPvcDirection
+					INTEGER,
+				hwhqosAtmPvcUserLayer1
+                                        Integer32,
+				hwhqosAtmPvcUserLayer2
+                                        Integer32,
+				hwhqosAtmPvcQueueIndex
+                                        Integer32,
+				hwhqosAtmPvcQueueForwardPackets
+					Counter64,
+				hwhqosAtmPvcQueueForwardBytes
+					Counter64,
+				hwhqosAtmPvcQueueDropPackets
+					Counter64,
+				hwhqosAtmPvcQueueDropBytes
+					Counter64,
+				hwhqosAtmPvcQueueRemarkPackets
+					Counter64,
+				hwhqosAtmPvcQueueRemarkBytes
+					Counter64
+			 }
+
+		hwhqosAtmPvcIfIndex OBJECT-TYPE
+                        SYNTAX Integer32 (0..2147483647)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"ATM interfaceindex.
+				"
+			::= { hwhqosAtmPvcStatEntry 1 }
+
+		hwhqosAtmPvcVPI OBJECT-TYPE
+                        SYNTAX Integer32 (0..2147483647)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"VPI NUMBER.
+				"
+			::= { hwhqosAtmPvcStatEntry 2 }
+
+		hwhqosAtmPvcVCI OBJECT-TYPE
+                        SYNTAX Integer32 (0..2147483647)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"VCI NUMBER.
+				"
+			::= { hwhqosAtmPvcStatEntry 3 }
+
+		hwhqosAtmPvcDirection OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				inbound(1),
+				outbound(2),
+				absent(255)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Direction: inbound;outbound.
+				if don't have, please fill 255.
+				"
+			::= { hwhqosAtmPvcStatEntry 4 }
+
+		hwhqosAtmPvcUserLayer1 OBJECT-TYPE
+                        SYNTAX Integer32 (0..2147483647)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Usergroupid: just the Usergroup's configure sequence 
+				Usergroupname is identifier in Hierarchy QoS.
+				"
+			::= { hwhqosAtmPvcStatEntry 5 }
+
+		hwhqosAtmPvcUserLayer2 OBJECT-TYPE
+                        SYNTAX Integer32 (0..2147483647)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Userid: just the User's configure sequence 
+				Username is identifier in Hierarchy QoS.
+				"
+			::= { hwhqosAtmPvcStatEntry 6 }
+
+		hwhqosAtmPvcQueueIndex OBJECT-TYPE
+                        SYNTAX Integer32 (0..2147483647)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"index of user's queue.
+				8031: everyuser have 4 queues
+				MA52: everyuser have 8 queues
+				8090: everyuser have 8 queues
+				
+				if don't have, please fill 0.                
+				"
+			::= { hwhqosAtmPvcStatEntry 7 }
+
+		hwhqosAtmPvcQueueForwardPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"ForwardPackets number of queue.
+				if not support, please fill 0.
+				"
+			::= { hwhqosAtmPvcStatEntry 8 }
+
+		hwhqosAtmPvcQueueForwardBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"ForwardBytes number of queue.
+				if not support, please fill 0.
+				"
+			::= { hwhqosAtmPvcStatEntry 9 }
+
+		hwhqosAtmPvcQueueDropPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DropPackets number of queue.
+				if not support, please fill 0.
+				"
+			::= { hwhqosAtmPvcStatEntry 10 }
+
+		hwhqosAtmPvcQueueDropBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DropBytes number of queue.
+				if not support, please fill 0.
+				"
+			::= { hwhqosAtmPvcStatEntry 11 }
+
+		hwhqosAtmPvcQueueRemarkPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"RemarkPackets number of queue.
+				if not support, please fill 0.
+				"
+			::= { hwhqosAtmPvcStatEntry 12 }
+
+		hwhqosAtmPvcQueueRemarkBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"RemarkBytes number of queue.
+				if not support, please fill 0.
+				"
+			::= { hwhqosAtmPvcStatEntry 13 }
+
+
+		hwhqosPortQueueTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwhqosPortQueueEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Table of configuration about a port-queue."
+			::= { hwhqosStat 3 }
+
+
+		hwhqosPortQueueEntry OBJECT-TYPE
+			SYNTAX HwhqosPortQueueEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Information about configuration of an interface cos-queue."
+			INDEX { hwhqosPortQueueIfIndex, hwhqosPortQueueCosValue }
+			::= { hwhqosPortQueueTable 1 }
+
+		
+		HwhqosPortQueueEntry ::=
+			SEQUENCE { 
+				hwhqosPortQueueIfIndex
+					Integer32,
+				hwhqosPortQueueCosValue
+					INTEGER,
+				hwhqosPortQueueArithmetic
+					INTEGER,
+				hwhqosPortQueueWeightValue
+					Integer32,
+				hwhqosPortQueueShaValue
+					Integer32,
+				hwhqosPortQueueShaPercent
+					Integer32,
+				hwhqosPortQueueWredName
+					OCTET STRING,
+				hwhqosPortQueueRowStatus
+					RowStatus
+			 }
+
+		hwhqosPortQueueIfIndex OBJECT-TYPE
+			SYNTAX Integer32 (0..2147483647)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The object specifies interface index."
+			::= { hwhqosPortQueueEntry 1 }
+
+
+		hwhqosPortQueueCosValue OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				portqueueBE(1),
+				portqueueAF1(2),
+				portqueueAF2(3),
+				portqueueAF3(4),
+				portqueueAF4(5),
+				portqueueEF(6),
+				portqueueCS6(7),
+				portqueueCS7(8)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The object specifies interface cos-queue."
+			::= { hwhqosPortQueueEntry 2 }
+
+
+		hwhqosPortQueueArithmetic OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				portqueuePQ(1),
+				portqueueWFQ(2),
+				portqueueLPQ(3)
+				}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object specifies the schedule mode of cos-queue."
+			::= { hwhqosPortQueueEntry 11 }
+
+
+		hwhqosPortQueueWeightValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object specifies the weight of the weighted fair queue scheduler."
+			::= { hwhqosPortQueueEntry 12 }
+
+
+		hwhqosPortQueueShaValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object specifies the value of interface bandwidth."
+			::= { hwhqosPortQueueEntry 13 }
+
+
+		hwhqosPortQueueShaPercent OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object specifies the Shaping rate percentage-value."
+			::= { hwhqosPortQueueEntry 14 }
+
+
+		hwhqosPortQueueWredName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..31))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object specifies wred template name."
+			::= { hwhqosPortQueueEntry 15 }
+
+
+		hwhqosPortQueueRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object specifies the status of this table entry.
+				When the status is active,hwhqosPortQueueArithmetic,hwhqosPortQueueWeightValue,
+				hwhqosPortQueueShaValue,hwhqosPortQueueShaPercent,hwhqosPortQueueWredName and hwhqosPortQueueDirection's
+				value in the entry are allowed to be modified."
+			::= { hwhqosPortQueueEntry 51 }
+
+
+		hwhqosWredTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwhqosWredEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Table of configuration about a wred template."
+			::= { hwhqosStat 4 }
+
+		
+		hwhqosWredEntry OBJECT-TYPE
+			SYNTAX HwhqosWredEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Information about configuration of the value of wred color ."
+			INDEX { hwhqosWredName }
+			::= { hwhqosWredTable 1 }
+
+		
+		HwhqosWredEntry ::=
+			SEQUENCE { 
+				hwhqosWredName
+					OCTET STRING,
+				hwhqosWredGreenLowLimit
+					Integer32,
+				hwhqosWredGreenHighLimit
+					Integer32,
+				hwhqosWredGreenDiscardPercent
+					Integer32,
+				hwhqosWredYellowLowLimit
+					Integer32,
+				hwhqosWredYellowHighLimit
+					Integer32,
+				hwhqosWredYellowDiscardPercent
+					Integer32,
+				hwhqosWredRedLowLimit
+					Integer32,
+				hwhqosWredRedHighLimit
+					Integer32,
+				hwhqosWredRedDiscardPercent
+					Integer32,
+				hwhqosWredRowStatus
+					RowStatus
+			 }
+
+
+		hwhqosWredName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..31))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The object specifies the wred template name."
+			::= { hwhqosWredEntry 1 }
+
+
+		hwhqosWredGreenLowLimit OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object specifies the low-limit value of the port-wred's green color."
+			::= { hwhqosWredEntry 11 }
+
+
+		hwhqosWredGreenHighLimit OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object specifies the high-limit value of the port-wred's green color."
+			::= { hwhqosWredEntry 12 }
+
+
+		hwhqosWredGreenDiscardPercent OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object specifies the value of the green color's discard-percentage."
+			::= { hwhqosWredEntry 13 }
+
+
+		hwhqosWredYellowLowLimit OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object specifies the low-limit value of the port-wred's yellow color."
+			::= { hwhqosWredEntry 14 }
+
+
+		hwhqosWredYellowHighLimit OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object specifies the high-limit value of the port-wred's yellow color."
+			::= { hwhqosWredEntry 15 }
+
+
+		hwhqosWredYellowDiscardPercent OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object specifies the value of the yellow color's discard-percentage."
+			::= { hwhqosWredEntry 16 }
+
+
+		hwhqosWredRedLowLimit OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object specifies the low-limit value of the port-wred's red color."
+			::= { hwhqosWredEntry 17 }
+
+
+		hwhqosWredRedHighLimit OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object specifies the high-limit value of the port-wred's red color."
+			::= { hwhqosWredEntry 18 }
+
+
+		hwhqosWredRedDiscardPercent OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object specifies the value of the red color's discard-percentage."
+			::= { hwhqosWredEntry 19 }
+
+
+		hwhqosWredRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object specifies the status of this table entry.
+				When the status is active, hwhqosWredLowLimit,hwhqosWredHighLimit 
+				and hwhqosWredDiscardPercent's value in the entry are allowed to be modified."
+			::= { hwhqosWredEntry 51 }
+
+		hwhqosIfQueueStatTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwhqosIfQueueStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Interface queue statistic table."
+			::= { hwhqosStat 5 }
+		
+
+		hwhqosIfQueueStatEntry OBJECT-TYPE
+			SYNTAX HwhqosIfQueueStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Interface Queue statistic table entry."
+			INDEX { hwhqosIfQueueStatIfIndex, hwhqosIfQueueStatQueueIndex, hwhqosIfQueueStatDirection }
+			::= { hwhqosIfQueueStatTable 1 }
+		
+		HwhqosIfQueueStatEntry ::=
+			SEQUENCE { 
+				hwhqosIfQueueStatIfIndex
+					InterfaceIndex,
+				hwhqosIfQueueStatQueueIndex
+					INTEGER,
+				hwhqosIfQueueStatDirection
+					INTEGER,
+				hwhqosIfQueueStatForwardPackets
+					Counter64,
+				hwhqosIfQueueStatForwardBytes
+					Counter64,
+				hwhqosIfQueueStatDropPackets
+					Counter64,
+				hwhqosIfQueueStatDropBytes
+					Counter64
+			 }
+
+
+		hwhqosIfQueueStatIfIndex OBJECT-TYPE
+			SYNTAX InterfaceIndex 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Interface index.	"
+			::= { hwhqosIfQueueStatEntry 1 }
+		
+
+		hwhqosIfQueueStatQueueIndex OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				be(1),
+				af1(2),
+				af2(3),
+				af3(4),
+				af4(5),
+				ef(6),
+				cs6(7),
+				cs7(8)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Index number of queues with priority. 
+The values and meanings are as follows:
+				1 be
+				2 af1
+				3 af2
+				4 af3
+				5 af4
+				6 ef
+				7 cs6
+				8 cs7
+				"
+			::= { hwhqosIfQueueStatEntry 2 }
+		
+
+		hwhqosIfQueueStatDirection OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				inbound(1),
+				outbound(2)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Direction: inbound 1,outbound 2"
+			::= { hwhqosIfQueueStatEntry 3 }
+		
+
+		hwhqosIfQueueStatForwardPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of forwarded packets."
+			::= { hwhqosIfQueueStatEntry 4 }
+		
+
+		hwhqosIfQueueStatForwardBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of forwarded bytes."
+			::= { hwhqosIfQueueStatEntry 5 }
+		
+
+		hwhqosIfQueueStatDropPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of discarded packets."
+			::= { hwhqosIfQueueStatEntry 6 }
+		
+
+		hwhqosIfQueueStatDropBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of discarded bytes."
+			::= { hwhqosIfQueueStatEntry 7 }
+		
+
+		hwhqosUserQueueStatTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwhqosUserQueueStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"User queue statistic table."
+			::= { hwhqosStat 6 }
+		
+
+		hwhqosUserQueueStatEntry OBJECT-TYPE
+			SYNTAX HwhqosUserQueueStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"User Queue statistic table entry"
+			INDEX { hwhqosUserQueueStatType, hwhqosUserQueueStatNameString, hwhqosUserQueueStatDirection, hwhqosUserQueueStatQueueIndex }
+			::= { hwhqosUserQueueStatTable 1 }
+		
+		HwhqosUserQueueStatEntry ::=
+			SEQUENCE { 
+				hwhqosUserQueueStatType
+					INTEGER,
+				hwhqosUserQueueStatNameString
+					OCTET STRING,
+				hwhqosUserQueueStatDirection
+					INTEGER,
+				hwhqosUserQueueStatQueueIndex
+					INTEGER,
+				hwhqosUserQueueStatForwardPackets
+					Counter64,
+				hwhqosUserQueueStatForwardBytes
+					Counter64,
+				hwhqosUserQueueStatDropPackets
+					Counter64,
+				hwhqosUserQueueStatDropBytes
+					Counter64,
+				hwhqosUserQueueStatReset
+					INTEGER,
+				hwhqosUserQueueStatLastResetTime
+					TimeTicks,
+				hwhqosUserQueueStatPerDropPackets
+					Counter64
+			 }
+
+
+		hwhqosUserQueueStatType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				interface(1),
+				mactunel(2),
+				userclassifier(3)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Types of statistic:
+				interface(1),
+				mactunel(2),
+				userclassifier(3)
+				"
+			::= { hwhqosUserQueueStatEntry 1 }
+		
+
+		hwhqosUserQueueStatNameString OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Name character string: If the statistic is based on mac-tunnel,
+				this field is the name of the mac-tunnel. If the statistic is based
+				on user classification, this field is the name of the user 
+				classification. If the statistic is based on an interface,
+				this field is the name of the interface.
+				"
+			::= { hwhqosUserQueueStatEntry 2 }
+		
+
+		hwhqosUserQueueStatDirection OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				inbound(1),
+				outbound(2)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Direction: If the statistic is based on user classification, 
+				the direction is divided to upstream (1) and downstream (2). If the 
+				Statistic is based on mac-tunnel, the direction is applied only on 
+				the downstream (2)."
+			::= { hwhqosUserQueueStatEntry 3 }
+		
+
+		hwhqosUserQueueStatQueueIndex OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				be(1),
+				af1(2),
+				af2(3),
+				af3(4),
+				af4(5),
+				ef(6),
+				cs6(7),
+				cs7(8),
+				total(9)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Index number of the queues. The values and meanings are as follows:
+				1 be
+				2 af1
+				3 af2
+				4 af3
+				5 af4
+				6 ef
+				7 cs6
+				8 cs7
+				9 total
+				
+				"
+			::= { hwhqosUserQueueStatEntry 4 }
+		
+
+		hwhqosUserQueueStatForwardPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of packets that pass through."
+			::= { hwhqosUserQueueStatEntry 5 }
+		
+
+		hwhqosUserQueueStatForwardBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of bytes that pass through."
+			::= { hwhqosUserQueueStatEntry 6 }
+		
+
+		hwhqosUserQueueStatDropPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of discarded packets."
+			::= { hwhqosUserQueueStatEntry 7 }
+		
+
+		hwhqosUserQueueStatDropBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of discarded bytes."
+			::= { hwhqosUserQueueStatEntry 8 }
+		
+
+		hwhqosUserQueueStatReset OBJECT-TYPE
+			SYNTAX INTEGER { reset(1) }
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Counter resetting. If the value is 1, the object resets 
+				the statistics through the set operation. It is no of use to
+				access the value of this object.
+				"
+			::= { hwhqosUserQueueStatEntry 9 }
+		
+
+		hwhqosUserQueueStatLastResetTime OBJECT-TYPE
+			SYNTAX TimeTicks
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The time stamp that the counter is reset last."
+			::= { hwhqosUserQueueStatEntry 10 }
+		
+		hwhqosUserQueueStatPerDropPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of discarded packets in a certain period."
+			::= { hwhqosUserQueueStatEntry 11 }
+		
+		hwhqosUserGroupQueueStatTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwhqosUserGroupQueueStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"User group queue statistic table."
+			::= { hwhqosStat 7 }
+		
+
+		hwhqosUserGroupQueueStatEntry OBJECT-TYPE
+			SYNTAX HwhqosUserGroupQueueStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"user group queue statistic table entry"
+			INDEX { hwhqosUserGroupQueueStatGroupName, hwhqosUserGroupQueueStatDirection }
+			::= { hwhqosUserGroupQueueStatTable 1 }
+		
+		HwhqosUserGroupQueueStatEntry ::=
+			SEQUENCE { 
+				hwhqosUserGroupQueueStatGroupName
+					OCTET STRING,
+				hwhqosUserGroupQueueStatDirection
+					INTEGER,
+				hwhqosUserGroupQueueForwardPackets
+					Counter64,
+				hwhqosUserGroupQueueForwardBytes
+					Counter64,
+				hwhqosUserGroupQueueDropPackets
+					Counter64,
+				hwhqosUserGroupQueueDropBytes
+					Counter64,
+				hwhqosUserGroupQueueStatReset
+					INTEGER,
+				hwhqosUserGroupQueueStatLastResetTime
+					TimeTicks
+			 }
+
+
+		hwhqosUserGroupQueueStatGroupName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"User group name.
+				"
+			::= { hwhqosUserGroupQueueStatEntry 1 }
+		
+
+		hwhqosUserGroupQueueStatDirection OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				inbount(1),
+				outbound(2)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Direction: upstream (1), downstream (2);"
+			::= { hwhqosUserGroupQueueStatEntry 2 }
+		
+
+		hwhqosUserGroupQueueForwardPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of packets that pass through."
+			::= { hwhqosUserGroupQueueStatEntry 3 }
+		
+
+		hwhqosUserGroupQueueForwardBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of bytes that pass through."
+			::= { hwhqosUserGroupQueueStatEntry 4 }
+		
+
+		hwhqosUserGroupQueueDropPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of discarded packets."
+			::= { hwhqosUserGroupQueueStatEntry 5 }
+		
+
+		hwhqosUserGroupQueueDropBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of discarded bytes."
+			::= { hwhqosUserGroupQueueStatEntry 6 }
+		
+
+		hwhqosUserGroupQueueStatReset OBJECT-TYPE
+			SYNTAX INTEGER { reset(1) }
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Counter resetting. If the value is reset(1), the object resets 
+				the statistics through the set operation. It is no of use to
+				access the value of this object."
+			::= { hwhqosUserGroupQueueStatEntry 7 }
+		
+
+		hwhqosUserGroupQueueStatLastResetTime OBJECT-TYPE
+			SYNTAX TimeTicks
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The time stamp that the counter is reset last."
+			::= { hwhqosUserGroupQueueStatEntry 8 }      
+			
+			
+
+       hwVPNHQoSTunnelStatisticsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwVPNHQoSTunnelStatisticsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"VPN qos tunnel statistic table."
+			::= { hwhqosStat 8 }
+		
+
+		hwVPNHQoSTunnelStatisticsEntry OBJECT-TYPE
+			SYNTAX HwVPNHQoSTunnelStatisticsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"VPN qos tunnel statistic table entry: L3VPN,VPLS and VLL are all supported. "
+			INDEX { hwVPNHQoSTunnelIfIndex, hwVPNHQoSVPNType, hwVPNHQoSVPNValue }
+			::= { hwVPNHQoSTunnelStatisticsTable 1 }
+		
+		HwVPNHQoSTunnelStatisticsEntry ::=
+			SEQUENCE { 
+				hwVPNHQoSTunnelIfIndex
+					Integer32,
+				hwVPNHQoSVPNType
+					Integer32,
+				hwVPNHQoSVPNValue
+					OCTET STRING, 	
+				hwVPNHQoSPassBytes
+					Counter64,
+				hwVPNHQoSPassPackets
+					Counter64,
+				hwVPNHQoSDropPackets
+					Counter64,
+				hwVPNHQoSDropBytes
+					Counter64
+			 }
+
+
+		hwVPNHQoSTunnelIfIndex OBJECT-TYPE
+			SYNTAX Integer32 (1..4294967295)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"VPN Tunnel interface index."
+			::= { hwVPNHQoSTunnelStatisticsEntry 1 }
+		
+
+		hwVPNHQoSVPNType OBJECT-TYPE
+			SYNTAX Integer32 (0..3)				
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"VPN Type: Tunnel (0), L3VPN (1), VPLS (2), VLL(3);"
+			::= { hwVPNHQoSTunnelStatisticsEntry 2 }
+		
+
+		hwVPNHQoSVPNValue OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Name of VPN Instance."
+			::= { hwVPNHQoSTunnelStatisticsEntry 3 }  
+				
+
+		hwVPNHQoSPassBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of bytes that pass through."
+			::= { hwVPNHQoSTunnelStatisticsEntry 4 }
+		
+
+		hwVPNHQoSPassPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of packets that pass through."
+			::= { hwVPNHQoSTunnelStatisticsEntry 5 }
+		
+
+		hwVPNHQoSDropPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of discarded packets."
+			::= { hwVPNHQoSTunnelStatisticsEntry 6 }
+		
+
+		hwVPNHQoSDropBytes OBJECT-TYPE
+			SYNTAX Counter64 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" The number of discarded bytes."
+			::= { hwVPNHQoSTunnelStatisticsEntry 7 }		
+
+		
+
+       hwhqosTunnelStatisticsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwhqosTunnelStatisticsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Tunnel statistic table."
+			::= { hwhqosStat 9 }
+		
+
+		hwhqosTunnelStatisticsEntry OBJECT-TYPE
+			SYNTAX HwhqosTunnelStatisticsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Tunnel statistic table entry: L3VPN,VPLS and VLL are all supported. "
+			INDEX { hwhqosTunnelIfIndex, hwhqosTunnelCosType, hwhqosTunnelVPNType, hwhqosTunnelVPNName }
+			::= { hwhqosTunnelStatisticsTable 1 }
+		
+		HwhqosTunnelStatisticsEntry ::=
+			SEQUENCE { 
+				hwhqosTunnelIfIndex
+					Integer32,
+			        hwhqosTunnelCosType
+	                                CosType,
+				hwhqosTunnelVPNType
+					Integer32, 
+				hwhqosTunnelVPNName
+					OCTET STRING, 	
+				hwhqosTunnelPassBytes
+					Counter64,
+				hwhqosTunnelPassPackets
+					Counter64,
+				hwhqosTunnelDropBytes
+					Counter64,
+				hwhqosTunnelDropPackets
+					Counter64,
+                                hwhqosTunnelPassedByteRate
+			                Counter64,
+			        hwhqosTunnelPassPacketRate
+			                Counter64
+			 }
+
+
+		hwhqosTunnelIfIndex OBJECT-TYPE
+			SYNTAX Integer32 (1..4294967295)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Tunnel interface index."
+			::= { hwhqosTunnelStatisticsEntry 1 }
+	
+		hwhqosTunnelCosType OBJECT-TYPE
+		        SYNTAX CosType
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+			     "BE(1) AF1(2) AF2(3) AF3(4) AF4(5) EF(6) CS6(7) CS7(8)"
+			::= { hwhqosTunnelStatisticsEntry 2 }
+			
+		hwhqosTunnelVPNType OBJECT-TYPE
+			SYNTAX Integer32 (0..3)				
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"VPN Type: Tunnel (0), L3VPN (1), VPLS (2), VLL(3);"
+			::= { hwhqosTunnelStatisticsEntry 3 }
+
+		hwhqosTunnelVPNName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..31))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Name of VPN Instance."
+			::= { hwhqosTunnelStatisticsEntry 4 }  
+				
+
+		hwhqosTunnelPassBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of bytes that pass through."
+			::= { hwhqosTunnelStatisticsEntry 5 }
+		
+
+		hwhqosTunnelPassPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of packets that pass through."
+			::= { hwhqosTunnelStatisticsEntry 6 }
+			
+
+		hwhqosTunnelDropBytes OBJECT-TYPE
+			SYNTAX Counter64 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" The number of discarded bytes."
+			::= { hwhqosTunnelStatisticsEntry 7 }						
+
+		hwhqosTunnelDropPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of discarded packets."
+			::= { hwhqosTunnelStatisticsEntry 8 }
+
+		hwhqosTunnelPassedByteRate OBJECT-TYPE
+			SYNTAX Counter64 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Rate of bytes passed of enqueue. Unit: Bps"
+			::= { hwhqosTunnelStatisticsEntry 9 }
+
+	        hwhqosTunnelPassPacketRate OBJECT-TYPE
+			SYNTAX Counter64 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Rate of packets passed of enqueue. Unit: pps"
+			::= { hwhqosTunnelStatisticsEntry 10 }
+		
+		
+		hwhqosObjects OBJECT IDENTIFIER ::= { hwHQOS 2 }
+		
+		hwhqosUserFrameId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The ID of the frame which the alarm device located."
+			::= { hwhqosObjects 1 }
+		
+		hwhqosUserSlotId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The ID of the slot on which the alarmed HQoS user applied."
+			::= { hwhqosObjects 2 }
+		
+		hwhqosUserPortId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The ID of port on which the alarmed HQoS user applied."
+			::= { hwhqosObjects 3 }
+		
+		hwhqosTraps OBJECT IDENTIFIER ::= { hwHQOS 3 }
+		
+		hwhqosUserQueueStatDiscardAlarmTrap NOTIFICATION-TYPE
+			OBJECTS { hwhqosUserFrameId, hwhqosUserSlotId, hwhqosUserPortId, hwhqosUserQueueStatPerDropPackets }
+			STATUS current
+			DESCRIPTION 
+				"The user queue discard alarm trap."
+			::= { hwhqosTraps 1 }
+		
+		hwhqosConformance OBJECT IDENTIFIER ::= { hwHQOS 4 }
+		
+		hwhqosCompliances OBJECT IDENTIFIER ::= { hwhqosConformance 1 }
+		
+
+-- ******************************************************************
+--
+--   hwhqosProfileTable
+--
+-- ******************************************************************  
+
+      hwhqosProfileTable  OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosProfileEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosProfileTable "
+          ::= { hwhqosStat 10 }
+
+      hwhqosProfileEntry OBJECT-TYPE
+          SYNTAX HwhqosProfileEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosProfileEntry " 
+          INDEX  { hwhqosProfileName }    
+          ::= { hwhqosProfileTable 1 }   
+      
+      HwhqosProfileEntry ::=
+        SEQUENCE {
+                hwhqosProfileName
+                    OCTET STRING,
+                hwhqosProfileDescription 
+                    OCTET STRING, 
+                hwhqosProfileRowStatus          
+                    RowStatus
+        }                
+     
+      hwhqosProfileName OBJECT-TYPE
+             SYNTAX OCTET STRING (SIZE(1..31))
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+      " hwhqosProfileName "     
+             ::= { hwhqosProfileEntry 1 }  
+       
+      hwhqosProfileDescription OBJECT-TYPE
+             SYNTAX OCTET STRING (SIZE(1..63))
+             MAX-ACCESS read-create
+             STATUS current
+             DESCRIPTION
+      " hwhqosProfileDescription "     
+             ::= { hwhqosProfileEntry 2 }
+             
+      hwhqosProfileRowStatus OBJECT-TYPE
+            SYNTAX RowStatus 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "
+             Row status. The value ranges from 1 to 6 but usually 4 and 6 are used.
+             createAndGo[4] - create a row.        
+             destroy[6] -delete a row.       
+            "
+            ::= { hwhqosProfileEntry 50 }   
+            
+-- ******************************************************************
+--
+--   hwhqosProfileSuppressionTable
+--
+-- ******************************************************************
+
+      hwhqosProfileSuppressionTable  OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosProfileSuppressionEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosProfileSuppressionTable "
+          ::= { hwhqosStat 11 }
+
+      hwhqosProfileSuppressionEntry OBJECT-TYPE
+          SYNTAX HwhqosProfileSuppressionEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosProfileSuppressionEntry " 
+          INDEX  { hwhqosProfileName, hwhqosSuppressionDirection, hwhqosSuppressionType }    
+          ::= { hwhqosProfileSuppressionTable 1 }   
+      
+      HwhqosProfileSuppressionEntry ::=
+        SEQUENCE {
+                hwhqosSuppressionDirection
+                    INTEGER,
+                hwhqosSuppressionType 
+                    INTEGER,
+                hwhqosSuppressionCirValue
+                    Integer32,    
+                hwhqosSuppressionCbsValue
+                    Integer32, 
+                hwhqosSuppressionRowStatus          
+                    RowStatus
+        }
+              
+      hwhqosSuppressionDirection OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+              inbound(1),
+              outbound(2),
+              inout(3)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosSuppressionDirection "
+            ::= { hwhqosProfileSuppressionEntry 1 }  
+             
+      hwhqosSuppressionType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+              broadcast(1),
+              multicast(2),
+              unkonwn-unicast(3)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosSuppressionType "
+            ::= { hwhqosProfileSuppressionEntry 2 }
+            
+      hwhqosSuppressionCirValue OBJECT-TYPE
+            SYNTAX Integer32 (100..10000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosSuppressionCirValue "
+            ::= { hwhqosProfileSuppressionEntry 3 }
+
+      hwhqosSuppressionCbsValue OBJECT-TYPE
+            SYNTAX Integer32 (100..33554432)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosSuppressionCbsValue " 
+            ::= { hwhqosProfileSuppressionEntry 4 }
+            
+      hwhqosSuppressionRowStatus OBJECT-TYPE
+            SYNTAX RowStatus 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "
+             Row status. The value ranges from 1 to 6 but usually 4 and 6 are used.
+             createAndGo[4] - create a row.        
+             destroy[6] -delete a row.       
+            "
+            ::= { hwhqosProfileSuppressionEntry 50 }        
+      
+      
+-- ******************************************************************
+--
+--   hwhqosProfileCarTable
+--
+-- ******************************************************************
+
+      hwhqosProfileCarTable  OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosProfileCarEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosProfileCarTable "
+          ::= { hwhqosStat 12 }
+
+      hwhqosProfileCarEntry OBJECT-TYPE
+          SYNTAX HwhqosProfileCarEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosProfileCarEntry " 
+          INDEX  { hwhqosProfileName, hwhqosProfileCarDirection }    
+          ::= { hwhqosProfileCarTable 1 }   
+      
+      HwhqosProfileCarEntry ::=
+        SEQUENCE {
+                hwhqosProfileCarDirection
+                    INTEGER,
+                hwhqosProfileCarCirValue
+                    Integer32,
+                hwhqosProfileCarPirValue
+                    Integer32,      
+                hwhqosProfileCarCbsValue
+                    Integer32,
+				hwhqosProfileCarPbsValue
+                    Integer32,
+                hwhqosProfileCarGreenAction
+                    INTEGER,
+                hwhqosProfileCarYellowAction
+                    INTEGER,
+                hwhqosProfileCarRedAction
+                    INTEGER,
+                hwhqosProfileCarRowStatus          
+                    RowStatus
+        } 
+
+      hwhqosProfileCarDirection OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+              inbound(1),
+              outbound(2),
+              inout(3)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarDirection "
+            ::= { hwhqosProfileCarEntry 1 }   
+
+      hwhqosProfileCarCirValue OBJECT-TYPE
+            SYNTAX Integer32 (100..10000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarCirValue "
+            ::= { hwhqosProfileCarEntry 2 }
+
+      hwhqosProfileCarPirValue OBJECT-TYPE
+            SYNTAX Integer32 (100..10000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarPirValue " 
+            ::= { hwhqosProfileCarEntry 3 }
+
+      hwhqosProfileCarCbsValue OBJECT-TYPE
+            SYNTAX Integer32 (100..33554432)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarCbsValue "
+            ::= { hwhqosProfileCarEntry 4 }
+      
+      hwhqosProfileCarPbsValue OBJECT-TYPE
+            SYNTAX Integer32 (0..33554432)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarPbsValue "  
+            ::= { hwhqosProfileCarEntry 5 }
+            
+      hwhqosProfileCarGreenAction OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+              pass(1),
+              discard(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarGreenAction "
+            DEFVAL {1}
+            ::= { hwhqosProfileCarEntry 6 }     
+      
+      hwhqosProfileCarYellowAction OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+              pass(1),
+              discard(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarYellowAction "
+            DEFVAL {1}
+            ::= { hwhqosProfileCarEntry 7 }
+            
+      hwhqosProfileCarRedAction OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+              pass(1),
+              discard(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarRedAction "
+            DEFVAL {2}
+            ::= { hwhqosProfileCarEntry 8 }
+            
+      hwhqosProfileCarRowStatus OBJECT-TYPE
+            SYNTAX RowStatus 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "
+             Row status. The value ranges from 1 to 6 but usually 4 and 6 are used.
+             createAndGo[4] - create a row.        
+             destroy[6] -delete a row.       
+            "
+            ::= { hwhqosProfileCarEntry 50 }
+
+
+
+-- ******************************************************************
+--
+--   hwhqosProfileUserQueueTable
+--
+-- ******************************************************************
+
+      hwhqosProfileUserQueueTable  OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosProfileUserQueueEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosProfileUserQueueTable "
+          ::= { hwhqosStat 13 }
+
+      hwhqosProfileUserQueueEntry OBJECT-TYPE
+          SYNTAX HwhqosProfileUserQueueEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosProfileUserQueueEntry " 
+          INDEX  { hwhqosProfileName, hwhqosProfileUserQueueDirection }    
+          ::= { hwhqosProfileUserQueueTable 1 }   
+      
+      HwhqosProfileUserQueueEntry ::=
+        SEQUENCE {
+                hwhqosProfileUserQueueDirection
+                    INTEGER,
+                hwhqosProfileUserQueueCirValue
+                    Integer32,
+                hwhqosProfileUserQueuePirValue
+                    Integer32,
+                hwhqosProfileUserQueueFlowQueueName
+                    OCTET STRING,     
+                hwhqosProfileUserQueueMappingName
+                    OCTET STRING,
+                hwhqosProfileUserQueueGroupName
+                    OCTET STRING,   
+                hwhqosProfileUserQueueServiceTemplateName
+                    OCTET STRING,
+                hwhqosProfileUserQueueRowStatus          
+                    RowStatus
+        }      
+      
+      hwhqosProfileUserQueueDirection OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+              inbound(1),
+              outbound(2),
+              inout(3)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileUserQueueDirection "
+            ::= { hwhqosProfileUserQueueEntry 1 }   
+
+      hwhqosProfileUserQueueCirValue OBJECT-TYPE
+            SYNTAX Integer32 (0 | 16..10000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileUserQueueCirValue "
+            ::= { hwhqosProfileUserQueueEntry 2 }
+
+      hwhqosProfileUserQueuePirValue OBJECT-TYPE
+            SYNTAX Integer32 (0 | 16..10000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileUserQueuePirValue " 
+            ::= { hwhqosProfileUserQueueEntry 3 }   
+
+      hwhqosProfileUserQueueFlowQueueName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileUserQueueFlowQueueName "     
+            ::= { hwhqosProfileUserQueueEntry 4 }   
+             
+      hwhqosProfileUserQueueMappingName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileUserQueueMappingName "     
+            ::= { hwhqosProfileUserQueueEntry 5 }    
+             
+      hwhqosProfileUserQueueGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+      		" hwhqosProfileUserQueueGroupName "     
+            ::= { hwhqosProfileUserQueueEntry 6 }      
+      
+      hwhqosProfileUserQueueServiceTemplateName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileUserQueueServiceTemplateName "     
+            ::= { hwhqosProfileUserQueueEntry 7 }
+                   
+      hwhqosProfileUserQueueRowStatus OBJECT-TYPE
+            SYNTAX RowStatus 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "
+             Row status. The value ranges from 1 to 6 but usually 4 and 6 are used.
+             createAndGo[4] - create a row.        
+             destroy[6] -delete a row.       
+            "
+            ::= { hwhqosProfileUserQueueEntry 50 } 
+
+-- ******************************************************************
+--
+--   hwhqosProfileApplyTable
+--
+-- ******************************************************************
+
+      hwhqosProfileApplyTable  OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosProfileApplyEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosProfileApplyTable "
+          ::= { hwhqosStat 14 }
+          
+
+      hwhqosProfileApplyEntry OBJECT-TYPE
+          SYNTAX HwhqosProfileApplyEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosProfileApplyEntry " 
+          INDEX  { hwhqosProfileInterfaceIndex, hwhqosProfileApplyDirection, hwhqosProfileApplyPevid, hwhqosProfileApplyCevid }    
+          ::= { hwhqosProfileApplyTable 1 }           
+
+      HwhqosProfileApplyEntry ::=
+        SEQUENCE {
+                hwhqosProfileInterfaceIndex
+                    InterfaceIndex,
+                hwhqosProfileApplyDirection
+                    INTEGER,
+                hwhqosProfileApplyPevid
+                    Integer32,
+                hwhqosProfileApplyCevid
+                    Integer32,
+                hwhqosProfileApplyName
+                    OCTET STRING,
+                hwhqosProfileApplyIdentifier
+                    INTEGER,
+                hwhqosGroupName
+                    OCTET STRING,
+                hwhqosProfileApplyRowStatus          
+                    RowStatus
+        }
+
+      hwhqosProfileInterfaceIndex OBJECT-TYPE
+             SYNTAX InterfaceIndex
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+             " hwhqosProfileInterfaceIndex "     
+             ::= { hwhqosProfileApplyEntry 1 }     
+      
+      hwhqosProfileApplyDirection OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+              inbound(1),
+              outbound(2)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileApplyDirection "
+            DEFVAL {1}
+            ::= { hwhqosProfileApplyEntry 2 }   
+
+      hwhqosProfileApplyPevid OBJECT-TYPE
+            SYNTAX Integer32 (0..4094)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileApplyPevid "
+            DEFVAL {0}
+            ::= { hwhqosProfileApplyEntry 3 }
+
+      hwhqosProfileApplyCevid OBJECT-TYPE
+            SYNTAX Integer32 (0..4094)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileApplyCevid "
+            DEFVAL {0}
+            ::= { hwhqosProfileApplyEntry 4 }   
+
+      hwhqosProfileApplyName OBJECT-TYPE
+             SYNTAX OCTET STRING (SIZE(1..31))
+             MAX-ACCESS read-create
+             STATUS current
+             DESCRIPTION
+             " hwhqosProfileApplyName "     
+             ::= { hwhqosProfileApplyEntry 5 }               
+
+      hwhqosProfileApplyIdentifier OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+              none(1),
+              vlan-id(2),
+              ce-vid(3),
+              pe-vid(4),
+              pe-ce-vid(5)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileApplyIdentifier "
+            DEFVAL {1}
+            ::= { hwhqosProfileApplyEntry 6 }   
+            
+      hwhqosGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosGroupName "     
+            ::= { hwhqosProfileApplyEntry 7 }
+
+      hwhqosProfileApplyRowStatus OBJECT-TYPE
+            SYNTAX RowStatus 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "
+             Row status. The value ranges from 1 to 6 but usually 4 and 6 are used.
+             createAndGo[4] - create a row.        
+             destroy[6] -delete a row.       
+            "
+            ::= { hwhqosProfileApplyEntry 50 }  
+
+  
+ 
+-- ******************************************************************
+--
+--   hwhqosFlowMappingTable
+--
+-- ****************************************************************** 
+ 
+      hwhqosFlowMappingTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosFlowMappingEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosFlowMappingTable "
+          ::= { hwhqosStat 15 }
+          
+
+      hwhqosFlowMappingEntry OBJECT-TYPE
+          SYNTAX HwhqosFlowMappingEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosFlowMappingEntry " 
+          INDEX  { hwhqosFlowMappingName }    
+          ::= { hwhqosFlowMappingTable 1 }           
+
+      HwhqosFlowMappingEntry ::=
+        SEQUENCE {
+                hwhqosFlowMappingName                
+                    OCTET STRING,
+                hwhqosFlowMappingRowStatus           
+                    RowStatus
+        }
+
+      hwhqosFlowMappingName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosFlowMappingName "     
+            ::= { hwhqosFlowMappingEntry 1 }  
+                      
+
+      hwhqosFlowMappingRowStatus   OBJECT-TYPE
+           SYNTAX RowStatus 
+           MAX-ACCESS read-create
+           STATUS current
+           DESCRIPTION
+           "
+            Row status. The value ranges from 1 to 6 but usually 4 and 6 are used.
+            createAndGo[4] - create a row.        
+            destroy[6] -delete a row.       
+           "
+           ::= { hwhqosFlowMappingEntry 50 }   
+           
+           
+-- ******************************************************************
+--
+--   hwhqosFlowMappingCfgTable
+--
+-- ******************************************************************  
+
+      hwhqosFlowMappingCfgTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosFlowMappingCfgEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosFlowMappingCfgTable "
+          ::= { hwhqosStat 16 }
+          
+
+      hwhqosFlowMappingCfgEntry OBJECT-TYPE
+          SYNTAX HwhqosFlowMappingCfgEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosFlowMappingCfgEntry " 
+          INDEX  { hwhqosFlowMappingName, hwhqosFolwMappingCfgQueueCosValue }    
+          ::= { hwhqosFlowMappingCfgTable 1 }           
+
+      HwhqosFlowMappingCfgEntry ::=
+        SEQUENCE {
+                hwhqosFolwMappingCfgQueueCosValue                
+                    INTEGER,
+                hwhqosFlowMappingCfgPortQueueCosValue
+                    INTEGER,
+                hwhqosFlowMappingCfgRowStatus           
+                    RowStatus
+        }
+             
+      hwhqosFolwMappingCfgQueueCosValue OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+              be(1),
+              af1(2),
+              af2(3),
+              af3(4),
+              af4(5),
+              ef(6),
+              cs6(7),
+              cs7(8)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosFolwMappingCfgQueueCosValue "
+            ::= { hwhqosFlowMappingCfgEntry 1 }   
+            
+
+      hwhqosFlowMappingCfgPortQueueCosValue OBJECT-TYPE
+           SYNTAX INTEGER
+           {
+              be(1),
+              af1(2),
+              af2(3),
+              af3(4),
+              af4(5),
+              ef(6),
+              cs6(7),
+              cs7(8)
+          }
+           MAX-ACCESS read-create
+           STATUS current
+           DESCRIPTION
+           " hwhqosFlowMappingCfgPortQueueCosValue "
+           ::= { hwhqosFlowMappingCfgEntry 2 }
+           
+
+      hwhqosFlowMappingCfgRowStatus   OBJECT-TYPE
+           SYNTAX RowStatus 
+           MAX-ACCESS read-create
+           STATUS current
+           DESCRIPTION
+           "
+            Row status. The value ranges from 1 to 6 but usually 4 and 6 are used.
+            createAndGo[4] - create a row.        
+            destroy[6] -delete a row.       
+           "
+           ::= { hwhqosFlowMappingCfgEntry 50 }            
+
+                
+
+-- ******************************************************************
+--
+--   hwhqosFlowQueueTable
+--
+-- ****************************************************************** 
+
+     hwhqosFlowQueueTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosFlowQueueEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosFlowQueueTable "
+          ::= { hwhqosStat 17 }
+          
+
+      hwhqosFlowQueueEntry OBJECT-TYPE
+          SYNTAX HwhqosFlowQueueEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosFlowQueueEntry " 
+          INDEX  { hwhqosFlowQueueName }    
+          ::= { hwhqosFlowQueueTable 1 }           
+
+	  HwhqosFlowQueueEntry ::=
+	    SEQUENCE {
+	            hwhqosFlowQueueName                 
+	                OCTET STRING, 	                 	                
+	            hwhqosFlowQueueRowStatus     
+	                RowStatus 	                
+	            }
+
+      hwhqosFlowQueueName  OBJECT-TYPE
+            SYNTAX   OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosFlowQueueName  "     
+            ::= { hwhqosFlowQueueEntry 1 }
+                   
+            
+       hwhqosFlowQueueRowStatus   OBJECT-TYPE
+            SYNTAX RowStatus 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+           "
+            Row status. The value ranges from 1 to 6 but usually 4 and 6 are used.
+            createAndGo[4] - create a row.               
+            destroy[destroy[6] -delete a row. 
+           "    
+            ::= { hwhqosFlowQueueEntry 50 }   
+            
+            
+            
+-- ******************************************************************
+--
+--   hwhqosFlowQueueCfgTable
+--
+-- ****************************************************************** 
+            
+      hwhqosFlowQueueCfgTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosFlowQueueCfgEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosFlowQueueCfgTable "
+          ::= { hwhqosStat 18 }
+          
+
+      hwhqosFlowQueueCfgEntry OBJECT-TYPE
+          SYNTAX HwhqosFlowQueueCfgEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosFlowQueueCfgEntry " 
+          INDEX  { hwhqosFlowQueueName, hwhqosFlowQueueCfgCosValue }    
+          ::= { hwhqosFlowQueueCfgTable 1 }           
+
+	  HwhqosFlowQueueCfgEntry ::=
+	    SEQUENCE {
+	            hwhqosFlowQueueCfgCosValue                 
+	                INTEGER,
+	            hwhqosFlowQueueCfgType 
+	                INTEGER,    
+	            hwhqosFlowQueueCfgWeightValue
+	                Integer32,                	                
+	            hwhqosFlowQueueCfgShapingValue 
+	                Integer32, 	                
+	            hwhqosFlowQueueCfgShapingPercentageValue
+	                Integer32,             
+	            hwhqosFlowQueueCfgWredName 
+	                OCTET STRING, 
+	            hwhqosFlowQueueCfgRowStatus     
+	                RowStatus 	 	                
+	            }
+
+      hwhqosFlowQueueCfgCosValue  OBJECT-TYPE
+            SYNTAX INTEGER
+              {
+				be(1),
+				af1(2),
+                af2(3),
+                af3(4),
+                af4(5),
+                ef(6),
+                cs6(7),
+                cs7(8)
+			  }
+            MAX-ACCESS  read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosFlowQueueCfgCosValue  "
+            ::= { hwhqosFlowQueueCfgEntry 1 }
+ 
+                              
+
+      hwhqosFlowQueueCfgType OBJECT-TYPE
+            SYNTAX INTEGER
+              {
+				pq(1),
+				wfq(2),
+                lpq(3)
+              }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosFlowQueueCfgType "    
+            ::= { hwhqosFlowQueueCfgEntry 2 }   
+            
+            
+        
+      hwhqosFlowQueueCfgWeightValue  OBJECT-TYPE
+            SYNTAX Integer32 (1..100)            
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosFlowQueueCfgWeightValue  "    
+            ::= { hwhqosFlowQueueCfgEntry 3 }   
+       
+            
+    
+      hwhqosFlowQueueCfgShapingValue OBJECT-TYPE
+            SYNTAX  Integer32 (1000..1000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosFlowQueueCfgShapingValue "    
+            ::= { hwhqosFlowQueueCfgEntry 4 }   
+            
+            
+     
+      hwhqosFlowQueueCfgShapingPercentageValue  OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosFlowQueueCfgShapingPercentageValue  "    
+            ::= { hwhqosFlowQueueCfgEntry 5 }  
+                  
+        
+        
+       hwhqosFlowQueueCfgWredName  OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..31)) 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosFlowQueueCfgWredName  "    
+            ::= { hwhqosFlowQueueCfgEntry 6 }     
+            
+            
+            
+       hwhqosFlowQueueCfgRowStatus   OBJECT-TYPE
+            SYNTAX RowStatus 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+           "
+            Row status. The value ranges from 1 to 6 but usually 4 and 6 are used.
+            createAndGo[4] - create a row.               
+            destroy[destroy[6] -delete a row. 
+           "    
+            ::= { hwhqosFlowQueueCfgEntry 50 }    
+            
+            
+-- ******************************************************************
+--
+--   hwhqosFlowWredTable
+--
+-- ****************************************************************** 
+
+      hwhqosFlowWredTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosFlowWredEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosFlowWredTable "
+          ::= { hwhqosStat 19 }
+          
+
+      hwhqosFlowWredEntry OBJECT-TYPE
+          SYNTAX HwhqosFlowWredEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosFlowQueueEntry " 
+          INDEX  { hwhqosFlowWredName }    
+          ::= { hwhqosFlowWredTable 1 }           
+
+	  HwhqosFlowWredEntry ::=
+	    SEQUENCE {
+	            hwhqosFlowWredName                 
+	                OCTET STRING, 	                 	                           	                	                  
+	            hwhqosFlowWredRowStatus      
+	                RowStatus 	                
+	            }
+
+      hwhqosFlowWredName  OBJECT-TYPE
+            SYNTAX   OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosFlowWredName  "     
+            ::= { hwhqosFlowWredEntry 1 }
+       
+              
+       hwhqosFlowWredRowStatus    OBJECT-TYPE
+            SYNTAX RowStatus 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+           "
+            Row status. The value ranges from 1 to 6 but usually 4 and 6 are used.
+            createAndGo[4] - create a row.               
+            destroy[destroy[6] -delete a row. 
+           "    
+            ::= { hwhqosFlowWredEntry 50 }  
+
+
+-- ******************************************************************
+--
+--   hwhqosFlowWredColorTable
+--
+-- ****************************************************************** 
+
+      hwhqosFlowWredColorTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosFlowWredColorEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosFlowWredColorTable "
+          ::= { hwhqosStat 20 }
+          
+
+      hwhqosFlowWredColorEntry OBJECT-TYPE
+          SYNTAX HwhqosFlowWredColorEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosFlowWredColorEntry " 
+          INDEX  { hwhqosFlowWredName, hwhqosFlowWredColor }    
+          ::= { hwhqosFlowWredColorTable 1 }           
+
+	  HwhqosFlowWredColorEntry ::=
+	    SEQUENCE {
+	            hwhqosFlowWredColor                 
+	                INTEGER,
+	            hwhqosFlowWredColorLowlimitPercentage
+	                Integer32,
+	            hwhqosFlowWredColorHighlimitPercentage
+	                Integer32,
+	            hwhqosFlowWredColorDiscardPercentage
+	                Integer32,	                 	                           	                	                  
+	            hwhqosFlowWredColorRowStatus      
+	                RowStatus 	                
+	            }
+
+      hwhqosFlowWredColor  OBJECT-TYPE
+            SYNTAX INTEGER
+              {
+				green(1),
+				yellow(2),
+                red(3)
+              }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosFlowWredColor  "     
+            ::= { hwhqosFlowWredColorEntry 1 }  
+              
+            
+      hwhqosFlowWredColorLowlimitPercentage  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosFlowWredColorLowlimitPercentage  " 
+            DEFVAL { 100 }    
+            ::= { hwhqosFlowWredColorEntry 2 }   
+                
+            
+      hwhqosFlowWredColorHighlimitPercentage  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosFlowWredColorHighlimitPercentage  "  
+            DEFVAL { 100 }
+            ::= { hwhqosFlowWredColorEntry 3 }  
+       
+      
+      hwhqosFlowWredColorDiscardPercentage  OBJECT-TYPE
+            SYNTAX  Integer32 (1..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosFlowWredColorDiscardPercentage  "  
+            DEFVAL { 100 }
+            ::= { hwhqosFlowWredColorEntry 4 }  
+
+              
+      hwhqosFlowWredColorRowStatus    OBJECT-TYPE
+            SYNTAX RowStatus 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+           "
+            Row status. The value ranges from 1 to 6 but usually 4 and 6 are used.
+            createAndGo[4] - create a row.               
+            destroy[destroy[6] -delete a row. 
+           "    
+            ::= { hwhqosFlowWredColorEntry 50 }  
+
+
+-- ******************************************************************
+--
+--   hwhqosUserGroupQueueTable
+--
+-- ****************************************************************** 
+
+      hwhqosUserGroupQueueTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosUserGroupQueueEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosUserGroupQueueTable "
+          ::= { hwhqosStat 21 }
+          
+
+      hwhqosUserGroupQueueEntry OBJECT-TYPE
+          SYNTAX HwhqosUserGroupQueueEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosUserGroupQueueEntry " 
+          INDEX  { hwhqosUserGroupQueueName }    
+          ::= { hwhqosUserGroupQueueTable 1 }           
+
+	  HwhqosUserGroupQueueEntry ::=
+	    SEQUENCE {
+	            hwhqosUserGroupQueueName                 
+	                OCTET STRING, 	                 	                
+	            hwhqosUserGroupQueueSlotNumber  
+	                Integer32,              	                	                                  	                  
+	   	        hwhqosUserGroupQueueRowStatus      
+	                RowStatus 	                
+	            }
+
+      hwhqosUserGroupQueueName  OBJECT-TYPE
+            SYNTAX   OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserGroupQueueName  "     
+            ::= { hwhqosUserGroupQueueEntry 1 }
+       
+       
+      
+      hwhqosUserGroupQueueSlotNumber  OBJECT-TYPE
+            SYNTAX Integer32 (0 | 1..8)
+            MAX-ACCESS  read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosFlowWredColor  "  
+            DEFVAL {0} 
+            ::= { hwhqosUserGroupQueueEntry 2 }
+ 
+
+          
+       hwhqosUserGroupQueueRowStatus     OBJECT-TYPE
+            SYNTAX RowStatus 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+           "
+            Row status. The value ranges from 1 to 6 but usually 4 and 6 are used.
+            createAndGo[4] - create a row.               
+            destroy[destroy[6] -delete a row. 
+           "    
+            ::= { hwhqosUserGroupQueueEntry 50 } 
+            
+            
+
+-- ******************************************************************
+--
+--   hwhqosUserGroupQueueShapingTable
+--
+-- ******************************************************************              
+
+      hwhqosUserGroupQueueShapingTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosUserGroupQueueShapingEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosUserGroupQueueShapingTable "
+          ::= { hwhqosStat 22 }
+          
+
+      hwhqosUserGroupQueueShapingEntry OBJECT-TYPE
+          SYNTAX HwhqosUserGroupQueueShapingEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosUserGroupQueueShapingEntry " 
+          INDEX  { hwhqosUserGroupQueueName,hwhqosUserGroupQueueShapingDirection }    
+          ::= { hwhqosUserGroupQueueShapingTable 1 }           
+
+	  HwhqosUserGroupQueueShapingEntry ::=
+	    SEQUENCE {
+	            hwhqosUserGroupQueueShapingDirection                 
+	                INTEGER, 	                 	                
+	            hwhqosUserGroupQueueShapingValue  
+	                Integer32,              	                	                                  	                  
+	   	        hwhqosUserGroupQueueShapingRowStatus      
+	                RowStatus 	                
+	            }
+
+      hwhqosUserGroupQueueShapingDirection  OBJECT-TYPE
+            SYNTAX INTEGER
+              {
+				inbound(1),
+				outbound(2)
+			  }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserGroupQueueShapingDirection  "     
+            ::= { hwhqosUserGroupQueueShapingEntry 1 }
+       
+       
+      
+      hwhqosUserGroupQueueShapingValue  OBJECT-TYPE
+            SYNTAX Integer32 (66..10000000)
+            UNITS "Kbps"
+            MAX-ACCESS  read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserGroupQueueShapingValue  "  
+            ::= { hwhqosUserGroupQueueShapingEntry 2 }
+ 
+
+          
+       hwhqosUserGroupQueueShapingRowStatus     OBJECT-TYPE
+            SYNTAX RowStatus 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+           "
+            Row status. The value ranges from 1 to 6 but usually 4 and 6 are used.
+            createAndGo[4] - create a row.               
+            destroy[destroy[6] -delete a row. 
+           "    
+            ::= { hwhqosUserGroupQueueShapingEntry 50 } 
+
+
+
+
+-- ******************************************************************
+--
+--   hwhqosUserQueueTable
+--
+-- ******************************************************************
+      hwhqosUserQueueTable       OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosUserQueueEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosUserQueueTable "
+          ::= { hwhqosStat 23 }
+          
+
+      hwhqosUserQueueEntry OBJECT-TYPE
+          SYNTAX HwhqosUserQueueEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosUserQueueEntry " 
+          INDEX  { hwhqosUserQueueInterfaceIndex, hwhqosUserQueueDirection }    
+          ::= { hwhqosUserQueueTable 1 }           
+
+      HwhqosUserQueueEntry ::=
+        SEQUENCE {
+                hwhqosUserQueueInterfaceIndex                
+                     InterfaceIndex,
+                hwhqosUserQueueDirection
+                     INTEGER,
+                hwhqosUserQueueCirValue
+                     Integer32,
+                hwhqosUserQueuePirValue
+                     Integer32,
+                hwhqosUserQueueFlowQueueName
+                     OCTET STRING,
+                hwhqosUserQueueFlowMappingName
+                     OCTET STRING,
+                hwhqosUserQueueGroupName
+                     OCTET STRING,
+                hwhqosUserQueueServiceTemplateName
+                     OCTET STRING,  
+                hwhqosUserQueueRowStatus           
+                     RowStatus
+         }
+
+      hwhqosUserQueueInterfaceIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueInterfaceIndex "     
+            ::= { hwhqosUserQueueEntry 1 }      
+            
+      hwhqosUserQueueDirection OBJECT-TYPE
+            SYNTAX INTEGER
+	        {
+	  	       inbound(1),
+	  	       outbound(2)
+	        }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueDirection "     
+            ::= { hwhqosUserQueueEntry 2 }
+
+      hwhqosUserQueueCirValue OBJECT-TYPE
+            SYNTAX Integer32 (0|16..1000000)
+            UNITS "Kbps"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosCirValue "     
+            ::= { hwhqosUserQueueEntry 3 }
+               
+      hwhqosUserQueuePirValue OBJECT-TYPE
+            SYNTAX Integer32 (0|16..1000000)
+            UNITS "Kbps"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosPirValue "     
+            ::= { hwhqosUserQueueEntry 4 }
+
+      hwhqosUserQueueFlowQueueName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosFlowQueueName "     
+            ::= { hwhqosUserQueueEntry 5 }
+
+      hwhqosUserQueueFlowMappingName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosFlowMappingName "     
+            ::= { hwhqosUserQueueEntry 6 }
+
+      hwhqosUserQueueGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosGroupName "     
+            ::= { hwhqosUserQueueEntry 7 }
+
+      hwhqosUserQueueServiceTemplateName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueServiceTemplateName "     
+            ::= { hwhqosUserQueueEntry 8 }
+
+      hwhqosUserQueueRowStatus OBJECT-TYPE
+            SYNTAX RowStatus 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "
+             Row status. The value ranges from 1 to 6 but usually 4 and 6 are used.
+             createAndGo[4] - create a row.        
+             destroy[6] -delete a row.       
+            "
+            
+            ::= { hwhqosUserQueueEntry 50 }  
+
+ 
+-- ******************************************************************
+--
+--   hwhqosBehaviorUserQueueTable
+--
+-- ******************************************************************
+      hwhqosBehaviorUserQueueTable       OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosBehaviorUserQueueEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwBehaviorhqosUserQueueTable "
+          ::= { hwhqosStat 24 }
+          
+
+      hwhqosBehaviorUserQueueEntry OBJECT-TYPE
+          SYNTAX HwhqosBehaviorUserQueueEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosBehaviorUserQueueEntry " 
+          INDEX  { hwhqosBehaviorName }    
+          ::= { hwhqosBehaviorUserQueueTable 1 }           
+
+     HwhqosBehaviorUserQueueEntry ::=
+        SEQUENCE {
+                hwhqosBehaviorName                
+                    OCTET STRING, 
+                hwhqosBehaviorCirValue
+                     Integer32,
+                hwhqosBehaviorPirValue
+                     Integer32,
+                hwhqosBehaviorFlowQueueName
+                     OCTET STRING,
+                hwhqosBehaviorFlowMappingName
+                     OCTET STRING,
+                hwhqosBehaviorGroupName
+                     OCTET STRING,
+                hwhqosBehaviorServiceTemplateName
+                     OCTET STRING,  
+                hwhqosBehaviorUserQueueRowStatus           
+                    RowStatus
+         }
+
+      hwhqosBehaviorName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosBehaviorName "     
+            ::= { hwhqosBehaviorUserQueueEntry 1 }
+      
+
+      hwhqosBehaviorCirValue OBJECT-TYPE
+            SYNTAX Integer32 (0 | 16..1000000)
+            UNITS "Kbps"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosBehaviorCirValue "     
+            ::= { hwhqosBehaviorUserQueueEntry 2 }
+               
+      hwhqosBehaviorPirValue OBJECT-TYPE
+            SYNTAX Integer32 (0 | 16..1000000)
+            UNITS "Kbps"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosBehaviorPirValue "     
+            ::= { hwhqosBehaviorUserQueueEntry 3 }
+
+
+      hwhqosBehaviorFlowQueueName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosBehaviorFlowQueueName "     
+            ::= { hwhqosBehaviorUserQueueEntry 4 }
+
+
+      hwhqosBehaviorFlowMappingName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosBehaviorFlowMappingName "     
+            ::= { hwhqosBehaviorUserQueueEntry 5 }
+
+      hwhqosBehaviorGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosBehaviorGroupName "     
+            ::= { hwhqosBehaviorUserQueueEntry 6 }
+
+      hwhqosBehaviorServiceTemplateName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosServiceTemplateName "     
+            ::= { hwhqosBehaviorUserQueueEntry 7 }
+
+      hwhqosBehaviorUserQueueRowStatus OBJECT-TYPE
+            SYNTAX RowStatus 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "
+             Row status. The value ranges from 1 to 6 but usually 4 and 6 are used.
+             createAndGo[4] - create a row.        
+             destroy[6] -delete a row.       
+            "
+            
+            ::= { hwhqosBehaviorUserQueueEntry 50 }  
+
+
+-- ******************************************************************
+--
+--   hwhqosBandwidthTable
+--
+-- ******************************************************************
+      hwhqosBandwidthTable       OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosBandwidthEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosBandwidthTable "
+          ::= { hwhqosStat 25 }
+          
+
+      hwhqosBandwidthEntry OBJECT-TYPE
+          SYNTAX HwhqosBandwidthEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosBandwidthEntry " 
+          INDEX  { hwhqosBandwidthInterfaceIndex }    
+          ::= { hwhqosBandwidthTable 1 }           
+
+      HwhqosBandwidthEntry ::=
+        SEQUENCE {
+                hwhqosBandwidthInterfaceIndex                
+                    InterfaceIndex, 
+                hwhqosBandwidthValue
+                     Integer32,  
+                hwhqosBandwidthRowStatus           
+                    RowStatus
+        }
+
+      hwhqosBandwidthInterfaceIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosBandwidthInterfaceIndex "     
+            ::= { hwhqosBandwidthEntry 1 }
+      
+
+      hwhqosBandwidthValue OBJECT-TYPE
+            SYNTAX Integer32 (0..10000)
+            UNITS "Mbps"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION 
+            " hwhqosBandwidthValue "
+            DEFVAL {1000}     
+            ::= { hwhqosBandwidthEntry 2 }              
+
+
+      hwhqosBandwidthRowStatus OBJECT-TYPE
+            SYNTAX RowStatus 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "
+              Row status. The value ranges from 1 to 6 but usually 4 and 6 are used.
+              createAndGo[4] - create a row.        
+              destroy[6] -delete a row.       
+            "
+            
+            ::= { hwhqosBandwidthEntry 50 }
+-- ******************************************************************
+--
+--   hwhqosServiceTemplateTable
+--
+-- ******************************************************************
+      hwhqosServiceTemplateTable       OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosServiceTemplateEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosServiceTemplateTable "
+          ::= { hwhqosStat 26 }
+          
+
+      hwhqosServiceTemplateEntry OBJECT-TYPE
+          SYNTAX HwhqosServiceTemplateEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosServiceTemplateEntry " 
+          INDEX  { hwhqosServiceTemplateName }    
+          ::= { hwhqosServiceTemplateTable 1 }           
+
+      HwhqosServiceTemplateEntry ::=
+        SEQUENCE {
+                hwhqosServiceTemplateName                
+                    OCTET STRING,
+                hwhqosSlotNumber
+                    Integer32,
+                hwhqosServiceTemplateRowStatus           
+                    RowStatus
+        }
+
+      hwhqosServiceTemplateName OBJECT-TYPE
+	        SYNTAX OCTET STRING (SIZE(1..31))
+	        MAX-ACCESS read-only
+	        STATUS current
+	        DESCRIPTION
+	        " hwhqosServiceTemplateName "     
+	        ::= { hwhqosServiceTemplateEntry 1 }	        
+
+	  hwhqosSlotNumber OBJECT-TYPE
+	        SYNTAX Integer32 (1..8)
+	        MAX-ACCESS read-create
+	        STATUS current
+	        DESCRIPTION 
+	        " hwhqosSlotNumber "     
+	        ::= { hwhqosServiceTemplateEntry 2 }                
+
+	  hwhqosServiceTemplateRowStatus OBJECT-TYPE
+	      	SYNTAX RowStatus 
+	      	MAX-ACCESS read-create
+	      	STATUS current
+	      	DESCRIPTION
+		      "
+		       Row status. The value ranges from 1 to 6 but usually 4 and 6 are used.
+		       createAndGo[4] - create a row.        
+		       destroy[6] -delete a row.       
+		      "
+	            
+	        ::= { hwhqosServiceTemplateEntry 50 }
+
+-- ******************************************************************
+--
+--   hwhqosNetworkHeaderLengthTable
+--
+-- ******************************************************************
+      hwhqosNetworkHeaderLengthTable       OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosNetworkHeaderLengthEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosNetworkHeaderLengthTable "
+          ::= { hwhqosStat 27 }
+          
+
+      hwhqosNetworkHeaderLengthEntry OBJECT-TYPE
+          SYNTAX HwhqosNetworkHeaderLengthEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosNetworkHeaderLengthEntry " 
+          INDEX  { hwhqosServiceTemplateName, hwhqosNetworkHeaderLengthDirection }    
+          ::= { hwhqosNetworkHeaderLengthTable 1 }           
+
+      HwhqosNetworkHeaderLengthEntry ::=
+        SEQUENCE {
+                hwhqosNetworkHeaderLengthDirection
+                    INTEGER, 
+                hwhqosNetWorkHeaderLengthValue
+                	Integer32, 
+                hwhqosNetWorkHeaderLengthRowStatus           
+                    RowStatus
+        }
+
+	  hwhqosNetworkHeaderLengthDirection OBJECT-TYPE
+	        SYNTAX INTEGER
+		  	{
+		  		inbound(1),
+		  		outbound(2)
+		  	}
+	        MAX-ACCESS read-only
+	        STATUS current
+	        DESCRIPTION 
+	      	" hwhqosNetworkHeaderLengthDirection "     
+	      	::= { hwhqosNetworkHeaderLengthEntry 1 }    	        
+
+	  hwhqosNetWorkHeaderLengthValue OBJECT-TYPE
+      		SYNTAX Integer32 (-63..63)
+	      	MAX-ACCESS read-create
+	      	STATUS current
+	      	DESCRIPTION 
+	      	" hwhqosNetWorkHeaderLengthValue "     
+	      	::= { hwhqosNetworkHeaderLengthEntry 2 }  
+
+	  hwhqosNetWorkHeaderLengthRowStatus OBJECT-TYPE
+	      	SYNTAX RowStatus 
+	      	MAX-ACCESS read-create
+	      	STATUS current
+	      	DESCRIPTION
+		      "
+		       Row status. The value ranges from 1 to 6 but usually 4 and 6 are used.
+		       createAndGo[4] - create a row.        
+		       destroy[6] -delete a row.       
+		      "
+	            
+	        ::= { hwhqosNetworkHeaderLengthEntry 50 }
+
+-- ******************************************************************
+--
+--   hwhqosServiceTemplateApplyTable
+--
+-- ******************************************************************
+		hwhqosServiceTemplateApplyTable    OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosServiceTemplateApplyEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosServiceTemplateApplyTable "
+          ::= { hwhqosStat 28 }
+          
+
+      hwhqosServiceTemplateApplyEntry OBJECT-TYPE
+          SYNTAX HwhqosServiceTemplateApplyEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosServiceTemplateApplyEntry " 
+          INDEX  { hwhqosServiceTemplateApplyInterfaceIndex }    
+          ::= { hwhqosServiceTemplateApplyTable 1 }           
+
+      HwhqosServiceTemplateApplyEntry ::=
+        SEQUENCE {
+                hwhqosServiceTemplateApplyInterfaceIndex                
+                    InterfaceIndex, 
+                hwhqosApplyServiceTemplateName
+                    OCTET STRING,
+                hwhqosServiceTemplateApplyRowStatus           
+                    RowStatus
+      }
+
+      hwhqosServiceTemplateApplyInterfaceIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosServiceTemplateApplyInterfaceIndex "     
+            ::= { hwhqosServiceTemplateApplyEntry 1 }
+      
+
+      hwhqosApplyServiceTemplateName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION 
+            " hwhqosSlotNumber "     
+            ::= { hwhqosServiceTemplateApplyEntry 2 }              
+
+      hwhqosServiceTemplateApplyRowStatus OBJECT-TYPE
+            SYNTAX RowStatus 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "
+             Row status. The value ranges from 1 to 6 but usually 4 and 6 are used.
+             createAndGo[4] - create a row.        
+             destroy[6] -delete a row.       
+            "
+            
+            ::= { hwhqosServiceTemplateApplyEntry 50 }
+
+-- ******************************************************************
+--
+--   hwhqosProfileUserQueueStatisticsTable
+--
+-- ******************************************************************
+      hwhqosProfileUserQueueStatisticsTable    OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosProfileUserQueueStatisticsEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosProfileUserQueueStatisticsTable "
+          ::= { hwhqosStat 29 }
+          
+
+      hwhqosProfileUserQueueStatisticsEntry OBJECT-TYPE
+          SYNTAX HwhqosProfileUserQueueStatisticsEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosProfileUserQueueStatisticsEntry " 
+          INDEX  { hwhqosProfileUserQueueStatisticsInterfaceIndex,
+                   hwhqosProfileUserQueueStatisticsDirection,
+                   hwhqosProfileUserQueueStatisticsPevid,
+                   hwhqosProfileUserQueueStatisticsCevid,
+                   hwhqosProfileUserQueueStatisticsSlotNumber,
+                   hwhqosProfileUserQueueStatisticsQueueIndex
+                   }    
+          ::= { hwhqosProfileUserQueueStatisticsTable 1 }           
+
+      HwhqosProfileUserQueueStatisticsEntry ::=
+        SEQUENCE {
+                hwhqosProfileUserQueueStatisticsInterfaceIndex                 
+                    InterfaceIndex,  
+                hwhqosProfileUserQueueStatisticsDirection
+                    INTEGER,
+                hwhqosProfileUserQueueStatisticsPevid
+                    Integer32,  
+                hwhqosProfileUserQueueStatisticsCevid
+                    Integer32, 
+                hwhqosProfileUserQueueStatisticsSlotNumber
+                    INTEGER,
+                hwhqosProfileUserQueueStatisticsQueueIndex
+                    INTEGER,
+                hwhqosProfileUserQueueStatisticsReset
+                    INTEGER,
+                hwhqosProfileUserQueueStatisticsPassPackets
+                    Counter64,
+                hwhqosProfileUserQueueStatisticsPassBytes
+                    Counter64,
+                hwhqosProfileUserQueueStatisticsDropPackets
+                    Counter64,
+                hwhqosProfileUserQueueStatisticsDropBytes
+                    Counter64,
+                hwhqosProfileUserQueueStatisticsPassPacketsRate
+                    Counter64,
+                hwhqosProfileUserQueueStatisticsPassBytesRate
+                    Counter64,
+                hwhqosProfileUserQueueStatisticsDropPacketsRate
+                    Counter64,
+                hwhqosProfileUserQueueStatisticsDropBytesRate            
+                    Counter64
+      }
+
+      hwhqosProfileUserQueueStatisticsInterfaceIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileUserQueueStatisticsInterfaceIndex "     
+            ::= { hwhqosProfileUserQueueStatisticsEntry 1 }
+
+      hwhqosProfileUserQueueStatisticsDirection OBJECT-TYPE
+            SYNTAX INTEGER 
+            {
+      	        inbound(1),
+      	        outbound(2)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            " hwhqosProfileUserQueueStatisticsDirection "     
+            ::= { hwhqosProfileUserQueueStatisticsEntry 2 }
+      
+
+      hwhqosProfileUserQueueStatisticsPevid OBJECT-TYPE
+            SYNTAX Integer32 (0..4094)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            " hwhqosProfileUserQueueStatisticsPevid "     
+            ::= { hwhqosProfileUserQueueStatisticsEntry 3 }              
+
+      hwhqosProfileUserQueueStatisticsCevid OBJECT-TYPE
+            SYNTAX Integer32 (0..4094)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            " hwhqosProfileUserQueueStatisticsCevid "     
+            ::= { hwhqosProfileUserQueueStatisticsEntry 4 }
+
+
+      hwhqosProfileUserQueueStatisticsSlotNumber OBJECT-TYPE
+           SYNTAX INTEGER (0..128)
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION 
+           " hwhqosProfileUserQueueStatisticsSlotNumber "     
+           ::= { hwhqosProfileUserQueueStatisticsEntry 5 }
+
+      hwhqosProfileUserQueueStatisticsQueueIndex OBJECT-TYPE
+	        SYNTAX INTEGER
+		    {
+		        be(1),
+		        af1(2),
+		        af2(3),
+		        af3(4),
+		        af4(5),
+		        ef(6),
+		        cs6(7),
+		        cs7(8),
+		        total(9)
+		    }
+	        MAX-ACCESS read-only
+	        STATUS current
+	        DESCRIPTION
+		    "Index number of the queues. The values and meanings are as follows:
+		    1 be
+		    2 af1
+		    3 af2
+		    4 af3
+		    5 af4
+		    6 ef
+		    7 cs6
+		    8 cs7
+		    9 total		
+		    "
+	        ::= { hwhqosProfileUserQueueStatisticsEntry 6 }
+
+                                        
+      hwhqosProfileUserQueueStatisticsReset OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                reset(1)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION 
+            " hwhqosProfileUserQueueStatisticsReset "     
+            ::= { hwhqosProfileUserQueueStatisticsEntry 7 }                                        
+
+      hwhqosProfileUserQueueStatisticsPassPackets OBJECT-TYPE
+            SYNTAX Counter64
+            UNITS "packets"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            " hwhqosProfileUserQueueStatisticsPassPackets "     
+            ::= { hwhqosProfileUserQueueStatisticsEntry 8 } 
+
+      hwhqosProfileUserQueueStatisticsPassBytes OBJECT-TYPE
+            SYNTAX Counter64  
+            UNITS "bytes"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            " hwhqosProfileUserQueueStatisticsPassBytes "     
+            ::= { hwhqosProfileUserQueueStatisticsEntry 9 }
+      
+      hwhqosProfileUserQueueStatisticsDropPackets OBJECT-TYPE
+            SYNTAX Counter64
+            UNITS "packets"      
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            " hwhqosProfileUserQueueStatisticsDropPackets "     
+            ::= { hwhqosProfileUserQueueStatisticsEntry 10 }
+      
+      hwhqosProfileUserQueueStatisticsDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            UNITS "bytes"      
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            " hwhqosProfileUserQueueStatisticsDropBytes "     
+            ::= { hwhqosProfileUserQueueStatisticsEntry 11 }      
+      
+      hwhqosProfileUserQueueStatisticsPassPacketsRate OBJECT-TYPE
+            SYNTAX Counter64
+            UNITS "pps"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            " hwhqosProfileUserQueueStatisticsPassPacketsRate "     
+            ::= { hwhqosProfileUserQueueStatisticsEntry 12 }
+
+      hwhqosProfileUserQueueStatisticsPassBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            UNITS "bps"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            " hwhqosProfileUserQueueStatisticsPassBytesRate "     
+            ::= { hwhqosProfileUserQueueStatisticsEntry 13 } 
+      
+      hwhqosProfileUserQueueStatisticsDropPacketsRate OBJECT-TYPE
+            SYNTAX Counter64
+            UNITS "pps"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            " hwhqosProfileUserQueueStatisticsDropPacketsRate "     
+            ::= { hwhqosProfileUserQueueStatisticsEntry 14 }                              
+                              
+      hwhqosProfileUserQueueStatisticsDropBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            UNITS "bps"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            " hwhqosProfileUserQueueStatisticsDropBytesRate "     
+            ::= { hwhqosProfileUserQueueStatisticsEntry 15 }   
+
+    
+      
+-- ******************************************************************
+--
+--   1.4.29  hwhqosProfileCarStatisticsTable
+--
+-- ******************************************************************
+
+      hwhqosProfileCarStatisticsTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosProfileCarStatisticsEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosProfileCarStatisticsTable "
+          ::= { hwhqosStat 30 }
+          
+
+      hwhqosProfileCarStatisticsEntry OBJECT-TYPE
+          SYNTAX HwhqosProfileCarStatisticsEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosProfileCarStatisticsEntry " 
+          INDEX  { 
+                   hwhqosProfileCarStatisticsInterfaceIndex,
+                   hwhqosProfileCarStatisticsDirection,
+                   hwhqosProfileCarStatisticsPevid,
+                   hwhqosProfileCarStatisticsCevid,
+                   hwhqosProfileCarStatisticsType,
+                   hwhqosProfileCarStatisticsSlotNumber
+                 }    
+          ::= { hwhqosProfileCarStatisticsTable 1 }           
+
+	  HwhqosProfileCarStatisticsEntry ::=
+	    SEQUENCE {
+	            hwhqosProfileCarStatisticsInterfaceIndex                
+	                InterfaceIndex,
+	            hwhqosProfileCarStatisticsDirection 
+	                INTEGER,
+	            hwhqosProfileCarStatisticsPevid  
+	                Integer32,   
+	            hwhqosProfileCarStatisticsCevid  
+	                Integer32,     
+	            hwhqosProfileCarStatisticsType
+	                INTEGER,
+	            hwhqosProfileCarStatisticsSlotNumber 
+	                Integer32,
+	            hwhqosProfileCarStatisticsReset 
+	                INTEGER, 
+	            hwhqosProfileCarStatisticsPassPackets
+	                Counter64,
+	            hwhqosProfileCarStatisticsPassBytes 
+	                Counter64, 
+	            hwhqosProfileCarStatisticsDropPackets    
+	                Counter64,
+	            hwhqosProfileCarStatisticsDropBytes
+	                Counter64,
+	            hwhqosProfileCarStatisticsPassPacketsRate
+	                Counter64, 
+	            hwhqosProfileCarStatisticsPassBytesRate
+	                Counter64,
+	            hwhqosProfileCarStatisticsDropPacketsRate
+	                Counter64,    
+	            hwhqosProfileCarStatisticsDropBytesRate          
+	                Counter64
+      }
+
+      hwhqosProfileCarStatisticsInterfaceIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarStatisticsInterfaceIndex "     
+            ::= { hwhqosProfileCarStatisticsEntry 1 }
+
+
+      hwhqosProfileCarStatisticsDirection OBJECT-TYPE
+            SYNTAX INTEGER 
+               {
+				inbound(1),
+				outbound(2)
+			   }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarStatisticsDirection "    
+            ::= { hwhqosProfileCarStatisticsEntry 2 }   
+
+  
+      hwhqosProfileCarStatisticsPevid  OBJECT-TYPE
+            SYNTAX Integer32 (0..4094)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarStatisticsPevid  "
+            ::= { hwhqosProfileCarStatisticsEntry 3 }
+      
+
+      hwhqosProfileCarStatisticsCevid  OBJECT-TYPE
+            SYNTAX Integer32 (0..4094)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarStatisticsCevid  "
+            ::= { hwhqosProfileCarStatisticsEntry 4 }           
+            
+        
+      hwhqosProfileCarStatisticsType OBJECT-TYPE
+            SYNTAX INTEGER 
+               {
+				car(1),
+				broadcast-suppression(2), 
+				multicast-suppression(3), 
+				unknown-unicast-suppression(4)
+			   }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarStatisticsType "    
+            ::= { hwhqosProfileCarStatisticsEntry 5 }   
+       
+            
+    
+      hwhqosProfileCarStatisticsSlotNumber OBJECT-TYPE
+            SYNTAX Integer32 (0..128)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarStatisticsSlotNumber "    
+            ::= { hwhqosProfileCarStatisticsEntry 6 }   
+            
+            
+            
+      hwhqosProfileCarStatisticsReset  OBJECT-TYPE
+            SYNTAX INTEGER 
+            {
+				reset(1)
+			}
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarStatisticsReset  "    
+            ::= { hwhqosProfileCarStatisticsEntry 7 }   
+      
+            
+      
+       hwhqosProfileCarStatisticsPassPackets  OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarStatisticsPassPackets  "    
+            ::= { hwhqosProfileCarStatisticsEntry 8 }  
+                  
+        
+        
+       hwhqosProfileCarStatisticsPassBytes  OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarStatisticsPassBytes  "    
+            ::= { hwhqosProfileCarStatisticsEntry 9 }     
+            
+            
+            
+       hwhqosProfileCarStatisticsDropPackets  OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarStatisticsDropPackets  "    
+            ::= { hwhqosProfileCarStatisticsEntry 10 }  
+            
+            
+            
+       hwhqosProfileCarStatisticsDropBytes  OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarStatisticsDropBytes  "    
+            ::= { hwhqosProfileCarStatisticsEntry 11 }   
+            
+            
+            
+       hwhqosProfileCarStatisticsPassPacketsRate  OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarStatisticsPassPacketsRate  "    
+            ::= { hwhqosProfileCarStatisticsEntry 12 }             
+        
+        
+
+       hwhqosProfileCarStatisticsPassBytesRate   OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarStatisticsPassBytesRate   "    
+            ::= { hwhqosProfileCarStatisticsEntry 13 }    
+            
+            
+            
+       hwhqosProfileCarStatisticsDropPacketsRate   OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarStatisticsPassBytesRate   "    
+            ::= { hwhqosProfileCarStatisticsEntry 14 } 
+            
+            
+       
+               
+       hwhqosProfileCarStatisticsDropBytesRate    OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosProfileCarStatisticsDropBytesRate    "    
+            ::= { hwhqosProfileCarStatisticsEntry 15 } 
+     
+ 
+-- ******************************************************************
+--
+--   hwhqosUserQueueStatisticsTable
+--
+-- ******************************************************************
+
+      hwhqosUserQueueStatisticsTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosUserQueueStatisticsEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosUserQueueStatisticsTable "
+          ::= { hwhqosStat 31 }
+          
+
+      hwhqosUserQueueStatisticsEntry OBJECT-TYPE
+          SYNTAX HwhqosUserQueueStatisticsEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosUserQueueStatisticsEntry " 
+          INDEX  { hwhqosUserQueueStatisticsInterfaceIndex,hwhqosUserQueueStatisticsDirection,
+                   hwhqosUserQueueStatisticsSlotNumber,hwhqosUserQueueStatisticsQueueIndex }    
+          ::= { hwhqosUserQueueStatisticsTable 1 }           
+
+	  HwhqosUserQueueStatisticsEntry ::=
+	    SEQUENCE {
+	            hwhqosUserQueueStatisticsInterfaceIndex                 
+	                InterfaceIndex,
+	            hwhqosUserQueueStatisticsDirection  
+	                INTEGER, 
+	            hwhqosUserQueueStatisticsSlotNumber 
+	                Integer32,               
+	            hwhqosUserQueueStatisticsQueueIndex  
+	                INTEGER,                    
+	            hwhqosUserQueueStatisticsReset 
+	                INTEGER, 	                
+	            hwhqosUserQueueStatisticsPassPackets 
+	                Counter64, 	                
+	            hwhqosUserQueueStatisticsPassBytes
+	                Counter64,             
+	            hwhqosUserQueueStatisticsDropPackets 
+	                Counter64, 
+	            hwhqosUserQueueStatisticsDropBytes    
+	                Counter64, 	                
+	            hwhqosUserQueueStatisticsPassPacketsRate
+	                Counter64,  	                
+	            hwhqosUserQueueStatisticsPassBytesRate 
+	                Counter64, 
+	            hwhqosUserQueueStatisticsDropPacketsRate 
+	                Counter64,
+	            hwhqosUserQueueStatisticsDropBytesRate 
+	                Counter64   
+      }
+
+      hwhqosUserQueueStatisticsInterfaceIndex  OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueStatisticsInterfaceIndex  "     
+            ::= { hwhqosUserQueueStatisticsEntry 1 }
+             
+      hwhqosUserQueueStatisticsDirection  OBJECT-TYPE
+            SYNTAX INTEGER
+              {
+				inbound(1),
+				outbound(2) 
+			  }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueStatisticsDirection  "
+            ::= { hwhqosUserQueueStatisticsEntry 2 }
+
+
+      hwhqosUserQueueStatisticsSlotNumber OBJECT-TYPE
+            SYNTAX Integer32 (0..128)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueStatisticsSlotNumber "    
+            ::= { hwhqosUserQueueStatisticsEntry 3 }   
+             
+  
+      hwhqosUserQueueStatisticsQueueIndex  OBJECT-TYPE
+            SYNTAX INTEGER
+              {
+				be(1),
+				af1(2), 
+				af2(3),
+				af3(4),
+				af4(5),
+				ef(6),
+				cs6(7),
+				cs7(8),
+				total(9)
+			   }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueStatisticsQueueIndex  "
+            ::= { hwhqosUserQueueStatisticsEntry 4 }
+      
+                  
+        
+      hwhqosUserQueueStatisticsReset  OBJECT-TYPE
+            SYNTAX INTEGER 
+            {
+				reset(1)
+			}
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueStatisticsReset  "    
+            ::= { hwhqosUserQueueStatisticsEntry 5 }   
+       
+            
+    
+      hwhqosUserQueueStatisticsPassPackets OBJECT-TYPE
+            SYNTAX  Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueStatisticsPassPackets "    
+            ::= { hwhqosUserQueueStatisticsEntry 6 }   
+            
+            
+     
+      hwhqosUserQueueStatisticsPassBytes  OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueStatisticsPassBytes  "    
+            ::= { hwhqosUserQueueStatisticsEntry 7 }  
+                  
+        
+        
+       hwhqosUserQueueStatisticsDropPackets  OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueStatisticsDropPackets  "    
+            ::= { hwhqosUserQueueStatisticsEntry 8 }     
+            
+            
+            
+       hwhqosUserQueueStatisticsDropBytes  OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueStatisticsDropBytes  "    
+            ::= { hwhqosUserQueueStatisticsEntry 9 }  
+            
+            
+            
+       hwhqosUserQueueStatisticsPassPacketsRate  OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueStatisticsPassPacketsRate  "    
+            ::= { hwhqosUserQueueStatisticsEntry 10 }   
+            
+            
+            
+       hwhqosUserQueueStatisticsPassBytesRate   OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueStatisticsPassBytesRate   "    
+            ::= { hwhqosUserQueueStatisticsEntry 11 }             
+        
+        
+
+       hwhqosUserQueueStatisticsDropPacketsRate    OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueStatisticsDropPacketsRate    "    
+            ::= { hwhqosUserQueueStatisticsEntry 12 }    
+            
+            
+            
+       hwhqosUserQueueStatisticsDropBytesRate    OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueStatisticsDropBytesRate    "    
+            ::= { hwhqosUserQueueStatisticsEntry 13 } 
+                   
+     
+-- ******************************************************************
+--
+--   hwhqosUserQueueClassifierStatisticsTable
+--
+-- ******************************************************************
+
+      hwhqosUserQueueClassifierStatisticsTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosUserQueueClassifierStatisticsEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosUserQueueStatisticsTable "
+          ::= { hwhqosStat 32 }
+          
+
+      hwhqosUserQueueClassifierStatisticsEntry OBJECT-TYPE
+          SYNTAX HwhqosUserQueueClassifierStatisticsEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosUserQueueStatisticsEntry " 
+          INDEX  { hwhqosUserQueueClassifierStatisticsInterfaceIndex,
+                   hwhqosUserQueueClassifierStatisticsDirection,
+                   hwhqosUserQueueClassifierStatisticsClassifierName,
+                   hwhqosUserQueueClassifierStatisticsSlotNumber,
+                   hwhqosUserQueueClassifierStatisticsQueueIndex }    
+          ::= { hwhqosUserQueueClassifierStatisticsTable 1 }           
+
+	  HwhqosUserQueueClassifierStatisticsEntry ::=
+	    SEQUENCE {
+	            hwhqosUserQueueClassifierStatisticsInterfaceIndex                 
+	                InterfaceIndex,
+	            hwhqosUserQueueClassifierStatisticsDirection  
+	                INTEGER, 
+	            hwhqosUserQueueClassifierStatisticsClassifierName
+	                OCTET STRING,
+	            hwhqosUserQueueClassifierStatisticsSlotNumber 
+	                Integer32,               
+	            hwhqosUserQueueClassifierStatisticsQueueIndex  
+	                INTEGER,                    
+	            hwhqosUserQueueClassifierStatisticsReset 
+	                INTEGER, 	                
+	            hwhqosUserQueueClassifierStatisticsPassPackets 
+	                Counter64, 	                
+	            hwhqosUserQueueClassifierStatisticsPassBytes
+	                Counter64,             
+	            hwhqosUserQueueClassifierStatisticsDropPackets 
+	                Counter64, 
+	            hwhqosUserQueueClassifierStatisticsDropBytes    
+	                Counter64, 	                
+	            hwhqosUserQueueClassifierStatisticsPassPacketsRate
+	                Counter64,  	                
+	            hwhqosUserQueueClassifierStatisticsPassBytesRate 
+	                Counter64, 
+	            hwhqosUserQueueClassifierStatisticsDropPacketsRate 
+	                Counter64,
+	            hwhqosUserQueueClassifierStatisticsDropBytesRate 
+	                Counter64   
+      }
+
+      hwhqosUserQueueClassifierStatisticsInterfaceIndex  OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueClassifierStatisticsInterfaceIndex  "     
+            ::= { hwhqosUserQueueClassifierStatisticsEntry 1 }
+       
+       
+      
+      hwhqosUserQueueClassifierStatisticsDirection  OBJECT-TYPE
+            SYNTAX INTEGER
+              {
+				inbound(1),
+				outbound(2) 
+			  }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueClassifierStatisticsDirection  "
+            ::= { hwhqosUserQueueClassifierStatisticsEntry 2 }
+
+
+      hwhqosUserQueueClassifierStatisticsClassifierName OBJECT-TYPE
+	        SYNTAX OCTET STRING (SIZE(1..31))
+	        MAX-ACCESS read-only
+	        STATUS current
+	        DESCRIPTION
+	        " hwhqosUserQueueClassifierStatisticsClassifierName "     
+	        ::= { hwhqosUserQueueClassifierStatisticsEntry 3 }	
+
+
+      hwhqosUserQueueClassifierStatisticsSlotNumber OBJECT-TYPE
+            SYNTAX Integer32 (0..128)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueClassifierStatisticsSlotNumber "    
+            ::= { hwhqosUserQueueClassifierStatisticsEntry 4 }   
+             
+  
+      hwhqosUserQueueClassifierStatisticsQueueIndex  OBJECT-TYPE
+            SYNTAX INTEGER
+              {
+				be(1),
+				af1(2), 
+				af2(3),
+				af3(4),
+				af4(5),
+				ef(6),
+				cs6(7),
+				cs7(8),
+				total(9)
+			   }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueClassifierStatisticsQueueIndex  "
+            ::= { hwhqosUserQueueClassifierStatisticsEntry 5 }
+      
+                  
+        
+      hwhqosUserQueueClassifierStatisticsReset  OBJECT-TYPE
+            SYNTAX INTEGER 
+            {
+				reset(1)
+			}
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueClassifierStatisticsReset  "    
+            ::= { hwhqosUserQueueClassifierStatisticsEntry 6 }   
+       
+            
+    
+      hwhqosUserQueueClassifierStatisticsPassPackets OBJECT-TYPE
+            SYNTAX  Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueClassifierStatisticsPassPackets "    
+            ::= { hwhqosUserQueueClassifierStatisticsEntry 7 }   
+            
+            
+     
+      hwhqosUserQueueClassifierStatisticsPassBytes  OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueClassifierStatisticsPassBytes  "    
+            ::= { hwhqosUserQueueClassifierStatisticsEntry 8 }  
+                  
+        
+        
+       hwhqosUserQueueClassifierStatisticsDropPackets  OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueClassifierStatisticsDropPackets  "    
+            ::= { hwhqosUserQueueClassifierStatisticsEntry 9 }     
+            
+            
+            
+       hwhqosUserQueueClassifierStatisticsDropBytes  OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueClassifierStatisticsDropBytes  "    
+            ::= { hwhqosUserQueueClassifierStatisticsEntry 10 }  
+            
+            
+            
+       hwhqosUserQueueClassifierStatisticsPassPacketsRate  OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueClassifierStatisticsPassPacketsRate  "    
+            ::= { hwhqosUserQueueClassifierStatisticsEntry 11 }   
+            
+            
+            
+       hwhqosUserQueueClassifierStatisticsPassBytesRate   OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueClassifierStatisticsPassBytesRate   "    
+            ::= { hwhqosUserQueueClassifierStatisticsEntry 12 }             
+        
+        
+
+       hwhqosUserQueueClassifierStatisticsDropPacketsRate    OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueClassifierStatisticsDropPacketsRate    "    
+            ::= { hwhqosUserQueueClassifierStatisticsEntry 13 }    
+            
+            
+            
+       hwhqosUserQueueClassifierStatisticsDropBytesRate    OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserQueueClassifierStatisticsDropBytesRate    "    
+            ::= { hwhqosUserQueueClassifierStatisticsEntry 14 }
+     
+-- ******************************************************************
+--
+--   hwhqosUserGroupQueueStatisticsTable
+--
+-- ******************************************************************
+
+      hwhqosUserGroupQueueStatisticsTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwhqosUserGroupQueueStatisticsEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " hwhqosUserGroupQueueStatisticsTable "
+          ::= { hwhqosStat 33 }
+          
+
+      hwhqosUserGroupQueueStatisticsEntry OBJECT-TYPE
+          SYNTAX HwhqosUserGroupQueueStatisticsEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " hwhqosUserGroupQueueStatisticsEntry " 
+          INDEX  { hwhqosUserGroupQueueStatisticsGroupName,
+                   hwhqosUserGroupQueueStatisticsDirection,
+                   hwhqosUserGroupQueueStatisticsSlotNumber }    
+          ::= { hwhqosUserGroupQueueStatisticsTable 1 }           
+
+	  HwhqosUserGroupQueueStatisticsEntry ::=
+	    SEQUENCE {
+	            hwhqosUserGroupQueueStatisticsGroupName                 
+	                OCTET STRING, 	                 	                
+	            hwhqosUserGroupQueueStatisticsDirection  
+	                INTEGER,              	                	                  
+	            hwhqosUserGroupQueueStatisticsSlotNumber  
+	                Integer32, 	                	                  
+	            hwhqosUserGroupQueueStatisticsReset  
+	                INTEGER, 		                
+	            hwhqosUserGroupQueueStatisticsPassPackets 
+	                Counter64, 	                
+	            hwhqosUserGroupQueueStatisticsPassBytes
+	                Counter64,             
+	            hwhqosUserGroupQueueStatisticsDropPackets 
+	                Counter64, 
+	            hwhqosUserGroupQueueStatisticsDropBytes    
+	                Counter64 	                
+	            }
+
+      hwhqosUserGroupQueueStatisticsGroupName  OBJECT-TYPE
+            SYNTAX   OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserGroupQueueStatisticsGroupName  "     
+            ::= { hwhqosUserGroupQueueStatisticsEntry 1 }
+       
+       
+      
+      hwhqosUserGroupQueueStatisticsDirection  OBJECT-TYPE
+            SYNTAX INTEGER
+              {
+				inbound(1),
+				outbound(2)
+			  }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserGroupQueueStatisticsDirection  "
+            ::= { hwhqosUserGroupQueueStatisticsEntry 2 }
+ 
+                              
+
+      hwhqosUserGroupQueueStatisticsSlotNumber OBJECT-TYPE
+            SYNTAX Integer32 (0..128)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserGroupQueueStatisticsSlotNumber "    
+            ::= { hwhqosUserGroupQueueStatisticsEntry 3 }   
+            
+            
+        
+      hwhqosUserGroupQueueStatisticsReset  OBJECT-TYPE
+            SYNTAX INTEGER 
+            {
+				reset(1)
+			}
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserGroupQueueStatisticsReset  "    
+            ::= { hwhqosUserGroupQueueStatisticsEntry 4 }   
+       
+            
+    
+      hwhqosUserGroupQueueStatisticsPassPackets OBJECT-TYPE
+            SYNTAX  Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserGroupQueueStatisticsPassPackets "    
+            ::= { hwhqosUserGroupQueueStatisticsEntry 5 }   
+            
+            
+     
+      hwhqosUserGroupQueueStatisticsPassBytes  OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserGroupQueueStatisticsPassBytes  "    
+            ::= { hwhqosUserGroupQueueStatisticsEntry 6 }  
+                  
+        
+        
+       hwhqosUserGroupQueueStatisticsDropPackets  OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserGroupQueueStatisticsDropPackets  "    
+            ::= { hwhqosUserGroupQueueStatisticsEntry 7 }     
+            
+            
+            
+       hwhqosUserGroupQueueStatisticsDropBytes  OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " hwhqosUserGroupQueueStatisticsDropBytes  "    
+            ::= { hwhqosUserGroupQueueStatisticsEntry 8 }  
+            
+
+ 
+
+                 
+
+-- this module
+		hwhqosUserQueueStatCompliances MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"The compliance statment."
+			MODULE -- this module
+				MANDATORY-GROUPS { hwhqosUserQueueStatGroup, hwhqosUserQueueStatTrapGroup }
+			::= { hwhqosCompliances 1 }
+		
+		hwhqosGroups OBJECT IDENTIFIER ::= { hwhqosConformance 2 }
+		
+
+		hwhqosIfStatGroup OBJECT-GROUP
+			OBJECTS { hwhqosQueueForwardPackets, hwhqosQueueForwardBytes, hwhqosQueueDropPackets, hwhqosQueueDropBytes, hwhqosQueueRemarkPackets, 
+				hwhqosQueueRemarkBytes, hwhqosSetZero, hwhqosQueueForwardPacketRate, hwhqosQueueForwardByteRate, hwhqosQueueDropPacketRate, 
+				hwhqosQueueDropByteRate }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 1 }
+		
+
+		hqhqosAtmPvcStatGroup OBJECT-GROUP
+			OBJECTS { hwhqosAtmPvcQueueForwardPackets, hwhqosAtmPvcQueueForwardBytes, hwhqosAtmPvcQueueDropPackets, hwhqosAtmPvcQueueDropBytes, hwhqosAtmPvcQueueRemarkPackets, 
+				hwhqosAtmPvcQueueRemarkBytes }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 2 }
+		
+
+		hwhqosPortQueueGroup OBJECT-GROUP
+			OBJECTS { hwhqosPortQueueArithmetic, hwhqosPortQueueWeightValue, hwhqosPortQueueShaValue, hwhqosPortQueueShaPercent, hwhqosPortQueueWredName, 
+				hwhqosPortQueueRowStatus }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 3 }
+		
+
+		hwhqosWredGroup OBJECT-GROUP
+			OBJECTS { hwhqosWredGreenLowLimit, hwhqosWredGreenHighLimit, hwhqosWredGreenDiscardPercent, hwhqosWredYellowLowLimit, hwhqosWredYellowHighLimit, 
+				hwhqosWredYellowDiscardPercent, hwhqosWredRedLowLimit, hwhqosWredRedHighLimit, hwhqosWredRedDiscardPercent, hwhqosWredRowStatus
+				 }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 4 }
+		
+		hwhqosIfQueueStatGroup OBJECT-GROUP
+			OBJECTS { hwhqosIfQueueStatForwardPackets, hwhqosIfQueueStatForwardBytes, hwhqosIfQueueStatDropBytes, hwhqosIfQueueStatDropPackets }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 5 }
+		
+
+		hwhqosUserQueueStatGroup OBJECT-GROUP
+			OBJECTS { hwhqosUserQueueStatForwardPackets, hwhqosUserQueueStatForwardBytes, hwhqosUserQueueStatDropPackets, hwhqosUserQueueStatDropBytes, hwhqosUserQueueStatReset, 
+				hwhqosUserQueueStatLastResetTime, hwhqosUserQueueStatPerDropPackets }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 6 }
+		
+
+		hwhqosUserGroupQueueStatGroup OBJECT-GROUP
+			OBJECTS { hwhqosUserGroupQueueStatReset, hwhqosUserGroupQueueDropBytes, hwhqosUserGroupQueueDropPackets, hwhqosUserGroupQueueForwardBytes, hwhqosUserGroupQueueForwardPackets, 
+				hwhqosUserGroupQueueStatLastResetTime }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 7 }
+		
+		hwhqosObjectsGroup OBJECT-GROUP
+			OBJECTS { hwhqosUserFrameId, hwhqosUserSlotId, hwhqosUserPortId }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 8 }
+		
+		hwhqosUserQueueStatTrapGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwhqosUserQueueStatDiscardAlarmTrap }
+			STATUS current
+			DESCRIPTION 
+				"The notification group defined for discard packets of a user`s queue."
+			::= { hwhqosGroups 9 }          
+			
+		hwhqosVpnQoSTunnelStatGroup OBJECT-GROUP
+			OBJECTS { hwVPNHQoSTunnelIfIndex,hwVPNHQoSVPNType, hwVPNHQoSVPNValue, hwVPNHQoSPassBytes,
+			hwVPNHQoSPassPackets,hwVPNHQoSDropPackets,hwVPNHQoSDropBytes }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 10 }
+			
+	       hwhqosTunnelStatGroup OBJECT-GROUP
+			OBJECTS { hwhqosTunnelIfIndex, hwhqosTunnelCosType, hwhqosTunnelVPNType, hwhqosTunnelVPNName, hwhqosTunnelPassBytes,
+			hwhqosTunnelPassPackets, hwhqosTunnelDropBytes, hwhqosTunnelDropPackets, hwhqosTunnelPassedByteRate, hwhqosTunnelPassPacketRate}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 11 }
+			
+           hwhqosProfileGroup OBJECT-GROUP
+			OBJECTS { hwhqosProfileName,hwhqosProfileDescription, hwhqosProfileRowStatus }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 12 }		 
+		   	   
+	    hwhqosProfileSuppressionGroup OBJECT-GROUP
+			OBJECTS { hwhqosSuppressionDirection, hwhqosSuppressionType,
+			hwhqosSuppressionCirValue, hwhqosSuppressionCbsValue, hwhqosSuppressionRowStatus }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 13 }			   
+			     
+		hwhqosProfileCarGroup OBJECT-GROUP
+			OBJECTS { hwhqosProfileCarDirection, hwhqosProfileCarCirValue, hwhqosProfileCarPirValue,
+			hwhqosProfileCarCbsValue, hwhqosProfileCarPbsValue, hwhqosProfileCarGreenAction, 
+			hwhqosProfileCarYellowAction, hwhqosProfileCarRedAction, hwhqosProfileCarRowStatus }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 14 }           
+			     
+		hwhqosProfileUserQueueGroup OBJECT-GROUP
+			OBJECTS { hwhqosProfileUserQueueDirection, hwhqosProfileUserQueueCirValue, hwhqosProfileUserQueuePirValue,
+			hwhqosProfileUserQueueFlowQueueName, hwhqosProfileUserQueueMappingName, hwhqosProfileUserQueueGroupName, 
+			hwhqosProfileUserQueueServiceTemplateName, hwhqosProfileUserQueueRowStatus }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 15 }
+		                              
+		hwhqosProfileUserApplyGroup OBJECT-GROUP
+			OBJECTS { hwhqosProfileInterfaceIndex, hwhqosProfileApplyDirection, hwhqosProfileApplyPevid,
+			hwhqosProfileApplyCevid, hwhqosProfileApplyName, hwhqosProfileApplyIdentifier, 
+			hwhqosGroupName, hwhqosProfileApplyRowStatus }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 16 }		
+	
+	
+	    hwhqosFlowMappingGroup OBJECT-GROUP
+			OBJECTS { hwhqosFlowMappingName,hwhqosFlowMappingRowStatus}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 17 }
+
+		hwhqosFlowMappingCfgGroup OBJECT-GROUP
+			OBJECTS { hwhqosFolwMappingCfgQueueCosValue,hwhqosFlowMappingCfgPortQueueCosValue,hwhqosFlowMappingCfgRowStatus}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 18 }
+			
+	 	hwhqosFlowQueueGroup OBJECT-GROUP
+			OBJECTS { hwhqosFlowQueueName,hwhqosFlowQueueRowStatus}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 19 }
+   		
+        hwhqosFlowQueueCfgGroup OBJECT-GROUP
+			OBJECTS { hwhqosFlowQueueCfgCosValue,hwhqosFlowQueueCfgType,hwhqosFlowQueueCfgWeightValue,
+			hwhqosFlowQueueCfgShapingValue,hwhqosFlowQueueCfgShapingPercentageValue,hwhqosFlowQueueCfgWredName,
+			hwhqosFlowQueueCfgRowStatus}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 20 } 
+			
+	    hwhqosFlowWredGroup OBJECT-GROUP
+			OBJECTS { hwhqosFlowWredName,hwhqosFlowWredRowStatus}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 21 } 		
+			
+	    hwhqosFlowWredColorGroup OBJECT-GROUP
+			OBJECTS { hwhqosFlowWredColor,hwhqosFlowWredColorLowlimitPercentage,hwhqosFlowWredColorHighlimitPercentage,
+			hwhqosFlowWredColorDiscardPercentage,hwhqosFlowWredColorRowStatus}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 22 }   
+			
+	   hwhqosUserGroupQueueGroup OBJECT-GROUP
+			OBJECTS { hwhqosUserGroupQueueName,hwhqosUserGroupQueueSlotNumber,hwhqosUserGroupQueueRowStatus}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 23 }  
+			
+	   hwhqosUserGroupQueueShapingGroup OBJECT-GROUP
+			OBJECTS { hwhqosUserGroupQueueShapingDirection,hwhqosUserGroupQueueShapingValue,hwhqosUserGroupQueueShapingRowStatus}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 24 } 
+			
+	   hwhqosUserQueueGroup OBJECT-GROUP
+			OBJECTS { hwhqosUserQueueInterfaceIndex,hwhqosUserQueueDirection,hwhqosUserQueueCirValue,
+			hwhqosUserQueuePirValue,hwhqosUserQueueFlowQueueName,hwhqosUserQueueFlowMappingName,
+			hwhqosUserQueueGroupName,hwhqosUserQueueServiceTemplateName,hwhqosUserQueueRowStatus
+			}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 25 }
+			
+	   hwhqosBehaviorUserQueueGroup OBJECT-GROUP
+			OBJECTS {hwhqosBehaviorName,hwhqosBehaviorCirValue,hwhqosBehaviorPirValue,hwhqosBehaviorFlowQueueName,
+			hwhqosBehaviorFlowMappingName,hwhqosBehaviorGroupName,hwhqosBehaviorServiceTemplateName,
+			hwhqosBehaviorUserQueueRowStatus
+			}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 26 }
+			
+	   hwhqosBandwidthGroup OBJECT-GROUP
+			OBJECTS {hwhqosBandwidthInterfaceIndex,hwhqosBandwidthValue,hwhqosBandwidthRowStatus}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 27 }
+			
+	   		
+	   hwhqosServiceTemplateGroup OBJECT-GROUP
+			OBJECTS {hwhqosServiceTemplateName,hwhqosSlotNumber,hwhqosServiceTemplateRowStatus}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 28 }  
+			
+			
+	   hwhqosNetworkHeaderLengthGroup OBJECT-GROUP
+			OBJECTS {hwhqosNetworkHeaderLengthDirection,hwhqosNetWorkHeaderLengthValue,hwhqosNetWorkHeaderLengthRowStatus}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 29 }
+			
+	   		
+	   hwhqosServiceTemplateApplyGroup OBJECT-GROUP
+			OBJECTS {hwhqosServiceTemplateApplyInterfaceIndex,hwhqosApplyServiceTemplateName,hwhqosServiceTemplateApplyRowStatus}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 30 }
+	
+	   hwhqosProfileUserQueueStatisticsGroup OBJECT-GROUP
+			OBJECTS {hwhqosProfileUserQueueStatisticsInterfaceIndex,hwhqosProfileUserQueueStatisticsDirection,
+			hwhqosProfileUserQueueStatisticsPevid,hwhqosProfileUserQueueStatisticsCevid,hwhqosProfileUserQueueStatisticsSlotNumber,
+			hwhqosProfileUserQueueStatisticsQueueIndex,hwhqosProfileUserQueueStatisticsReset,hwhqosProfileUserQueueStatisticsPassPackets,
+			hwhqosProfileUserQueueStatisticsPassBytes,hwhqosProfileUserQueueStatisticsDropPackets,hwhqosProfileUserQueueStatisticsDropBytes,
+			hwhqosProfileUserQueueStatisticsPassPacketsRate,hwhqosProfileUserQueueStatisticsPassBytesRate,
+			hwhqosProfileUserQueueStatisticsDropPacketsRate, hwhqosProfileUserQueueStatisticsDropBytesRate
+			}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 31 }
+			
+	   hwhqosProfileCarStatisticsGroup OBJECT-GROUP
+			OBJECTS {hwhqosProfileCarStatisticsInterfaceIndex,hwhqosProfileCarStatisticsDirection,
+			hwhqosProfileCarStatisticsPevid,hwhqosProfileCarStatisticsCevid,hwhqosProfileCarStatisticsType,
+			hwhqosProfileCarStatisticsSlotNumber,hwhqosProfileCarStatisticsReset,hwhqosProfileCarStatisticsPassPackets,
+			hwhqosProfileCarStatisticsPassBytes,hwhqosProfileCarStatisticsDropPackets,hwhqosProfileCarStatisticsDropBytes,
+			hwhqosProfileCarStatisticsPassPacketsRate,hwhqosProfileCarStatisticsPassBytesRate,
+			hwhqosProfileCarStatisticsDropPacketsRate,hwhqosProfileCarStatisticsDropBytesRate
+			}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 32 }
+  		
+	 	hwhqosUserQueueStatisticsGroup OBJECT-GROUP
+			OBJECTS {hwhqosUserQueueStatisticsInterfaceIndex,hwhqosUserQueueStatisticsDirection,
+            hwhqosUserQueueStatisticsSlotNumber,hwhqosUserQueueStatisticsQueueIndex,
+			hwhqosUserQueueStatisticsReset,hwhqosUserQueueStatisticsPassPackets,
+			hwhqosUserQueueStatisticsPassBytes,hwhqosUserQueueStatisticsDropPackets,
+			hwhqosUserQueueStatisticsDropBytes,hwhqosUserQueueStatisticsPassPacketsRate,
+			hwhqosUserQueueStatisticsPassBytesRate,hwhqosUserQueueStatisticsDropPacketsRate,
+			hwhqosUserQueueStatisticsDropBytesRate
+			}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 33 }         
+			
+	 	hwhqosUserQueueClassifierStatisticsGroup OBJECT-GROUP
+			OBJECTS {hwhqosUserQueueClassifierStatisticsInterfaceIndex,
+			hwhqosUserQueueClassifierStatisticsDirection,hwhqosUserQueueClassifierStatisticsClassifierName,
+			hwhqosUserQueueClassifierStatisticsSlotNumber,hwhqosUserQueueClassifierStatisticsQueueIndex,
+			hwhqosUserQueueClassifierStatisticsReset,hwhqosUserQueueClassifierStatisticsPassPackets,
+			hwhqosUserQueueClassifierStatisticsPassBytes,hwhqosUserQueueClassifierStatisticsDropPackets,
+			hwhqosUserQueueClassifierStatisticsDropBytes,hwhqosUserQueueClassifierStatisticsPassPacketsRate,
+			hwhqosUserQueueClassifierStatisticsPassBytesRate,hwhqosUserQueueClassifierStatisticsDropPacketsRate,
+			hwhqosUserQueueClassifierStatisticsDropBytesRate
+			}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 34 }
+					
+	   hwhqosUserGroupQueueStatisticsGroup OBJECT-GROUP
+			OBJECTS {hwhqosUserGroupQueueStatisticsGroupName,hwhqosUserGroupQueueStatisticsDirection,
+			hwhqosUserGroupQueueStatisticsSlotNumber,hwhqosUserGroupQueueStatisticsReset,
+			hwhqosUserGroupQueueStatisticsPassPackets,hwhqosUserGroupQueueStatisticsPassBytes,
+			hwhqosUserGroupQueueStatisticsDropPackets,hwhqosUserGroupQueueStatisticsDropBytes		
+			}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwhqosGroups 35 }
+		 		
+			
+		
+	
+	END
+
+--
+-- HUAWEI-HQOS-MIB.mib
+--

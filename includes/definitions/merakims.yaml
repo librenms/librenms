@@ -1,0 +1,10 @@
+os: merakims
+text: 'Meraki Switch'
+type: network
+icon: meraki
+ifname: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysDescr_regex:
+        - '/^Meraki MS/'

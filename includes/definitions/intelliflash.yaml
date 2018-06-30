@@ -1,0 +1,11 @@
+os: intelliflash
+text: 'Tegile IntelliFlash'
+type: storage
+icon: tegile
+over:
+    - { graph: device_storage, text: 'Storage Usage' }
+mib_dir:
+    - tegile
+discovery:
+    - sysObjectID:
+      - .1.3.6.1.4.1.43906.1

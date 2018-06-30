@@ -1,0 +1,208 @@
+--
+-- Accedian Enterprise Specific MIB
+--
+-- Copyright (c) 2005-2011, Accedian Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+ACD-TID-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+    acdMibs
+        FROM ACCEDIAN-SMI;
+
+acdTid MODULE-IDENTITY
+
+    LAST-UPDATED "201111110100Z"
+    ORGANIZATION "Accedian Networks, Inc."
+    CONTACT-INFO
+            "Accedian Technical Assistance Center
+             Accedian Networks, Inc.
+             2351 Boul. Alfred-Nobel, Suite N-410
+             Montreal, Quebec Canada H4S 2A9
+             E-mail: support@accedian.com"
+    DESCRIPTION
+            "The Transaction ID database for this Accedian Networks device."
+
+    REVISION "201111110100Z"        -- 11 November 2011
+    DESCRIPTION
+            "Initial version of MIB module ACD-TID-MIB."
+
+    ::= { acdMibs 14 }
+
+acdTidNotifications     OBJECT IDENTIFIER ::= { acdTid 0 }
+acdTidMIBObjects        OBJECT IDENTIFIER ::= { acdTid 1 }
+acdTidConformance       OBJECT IDENTIFIER ::= { acdTid 2 }
+
+acdTidGeneral           OBJECT IDENTIFIER ::= { acdTidMIBObjects 1 }
+acdTidInfo              OBJECT IDENTIFIER ::= { acdTidMIBObjects 2 }
+
+---------------------------------------------------------------------------
+-- Textual conventions
+---------------------------------------------------------------------------
+
+AcdTidType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicate if the object is covers by the acdTidCfgLastChangeTid or
+        or by the acdTidStatusLastChangeTid transaction identifier."
+    SYNTAX      INTEGER {
+                    configuration(1),
+                    status(2)
+    }
+
+---------------------------------------------------------------------------
+ -- Transaction Identifier General onfiguration
+ -- 
+---------------------------------------------------------------------------
+
+acdTidCfgLastChangeTid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the transaction ID of the last change of a configuration
+        object.  If this value is different since the last read this is 
+        indicate a change."
+    ::= { acdTidGeneral 1 }
+
+acdTidStatusLastChangeTid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the transaction ID of the last change of a status object.
+        If this value is different since the last read this is indicate 
+        a change."
+    ::= { acdTidGeneral 2 }
+
+---------------------------------------------------------------------------
+ -- Table of all object covers by Transaction Identifier feature.
+ ---------------------------------------------------------------------------
+
+acdTidInfoTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AcdTidInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Table of all object covers by Transaction Identifier feature."
+    ::= { acdTidInfo 1 }
+
+acdTidInfoEntry OBJECT-TYPE
+    SYNTAX     AcdTidInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry contains information applicble to a specific object."
+    INDEX      { acdTidInfoIndex }
+    ::= { acdTidInfoTable 1 }
+
+AcdTidInfoEntry ::= SEQUENCE {
+    acdTidInfoIndex             Unsigned32,
+    acdTidInfoOID               OBJECT IDENTIFIER,
+    acdTidInfoType              AcdTidType,
+    acdTidInfoDescr             DisplayString,
+    acdTidInfoLastChangeTid     Unsigned32
+}
+
+acdTidInfoIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique value, greater than zero, for each entry."
+    ::= { acdTidInfoEntry 1 }
+
+acdTidInfoOID OBJECT-TYPE
+    SYNTAX     OBJECT IDENTIFIER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object identifies the OID covers by this transaction
+             Identifier."
+    ::= { acdTidInfoEntry 2 }
+
+acdTidInfoType OBJECT-TYPE
+    SYNTAX     AcdTidType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "Indicate if the object is covers by the acdTidCfgLastChangeTid or
+        or by the acdTidStatusLastChangeTid transaction identifier."
+    ::= { acdTidInfoEntry 3 }
+
+acdTidInfoDescr OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "A textual description of the object point by acdTidInfoOID."
+    ::= { acdTidInfoEntry 4 }
+
+acdTidInfoLastChangeTid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the transaction ID of the last change of a the object
+        point by acdTidInfoOID. If this value is different since the 
+        last read this is indicate a change."
+    ::= { acdTidInfoEntry 5 }
+
+---------------------------------------------------------------------------
+ -- ACD-TID-MIB Module - Conformance Information
+---------------------------------------------------------------------------
+
+acdTidCompliances   OBJECT IDENTIFIER ::= { acdTidConformance 1 }
+acdTidGroups        OBJECT IDENTIFIER ::= { acdTidConformance 2 }
+
+---------------------------------------------------------------------------
+ -- Units of conformance
+---------------------------------------------------------------------------
+
+acdTidGeneralGroup OBJECT-GROUP
+    OBJECTS {
+        acdTidCfgLastChangeTid,
+        acdTidStatusLastChangeTid
+    }
+    STATUS      current
+    DESCRIPTION
+       "List of scalars to monitior changes in supported object."
+    ::= { acdTidGroups 1 }
+
+acdTidTableGroup OBJECT-GROUP
+    OBJECTS {
+        acdTidInfoOID,
+        acdTidInfoType,
+        acdTidInfoDescr,
+        acdTidInfoLastChangeTid
+    }
+    STATUS      current
+    DESCRIPTION
+       "Group for the acdTidTable."
+    ::= { acdTidGroups 2 }
+
+acdTidCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+       "The compliance statement for support of the ACD-TID-MIB module."
+    MODULE
+        MANDATORY-GROUPS {
+            acdTidGeneralGroup,
+            acdTidTableGroup
+         }
+
+    ::= { acdTidCompliances 1 }
+
+END

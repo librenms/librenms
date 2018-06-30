@@ -20,7 +20,7 @@ IMPORTS
         FROM JUNIPER-SMI;
 
 jnxJdhcpMIB  MODULE-IDENTITY
-    LAST-UPDATED "201107090000Z" --  July 9, 2011
+    LAST-UPDATED "201503030000Z" --  March 3, 2015
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
             "        Juniper Technical Assistance Center
@@ -32,6 +32,8 @@ jnxJdhcpMIB  MODULE-IDENTITY
         "The JUNOS DHCP MIB for the Juniper Networks enterprise."
 
     -- revision history
+    REVISION      "201503030000Z"
+    DESCRIPTION   "Add statistics for leasequery and bulk leasequery messages" 
     REVISION      "201107090000Z"
     DESCRIPTION   "Add scalar for pkts dropped due to recovery in progress"
     REVISION      "201103150000Z"
@@ -284,6 +286,53 @@ jnxJdhcpLocalServerSwitchDropped OBJECT-TYPE
         "The number of packets dropped due to switchover recovery in progress."
     ::= { jnxJdhcpLocalServerStatistics 28}
 
+jnxJdhcpLocalServerLeaseQueryReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Lease Query Request received."
+    ::= { jnxJdhcpLocalServerStatistics 29}
+
+jnxJdhcpLocalServerBulkLeaseQueryReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Bulk Lease Query Request Received."
+    ::= { jnxJdhcpLocalServerStatistics 30}
+
+jnxJdhcpLocalServerLeaseActiveSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Lease Active Sent."
+    ::= { jnxJdhcpLocalServerStatistics 31}
+
+jnxJdhcpLocalServerLeaseUnknownSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Lease Unknown Sent."
+    ::= { jnxJdhcpLocalServerStatistics 32}
+
+jnxJdhcpLocalServerLeaseUnAssignedSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Lease UnAssigned Sent."
+    ::= { jnxJdhcpLocalServerStatistics 33}
+
+jnxJdhcpLocalServerLeaseQueryDoneSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCP Lease Query Done Sent."
+    ::= { jnxJdhcpLocalServerStatistics 34}
 
 -- DHCP Local Server Bindings Table
 
@@ -1011,6 +1060,54 @@ jnxJdhcpRelaySwitchDropped OBJECT-TYPE
     DESCRIPTION
         "The number of packets dropped due to switchover recovery in progress."
     ::= { jnxJdhcpRelayStatistics 30}
+
+jnxJdhcpRelayLeaseQuerySent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of Lease Query Request sent."
+    ::= { jnxJdhcpRelayStatistics 31}
+
+jnxJdhcpRelayBulkLeaseQuerySent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of Bulk Lease Query Request sent."
+    ::= { jnxJdhcpRelayStatistics 32}    
+
+jnxJdhcpRelayLeaseActiveReceived OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "The number of Lease Active received."
+     ::= { jnxJdhcpRelayStatistics 33}
+
+jnxJdhcpRelayLeaseUnknownReceived OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "The number of Lease Unknown received."
+     ::= { jnxJdhcpRelayStatistics 34}
+
+jnxJdhcpRelayLeaseUnAssignedReceived OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "The number of Lease Un Assigned received."
+     ::= { jnxJdhcpRelayStatistics 35}
+
+jnxJdhcpRelayLeaseQueryDoneReceived OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "The number of Lease Query Done received."
+     ::= { jnxJdhcpRelayStatistics 36}
 
 -- DHCP Relay Bindings Table
 

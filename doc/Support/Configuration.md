@@ -20,49 +20,76 @@ $config['log_dir'] = "/opt/librenms/logs";
 ```
 Log files created by LibreNMS will be stored within this directory.
 
-#### Database config
+### Database config
 
 These are the configuration options you will need to use to specify to get started.
 
 ```php
 $config['db_host'] = '127.0.0.1';
+$config['db_port'] = 3306;
 $config['db_user'] = '';
 $config['db_pass'] = '';
 $config['db_name'] = '';
 ```
 
-You can also select between the mysql and mysqli php extensions:
-
+If you use a unix socket, you can specify it with these options:
 ```php
-$config['db']['extension'] = 'mysqli';
+$config['db_host']   = NULL;
+$config['db_port']   = NULL;
+$config['db_socket'] = '/run/mysqld/mysqld.sock';
 ```
 
-#### Programs
+### Core
+
+#### PHP Settings
+
+You can change the memory limits for php within `config.php`. The value is in Megabytes and should just be an int value:
+
+`$config['php_memory_limit'] = 128;`
+
+### Programs
 
 A lot of these are self explanatory so no further information may be provided. Any extensions that have dedicated 
 documentation page will be linked to rather than having the config provided.
+
+#### RRDTool
+
+> You can configure these options within the WebUI now, please avoid setting these options within config.php
+
+> Settings -> External Settings -> RRDTool Setup
 
 ```php
 $config['rrdtool'] = "/usr/bin/rrdtool";
 ```
 
+Please see [1 Minute polling](1-Minute-Polling.md) for information on configuring your install to record data more frequently.
+
+#### fping
 ```php
 $config['fping']            = "/usr/bin/fping";
 $config['fping6']           = "fping6";
-$config['fping_options']['retries'] = 3;
 $config['fping_options']['timeout'] = 500;
 $config['fping_options']['count'] = 3;
-$config['fping_options']['millisec'] = 200;
+$config['fping_options']['interval'] = 500;
 ```
 `fping` configuration options:
 
-* `retries` (`fping` parameter `-r`): Number of times an attempt at pinging a target will be made, not including the first try.
-* `timeout` (`fping` parameter `-t`): Amount of time that fping waits for a response to its first request (in milliseconds).
+* `timeout` (`fping` parameter `-t`): Amount of time that fping waits for a response to its first request (in milliseconds). **See note below**
 * `count` (`fping` parameter `-c`): Number of request packets to send to each target.
-* `millisec` (`fping` parameter `-p`): Time in milliseconds that fping waits between successive packets to an individual target.
+* `interval` (`fping` parameter `-p`): Time in milliseconds that fping waits between successive packets to an individual target.
+
+> NOTE: Setting a higher timeout value than the interval value can lead to slowing down poller. Example:
+>
+> timeout: 3000
+>
+> count: 3
+>
+> interval: 500
+>
+> In this example, interval will be overwritten by the timeout value of 3000 which is 3 seconds. As we send three icmp packets (count: 3), each one is delayed by 3 seconds which will result in fping taking > 6 seconds to return results.
 
 You can disable the fping / icmp check that is done for a device to be determined to be up on a global or per device basis.
-**We don't advice disabling the fping / icmp check unless you know the impact, at worst if you have a large number of devices down
+**We don't advise disabling the fping / icmp check unless you know the impact, at worst if you have a large number of devices down
 then it's possible that the poller would no longer complete in 5 minutes due to waiting for snmp to timeout.**
 
 Globally disable fping / icmp check:
@@ -71,6 +98,8 @@ $config['icmp_check'] = false;
 ```
 
 If you would like to do this on a per device basis then you can do so under Device -> Edit -> Misc -> Disable ICMP Test? On
+
+#### SNMP
 
 ```php
 $config['snmpwalk']         = "/usr/bin/snmpwalk";
@@ -93,15 +122,28 @@ $config['neato']            = "/usr/bin/neato";
 $config['sfdp']             = "/usr/bin/sfdp";
 ```
 
-#### Memcached
+### Proxy support
 
-[Memcached](Extensions/Memcached.md]
+For alerting and the callback functionality, we support the use of a http proxy setting. 
+These can be any one of the following:
 
-#### RRDCached
+```php
+$config['callback_proxy'] = 'proxy.domain.com';
+$config['http_proxy']     = 'proxy.domain.com';
+```
 
-[RRDCached](Extensions/RRDCached.md]
+We can also make use of one of these environment variables which can be set in `/etc/environment`:
 
-#### WebUI Settings
+```bash
+http_proxy=proxy.domain.com
+https_proxy=proxy.domain.com
+```
+
+### RRDCached
+
+[RRDCached](../Extensions/RRDCached.md)
+
+### WebUI Settings
 
 ```php
 $config['base_url'] = "http://demo.librenms.org";
@@ -114,9 +156,16 @@ $config['site_style']       = "light";
 Currently we have a number of styles which can be set which will alter the navigation bar look. dark, light and mono with light being the default.
 
 ```php
-$config['stylesheet']       = "css/styles.css";
+$config['webui']['custom_css'][]       = "css/custom/styles.css";
 ```
-You can override a large number of visual elements by creating your own css stylesheet and referencing it here.
+You can override a large number of visual elements by creating your own css stylesheet and referencing it here, place any custom css files into 
+`html/css/custom` so they will be ignored by auto updates. You can specify as many css files as you like, the order they are within your config 
+will be the order they are loaded in the browser.
+
+```php
+$config['title_image'] = "images/custom/yourlogo.png";
+```
+You can override the default logo with yours, place any custom images files into `html/images/custom` so they will be ignored by auto updates.
 
 ```php
 $config['page_refresh']     = "300";
@@ -173,6 +222,44 @@ $config['int_l2tp']                = 0;  # Enable L2TP Port Types
 ```
 Enable / disable certain menus from being shown in the WebUI.
 
+You are able to adjust the number and time frames of the quick select time options for graphs and the mini graphs shown per row.
+
+Quick select:
+```php
+$config['graphs']['mini']['normal'] = array(
+    'day' => '24 Hours',
+    'week' => 'One Week',
+    'month' => 'One Month',
+    'year' => 'One Year',
+);
+$config['graphs']['mini']['widescreen'] = array(
+    'sixhour' => '6 Hours',
+    'day' => '24 Hours',
+    'twoday' => '48 Hours',
+    'week' => 'One Week',
+    'twoweek' => 'Two Weeks',
+    'month' => 'One Month',
+    'twomonth' => 'Two Months',
+    'year' => 'One Year',
+    'twoyear' => 'Two Years',
+);
+```
+
+Mini graphs:
+```php
+$config['graphs']['row']['normal'] = array(
+    'sixhour' => '6 Hours',
+    'day' => '24 Hours',
+    'twoday' => '48 Hours',
+    'week' => 'One Week',
+    'twoweek' => 'Two Weeks',
+    'month' => 'One Month',
+    'twomonth' => 'Two Months',
+    'year' => 'One Year',
+    'twoyear' => 'Two Years',
+);
+```
+
 ```php
 $config['web_mouseover']      = true;
 ```
@@ -197,6 +284,10 @@ Enable or disable the sysDescr output for a device.
 $config['force_ip_to_sysname'] = false;
 ```
 When using IP addresses as a hostname you can instead represent the devices on the WebUI by its SNMP sysName resulting in an easier to read overview of your network. This would apply on networks where you don't have DNS records for most of your devices.
+```php
+$config['force_hostname_to_sysname'] = false;
+```
+When using a dynamic DNS hostname or one that does not resolve, this option would allow you to make use of the SNMP sysName instead as the preferred reference to the device.
 
 ```php
 $config['device_traffic_iftype'][] = '/loopback/';
@@ -218,7 +309,24 @@ You can enable the old style network map (only available for individual devices 
 $config['gui']['network-map']['style'] = 'old';
 ```
 
-#### Add host settings
+```php
+$config['percentile_value'] = X;
+```
+Show the `X`th percentile in the graph instead of the default 95th percentile.
+
+```php
+$config['shorthost_target_length'] = X;
+```
+The target maximum hostname length when applying the shorthost() function.
+You can increase this if you want to try and fit more of the hostname in graph titles.
+The default value is 12
+However, this can possibly break graph generation if this is very long.
+
+### Stacked Graphs
+You can enable stacked graphs instead of the default inverted graphs. 
+Enabling them is possible via webui Global Settings -> Webui Settings -> Graph settings -> Use stacked graphs
+
+### Add host settings
 The following setting controls how hosts are added.  If a host is added as an ip address it is checked to ensure the ip is not already present.  If the ip is present the host is not added.
 If host is added by hostname this check is not performed.  If the setting is true hostnames are resolved and the check is also performed.  This helps prevents accidental duplicate hosts.
 ```php
@@ -232,13 +340,21 @@ By default we allow hosts to be added with duplicate sysName's, you can disable 
 $config['allow_duplicate_sysName'] = false;
 ```
 
-#### SNMP Settings
+### Global poller and discovery modules
+Generally, it is a better to set these [per OS](../Developing/os/Settings.md#poller-and-discovery-modules) or device.
+
+```php
+$config['discovery_modules]['arp-table'] = true;
+$config['poller_modules']['bgp-peers'] = false;
+```
+
+### SNMP Settings
 
 ```php
 $config['snmp']['timeout'] = 1;            # timeout in seconds
 $config['snmp']['retries'] = 5;            # how many times to retry the query
 $config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');
-$config['snmp']['version'] = "v2c";         # Default version to use
+$config['snmp']['version'] = ['v2c', 'v3', 'v1'];         # Default versions to use
 $config['snmp']['port'] = 161;
 ```
 Default SNMP options including retry and timeout settings and also default version and port.
@@ -258,11 +374,11 @@ $config['snmp']['v3'][0]['cryptoalgo'] = "AES";          # AES | DES
 ```
 The default v3 snmp details to use, you can expand this array with `[1]`, `[2]`, `[3]`, etc.
 
-#### Auto discovery settings
+### Auto discovery settings
 
-[Auto-Discovery](Extensions/Auto-Discovery.md)
+[Auto-Discovery](../Extensions/Auto-Discovery.md)
 
-#### Email configuration
+### Email configuration
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
@@ -282,15 +398,15 @@ $config['email_smtp_password']        = NULL;
 What type of mail transport to use for delivering emails. Valid options for `email_backend` are mail, sendmail or smtp.
 The varying options after that are to support the different transports.
 
-#### Alerting
+### Alerting
 
-[Alerting](Extensions/Alerting.md)
+[Alerting](../Alerting/Rules.md)
 
-#### Billing
+### Billing
 
-[Billing](Extensions/Billing-Module.md)
+[Billing](../Extensions/Billing-Module.md)
 
-#### Global module support
+### Global module support
 
 ```php
 $config['enable_bgp']                   = 1; # Enable BGP session collection and display
@@ -301,9 +417,9 @@ $config['enable_vrfs']                  = 1; # Enable VRFs
 $config['enable_sla']                   = 0; # Enable Cisco SLA collection and display
 ```
 
-#### Port extensions
+### Port extensions
 
-[Port-Description-Parser](Extensions/Port-Description-Parser.md)
+[Port-Description-Parser](../Extensions/Port-Description-Parser.md)
 
 ```php
 $config['enable_ports_etherlike']       = 0;
@@ -315,6 +431,8 @@ Enable / disable additional port statistics.
 
 ### External integration
 
+#### Rancid
+
 ```php
 $config['rancid_configs'][]             = '/var/lib/rancid/network/configs/';
 $config['rancid_ignorecomments']        = 0;
@@ -324,7 +442,7 @@ Setting `rancid_ignorecomments` will disable showing lines that start with #
 
 #### Oxidized
 
-[Oxidized](Extensions/Oxidized.md)
+[Oxidized](../Extensions/Oxidized.md)
 
 #### CollectD
 ```php
@@ -339,13 +457,13 @@ Specify the location of the collectd unix socket. Using a socket allows the coll
 
 #### Smokeping
 
-[Smokeping](Extensions/Smokeping.md)
+[Smokeping](../Extensions/Smokeping.md)
 
 #### NFSen
 
-[NFSen](Extensions/NFSen.md)
+[NFSen](../Extensions/NFSen.md)
 
-#### Location mapping
+### Location mapping
 
 Exact Matching:
 ```php
@@ -355,23 +473,49 @@ Regex Matching:
 ```php
 $config['location_map_regex']['/Sink/'] = "Under The Sink, The Office, London, UK";
 ```
+Regex Match Substitution:
+```php
+$config['location_map_regex_sub']['/Sink/'] = "Under The Sink, The Office, London, UK [lat, long]";
+```
+If you have an SNMP SysLocation of "Rack10,Rm-314,Sink", Regex Match Substition yields "Rack10,Rm-314,Under The Sink, The Office, London, UK [lat, long]". This allows you to keep the SysLocation string short and keeps Rack/Room/Building information intact after the substitution.
+
 The above are examples, these will rewrite device snmp locations so you don't need to configure full location within snmp.
 
-#### Interfaces to be ignored
+### Interfaces to be ignored
+
+Examples:
 
 ```php
 $config['bad_if'][] = "voip-null";
 $config['bad_iftype'][] = "voiceEncap";
+$config['bad_if_regexp'][] = '/^lo[0-9].*/';    // loopback
 ```
 Numerous defaults exist for this array already (see includes/defaults.inc.php for the full list). You can expand this list
 by continuing the array.
+
 `bad_if` is matched against the ifDescr value.
+
 `bad_iftype` is matched against the ifType value.
+
 `bad_if_regexp` is matched against the ifDescr value as a regular expression.
+
 `bad_ifname_regexp` is matched against the ifName value as a regular expression.
+
 `bad_ifalias_regexp` is matched against the ifAlias value as a regular expression.
 
-#### Interfaces to be rewritten
+### Interfaces that shouldn't be ignored
+
+Examples:
+
+```php
+$config['good_if'][] = 'FastEthernet';
+$config['os']['ios']['good_if'][] = 'FastEthernet';
+```
+
+`good_if` is matched against ifDescr value. This can be a bad_if value as well which would stop that port from being ignored. 
+I.e If bad_if and good_if both contained FastEthernet then ports with this value in the ifDescr will be valid.
+
+### Interfaces to be rewritten
 
 ```php
 $config['rewrite_if']['cpu'] = 'Management Interface';
@@ -381,7 +525,7 @@ Entries defined in `rewrite_if` are being replaced completely.
 Entries defined in `rewrite_if_regexp` only replace the match.
 Matches are compared case-insensitive.
 
-#### Entity sensors to be ignored
+### Entity sensors to be ignored
 
 Some devices register bogus sensors as they are returned via SNMP but either don't exist or just don't return data.
 This allows you to ignore those based on the descr field in the database. You can either ignore globally or on a per 
@@ -392,7 +536,7 @@ $config['bad_entity_sensor_regex'][] = '/Physical id [0-9]+/';
 $config['os']['cisco']['bad_entity_sensor_regex'] = '/Physical id [0-9]+/';
 ```
 
-#### Storage configuration
+### Storage configuration
 
 ```php
 $config['ignore_mount_removable']  = 1;
@@ -423,15 +567,15 @@ $config['ignore_mount_regexp'][] = "/UMA/";
 ```
 Mounted storage / mount points to ignore in discovery and polling.
 
-#### IRC Bot
+### IRC Bot
 
-[IRC Bot](Extensions/IRC-Bot.md)
+[IRC Bot](../Extensions/IRC-Bot.md)
 
-#### Authentication
+### Authentication
 
-[Authentication](Extensions/Authentication.md)
+[Authentication](../Extensions/Authentication.md)
 
-#### Cleanup options
+### Cleanup options
 
 These options rely on daily.sh running from cron as per the installation instructions.
 
@@ -440,7 +584,7 @@ $config['syslog_purge']                                   = 30;
 $config['eventlog_purge']                                 = 30;
 $config['authlog_purge']                                  = 30;
 $config['perf_times_purge']                               = 30;
-$config['device_perf_purge']                              = 30;
+$config['device_perf_purge']                              = 7;
 $config['rrd_purge']                                      = 90;// Not set by default
 ```
 These options will ensure data within LibreNMS over X days old is automatically purged. You can alter these individually,
@@ -449,11 +593,11 @@ values are in days.
 > NOTE: Please be aware that `$config['rrd_purge']` is _NOT_ set by default. This option will remove any old data within 
 the rrd directory automatically - only enable this if you are comfortable with that happening.
 
-#### Syslog options
+### Syslog options
 
-[Syslog](Extensions/Syslog.md)
+[Syslog](../Extensions/Syslog.md)
 
-#### Virtualization
+### Virtualization
 
 ```php
 $config['enable_libvirt'] = 1;
@@ -475,19 +619,19 @@ to indicate how you connect to libvirt.  You also need to:
 To test your setup, run `virsh -c qemu+ssh://vmhost/system list` or
 `virsh -c xen+ssh://vmhost list` as your librenms polling user.
 
-#### BGP Support
+### BGP Support
 
 ```php
-$config['astext'][65332] = "Cymru FullBogon Feed";
+$config['astext']['65332'] = "Cymru FullBogon Feed";
 ```
 You can use this array to rewrite the description of ASes that you have discovered.
 
-#### Auto updates
+### Auto updates
 
-[Updating](General/Updating.md)
+[Updating](../General/Updating.md)
 
-#### IPMI
-Setup the types of IPMI protocols to test a host for and it what order.
+### IPMI
+Setup the types of IPMI protocols to test a host for and in what order. Don't forget to install ipmitool on the monitoring host.
 
 ```php
 $config['ipmi']['type'] = array();
@@ -497,6 +641,23 @@ $config['ipmi']['type'][] = "imb";
 $config['ipmi']['type'][] = "open";
 ```
 
-#### Distributed poller settings
+### Distributed poller settings
 
-[Distributed Poller](Extensions/Distributed-Poller.md)
+[Distributed Poller](../Extensions/Distributed-Poller.md)
+
+## API Settings
+
+### CORS Support
+
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
+
+CORS support for the API is disabled by default. Below you will find the standard options,
+all of which you can configure.
+ 
+```php
+$config['api']['cors']['enabled'] = false;
+$config['api']['cors']['origin'] = '*';
+$config['api']['cors']['maxage'] = '86400';
+$config['api']['cors']['allowmethods'] = array('POST', 'GET', 'PUT', 'DELETE', 'PATCH');
+$config['api']['cors']['allowheaders'] = array('Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'X-Auth-Token');
+```

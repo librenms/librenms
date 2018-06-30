@@ -1,0 +1,49 @@
+mib: VALERE-DC-POWER-MIB
+modules:
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: vpwrSystemParameterGroup
+                    value: vpwrSystemVoltage
+                    num_oid: .1.3.6.1.4.1.13858.2.3.2.
+                    descr: System Voltage
+                    divisor: 100
+        current:
+            data:
+                -
+                    oid: vpwrSystemParameterGroup
+                    value: vpwrSystemCurrent
+                    num_oid: .1.3.6.1.4.1.13858.2.3.3.
+                    descr: System Current
+        temperature:
+            data:
+                -
+                    oid: vpwrSystemParameterGroup
+                    value: vpwrSystemInternalTemperature
+                    num_oid: .1.3.6.1.4.1.13858.2.3.5.
+                    descr: Internal Temperature
+        state:
+            data:
+                -
+                    oid: vpwrSystemParameterGroup
+                    value: vpwrSystemControllerState
+                    num_oid: .1.3.6.1.4.1.13858.2.3.4.
+                    descr: Controller State
+                    state_name: vpwrSystemControllerState
+                    states:
+                        - { descr: systemControllerStateUnknown, graph: 0, value: 0, generic: 3 }
+                        - { descr: systemControllerStateNormal, graph: 0, value: 1, generic: 0 }
+                        - { descr: systemControllerStateChange, graph: 0, value: 2, generic: 1 }
+                        - { descr: systemControllerStateAlarm, graph: 0, value: 3, generic: 2 }
+                        - { descr: systemControllerStateMenu, graph: 0, value: 4, generic: 1 }
+                        - { descr: systemControllerStateIrActive, graph: 0, value: 5, generic: 1 }
+                -
+                    oid: vpwrSystemParameterGroup
+                    value: vpwrSystemTempCompensationState
+                    num_oid: .1.3.6.1.4.1.13858.2.3.4.
+                    descr: Temperature Compensation State
+                    state_name: vpwrSystemTempCompensationState
+                    states:
+                        - { descr: systemTempCompInactive, graph: 0, value: 0, generic: 0 }
+                        - { descr: systemTempCompActive, graph: 0, value: 1, generic: 1 }

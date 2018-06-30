@@ -1,0 +1,7 @@
+os: sonus-gsx
+text: 'Sonus GSX'
+type: appliance
+icon: sonus
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.2879.1.1.2

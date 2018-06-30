@@ -5,9 +5,9 @@ $pagetitle[] = 'Historical Usage';
 // $url         = $PHP_SELF."/bill/".$bill_id."/history/";
 $i = 0;
 
-$img['his']  = '<img src="bandwidth-graph.php?bill_id='.$bill_id;
-$img['his'] .= '&amp;type=historical';
-$img['his'] .= '&amp;x=1190&amp;y=250';
+$img['his']  = '<img src="graph.php?id='.$bill_id;
+$img['his'] .= '&amp;type=bill_historicmonthly';
+$img['his'] .= '&amp;width=1190&amp;height=250';
 $img['his'] .= '" style="margin: 15px 5px 25px 5px;" />';
 ?>
 
@@ -22,23 +22,20 @@ $img['his'] .= '" style="margin: 15px 5px 25px 5px;" />';
 
 <?php
 
-function showDetails($bill_id, $imgtype, $bill_hist_id, $bittype = 'Quota')
+function showDetails($bill_id, $imgtype, $bill_hist_id)
 {
-    if ($imgtype == 'bitrate') {
-        $res = '<img src="billing-graph.php?bill_id='.$bill_id;
-        if ($bittype == 'Quota') {
-            $res .= '&amp;ave=yes';
-        } elseif ($bittype == 'CDR') {
-            $res .= '&amp;95th=yes';
-        }
-    } else {
-        $res = '<img src="bandwidth-graph.php?bill_id='.$bill_id;
-    }
+    $res = '<img src="graph.php?id='.$bill_id;
 
-    // $res .= "&amp;type=".$type;
-    $res .= '&amp;type='.$imgtype;
-    $res .= '&amp;x=1190&amp;y=250';
-    $res .= '&amp;bill_hist_id='.$bill_hist_id;
+    if ($imgtype == 'bitrate') {
+        $res .= '&amp;type=bill_historicbits';
+    } else {
+        $res .= '&amp;type=bill_historictransfer';
+        $res .= '&amp;imgtype='.$imgtype;
+    }
+    $res .= '&amp;width=1190&amp;height=250';
+    if (is_numeric($bill_hist_id)) {
+        $res .= '&amp;bill_hist_id='.$bill_hist_id;
+    }
     $res .= '" style="margin: 15px 5px 25px 5px;" />';
     return $res;
 }//end showDetails()
@@ -60,7 +57,7 @@ echo '<table class="table table-striped">
         <th>95th %ile</th>
         <th style="text-align: center;">Overusage</th>
         <th colspan="2" style="text-align: right;"><a href="'.generate_url($vars, array('detail' => 'all')).'">
-            <img src="images/16/chart_curve.png" border="0" align="absmiddle" alt="Show details" title="Show details" /> Show all details</a>
+            <i class="fa fa-bar-chart fa-lg icon-theme" aria-hidden="true" title="Show details"></i> Show details</a>
         </th>
     </tr>
     </thead>
@@ -111,12 +108,12 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
                 <td style=\"text-align: center;\">$overuse</td>
                 <td width=\"250\">".print_percentage_bar(250, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']).'</td>
                 <td>
-                    <a href="'.$url.'"><img src="images/16/chart_curve.png" border="0" align="absmiddle" alt="Show details" title="Show details"/></a>
+                    <a href="'.$url.'"><i class="fa fa-bar-chart fa-lg icon-theme" aria-hidden="true" title="Show details"></i></a>
                 </td>
             </tr>';
 
         if ($vars['detail'] == $history['bill_hist_id'] || $vars['detail'] == 'all') {
-            $img['bitrate'] = showDetails($bill_id, 'bitrate', $history['bill_hist_id'], $type);
+            $img['bitrate'] = showDetails($bill_id, 'bitrate', $history['bill_hist_id']);
             $img['bw_day']  = showDetails($bill_id, 'day', $history['bill_hist_id']);
             $img['bw_hour'] = showDetails($bill_id, 'hour', $history['bill_hist_id']);
             echo '

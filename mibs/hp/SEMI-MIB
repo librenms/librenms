@@ -1,0 +1,860 @@
+SEMI-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS
+     OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE,
+     enterprises, IpAddress
+       	FROM SNMPv2-SMI
+     	TEXTUAL-CONVENTION
+       	FROM SNMPv2-TC
+     	OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE
+       	FROM SNMPv2-CONF;
+
+    hp           OBJECT IDENTIFIER ::= { enterprises 11 }
+    nm           OBJECT IDENTIFIER ::= { hp 2 }
+    hpWebMgmt    OBJECT IDENTIFIER ::= { nm 36 }
+
+-- ========================================================================
+-- Module Identity
+
+  hpHttpMgMod MODULE-IDENTITY
+    LAST-UPDATED "0104030000Z"
+    ORGANIZATION "Hewlett-Packard"
+    CONTACT-INFO "brian_harrison@hp.com"
+
+    DESCRIPTION 
+      "Management information for HP devices. This MIB provides SNMP 
+       systems asset and HTTP management information, as well as 
+       entity relationship information for host based implementations.
+       This version contains additions for SEMI"
+
+    REVISION     "0010160000Z"
+    DESCRIPTION  "Minor syntactic changes in notifications."
+
+    REVISION     "0010120000Z"
+    DESCRIPTION  "Fixed semantic error, modified traps and included
+                  changes from the review team."
+
+    REVISION     "0010040000Z"
+    DESCRIPTION  "Moved Device asset information into a container model.
+                  Modified traps and compliance definitions. Depricated
+                  previous device asset objects."
+
+    REVISION     "0001120000Z"
+    DESCRIPTION  "Added cluster support"
+
+    REVISION     "9903170000Z"
+    DESCRIPTION  "Corrected definition of hpHttpMgMod"
+
+    REVISION     "9812010000Z"
+    DESCRIPTION  "Incorporated entity-relationship table"
+
+    REVISION     "9706260000Z"
+    DESCRIPTION  "Incorporated NetCitizen definitions"
+
+    REVISION     "9606120000Z"
+    DESCRIPTION  "Initial Version"
+       ::= { hpWebMgmt 1 }
+
+-- ========================================================================
+-- Textual Conventions for this MIB
+
+     Utf8String ::= TEXTUAL-CONVENTION
+         DISPLAY-HINT "255a"
+         STATUS  current
+         DESCRIPTION
+              "To facilitate internationalization, this TC
+               represents information taken from the ISO/IEC IS 
+               10646-1 character set, encoded as an octet string 
+               using the UTF-8 character encoding scheme described 
+               in RFC 2044 [10].  For strings in 7-bit US-ASCII, 
+               there is no impact since the UTF-8 representation is 
+               identical to the US-ASCII encoding."
+         SYNTAX  OCTET STRING (SIZE (0..255))
+
+-- ========================================================================
+-- 
+    hpHttpMgTraps         OBJECT IDENTIFIER ::= { hpHttpMgMod 0 } 
+    hpHttpMgObjects       OBJECT IDENTIFIER ::= { hpHttpMgMod 1 } 
+    hpHttpMgGroups        OBJECT IDENTIFIER ::= { hpHttpMgMod 2 } 
+    hpHttpMgCompliances   OBJECT IDENTIFIER ::= { hpHttpMgMod 3 }
+
+-- ========================================================================
+-- Default attributes for managing via HTTP
+
+    hpHttpMgDefaults      OBJECT IDENTIFIER ::= { hpHttpMgObjects 1 }
+     
+    hpHttpMgDefaultURL    OBJECT-TYPE
+        SYNTAX      Utf8String 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "A Uniform Resource Locator (URL), as defined in RFC1738,
+             for the default management information for this device. 
+             This URL is typically used by a HTTP browser to display 
+             management information for this device.  This default 
+             page should contain links to any other management
+             pages for this device."
+        ::= { hpHttpMgDefaults 1}
+
+-- ========================================================================
+-- HP NetCitizen attributes
+     
+    hpHttpMgNetCitizen    OBJECT IDENTIFIER ::= { hpHttpMgObjects 2 }
+ 
+    hpHttpMgMgmtSrvrURL OBJECT-TYPE
+        SYNTAX          Utf8String
+        MAX-ACCESS      read-write
+        STATUS          deprecated
+        DESCRIPTION     "URL of management server for this device.  " 
+        ::= { hpHttpMgNetCitizen 1}
+     
+    hpHttpMgID OBJECT-TYPE
+        SYNTAX          Utf8String
+        MAX-ACCESS      read-only
+        STATUS          deprecated
+        DESCRIPTION     "Unique identifier for this entity.  This ID
+			must not change even if network address or
+			removable cards are changed. For devices with
+			fixed MAC addresses this may be the same as
+			ifPhysAddress; for devices with fixed serial
+			numbers this may be the same as
+			hpHttpMgSerialNumber."
+        ::= { hpHttpMgNetCitizen 2}
+     
+    hpHttpMgHealth OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                unknown(1),
+                                information(2),
+                                ok(3),
+                                warning(4),
+                                critical(5),
+                                nonrecoverable(6)
+                                }
+        MAX-ACCESS      read-only
+        STATUS          deprecated
+        DESCRIPTION     "Operating status of this entity." 
+        ::= { hpHttpMgNetCitizen 3}
+     
+    hpHttpMgManufacturer OBJECT-TYPE
+        SYNTAX          Utf8String
+        MAX-ACCESS      read-only
+        STATUS          deprecated
+        DESCRIPTION     "Manufacturer of the hardware for this entity
+                         e.g. 'Hewlett-Packard'."
+        ::= { hpHttpMgNetCitizen 4}
+     
+    hpHttpMgProduct OBJECT-TYPE
+        SYNTAX          Utf8String (SIZE(0..32))
+        MAX-ACCESS      read-only
+        STATUS          deprecated
+        DESCRIPTION     "Manufacturer's product number for this entity,
+                         e.g. 'D1234A'."
+        ::= { hpHttpMgNetCitizen 5}
+     
+    hpHttpMgVersion OBJECT-TYPE
+        SYNTAX          Utf8String (SIZE(0..32))
+        MAX-ACCESS      read-only
+        STATUS          deprecated
+        DESCRIPTION     "Version number of this entity, e.g. 'A.00.01'.
+                         Where several version numbers are available, 
+                         this represents the software version."
+        ::= { hpHttpMgNetCitizen 6}
+     
+    hpHttpMgHWVersion OBJECT-TYPE
+        SYNTAX          Utf8String (SIZE(0..32))
+        MAX-ACCESS      read-only
+        STATUS          deprecated
+        DESCRIPTION     "Version number of the hardware for this entity,
+                         e.g. 'A.00.01'."
+        ::= { hpHttpMgNetCitizen 7}
+     
+    hpHttpMgROMVersion OBJECT-TYPE
+        SYNTAX          Utf8String (SIZE(0..32))
+        MAX-ACCESS      read-only
+        STATUS          deprecated
+        DESCRIPTION     "Version number of ROM for this entity, e.g.
+			'A.00.01'." 
+        ::= { hpHttpMgNetCitizen 8}
+     
+    hpHttpMgSerialNumber OBJECT-TYPE
+        SYNTAX          Utf8String (SIZE(0..32))
+        MAX-ACCESS      read-write
+        STATUS          deprecated
+        DESCRIPTION     "Serial number of entity.  It is recommended
+			that this be factory set and read only; if not
+			factory set, should initially be blank."
+        ::= { hpHttpMgNetCitizen 9}
+     
+    hpHttpMgAssetNumber OBJECT-TYPE
+        SYNTAX          Utf8String (SIZE(0..32))
+        MAX-ACCESS      read-write
+        STATUS          deprecated
+        DESCRIPTION     "Asset number of entity.  This is not normally
+			modified once set."
+        ::= { hpHttpMgNetCitizen 10}
+     
+    hpHttpMgPhone OBJECT-TYPE
+        SYNTAX          Utf8String (SIZE(0..32))
+        MAX-ACCESS      read-write
+        STATUS          deprecated
+        DESCRIPTION     "Phone number of contact person for this
+			entity."
+        ::= { hpHttpMgNetCitizen 11}
+
+-- ========================================================================
+-- Entity Relationships
+
+  hpHttpMgEntityNetInfo    OBJECT IDENTIFIER ::= { hpHttpMgObjects 3 }
+
+  hpHttpMgEntityNetInfoTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF HpHttpMgEntityNetInfoEntrySequence
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+   "A table of EntityRelationships, connection type, URLs, IPAddress etc.
+    This table typcially contains relationships between devices that each
+    have their own management agent.  "
+   ::= { hpHttpMgEntityNetInfo 1 }
+
+   hpHttpMgEntityNetInfoEntry OBJECT-TYPE
+      SYNTAX HpHttpMgEntityNetInfoEntrySequence
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+   "Information describing EntityRelationships, URLs, IPAddresses etc."
+      INDEX { hpHttpMgEntityNetInfoIndex }
+   ::= { hpHttpMgEntityNetInfoTable 1 }
+
+   HpHttpMgEntityNetInfoEntrySequence ::=    SEQUENCE {
+      hpHttpMgEntityNetInfoIndex     INTEGER,
+      hpHttpMgEntityNetInfoSysObjID  Utf8String,
+      hpHttpMgEntityNetInfoRelationshipType  INTEGER,
+      hpHttpMgEntityNetInfoUniqueID  Utf8String, 
+      hpHttpMgEntityNetInfoURL       Utf8String,
+      hpHttpMgEntityNetInfoURLLabel  Utf8String,
+      hpHttpMgEntityNetInfoIPAddress Utf8String
+   }
+
+   hpHttpMgEntityNetInfoIndex OBJECT-TYPE
+      SYNTAX INTEGER (0..65536)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "The EntityRelationship Entity Index."
+   ::= { hpHttpMgEntityNetInfoEntry 1 }
+
+   hpHttpMgEntityNetInfoSysObjID OBJECT-TYPE
+      SYNTAX Utf8String
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Sys Object ID of this entity."
+   ::= { hpHttpMgEntityNetInfoEntry 2 }
+
+   hpHttpMgEntityNetInfoRelationshipType OBJECT-TYPE
+      SYNTAX INTEGER {
+         self                     (0),
+         containedEntity          (1),
+         containingEntity         (2),
+         externallyAttachedEntity (3),
+         indirectlyAttachedEntity (4),
+         clusterNode              (5)
+      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+   "Specifies the type of relationship this entry has to this entity."
+   ::= { hpHttpMgEntityNetInfoEntry 3 }
+
+   hpHttpMgEntityNetInfoUniqueID OBJECT-TYPE
+      SYNTAX Utf8String
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This represents a globally unique ID for the device. 
+         This MUST be the ordered combination of the Manufacturer, 
+         product name, AND any other text that is necessary to guarantee 
+         global uniqueness. This ID must not change even if the referenced
+         entity is moved.
+         e.g. HPD1234A9482882"
+   ::= { hpHttpMgEntityNetInfoEntry 4 }
+
+   hpHttpMgEntityNetInfoURL OBJECT-TYPE
+      SYNTAX Utf8String
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Home Page URL of entity corresponding to this entry.
+          This field may only contain the DNS name of a managed
+          system, in which case the actual URL must be determined
+          from this managed system."
+   ::= { hpHttpMgEntityNetInfoEntry 5 }
+
+   hpHttpMgEntityNetInfoURLLabel OBJECT-TYPE
+      SYNTAX Utf8String
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Label that a managaement application should use for the hyperlink 
+          to the entity's URL."
+   ::= { hpHttpMgEntityNetInfoEntry 6 }
+
+   hpHttpMgEntityNetInfoIPAddress OBJECT-TYPE
+      SYNTAX Utf8String
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Addressing information for one of the IP Addresses of the entity 
+          corresponding to this entry."
+   ::= { hpHttpMgEntityNetInfoEntry 7 }
+
+-- ========================================================================
+-- Clustering information
+
+   hpHttpMgCluster  OBJECT IDENTIFIER  ::=  { hpHttpMgObjects 4 }
+
+   hpHttpMgClusterName  OBJECT-TYPE
+      SYNTAX Utf8String
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "The name of the cluster that this system is a member of, 
+          or blank if this system is not a member of a cluster." 
+   ::= { hpHttpMgCluster 1}
+
+-- ========================================================================
+-- Device Table
+--
+-- NOTE: For agents that only support one device the table must only
+--       have one row and the index value should always be 1.
+
+  hpHttpMgDeviceInfo    OBJECT IDENTIFIER ::= { hpHttpMgObjects 5 }
+
+  hpHttpMgDeviceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HpHttpMgDeviceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A list of HP devices under a single SNMP agent."
+    ::= { hpHttpMgDeviceInfo 1 }
+
+  hpHttpMgDeviceEntry OBJECT-TYPE
+    SYNTAX HpHttpMgDeviceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A device entry containing objects for a particular device."
+    INDEX { hpHttpMgDeviceIndex }
+    ::= { hpHttpMgDeviceTable 1 }
+
+    HpHttpMgDeviceEntry ::=
+       SEQUENCE {
+          hpHttpMgDeviceIndex              INTEGER,
+          hpHttpMgDeviceGlobalUniqueID     Utf8String,
+          hpHttpMgDeviceHealth             INTEGER,
+          hpHttpMgDeviceSysObjID           Utf8String,
+          hpHttpMgDeviceManagementURL      Utf8String,
+          hpHttpMgDeviceManagementURLLabel Utf8String,
+          hpHttpMgDeviceManufacturer       Utf8String,
+          hpHttpMgDeviceProductName        Utf8String,
+          hpHttpMgDeviceProductCaption     Utf8String,
+          hpHttpMgDeviceSerialNumber       Utf8String,
+          hpHttpMgDeviceVersion            Utf8String,
+          hpHttpMgDeviceHWVersion          Utf8String,
+          hpHttpMgDeviceROMVersion         Utf8String,
+          hpHttpMgDeviceAssetNumber        Utf8String,
+          hpHttpMgDeviceContactPerson      Utf8String,
+          hpHttpMgDeviceContactPhone       Utf8String,
+          hpHttpMgDeviceContactEmail       Utf8String,
+          hpHttpMgDeviceContactPagerNumber Utf8String,
+          hpHttpMgDeviceLocation           Utf8String,
+          hpHttpMgDeviceRackId             Utf8String,
+          hpHttpMgDeviceRackPosition       Utf8String,
+	  hpHttpMgDeviceRelationshipType   INTEGER
+          }
+
+  hpHttpMgDeviceIndex OBJECT-TYPE
+    SYNTAX INTEGER (0..1000)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The unique device identification within the 
+         instance of this Mib."
+    ::= { hpHttpMgDeviceEntry 1 }
+
+  hpHttpMgDeviceGlobalUniqueID OBJECT-TYPE
+    SYNTAX Utf8String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This represents a globally unique ID for the device. 
+         This MUST be the ordered combination of the Manufacturer, 
+         product name, AND any other text that is necessary to guarantee 
+         global uniqueness. This value may not be null.
+         e.g. HPD1234A9482882"
+    ::= { hpHttpMgDeviceEntry 2 }
+
+  hpHttpMgDeviceHealth OBJECT-TYPE
+    SYNTAX INTEGER {
+           unknown        (1),
+           unused         (2),
+           ok             (3), -- available for meaningful work
+           warning        (4), -- something needs attention
+           critical       (5), -- something has failed
+           nonrecoverable (6)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Overall health of the device. The goal of this object
+         is to be the single poll point to check the status of the 
+         device."
+    ::= { hpHttpMgDeviceEntry 3 }
+
+  hpHttpMgDeviceSysObjID OBJECT-TYPE
+    SYNTAX Utf8String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "System Object ID for this Device entity. This should be an
+         ASCII integer format. (i.e. 1.3.6.1.4.1.11.2.36.1.1) 
+         The value may not be null."
+        --
+        -- NOTE: For single device agents this field contains a value
+        --       similar to the MIB II/System/sysObjID
+        --
+    ::= { hpHttpMgDeviceEntry 4 }
+
+  hpHttpMgDeviceManagementURL OBJECT-TYPE
+    SYNTAX Utf8String
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the URL for the device's management 
+         software.  If it does not exist the value is empty string.  
+	   If write is not supported, then return invalid. This value is 
+         retained across boots."
+    ::= { hpHttpMgDeviceEntry 5 }
+
+  hpHttpMgDeviceManagementURLLabel OBJECT-TYPE
+    SYNTAX Utf8String
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The label that a management application should use for the 
+         hyperlink to the entity's URL."
+    ::= { hpHttpMgDeviceEntry 6 }
+
+  hpHttpMgDeviceManufacturer OBJECT-TYPE
+    SYNTAX Utf8String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The device's manufacturer name. For Hewlett Packard branded
+         equipment this value MUST be 'HP'"
+    ::= { hpHttpMgDeviceEntry 7 }
+
+  hpHttpMgDeviceProductName OBJECT-TYPE
+    SYNTAX Utf8String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The device's product name. Null is NOT a valid value.
+         (i.e. D1234A)"
+    ::= { hpHttpMgDeviceEntry 8 }
+
+  hpHttpMgDeviceProductCaption OBJECT-TYPE
+    SYNTAX Utf8String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The device's product caption name. 
+         (i.e. HP Multi-stack Disk Array)"
+    ::= { hpHttpMgDeviceEntry 9 }
+
+  hpHttpMgDeviceSerialNumber OBJECT-TYPE
+    SYNTAX Utf8String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The serial number for the device. This can return
+         a NULL string."
+    ::= { hpHttpMgDeviceEntry 10 }
+
+  hpHttpMgDeviceVersion OBJECT-TYPE
+    SYNTAX Utf8String (SIZE(0..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Version number for this device."
+    ::= { hpHttpMgDeviceEntry 11 }
+
+  hpHttpMgDeviceHWVersion OBJECT-TYPE
+    SYNTAX Utf8String (SIZE(0..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Version number for this device's hardware."
+    ::= { hpHttpMgDeviceEntry 12 }
+
+  hpHttpMgDeviceROMVersion OBJECT-TYPE
+    SYNTAX Utf8String (SIZE(0..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Version number for this device's ROM."
+    ::= { hpHttpMgDeviceEntry 13 }
+
+  hpHttpMgDeviceAssetNumber OBJECT-TYPE
+    SYNTAX Utf8String (SIZE(0..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Asset number for the device."
+    ::= { hpHttpMgDeviceEntry 14 }
+
+  hpHttpMgDeviceContactPerson OBJECT-TYPE
+    SYNTAX Utf8String (SIZE(0..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Identifies the name of the person responsible for the
+         operation of this device. If write is not
+         supported then return invalid."
+        --
+        -- NOTE: For single device agents this field contains a value
+        --       similar to the MIB II/System/sysContact
+        --
+    ::= { hpHttpMgDeviceEntry 15 }
+
+  hpHttpMgDeviceContactPhone OBJECT-TYPE
+    SYNTAX Utf8String (SIZE(0..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Phone number of the contact person for this device."
+    ::= { hpHttpMgDeviceEntry 16 }
+
+  hpHttpMgDeviceContactEmail OBJECT-TYPE
+    SYNTAX Utf8String 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "e-mail address of the contact person for this device."
+    ::= { hpHttpMgDeviceEntry 17 }
+
+  hpHttpMgDeviceContactPagerNumber OBJECT-TYPE
+    SYNTAX Utf8String (SIZE(0..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Pager number of the contact person for this device."
+    ::= { hpHttpMgDeviceEntry 18 }
+
+  hpHttpMgDeviceLocation OBJECT-TYPE
+    SYNTAX Utf8String 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Identifies the location for the this device. If 
+         write is not supported then return invalid."
+        --
+        -- NOTE: For single device agents this field contains a value
+        --       similar to the MIB II/System/sysLocation
+        --
+    ::= { hpHttpMgDeviceEntry 19 }
+
+  hpHttpMgDeviceRackId OBJECT-TYPE
+    SYNTAX Utf8String 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Identifies the name given by the administrator to identify a 
+         particular rack such a rack 4a or SAP 2 for example."
+    ::= { hpHttpMgDeviceEntry 20 }
+
+  hpHttpMgDeviceRackPosition OBJECT-TYPE
+    SYNTAX Utf8String 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Identifies the location such as top, middle or bottom or a 
+         number such a 1st from top etc. to identify the placement 
+         of a device in a rack."
+    ::= { hpHttpMgDeviceEntry 21 }
+
+  hpHttpMgDeviceRelationshipType OBJECT-TYPE 
+    SYNTAX INTEGER {
+            host        (1),
+            other       (2) 
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates the relationship of this device to the SNMP agent.
+         Host indicates that this device owns the SNMP agent."
+    ::= { hpHttpMgDeviceEntry 22 }
+
+
+ 
+-- ========================================================================
+-- Trap Definitions
+     
+    hpHttpMgHealthTrap NOTIFICATION-TYPE
+        OBJECTS         { hpHttpMgHealth }
+        STATUS          deprecated
+        DESCRIPTION     "Sent whenever hpHttpMgHealth changes state." 
+        ::= { hpHttpMgTraps 1 }
+     
+    hpHttpMgShutdown NOTIFICATION-TYPE
+        STATUS          deprecated
+        DESCRIPTION     "Sent when the agent is about to shut down." 
+        ::= { hpHttpMgTraps 2 }
+
+    hpHttpMgUnknownHealthTrap NOTIFICATION-TYPE
+	OBJECTS { hpHttpMgDeviceIndex, 
+                  hpHttpMgDeviceSysObjID,
+                  hpHttpMgDeviceGlobalUniqueID,
+                  hpHttpMgDeviceManagementURL,
+                  hpHttpMgDeviceManagementURLLabel, 
+                  hpHttpMgDeviceSpecificEventCode, 
+                  hpHttpMgDeviceSpecificFRU 
+                }
+        STATUS          current
+	DESCRIPTION  "The device's health has changed to unknown."
+        ::= { hpHttpMgTraps 3 }
+
+    hpHttpMgOKHealthTrap NOTIFICATION-TYPE
+	OBJECTS { hpHttpMgDeviceIndex, 
+                  hpHttpMgDeviceSysObjID,
+                  hpHttpMgDeviceGlobalUniqueID,
+                  hpHttpMgDeviceManagementURL,
+                  hpHttpMgDeviceManagementURLLabel, 
+                  hpHttpMgDeviceSpecificEventCode, 
+                  hpHttpMgDeviceSpecificFRU 
+                }
+        STATUS          current
+	DESCRIPTION  "The device's health has changed to OK."
+        ::= { hpHttpMgTraps 4 }
+
+    hpHttpMgWarningHealthTrap NOTIFICATION-TYPE
+	OBJECTS { hpHttpMgDeviceIndex, 
+                  hpHttpMgDeviceSysObjID,
+                  hpHttpMgDeviceGlobalUniqueID,
+                  hpHttpMgDeviceManagementURL,
+                  hpHttpMgDeviceManagementURLLabel, 
+                  hpHttpMgDeviceSpecificEventCode, 
+                  hpHttpMgDeviceSpecificFRU 
+                }
+        STATUS          current
+	DESCRIPTION  "The device's health has changed to warning."
+        ::= { hpHttpMgTraps 5 }
+
+    hpHttpMgCriticalHealthTrap NOTIFICATION-TYPE
+	OBJECTS { hpHttpMgDeviceIndex, 
+                  hpHttpMgDeviceSysObjID,
+                  hpHttpMgDeviceGlobalUniqueID,
+                  hpHttpMgDeviceManagementURL,
+                  hpHttpMgDeviceManagementURLLabel, 
+                  hpHttpMgDeviceSpecificEventCode, 
+                  hpHttpMgDeviceSpecificFRU 
+                }
+        STATUS          current
+	DESCRIPTION  "The device's health has changed to critical."
+        ::= { hpHttpMgTraps 6 }
+
+    hpHttpMgNonRecoverableHealthTrap NOTIFICATION-TYPE
+	OBJECTS { hpHttpMgDeviceIndex, 
+                  hpHttpMgDeviceSysObjID,
+                  hpHttpMgDeviceGlobalUniqueID,
+                  hpHttpMgDeviceManagementURL,
+                  hpHttpMgDeviceManagementURLLabel, 
+                  hpHttpMgDeviceSpecificEventCode, 
+                  hpHttpMgDeviceSpecificFRU 
+                }
+        STATUS          current
+	DESCRIPTION  "The device's health has changed to Non-Recoverable."
+        ::= { hpHttpMgTraps 7 }
+
+    hpHttpMgDeviceAddedTrap NOTIFICATION-TYPE
+	OBJECTS { hpHttpMgDeviceIndex, 
+                  hpHttpMgDeviceSysObjID,
+                  hpHttpMgDeviceGlobalUniqueID,
+                  hpHttpMgDeviceManagementURL,
+                  hpHttpMgDeviceManagementURLLabel
+                }
+        STATUS          current
+	DESCRIPTION  "Sent whenever a device is added to the mib."
+        ::= { hpHttpMgTraps 8 }
+
+    hpHttpMgDeviceRemovedTrap NOTIFICATION-TYPE
+	OBJECTS { hpHttpMgDeviceIndex, 
+                  hpHttpMgDeviceSysObjID,
+                  hpHttpMgDeviceGlobalUniqueID
+                }
+        STATUS          current
+	DESCRIPTION  "Sent whenever a device is removed from the mib."
+        ::= { hpHttpMgTraps 9 }
+
+
+    hpHttpMgDeviceSpecificEventCode OBJECT-TYPE
+      SYNTAX Utf8String 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+            "Device specific event error code."
+      ::= { hpHttpMgTraps 10 }
+
+    hpHttpMgDeviceSpecificFRU OBJECT-TYPE
+      SYNTAX Utf8String 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+           "Device specific FRU identifier"
+      ::= { hpHttpMgTraps 11 }
+-- ========================================================================
+-- Compliance Statements
+
+    hpHttpMgMinCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "The compliance statement for SNMP entities which
+             are http manageable."
+     
+        MODULE  -- this module
+        MANDATORY-GROUPS { hpHttpMgDefaultGroup }
+     
+        ::= { hpHttpMgCompliances 1 }
+     
+    hpHttpMgBasicNetCitizenCompliance MODULE-COMPLIANCE
+            STATUS deprecated
+                DESCRIPTION
+                    " The compliance statement for SNMP entities which
+                      meet basic NetCitizen crieria"
+                MODULE -- this module
+                MANDATORY-GROUPS { hpHttpMgDefaultGroup,
+                                   hpHttpMgBasicNetCitizenGroup,
+                                   hpHttpMgBasicNetCitizenTrapGroup }
+                ::= { hpHttpMgCompliances 2 }
+
+    hpHttpMgEnhancedNetCitizenCompliance MODULE-COMPLIANCE
+            STATUS current
+                DESCRIPTION
+                    " The compliance statement for SNMP entities which
+                      meet basic NetCitizen crieria"
+                MODULE -- this module
+                MANDATORY-GROUPS { hpHttpMgDefaultGroup,
+                                   hpHttpMgEnhancedNetCitizenGroup,
+                                   hpHttpMgEnhancedNetCitizenTrapGroup }
+                ::= { hpHttpMgCompliances 3 }
+-- ========================================================================
+-- Units of conformance
+     
+    hpHttpMgDefaultGroup OBJECT-GROUP
+        OBJECTS { hpHttpMgDefaultURL }
+        STATUS current
+        DESCRIPTION
+            "The objects providing information applicable to all
+             http manageable systems"
+              ::= { hpHttpMgGroups 1 }             
+     
+    hpHttpMgBasicNetCitizenGroup OBJECT-GROUP
+        OBJECTS {   hpHttpMgMgmtSrvrURL,
+                    hpHttpMgID,
+                    hpHttpMgHealth,
+                    hpHttpMgManufacturer,
+                    hpHttpMgProduct,
+                    hpHttpMgVersion }
+        STATUS deprecated
+        DESCRIPTION
+            "Additional HP NetCitizen objects"
+              ::= { hpHttpMgGroups 2 }
+     
+    hpHttpMgBasicNetCitizenTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { hpHttpMgHealthTrap }
+        STATUS deprecated
+        DESCRIPTION
+            "HP NetCitizen notifications"
+              ::= { hpHttpMgGroups 3 }
+
+    hpHttpMgExtendedNetCitizenGroup OBJECT-GROUP
+        OBJECTS {   hpHttpMgHWVersion,
+                    hpHttpMgROMVersion,
+                    hpHttpMgSerialNumber,
+                    hpHttpMgAssetNumber,
+                    hpHttpMgPhone }
+        STATUS deprecated
+        DESCRIPTION
+            "Additional HP NetCitizen objects"
+              ::= { hpHttpMgGroups 4 }
+     
+    hpHttpMgExtendedNetCitizenTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { hpHttpMgShutdown }
+        STATUS current
+        DESCRIPTION
+            "HP NetCitizen notifications"
+              ::= { hpHttpMgGroups 5 }
+    
+    hpHttpMgEntityRelationshipGroup  OBJECT-GROUP
+        OBJECTS {   hpHttpMgEntityNetInfoIndex,
+                    hpHttpMgEntityNetInfoSysObjID,
+                    hpHttpMgEntityNetInfoRelationshipType,
+                    hpHttpMgEntityNetInfoUniqueID,
+                    hpHttpMgEntityNetInfoURL,
+                    hpHttpMgEntityNetInfoURLLabel,
+                    hpHttpMgEntityNetInfoIPAddress }
+        STATUS current
+        DESCRIPTION
+            "NetCitizen entitly-relationship table"
+               ::= { hpHttpMgGroups 6 }
+
+   hpHttpMgClusterGroup OBJECT-GROUP
+        OBJECTS {   hpHttpMgClusterName }
+        STATUS current
+        DESCRIPTION
+            "Cluster objects"
+              ::= { hpHttpMgGroups 7 }
+
+    hpHttpMgEnhancedNetCitizenGroup OBJECT-GROUP
+        OBJECTS { hpHttpMgDeviceIndex,
+                  hpHttpMgDeviceGlobalUniqueID,
+                  hpHttpMgDeviceHealth,
+                  hpHttpMgDeviceSysObjID,
+                   hpHttpMgDeviceManagementURL,
+                  hpHttpMgDeviceManagementURLLabel,
+                  hpHttpMgDeviceManufacturer,
+                  hpHttpMgDeviceProductName,
+                  hpHttpMgDeviceProductCaption,
+                  hpHttpMgDeviceSerialNumber,
+                  hpHttpMgDeviceVersion,
+                  hpHttpMgDeviceHWVersion,
+                  hpHttpMgDeviceROMVersion,
+                  hpHttpMgDeviceAssetNumber,
+                  hpHttpMgDeviceContactPerson,
+                  hpHttpMgDeviceContactPhone,
+                  hpHttpMgDeviceContactEmail,
+                  hpHttpMgDeviceContactPagerNumber,
+                  hpHttpMgDeviceLocation,
+                  hpHttpMgDeviceRackId,
+                  hpHttpMgDeviceRackPosition,
+                  hpHttpMgDeviceRelationshipType 
+                }
+        STATUS current
+        DESCRIPTION
+            "Additional HP NetCitizen objects"
+              ::= { hpHttpMgGroups 8 }
+
+    hpHttpMgEnhancedNetCitizenTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { hpHttpMgUnknownHealthTrap,
+                        hpHttpMgOKHealthTrap,
+                        hpHttpMgWarningHealthTrap,
+                        hpHttpMgCriticalHealthTrap,
+                        hpHttpMgNonRecoverableHealthTrap,
+                        hpHttpMgDeviceAddedTrap,
+                        hpHttpMgDeviceRemovedTrap
+                      }
+        STATUS current
+        DESCRIPTION
+            "HP NetCitizen notifications"
+              ::= { hpHttpMgGroups 9 }
+END

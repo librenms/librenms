@@ -1,0 +1,31 @@
+os: cips
+text: 'Cisco Intrusion Prevention System'
+type: network
+icon: cisco
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+poller_modules:
+    cisco-cbqos: true
+    cisco-cef: true
+    cisco-mac-accounting: true
+    cisco-voice: true
+    cisco-remote-access-monitor: true
+    cisco-sla: true
+    cisco-ipsec-flow-monitor: true
+    cipsec-tunnels: true
+    cisco-otv: true
+discovery_modules:
+    cisco-cef: true
+    cisco-sla: true
+    cisco-mac-accounting: true
+    cisco-otv: true
+    cisco-pw: true
+    vrf: true
+    cisco-vrf-lite: true
+mib_dir:
+    - cisco
+discovery:
+    - sysDescr_regex:
+        - '/^Cisco Intrusion Prevention System/'

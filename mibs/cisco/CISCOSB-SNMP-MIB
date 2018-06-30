@@ -1,0 +1,805 @@
+CISCOSB-SNMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    switch001                                   FROM CISCOSB-MIB
+    OBJECT-TYPE, MODULE-IDENTITY, TimeTicks     FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString           FROM SNMPv2-TC
+    RowStatus, TruthValue                       FROM SNMPv2-TC
+    InetAddressType, InetAddress                FROM INET-ADDRESS-MIB
+    snmpTargetAddrExtEntry                      FROM SNMP-COMMUNITY-MIB
+    SnmpEngineID                                FROM SNMP-FRAMEWORK-MIB
+    usmUserEntry                                FROM SNMP-USER-BASED-SM-MIB;
+
+rlSNMP MODULE-IDENTITY
+          LAST-UPDATED "200709100000Z"
+          ORGANIZATION "Cisco Systems, Inc."
+
+          CONTACT-INFO
+          "Postal: 170 West Tasman Drive
+          San Jose , CA 95134-1706
+          USA
+
+          
+          Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+          DESCRIPTION
+                  "Private MIB module for SNMP support in CISCOSB devices."
+          REVISION "201102110000Z"
+          DESCRIPTION
+                  "Added support in usmUserTable augment for authentication and
+                   privacy passwords saving."
+          REVISION "201002150000Z"
+          DESCRIPTION
+                  "1. Changed SYNTAX of rlSnmpEngineID from
+                      OCTET STRING (SIZE(5..32))to SnmpEngineID.
+                   2. Added rlInet2EngineIdTable."
+          REVISION "200709100000Z"
+          DESCRIPTION
+                  "Added rlEvents MIB."
+          REVISION "200606060000Z"
+          DESCRIPTION
+                  "Added rlSNMPenable object."
+          REVISION "0410200000Z"
+          DESCRIPTION
+                  "Initial version of this MIB."
+          ::= { switch001 98 }
+
+rlSNMPv3 OBJECT IDENTIFIER ::= { rlSNMP 1 }
+
+rlTargetParamsTestingLevel OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        low(1),
+        high(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The level of the tests done when configuring an entry in the snmpTargetParamsTable."
+    ::= { rlSNMPv3 1 }
+
+rlNotifyFilterTestingLevel OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        low(1),
+        high(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The level of the tests done when configuring an entry in the snmpNotifyFilterTable."
+    ::= { rlSNMPv3 2 }
+
+rlSnmpEngineID OBJECT-TYPE
+    SYNTAX  SnmpEngineID
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "A variable for setting the router's local engineID value.
+         Setting this variable will effect the value of snmpEngineID. Setting this
+         variable to the value '00 00 00 00 00'H will cause snmpEngineID to get
+         an automatically created value based on the device basic MAC address.
+         This method of setting the agent's engineID is recommended for stand-alone
+         systems. Setting this variable to any other (valid) value will set snmpEngineID
+         to this value. Setting this variable to all 'ff'H or all zeros is not
+         allowed, with the exception of the value '00 00 00 00 00'H.
+         The last method is recommended for stackable system, in order for the
+         engineID to be unique within an administrative domain.
+         Setting this value (to a value different then the default value)
+         is required before configuring users data in usmUserTable and
+         vacmSecurityToGroupTable.
+         Changing the value of this variable has 2 side-effects:
+         - All user data will be deleted, including: all usmUserTable configured entries and
+           vacmSecurityToGroupTable entries  where vacmSecurityModel = 3.
+         - All snmpCommunityTable entries with snmpCommunityContextEngineID value
+           equal to old rlSnmpEngineID value, will be updated with the new
+           rlSnmpEngineID value."
+    DEFVAL      { '0000000001'H }
+    ::= { rlSNMPv3 3 }
+
+rlSNMPv3IpAddrToIndexTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlSNMPv3IpAddrToIndexEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+    "This table maps ip addresses to indices. The output index
+     is used as a component in some SNMPv3 tables fields (for example:
+     snmpTargetAddrName). Ipv4 addresses are not supported by this table.
+     Note: in getNext operations on this table, only mappings which are in use
+     in snmpTargetAddrTable (using rlTargetAddrMagicUsedInIndex) will be retreived.
+     The mapped index does not include delimiters which are forbidden
+     in SNMPv3 tag values (and thus can be used in tag fields). "
+     ::= { rlSNMPv3 4 }
+
+rlSNMPv3IpAddrToIndexEntry  OBJECT-TYPE
+   SYNTAX RlSNMPv3IpAddrToIndexEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rlSNMPv3IpAddrToIndexAddrType,
+           rlSNMPv3IpAddrToIndexAddr }
+   ::= { rlSNMPv3IpAddrToIndexTable 1 }
+
+RlSNMPv3IpAddrToIndexEntry ::= SEQUENCE {
+       rlSNMPv3IpAddrToIndexAddrType        InetAddressType,
+       rlSNMPv3IpAddrToIndexAddr            InetAddress,
+       rlSNMPv3IpAddrToIndexMappedIndex     OCTET STRING
+}
+
+rlSNMPv3IpAddrToIndexAddrType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+    "Type of NMS IP address."
+     ::=  { rlSNMPv3IpAddrToIndexEntry 1 }
+
+rlSNMPv3IpAddrToIndexAddr OBJECT-TYPE
+   SYNTAX InetAddress
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+    "NMS IP address."
+     ::=  { rlSNMPv3IpAddrToIndexEntry 2 }
+
+rlSNMPv3IpAddrToIndexMappedIndex OBJECT-TYPE
+   SYNTAX OCTET STRING (SIZE(4))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+    "The index mapped for this row ip address."
+     ::=  { rlSNMPv3IpAddrToIndexEntry 3 }
+
+rlTargetAddrExtTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlTargetAddrExtEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+    "This table extends rlTargetAddrExtEntry.  "
+     ::= { rlSNMPv3 5 }
+
+rlTargetAddrExtEntry  OBJECT-TYPE
+   SYNTAX RlTargetAddrExtEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+       " The row definition for this table."
+   AUGMENTS       { snmpTargetAddrExtEntry }
+   ::= { rlTargetAddrExtTable 1 }
+
+RlTargetAddrExtEntry ::= SEQUENCE {
+       rlTargetAddrMagicUsedInIndex         OCTET STRING
+}
+
+rlTargetAddrMagicUsedInIndex OBJECT-TYPE
+   SYNTAX OCTET STRING  (SIZE (0 | 4))
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "Setting this field to a 4 octets length value means that ip mapping (using rlSNMPv3IpAddrToIndexTable)
+     is used for this row. If such a mapping is not used, a 0-length octet string
+     value should be used for this field (this is also the default).
+     This field value is determined only once, upon creation of an entry in the
+     snmpTargetAddrTable. A change in its value while updating an existing entry
+     is ignored.
+     Prior to creating a snmpTargetAddrTable entry with a 4 octets length value for
+     this field, the rlSNMPv3IpAddrToIndexTable must be used in order to retrieve
+     this value."
+   DEFVAL  { "" }
+     ::=  { rlTargetAddrExtEntry 1 }
+
+rlInet2EngineIdTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlInet2EngineIdEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+    "This table maps inet addresses to SNMPv3 engine identifiers.  "
+     ::= { rlSNMPv3 6 }
+
+rlInet2EngineIdEntry  OBJECT-TYPE
+   SYNTAX RlInet2EngineIdEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX       { rlInet2EngineIdAddressType,  rlInet2EngineIdAddress}
+   ::= { rlInet2EngineIdTable 1 }
+
+RlInet2EngineIdEntry ::= SEQUENCE {
+       rlInet2EngineIdAddressType         InetAddressType,
+       rlInet2EngineIdAddress             InetAddress,
+       rlInet2EngineIdEngineId            SnmpEngineID,
+       rlInet2EngineIdStatus              RowStatus
+}
+
+rlInet2EngineIdAddressType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+    "Inet address type of the mapped inet address."
+     ::=  { rlInet2EngineIdEntry 1 }
+
+rlInet2EngineIdAddress OBJECT-TYPE
+   SYNTAX InetAddress
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+    "Mapped inet address."
+     ::=  { rlInet2EngineIdEntry 2 }
+
+rlInet2EngineIdEngineId OBJECT-TYPE
+   SYNTAX SnmpEngineID
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "The SNMPv3 engine id to which the address denoted by rlInet2EngineIdAddressType and rlInet2EngineIdAddress is mapped."
+     ::=  { rlInet2EngineIdEntry 3 }
+
+rlInet2EngineIdStatus  OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "The management control for this table."
+   DEFVAL      { createAndGo }
+     ::=  { rlInet2EngineIdEntry 4 }
+
+
+rlSNMPDomains OBJECT IDENTIFIER ::= { rlSNMP 2 }
+
+rlSnmpUDPMridDomain  OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The SNMPv2 over UDP transport domain, used when Multi-Instance Router
+             is supported (more than one MIR instance exist).
+             The corresponding transport address is of type RlSnmpUDPMridAddress."
+    ::= { rlSNMPDomains 1 }
+
+RlSnmpUDPMridAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d.1d.1d.1d/2d/2d"
+    STATUS       current
+    DESCRIPTION
+            "Represents the UDP address of NMS and the MRID through which it is
+             connected in order to access the agent:
+               octets   contents        encoding
+                1-4     IP-address      network-byte order
+                5-6     UDP-port        network-byte order
+                7-8     MRID            network-byte order
+            "
+    SYNTAX       OCTET STRING (SIZE (8))
+
+rlSnmpUdpIpv6MridDomain OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The SNMPv2 over UDP over IPv6 transport domain, used when Multi-Instance Router
+         is supported (more than one MIR instance exist).
+         The corresponding transport address is of type RlSnmpUDPIpv6MridAddress
+         for global IPv6 addresses."
+    ::= { rlSNMPDomains 2 }
+
+RlSnmpUDPIpv6MridAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "0a[2x:2x:2x:2x:2x:2x:2x:2x]0a:2d:2d"
+    STATUS       current
+    DESCRIPTION
+            "Represents the UDP address of NMS and the MRID through which it is
+             connected in order to access the agent:
+               octets   contents        encoding
+                1-16    IPv6 address    network-byte order
+                17-18   UDP-port        network-byte order
+                19-20   MRID            network-byte order      "
+    SYNTAX       OCTET STRING (SIZE (20))
+
+rlSnmpUdpIpv6zMridDomain OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The SNMPv2 over UDP over IPv6 transport domain, used when Multi-Instance Router
+         is supported (more than one MIR instance exist).
+         The corresponding transport address is of type RlSnmpUDPIpv6zMridAddress
+         for scoped IPv6 addresses with a zone index."
+    ::= { rlSNMPDomains 3 }
+
+RlSnmpUDPIpv6zMridAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "0a[2x:2x:2x:2x:2x:2x:2x:2x%4d]0a:2d"
+    STATUS      current
+    DESCRIPTION
+        "Represents the UDP address of NMS (consisting of an IPv6 address,
+         a zone index and a port number) and the MRID through which it is
+         connected in order to access the agent:
+          octets       contents         encoding
+           1-16        IPv6 address     network-byte order
+          17-20        zone index       network-byte order
+          21-22        UDP-port         network-byte order
+          23-24        MRID             network-byte order        "
+    SYNTAX      OCTET STRING (SIZE (24))
+
+
+rlSnmpRequestMridTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlSnmpRequestMridEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+    "A table for determining the Mrid for the current SNMP request."
+     ::= { rlSNMP 3 }
+
+rlSnmpRequestMridEntry  OBJECT-TYPE
+   SYNTAX RlSnmpRequestMridEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rlSnmpRequestManagedMrid }
+   ::= { rlSnmpRequestMridTable 1 }
+
+RlSnmpRequestMridEntry ::= SEQUENCE {
+       rlSnmpRequestManagedMrid  INTEGER,
+       rlSnmpRequestMridStatus   INTEGER                                  }
+
+rlSnmpRequestManagedMrid OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+    "The router instance the NMS wants to manage in the current SNMP request.
+     The value of this object, when attaching a variable instance of the
+     rlSnmpRequestManagedMridTable to an SNMP request, will determine the
+     managed Mrid for this request.
+     It is important to mention that the variable insance must be attached
+     as the first variable in the PDU in order to influence all variables."
+     ::=  { rlSnmpRequestMridEntry 1 }
+
+rlSnmpRequestMridStatus OBJECT-TYPE
+   SYNTAX INTEGER {
+    enable(1)
+     }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+    "The status of this entry."
+    ::= { rlSnmpRequestMridEntry 2 }
+
+rlSNMPenable OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enables or disables SNMP."
+    DEFVAL      { enable }
+    ::= { rlSNMP 4 }
+
+rndCommunityInetTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RndCommunityInetEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+    "The community table of the agent"
+     ::= { rlSNMP 5 }
+
+rndCommunityInetEntry  OBJECT-TYPE
+   SYNTAX RndCommunityInetEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rndCommunityInetMngStationAddrType, rndCommunityInetMngStationAddr,
+           IMPLIED rndCommunityInetString }
+   ::= { rndCommunityInetTable 1 }
+
+RndCommunityInetEntry ::= SEQUENCE {
+  rndCommunityInetMngStationAddrType InetAddressType,
+  rndCommunityInetMngStationAddr     InetAddress,
+  rndCommunityInetString             DisplayString,
+  rndCommunityInetAccess             INTEGER,
+  rndCommunityInetTrapsEnable        INTEGER,
+  rndCommunityInetStatus             INTEGER,
+  rndCommunityInetPortSecurity       INTEGER,
+  rndCommunityInetOwner              DisplayString,
+  rndCommunityInetTrapDestPort       INTEGER,
+  rndCommunityInetAltAddrType        InetAddressType,
+  rndCommunityInetAltAddr            InetAddress
+
+}
+
+rndCommunityInetMngStationAddrType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+    "Address type of the management station that will be allowed to
+    communicate with the agent IP address"
+     ::=  { rndCommunityInetEntry 1 }
+
+
+rndCommunityInetMngStationAddr OBJECT-TYPE
+   SYNTAX InetAddress
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+    "Address of the management station that will be allowed to
+    communicate with the agent IP address"
+     ::=  { rndCommunityInetEntry 2 }
+
+rndCommunityInetString OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(1..20))
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+    "The community string with which the management
+     station will communicate with the agent"
+     ::= { rndCommunityInetEntry 3 }
+
+rndCommunityInetAccess OBJECT-TYPE
+   SYNTAX INTEGER {
+    readOnly(1),
+    readWrite(2),
+    super(3)
+      }
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "The allowed access to this management station"
+     ::= { rndCommunityInetEntry 4}
+
+rndCommunityInetTrapsEnable OBJECT-TYPE
+   SYNTAX INTEGER {
+        snmpV1(1),
+        snmpV2(2),
+        snmpV3(3),
+        trapsDisable(4)
+   }
+   MAX-ACCESS   read-create
+   STATUS current
+   DESCRIPTION
+    "Should the agent send traps to the management station,
+     and what version is required"
+      ::= { rndCommunityInetEntry 5 }
+
+rndCommunityInetStatus OBJECT-TYPE
+   SYNTAX INTEGER {
+    enable(1),
+    invalid(2)
+     }
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "The status of this entry. If the status is invalid the
+    community entry will be deleted"
+    ::= { rndCommunityInetEntry 6 }
+
+rndCommunityInetPortSecurity OBJECT-TYPE
+   SYNTAX INTEGER {
+    enabled(1),
+    disabled(2)
+   }
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "If enabled the device will only receive SNMP messages from the port,
+     through which this NMS is reachable from the device."
+   DEFVAL { disabled }
+   ::= { rndCommunityInetEntry 7 }
+
+rndCommunityInetOwner OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(1..32))
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "The owner of this community"
+     ::= { rndCommunityInetEntry 8 }
+
+rndCommunityInetTrapDestPort OBJECT-TYPE
+   SYNTAX INTEGER(0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "The transport protocol (usually UDP) port to which traps to the
+    management station represebted by this entry will be sent. The default
+    is the well-known IANA assigned port number for SNMP traps.
+    This object is relevant only if rndCommunityInetTrapsEnable has a value
+    different from trapsDisable."
+   DEFVAL { 162 }
+   ::= { rndCommunityInetEntry 9 }
+
+rndCommunityInetAltAddrType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "For testing purposes"
+     ::=  { rndCommunityInetEntry 10 }
+
+
+rndCommunityInetAltAddr OBJECT-TYPE
+   SYNTAX InetAddress
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "For testing purposes"
+     ::=  { rndCommunityInetEntry 11 }
+
+rlMridInetTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlMridInetEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+    "The MRID related configurations table of the agent"
+     ::= { rlSNMP 6 }
+
+rlMridInetEntry  OBJECT-TYPE
+   SYNTAX RlMridInetEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rndCommunityInetMngStationAddrType, rndCommunityInetMngStationAddr,
+           IMPLIED rndCommunityInetString }
+   ::= { rlMridInetTable 1 }
+
+RlMridInetEntry ::= SEQUENCE {
+       rlMridInetConnection    INTEGER,
+       rlInetManagedMrid       INTEGER
+}
+
+rlMridInetConnection OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+    "The router instance connecting the NMS who accessed the agent
+     through the community table entry corresponding to the keys of this entry."
+     ::=  { rlMridInetEntry 1 }
+
+rlInetManagedMrid OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+    "The router instance currently managed by the NMS who accessed the agent
+     through the community table entry corresponding to the keys of this entry "
+     ::=  { rlMridInetEntry 2 }
+
+rlEvents OBJECT IDENTIFIER ::= { rlSNMP 7 }
+
+rlEventsPollerId OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+    " The rlEventsPollerId is the 1st key in all the rlEvents tables. Each poller must first GET from this
+      object his Id. The agent will ensure uniqueness."
+     ::=  { rlEvents 1 }
+
+rlEventsDefaultPollingInterval OBJECT-TYPE
+   SYNTAX TimeTicks
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+     "The default polling time. Will be used to detrermined whether the events configured by a poller in
+      rlEventsTable can be destroyed, in absence of an entry for this poller in the rlEventsPollingControlTable."
+::=  { rlEvents 2 }
+
+
+rlEventsDeleteEvents OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+    " SETting a id of an active poller will cause all the rows of this poller in the rlEventsTable
+      to be destroyed. This is equivalent to SETting rlEventsStatus of each row of this poller to 'destroy'.
+      GET operation on this variable is meaningless, and the value 0 will be returned in this case (actual
+      pollers start from 1)."
+     ::=  { rlEvents 3 }
+
+
+rlEventsMaskTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlEventsMaskEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+    "The table showing the events mask for each client."
+     ::= { rlEvents 4 }
+
+rlEventsMaskEntry  OBJECT-TYPE
+   SYNTAX RlEventsMaskEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX {  rlEventsMaskPollerId }
+   ::= { rlEventsMaskTable 1 }
+
+
+RlEventsMaskEntry ::= SEQUENCE {
+       rlEventsMaskPollerId  INTEGER,
+       rlEventsMaskMask      OCTET STRING
+}
+
+rlEventsMaskPollerId OBJECT-TYPE
+   SYNTAX     INTEGER
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+    "The poller id whose events are shown in this table  "
+     ::=  { rlEventsMaskEntry 1 }
+
+
+rlEventsMaskMask OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+    "The semantics of the rlEventsMask is an array of timestamps (each 4 octets
+     containing one time stamp). Each timestamp is in TimeTicks units encoded in network order.
+     Thus the mask can contain up to 40 timestamps. If a place in the array is empty it will contain
+     0.
+     Each timestamp shows the time of the last occurrence of the event whose
+     rlEventIndexKey in the rlEventsTable for this client id is the same as its index in the array.
+     Each for bytes of the rlEventsMask will contain the timestamp in TimeTicks
+     units encoded in network order of the last time the event "
+     ::=  { rlEventsMaskEntry 2 }
+
+rlEventsTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlEventsEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+    "The table relating the events recorded to the indices in the rlEventsMask."
+     ::= { rlEvents 5 }
+
+rlEventsEntry  OBJECT-TYPE
+   SYNTAX RlEventsEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rlEventsPoller, IMPLIED rlEventId }
+   ::= { rlEventsTable 1 }
+
+
+RlEventsEntry ::= SEQUENCE {
+       rlEventsPoller    INTEGER,
+       rlEventId           OBJECT IDENTIFIER,
+       rlEventIndexInMask  INTEGER,
+       rlEventsStatus      RowStatus
+}
+
+rlEventsPoller OBJECT-TYPE
+   SYNTAX     INTEGER
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+    "The poller id whose event definitions are shown in this table."
+    ::= { rlEventsEntry 1 }
+
+rlEventId OBJECT-TYPE
+   SYNTAX     OBJECT IDENTIFIER
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+    "The event id of the polled event. This is the notification object identifier (in case of a
+     SNMPV2 notification) or the translation to SNMPv2 notation of an SNMPv1 trap according to the RFC 3584
+     (SNMP versions coexistence)."
+     ::=  { rlEventsEntry 2 }
+
+rlEventIndexInMask OBJECT-TYPE
+   SYNTAX     INTEGER
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+    "Index in the rlEventsMaskMask of this poller id that has been allocated for this event by the device."
+     ::=  { rlEventsEntry 3 }
+
+rlEventsStatus OBJECT-TYPE
+   SYNTAX     RowStatus
+   MAX-ACCESS read-create
+   STATUS     current
+   DESCRIPTION
+    "RowStatus for this table. Note that the device may refuse for resource shortage reasons to honour a create request
+     for this poller even if apparently there still is room in his rlEventsMaskMask (i.e. the poller has requested
+     monitoring of less than 40 events). "
+     ::=  { rlEventsEntry 4 }
+
+
+rlEventsPollingControlTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlEventsPollingControlEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+    "The polling control table for a poller. Currently contain only the polling interval."
+     ::= { rlEvents 6 }
+
+rlEventsPollingControlEntry  OBJECT-TYPE
+   SYNTAX RlEventsPollingControlEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rlEventsPollingControlPollerId }
+   ::= { rlEventsPollingControlTable 1 }
+
+
+RlEventsPollingControlEntry ::= SEQUENCE {
+       rlEventsPollingControlPollerId            INTEGER,
+       rlEventsPollingControlPollingInterval     TimeTicks
+}
+
+rlEventsPollingControlPollerId  OBJECT-TYPE
+   SYNTAX     INTEGER
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+    "The poller id whose polling controls are shown in this table."
+    ::= { rlEventsPollingControlEntry 1 }
+
+
+rlEventsPollingControlPollingInterval OBJECT-TYPE
+   SYNTAX     TimeTicks
+   MAX-ACCESS read-create
+   STATUS     current
+   DESCRIPTION
+    "The desired polling interval for this poller. If the device has determined that the poller has not
+     polled the device for 3 times this polling interval it may destroy all the data related to this poller
+     in the rlevents database "
+     ::=  { rlEventsPollingControlEntry 2 }
+
+
+rlUsmUserExtTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlUsmUserExtEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+    "This table extends usmUserEntry.  "
+     ::= { rlSNMPv3 8 }
+
+rlUsmUserExtEntry  OBJECT-TYPE
+   SYNTAX RlUsmUserExtEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+       " The row definition for this table."
+   AUGMENTS       { usmUserEntry }
+   ::= { rlUsmUserExtTable 1 }
+
+RlUsmUserExtEntry ::= SEQUENCE {
+       rlUsmUserAuthPassword      DisplayString,
+       rlUsmUserPrivPassword      DisplayString
+}
+
+rlUsmUserAuthPassword OBJECT-TYPE
+   SYNTAX DisplayString  (SIZE (0..32))
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "Authentication password.
+     Setting the field to a non zero-length value will convert the given password
+     to a localized authentication key, appropriate to the corresponding
+     usmUserAuthProtocol field. The key is localized using the appropriate
+     usmUserEngineID field, according to the algorithm specified in RFC 2574.
+     This field may be set to a non zero-length value if the following conditions hold:
+     1) This is the creation of the entry.
+     2) The value of the corresponding usmUserCloneFrom field is zeroDotZero.
+     Setting the field in any other case will cause no effect."
+   DEFVAL  { "" }
+     ::=  { rlUsmUserExtEntry 1 }
+
+
+rlUsmUserPrivPassword OBJECT-TYPE
+   SYNTAX DisplayString  (SIZE (0..32))
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "Privacy password.
+     Setting the field to a non zero-length value will convert the given password
+     to a localized privacy key, appropriate to the corresponding
+     usmUserAuthProtocol field. The key is localized using the appropriate
+     usmUserEngineID field, according to the algorithm specified in RFC 2574.
+     This field may be set to a non zero-length value if the following conditions hold:
+     1) This is the creation of the entry.
+     2) The value of the corresponding usmUserCloneFrom field is zeroDotZero.
+     Setting the field in any other case will cause no effect."
+   DEFVAL  { "" }
+     ::=  { rlUsmUserExtEntry 2 }
+
+END

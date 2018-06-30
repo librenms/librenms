@@ -1,3 +1,7 @@
+
+-- WinAgents MIB Extraction Wizard
+-- Extracted from rfc2922.txt 16.03.2005 20:21:53
+
 PTOPO-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -820,5 +824,4 @@ ptopoNotificationsGroup NOTIFICATION-GROUP
     ::= { ptopoGroups 4 }
 
 END
-
 

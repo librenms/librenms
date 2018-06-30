@@ -10,7 +10,7 @@
  * the source code distribution for details.
  */
 
-preg_match_all('/^(MSM\d{3})|Serial number ([\S]+)|Firmware version (\d+\.\d+\.\d+\.\d+-\d+)/', $poll_device['sysDescr'], $matches);
+preg_match_all('/^(MSM\d{3})|Serial number ([\S]+)|Firmware version (\d+\.\d+\.\d+\.\d+-\d+)/', $device['sysDescr'], $matches);
 $hardware = $matches[1][0];
 $serial = $matches[2][1];
 $version = $matches[3][2];

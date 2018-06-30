@@ -1,5 +1,7 @@
 <?php
 
+$no_refresh = true;
+
 $pagetitle[] = 'Search';
 
 $sections = array(
@@ -7,6 +9,7 @@ $sections = array(
     'ipv6' => 'IPv6 Address',
     'mac'  => 'MAC Address',
     'arp'  => 'ARP Table',
+    'fdb'  => 'FDB Table'
 );
 
 if (dbFetchCell('SELECT 1 from `packages` LIMIT 1')) {
@@ -40,7 +43,7 @@ foreach ($sections as $type => $texttype) {
 
 unset($sep);
 
-print_optionbar_end('', '');
+print_optionbar_end();
 
 if (file_exists('pages/search/'.$vars['search'].'.inc.php')) {
     include 'pages/search/'.$vars['search'].'.inc.php';

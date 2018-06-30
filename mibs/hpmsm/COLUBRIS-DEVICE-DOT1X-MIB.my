@@ -1,0 +1,321 @@
+-- ****************************************************************************
+--  COLUBRIS-DEVICE-DOT1X-MIB definitions
+--
+--  Copyright (c) 2006, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Colubris Device IEEE 802.1x MIB file.
+--
+-- ****************************************************************************
+
+
+COLUBRIS-DEVICE-DOT1X-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Counter32
+        FROM    SNMPv2-SMI
+    DisplayString, MacAddress
+        FROM    SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM    SNMPv2-CONF
+    colubrisMgmtV2
+        FROM    COLUBRIS-SMI
+    coDevDisIndex
+        FROM    COLUBRIS-DEVICE-MIB
+;
+
+
+colubrisDeviceDot1xMIB MODULE-IDENTITY
+    LAST-UPDATED    "200607050000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "Colubris Device IEEE 802.1x MIB."
+
+    ::= { colubrisMgmtV2 32 }
+
+
+-- colubrisDeviceDot1xMIB definition
+colubrisDeviceDot1xMIBObjects OBJECT IDENTIFIER ::= { colubrisDeviceDot1xMIB 1 }
+
+-- colubris Device IEEE 802.1x groups
+coDeviceDot1xConfigGroup       OBJECT IDENTIFIER ::= { colubrisDeviceDot1xMIBObjects 1 }
+coDeviceDot1xStatusGroup       OBJECT IDENTIFIER ::= { colubrisDeviceDot1xMIBObjects 2 }
+coDeviceDot1xStatsGroup        OBJECT IDENTIFIER ::= { colubrisDeviceDot1xMIBObjects 3 }
+
+-- The Device IEEE 802.1x Status Group
+coDeviceDot1xStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoDeviceStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Device IEEE 802.1x wireless station status attributes."
+    ::= { coDeviceDot1xStatusGroup 1 }
+
+coDeviceDot1xStatusEntry OBJECT-TYPE
+    SYNTAX      CoDeviceStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the coDeviceDot1xStatusTable.
+                 coDevDisIndex - Uniquely identifies a device on the
+                                 MultiService Controller.
+                 coDev1xStaIndex - Uniquely identifies a 802.1x station on
+                                   the device."
+    INDEX       { coDevDisIndex, coDev1xStaIndex }
+    ::= { coDeviceDot1xStatusTable 1 }
+
+CoDeviceStatusEntry ::= SEQUENCE
+{
+    coDev1xStaIndex             Integer32,
+    coDev1xStaMacAddress        MacAddress,
+    coDev1xStaUserName          DisplayString,
+    coDev1xStaPaeState          INTEGER,
+    coDev1xStaBackendAuthState  INTEGER,
+    coDev1xStaPortStatus        INTEGER,
+    coDev1xStaSessionTime       Counter32,
+    coDev1xStaTerminateCause    INTEGER
+}
+
+coDev1xStaIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Specifies the index of a 802.1x station on the
+                 device."
+    ::= { coDeviceDot1xStatusEntry 1 }
+
+coDev1xStaMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Wireless MAC address of the 802.1x station."
+    ::= { coDeviceDot1xStatusEntry 2 }
+
+coDev1xStaUserName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The User-Name representing the identity of the
+                 Supplicant PAE."
+    ::= { coDeviceDot1xStatusEntry 3 }
+
+coDev1xStaPaeState OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    initialize(1),
+                    disconnected(2),
+                    connecting(3),
+                    authenticating(4),
+                    authenticated(5),
+                    aborting(6),
+                    held(7),
+                    forceAuth(8),
+                    forceUnauth(9)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The current value of the Authenticator PAE state
+                 machine."
+    ::= { coDeviceDot1xStatusEntry 4 }
+
+coDev1xStaBackendAuthState OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    request(1),
+                    response(2),
+                    success(3),
+                    fail(4),
+                    timeout(5),
+                    idle(6),
+                    initialize(7)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The current state of the Backend Authentication
+                 state machine."
+    ::= { coDeviceDot1xStatusEntry 5 }
+
+coDev1xStaPortStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    authorized(1),
+                    unauthorized(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The current value of the controlled Port status
+                 parameter for the Port."
+    ::= { coDeviceDot1xStatusEntry 6 }
+
+coDev1xStaSessionTime OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The duration of the session in seconds."
+    ::= { coDeviceDot1xStatusEntry 7 }
+
+coDev1xStaTerminateCause OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    supplicantLogoff(1),
+                    portFailure(2),
+                    supplicantRestart(3),
+                    reauthFailed(4),
+                    authControlForceUnauth(5),
+                    portReInit(6),
+                    portAdminDisabled(7),
+                    notTerminatedYet(999)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The reason for session termination."
+    ::= { coDeviceDot1xStatusEntry 8 }
+
+-- The Device IEEE 802.1x Stats Group
+coDeviceDot1xStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoDeviceStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Device IEEE 802.1x wireless client statistic attributes."
+    ::= { coDeviceDot1xStatsGroup 1 }
+
+coDeviceDot1xStatsEntry OBJECT-TYPE
+    SYNTAX      CoDeviceStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the coDeviceDot1xStatsTable.
+                 coDevDisIndex - Uniquely identify a device in the
+                                 MultiService Controller.
+                 coDev1xStaIndex - Uniquely identify a 802.1x station on
+                                   the device."
+    AUGMENTS    { coDeviceDot1xStatusEntry }
+    ::= { coDeviceDot1xStatsTable 1 }
+
+CoDeviceStatsEntry ::= SEQUENCE
+{
+    coDev1xStaEapolRxFrame          Counter32,
+    coDev1xStaEapolTxFrame          Counter32,
+    coDev1xStaBackendResponses      Counter32,
+    coDev1xStaBackendChallenges     Counter32,
+    coDev1xStaBackendAuthSuccesses  Counter32,
+    coDev1xStaBackendAuthFails      Counter32
+}
+
+coDev1xStaEapolRxFrame OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of valid EAPOL frames of any type
+                 that have been received by this Authenticator."
+    ::= { coDeviceDot1xStatsEntry 1 }
+
+coDev1xStaEapolTxFrame OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of EAPOL frames of any type that
+                 have been transmitted by this Authenticator."
+    ::= { coDeviceDot1xStatsEntry 2 }
+
+coDev1xStaBackendResponses OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Counts the number of times that the state machine sends
+                 an initial Access-Request packet to the Authentication
+                 server (i.e., executes sendRespToServer on entry to the
+                 RESPONSE state). Indicates that the Authenticator
+                 attempted communication with the Authentication Server."
+    ::= { coDeviceDot1xStatsEntry 3 }
+
+coDev1xStaBackendChallenges OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Counts the number of times that the state machine
+                 receives an initial Access-Challenge packet from the
+                 Authentication server (i.e., aReq becomes TRUE,
+                 causing exit from the RESPONSE state). Indicates that
+                 the Authentication Server has communication with
+                 the Authenticator."
+    ::= { coDeviceDot1xStatsEntry 4 }
+
+coDev1xStaBackendAuthSuccesses OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Counts the number of times that the state machine
+                 receives an EAP-Success message from the Authentication
+                 Server (i.e., aSuccess becomes TRUE, causing a
+                 transition from RESPONSE to SUCCESS). Indicates that
+                 the Supplicant has successfully authenticated to
+                 the Authentication Server."
+    ::= { coDeviceDot1xStatsEntry 5 }
+
+coDev1xStaBackendAuthFails OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Counts the number of times that the state machine
+                 receives an EAP-Failure message from the Authentication
+                 Server (i.e., aFail becomes TRUE, causing a transition
+                 from RESPONSE to FAIL). Indicates that the Supplicant
+                 has not authenticated to the Authentication Server."
+    ::= { coDeviceDot1xStatsEntry 6 }
+
+
+-- conformance information
+colubrisDeviceDot1xMIBConformance OBJECT IDENTIFIER ::= { colubrisDeviceDot1xMIB 2 }
+colubrisDeviceDot1xMIBCompliances OBJECT IDENTIFIER ::= { colubrisDeviceDot1xMIBConformance 1 }
+colubrisDeviceDot1xMIBGroups      OBJECT IDENTIFIER ::= { colubrisDeviceDot1xMIBConformance 2 }
+
+
+-- compliance statements
+colubrisDeviceDot1xMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for the Device MIB."
+    MODULE      MANDATORY-GROUPS
+                    {
+                        colubrisDeviceDot1xStatusMIBGroup,
+                        colubrisDeviceDot1xStatsMIBGroup
+                    }
+    ::= { colubrisDeviceDot1xMIBCompliances 1 }
+
+-- units of conformance
+colubrisDeviceDot1xStatusMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coDev1xStaMacAddress,
+                    coDev1xStaUserName,
+                    coDev1xStaPaeState,
+                    coDev1xStaBackendAuthState,
+                    coDev1xStaPortStatus,
+                    coDev1xStaSessionTime,
+                    coDev1xStaTerminateCause
+                }
+    STATUS      current
+    DESCRIPTION "A collection of status objects for IEEE 802.1x
+                 stations connected to colubris devices."
+    ::= { colubrisDeviceDot1xMIBGroups 1 }
+
+colubrisDeviceDot1xStatsMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coDev1xStaEapolRxFrame,
+                    coDev1xStaEapolTxFrame,
+                    coDev1xStaBackendResponses,
+                    coDev1xStaBackendChallenges,
+                    coDev1xStaBackendAuthSuccesses,
+                    coDev1xStaBackendAuthFails
+                }
+    STATUS      current
+    DESCRIPTION "A collection of statistical objects for IEEE 802.1x
+                 stations connected to colubris devices."
+    ::= { colubrisDeviceDot1xMIBGroups 2 }
+
+END

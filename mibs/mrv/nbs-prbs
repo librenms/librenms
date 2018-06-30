@@ -1,0 +1,682 @@
+NBS-PRBS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32, Counter32, OBJECT-TYPE,
+    MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+
+    DisplayString
+        FROM SNMPv2-TC
+
+    InterfaceIndex
+        FROM IF-MIB
+
+    nbs
+        FROM NBS-MIB
+
+    nbsCmmcChassisIndex, nbsCmmcSlotIndex, nbsCmmcPortIndex, nbsCmmcPortName
+        FROM NBS-CMMC-MIB
+    ;
+
+
+nbsPrbsMib  MODULE-IDENTITY
+    LAST-UPDATED "201209260000Z"  -- Sep 26, 2012
+    ORGANIZATION  "NBS"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+
+    DESCRIPTION
+      "Pattern checking and generation"
+
+    ::= { nbs 212 }
+
+-- *******************************************************************
+-- NBS-PRBS-MIB local defines
+-- *******************************************************************
+
+nbsPrbsPatternGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "Available bit sequences"
+    ::= { nbsPrbsMib 1 }
+
+nbsPrbsGenGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "PRBS pattern generation status and configuration"
+    ::= { nbsPrbsMib 2 }
+
+nbsPrbsCheckGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "PRBS pattern checking status and configuration"
+    ::= { nbsPrbsMib 3 }
+
+nbsPrbsTrapGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "Objects used as varbinds in traps"
+    ::= { nbsPrbsMib 200 }
+
+nbsPrbsTraps0  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "PRBS event notifications"
+    ::= { nbsPrbsTrapGrp 0 }
+
+-- *******************************************************************
+--
+-- the nbsPrbsPatternTable
+--
+-- *******************************************************************
+
+nbsPrbsPatternTableSize OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Number of entries in nbsPrbsPatternTable"
+        ::= { nbsPrbsPatternGrp 1 }
+
+nbsPrbsPatternTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsPrbsPatternEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "List of known PRBS patterns"
+        ::= { nbsPrbsPatternGrp 2 }
+
+NbsPrbsPatternEntry ::= SEQUENCE {
+        nbsPrbsPatternIndex      INTEGER,
+        nbsPrbsPatternName       DisplayString,
+        nbsPrbsPatternDesc       DisplayString
+}
+
+nbsPrbsPatternEntry      OBJECT-TYPE
+        SYNTAX      NbsPrbsPatternEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "A particular PRBS pattern"
+        INDEX { nbsPrbsPatternIndex }
+        ::= { nbsPrbsPatternTable 1 }
+
+nbsPrbsPatternIndex   OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Index 1 is reserved.  Indexing starts from 2."
+        ::= { nbsPrbsPatternEntry 1 }
+
+nbsPrbsPatternName   OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Name of this pattern"
+        ::= { nbsPrbsPatternEntry 2 }
+
+nbsPrbsPatternDesc   OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Description of this pattern"
+        ::= { nbsPrbsPatternEntry 3 }
+
+
+-- *******************************************************************
+--
+-- the nbsPrbsGenTable
+--
+-- *******************************************************************
+
+nbsPrbsGenTableSize OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          ""
+        ::= { nbsPrbsGenGrp 1 }
+
+nbsPrbsGenTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsPrbsGenEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "List of ports that can generate a PRBS bitstream."
+        ::= { nbsPrbsGenGrp 2 }
+
+NbsPrbsGenEntry ::= SEQUENCE {
+        nbsPrbsGenIfIndex       InterfaceIndex,
+        nbsPrbsGenPatternCaps   OCTET STRING,
+        nbsPrbsGenPatternIndex  INTEGER,
+        nbsPrbsGenDurationMax   INTEGER,
+        nbsPrbsGenDuration      INTEGER,
+        nbsPrbsGenAction        INTEGER,
+        nbsPrbsGenStatus        INTEGER,
+        nbsPrbsGenProgress      Counter32
+}
+
+nbsPrbsGenEntry      OBJECT-TYPE
+        SYNTAX      NbsPrbsGenEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "An individual port's PRBS pattern generation status and
+           configuration"
+        INDEX { nbsPrbsGenIfIndex }
+        ::= { nbsPrbsGenTable 1 }
+
+nbsPrbsGenIfIndex   OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "The Mib2 ifIndex of this pattern generator port."
+        ::= { nbsPrbsGenEntry 1 }
+
+nbsPrbsGenPatternCaps   OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Bitmask indicating which patterns can be generated from
+           this port.
+
+           Bits 0 and 1 are reserved.
+
+           Subsequent bits refer to the nbsPrbsPatternTable.  Bit 2
+           corresponds to nbsPrbsPatternIndex 2, bit 3 to
+           nbsPrbsPatternIndex 3, and so on.
+
+           A bit is set (1) if that pattern can be generated by this
+           port, cleared (0) otherwise.
+
+           OCTET STRING bitmasks count the leftmost bit (MSB) as 0.
+
+           A zero length OCTET STRING indicates that this object is not
+           supported."
+        ::= { nbsPrbsGenEntry 2 }
+
+nbsPrbsGenPatternIndex   OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The nbsPrbsPatternIndex to utilize.
+
+           When read, the value -1 indicates pattern generation is not
+           supported.
+
+           When read, the value 1 indicates there is no pattern
+           currently selected.
+
+           Values less than 2 cannot be written."
+        ::= { nbsPrbsGenEntry 3 }
+
+nbsPrbsGenDurationMax   OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The maximum length of time, in seconds, that a bitstream can
+           be generated from this port.
+
+           The value 0 indicates there is no limit on the length of
+           time.
+
+           The value -1 indicates the duration cannot be set, either
+           because generation is not supported, or because there is no
+           way to limit the duration. The generator will not stop
+           without user intervention. It may also indicate there is no
+           valid protocol currently selected, so the maximum duration
+           cannot be calculated."
+        DEFVAL { 0 }
+        ::= { nbsPrbsGenEntry 4 }
+
+nbsPrbsGenDuration   OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The length of time, in seconds, to generate a bitstream.
+
+           The value 0 indicates test should run until terminated
+           manually by user.
+
+           When read, the value -1 indicates setting a duration is not
+           supported.
+
+           Values less than 0 cannot be written."
+        DEFVAL { 60 }
+        ::= { nbsPrbsGenEntry 5 }
+
+nbsPrbsGenAction   OBJECT-TYPE
+        SYNTAX      INTEGER {
+            notSupported (1),
+            stop         (2),
+            start        (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Used to initiate and terminate pattern generation from this
+           port.
+
+           If pattern generation is not available from this port, Agent
+           will report notSupported(1).  Any SET attempts will be
+           rejected.
+
+           To generate a bitstream, user should SET this object to
+           start(3).
+
+           To terminate a bitstream, user should SET this object to
+           stop(2).
+
+           When read, Agent should report the value last SET.  Agent
+           may report stop(2) after a system reboot, or after it halts
+           pattern generation because the time specified in
+           nbsPrbsGenDuration elapsed."
+       DEFVAL { stop }
+         ::= { nbsPrbsGenEntry 6 }
+
+nbsPrbsGenStatus   OBJECT-TYPE
+        SYNTAX      INTEGER {
+            notSupported (1),
+            unknown      (2),
+            idle         (3),
+            generating   (4)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Indicates whether this port is generating a test bitstream.
+
+           If notSupported(1), this port cannot generate a test
+           bitstream.
+
+           If unknown(2), this port can generate a test bitstream but
+           cannot report the status.
+
+           If idle(3), this port is currently not generating a test
+           bitstream.
+
+           If generating(4), this port currently is generating a test
+           bitstream."
+       DEFVAL { idle }
+         ::= { nbsPrbsGenEntry 7 }
+
+nbsPrbsGenProgress   OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Indicates how long, in seconds, the port has been
+           generating a bitstream.
+
+           When nbsPrbsGenStatus changes to generating(4), this.counter
+           should be cleared to zero(0) and then increment once each
+           second.
+
+           When nbsPrbsGenStatus changes to idle(3), this.counter
+           should be frozen at its then current value."
+         ::= { nbsPrbsGenEntry 8 }
+
+
+
+-- *******************************************************************
+--
+-- the nbsPrbsCheckTable
+--
+-- *******************************************************************
+
+nbsPrbsCheckTableSize OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          ""
+        ::= { nbsPrbsCheckGrp 1 }
+
+nbsPrbsCheckTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsPrbsCheckEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "List of ports that can check a PRBS bitstream."
+        ::= { nbsPrbsCheckGrp 2 }
+
+NbsPrbsCheckEntry ::= SEQUENCE {
+        nbsPrbsCheckIfIndex       InterfaceIndex,
+        nbsPrbsCheckPatternCaps   OCTET STRING,
+        nbsPrbsCheckPatternIndex  INTEGER,
+        nbsPrbsCheckDurationMax   INTEGER,
+        nbsPrbsCheckDuration      INTEGER,
+        nbsPrbsCheckAction        INTEGER,
+        nbsPrbsCheckStatus        INTEGER,
+        nbsPrbsCheckProgress      Counter32,
+        nbsPrbsCheckErrors        Counter32,
+        nbsPrbsCheckUpdateFreq    INTEGER
+}
+
+nbsPrbsCheckEntry      OBJECT-TYPE
+        SYNTAX      NbsPrbsCheckEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "An individual port's PRBS pattern checking status and
+           configuration"
+        INDEX { nbsPrbsCheckIfIndex }
+        ::= { nbsPrbsCheckTable 1 }
+
+nbsPrbsCheckIfIndex   OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "The Mib2 ifIndex of this pattern checker port."
+        ::= { nbsPrbsCheckEntry 1 }
+
+nbsPrbsCheckPatternCaps   OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Bitmask indicating which patterns can be checked from
+           this port.
+
+           Bits 0 and 1 are reserved.
+
+           Subsequent bits refer to the nbsPrbsPatternTable.  Bit 2
+           corresponds to nbsPrbsPatternIndex 2, bit 3 to
+           nbsPrbsPatternIndex 3, and so on.
+
+           A bit is set (1) if that pattern can be generated by this
+           port, cleared (0) otherwise.
+
+           OCTET STRING bitmasks count the leftmost bit (MSB) as 0.
+
+           A zero length OCTET STRING indicates that this object is not
+           supported."
+        ::= { nbsPrbsCheckEntry 2 }
+
+nbsPrbsCheckPatternIndex   OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The nbsPrbsPatternIndex to check for.
+
+           When read, the value -1 indicates pattern checking is not
+           supported.
+
+           When read, the value 1 indicates there is no pattern
+           currently selected.
+
+           Values less than 2 cannot be written."
+        ::= { nbsPrbsCheckEntry 3 }
+
+nbsPrbsCheckDurationMax   OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The maximum length of time, in seconds, that a bitstream
+           can be checked from this port.
+
+           The value 0 indicates there is no limit on the length of
+           time.
+
+           The value -1 indicates the duration cannot be set, either
+           because checking is not supported, or because there is no
+           way to limit the duration. The checker will not stop without
+           user intervention. It may also indicate there is no valid
+           protocol currently selected, so the maximum duration cannot
+           be calculated."
+        DEFVAL { 0 }
+        ::= { nbsPrbsCheckEntry 4 }
+
+nbsPrbsCheckDuration   OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The length of time, in seconds, to check a bitstream.
+
+           The value 0 indicates test should run until terminated
+           manually by user.
+
+           When read, the value -1 indicates setting a duration is not
+           supported.
+
+           Values less than 0 cannot be written."
+        DEFVAL { 60 }
+        ::= { nbsPrbsCheckEntry 5 }
+
+nbsPrbsCheckAction   OBJECT-TYPE
+        SYNTAX      INTEGER {
+            notSupported (1),
+            stop         (2),
+            start        (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Used to initiate and terminate pattern checking from this
+           port.
+
+           If pattern checking is not available from this port, Agent
+           will report notSupported(1).  Any SET attempts will be
+           rejected.
+
+           To check a bitstream, user should SET this object to
+           start(3).
+
+           To terminate checking, user should SET this object to
+           stop(2).
+
+           When read, Agent should report the value last SET.  Agent
+           may report stop(2) after a system reboot, or after it halts
+           pattern checking because the time specified in
+           nbsPrbsCheckDuration elapsed."
+       DEFVAL { stop }
+         ::= { nbsPrbsCheckEntry 6 }
+
+nbsPrbsCheckStatus   OBJECT-TYPE
+        SYNTAX      INTEGER {
+            notSupported (1),
+            idle         (2),
+            syncIn       (3),
+            syncOut      (4),
+            error        (5),
+            errOverflow  (6),
+            gaveUp       (7)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Indicates whether this port is checking a bitstream.
+
+           If notSupported(1), this port cannot check a test
+           bitstream.
+
+           If idle(2), this port is currently not checking a test
+           bitstream.
+
+           If syncIn(3), this port currently is checking a bitstream
+           and is synchronized with the pattern specified in
+           nbsPrbsCheckPatternIndex.
+
+           If syncOut(4), this port currently is checking a bitstream
+           and is out of synchronization with the pattern specified in
+           nbsPrbsCheckPatternIndex.
+
+           If error(5), this port currently is checking a bitstream
+           and an unspecified error occured in the checker.
+
+           If errOverflow(6), the Error Counter reached its maximum and
+           checking has been suspended. To clear this condition, user
+           should set nbsPrbsCheckAction to stop(2).
+
+           If gaveUp(7), the pattern checker was unable to synchronize
+           and aborted."
+       DEFVAL { idle }
+         ::= { nbsPrbsCheckEntry 7 }
+
+nbsPrbsCheckProgress   OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Indicates how long, in seconds, the port has been
+           checking a bitstream.
+
+           When nbsPrbsCheckStatus changes to idle(2), this.counter
+           should be cleared to zero(0) and then increment once each
+           second.
+
+           When nbsPrbsCheckStatus changes to syncIn(3) or syncOut(4),
+           this.counter should be frozen at its then current value."
+         ::= { nbsPrbsCheckEntry 8 }
+
+nbsPrbsCheckErrors   OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Indicates how many errors were detected during the last
+           pattern checking session.
+
+           The Agent should clear this counter to zero(0) when
+           nbsPrbsCheckStatus changes from idle(2).  While pattern
+           checking, Agent may increase this counter as errors occur.
+
+           Once nbsPrbsCheckStatus changes to idle(2), this counter
+           should report the final error count.
+
+           If errors were detected but the count is unknown, Agent
+           should report the number 1."
+         ::= { nbsPrbsCheckEntry 9 }
+
+nbsPrbsCheckUpdateFreq     OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Indicates how frequently, in minutes, the
+           nbsPrbsTrapCheckerStatusUpdate Notification should be sent.
+
+           The value zero (0) disables update Notifications."
+       DEFVAL { 0 }
+         ::= { nbsPrbsCheckEntry 10 }
+
+-- ******************************************************************
+--
+-- nbsPrbsTraps0 - Trap varbind objects
+--
+-- ******************************************************************
+
+nbsPrbsTrapGeneratorStarted  NOTIFICATION-TYPE
+        OBJECTS   { nbsCmmcChassisIndex, nbsCmmcSlotIndex, nbsCmmcPortIndex,
+                    nbsCmmcPortName }
+        STATUS      current
+        DESCRIPTION
+          "Sent when nbsPrbsGenStatus transitions to generating(4).
+
+           This Notification should be of Severity INFO."
+        ::= { nbsPrbsTraps0 10 }
+
+nbsPrbsTrapGeneratorStopped  NOTIFICATION-TYPE
+        OBJECTS   { nbsCmmcChassisIndex, nbsCmmcSlotIndex, nbsCmmcPortIndex,
+                    nbsCmmcPortName }
+        STATUS      current
+        DESCRIPTION
+          "Sent when nbsPrbsGenStatus transitions from generating(4).
+
+           This Notification should be of Severity INFO."
+        ::= { nbsPrbsTraps0 11 }
+
+nbsPrbsTrapCheckerStarted  NOTIFICATION-TYPE
+        OBJECTS   { nbsCmmcChassisIndex, nbsCmmcSlotIndex, nbsCmmcPortIndex,
+                    nbsCmmcPortName }
+        STATUS      current
+        DESCRIPTION
+          "Sent when an interface begins checking for a bitstream.
+
+           This Notification should be of Severity INFO."
+        ::= { nbsPrbsTraps0 20 }
+
+nbsPrbsTrapCheckerStopped  NOTIFICATION-TYPE
+        OBJECTS   { nbsCmmcChassisIndex, nbsCmmcSlotIndex, nbsCmmcPortIndex,
+                    nbsCmmcPortName, nbsPrbsCheckStatus }
+        STATUS      current
+        DESCRIPTION
+          "Sent when an interface stops checking for a bitstream.
+
+           This Notification should be of Severity INFO."
+        ::= { nbsPrbsTraps0 21 }
+
+nbsPrbsTrapCheckerOverflowed  NOTIFICATION-TYPE
+        OBJECTS   { nbsCmmcChassisIndex, nbsCmmcSlotIndex, nbsCmmcPortIndex,
+                    nbsCmmcPortName }
+        STATUS      current
+        DESCRIPTION
+          "Sent when nbsPrbsCheckStatus transitions to errOverflow(6).
+
+           This event indicates that the checker was unable to continue
+           and is now in a suspended state which requires a user to
+           manually stop the checker.
+
+           This Notification should be of Severity ERROR."
+        ::= { nbsPrbsTraps0 22 }
+
+nbsPrbsTrapCheckerErrorDetected  NOTIFICATION-TYPE
+        OBJECTS   { nbsCmmcChassisIndex, nbsCmmcSlotIndex, nbsCmmcPortIndex,
+                    nbsCmmcPortName, nbsPrbsCheckStatus }
+        STATUS      current
+        DESCRIPTION
+          "Sent when nbsPrbsCheckErrors transitions from zero (0).
+
+           This event indicates the first error was detected in
+           the incoming bitstream.
+
+           This Notification should be of Severity ERROR."
+        ::= { nbsPrbsTraps0 23 }
+
+nbsPrbsTrapCheckerStatusUpdate  NOTIFICATION-TYPE
+        OBJECTS   { nbsCmmcChassisIndex, nbsCmmcSlotIndex, nbsCmmcPortIndex,
+                    nbsCmmcPortName, nbsPrbsCheckStatus, nbsPrbsCheckErrors,
+                    nbsPrbsCheckProgress }
+        STATUS      current
+        DESCRIPTION
+          "This Notification periodically reports the status, error
+           counts, and running time of the Checker process.
+
+           This Notification should be of Severity INFO."
+        ::= { nbsPrbsTraps0 24 }
+
+nbsPrbsTrapCheckerSyncIn  NOTIFICATION-TYPE
+        OBJECTS   { nbsCmmcChassisIndex, nbsCmmcSlotIndex, nbsCmmcPortIndex,
+                    nbsCmmcPortName, nbsPrbsCheckStatus }
+        STATUS      current
+        DESCRIPTION
+          "Sent when a checker port synchronizes with a bitstream.
+
+           This Notification should be of Severity ERROR."
+        ::= { nbsPrbsTraps0 25 }
+
+nbsPrbsTrapCheckerSyncOut  NOTIFICATION-TYPE
+        OBJECTS   { nbsCmmcChassisIndex, nbsCmmcSlotIndex, nbsCmmcPortIndex,
+                    nbsCmmcPortName, nbsPrbsCheckStatus }
+        STATUS      current
+        DESCRIPTION
+          "Sent when a checker port loses synchronization with a
+           bitstream.
+
+           This Notification should be of Severity ERROR."
+        ::= { nbsPrbsTraps0 26 }
+
+
+END

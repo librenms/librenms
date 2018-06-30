@@ -1,0 +1,152 @@
+-- **************************************************************************
+-- HILLSTONE-ZONE-MIB 
+--
+-- Copyright (c) 2009 by Hillstone Networks, Inc.
+-- All rights reserved.
+-- 
+-- Version:      V3   
+-- Description:	 Hillstone Networks ZONE MIB Object Identifier Assignments
+-- **************************************************************************
+--
+
+HILLSTONE-ZONE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	hillstoneZONE
+		FROM HILLSTONE-SMI
+	OBJECT-TYPE
+		FROM RFC-1212	
+	RowStatus		
+		FROM SNMPv2-TC;
+          -- textual conventions
+
+          DisplayString ::=
+              OCTET STRING
+          -- This data type is used to model textual information taken
+          -- from the NVT ASCII character set.  By convention, objects
+          -- with this syntax are declared as having
+          --
+          --      SIZE (0..255)
+
+hillstoneZoneObjects OBJECT IDENTIFIER ::= { hillstoneZONE 1 }
+
+hillstoneZoneTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HillstoneZoneEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	    "This table contains all the security zones defined in the system."
+::= { hillstoneZoneObjects 1 }
+
+HillstoneZoneEntry OBJECT-TYPE
+	SYNTAX HillstoneZoneEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Define the parameters of security zone."
+INDEX { hillstoneZoneZoneIdx }
+::= { hillstoneZoneTable 1 }
+	
+HillstoneZoneEntry ::=
+	SEQUENCE { 
+	hillstoneZoneZoneIdx
+		Counter,
+	hillstoneZoneZoneName
+		OCTET STRING,
+	hillstoneZoneType
+		INTEGER,
+	hillstoneZoneRowStatus
+		RowStatus
+	}
+
+hillstoneZoneZoneIdx OBJECT-TYPE
+	SYNTAX Counter 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "
+	    An internal number to distinguish security zone.
+	    Different zone has different number.
+	    "
+::= { HillstoneZoneEntry 1 }
+
+hillstoneZoneZoneName OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (1..255))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	    "
+	    The name of security zone.
+	    Different zone has different name."
+::= { HillstoneZoneEntry 2 }
+
+hillstoneZoneType OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		lever-2(1),
+		lever-3(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	    "
+	    The priority of security zone.
+	    Different zone has different priority.
+	    "
+::= { HillstoneZoneEntry 3 }
+  
+hillstoneZoneRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	 "The status of this address book row. support: active, createandgo, destory"
+::= { HillstoneZoneEntry 4 }
+	
+hillstoneZoneIFTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF hillstoneZoneIFEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	    "
+	    This table define the interfaces belong to which security zone.
+	    An interface can only belong to one security zone."
+::= { hillstoneZoneObjects 2 }
+
+hillstoneZoneIFEntry OBJECT-TYPE
+	SYNTAX hillstoneZoneIFEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	    " "
+	INDEX { hillstoneZoneIdx, 
+	       hillstoneZoneIfIndex }
+::= { hillstoneZoneIFTable 1 }
+
+hillstoneZoneIFEntry ::=
+SEQUENCE { 
+        hillstoneZoneIdx
+		Counter,
+	hillstoneZoneIfIndex
+		Counter
+	}
+
+hillstoneZoneIdx OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "An internal number to distinguish security zone.
+	    Different zone has different number."
+::= { hillstoneZoneIFEntry 1 }
+	
+hillstoneZoneIfIndex OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "hillstoneZoneIfIndex equals to ifindex of IF-MIB"
+::= { hillstoneZoneIFEntry 2 }
+
+
+END

@@ -3,8 +3,8 @@
 if ($device['os'] == 'aos') {
     echo 'Alcatel-Lucent OS: ';
 
-    $total   = snmp_get($device, 'systemHardwareMemorySize.0', '-OvQ', 'ALCATEL-IND1-SYSTEM-MIB', '+'.$config['install_dir'].'/mibs/aos');
-    $percent = snmp_get($device, 'healthDeviceMemoryLatest.0', '-OvQ', 'ALCATEL-IND1-HEALTH-MIB', '+'.$config['install_dir'].'/mibs/aos');
+    $total   = snmp_get($device, 'systemHardwareMemorySize.0', '-OvQ', 'ALCATEL-IND1-SYSTEM-MIB', 'aos');
+    $percent = snmp_get($device, 'healthDeviceMemoryLatest.0', '-OvQ', 'ALCATEL-IND1-HEALTH-MIB', 'aos');
     $used    = ($total / 100 * $perc_used);
     $free    = ($total - $used);
 

@@ -10,4 +10,4 @@ list($version,$features) = explode(':', $version);
 list(,$version)          = explode(' ', $version);
 list($features)          = explode(',', trim($features));
 
-require 'includes/polling/netscaler-stats.inc.php';
+require 'includes/polling/os/misc/netscaler-stats.inc.php';

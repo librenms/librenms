@@ -24,7 +24,8 @@
  * @author     f0o <f0o@devilcode.org>
  */
 
-$config['memcached']['enable'] = false;
+use LibreNMS\Authentication\Auth;
+
 ?>
 
 <div class="container-fluid">
@@ -41,7 +42,7 @@ $config['memcached']['enable'] = false;
 <?php
 
 
-if (is_admin() === true) {
+if (Auth::user()->hasGlobalAdmin()) {
     echo '<ul class="nav nav-tabs">';
     $pages = dbFetchRows("SELECT DISTINCT `config_group` FROM `config` WHERE `config_group` IS NOT NULL AND `config_group` != ''");
     array_unshift($pages, array('config_group' => 'Global')); // Add Global tab
@@ -80,12 +81,22 @@ if (is_admin() === true) {
 
         function a2t($a)
         {
+
+            $excluded = array(
+                'db_pass',
+                'email_smtp_password',
+                'password',
+                'auth_ad_bindpassword',
+            );
+
             $r = '<table class="table table-condensed table-hover"><tbody>';
             foreach ($a as $k => $v) {
                 if (!empty($v)) {
-                    $r .= '<tr><td class="col-md-2"><i><b>' . $k . '</b></i></td><td class="col-md-10">';
-                    $r .= is_array($v) ? a2t($v) : '<code>' . wordwrap($v, 75, '<br/>') . '</code>';
-                    $r .= '</td></tr>';
+                    if (!in_array($k, $excluded, true)) {
+                        $r .= '<tr><td class="col-md-2"><i><b>' . $k . '</b></i></td><td class="col-md-10">';
+                        $r .= is_array($v) ? a2t($v) : '<code>' . wordwrap($v, 75, '<br/>') . '</code>';
+                        $r .= '</td></tr>';
+                    }
                 }
             }
             $r .= '</tbody></table>';
@@ -94,7 +105,7 @@ if (is_admin() === true) {
 
         echo '<div class="table-responsive">' . a2t($config) . '</div>';
 
-        if ($debug && $_SESSION['userlevel'] >= '10') {
+        if ($debug && Auth::user()->hasGlobalAdmin()) {
             echo("<pre>");
             print_r($config);
             echo("</pre>");

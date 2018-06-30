@@ -1,0 +1,11 @@
+os: zyxelnwa
+text: 'ZyXEL NWA'
+group: zyxel
+type: network
+icon: zyxel
+discovery:
+    -
+      sysDescr_regex:
+          - '/^NWA/'
+      sysObjectID:
+          - '.1.3.6.1.4.1.890.1.15'

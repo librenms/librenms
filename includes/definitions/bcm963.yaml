@@ -1,0 +1,9 @@
+os: bcm963
+text: 'Broadcom BCM963xx'
+type: network
+icon: broadcom
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysDescr:
+        - bcm963

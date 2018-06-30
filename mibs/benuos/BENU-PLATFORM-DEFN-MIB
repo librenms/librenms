@@ -1,0 +1,108 @@
+-- *****************************************************************
+-- BENU-PLATFORM-DEFN-MIB.txt : Benu Product Object Identifier assignments
+--
+-- Copyright (C) 2012 by Benu Networks  Inc.
+-- All rights reserved.
+-- *****************************************************************
+BENU-PLATFORM-DEFN-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY
+            FROM SNMPv2-SMI
+        benuPlatform
+            FROM BENU-PLATFORM-MIB;
+
+    benuPlatformDefn MODULE-IDENTITY
+            LAST-UPDATED "201611170000Z" -- November 17, 2016
+            ORGANIZATION "Benu Networks,Inc"
+            CONTACT-INFO "Benu Networks,Inc
+                          Corporate Headquarters
+                          300 Concord Road, Suite 110
+                          Billerica, MA 01821 USA
+                          Tel: +1 978-223-4700
+                          Fax: +1 978-362-1908
+                          Email: info@benunets.com"
+            DESCRIPTION
+               "This module defines the object identifiers that are
+                 assigned to various hardware platforms"
+
+            REVISION "201611170000Z" -- November 17, 2016
+            DESCRIPTION "Updated platform types"
+
+            REVISION "201610130000Z" -- October 13, 2016
+            DESCRIPTION "Changed vMEG to xMEG"
+
+            REVISION "201604120000Z" -- April 12, 2016
+            DESCRIPTION "Changed benuVSE to vMEG"
+
+            REVISION "201210180000Z" -- October 18, 2012
+            DESCRIPTION "Initial Version."
+
+        ::= { benuPlatform 2 }
+
+      --
+      -- Platform definitions for all Benu Network . Inc
+      --
+
+      benuPlatformTypes           OBJECT IDENTIFIER ::= { benuPlatformDefn  1 }
+      platformUnknown             OBJECT IDENTIFIER ::= { benuPlatformTypes 0 }
+      Benu-xMEG-100               OBJECT IDENTIFIER ::= { benuPlatformTypes 1 }
+      Benu-xMEG-10                OBJECT IDENTIFIER ::= { benuPlatformTypes 2 }
+      Benu-Internal               OBJECT IDENTIFIER ::= { benuPlatformTypes 3 }
+      Benu-Virtual                OBJECT IDENTIFIER ::= { benuPlatformTypes 4 }
+      Benu-KVM                    OBJECT IDENTIFIER ::= { benuPlatformTypes 5 }
+      Benu-VMware                 OBJECT IDENTIFIER ::= { benuPlatformTypes 6 }
+      Benu-VirtualBox             OBJECT IDENTIFIER ::= { benuPlatformTypes 7 }
+
+      --
+      -- chassis-type definitions for all Benu products
+      --
+
+      benuChassisTypes            OBJECT IDENTIFIER ::= { benuPlatformDefn 2 }
+
+      benuChassisTypeUnknown     OBJECT IDENTIFIER ::= { benuChassisTypes 0 }
+      benuChassisTypeMEG100      OBJECT IDENTIFIER ::= { benuChassisTypes 1 }
+      benuChassisTypeMEG400      OBJECT IDENTIFIER ::= { benuChassisTypes 2 }
+      benuChassisTypeMEG1200     OBJECT IDENTIFIER ::= { benuChassisTypes 3 }
+      benuChassisTypeMEG50       OBJECT IDENTIFIER ::= { benuChassisTypes 4 }
+
+      --
+      -- Card Type definitions for all Benu products
+      --
+
+      benuCardTypes               OBJECT IDENTIFIER ::= { benuPlatformDefn 3 }
+
+      benuCardUnknown             OBJECT IDENTIFIER ::= { benuCardTypes 0 }
+      benuCardRSM                 OBJECT IDENTIFIER ::= { benuCardTypes 1 }
+      benuCardSwitchFabric        OBJECT IDENTIFIER ::= { benuCardTypes 2 }
+      benuCardShelfMgr            OBJECT IDENTIFIER ::= { benuCardTypes 3 }
+      benuCardSEFP                OBJECT IDENTIFIER ::= { benuCardTypes 4 }
+      benuCardIO                  OBJECT IDENTIFIER ::= { benuCardTypes 5 }
+      benuCardSwitchMesh          OBJECT IDENTIFIER ::= { benuCardTypes 6 }
+
+
+
+      --
+      -- Port  Type definitions for all Benu products
+      --
+
+      benuPortTypes            OBJECT IDENTIFIER ::= { benuPlatformDefn 4 }
+
+      benuPortUnknown         OBJECT IDENTIFIER   ::= { benuPortTypes 0}
+      benuPortGige            OBJECT IDENTIFIER   ::= { benuPortTypes 1}
+      benuPortEthernet        OBJECT IDENTIFIER   ::= { benuPortTypes 2}
+      benuPortl2tp            OBJECT IDENTIFIER   ::= { benuPortTypes 3}
+      benuPortLoopback        OBJECT IDENTIFIER   ::= { benuPortTypes 4}
+      benuPortT1              OBJECT IDENTIFIER   ::= { benuPortTypes 5}
+      benuPortNULL            OBJECT IDENTIFIER   ::= { benuPortTypes 6}
+      benuPortTunnel          OBJECT IDENTIFIER   ::= { benuPortTypes 7}
+      benuPortPOS             OBJECT IDENTIFIER   ::= { benuPortTypes 8}
+      benuPortATM             OBJECT IDENTIFIER   ::= { benuPortTypes 9} 
+      benuPortIpGre           OBJECT IDENTIFIER   ::= { benuPortTypes 10} 
+      benuPortBridge          OBJECT IDENTIFIER   ::= { benuPortTypes 11} 
+      benuPortLag             OBJECT IDENTIFIER   ::= { benuPortTypes 12} 
+      benuPortMultiBind       OBJECT IDENTIFIER   ::= { benuPortTypes 13} 
+      benuPortMultiBindLastResort  OBJECT IDENTIFIER   ::= { benuPortTypes 14} 
+
+
+END

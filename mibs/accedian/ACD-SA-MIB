@@ -1,0 +1,1165 @@
+--
+-- Accedian Enterprise Specific MIB
+--
+-- Copyright (c) 2005-2011, Accedian Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+ACD-SA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32, Gauge32
+        FROM SNMPv2-SMI
+    DisplayString, DateAndTime, TEXTUAL-CONVENTION, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+    acdMibs
+        FROM ACCEDIAN-SMI;
+
+acdSa MODULE-IDENTITY
+
+    LAST-UPDATED "201112210100Z"
+    ORGANIZATION "Accedian Networks, Inc."
+    CONTACT-INFO
+            "Accedian Technical Assistance Center
+             Accedian Networks, Inc.
+             4878 Levy, suite 202
+             Saint-Laurent, Quebec Canada H4R 2P1
+             E-mail: support@accedian.com"
+    DESCRIPTION
+            "The Service Availability database for this Accedian Networks device."
+
+    REVISION "201112210100Z"        -- 21 Dec 2011
+    DESCRIPTION
+            "Add support for ETH-SLM metrics."
+
+
+    REVISION "201103150100Z"        -- 15 Mars 2011
+    DESCRIPTION
+            "Initial version of MIB module ACD-SA-MIB."
+
+    ::= { acdMibs 12 }
+
+acdSaNotifications      OBJECT IDENTIFIER ::= { acdSa 0 }
+acdSaMIBObjects         OBJECT IDENTIFIER ::= { acdSa 1 }
+acdSaConformance        OBJECT IDENTIFIER ::= { acdSa 2 }
+                        
+acdSaConfig             OBJECT IDENTIFIER ::= { acdSaMIBObjects 1 }
+acdSaCounter            OBJECT IDENTIFIER ::= { acdSaMIBObjects 2 }
+acdSaStatus             OBJECT IDENTIFIER ::= { acdSaMIBObjects 3 }
+
+---------------------------------------------------------------------------
+-- Textual conventions
+---------------------------------------------------------------------------
+
+AcdSaMetricType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "A value that represents a type of metric that can be used in an
+        instance of Service Availability."
+    SYNTAX      INTEGER {
+                    metricPaaPlr(1),
+                    metricPaaOwDelay(2),
+                    metricPaaOwDv(3),
+                    metricPaaTwDelay(4),
+                    metricPaaTwDv(5),
+                    metricCfmPlr(6),
+                    metricCfmOwDelay(7),
+                    metricCfmOwDv(8),
+                    metricCfmTwDelay(9),
+                    metricCfmTwDv(10),
+		    metricCfmSlmNearEndPlr(11),
+		    metricCfmSlmFarEndPlr(12)
+    }
+    
+AcdSaValidFlag ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "The validity flag can have three values: valid, adjusted, or pending.
+        The value of valid indicates the metrics are calculated normally. 
+	The value of adjusted is used to indicate a change occurred in the 
+	configuration during the reporting period which may impact the service 
+	availability calculation. 
+	The value of pending indicates that the counters were reset in the 
+	middle of a time interval."
+    SYNTAX      INTEGER {
+                    valid(1),
+                    adjusted(2),
+                    pending(3)
+    }
+    
+AcdSaAdminStateFlag ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "This flag is used for the administrative state.
+        The value IS indicates the state is In-Service. The value OOS
+	indicates the state is Out-of-Service."
+    SYNTAX      INTEGER {
+                    is(1),
+                    oos(2)
+    }
+    
+AcdSaOperStateFlag ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "This flag is used for the operational state.
+        The value IS indicates the state is In-Service. The value OOS
+	indicates the state is Out-of-Service. The value oos-au indicates
+	the state is Out-of-Service-Autonomous. This state is entered when
+	all of the metrics associated with the service instance are disabled."
+    SYNTAX      INTEGER {
+                    is(1),
+                    oos(2),
+                    oosAu(3)
+    }
+    
+---------------------------------------------------------------------------
+ -- The Service configuration table
+ -- This table contains all Service entry configurations.
+---------------------------------------------------------------------------
+
+acdSaServiceConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdSaServiceConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains all instance of service availability of this unit."
+    ::= { acdSaConfig 1 }
+
+acdSaServiceConfigEntry OBJECT-TYPE
+    SYNTAX      AcdSaServiceConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all settings for a Service."
+    INDEX   { acdSaServiceIndex }
+    ::=  { acdSaServiceConfigTable 1 }
+
+AcdSaServiceConfigEntry ::= SEQUENCE {
+    acdSaServiceIndex                   Unsigned32,
+    acdSaServiceConfigRowStatus         RowStatus,
+    acdSaServiceConfigName              DisplayString,    
+    acdSaServiceConfigAdminState        AcdSaAdminStateFlag,
+    acdSaServiceConfigReportingPeriod   Unsigned32,
+    acdSaServiceConfigUaWindowSize      Unsigned32,
+    acdSaServiceConfigHliWindowSize     Unsigned32,
+    acdSaServiceConfigTimeInterval      Unsigned32
+}
+
+acdSaServiceIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each service instance."
+    ::= { acdSaServiceConfigEntry 1 }
+
+acdSaServiceConfigRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "All columns must have a valid value before a row can be activated. To
+        create a new Service you shall provide a unique name for an empty
+        row with the RowStatus set to Create and Go."
+    ::= { acdSaServiceConfigEntry 2 }
+
+acdSaServiceConfigName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A unique name used to identify the Service."
+    ::= { acdSaServiceConfigEntry 3 }
+
+acdSaServiceConfigAdminState OBJECT-TYPE
+    SYNTAX      AcdSaAdminStateFlag
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Administrative state is(1) or oos(2)."
+    DEFVAL      { 2 }
+    ::= { acdSaServiceConfigEntry 4 }
+
+acdSaServiceConfigReportingPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32 (1 .. 1440)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A reporting period over which availability counters are evaluated
+        in addition to the monotonic counters (In minutes)."
+    DEFVAL      { 15 }
+    ::= { acdSaServiceConfigEntry 5 }
+
+acdSaServiceConfigUaWindowSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (1 .. 1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of consecutive seconds over which to assess unavailability."
+    DEFVAL      { 10 }
+    ::= { acdSaServiceConfigEntry 6 }
+
+acdSaServiceConfigHliWindowSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (1 .. 999)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of consecutive Time Intervals used to assess High Loss Intervals for this instance."
+    DEFVAL      { 3 }
+    ::= { acdSaServiceConfigEntry 7 }
+    
+acdSaServiceConfigTimeInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (1 .. 60)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The interval of time during which the metric is evaluated. Allowed values
+	are 1, 5, 10, 20, or 60."
+    DEFVAL      { 1 }
+    ::= { acdSaServiceConfigEntry 8 }
+
+    
+---------------------------------------------------------------------------
+ -- The Metric configuration table
+ -- This table contains all Metric entry configurations.
+---------------------------------------------------------------------------
+
+acdSaMetricConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdSaMetricConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ....."
+    ::= { acdSaConfig 2 }
+
+acdSaMetricConfigEntry OBJECT-TYPE
+    SYNTAX      AcdSaMetricConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all settings for a Metric."
+    INDEX   { acdSaServiceIndex,
+              acdSaMetricIndex }
+    ::=  { acdSaMetricConfigTable 1 }
+
+AcdSaMetricConfigEntry ::= SEQUENCE {
+    acdSaMetricIndex                 Unsigned32,
+    acdSaMetricConfigRowStatus          RowStatus,
+    acdSaMetricConfigName               DisplayString,
+    acdSaMetricConfigSrcName		DisplayString,
+    acdSaMetricConfigType               AcdSaMetricType,
+    acdSaMetricConfigThreshold     	Unsigned32
+}
+
+acdSaMetricIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index for each metric instance."
+    ::= { acdSaMetricConfigEntry 1 }
+
+acdSaMetricConfigRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "All columns must have a valid value before a row can be activated. To
+        create a new Service you shall provide the a unique name for an empty
+        row with the RowStatus set to Create and Go.  To delete the VLAN set
+        you need to set the RowStatus to destroy."
+    ::= { acdSaMetricConfigEntry 2 }
+
+acdSaMetricConfigName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A unique name used to identify the Metric."
+    ::= { acdSaMetricConfigEntry 3 }
+
+acdSaMetricConfigSrcName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A unique name used to identify the source metric."
+    ::= { acdSaMetricConfigEntry 4 }
+
+acdSaMetricConfigType OBJECT-TYPE
+    SYNTAX      AcdSaMetricType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the Service Availability entry."
+    DEFVAL      { metricCfmTwDelay }
+    ::= { acdSaMetricConfigEntry 5 }
+
+acdSaMetricConfigThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the delay threshold for this metric when type is 
+	one of metric delay parameters (in micro-seconds). Indicates
+	the packet loss threshold for this metric when type is one of
+	packet-loss parameter expressed in millionth of percent
+	(1,000,000 is 1%)."
+     DEFVAL      { 0 }
+    ::= { acdSaMetricConfigEntry 6 }
+
+
+---------------------------------------------------------------------------
+ -- The Service counters table
+ -- This table contains all services history counters.
+---------------------------------------------------------------------------
+
+acdSaServiceCounterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdSaServiceCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains all instance of service availability of this unit."
+    ::= { acdSaCounter 1 }
+
+acdSaServiceCounterEntry OBJECT-TYPE
+    SYNTAX      AcdSaServiceCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all counters for a Service."
+    INDEX   { acdSaServiceIndex }
+    ::=  { acdSaServiceCounterTable 1 }
+
+AcdSaServiceCounterEntry ::= SEQUENCE {
+    acdSaServiceCounterPeriodIndex      Unsigned32,
+    acdSaServiceCounterValidFlag        AcdSaValidFlag,
+    acdSaServiceCounterUpTime           Unsigned32,
+    acdSaServiceCounterUaTime           Unsigned32,
+    acdSaServiceCounterMaintTime        Unsigned32,
+    acdSaServiceCounterAvailRatio       Unsigned32,
+    acdSaServiceCounterGaps             Unsigned32,
+    acdSaServiceCounterLargestGap       Unsigned32,
+    acdSaServiceCounterChliTime         Unsigned32,
+    acdSaServiceCounterChliRatio        Unsigned32
+}
+
+acdSaServiceCounterPeriodIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that uniquely identifies the particular sample this entry
+         represents among all samples associated with the same service
+         instance. This index starts at 1 and increases by one as each new
+         period."
+    ::= { acdSaServiceCounterEntry 1 }
+
+acdSaServiceCounterValidFlag  OBJECT-TYPE
+    SYNTAX      AcdSaValidFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the service counter during this sampling
+         interval."
+    ::= { acdSaServiceCounterEntry 2 }
+
+
+acdSaServiceCounterUpTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Uptime is a measure of the time a service has been up during this
+         sampling interval."
+    ::= { acdSaServiceCounterEntry 3 }
+
+acdSaServiceCounterUaTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The UaTime is a measure of the time a service has been unavailable
+         during this sampling interval."
+    ::= { acdSaServiceCounterEntry 4 }
+
+acdSaServiceCounterMaintTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MaintTime is a measure of the time a service has been in maintenance
+         during this sampling interval."
+    ::= { acdSaServiceCounterEntry 5 }
+
+acdSaServiceCounterAvailRatio  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the availability ratio in millionth of a percent
+        (1,000,000 is 1%)."
+    ::= { acdSaServiceCounterEntry 6 }
+
+
+acdSaServiceCounterGaps  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The gap shall be the number of time the state change from available
+         to unavailable."
+    ::= { acdSaServiceCounterEntry 7 }
+
+acdSaServiceCounterLargestGap  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The largest gap shall be the largest number of consecutive unavailable
+         second."
+    ::= { acdSaServiceCounterEntry 8 }
+
+acdSaServiceCounterChliTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The CHLI time is a counter which increments for every high loss interval. 
+	 It is only reset to zero when one of the following conditions occur: 
+	 1) device reboot 2) explicit counter reset."
+    ::= { acdSaServiceCounterEntry 9 }
+
+acdSaServiceCounterChliRatio  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ratio of high loss intervals divided by the uptime minus the sum of 
+	maintenance time and unavailable time, expressed in millionth of a percent (1,000,000 is 1%)."
+    ::= { acdSaServiceCounterEntry 10 }
+
+
+---------------------------------------------------------------------------
+ -- The Service History counters table
+ -- This table contains all services history counters.
+---------------------------------------------------------------------------
+
+acdSaServiceHistCounterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdSaServiceHistCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains all instance of service availability of this unit."
+    ::= { acdSaCounter 2 }
+
+acdSaServiceHistCounterEntry OBJECT-TYPE
+    SYNTAX      AcdSaServiceHistCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all counters for a Service."
+    INDEX   { acdSaServiceIndex,
+              acdSaServiceHistCounterPeriodIndex }
+    ::=  { acdSaServiceHistCounterTable 1 }
+
+AcdSaServiceHistCounterEntry ::= SEQUENCE {
+    acdSaServiceHistCounterPeriodIndex      Unsigned32,
+    acdSaServiceHistCounterIntervalEnd      DateAndTime,
+    acdSaServiceHistCounterValidFlag        AcdSaValidFlag,
+    acdSaServiceHistCounterUpTime           Unsigned32,
+    acdSaServiceHistCounterUaTime           Unsigned32,
+    acdSaServiceHistCounterMaintTime        Unsigned32,
+    acdSaServiceHistCounterAvailRatio       Unsigned32,
+    acdSaServiceHistCounterGaps             Unsigned32,
+    acdSaServiceHistCounterLargestGap       Unsigned32,
+    acdSaServiceHistCounterChliTime         Unsigned32,
+    acdSaServiceHistCounterChliRatio        Unsigned32
+}
+
+acdSaServiceHistCounterPeriodIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index that uniquely identifies the particular sample this entry
+         represents among all samples associated with the same service
+         instance. This index starts at 1 and increases by one as each new
+         period."
+    ::= { acdSaServiceHistCounterEntry 1 }
+
+
+acdSaServiceHistCounterIntervalEnd  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the time of the end of this entry."
+    ::= { acdSaServiceHistCounterEntry 2 }
+
+
+acdSaServiceHistCounterValidFlag  OBJECT-TYPE
+    SYNTAX      AcdSaValidFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the service counter during this sampling
+         interval."
+    ::= { acdSaServiceHistCounterEntry 3 }
+
+
+acdSaServiceHistCounterUpTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Uptime is a measure of the time a service has been up during this
+         sampling interval."
+    ::= { acdSaServiceHistCounterEntry 4 }
+
+acdSaServiceHistCounterUaTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The UaTime is a measure of the time a service has been unavailable
+         during this sampling interval."
+    ::= { acdSaServiceHistCounterEntry 5 }
+
+acdSaServiceHistCounterMaintTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MaintTime is a measure of the time a service has been in maintenance
+         during this sampling interval."
+    ::= { acdSaServiceHistCounterEntry 6 }
+
+acdSaServiceHistCounterAvailRatio  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the availability ratio in millionth of a percent
+        (1,000,000 is 1%)."
+    ::= { acdSaServiceHistCounterEntry 7 }
+
+
+acdSaServiceHistCounterGaps  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The gap shall be the number of time the state change from available
+         to unavailable."
+    ::= { acdSaServiceHistCounterEntry 8 }
+
+acdSaServiceHistCounterLargestGap  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The largest gap shall be the largest number of consecutive unavailable
+         second."
+    ::= { acdSaServiceHistCounterEntry 9 }
+
+acdSaServiceHistCounterChliTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The CHLI time is a counter which increments for every High Loss Interval.
+	 It is only reset to zero when one of the following conditions occur:
+	 1) device reboot 2) explicit counter reset."
+    ::= { acdSaServiceHistCounterEntry 10 }
+
+acdSaServiceHistCounterChliRatio  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ratio of high loss intervals divided by the uptime minus the sum of 
+	maintenance time and unavailable time, expressed in millionth of a percent (1,000,000 is 1%)."
+    ::= { acdSaServiceHistCounterEntry 11 }
+
+---------------------------------------------------------------------------
+ -- The Monotonic Service counters table
+ -- This table contains all services monotonic counters.
+---------------------------------------------------------------------------
+
+acdSaServiceMonoCounterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdSaServiceMonoCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains all instance of service availability of this unit."
+    ::= { acdSaCounter 3 }
+
+acdSaServiceMonoCounterEntry OBJECT-TYPE
+    SYNTAX      AcdSaServiceMonoCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all monotonic counters for a Service."
+    INDEX   { acdSaServiceIndex }
+    ::=  { acdSaServiceMonoCounterTable 1 }
+
+AcdSaServiceMonoCounterEntry ::= SEQUENCE {
+    acdSaServiceMonoCounterValidFlag        AcdSaValidFlag,
+    acdSaServiceMonoCounterUpTime           Unsigned32,
+    acdSaServiceMonoCounterUaTime           Unsigned32,
+    acdSaServiceMonoCounterMaintTime        Unsigned32,
+    acdSaServiceMonoCounterAvailRatio       Unsigned32,
+    acdSaServiceMonoCounterGaps             Unsigned32,
+    acdSaServiceMonoCounterLargestGap       Unsigned32,
+    acdSaServiceMonoCounterChliTime         Unsigned32,
+    acdSaServiceMonoCounterChliRatio        Unsigned32
+}
+
+acdSaServiceMonoCounterValidFlag  OBJECT-TYPE
+    SYNTAX      AcdSaValidFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the service counter during this sampling
+         interval."
+    ::= { acdSaServiceMonoCounterEntry 1 }
+
+
+acdSaServiceMonoCounterUpTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Uptime is a measure of the time a service has been up during this
+         sampling interval."
+    ::= { acdSaServiceMonoCounterEntry 2 }
+
+acdSaServiceMonoCounterUaTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The UaTime is a measure of the time a service has been unavailable
+         during this sampling interval."
+    ::= { acdSaServiceMonoCounterEntry 3 }
+
+acdSaServiceMonoCounterMaintTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MaintTime is a measure of the time a service has been in maintenance
+         during this sampling interval."
+    ::= { acdSaServiceMonoCounterEntry 4 }
+
+acdSaServiceMonoCounterAvailRatio  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the availability ratio in millionth of a percent
+        (1,000,000 is 1%)."
+    ::= { acdSaServiceMonoCounterEntry 5 }
+
+
+acdSaServiceMonoCounterGaps  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The gap shall be the number of time the state change from available
+         to unavailable."
+    ::= { acdSaServiceMonoCounterEntry 6 }
+
+acdSaServiceMonoCounterLargestGap  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The largest gap shall be the largest number of consecutive unavailable
+         second."
+    ::= { acdSaServiceMonoCounterEntry 7 }
+
+acdSaServiceMonoCounterChliTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A counter which increments for every high loss interval. 
+	 It is only reset to zero when one of the following conditions occur: 
+	 1) device reboot 2) explicit counter reset."
+    ::= { acdSaServiceMonoCounterEntry 8 }
+
+acdSaServiceMonoCounterChliRatio  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ratio of high loss intervals divided by the uptime minus the sum of maintenance time and unavailable time,
+	 expressed in millionth of a percent (1,000,000 is 1%)."
+    ::= { acdSaServiceMonoCounterEntry 9 }
+
+
+---------------------------------------------------------------------------
+ -- The Metric counters table
+ -- This table contains all metrics history counters.
+---------------------------------------------------------------------------
+
+acdSaMetricCounterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdSaMetricCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains all instance of service availability of this unit."
+    ::= { acdSaCounter 4 }
+
+acdSaMetricCounterEntry OBJECT-TYPE
+    SYNTAX      AcdSaMetricCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all counters for a Metric."
+    INDEX   { acdSaServiceIndex,
+	      acdSaMetricIndex }
+    ::=  { acdSaMetricCounterTable 1 }
+
+AcdSaMetricCounterEntry ::= SEQUENCE {
+    acdSaMetricCounterValidFlag        AcdSaValidFlag,
+    acdSaMetricCounterUaTime           Unsigned32,
+    acdSaMetricCounterChliTime         Unsigned32
+}
+
+acdSaMetricCounterValidFlag  OBJECT-TYPE
+    SYNTAX      AcdSaValidFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the metric counter during this sampling
+         interval."
+    ::= { acdSaMetricCounterEntry 1 }
+
+
+acdSaMetricCounterUaTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The UaTime is a measure of the time a metric has been unavailable
+         during this sampling interval."
+    ::= { acdSaMetricCounterEntry 2 }
+
+acdSaMetricCounterChliTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A counter which increments for every High Loss Interval. It is only reset to zero when one of the following conditions occur: 
+	 1) device reboot 2) explicit counter reset."
+    ::= { acdSaMetricCounterEntry 3 }
+
+
+---------------------------------------------------------------------------
+ -- The Metric History counters table
+ -- This table contains all metrics history counters.
+---------------------------------------------------------------------------
+
+acdSaMetricHistCounterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdSaMetricHistCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains all instance of service availability of this unit."
+    ::= { acdSaCounter 5 }
+
+acdSaMetricHistCounterEntry OBJECT-TYPE
+    SYNTAX      AcdSaMetricHistCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all counters for a Metric."
+    INDEX   { acdSaMetricHistCounterID,
+              acdSaMetricHistCounterPeriodIndex }
+    ::=  { acdSaMetricHistCounterTable 1 }
+
+AcdSaMetricHistCounterEntry ::= SEQUENCE {
+    acdSaMetricHistCounterID               Unsigned32,
+    acdSaMetricHistCounterPeriodIndex      Unsigned32,
+    acdSaMetricHistCounterIntervalEnd      DateAndTime,
+    acdSaMetricHistCounterValidFlag        AcdSaValidFlag,
+    acdSaMetricHistCounterUaTime           Unsigned32,
+    acdSaMetricHistCounterChliTime         Unsigned32
+}
+
+acdSaMetricHistCounterID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each Metric instance. This value follows the
+         ordering of the service table."
+    ::= { acdSaMetricHistCounterEntry 1 }
+
+acdSaMetricHistCounterPeriodIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index that uniquely identifies the particular sample this entry
+         represents among all samples associated with the same service
+         instance. This index starts at 1 and increases by one as each new
+         period."
+    ::= { acdSaMetricHistCounterEntry 2 }
+
+
+acdSaMetricHistCounterIntervalEnd  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the time of the end of this entry."
+    ::= { acdSaMetricHistCounterEntry 3 }
+
+
+acdSaMetricHistCounterValidFlag  OBJECT-TYPE
+    SYNTAX      AcdSaValidFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the metric counter during this sampling
+         interval."
+    ::= { acdSaMetricHistCounterEntry 4 }
+
+
+acdSaMetricHistCounterUaTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The UaTime is a measure of the time a metric has been unavailable
+         during this sampling interval."
+    ::= { acdSaMetricHistCounterEntry 5 }
+
+acdSaMetricHistCounterChliTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A counter which increments for every High Loss Interval. It is only reset to zero when one of the following conditions occur: 
+	1) device reboot 2) explicit counter reset."
+    ::= { acdSaMetricHistCounterEntry 6 }
+
+---------------------------------------------------------------------------
+ -- The Metric counters table
+ -- This table contains all metrics history counters.
+---------------------------------------------------------------------------
+
+acdSaMetricMonoCounterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdSaMetricMonoCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains all instance of service availability of this unit."
+    ::= { acdSaCounter 6 }
+
+acdSaMetricMonoCounterEntry OBJECT-TYPE
+    SYNTAX      AcdSaMetricMonoCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all counters for a Metric."
+    INDEX   { acdSaServiceIndex,
+	    acdSaMetricIndex }
+    ::=  { acdSaMetricMonoCounterTable 1 }
+
+AcdSaMetricMonoCounterEntry ::= SEQUENCE {
+    acdSaMetricMonoCounterValidFlag        AcdSaValidFlag,
+    acdSaMetricMonoCounterUaTime           Unsigned32,
+    acdSaMetricMonoCounterChliTime         Unsigned32
+}
+
+acdSaMetricMonoCounterValidFlag  OBJECT-TYPE
+    SYNTAX      AcdSaValidFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the metric counter during this sampling
+         interval."
+    ::= { acdSaMetricMonoCounterEntry 1 }
+
+
+acdSaMetricMonoCounterUaTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The UaTime is a measure of the time a metric has been unavailable
+         during this sampling interval."
+    ::= { acdSaMetricMonoCounterEntry 2 }
+
+acdSaMetricMonoCounterChliTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A counter which increments for every high loss interval. It is only reset to zero when one of the following conditions occur: 
+	 1) device reboot 2) explicit counter reset."
+    ::= { acdSaMetricMonoCounterEntry 3 }
+
+
+
+---------------------------------------------------------------------------
+ -- The Service status table
+ -- This table contains all Service entry status.
+---------------------------------------------------------------------------
+
+acdSaServiceStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdSaServiceStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains all instance of service availability of this unit."
+    ::= { acdSaStatus 1 }
+
+acdSaServiceStatusEntry OBJECT-TYPE
+    SYNTAX      AcdSaServiceStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all status for a Service."
+    INDEX   { acdSaServiceStatusID }
+    ::=  { acdSaServiceStatusTable 1 }
+
+AcdSaServiceStatusEntry ::= SEQUENCE {
+    acdSaServiceStatusID                Unsigned32,
+    acdSaServiceStatusName              DisplayString,    
+    acdSaServiceStatusAdminState        AcdSaAdminStateFlag,
+    acdSaServiceStatusOperState         AcdSaOperStateFlag,
+    acdSaServiceStatusNbrMetrics   	Gauge32
+}
+
+acdSaServiceStatusID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each service instance."
+    ::= { acdSaServiceStatusEntry 1 }
+
+acdSaServiceStatusName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique name used to identify the Service."
+    ::= { acdSaServiceStatusEntry 2 }
+
+acdSaServiceStatusAdminState OBJECT-TYPE
+    SYNTAX      AcdSaAdminStateFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Administrative state is one of is(1) or oos(2)."
+    DEFVAL      { 2 }
+    ::= { acdSaServiceStatusEntry 3 }
+
+acdSaServiceStatusOperState OBJECT-TYPE
+    SYNTAX      AcdSaOperStateFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational state is one of is(1), oos(2) or oosAu (3)."
+    DEFVAL      { 2 }
+    ::= { acdSaServiceStatusEntry 4 }
+
+acdSaServiceStatusNbrMetrics OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of metrics associated with this Service instance."
+    DEFVAL      { 0 }
+    ::= { acdSaServiceStatusEntry 5 }
+
+
+
+
+
+---------------------------------------------------------------------------
+ -- ACD-SA-MIB Module - Conformance Information
+---------------------------------------------------------------------------
+
+acdSaCompliances    OBJECT IDENTIFIER ::= { acdSaConformance 1 }
+acdSaGroups         OBJECT IDENTIFIER ::= { acdSaConformance 2 }
+                    
+---------------------------------------------------------------------------
+ -- Units of conformance
+---------------------------------------------------------------------------
+
+acdSaServiceConfigGroup OBJECT-GROUP
+    OBJECTS {
+        acdSaServiceConfigRowStatus,
+        acdSaServiceConfigName,
+        acdSaServiceConfigAdminState,
+        acdSaServiceConfigReportingPeriod,
+        acdSaServiceConfigUaWindowSize,
+        acdSaServiceConfigHliWindowSize,
+        acdSaServiceConfigTimeInterval
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Service configuration Group."
+    ::= { acdSaGroups 1 }
+
+acdSaMetricConfigGroup OBJECT-GROUP
+    OBJECTS {
+        acdSaMetricConfigRowStatus,
+        acdSaMetricConfigName,
+        acdSaMetricConfigSrcName,
+        acdSaMetricConfigType,
+        acdSaMetricConfigThreshold
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Metric configuration Group."
+    ::= { acdSaGroups 2 }
+
+acdSaServiceCounterGroup OBJECT-GROUP
+    OBJECTS {    
+        acdSaServiceCounterPeriodIndex,    
+        acdSaServiceCounterValidFlag,
+        acdSaServiceCounterUpTime,
+        acdSaServiceCounterUaTime,
+        acdSaServiceCounterMaintTime,
+        acdSaServiceCounterAvailRatio,
+        acdSaServiceCounterGaps,
+        acdSaServiceCounterLargestGap,
+        acdSaServiceCounterChliTime,
+        acdSaServiceCounterChliRatio
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Service Counter Group."
+    ::= { acdSaGroups 3 }
+
+acdSaServiceHistCounterGroup OBJECT-GROUP
+    OBJECTS {
+    
+        acdSaServiceHistCounterIntervalEnd,
+        acdSaServiceHistCounterValidFlag,
+        acdSaServiceHistCounterUpTime,
+        acdSaServiceHistCounterUaTime,
+        acdSaServiceHistCounterMaintTime,
+        acdSaServiceHistCounterAvailRatio,
+        acdSaServiceHistCounterGaps,
+        acdSaServiceHistCounterLargestGap,
+        acdSaServiceHistCounterChliTime,
+        acdSaServiceHistCounterChliRatio
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Service History Counter Group."
+    ::= { acdSaGroups 4 }
+
+acdSaServiceMonoCounterGroup OBJECT-GROUP
+    OBJECTS {
+        acdSaServiceMonoCounterValidFlag,
+        acdSaServiceMonoCounterUpTime,
+        acdSaServiceMonoCounterUaTime,
+        acdSaServiceMonoCounterMaintTime,
+        acdSaServiceMonoCounterAvailRatio,
+        acdSaServiceMonoCounterGaps,
+        acdSaServiceMonoCounterLargestGap,
+        acdSaServiceMonoCounterChliTime,
+        acdSaServiceMonoCounterChliRatio
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Service Monotonic Counter Group."
+    ::= { acdSaGroups 5 }
+
+acdSaMetricCounterGroup OBJECT-GROUP
+    OBJECTS {
+        acdSaMetricCounterValidFlag,
+        acdSaMetricCounterUaTime,
+        acdSaMetricCounterChliTime
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Metric Counter Group."
+    ::= { acdSaGroups 6 }
+
+acdSaMetricHistCounterGroup OBJECT-GROUP
+    OBJECTS {
+    
+        acdSaMetricHistCounterIntervalEnd,
+        acdSaMetricHistCounterValidFlag,
+        acdSaMetricHistCounterUaTime,
+        acdSaMetricHistCounterChliTime
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Metric History Counter Group."
+    ::= { acdSaGroups 7 }
+
+acdSaMetricMonoCounterGroup OBJECT-GROUP
+    OBJECTS {
+        acdSaMetricMonoCounterValidFlag,
+        acdSaMetricMonoCounterUaTime,
+        acdSaMetricMonoCounterChliTime
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Metric History Counter Group."
+    ::= { acdSaGroups 8 }
+
+acdSaServiceStatusGroup OBJECT-GROUP
+    OBJECTS {
+	acdSaServiceStatusName,
+	acdSaServiceStatusAdminState,
+	acdSaServiceStatusOperState,
+	acdSaServiceStatusNbrMetrics
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Service Status Group."
+    ::= { acdSaGroups 9 }
+
+
+acdSaCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+       "The compliance statement for support of the ACD-SA-MIB module."
+    MODULE
+        MANDATORY-GROUPS {
+            acdSaServiceConfigGroup,
+            acdSaMetricConfigGroup,
+            acdSaServiceCounterGroup,
+            acdSaServiceHistCounterGroup,
+            acdSaServiceMonoCounterGroup,
+            acdSaMetricCounterGroup,
+            acdSaMetricHistCounterGroup,
+            acdSaMetricMonoCounterGroup,
+	  acdSaServiceStatusGroup
+         }
+
+    OBJECT  acdSaServiceConfigRowStatus
+      SYNTAX       RowStatus { active(1) }
+      WRITE-SYNTAX RowStatus { createAndGo(4), destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    OBJECT  acdSaMetricConfigRowStatus
+      SYNTAX       RowStatus { active(1) }
+      WRITE-SYNTAX RowStatus { createAndGo(4), destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    ::= { acdSaCompliances 1 }
+
+END

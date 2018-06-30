@@ -1,0 +1,190 @@
+
+NBS-SYSCOMM-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    InetAddress, InetAddressPrefixLength
+        FROM INET-ADDRESS-MIB
+    nbs
+        FROM NBS-MIB
+    ;
+
+nbsSyscommMib  MODULE-IDENTITY
+    LAST-UPDATED "201306060000Z"  -- June 6, 2013
+    ORGANIZATION  "NBS"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+
+    DESCRIPTION
+      "Information Base for provisioning ip configuration of managed device."
+    ::= { nbs 214 }
+
+
+
+-- *******************************************************************
+-- NBS-SYSCOMM-MIB local defines  and textual conventions
+-- *******************************************************************
+
+nbsSyscommInetGrp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "TCP/IP configuration of system management card"
+    ::= { nbsSyscommMib 3 }
+
+nbsSyscommEventGrp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Objects to be included in event notifications"
+    ::= { nbsSyscommMib 100 }
+
+nbsSyscommEvents  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Events related to system communications"
+    ::= { nbsSyscommEventGrp 0 }
+
+
+-- ********************************************************************
+--
+-- nbsSyscommInetAddrGrp
+--
+-- ********************************************************************
+
+
+nbsSyscommInetSlaacAddr      OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The IPv6 link-local address assigned by the Stateless Address
+        Autoconfiguration process."
+    ::= { nbsSyscommInetGrp 3 }
+
+nbsSyscommInetSlaacAddrPrefix     OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The prefix length of nbsSyscommInetSlaacAddr."
+    ::= { nbsSyscommInetGrp 5 }
+
+nbsSyscommInetAddrAdmin      OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Persistent. User-desired IPv6 address.
+
+        For IPv4, use the object nbsCmmcSysIpAddr[Admin]"
+    --DEFVAL { "" }
+    ::= { nbsSyscommInetGrp 10 }
+
+nbsSyscommInetAddrOper       OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The user-specified Ipv6 address actually in effect.
+
+        For IPv4, please refer to the object nbsCmmcSysIpAddrOper."
+    --DEFVAL { "" }
+    ::= { nbsSyscommInetGrp 11 }
+
+nbsSyscommInetAddrPrefixAdmin     OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The prefix length of nbsSyscommInetAddrAdmin."
+    DEFVAL { 64 }
+    ::= { nbsSyscommInetGrp 22 }
+
+nbsSyscommInetAddrPrefixOper     OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The prefix length of nbsSyscommInetAddrOper."
+    ::= { nbsSyscommInetGrp 23 }
+
+nbsSyscommGateAddrAdmin      OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Persistent. Desired default IPv6 gateway.
+
+        For IPv4, use the object nbsCmmcSysDefaultGateway[Admin]."
+    --DEFVAL { "" }
+    ::= { nbsSyscommInetGrp 30 }
+
+nbsSyscommGateAddrOper       OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The current IPv6 default gateway.
+
+        For IPv4, please refer to nbsCmmcSysDefaultGatewayOper."
+    --DEFVAL { "" }
+    ::= { nbsSyscommInetGrp 31 }
+
+
+
+
+-- ********************************************************************
+--
+-- nbsSyscommEventGrp
+--
+-- ********************************************************************
+
+nbsSyscommInetAddrPrior       OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The value nbsSyscommInetAddrOper had before the last modification"
+    --DEFVAL { "" }
+    ::= { nbsSyscommEventGrp 311 }
+
+nbsSyscommGateAddrPrior       OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The value nbsSyscommGateAddrOper had before the last modification"
+    --DEFVAL { "" }
+    ::= { nbsSyscommEventGrp 331 }
+
+
+
+-- ********************************************************************
+--
+-- nbsSyscommEvents definitions
+--
+-- ********************************************************************
+
+
+nbsSyscommInetCfgChanging  NOTIFICATION-TYPE
+    OBJECTS   { nbsSyscommInetAddrAdmin, nbsSyscommGateAddrAdmin }
+    STATUS      current
+    DESCRIPTION
+       "Sent when before the changes are actually applied.  This is a
+        warning to all SNMP Manager stations that the IP Address is
+        changing, and they will soon lose contact with this device.
+
+        This Notification's nbsCmmcSysTrapTblEntLevel is fatal(2)."
+    ::= { nbsSyscommEvents 30 }
+
+nbsSyscommInetCfgChanged  NOTIFICATION-TYPE
+    OBJECTS   { nbsSyscommInetAddrPrior, nbsSyscommGateAddrPrior }
+    STATUS      current
+    DESCRIPTION
+       "Sent after changes are complete and have been applied.
+
+        This Notification's nbsCmmcSysTrapTblEntLevel is fatal(2)."
+    ::= { nbsSyscommEvents 31 }
+
+
+
+END

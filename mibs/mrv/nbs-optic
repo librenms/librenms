@@ -1,0 +1,221 @@
+
+NBS-OPTIC-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+
+    InterfaceIndex
+        FROM IF-MIB
+
+    nbs
+        FROM NBS-MIB
+    ;
+
+nbsOpticMib  MODULE-IDENTITY
+    LAST-UPDATED "201209260000Z"  -- Sep 26, 2012
+    ORGANIZATION  "NBS"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+
+    DESCRIPTION
+      "Information Base for common fiber optic features."
+    ::= { nbs 213 }
+
+-- *******************************************************************
+-- Groups in NBS-OPTIC-MIB
+-- *******************************************************************
+
+nbsOpticPortGrp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "For describing fiber optic ports."
+    ::= { nbsOpticMib 1 }
+
+
+-- ********************************************************************
+--
+-- nbsOpticPortGrp
+--
+-- ********************************************************************
+
+nbsOpticPortTableSize OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of fiber optic ports in this system."
+    ::= { nbsOpticPortGrp 1 }
+
+nbsOpticPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsOpticPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "List of all fiber optic ports in this system."
+    ::= { nbsOpticPortGrp 2 }
+
+nbsOpticPortEntry      OBJECT-TYPE
+    SYNTAX      NbsOpticPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A particular fiber optic port."
+    INDEX { nbsOpticPortNdx }
+    ::= { nbsOpticPortTable 1 }
+
+NbsOpticPortEntry ::= SEQUENCE {
+    nbsOpticPortNdx               InterfaceIndex,
+    nbsOpticPortTxStatusAdmin     INTEGER,
+    nbsOpticPortTxStatusOper      INTEGER,
+    nbsOpticPortRxStatusAdmin     INTEGER,
+    nbsOpticPortRxStatusOper      INTEGER,
+    nbsOpticPortConnector         INTEGER,
+    nbsOpticPortPolish            INTEGER,
+    nbsOpticPortFiberMode         INTEGER
+}
+
+nbsOpticPortNdx      OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "ifIndex-like unique id of this port."
+    ::= { nbsOpticPortEntry 1 }
+
+nbsOpticPortTxStatusAdmin OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        outOfService (2),
+        inService    (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Persistent. This object is used to administratively disable or
+        enable the Transmitter of this port.  It is an alias to the
+        nbsCmmcPortEnableAdmin object.
+
+        If the transmitter cannot be disabled by user, this object is
+        notSupported(1).
+
+        If the user wishes to disable this transmitter, the user should
+        set this to outOfService(2). This is equivalent to setting
+        nbsCmmcPortEnableAdmin to disable(2).  This action should cause
+        the mib2 object ifAdminStatus to go down(2).
+
+        If the user wishes to enable this transmitter, the user should
+        set this to inService(3). If nothing else remains disabled,
+        this should return the mib2 object ifAdminStatus to up(1)."
+    ::= { nbsOpticPortEntry 21 }
+
+nbsOpticPortTxStatusOper OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        outOfService (2),
+        inService    (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates whether this port's transmitter is
+        currently enabled or disabled.  It is an alias to the object
+        nbsCmmcPortEnableOper.
+
+        If the transmitter cannot be independently disabled, this
+        object is notSupported(1).
+
+        If the transmitter is currently disabled, this value will be
+        outOfService(2).
+
+        If the transmitter is currently enabled, this value will be
+        inService(3)."
+    ::= { nbsOpticPortEntry 22 }
+
+nbsOpticPortRxStatusAdmin OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        outOfService (2),
+        inService    (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Persistent. This object is used to administratively disable or
+        enable the receiver of this port.
+
+        If the receiver cannot be selectively disabled by user, this
+        object is notSupported(1).
+
+        If the user wishes to disable this receiver, the user should
+        set this to outOfService(2). This action should also set the
+        mib2 object ifAdminStatus to down(2).
+
+        If the user wishes to enable this receiver, the user should
+        set this to inService(3). If nothing else remains disabled,
+        this should return the mib2 object ifAdminStatus to up(1)."
+    ::= { nbsOpticPortEntry 31 }
+
+nbsOpticPortRxStatusOper OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        outOfService (2),
+        inService    (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates whether this port's receiver is
+        currently enabled or disabled.
+
+        If the receiver cannot be independently disabled, this
+        object is notSupported(1).
+
+        If the receiver is currently disabled, this value will be
+        outOfService(2).
+
+        If the receiver is currently enabled, this value will be
+        inService(3)."
+    ::= { nbsOpticPortEntry 32 }
+
+nbsOpticPortConnector   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the physical connector to the port.  It
+        is an alias to the object nbsCmmcPortConnector, and the list of
+        connector types is enumerated there."
+    ::= { nbsOpticPortEntry 41 }
+
+nbsOpticPortPolish   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        pc           (2),
+        upc          (3),
+        apc          (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the terminal polish."
+    ::= { nbsOpticPortEntry 42 }
+
+nbsOpticPortFiberMode   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        reserved2    (2),
+        reserved3    (3),
+        singleMode   (4),
+        multiMode    (5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the modality of the fiber.  It is an
+        alias of nbsCmmcPortMedium"
+    ::= { nbsOpticPortEntry 51 }
+
+
+END

@@ -1,0 +1,7 @@
+os: digipower
+text: Digipower
+type: power
+over:
+    - { graph: device_current, text: Current }
+discovery:
+    - sysObjectID: .1.3.6.1.4.1.17420

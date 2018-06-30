@@ -1,0 +1,118 @@
+RADLAN-UDP DEFINITIONS ::= BEGIN
+
+-- Title:      RADLAN UDP Private Extension
+-- Version:    7.37.00.00
+-- Date:       17 May 2004
+
+IMPORTS
+    rnd                                                     FROM RADLAN-MIB
+    ipAddrEntry                                             FROM IP-MIB
+    rip2IfConfEntry                                         FROM RFC1389-MIB
+    ipCidrRouteEntry,ipCidrRouteDest,
+    ipCidrRouteMask, ipCidrRouteTos, ipCidrRouteNextHop     FROM IP-FORWARD-MIB
+    DisplayString                                           FROM SNMPv2-TC-v1
+    Unsigned32, Integer32, Counter32, IpAddress,
+    MODULE-IDENTITY, OBJECT-TYPE                            FROM SNMPv2-SMI
+    RowStatus, TruthValue, TEXTUAL-CONVENTION               FROM SNMPv2-TC;
+
+rsUDP MODULE-IDENTITY
+      LAST-UPDATED "200406010000Z"
+      ORGANIZATION "Radlan Computer Communications Ltd."
+      CONTACT-INFO
+           "radlan.com"
+      DESCRIPTION
+           "The private MIB module definition for RND UDP MIB."
+      REVISION "200406010000Z"
+      DESCRIPTION
+           "Initial version of this MIB."
+      ::= { rnd 42 }
+
+
+
+rsUdpRelayTable  OBJECT-TYPE
+   SYNTAX  SEQUENCE OF RsUdpRelayEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+       "This table contains the udp relay configuration per port."
+   ::= {rsUDP 1}
+
+rsUdpRelayEntry  OBJECT-TYPE
+   SYNTAX     RsUdpRelayEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+       " The row definition for this table."
+
+   INDEX {rsUdpRelayDstPort,
+          rsUdpRelaySrcIpInf,
+          rsUdpRelayDstIpAddr }
+   ::= {rsUdpRelayTable 1}
+
+RsUdpRelayEntry  ::= SEQUENCE {
+    rsUdpRelayDstPort   INTEGER,
+    rsUdpRelaySrcIpInf  IpAddress,
+    rsUdpRelayDstIpAddr IpAddress,
+    rsUdpRelayStatus    RowStatus,
+    rsUdpRelayUserInfo  INTEGER
+}
+
+rsUdpRelayDstPort OBJECT-TYPE
+   SYNTAX     INTEGER
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+       "The UDP port number in the UDP message header."
+   ::= {rsUdpRelayEntry 1}
+
+rsUdpRelaySrcIpInf OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The source interface IP that receives UDP message.
+         255.255.255.255 from all IP interface.
+         0.0.0.0 - 0.255.255.255 and 127.0.0.0 - 127.255.255.255
+         not relevant addresses."
+--    DEFVAL  { 255.255.255.255 }
+   ::= {rsUdpRelayEntry 2}
+
+rsUdpRelayDstIpAddr OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The destination IP address the UDP message will be forward.
+         0.0.0.0 does not forward, 255.255.255.255 broadcasts to all
+         addresses."
+--    DEFVAL  { 255.255.255.255 }
+   ::= {rsUdpRelayEntry 3}
+
+rsUdpRelayStatus OBJECT-TYPE
+   SYNTAX       RowStatus
+   MAX-ACCESS  read-write
+   STATUS       current
+   DESCRIPTION
+       "The status of a table entry.
+        It is used to delete an entry from this table."
+  ::= { rsUdpRelayEntry 4 }
+
+rsUdpRelayUserInfo  OBJECT-TYPE
+   SYNTAX      INTEGER
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "The information used for implementation purposes"
+  DEFVAL  { 0 }
+  ::= { rsUdpRelayEntry 5 }
+
+rsUdpRelayMibVersion  OBJECT-TYPE
+   SYNTAX      INTEGER
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "Mib version. The current version is 1."
+   ::= {rsUDP 2}
+
+END
+

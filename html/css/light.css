@@ -18,6 +18,10 @@
     color: #e30613;
 }
 
+.icon-theme {
+    color: black;
+}
+
 .pace {
   -webkit-pointer-events: none;
   pointer-events: none;

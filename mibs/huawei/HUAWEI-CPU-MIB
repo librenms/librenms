@@ -1,0 +1,109 @@
+-- =================================================================
+-- Copyright (C) 2001,2002 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: the huawei cpu mib from huawei-device-mib
+-- Reference:
+-- Version:     V1.0
+-- History:
+--    
+-- =================================================================
+
+HUAWEI-CPU-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hwDev
+            FROM HUAWEI-MIB
+        hwFrameIndex, hwSlotIndex
+            FROM HUAWEI-DEVICE-MIB    
+        OBJECT-GROUP, MODULE-COMPLIANCE            
+            FROM SNMPv2-CONF                                
+        Gauge, OBJECT-TYPE, MODULE-IDENTITY                
+            FROM SNMPv2-SMI;        
+    
+    --This mib defines the CPU usage statistics information. NMS can query CPU utilization
+    --from device by the mib.
+                    
+    hwCpuDevTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCpuDevEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            This table provides the information of CPU usage statistics of device 
+            in the period of last 5 seconds, 1 minute,or 5 minutes.
+            "
+        ::= { hwDev 4 }
+    
+    hwCpuDevEntry OBJECT-TYPE
+        SYNTAX HwCpuDevEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The Entries of hwCpuDevTable.                
+            
+            The hwCpuDevTable is indexed by hwFrameIndex, hwSlotIndex and hwCpuDevIndex.
+            
+            hwFrameIndex  - the index of frame of the device. for example, hwFrameIndex 
+            equals 0 in NE16.
+            hwSlotIndex   - the slot number of the device, the MAX value varies with 
+            different devices.
+            hwCpuDevIndex - for the purpose of extension.In single CPU devices (NE16,eg.),
+            hwCpuDevIndex equals 0."
+        INDEX { hwFrameIndex, hwSlotIndex, hwCpuDevIndex }
+        ::= { hwCpuDevTable 1 }
+    
+    HwCpuDevEntry ::=
+        SEQUENCE { 
+            hwCpuDevIndex
+                INTEGER,
+            hwCpuDevDuty
+                INTEGER,
+            hwAvgDuty1min
+                INTEGER,
+            hwAvgDuty5min
+                INTEGER
+            }
+
+    hwCpuDevIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..255)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The object is used only for the purpose of extension. In single CPU
+            devices (NE16,eg.), the value of the object equals 0. 
+            "
+        ::= { hwCpuDevEntry 1 }
+    
+    hwCpuDevDuty OBJECT-TYPE
+        SYNTAX INTEGER (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The object indicates the overall CPU usage in the last 5 second period.
+            It is from 0 to 100 percentage. "
+        ::= { hwCpuDevEntry 2 }
+    
+    hwAvgDuty1min OBJECT-TYPE
+        SYNTAX INTEGER (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The object indicates the overall CPU usage in the last 1 minute period.
+            It is from 0 to 100 percentage. "
+        ::= { hwCpuDevEntry 3 }
+    
+    hwAvgDuty5min OBJECT-TYPE
+        SYNTAX INTEGER (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The object indicates the overall CPU usage in the last 5 minutes period.
+            It is from 0 to 100 percentage. "
+        ::= { hwCpuDevEntry 4 }
+
+END

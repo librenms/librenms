@@ -3,7 +3,7 @@
 require 'memcached.inc.php';
 require 'includes/graphs/common.inc.php';
 
-$device = device_by_id_cache($vars['id']);
+$device = device_by_id_cache($var['id']);
 
 require 'includes/graphs/common.inc.php';
 

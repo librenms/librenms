@@ -20,7 +20,7 @@ IMPORTS
 
 
     jnxJsScreenMIB MODULE-IDENTITY
-        LAST-UPDATED  "200901231644Z" -- Jan 23, 2009
+        LAST-UPDATED  "201404020000Z" -- Apr 02, 2014
         ORGANIZATION  "Juniper Networks, Inc."
         CONTACT-INFO
             "Juniper Technical Assistance Center
@@ -44,6 +44,18 @@ IMPORTS
                             OS specific DOS attack   
                             Fragment reassembly 
             "
+        REVISION        "201404020000Z" -- Apr 02, 2014
+        DESCRIPTION     "Added IPv6 Tunneling Screen statistics MIBs
+                         Add new trap var bindings for IPv6 Tunneling Screen" 
+        REVISION        "201311070000Z" -- Nov 07, 2013
+        DESCRIPTION     "Added Udp Port Scan screen statistics MIBs
+                         Add new trap var bindings for Udp Port Scan" 
+        REVISION        "201306060000Z" -- Jun. 06, 2013
+        DESCRIPTION     "Added IPv6 screen statistics MIBs
+                         Add new traps" 
+        REVISION        "201204061030Z" -- Apr 06, 2012
+        DESCRIPTION     "Added TCP/UDP sweeping MIBs
+                         Put trap to under routing category"
         REVISION        "200902040000Z" -- Feb 04, 2009
         DESCRIPTION     "Added following new trap tresholds:
                          jnxJsScreenSynFloodSrcThresh
@@ -147,7 +159,35 @@ IMPORTS
         jnxJsScreenUdpFloodThresh       Integer32,
         jnxJsScreenPortScanThresh       Integer32,
         jnxJsScreenIpSweepThresh        Integer32,
-        jnxJsScreenSynAckAckThres       Integer32
+        jnxJsScreenSynAckAckThres       Integer32,
+
+        -- IPv6 specific data --
+        jnxJsScreenMonIpv6ExtHdr        Counter64,
+        jnxJsScreenMonIpv6HopOpt        Counter64,
+        jnxJsScreenMonIpv6DstOpt        Counter64,
+        jnxJsScreenMonIpv6ExtLimit      Counter64,
+        jnxJsScreenMonIpMalIpv6         Counter64,
+        jnxJsScreenMonIcmpMalIcmpv6     Counter64,
+        jnxJsScreenIpv6ExtNumLim        Integer32,
+
+        -- Other Screen data --
+        jnxJsScreenUdpPortScanThresh    Integer32,
+        jnxJsScreenMonUdpPortScan       Counter64,
+        jnxJsScreenMonIpTunnelGre6in4   Counter64,
+        jnxJsScreenMonIpTunnelGre4in6	Counter64,
+        jnxJsScreenMonIpTunnelGre6in6   Counter64,
+        jnxJsScreenMonIpTunnelGre4in4   Counter64,
+        jnxJsScreenMonIpTunnelIpInUdpTeredo  Counter64,
+        jnxJsScreenMonIpTunnelBadInnerHeader Counter64,
+        jnxJsScreenMonIpTunnelIpIp6to4relay  Counter64,
+        jnxJsScreenMonIpTunnelIpIp6in4  Counter64,
+        jnxJsScreenMonIpTunnelIpIp6over4 Counter64,
+        jnxJsScreenMonIpTunnelIpIp4in6  Counter64,
+        jnxJsScreenMonIpTunnelIpIp4in4  Counter64,
+        jnxJsScreenMonIpTunnelIpIp6in6  Counter64,
+        jnxJsScreenMonIpTunnelIpIpIsatap Counter64,
+        jnxJsScreenMonIpTunnelIpIpDsLite Counter64
+
     }
 
     jnxJsScreenZoneName OBJECT-TYPE
@@ -872,7 +912,317 @@ IMPORTS
             "SYN ack ack alarm threshold value."
         ::= { jnxJsScreenMonEntry 41 }
 
+    jnxJsScreenMonIpv6ExtHdr OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "In one IPv6 packet, one or more extension headers may appear before
+             the encapsulated payload after the mandatory header. User can screen 
+             any one or several extension headers.
 
+             When the extension header screen is enabled, the device screens all 
+             IPv6 packets with specific header.
+
+             The attribute counts the number of block IPv6 extension packets."
+        ::= { jnxJsScreenMonEntry 42 }
+
+    jnxJsScreenMonIpv6HopOpt OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "In one IPv6 hop by hop option extension header, it carries a variable
+             number options. User can screen any one or several options.
+
+             When the hop by hop option screen is enabled, the device screens all 
+             IPv6 packets with specific option type.
+
+             The attribute counts the number of block IPv6 option type packets."
+        ::= { jnxJsScreenMonEntry 43 }
+
+    jnxJsScreenMonIpv6DstOpt OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "In one IPv6 destination option extension header, it carries a variable
+             number options. User can screen any one or several options.
+
+             When the destination option screen is enabled, the device screens all
+             IPv6 packets with specific option type.
+
+             The attribute counts the number of block IPv6 option type packets."
+        ::= { jnxJsScreenMonEntry 44 }
+
+    jnxJsScreenMonIpv6ExtLimit OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "In one IPv6 packet, one or more extension headers may appear before
+             the encapsulated payload. User can screen IPv6 packets if their extension
+             header number is larger than one limit.
+
+             When the extension header limit screen is enabled, the device screens
+             IPv6 packets with more than one limit extension headers.
+
+             The attribute counts the number of block IPv6 packets."
+        ::= { jnxJsScreenMonEntry 45 }
+
+    jnxJsScreenMonIpMalIpv6 OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "One IPv6 packets may contain malformed header, the device tries to block
+             these packets to protect downstream devices.
+
+             When the malformed IPv6 screen is enabled, the device screens IPv6 packets
+             with malformed header.
+
+             The attribute counts the number of block malformed header IPv6 packets."
+        ::= { jnxJsScreenMonEntry 46 }
+
+    jnxJsScreenMonIcmpMalIcmpv6 OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "One ICMPv6 packets may contain malformed content, the device tries to block
+             these packets to protect downstream devices.
+
+             When the malformed ICMPv6 screen is enabled, the device screens ICMPv6
+             packets with malformed content.
+
+             The attribute counts the number of block malformed ICMPv6 packets."
+        ::= { jnxJsScreenMonEntry 47 }
+
+    jnxJsScreenIpv6ExtNumLim OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "IPv6 extension header number limit value."
+        ::= { jnxJsScreenMonEntry 48 }
+
+
+    --
+    --  Other Screen values 
+    -- 
+    jnxJsScreenUdpPortScanThresh OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The UDP port scan threshold interval is in microseconds.  The default 
+             threshold value is 5000.  The valid threshold range is 1000-1000000. 
+
+             By using the default settings, if a remote host scans 10 ports in 
+             0.005 seconds (5000 microseconds), the device flags this as a 
+             udp port scan attack, and rejects all further packets from the remote 
+             source for the remainder of the specified timeout period. The 
+             device detects and drops the tenth packet that meets the port scan 
+             attack criterion.
+
+             This attribute displays the UDP port scan threshold value."
+        ::= { jnxJsScreenMonEntry 49 }
+
+    jnxJsScreenMonUdpPortScan OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "A UDP port scan occurs when one source IP address sends UDP packets
+             to a defined number of different ports at the same destination 
+             IP address within a defined interval. The purpose of this attack 
+             is to scan the available services in the hope that at least one 
+             port will respond, thus identifying a service of the target. 
+             The device should internally log the number of different ports
+             scanned from one remote source. 
+            
+             This attribute records the UDP port scan attempt attack packets."
+        ::= { jnxJsScreenMonEntry 50 }
+
+
+    jnxJsScreenMonIpTunnelGre6in4 OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "When an IP GRE 6in4 Tunnel packet meets the attack criteria 
+             specified by current configuration, it will be counted in this
+             statisitic.
+            
+             This attribute records the IP GRE 6in4 Tunnel attempt attack packets."
+        ::= { jnxJsScreenMonEntry 51 }
+
+
+    jnxJsScreenMonIpTunnelGre4in6 OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "When an IP GRE 4in6 Tunnel packet meets the attack criteria 
+             specified by current configuration, it will be counted in this
+             statisitic.
+            
+             This attribute records the IP GRE 4in6 Tunnel attempt attack packets."
+        ::= { jnxJsScreenMonEntry 52 }
+
+
+    jnxJsScreenMonIpTunnelGre6in6 OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "When an IP GRE 6in6 Tunnel packet meets the attack criteria 
+             specified by current configuration, it will be counted in this
+             statisitic.
+            
+             This attribute records the IP GRE 6in6 Tunnel attempt attack packets."
+        ::= { jnxJsScreenMonEntry 53 }
+
+
+    jnxJsScreenMonIpTunnelGre4in4 OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "When an IP GRE 4in4 Tunnel packet meets the attack criteria 
+             specified by current configuration, it will be counted in this
+             statisitic.
+            
+             This attribute records the IP GRE 4in4 Tunnel attempt attack packets."
+        ::= { jnxJsScreenMonEntry 54 }
+
+
+    jnxJsScreenMonIpTunnelIpInUdpTeredo OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "When an IPinUDP Teredo Tunnel packet meets the attack criteria 
+             specified by current configuration, it will be counted in this
+             statisitic.
+            
+             This attribute records the IPinUDP Teredo Tunnel attempt attack packets."
+        ::= { jnxJsScreenMonEntry 55 }
+
+
+    jnxJsScreenMonIpTunnelBadInnerHeader OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "When an IP Tunnel Bad Inner Header packet meets the attack criteria 
+             specified by current configuration, it will be counted in this
+             statisitic.
+            
+             This attribute records the IP Tunnel Bad Inner Header attempt attack packets."
+        ::= { jnxJsScreenMonEntry 56 }
+
+
+    jnxJsScreenMonIpTunnelIpIp6to4relay OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "When an IP Tunnel IPinIP 6to4 relay packet meets the attack criteria 
+             specified by current configuration, it will be counted in this
+             statisitic.
+            
+             This attribute records the IP Tunnel IPinIP 6to4 relay attempt attack packets."
+        ::= { jnxJsScreenMonEntry 57 }
+
+
+    jnxJsScreenMonIpTunnelIpIp6in4 OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "When an IP Tunnel IPinIP 6in4 packet meets the attack criteria 
+             specified by current configuration, it will be counted in this
+             statisitic.
+            
+             This attribute records the IP Tunnel IPinIP 6in4 attempt attack packets."
+        ::= { jnxJsScreenMonEntry 58 }
+
+
+    jnxJsScreenMonIpTunnelIpIp6over4 OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "When an IP Tunnel IPinIP 6over4 packet meets the attack criteria 
+             specified by current configuration, it will be counted in this
+             statisitic.
+            
+             This attribute records the IP Tunnel IPinIP 6over4 attempt attack packets."
+        ::= { jnxJsScreenMonEntry 59 }
+
+
+    jnxJsScreenMonIpTunnelIpIp4in6 OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "When an IP Tunnel IPinIP 4in6 packet meets the attack criteria 
+             specified by current configuration, it will be counted in this
+             statisitic.
+            
+             This attribute records the IP Tunnel IPinIP 4in6 attempt attack packets."
+        ::= { jnxJsScreenMonEntry 60 }
+
+    jnxJsScreenMonIpTunnelIpIp4in4 OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "When an IP Tunnel IPinIP 4in4 packet meets the attack criteria 
+             specified by current configuration, it will be counted in this
+             statisitic.
+            
+             This attribute records the IP Tunnel IPinIP 4in4 attempt attack packets."
+        ::= { jnxJsScreenMonEntry 61 }
+
+    jnxJsScreenMonIpTunnelIpIp6in6 OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "When an IP Tunnel IPinIP 6in6 packet meets the attack criteria 
+             specified by current configuration, it will be counted in this
+             statisitic.
+            
+             This attribute records the IP Tunnel IPinIP 6in6 attempt attack packets."
+        ::= { jnxJsScreenMonEntry 62 }
+
+
+    jnxJsScreenMonIpTunnelIpIpIsatap OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "When an IP Tunnel IPinIP ISATAP packet meets the attack criteria 
+             specified by current configuration, it will be counted in this
+             statisitic.
+            
+             This attribute records the IP Tunnel IPinIP ISATAP attempt attack packets."
+        ::= { jnxJsScreenMonEntry 63 }
+
+
+    jnxJsScreenMonIpTunnelIpIpDsLite OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "When an IP Tunnel IPinIP DS-Lite packet meets the attack criteria 
+             specified by current configuration, it will be counted in this
+             statisitic.
+            
+             This attribute records the IP Tunnel IPinIP DS-Lite attempt attack packets."
+        ::= { jnxJsScreenMonEntry 64 }
 
 --
 -- Additional Syn Flood, Session Limit thresholds and counters
@@ -966,6 +1316,89 @@ IMPORTS
             "The number of concurrent sessions to the same destination IP address."
         ::= { jnxJsScreenMonThreshEntry 6 }
 
+--
+-- This table is for TCP/UDP sweep thresholds and counters
+--
+    
+    jnxJsScreenSweepTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF JnxJsScreenSweepEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table is a read-only table that augments the
+             jnxJsScreenMonTable. The purpose of this table is
+             to add counters and thresholds for TCP/UDP sweep
+             feature."
+        ::= { jnxJsScreenObjects 3 }
+
+    jnxJsScreenSweepEntry OBJECT-TYPE
+        SYNTAX          JnxJsScreenSweepEntry
+        MAX-ACCESS      not-accessible  
+        STATUS          current
+        DESCRIPTION     
+            "TCP/UDP sweep thresholds and counters."
+        AUGMENTS { jnxJsScreenMonEntry }
+        ::= { jnxJsScreenSweepTable 1 }
+
+        JnxJsScreenSweepEntry ::= SEQUENCE
+        {
+            jnxJsScreenTcpSweepThresh   Integer32,
+            jnxJsScreenUdpSweepThresh   Integer32,
+            jnxJsScreenMonTcpSweep      Counter64,
+            jnxJsScreenMonUdpSweep      Counter64
+        }
+
+        jnxJsScreenTcpSweepThresh OBJECT-TYPE
+            SYNTAX          Integer32
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION
+                "The TCP sweep threshold interval is in microseconds. The 
+                 default threshold value is 5000.  The valid threshold range 
+                 is 1000-1000000. 
+
+                 By using the default settings, if a remote host initiates TCP  
+                 connection to 10 addresses in 0.005 seconds(5000 microseconds),
+                 the security device flags this as an TCP sweep attack, and 
+                 rejects all further new TCP connections initiated from that 
+                 host for the remainder of the specified threshold time period.  
+                 This attribute holds the TCP sweep attack threshold."
+            ::= { jnxJsScreenSweepEntry 1 }
+ 
+        jnxJsScreenUdpSweepThresh OBJECT-TYPE
+            SYNTAX          Integer32
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION
+                "The UDP sweep threshold interval is in microseconds. The 
+                 default threshold value is 5000. The valid threshold range is 
+                 1000-1000000. 
+
+                 By using the default settings, if a remote host has UDP  
+                 connection to 10 addresses in 0.005 seconds(5000 microseconds),
+                 the security device flags this as an UDP sweep attack, and 
+                 rejects all further new UDP connections from that host for 
+                 the remainder of the specified threshold time period.  
+                
+                 This attribute holds the UDP sweep attack threshold."
+            ::= { jnxJsScreenSweepEntry 2 }
+
+        jnxJsScreenMonTcpSweep OBJECT-TYPE
+            SYNTAX          Counter64       
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION 
+                "The number of TCP sessions dropped due to TCP sweeping attack."
+            ::= { jnxJsScreenSweepEntry 3 }
+
+        jnxJsScreenMonUdpSweep OBJECT-TYPE
+            SYNTAX          Counter64       
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION 
+                "The number of UDP packets dropped due to UDP sweeping attack."
+            ::= { jnxJsScreenSweepEntry 4 }
+
 
     -- ***************************************************************
     -- definition of access authentication related traps.
@@ -1055,7 +1488,31 @@ IMPORTS
                             icmpLarge          (28),
                             tcpSynFin          (29),
                             tcpFinNoAck        (30),
-                            ipFragmentation    (31)
+                            ipFragmentation    (31),
+                            tcpSweeping        (32),
+                            udpSweeping        (33),
+                            ipv6exthdr         (34),
+                            ipv6hbyhopt        (35),
+                            ipv6dstopt         (36),
+                            ipv6extlim         (37),
+                            ipv6malhdr         (38),
+                            icmpv6malpkt       (39),
+                            udpportScanning    (40),
+                            ipTunnelGre6in4    (41),
+                            ipTunnelGre4in6    (42),
+                            ipTunnelGre6in6    (43),
+                            ipTunnelGre4in4    (44),
+                            ipTunnelIpInUdpTeredo  (45),
+                            ipTunnelBadInnerHeader (46),
+                            ipTunnelIpIp6to4relay  (47),
+                            ipTunnelIpIp6in4   (48),
+                            ipTunnelIpIp6over4 (49),
+                            ipTunnelIpIp4in6   (50),
+                            ipTunnelIpIp4in4   (51),
+                            ipTunnelIpIp6in6   (52),
+                            ipTunnelIpIpIsatap (53),
+                            ipTunnelIpIpDsLite (54)
+
                     } 
         MAX-ACCESS  accessible-for-notify
         STATUS      current
