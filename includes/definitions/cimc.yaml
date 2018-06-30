@@ -1,0 +1,30 @@
+os: cimc
+text: 'Cisco Integrated Management Controller'
+type: server
+icon: cisco
+group: cisco
+over:
+    - { graph: device_temperature, text: Temperature }
+    - { graph: device_voltage, text: 'Power Voltage' }
+    - { graph: device_current, text: 'Power Current' }
+poller_modules:
+    cisco-cbqos: true
+    cisco-cef: true
+    cisco-mac-accounting: true
+    cisco-voice: true
+    cisco-remote-access-monitor: true
+    cisco-sla: true
+    cisco-ipsec-flow-monitor: true
+    cipsec-tunnels: true
+    cisco-otv: true
+discovery_modules:
+    cisco-cef: true
+    cisco-sla: true
+    cisco-mac-accounting: true
+    cisco-otv: true
+    cisco-pw: true
+    vrf: true
+    cisco-vrf-lite: true
+discovery:
+    - sysDescr:
+        - 'Cisco Integrated Management Controller'

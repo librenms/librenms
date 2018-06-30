@@ -23,15 +23,14 @@
  * @package LibreNMS/Alerts
  */
 
-session_start();
-if (!isset($_SESSION['authenticated'])) {
+use LibreNMS\Authentication\Auth;
+
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
+
+if (!Auth::check()) {
     die('Unauthorized.');
 }
-
-require_once '../includes/defaults.inc.php';
-require_once '../config.php';
-require_once '../includes/definitions.inc.php';
-require_once '../includes/functions.php';
 
 set_debug($_REQUEST['debug']);
 
@@ -65,7 +64,7 @@ header('Content-type: application/json');
 $obj     = array(array('name' => 'Error: No suggestions found.'));
 $term    = array();
 $current = false;
-if (isset($_GET['term'],$_GET['device_id'])) {
+if (isset($_GET['term'], $_GET['device_id'])) {
     $chk               = array();
     $_GET['term']      = mres($_GET['term']);
     $_GET['device_id'] = mres($_GET['device_id']);
@@ -121,6 +120,18 @@ if (isset($_GET['term'],$_GET['device_id'])) {
 
             $obj = $ret;
         }
+    }
+} elseif ($vars['type'] === 'alert_rule_collection') {
+    $x=0;
+    foreach (get_rules_from_json() as $rule) {
+        if (str_i_contains($rule['name'], $vars['term'])) {
+            $rule['id'] = $x;
+            $tmp[] = $rule;
+        }
+        $x++;
+    }
+    if (is_array($tmp)) {
+        $obj = $tmp;
     }
 }
 

@@ -1,0 +1,473 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-TWAMP-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-TWAMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    switch
+        FROM PRVT-SWITCH-MIB
+    Counter32, Counter64, Integer32, IpAddress, MODULE-IDENTITY, 
+    NOTIFICATION-TYPE, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    MacAddress, RowStatus, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+prvtTwampMIB MODULE-IDENTITY
+    LAST-UPDATED "201405160000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "This MIB provides the extended capability of controlling and
+         provisioning of TWAMP tests."
+    REVISION    "201005270000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { switch 240 }
+
+
+PrvtTwampTestNameType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32a"
+    STATUS      current
+    DESCRIPTION 
+        "TWAMP test name type (1..32 characters)."
+    SYNTAX      OCTET STRING (SIZE(1..32))
+
+PrvtTwampDecimalPercent ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "3d.2d"
+    STATUS      current
+    DESCRIPTION 
+        "A percentage value in decimal format."
+    SYNTAX      OCTET STRING (SIZE(1..10))
+
+prvtTwampNotifications OBJECT IDENTIFIER
+    ::= { prvtTwampMIB 0 }
+
+prvtTwampObjects OBJECT IDENTIFIER
+    ::= { prvtTwampMIB 1 }
+
+prvtTwampTest OBJECT IDENTIFIER
+    ::= { prvtTwampObjects 1 }
+
+prvtTwampTestTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtTwampTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Table contains TWAMP tests."
+    ::= { prvtTwampTest 1 }
+
+prvtTwampTestEntry OBJECT-TYPE
+    SYNTAX      PrvtTwampTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Entry in prvtTwampTestTable"
+    INDEX       { prvtTwampTestName }
+    ::= { prvtTwampTestTable 1 }
+
+PrvtTwampTestEntry ::= SEQUENCE {
+    prvtTwampTestName           PrvtTwampTestNameType,
+    prvtTwampTestRowStatus      RowStatus,
+    prvtTwampTestServer         IpAddress,
+    prvtTwampTestSessionsCount  Integer32,
+    prvtTwampTestPackets        Integer32,
+    prvtTwampTestTimeout        Integer32,
+    prvtTwampTestDelay          Integer32,
+    prvtTwampTestExecuteNow     Integer32
+}
+
+prvtTwampTestName OBJECT-TYPE
+    SYNTAX      PrvtTwampTestNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "TWAMP test name."
+    ::= { prvtTwampTestEntry 1 }
+
+prvtTwampTestRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Create/delete entry in prvtTwampTestTable."
+    ::= { prvtTwampTestEntry 2 }
+
+prvtTwampTestServer OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "TWAMP test server ip-address."
+    ::= { prvtTwampTestEntry 3 }
+
+prvtTwampTestSessionsCount OBJECT-TYPE
+    SYNTAX      Integer32 (1..10)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The number of parallel test sessions."
+    DEFVAL      { 1 }
+    ::= { prvtTwampTestEntry 4 }
+
+prvtTwampTestPackets OBJECT-TYPE
+    SYNTAX      Integer32 (10..1000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The number of packets in parallel sessions."
+    DEFVAL      { 300 }
+    ::= { prvtTwampTestEntry 5 }
+
+prvtTwampTestTimeout OBJECT-TYPE
+    SYNTAX      Integer32 (100..10000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The timout interval of test packets (in milliseconds)."
+    DEFVAL      { 900 }
+    ::= { prvtTwampTestEntry 6 }
+
+prvtTwampTestDelay OBJECT-TYPE
+    SYNTAX      Integer32 (100..1500)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The delay interval between test packets (in milliseconds)"
+    DEFVAL      { 100 }
+    ::= { prvtTwampTestEntry 7 }
+
+prvtTwampTestExecuteNow OBJECT-TYPE
+    SYNTAX      Integer32 (0..2)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "When this object is set to '1', command
+         self-test execute-now.  When this object is set to '2' 
+         the self-test is stopped. Setting the variable to '0'
+         results in an 'inconsistentValue' error.
+         Setting it to any other value has no effect.
+         
+         When this object is read, the value '0' is returned."
+    ::= { prvtTwampTestEntry 8 }
+
+prvtTwampServer OBJECT IDENTIFIER
+    ::= { prvtTwampObjects 2 }
+
+prvtTwampServerInnactivity OBJECT-TYPE
+    SYNTAX      Integer32 (1..900)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The server innactivity timeout interval of the TWAMP server (in seconds)."
+    DEFVAL      { 900 }
+    ::= { prvtTwampServer 2 }
+
+prvtTwampServerSessionInnactivity OBJECT-TYPE
+    SYNTAX      Integer32 (1..900)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The session innactivity timeout interval of the TWAMP server (in seconds)."
+    DEFVAL      { 900 }
+    ::= { prvtTwampServer 3 }
+
+prvtTwampServerMaxSessions OBJECT-TYPE
+    SYNTAX      Integer32 (1..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The maximum number of controll sessions supported by the TWAMP server."
+    DEFVAL      { 10 }
+    ::= { prvtTwampServer 4 }
+
+prvtTwampServerMaxParallelSessions OBJECT-TYPE
+    SYNTAX      Integer32 (1..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The maximum number of parallel test sessions for each client supperted by the TWAMP server."
+    DEFVAL      { 1 }
+    ::= { prvtTwampServer 5 }
+
+prvtTwampServerShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The administrative state of the TWAMP server."
+    DEFVAL      { true }
+    ::= { prvtTwampServer 6 }
+
+prvtTwampClientTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtTwampClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Table contains the allowed clients for the TWAMP server."
+    ::= { prvtTwampServer 7 }
+
+prvtTwampClientEntry OBJECT-TYPE
+    SYNTAX      PrvtTwampClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Entry in twampClientTable."
+    INDEX       { prvtTwampClientIp }
+    ::= { prvtTwampClientTable 1 }
+
+PrvtTwampClientEntry ::= SEQUENCE {
+    prvtTwampClientIp           IpAddress,
+    prvtTwampClientRowStatus    RowStatus
+}
+
+prvtTwampClientIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The ip-address of the client."
+    ::= { prvtTwampClientEntry 1 }
+
+prvtTwampClientRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "create/delete entry in prvtTwampClientTable"
+    ::= { prvtTwampClientEntry 2 }
+
+prvtTwampServerControlSessions OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of current control sessions established on the TWAMP server."
+    ::= { prvtTwampServer 8 }
+
+prvtTwampServerTestSessions OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of current test sessions established on the TWAMP server."
+    ::= { prvtTwampServer 9 }
+
+prvtTwampTestResult OBJECT IDENTIFIER
+    ::= { prvtTwampObjects 3 }
+
+prvtTwampTestResultTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtTwampTestResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Table contains statistics of the executed TWAMP tests."
+    ::= { prvtTwampTestResult 1 }
+
+prvtTwampTestResultEntry OBJECT-TYPE
+    SYNTAX      PrvtTwampTestResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Entry in twampTestResultTable"
+    INDEX       { prvtTwampTestId, prvtTwampTestResultName }
+    ::= { prvtTwampTestResultTable 1 }
+
+PrvtTwampTestResultEntry ::= SEQUENCE {
+    prvtTwampTestId                 Unsigned32,
+    prvtTwampTestResultName         PrvtTwampTestNameType,
+    prvtTwampTestStartTime          Unsigned32,
+    prvtTwampTestServerAddress      IpAddress,
+    prvtTwampTestSessions           Unsigned32,
+    prvtTwampTestState              INTEGER,
+    prvtTwampTestRtt                Counter64,
+    prvtTwampTestMinRtt             Counter64,
+    prvtTwampTestMaxRtt             Counter64,
+    prvtTwampTestPcktSent           Unsigned32,
+    prvtTwampTestPcktLost           Unsigned32,
+    prvtTwampTestPcktDrop           Unsigned32,
+    prvtTwampTestVariation          Counter64,
+    prvtTwampTestVariationLow       PrvtTwampDecimalPercent,
+    prvtTwampTestVariationMiddle    PrvtTwampDecimalPercent,
+    prvtTwampTestVariationHigh      PrvtTwampDecimalPercent
+}
+
+prvtTwampTestId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The internal ID of the TWAMP test instance."
+    ::= { prvtTwampTestResultEntry 1 }
+
+prvtTwampTestResultName OBJECT-TYPE
+    SYNTAX      PrvtTwampTestNameType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "TWAMP test name."
+    ::= { prvtTwampTestResultEntry 2 }
+
+prvtTwampTestStartTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The start time of the TWAMP test instance."
+    ::= { prvtTwampTestResultEntry 3 }
+
+prvtTwampTestServerAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The server ip-address of the TWAMP test instance."
+    ::= { prvtTwampTestResultEntry 4 }
+
+prvtTwampTestSessions OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of parallel test sessions of the TWAMP test instance."
+    DEFVAL      { 0 }
+    ::= { prvtTwampTestResultEntry 5 }
+
+prvtTwampTestState OBJECT-TYPE
+    SYNTAX      INTEGER { failed(1), running(2), stopped(3), finished(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The status of the executed TWAMP test instance."
+    DEFVAL      { 0 }
+    ::= { prvtTwampTestResultEntry 6 }
+
+prvtTwampTestRtt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The average round-trip time of the TWAMP test sample."
+    DEFVAL      { 0 }
+    ::= { prvtTwampTestResultEntry 7 }
+
+prvtTwampTestMinRtt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The minimum round-trip time of the TWAMP test sample."
+    DEFVAL      { 0 }
+    ::= { prvtTwampTestResultEntry 8 }
+
+prvtTwampTestMaxRtt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The maximum round-trip time of the TWAMP test sample."
+    DEFVAL      { 0 }
+    ::= { prvtTwampTestResultEntry 9 }
+
+prvtTwampTestPcktSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of test packets sent for the TWAMP test instance."
+    DEFVAL      { 0 }
+    ::= { prvtTwampTestResultEntry 10 }
+
+prvtTwampTestPcktLost OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of lost test packets."
+    DEFVAL      { 0 }
+    ::= { prvtTwampTestResultEntry 11 }
+
+prvtTwampTestPcktDrop OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of dropped test packets."
+    DEFVAL      { 0 }
+    ::= { prvtTwampTestResultEntry 12 }
+
+prvtTwampTestVariation OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The maximum module variation of the TWAMP test sample"
+    DEFVAL      { 0 }
+    ::= { prvtTwampTestResultEntry 13 }
+
+prvtTwampTestVariationLow OBJECT-TYPE
+    SYNTAX      PrvtTwampDecimalPercent
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The percent of singletons whose variation is less than 10% of the negated maximum module variation of the sample."
+    ::= { prvtTwampTestResultEntry 14 }
+
+prvtTwampTestVariationMiddle OBJECT-TYPE
+    SYNTAX      PrvtTwampDecimalPercent
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The percent of singletons whose variation by module is less than 10% of the maximum module variation of the sample."
+    ::= { prvtTwampTestResultEntry 15 }
+
+prvtTwampTestVariationHigh OBJECT-TYPE
+    SYNTAX      PrvtTwampDecimalPercent
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The percent of singletons whose variation is greater than 10% of the maximum module variation of the sample."
+    ::= { prvtTwampTestResultEntry 16 }
+
+END -- end of module PRVT-TWAMP-MIB.

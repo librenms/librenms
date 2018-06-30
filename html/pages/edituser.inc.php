@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 $no_refresh = true;
 
 require 'includes/javascript-interfacepicker.inc.php';
@@ -8,11 +10,11 @@ echo "<div style='margin: 10px;'>";
 
 $pagetitle[] = 'Edit user';
 
-if ($_SESSION['userlevel'] != '10') {
+if (!Auth::user()->isAdmin()) {
     include 'includes/error-no-perm.inc.php';
 } else {
     if ($vars['user_id'] && !$vars['edit']) {
-        $user_data = dbFetchRow('SELECT * FROM users WHERE user_id = ?', array($vars['user_id']));
+        $user_data = Auth::get()->getUser($vars['user_id']);
         echo '<p><h2>'.$user_data['realname']."</h2><a href='edituser/'>Change...</a></p>";
         // Perform actions if requested
         if ($vars['action'] == 'deldevperm') {
@@ -66,7 +68,7 @@ if ($_SESSION['userlevel'] != '10') {
 
         $device_perms = dbFetchRows('SELECT * from devices_perms as P, devices as D WHERE `user_id` = ? AND D.device_id = P.device_id', array($vars['user_id']));
         foreach ($device_perms as $device_perm) {
-            echo '<tr><td><strong>'.$device_perm['hostname']."</td><td> <a href='edituser/action=deldevperm/user_id=".$vars['user_id'].'/device_id='.$device_perm['device_id']."'><img src='images/16/cross.png' align=absmiddle border=0></a></strong></td></tr>";
+            echo '<tr><td><strong>'.$device_perm['hostname']."</td><td> <a href='edituser/action=deldevperm/user_id=".$vars['user_id'].'/device_id='.$device_perm['device_id']."'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a></strong></td></tr>";
             $access_list[] = $device_perm['device_id'];
             $permdone      = 'yes';
         }
@@ -98,7 +100,7 @@ if ($_SESSION['userlevel'] != '10') {
             }
 
             if (!$done) {
-                echo "<option value='".$device['device_id']."'>".$device['hostname'].'</option>';
+                echo "<option value='".$device['device_id']."'>".format_hostname($device, $device['hostname']).'</option>';
             }
         }
 
@@ -121,10 +123,10 @@ if ($_SESSION['userlevel'] != '10') {
         foreach ($interface_perms as $interface_perm) {
             echo '<tr>
               <td>
-                <strong>'.$interface_perm['hostname'].' - '.$interface_perm['ifDescr'].'</strong>'.''.$interface_perm['ifAlias']."
+                <strong>'.$interface_perm['hostname'].' - '.$interface_perm['ifDescr'].'</strong>'.''.display($interface_perm['ifAlias'])."
               </td>
               <td>
-                &nbsp;&nbsp;<a href='edituser/action=delifperm/user_id=".$vars['user_id'].'/port_id='.$interface_perm['port_id']."'><img src='images/16/cross.png' align=absmiddle border=0></a>
+                &nbsp;&nbsp;<a href='edituser/action=delifperm/user_id=".$vars['user_id'].'/port_id='.$interface_perm['port_id']."'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a>
               </td>
             </tr>";
             $ipermdone = 'yes';
@@ -159,7 +161,7 @@ if ($_SESSION['userlevel'] != '10') {
             }
 
             if (!$done) {
-                echo "<option value='".$device['device_id']."'>".$device['hostname'].'</option>';
+                echo "<option value='".$device['device_id']."'>".format_hostname($device, $device['hostname']).'</option>';
             }
         }
 
@@ -196,7 +198,7 @@ if ($_SESSION['userlevel'] != '10') {
         foreach ($bill_perms as $bill_perm) {
             echo '<tr>
               <td>
-                <strong>'.$bill_perm['bill_name']."</strong></td><td width=50>&nbsp;&nbsp;<a href='edituser/action=delbillperm/user_id=".$vars['user_id'].'/bill_id='.$bill_perm['bill_id']."'><img src='images/16/cross.png' align=absmiddle border=0></a>
+                <strong>'.$bill_perm['bill_name']."</strong></td><td width=50>&nbsp;&nbsp;<a href='edituser/action=delbillperm/user_id=".$vars['user_id'].'/bill_id='.$bill_perm['bill_id']."'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a>
               </td>
             </tr>";
             $bill_access_list[] = $bill_perm['bill_id'];
@@ -241,7 +243,7 @@ if ($_SESSION['userlevel'] != '10') {
         </form>
         </div>";
     } elseif ($vars['user_id'] && $vars['edit']) {
-        if ($_SESSION['userlevel'] == 11) {
+        if (Auth::user()->isDemoUser()) {
             demo_account();
         } else {
             if (!empty($vars['new_level'])) {
@@ -249,10 +251,10 @@ if ($_SESSION['userlevel'] != '10') {
                     $vars['can_modify_passwd'] = '1';
                 }
 
-                update_user($vars['user_id'], $vars['new_realname'], $vars['new_level'], $vars['can_modify_passwd'], $vars['new_email']);
+                Auth::get()->updateUser($vars['user_id'], $vars['new_realname'], $vars['new_level'], $vars['can_modify_passwd'], $vars['new_email']);
                 print_message('User has been updated');
-                if (!empty($vars['new_pass1']) && $vars['new_pass1'] == $vars['new_pass2'] && passwordscanchange($vars['cur_username'])) {
-                    if (changepassword($vars['cur_username'], $vars['new_pass1']) == 1) {
+                if (!empty($vars['new_pass1']) && $vars['new_pass1'] == $vars['new_pass2'] && Auth::get()->canUpdatePasswords($vars['cur_username'])) {
+                    if (Auth::get()->changePassword($vars['cur_username'], $vars['new_pass1']) == 1) {
                         print_message("User password has been updated");
                     } else {
                         print_error("Password couldn't be updated");
@@ -262,9 +264,18 @@ if ($_SESSION['userlevel'] != '10') {
                 }
             }
 
-            if (can_update_users() == '1') {
-                $users_details = get_user($vars['user_id']);
-                if (!empty($users_details)) {
+            $users_details = Auth::get()->getUser($vars['user_id']);
+            if (!empty($users_details)) {
+                if (!empty($vars['dashboard']) && $vars['dashboard'] != $users_details['dashboard']) {
+                    set_user_pref('dashboard', $vars['dashboard']);
+                    print_message("User default dashboard updated");
+                }
+                echo "<form class='form-horizontal' role='form' method='post' action=''>
+  <input type='hidden' name='user_id' value='".$vars['user_id']."'>
+  <input type='hidden' name='cur_username' value='" . $users_details['username'] . "'>
+  <input type='hidden' name='edit' value='yes'>
+";
+                if (Auth::get()->canUpdateUsers() == '1') {
                     if (empty($vars['new_realname'])) {
                         $vars['new_realname'] = $users_details['realname'];
                     }
@@ -283,35 +294,7 @@ if ($_SESSION['userlevel'] != '10') {
                         $vars['new_email'] = $users_details['email'];
                     }
 
-                    if ($config['twofactor']) {
-                        if ($vars['twofactorremove']) {
-                            if (dbUpdate(array('twofactor' => ''), users, 'user_id = ?', array($vars['user_id']))) {
-                                echo "<div class='alert alert-success'>TwoFactor credentials removed.</div>";
-                            } else {
-                                echo "<div class='alert alert-danger'>Couldnt remove user's TwoFactor credentials.</div>";
-                            }
-                        }
-
-                        if ($vars['twofactorunlock']) {
-                            $twofactor          = dbFetchRow('SELECT twofactor FROM users WHERE user_id = ?', array($vars['user_id']));
-                            $twofactor          = json_decode($twofactor['twofactor'], true);
-                            $twofactor['fails'] = 0;
-                            if (dbUpdate(array('twofactor' => json_encode($twofactor)), users, 'user_id = ?', array($vars['user_id']))) {
-                                echo "<div class='alert alert-success'>User unlocked.</div>";
-                            } else {
-                                echo "<div class='alert alert-danger'>Couldnt reset user's TwoFactor failures.</div>";
-                            }
-                        }
-                    }
-
-                    if (!empty($vars['dashboard'])) {
-                        dbUpdate(array('dashboard'=>$vars['dashboard']), 'users', 'user_id = ?', array($vars['user_id']));
-                    }
-
-                    echo "<form class='form-horizontal' role='form' method='post' action=''>
-  <input type='hidden' name='user_id' value='".$vars['user_id']."'>
-  <input type='hidden' name='cur_username' value='" . $users_details['username'] . "'>
-  <input type='hidden' name='edit' value='yes'>
+                    echo "
   <div class='form-group'>
     <label for='new_realname' class='col-sm-2 control-label'>Realname</label>
     <div class='col-sm-4'>
@@ -354,7 +337,7 @@ if ($_SESSION['userlevel'] != '10') {
     </div>
   </div>";
 
-                    if (passwordscanchange($users_details['username'])) {
+                    if (Auth::get()->canUpdatePasswords($users_details['username'])) {
                         echo "
         <div class='form-group'>
             <label for='new_pass1' class='col-sm-2 control-label'>Password</label>
@@ -370,18 +353,6 @@ if ($_SESSION['userlevel'] != '10') {
         </div>
         ";
                     }
-                    echo "
-       <div class='form-group'>
-           <label for='dashboard' class='col-sm-2 control-label'>Dashboard</label>
-           <div class='col-sm-4'><select class='form-control' name='dashboard'>";
-                    $defdash = dbFetchCell("SELECT dashboard FROM users WHERE user_id = ?", array($vars['user_id']));
-                    foreach (dbFetchRows("SELECT dashboards.*,users.username FROM `dashboards` INNER JOIN `users` ON users.user_id = dashboards.user_id WHERE (dashboards.access > 0 && dashboards.user_id != ?) || dashboards.user_id = ?", array($vars['user_id'],$vars['user_id'])) as $dash) {
-                        echo "<option value='".$dash['dashboard_id']."'".($defdash == $dash['dashboard_id'] ? ' selected' : '').">".$dash['username'].':'.$dash['dashboard_name']."</option>";
-                    }
-                    echo "</select>
-           </div>
-       </div>
-       ";
 
                     echo "<div class='form-group'>
     <div class='col-sm-6'>
@@ -390,21 +361,50 @@ if ($_SESSION['userlevel'] != '10') {
           <input type='checkbox' ";
                     if ($vars['can_modify_passwd'] == '1') {
                         echo "checked='checked'";
-                    } echo " name='can_modify_passwd'> Allow the user to change his password.
+                    } echo " name='can_modify_passwd'> Allow the user to change their password.
         </label>
       </div>
     </div>
     <div class='col-sm-6'>
     </div>
   </div>
+";
+                }
+                echo "
+       <div class='form-group'>
+           <label for='dashboard' class='col-sm-2 control-label'>Dashboard</label>
+           <div class='col-sm-4'><select class='form-control' name='dashboard'>";
+                foreach (get_dashboards($vars['user_id']) as $dash) {
+                    echo "<option value='".$dash['dashboard_id']."'".($dash['default'] ? ' selected' : '').">".$dash['username'].':'.$dash['dashboard_name']."</option>";
+                }
+                echo "</select>
+           </div>
+       </div>
   <button type='submit' class='btn btn-default'>Update User</button>
   </form>";
-                    if ($config['twofactor']) {
-                        echo "<br/><div class='well'><h3>Two-Factor Authentication</h3>";
-                        $twofactor = dbFetchRow('SELECT twofactor FROM users WHERE user_id = ?', array($vars['user_id']));
-                        $twofactor = json_decode($twofactor['twofactor'], true);
-                        if ($twofactor['fails'] >= 3 && (!$config['twofactor_lock'] || (time() - $twofactor['last']) < $config['twofactor_lock'])) {
-                            echo "<form class='form-horizontal' role='form' method='post' action=''>
+
+                if ($config['twofactor']) {
+                    if ($vars['twofactorremove']) {
+                        if (set_user_pref('twofactor', array(), $vars['user_id'])) {
+                            echo "<div class='alert alert-success'>TwoFactor credentials removed.</div>";
+                        } else {
+                            echo "<div class='alert alert-danger'>Couldnt remove user's TwoFactor credentials.</div>";
+                        }
+                    }
+
+                    if ($vars['twofactorunlock']) {
+                        $twofactor = get_user_pref('twofactor', array(), $vars['user_id']);
+                        $twofactor['fails'] = 0;
+                        if (set_user_pref('twofactor', $twofactor, $vars['user_id'])) {
+                            echo "<div class='alert alert-success'>User unlocked.</div>";
+                        } else {
+                            echo "<div class='alert alert-danger'>Couldnt reset user's TwoFactor failures.</div>";
+                        }
+                    }
+                    echo "<br/><div class='well'><h3>Two-Factor Authentication</h3>";
+                    $twofactor = get_user_pref('twofactor', array(), $vars['user_id']);
+                    if ($twofactor['fails'] >= 3 && (!$config['twofactor_lock'] || (time() - $twofactor['last']) < $config['twofactor_lock'])) {
+                        echo "<form class='form-horizontal' role='form' method='post' action=''>
   <input type='hidden' name='user_id' value='".$vars['user_id']."'>
   <input type='hidden' name='edit' value='yes'>
   <div class='form-group'>
@@ -413,29 +413,26 @@ if ($_SESSION['userlevel'] != '10') {
     <button type='submit' class='btn btn-default'>Unlock</button>
   </div>
 </form>";
-                        }
+                    }
 
-                        if ($twofactor['key']) {
-                            echo "<form class='form-horizontal' role='form' method='post' action=''>
+                    if ($twofactor['key']) {
+                        echo "<form class='form-horizontal' role='form' method='post' action=''>
   <input type='hidden' name='user_id' value='".$vars['user_id']."'>
   <input type='hidden' name='edit' value='yes'>
   <input type='hidden' name='twofactorremove' value='1'>
   <button type='submit' class='btn btn-danger'>Disable TwoFactor</button>
 </form>
 </div>";
-                        } else {
-                            echo '<p>No TwoFactor key generated for this user, Nothing to do.</p>';
-                        }
-                    }//end if
-                } else {
-                    print_error('Error getting user details');
+                    } else {
+                        echo '<p>No TwoFactor key generated for this user, Nothing to do.</p>';
+                    }
                 }//end if
             } else {
-                print_error("Authentication method doesn't support updating users");
-            }//end if
+                print_error('Error getting user details');
+            }//end if !empty($users_details)
         }//end if
     } else {
-        $user_list = get_userlist();
+        $user_list = Auth::get()->getUserlist();
 
         echo '<h3>Select a user to edit</h3>';
 
@@ -446,7 +443,17 @@ if ($_SESSION['userlevel'] != '10') {
                 <div class='col-sm-4'>
                   <select name='user_id' class='form-control input-sm'>";
         foreach ($user_list as $user_entry) {
-            echo "<option value='".$user_entry['user_id']."'>".$user_entry['username'].'</option>';
+            switch ($user_entry['level']) {
+                case "10":
+                    $user_level = ' (admin)';
+                    break;
+                case "11":
+                    $user_level = ' (demo)';
+                    break;
+                default:
+                    $user_level = '';
+            }
+            echo "<option value='".$user_entry['user_id']."'>".$user_entry['username'].$user_level.'</option>';
         }
 
         echo "</select>

@@ -1,0 +1,443 @@
+--
+-- Accedian Enterprise Specific MIB
+--
+-- Copyright (c) 2005-2011, Accedian Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+ACD-DISCOVERY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,IpAddress, Unsigned32 FROM SNMPv2-SMI
+    DisplayString, DateAndTime, MacAddress FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    acdMibs FROM ACCEDIAN-SMI;
+
+acdDiscovery MODULE-IDENTITY
+
+    LAST-UPDATED "201111010100Z"
+    ORGANIZATION "Accedian Networks, Inc."
+    CONTACT-INFO
+            "Accedian Technical Assistance Center
+             Accedian Networks, Inc.
+             4878 Levy, suite 202
+             Saint-Laurent, Quebec Canada H4R 2P1
+             E-mail: support@accedian.com"
+    DESCRIPTION
+            "The discovery inventory information for this Accedian Networks device."
+
+    REVISION "201111010100Z"        -- 1 November 2011
+    DESCRIPTION
+            "Addition of MAC Address List table."
+
+    REVISION "200810010100Z"        -- 1 October 2008
+    DESCRIPTION
+            "Initial version of MIB module ACD-DISCOVERY-MIB."
+
+    ::= { acdMibs 11 }
+
+acdDiscoveryNotifications   OBJECT IDENTIFIER ::= { acdDiscovery 0 }
+acdDiscoveryMIBObjects      OBJECT IDENTIFIER ::= { acdDiscovery 1 }
+acdDiscoveryConformance     OBJECT IDENTIFIER ::= { acdDiscovery 2 }
+
+acdDiscoveryInventory       OBJECT IDENTIFIER ::= { acdDiscoveryMIBObjects 1 }
+
+-------------------------------------------------------------------------------
+ -- The discovery inventory table.
+ -- This table contains the information on all the NID neighbors.
+-------------------------------------------------------------------------------
+
+acdDiscoveryInventoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdDiscoveryInventoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table of information on neighboring NIDs"
+    ::= { acdDiscoveryInventory 1 }
+
+acdDiscoveryInventoryEntry OBJECT-TYPE
+    SYNTAX      AcdDiscoveryInventoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Inventory information."
+    INDEX   { acdDiscoveryIndex }
+    ::=  { acdDiscoveryInventoryTable 1 }
+
+
+AcdDiscoveryInventoryEntry ::= SEQUENCE {
+    acdDiscoveryIndex                  Unsigned32,
+    acdDiscoveryMgmtIpAddress          IpAddress,
+    acdDiscoverySystemName             DisplayString,
+    acdDiscoverySystemDesc             DisplayString,
+    acdDiscoverySerialNumber           DisplayString,
+    acdDiscoveryLastChange             DateAndTime,
+    acdDiscoveryDomain                 DisplayString,
+    acdDiscoveryFirmware               DisplayString,
+    acdDiscoveryBaseMacAddress         MacAddress,
+    acdDiscoveryInterfaceMacAddress    MacAddress,
+    acdDiscoveryChassisIdSubtype       Unsigned32,
+    acdDiscoveryChassisId              DisplayString,
+    acdDiscoveryLocalPortId            DisplayString,
+    acdDiscoveryRemotePortId           DisplayString,
+    acdDiscoveryWebServerPort          Unsigned32,
+    acdDiscoverySnmpAgentPort          Unsigned32,
+    acdDiscoverySshPort                Unsigned32,
+    acdDiscoveryVlan1                  Unsigned32,
+    acdDiscoveryVlan2                  Unsigned32
+}
+
+acdDiscoveryIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of this object uniquely identifies this acdDiscovery
+        entry."
+    ::= { acdDiscoveryInventoryEntry 1 }
+
+acdDiscoveryMgmtIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the management interface."
+    ::= { acdDiscoveryInventoryEntry 2 }
+
+acdDiscoverySystemName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An administratively-assigned name for this managed node."
+    ::= { acdDiscoveryInventoryEntry 3 }
+
+acdDiscoverySystemDesc OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system description."
+    ::= { acdDiscoveryInventoryEntry 4 }
+
+acdDiscoverySerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the serial number of the unit."
+    ::= { acdDiscoveryInventoryEntry 5 }
+
+acdDiscoveryLastChange OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the last time we received an information frame for the device."
+    ::= { acdDiscoveryInventoryEntry 6 }
+
+acdDiscoveryDomain OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the discovery domain."
+    ::= { acdDiscoveryInventoryEntry 7 }
+
+acdDiscoveryFirmware OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The firmware version of the unit."
+    ::= { acdDiscoveryInventoryEntry 8 }
+
+acdDiscoveryBaseMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The base MAC address of the remote NID based on the last information
+         frame received from the device. If no information has been received,
+         this object shall be equal to six octets of zero."
+    ::= { acdDiscoveryInventoryEntry 9 }
+
+acdDiscoveryInterfaceMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management interface MAC address of the remote NID based on the
+         last information frame received from the device. If no information has
+         been received, this object shall be equal to six octets of zero."
+    ::= { acdDiscoveryInventoryEntry 10 }
+
+acdDiscoveryChassisIdSubtype OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The chassis ID subtype, as defined by IEEE 802.1AB."
+    ::= { acdDiscoveryInventoryEntry 11 }
+
+acdDiscoveryChassisId OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The chassis ID of the remote device."
+    ::= { acdDiscoveryInventoryEntry 12 }
+
+acdDiscoveryLocalPortId OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the port name where the advertisement frame was received."
+    ::= { acdDiscoveryInventoryEntry 13 }
+
+acdDiscoveryRemotePortId OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the advertisement port of the remote device."
+    ::= { acdDiscoveryInventoryEntry 14 }
+
+acdDiscoveryWebServerPort OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The web server port of the remote device."
+    ::= { acdDiscoveryInventoryEntry 15 }
+
+acdDiscoverySnmpAgentPort OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The SNMP agent port of the remote device. If 0, SNMP agent is disabled."
+    ::= { acdDiscoveryInventoryEntry 16 }
+
+acdDiscoverySshPort OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The SSH port of the remote device."
+    ::= { acdDiscoveryInventoryEntry 17 }
+
+acdDiscoveryVlan1 OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The first VLAN on the remote device interface. No VLAN when this value is zero."
+    ::= { acdDiscoveryInventoryEntry 18 }
+
+acdDiscoveryVlan2 OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The second VLAN on the remote device interface. No VLAN when this value is zero."
+    ::= { acdDiscoveryInventoryEntry 19 }
+
+---------------------------------------------------------------------------
+ -- The IP interface table
+ -- This table contains all interfaces found on the remote device, excluding the
+ -- management interface, which was configured by a beacon frame.
+---------------------------------------------------------------------------
+
+acdDiscoveryIpListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdDiscoveryIpListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains all interfaces found on the remote device, excluding the
+        management interface, which was configured by a beacon frame."
+    ::= { acdDiscoveryInventory 2 }
+
+acdDiscoveryIpListEntry OBJECT-TYPE
+    SYNTAX      AcdDiscoveryIpListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of the IP address of an interface on the remote device."
+    INDEX   { acdDiscoveryIndex, acdDiscoveryIpListIndex }
+    ::=  { acdDiscoveryIpListTable 1 }
+
+AcdDiscoveryIpListEntry ::= SEQUENCE {
+    acdDiscoveryIpListIndex                 Unsigned32,
+    acdDiscoveryIpListAddress               IpAddress
+}
+
+acdDiscoveryIpListIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..63)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each row. Based on number of interface found."
+    ::= { acdDiscoveryIpListEntry 1 }
+
+acdDiscoveryIpListAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the IP address on one of the interfaces found on the remote NID."
+    ::= { acdDiscoveryIpListEntry 2 }
+
+---------------------------------------------------------------------------
+ -- The port MAC address table.
+ -- This table contains MAC address or ports found on the remote device.
+ -- For a first phase, only the MAC addresses for ports of a line cards in 
+ -- a MetroNODE chassis are listed. Eventually, we may add to the list the 
+ -- MAC address of all available ports including those of a MetroNID and 
+ -- those of a controller card of a MetroNODE.
+---------------------------------------------------------------------------
+
+acdDiscoveryMacAddressListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdDiscoveryMacAddressListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains MAC addresses of ports found on the remote device. Not
+         all port MAC addresses are necessary listed."
+    ::= { acdDiscoveryInventory 3 }
+
+acdDiscoveryMacAddressListEntry OBJECT-TYPE
+    SYNTAX      AcdDiscoveryMacAddressListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of the MAC address of a port on the remote device."
+    INDEX   { acdDiscoveryIndex, acdDiscoveryMacAddressListIndex }
+    ::=  { acdDiscoveryMacAddressListTable 1 }
+
+AcdDiscoveryMacAddressListEntry ::= SEQUENCE {
+    acdDiscoveryMacAddressListIndex             Unsigned32,
+    acdDiscoveryMacAddressListSystemSlotId      Unsigned32,
+    acdDiscoveryMacAddressListPortId            Unsigned32,
+    acdDiscoveryMacAddressListPortName          DisplayString,
+    acdDiscoveryMacAddressListPortMacAddress    MacAddress
+}
+
+acdDiscoveryMacAddressListIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..63)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each row. Based on number of port MAC addresses found."
+    ::= { acdDiscoveryMacAddressListEntry 1 }
+
+acdDiscoveryMacAddressListSystemSlotId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "System slot identifier of module on which the port is located. 
+         Applies only to a MetroNODE module. Value is 0 for a MetroNID device."
+    ::= { acdDiscoveryMacAddressListEntry 2 }
+
+acdDiscoveryMacAddressListPortId        OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..63)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port identifier."
+    ::= { acdDiscoveryMacAddressListEntry 3 }
+
+acdDiscoveryMacAddressListPortName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port name."
+    ::= { acdDiscoveryMacAddressListEntry 4 }
+
+acdDiscoveryMacAddressListPortMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the MAC address of one of the ports found on the remote device."
+    ::= { acdDiscoveryMacAddressListEntry 5 }
+
+---------------------------------------------------------------------------
+ -- ACD-DISCOVERY-MIB Module - Conformance Information
+---------------------------------------------------------------------------
+
+acdDiscoveryCompliances  OBJECT IDENTIFIER ::= { acdDiscoveryConformance 1 }
+acdDiscoveryGroups       OBJECT IDENTIFIER ::= { acdDiscoveryConformance 2 }
+
+---------------------------------------------------------------------------
+ -- Units of conformance
+---------------------------------------------------------------------------
+
+acdDiscoveryInventoryGroup OBJECT-GROUP
+    OBJECTS {
+        acdDiscoveryMgmtIpAddress,
+        acdDiscoverySystemName,
+        acdDiscoverySystemDesc,
+        acdDiscoverySerialNumber,
+        acdDiscoveryLastChange,
+        acdDiscoveryDomain,
+        acdDiscoveryFirmware,
+        acdDiscoveryBaseMacAddress,
+        acdDiscoveryInterfaceMacAddress,
+        acdDiscoveryChassisIdSubtype,
+        acdDiscoveryChassisId,
+        acdDiscoveryLocalPortId,
+        acdDiscoveryRemotePortId,
+        acdDiscoveryWebServerPort,
+        acdDiscoverySnmpAgentPort,
+        acdDiscoverySshPort,
+        acdDiscoveryVlan1,
+        acdDiscoveryVlan2
+    }
+    STATUS      current
+    DESCRIPTION
+       "."
+    ::= { acdDiscoveryGroups 1 }
+
+acdDiscoveryIpListGroup OBJECT-GROUP
+    OBJECTS {
+        acdDiscoveryIpListAddress
+    }
+    STATUS      current
+    DESCRIPTION
+       "."
+    ::= { acdDiscoveryGroups 2 }
+
+acdDiscoveryMacAddressListGroup OBJECT-GROUP
+    OBJECTS {
+        acdDiscoveryMacAddressListSystemSlotId,
+        acdDiscoveryMacAddressListPortId,
+        acdDiscoveryMacAddressListPortName,
+        acdDiscoveryMacAddressListPortMacAddress
+    }
+    STATUS      current
+    DESCRIPTION
+       "."
+    ::= { acdDiscoveryGroups 3 }
+
+acdDiscoveryCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+       "The compliance statement for support of the ACD-DISCOVERY-MIB module."
+    MODULE
+        MANDATORY-GROUPS {
+            acdDiscoveryInventoryGroup,
+            acdDiscoveryIpListGroup,
+            acdDiscoveryMacAddressListGroup
+         }
+
+    ::= { acdDiscoveryCompliances 1 }
+
+END
+

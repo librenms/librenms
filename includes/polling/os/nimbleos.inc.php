@@ -10,5 +10,5 @@
  * the source code distribution for details.
  */
  
-preg_match('/version (.*)/', $poll_device['sysDescr'], $data);
+preg_match('/version (.*)/', $device['sysDescr'], $data);
 $version = $data[1];

@@ -11,11 +11,13 @@
  * the source code distribution for details.
  */
 
-$module = 'ntp';
+use LibreNMS\RRD\RrdDefinition;
+
+$tmp_module = 'ntp';
 
 $component = new LibreNMS\Component();
 $options = array();
-$options['filter']['type'] = array('=',$module);
+$options['filter']['type'] = array('=',$tmp_module);
 $options['filter']['disabled'] = array('=',0);
 $options['filter']['ignore'] = array('=',0);
 $components = $component->getComponents($device['device_id'], $options);
@@ -34,18 +36,17 @@ if (count($components > 0)) {
 
         // Let's make sure the rrd is setup for this class.
         $rrd_name = array('ntp', $peer);
-        $rrd_def = array(
-            'DS:stratum:GAUGE:600:0:U',
-            'DS:offset:GAUGE:600:0:U',
-            'DS:delay:GAUGE:600:0:U',
-            'DS:dispersion:GAUGE:600:0:U',
-        );
+        $rrd_def = RrdDefinition::make()
+            ->addDataset('stratum', 'GAUGE', 0)
+            ->addDataset('offset', 'GAUGE', 0)
+            ->addDataset('delay', 'GAUGE', 0)
+            ->addDataset('dispersion', 'GAUGE', 0);
 
         $array['stratum'] = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][9][$array['UID']];
         // Set the status, 16 = Bad
         if ($array['stratum'] == 16) {
             $array['status'] = 2;
-            $array['error'] = 'NTP Stratum is Insane';
+            $array['error'] = 'NTP is not in sync';
         } else {
             $array['status'] = 0;
             $array['error'] = '';
@@ -77,4 +78,4 @@ if (count($components > 0)) {
 } // end if count components
 
 // Clean-up after yourself!
-unset($type, $components, $component, $options, $module);
+unset($type, $components, $component, $options, $tmp_module);

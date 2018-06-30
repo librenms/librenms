@@ -12,7 +12,9 @@
  * the source code distribution for details.
  */
 
-if (is_admin() === false) {
+use LibreNMS\Authentication\Auth;
+
+if (!Auth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
@@ -20,11 +22,15 @@ if (is_admin() === false) {
 $transport = mres($_POST['transport']);
 
 require_once $config['install_dir'].'/includes/alerts.inc.php';
-$tmp = array(dbFetchRow('select device_id,hostname from devices order by device_id asc limit 1'));
+$tmp = array(dbFetchRow('select device_id,hostname,sysDescr,version,hardware,location from devices order by device_id asc limit 1'));
 $tmp['contacts'] = GetContacts($tmp);
 $obj = array(
     "hostname"  => $tmp[0]['hostname'],
     "device_id" => $tmp[0]['device_id'],
+    "sysDescr" => $tmp[0]['sysDescr'],
+    "version" => $tmp[0]['version'],
+    "hardware" => $tmp[0]['hardware'],
+    "location" => $tmp[0]['location'],
     "title"     => "Testing transport from ".$config['project_name'],
     "elapsed"   => "11s",
     "id"        => "000",
@@ -33,6 +39,7 @@ $obj = array(
     "severity"  => "critical",
     "rule"      => "%macros.device = 1",
     "name"      => "Test-Rule",
+    "string"      => "#1: test => string;",
     "timestamp" => date("Y-m-d H:i:s"),
     "contacts"  => $tmp['contacts'],
     "state"     => "1",
@@ -41,11 +48,12 @@ $obj = array(
 
 $status = 'error';
 
-if (file_exists($config['install_dir']."/includes/alerts/transport.".$transport.".php")) {
+$class  = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport);
+if (class_exists($class)) {
     $opts = $config['alert']['transports'][$transport];
     if ($opts) {
-        eval('$tmp = function($obj,$opts) { global $config; '.file_get_contents($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php').' return false; };');
-        $tmp = $tmp($obj,$opts);
+        $instance = new $class;
+        $tmp = $instance->deliverAlert($obj, $opts);
         if ($tmp) {
             $status = 'ok';
         }

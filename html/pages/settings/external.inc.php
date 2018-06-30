@@ -12,6 +12,8 @@ $oxidized_conf = array(
     array('name'               => 'oxidized.url',
           'descr'              => 'URL to your Oxidized API',
           'type'               => 'text',
+          'pattern'            => '[a-zA-Z0-9]{1,5}://.*',
+          'required'           => true,
     ),
     array('name'               => 'oxidized.features.versioning',
           'descr'              => 'Enable config versioning access',
@@ -34,25 +36,45 @@ $oxidized_conf = array(
 $unixagent_conf = array(
     array('name'               => 'unix-agent.port',
           'descr'              => 'Default unix-agent port',
-          'type'               => 'text',
+          'type'               => 'numeric',
+          'required'           => true,
     ),
     array('name'               => 'unix-agent.connection-timeout',
           'descr'              => 'Connection timeout',
-          'type'               => 'text',
+          'type'               => 'numeric',
+          'required'           => true,
     ),
     array('name'               => 'unix-agent.read-timeout',
           'descr'              => 'Read timeout',
-          'type'               => 'text',
+          'type'               => 'numeric',
+          'required'           => true,
     ),
 );
 
 $rrdtool_conf = array(
     array('name'               => 'rrdtool',
-           'descr'             => 'Path to rrdtool binary',
-           'type'              => 'text',
+          'descr'              => 'Path to rrdtool binary',
+          'type'               => 'text',
     ),
     array('name'               => 'rrdtool_tune',
           'descr'              => 'Tune all rrd port files to use max values',
+          'type'               => 'checkbox',
+    ),
+    array('name'               => 'rrd.step',
+          'descr'              => 'Change the rrd step value (default 300)',
+          'type'               => 'numeric',
+          'required'           => true,
+    ),
+    array('name'               => 'rrd.heartbeat',
+          'descr'              => 'Change the rrd heartbeat value (default 600)',
+          'type'               => 'numeric',
+          'required'           => true,
+    ),
+);
+
+$peeringdb_conf = array(
+    array('name'               => 'peeringdb.enabled',
+          'descr'              => 'Enable PeeringDB lookup (data is downloaded with daily.sh)',
           'type'               => 'checkbox',
     ),
 );
@@ -65,6 +87,7 @@ echo '
 echo generate_dynamic_config_panel('Oxidized integration', $config_groups, $oxidized_conf);
 echo generate_dynamic_config_panel('Unix-agent integration', $config_groups, $unixagent_conf);
 echo generate_dynamic_config_panel('RRDTool Setup', $config_groups, $rrdtool_conf);
+echo generate_dynamic_config_panel('PeeringDB Integration', $config_groups, $peeringdb_conf);
 
 echo '
     </form>

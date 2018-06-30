@@ -1,0 +1,2295 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-SAA-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-SAA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    switch
+        FROM PRVT-SWITCH-MIB
+    Counter32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, 
+    Unsigned32
+        FROM SNMPv2-SMI
+    MacAddress, RowStatus, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+prvtSaaMIB MODULE-IDENTITY
+    LAST-UPDATED "201405160000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "This MIB provides the extended capability of controlling and
+         provisioning various OAM tests and SAA monitoring."
+    REVISION    "201405160000Z"
+    DESCRIPTION 
+        "Removed hidden leaf and fixed several type mismatches."
+    REVISION    "201401230000Z"
+    DESCRIPTION 
+        "Added SAA Y1731-SLM support."
+    REVISION    "201311180000Z"
+    DESCRIPTION 
+        "New y1731 SLM traps.
+         prvtSaaY1731NotificationTable notification table."
+    REVISION    "201303270000Z"
+    DESCRIPTION 
+        "Added SAA Y1564 support."
+    REVISION    "201301230000Z"
+    DESCRIPTION 
+        "Minor updates. SAA Y1564 is not yet supported in this mib."
+    REVISION    "201005270000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { switch 130 }
+
+
+PrvtSaaNameType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32a"
+    STATUS      current
+    DESCRIPTION 
+        "Saa name type"
+    SYNTAX      OCTET STRING (SIZE(1..32))
+
+prvtSaaNotifications OBJECT IDENTIFIER
+    ::= { prvtSaaMIB 0 }
+
+prvtSaaObjects OBJECT IDENTIFIER
+    ::= { prvtSaaMIB 1 }
+
+prvtSaaProfiles OBJECT IDENTIFIER
+    ::= { prvtSaaObjects 1 }
+
+prvtSaaProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtSaaProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Table contains SAA thresholds."
+    ::= { prvtSaaProfiles 1 }
+
+prvtSaaProfileEntry OBJECT-TYPE
+    SYNTAX      PrvtSaaProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Entry in prvtSaaProfileTable"
+    INDEX       { prvtSaaProfileName }
+    ::= { prvtSaaProfileTable 1 }
+
+PrvtSaaProfileEntry ::= SEQUENCE {
+    prvtSaaProfileName                      PrvtSaaNameType,
+    prvtSaaProfileRowStatus                 RowStatus,
+    prvtSaaProfileType                      INTEGER,
+    prvtSaaProfileY1731DelayNearEnd         Unsigned32,
+    prvtSaaProfileY1731DelayFarEnd          Unsigned32,
+    prvtSaaProfileY1731JitterNearEnd        Unsigned32,
+    prvtSaaProfileY1731JitterFarEnd         Unsigned32,
+    prvtSaaProfileY1731FrameLossNearEnd     Unsigned32,
+    prvtSaaProfileY1731FrameLossFarEnd      Unsigned32,
+    prvtSaaProfileRfc2544FrameLoss          Unsigned32,
+    prvtSaaProfileY1564FrameLoss            Unsigned32,
+    prvtSaaProfileY1564FrameDelay           Unsigned32,
+    prvtSaaProfileY1731SlmDelayNearEnd      Unsigned32,
+    prvtSaaProfileY1731SlmDelayFarEnd       Unsigned32,
+    prvtSaaProfileY1731SlmJitterNearEnd     Unsigned32,
+    prvtSaaProfileY1731SlmJitterFarEnd      Unsigned32,
+    prvtSaaProfileY1731SlmFrameLossNearEnd  Unsigned32,
+    prvtSaaProfileY1731SlmFrameLossFarEnd   Unsigned32
+}
+
+prvtSaaProfileName OBJECT-TYPE
+    SYNTAX      PrvtSaaNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "SAA profile table index."
+    ::= { prvtSaaProfileEntry 1 }
+
+prvtSaaProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Creation/delete/edit of the SAA profile. "
+    ::= { prvtSaaProfileEntry 2 }
+
+prvtSaaProfileType OBJECT-TYPE
+    SYNTAX      INTEGER { y1731(1), rfc2544(2), y1564(3), y1731slm(4) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify profile type."
+    ::= { prvtSaaProfileEntry 3 }
+
+prvtSaaProfileY1731DelayNearEnd OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Near end delay in microseconds"
+    ::= { prvtSaaProfileEntry 4 }
+
+prvtSaaProfileY1731DelayFarEnd OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Far end delay in microseconds"
+    ::= { prvtSaaProfileEntry 5 }
+
+prvtSaaProfileY1731JitterNearEnd OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Near end jitter in microseconds"
+    ::= { prvtSaaProfileEntry 6 }
+
+prvtSaaProfileY1731JitterFarEnd OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Far end jitter in microseconds"
+    ::= { prvtSaaProfileEntry 7 }
+
+prvtSaaProfileY1731FrameLossNearEnd OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Near end frame-loss measured in 0.001 of percent"
+    ::= { prvtSaaProfileEntry 8 }
+
+prvtSaaProfileY1731FrameLossFarEnd OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Far end frame-loss measured in 0.001 of percent"
+    ::= { prvtSaaProfileEntry 9 }
+
+prvtSaaProfileRfc2544FrameLoss OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify maximum frameloss to declare test succeeded"
+    ::= { prvtSaaProfileEntry 10 }
+
+prvtSaaProfileY1564FrameLoss OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify maximum frameloss to declare test succeeded"
+    ::= { prvtSaaProfileEntry 11 }
+
+prvtSaaProfileY1564FrameDelay OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify delay in microseconds"
+    ::= { prvtSaaProfileEntry 12 }
+
+prvtSaaProfileY1731SlmDelayNearEnd OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Near end delay in microseconds"
+    ::= { prvtSaaProfileEntry 13 }
+
+prvtSaaProfileY1731SlmDelayFarEnd OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Far end delay in microseconds"
+    ::= { prvtSaaProfileEntry 14 }
+
+prvtSaaProfileY1731SlmJitterNearEnd OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Near end jitter in microseconds"
+    ::= { prvtSaaProfileEntry 15 }
+
+prvtSaaProfileY1731SlmJitterFarEnd OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Far end jitter in microseconds"
+    ::= { prvtSaaProfileEntry 16 }
+
+prvtSaaProfileY1731SlmFrameLossNearEnd OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Near end frame-loss measured in 0.001 of percent"
+    ::= { prvtSaaProfileEntry 17 }
+
+prvtSaaProfileY1731SlmFrameLossFarEnd OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Far end frame-loss measured in 0.001 of percent"
+    ::= { prvtSaaProfileEntry 18 }
+
+prvtSaaTest OBJECT IDENTIFIER
+    ::= { prvtSaaObjects 2 }
+
+prvtSaaTestTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtSaaTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table holds the configuration for a SAA test"
+    ::= { prvtSaaTest 1 }
+
+prvtSaaTestEntry OBJECT-TYPE
+    SYNTAX      PrvtSaaTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Entry in prvtSaaTestTable"
+    INDEX       { prvtSaaTestName, prvtSaaTestOwner }
+    ::= { prvtSaaTestTable 1 }
+
+PrvtSaaTestEntry ::= SEQUENCE {
+    prvtSaaTestName                             PrvtSaaNameType,
+    prvtSaaTestOwner                            PrvtSaaNameType,
+    prvtSaaTestRowStatus                        RowStatus,
+    prvtSaaTestType                             INTEGER,
+    prvtSaaTestProfile                          PrvtSaaNameType,
+    prvtSaaTestEnable                           TruthValue,
+    prvtSaaTestStatus                           INTEGER,
+    prvtSaaTestY1731Mode                        INTEGER,
+    prvtSaaTestY1731Domain                      OCTET STRING,
+    prvtSaaTestY1731MA                          OCTET STRING,
+    prvtSaaTestY1731Mep                         Unsigned32,
+    prvtSaaTestY1731TargetType                  INTEGER,
+    prvtSaaTestY1731TargetMac                   MacAddress,
+    prvtSaaTestY1731TargetMep                   Unsigned32,
+    prvtSaaTestY1731Priority                    Unsigned32,
+    prvtSaaTestY1731Frequency                   Unsigned32,
+    prvtSaaTestY1731Interval                    Unsigned32,
+    prvtSaaTestY1731Period                      Unsigned32,
+    prvtSaaTestY1731Timeout                     Unsigned32,
+    prvtSaaTestY1731Function                    INTEGER,
+    prvtSaaTestY1731DelayMethod                 INTEGER,
+    prvtSaaTestY1731DelayPValue                 Unsigned32,
+    prvtSaaTestY1731JitterMethod                INTEGER,
+    prvtSaaTestY1731JitterPValue                Unsigned32,
+    prvtSaaTestY1731History                     Unsigned32,
+    prvtSaaTestRfc2544Mode                      INTEGER,
+    prvtSaaTestRfc2544Domain                    OCTET STRING,
+    prvtSaaTestRfc2544MA                        OCTET STRING,
+    prvtSaaTestRfc2544Mep                       Unsigned32,
+    prvtSaaTestRfc2544TargetType                INTEGER,
+    prvtSaaTestRfc2544TargetMac                 MacAddress,
+    prvtSaaTestRfc2544TargetMep                 Unsigned32,
+    prvtSaaTestRfc2544Cir                       Unsigned32,
+    prvtSaaTestRfc2544Cbs                       Unsigned32,
+    prvtSaaTestRfc2544BurstPercentage           Unsigned32,
+    prvtSaaTestRfc2544Duration                  Unsigned32,
+    prvtSaaTestRfc2544Pattern                   INTEGER,
+    prvtSaaTestRfc2544LoopbackType              INTEGER,
+    prvtSaaTestRfc2544CVlan                     Unsigned32,
+    prvtSaaTestRfc2544CVlanPriority             Unsigned32,
+    prvtSaaTestRfc2544CVlanDropEligible         TruthValue,
+    prvtSaaTestRfc2544SVlanPriority             Unsigned32,
+    prvtSaaTestRfc2544SVlanDropEligible         TruthValue,
+    prvtSaaTestRfc2544Timeout                   Unsigned32,
+    prvtSaaTestRfc2544ResultAckTimeout          Unsigned32,
+    prvtSaaTestY1564Mode                        INTEGER,
+    prvtSaaTestY1564Domain                      OCTET STRING,
+    prvtSaaTestY1564Ma                          OCTET STRING,
+    prvtSaaTestY1564Mep                         Unsigned32,
+    prvtSaaTestY1564Function                    INTEGER,
+    prvtSaaTestY1564CVlan                       Unsigned32,
+    prvtSaaTestY1564CVlanPriority               Unsigned32,
+    prvtSaaTestY1564CVlanDropEligible           TruthValue,
+    prvtSaaTestY1564SVlanPriority               Unsigned32,
+    prvtSaaTestY1564SVlanDropEligible           TruthValue,
+    prvtSaaTestY1564TargetType                  INTEGER,
+    prvtSaaTestY1564TargetMac                   MacAddress,
+    prvtSaaTestY1564TargetMep                   Unsigned32,
+    prvtSaaTestY1564Cir                         Unsigned32,
+    prvtSaaTestY1564Eir                         Unsigned32,
+    prvtSaaTestY1564Pattern                     INTEGER,
+    prvtSaaTestY1564ConfigurationStepDuration   Unsigned32,
+    prvtSaaTestY1564PerformanceTestDuration     INTEGER,
+    prvtSaaTestY1564TrafficPolicing             TruthValue,
+    prvtSaaTestY1564CirSteps                    Unsigned32,
+    prvtSaaTestY1564Timeout                     Unsigned32,
+    prvtSaaTestY1564LoopbackType                INTEGER,
+    prvtSaaTestY1564DataSize                    OCTET STRING,
+    prvtSaaTestY1564CustomDataSize              Unsigned32,
+    prvtSaaTestY1731SlmMode                     INTEGER,
+    prvtSaaTestY1731SlmDomain                   OCTET STRING,
+    prvtSaaTestY1731SlmMA                       OCTET STRING,
+    prvtSaaTestY1731SlmMep                      Unsigned32,
+    prvtSaaTestY1731SlmTargetType               INTEGER,
+    prvtSaaTestY1731SlmTargetMac                MacAddress,
+    prvtSaaTestY1731SlmTargetMep                Unsigned32,
+    prvtSaaTestY1731SlmPriority                 Unsigned32,
+    prvtSaaTestY1731SlmInterval                 Unsigned32,
+    prvtSaaTestY1731SlmPeriod                   INTEGER,
+    prvtSaaTestY1731SlmTestId                   Unsigned32,
+    prvtSaaTestY1731SlmPduSize                  Unsigned32,
+    prvtSaaTestY1731SlmDropEligible             TruthValue,
+    prvtSaaTestY1731SlmIncludeDelay             TruthValue,
+    prvtSaaTestY1731SlmHistory                  Unsigned32,
+    prvtSaaTestY1731CountAllPriorities          TruthValue
+}
+
+prvtSaaTestName OBJECT-TYPE
+    SYNTAX      PrvtSaaNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This string is used to describe the test name for the
+         Y1731 Pm SAA test. It is also used as a test identifier."
+    ::= { prvtSaaTestEntry 1 }
+
+prvtSaaTestOwner OBJECT-TYPE
+    SYNTAX      PrvtSaaNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This string is used to describe the owner of the
+         Y1731 Pm SAA test."
+    ::= { prvtSaaTestEntry 2 }
+
+prvtSaaTestRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "RowStatus"
+    ::= { prvtSaaTestEntry 3 }
+
+prvtSaaTestType OBJECT-TYPE
+    SYNTAX      INTEGER { y1731(1), rfc2544(2), y1564(3), y1731slm(4) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "SAA test type. Test y1564 is not supported yet."
+    ::= { prvtSaaTestEntry 4 }
+
+prvtSaaTestProfile OBJECT-TYPE
+    SYNTAX      PrvtSaaNameType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify test profile"
+    ::= { prvtSaaTestEntry 5 }
+
+prvtSaaTestEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "SAA Y1731 Pm test execution status."
+    ::= { prvtSaaTestEntry 6 }
+
+prvtSaaTestStatus OBJECT-TYPE
+    SYNTAX      INTEGER { na(0), pending(1), started(2), running(3), 
+                    finished(4), stopped(5) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Operational status of the SAA test"
+    ::= { prvtSaaTestEntry 7 }
+
+prvtSaaTestY1731Mode OBJECT-TYPE
+    SYNTAX      INTEGER { test(1), loopback(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify test Y1731 mode"
+    ::= { prvtSaaTestEntry 8 }
+
+prvtSaaTestY1731Domain OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..22))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify Y1731 domain level"
+    ::= { prvtSaaTestEntry 9 }
+
+prvtSaaTestY1731MA OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..22))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify Y1731 cfm ma"
+    ::= { prvtSaaTestEntry 10 }
+
+prvtSaaTestY1731Mep OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8191)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify mep id"
+    ::= { prvtSaaTestEntry 12 }
+
+prvtSaaTestY1731TargetType OBJECT-TYPE
+    SYNTAX      INTEGER { mac(1), mep(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The target type of the remote device"
+    ::= { prvtSaaTestEntry 13 }
+
+prvtSaaTestY1731TargetMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The MAC address of the remote device"
+    ::= { prvtSaaTestEntry 14 }
+
+prvtSaaTestY1731TargetMep OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8191)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The MAC address of the remote device"
+    ::= { prvtSaaTestEntry 15 }
+
+prvtSaaTestY1731Priority OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify packet priority"
+    ::= { prvtSaaTestEntry 16 }
+
+prvtSaaTestY1731Frequency OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify frequency of repetition"
+    ::= { prvtSaaTestEntry 17 }
+
+prvtSaaTestY1731Interval OBJECT-TYPE
+    SYNTAX      Unsigned32 (60..3600)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify interval, in seconds"
+    ::= { prvtSaaTestEntry 18 }
+
+prvtSaaTestY1731Period OBJECT-TYPE
+    SYNTAX      Unsigned32 (100..10000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify period, in milliseconds"
+    ::= { prvtSaaTestEntry 19 }
+
+prvtSaaTestY1731Timeout OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Define the timeout interval for each packet, in seconds"
+    ::= { prvtSaaTestEntry 20 }
+
+prvtSaaTestY1731Function OBJECT-TYPE
+    SYNTAX      INTEGER { lossMeasurement(1), delayMeasurement(2), 
+                    both(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify test functions"
+    ::= { prvtSaaTestEntry 21 }
+
+prvtSaaTestY1731DelayMethod OBJECT-TYPE
+    SYNTAX      INTEGER { average(1), pPercentile(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify delay calculation method"
+    ::= { prvtSaaTestEntry 23 }
+
+prvtSaaTestY1731DelayPValue OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify delay p value"
+    ::= { prvtSaaTestEntry 24 }
+
+prvtSaaTestY1731JitterMethod OBJECT-TYPE
+    SYNTAX      INTEGER { peakToPeak(1), variance(2), pPercentile(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify jitter calculation method"
+    ::= { prvtSaaTestEntry 25 }
+
+prvtSaaTestY1731JitterPValue OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify jitter p value"
+    ::= { prvtSaaTestEntry 26 }
+
+prvtSaaTestY1731History OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..120)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify number of last stored probes"
+    ::= { prvtSaaTestEntry 27 }
+
+prvtSaaTestRfc2544Mode OBJECT-TYPE
+    SYNTAX      INTEGER { uniTestHead(1), biTestHead(2), uniTestTail(3), 
+                    biTestLoopback(4) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify test mode"
+    ::= { prvtSaaTestEntry 28 }
+
+prvtSaaTestRfc2544Domain OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..22))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifty CFM Domain id"
+    ::= { prvtSaaTestEntry 29 }
+
+prvtSaaTestRfc2544MA OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..22))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifty CFM MA name"
+    ::= { prvtSaaTestEntry 30 }
+
+prvtSaaTestRfc2544Mep OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8191)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify CFM source MEP"
+    ::= { prvtSaaTestEntry 31 }
+
+prvtSaaTestRfc2544TargetType OBJECT-TYPE
+    SYNTAX      INTEGER { mac(1), mep(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify target type"
+    ::= { prvtSaaTestEntry 32 }
+
+prvtSaaTestRfc2544TargetMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify target MAC address"
+    ::= { prvtSaaTestEntry 33 }
+
+prvtSaaTestRfc2544TargetMep OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8191)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify target MEP"
+    ::= { prvtSaaTestEntry 34 }
+
+prvtSaaTestRfc2544Cir OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..10000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify Committed Information Rate"
+    ::= { prvtSaaTestEntry 35 }
+
+prvtSaaTestRfc2544Cbs OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..2048)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify Committed Burst Size"
+    ::= { prvtSaaTestEntry 36 }
+
+prvtSaaTestRfc2544BurstPercentage OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify burst percentage"
+    ::= { prvtSaaTestEntry 37 }
+
+prvtSaaTestRfc2544Duration OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..180)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify duration, in seconds"
+    ::= { prvtSaaTestEntry 38 }
+
+prvtSaaTestRfc2544Pattern OBJECT-TYPE
+    SYNTAX      INTEGER { null(1), nullCrc(2), prbs(3), prbsCrc(4), 
+                    none(8) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify pattern type"
+    ::= { prvtSaaTestEntry 39 }
+
+prvtSaaTestRfc2544LoopbackType OBJECT-TYPE
+    SYNTAX      INTEGER { macSwap(1), oam(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify loopback type"
+    ::= { prvtSaaTestEntry 40 }
+
+prvtSaaTestRfc2544CVlan OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify C-VLAN"
+    ::= { prvtSaaTestEntry 41 }
+
+prvtSaaTestRfc2544CVlanPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify C-VLAN priority"
+    ::= { prvtSaaTestEntry 42 }
+
+prvtSaaTestRfc2544CVlanDropEligible OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify C-VLAN drop eligible"
+    ::= { prvtSaaTestEntry 43 }
+
+prvtSaaTestRfc2544SVlanPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify S-VLAN priority"
+    ::= { prvtSaaTestEntry 44 }
+
+prvtSaaTestRfc2544SVlanDropEligible OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify S-VLAN drop eligible"
+    ::= { prvtSaaTestEntry 45 }
+
+prvtSaaTestRfc2544Timeout OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The timeout interval for the test packet, in x100 milliseconds"
+    ::= { prvtSaaTestEntry 46 }
+
+prvtSaaTestRfc2544ResultAckTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The time the test-head waits for an inform acknowledgment from the test-tail, in seconds"
+    ::= { prvtSaaTestEntry 47 }
+
+prvtSaaTestY1564Mode OBJECT-TYPE
+    SYNTAX      INTEGER { biTestHead(1), biTestLoopback(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify SAA Y1564 test mode"
+    ::= { prvtSaaTestEntry 48 }
+
+prvtSaaTestY1564Domain OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..22))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifty CFM Domain id"
+    ::= { prvtSaaTestEntry 49 }
+
+prvtSaaTestY1564Ma OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..22))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifty CFM MA name"
+    ::= { prvtSaaTestEntry 50 }
+
+prvtSaaTestY1564Mep OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8191)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify CFM source MEP"
+    ::= { prvtSaaTestEntry 51 }
+
+prvtSaaTestY1564Function OBJECT-TYPE
+    SYNTAX      INTEGER { configuration(1), performance(2), both(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify SAA Y1564 test function"
+    ::= { prvtSaaTestEntry 52 }
+
+prvtSaaTestY1564CVlan OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify C-VLAN"
+    ::= { prvtSaaTestEntry 53 }
+
+prvtSaaTestY1564CVlanPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify C-VLAN priority"
+    ::= { prvtSaaTestEntry 54 }
+
+prvtSaaTestY1564CVlanDropEligible OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify C-VLAN drop eligible"
+    ::= { prvtSaaTestEntry 55 }
+
+prvtSaaTestY1564SVlanPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify S-VLAN priority"
+    ::= { prvtSaaTestEntry 56 }
+
+prvtSaaTestY1564SVlanDropEligible OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify S-VLAN drop eligible"
+    ::= { prvtSaaTestEntry 57 }
+
+prvtSaaTestY1564TargetType OBJECT-TYPE
+    SYNTAX      INTEGER { mac(1), mep(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify target type"
+    ::= { prvtSaaTestEntry 58 }
+
+prvtSaaTestY1564TargetMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify target MAC address"
+    ::= { prvtSaaTestEntry 59 }
+
+prvtSaaTestY1564TargetMep OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8191)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify target MEP"
+    ::= { prvtSaaTestEntry 60 }
+
+prvtSaaTestY1564Cir OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..1000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify Committed Information Rate"
+    ::= { prvtSaaTestEntry 61 }
+
+prvtSaaTestY1564Eir OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify EIR"
+    ::= { prvtSaaTestEntry 62 }
+
+prvtSaaTestY1564Pattern OBJECT-TYPE
+    SYNTAX      INTEGER { null(1), nullCrc(2), prbs(3), prbsCrc(4), 
+                    none(8) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify pattern type"
+    ::= { prvtSaaTestEntry 63 }
+
+prvtSaaTestY1564ConfigurationStepDuration OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify configuration test step duration"
+    ::= { prvtSaaTestEntry 64 }
+
+prvtSaaTestY1564PerformanceTestDuration OBJECT-TYPE
+    SYNTAX      INTEGER { duration15min(1), duration30min(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify performance test duration"
+    ::= { prvtSaaTestEntry 65 }
+
+prvtSaaTestY1564TrafficPolicing OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable traffic policing test"
+    ::= { prvtSaaTestEntry 66 }
+
+prvtSaaTestY1564CirSteps OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify the number of steps for configuration test"
+    ::= { prvtSaaTestEntry 67 }
+
+prvtSaaTestY1564Timeout OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The timeout interval for the test packet, in x100 milliseconds"
+    ::= { prvtSaaTestEntry 68 }
+
+prvtSaaTestY1564LoopbackType OBJECT-TYPE
+    SYNTAX      INTEGER { macSwap(1), oam(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify loopback type"
+    ::= { prvtSaaTestEntry 69 }
+
+prvtSaaTestY1564DataSize OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify test PDU size"
+    ::= { prvtSaaTestEntry 70 }
+
+prvtSaaTestY1564CustomDataSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..9000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify test custom PDU size"
+    ::= { prvtSaaTestEntry 71 }
+
+prvtSaaTestY1731SlmMode OBJECT-TYPE
+    SYNTAX      INTEGER { uni-test-head(1), bi-test-head(2), 
+                    uni-test-tail(3), bi-test-loopback(4) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify test Y1731-slm mode"
+    ::= { prvtSaaTestEntry 72 }
+
+prvtSaaTestY1731SlmDomain OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..22))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify Y1731-slm domain level"
+    ::= { prvtSaaTestEntry 73 }
+
+prvtSaaTestY1731SlmMA OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..22))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify Y1731-slm cfm ma"
+    ::= { prvtSaaTestEntry 74 }
+
+prvtSaaTestY1731SlmMep OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8191)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify mep id"
+    ::= { prvtSaaTestEntry 75 }
+
+prvtSaaTestY1731SlmTargetType OBJECT-TYPE
+    SYNTAX      INTEGER { mac(1), mep(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The target type of the remote device"
+    ::= { prvtSaaTestEntry 76 }
+
+prvtSaaTestY1731SlmTargetMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The MAC address of the remote device"
+    ::= { prvtSaaTestEntry 77 }
+
+prvtSaaTestY1731SlmTargetMep OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8191)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The MAC address of the remote device"
+    ::= { prvtSaaTestEntry 78 }
+
+prvtSaaTestY1731SlmPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify packet priority"
+    ::= { prvtSaaTestEntry 79 }
+
+prvtSaaTestY1731SlmInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (60..3600)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify interval, in seconds"
+    ::= { prvtSaaTestEntry 80 }
+
+prvtSaaTestY1731SlmPeriod OBJECT-TYPE
+    SYNTAX      INTEGER { i300Hz(3), i10msec(10), i100msec(100), 
+                    i1sec(1000) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify period, in milliseconds"
+    ::= { prvtSaaTestEntry 81 }
+
+prvtSaaTestY1731SlmTestId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4095)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify slm test-id"
+    ::= { prvtSaaTestEntry 82 }
+
+prvtSaaTestY1731SlmPduSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..9000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify slm packet size in bytes"
+    ::= { prvtSaaTestEntry 83 }
+
+prvtSaaTestY1731SlmDropEligible OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify SLM packets drop eligible flag"
+    ::= { prvtSaaTestEntry 84 }
+
+prvtSaaTestY1731SlmIncludeDelay OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify if SLM measurement will include delay"
+    ::= { prvtSaaTestEntry 85 }
+
+prvtSaaTestY1731SlmHistory OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..120)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify number of last stored probes"
+    ::= { prvtSaaTestEntry 86 }
+
+prvtSaaTestY1731CountAllPriorities OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Measure for all priorities"
+    ::= { prvtSaaTestEntry 87 }
+
+prvtSaaTestDataSizeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtSaaTestDataSizeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table holds the configuration for a SAA test data-size"
+    ::= { prvtSaaTest 2 }
+
+prvtSaaTestDataSizeEntry OBJECT-TYPE
+    SYNTAX      PrvtSaaTestDataSizeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Entry in prvtSaaTestDataSizeTable"
+    INDEX       { prvtSaaTestName, prvtSaaTestOwner, 
+                  prvtSaaTestDataSizeIdx }
+    ::= { prvtSaaTestDataSizeTable 1 }
+
+PrvtSaaTestDataSizeEntry ::= SEQUENCE {
+    prvtSaaTestDataSizeIdx          INTEGER,
+    prvtSaaTestDataSizeRowStatus    RowStatus
+}
+
+prvtSaaTestDataSizeIdx OBJECT-TYPE
+    SYNTAX      INTEGER { i64(1), i128(2), i256(4), i512(8), i1024(16), 
+                    i1280(32), i1518(64), i1522(128), i1526(256), 
+                    i1530(512), i1534(1024), i2000(2048), i9000(4096) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Define the PDU size for which the test is executed, in bytes"
+    ::= { prvtSaaTestDataSizeEntry 1 }
+
+prvtSaaTestDataSizeRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Row Status field in prvtSaaTestDataSizeTable"
+    ::= { prvtSaaTestDataSizeEntry 2 }
+
+prvtSaaTestResult OBJECT IDENTIFIER
+    ::= { prvtSaaObjects 3 }
+
+prvtSaaTestY1731ResultTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtSaaTestY1731ResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains SAA results for Y1731 tests."
+    ::= { prvtSaaTestResult 1 }
+
+prvtSaaTestY1731ResultEntry OBJECT-TYPE
+    SYNTAX      PrvtSaaTestY1731ResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Y.1731 test result table"
+    INDEX       { prvtSaaTestName, prvtSaaTestOwner, 
+                  prvtSaaTestY1731ResultIndex }
+    ::= { prvtSaaTestY1731ResultTable 1 }
+
+PrvtSaaTestY1731ResultEntry ::= SEQUENCE {
+    prvtSaaTestY1731ResultIndex                     Unsigned32,
+    prvtSaaTestY1731ResultMep                       Unsigned32,
+    prvtSaaTestY1731ResultDelayNearEnd              Unsigned32,
+    prvtSaaTestY1731ResultDelayFarEnd               Unsigned32,
+    prvtSaaTestY1731ResultJitterNearEnd             Unsigned32,
+    prvtSaaTestY1731ResultJitterFarEnd              Unsigned32,
+    prvtSaaTestY1731ResultFrameLossNearEnd          Unsigned32,
+    prvtSaaTestY1731ResultFrameLossFarEnd           Unsigned32,
+    prvtSaaTestY1731ResultFramesSentNearEnd         Counter32,
+    prvtSaaTestY1731ResultFramesSentFarEnd          Counter32,
+    prvtSaaTestY1731ResultFramesReceivedNearEnd     Counter32,
+    prvtSaaTestY1731ResultFramesReceivedFarEnd      Counter32,
+    prvtSaaTestY1731ResultFramesPacketSend          Counter32,
+    prvtSaaTestY1731ResultTimeouts                  Unsigned32,
+    prvtSaaTestY1731ResultErrors                    Unsigned32,
+    prvtSaaTestY1731ResultCompletionTime            Unsigned32,
+    prvtSaaTestEpsSwitchover                        Unsigned32
+}
+
+prvtSaaTestY1731ResultIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "SAA Y1731 test results table index"
+    ::= { prvtSaaTestY1731ResultEntry 1 }
+
+prvtSaaTestY1731ResultMep OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Mep id"
+    ::= { prvtSaaTestY1731ResultEntry 2 }
+
+prvtSaaTestY1731ResultDelayNearEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Near end delay result in 0.001 of a microsecond"
+    ::= { prvtSaaTestY1731ResultEntry 3 }
+
+prvtSaaTestY1731ResultDelayFarEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Far end delay result in 0.001 of a microsecond"
+    ::= { prvtSaaTestY1731ResultEntry 4 }
+
+prvtSaaTestY1731ResultJitterNearEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Near end jitter result in 0.001 of a microsecond"
+    ::= { prvtSaaTestY1731ResultEntry 5 }
+
+prvtSaaTestY1731ResultJitterFarEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Far end jitter result in 0.001 of a microsecond"
+    ::= { prvtSaaTestY1731ResultEntry 6 }
+
+prvtSaaTestY1731ResultFrameLossNearEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Near end frame-loss result in 0.001 of a percent"
+    ::= { prvtSaaTestY1731ResultEntry 7 }
+
+prvtSaaTestY1731ResultFrameLossFarEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Far end frame-loss result in 0.001 of a percent"
+    ::= { prvtSaaTestY1731ResultEntry 8 }
+
+prvtSaaTestY1731ResultFramesSentNearEnd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Near end sent frames"
+    ::= { prvtSaaTestY1731ResultEntry 9 }
+
+prvtSaaTestY1731ResultFramesSentFarEnd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Far end sent frames"
+    ::= { prvtSaaTestY1731ResultEntry 10 }
+
+prvtSaaTestY1731ResultFramesReceivedNearEnd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Near end received frames"
+    ::= { prvtSaaTestY1731ResultEntry 11 }
+
+prvtSaaTestY1731ResultFramesReceivedFarEnd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Far end received frames"
+    ::= { prvtSaaTestY1731ResultEntry 12 }
+
+prvtSaaTestY1731ResultFramesPacketSend OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Sent packets"
+    ::= { prvtSaaTestY1731ResultEntry 13 }
+
+prvtSaaTestY1731ResultTimeouts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of timeouts for the SAA Y1731 Pm test"
+    ::= { prvtSaaTestY1731ResultEntry 14 }
+
+prvtSaaTestY1731ResultErrors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of errors for the SAA Y1731 Pm test"
+    ::= { prvtSaaTestY1731ResultEntry 15 }
+
+prvtSaaTestY1731ResultCompletionTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Completion time for the SAA Y1731 PM test (format is unix time)."
+    ::= { prvtSaaTestY1731ResultEntry 16 }
+
+prvtSaaTestEpsSwitchover OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Marks if eps switchover occured."
+    ::= { prvtSaaTestY1731ResultEntry 17 }
+
+prvtSaaTestRfc2544ResultTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtSaaTestRfc2544ResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains SAA results for Rfc2544 tests."
+    ::= { prvtSaaTestResult 2 }
+
+prvtSaaTestRfc2544ResultEntry OBJECT-TYPE
+    SYNTAX      PrvtSaaTestRfc2544ResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Entry in prvtSaaTestRfc2544ResultTable"
+    INDEX       { prvtSaaTestName, prvtSaaTestOwner, 
+                  prvtSaaTestRfc2544ResultIndex, 
+                  prvtSaaTestRfc2544ResultPduIndex }
+    ::= { prvtSaaTestRfc2544ResultTable 1 }
+
+PrvtSaaTestRfc2544ResultEntry ::= SEQUENCE {
+    prvtSaaTestRfc2544ResultIndex           Unsigned32,
+    prvtSaaTestRfc2544ResultPduIndex        Unsigned32,
+    prvtSaaTestRfc2544ResultFrameLoss       Unsigned32,
+    prvtSaaTestRfc2544ResultThroughput      Unsigned32,
+    prvtSaaTestRfc2544ResultNetThroughput   Unsigned32,
+    prvtSaaTestRfc2544ResultMinDelay        Unsigned32,
+    prvtSaaTestRfc2544ResultMaxDelay        Unsigned32,
+    prvtSaaTestRfc2544ResultAvgDelay        Unsigned32,
+    prvtSaaTestRfc2544ResultStatus          Unsigned32
+}
+
+prvtSaaTestRfc2544ResultIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "SAA RFC2544 Throughput test results table index."
+    ::= { prvtSaaTestRfc2544ResultEntry 1 }
+
+prvtSaaTestRfc2544ResultPduIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "SAA RFC2544 Throughput test results table pdu size"
+    ::= { prvtSaaTestRfc2544ResultEntry 2 }
+
+prvtSaaTestRfc2544ResultFrameLoss OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Frame loss of the SAA RFC2544 test measured in 0.001 of a percent"
+    ::= { prvtSaaTestRfc2544ResultEntry 3 }
+
+prvtSaaTestRfc2544ResultThroughput OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Throughput of the SAA RFC2544 test measured in Kbps"
+    ::= { prvtSaaTestRfc2544ResultEntry 4 }
+
+prvtSaaTestRfc2544ResultNetThroughput OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The actual throughput of the SAA RFC2544 test
+         containing only user data. It is measured in Kbps."
+    ::= { prvtSaaTestRfc2544ResultEntry 5 }
+
+prvtSaaTestRfc2544ResultMinDelay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Minimum Delay measured in nanoseconds"
+    ::= { prvtSaaTestRfc2544ResultEntry 6 }
+
+prvtSaaTestRfc2544ResultMaxDelay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Maximum Delay measured in nanoseconds"
+    ::= { prvtSaaTestRfc2544ResultEntry 7 }
+
+prvtSaaTestRfc2544ResultAvgDelay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Average Delay measured in nanoseconds"
+    ::= { prvtSaaTestRfc2544ResultEntry 8 }
+
+prvtSaaTestRfc2544ResultStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Status of the SAA RFC2544 test"
+    ::= { prvtSaaTestRfc2544ResultEntry 9 }
+
+prvtSaaTestY1564ResultTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtSaaTestY1564ResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains SAA results for Y1564 tests."
+    ::= { prvtSaaTestResult 3 }
+
+prvtSaaTestY1564ResultEntry OBJECT-TYPE
+    SYNTAX      PrvtSaaTestY1564ResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Entry in prvtSaaTestY1564ResultTable"
+    INDEX       { prvtSaaTestName, prvtSaaTestOwner, 
+                  prvtSaaTestY1564ResultIndex, 
+                  prvtSaaTestY1564ResultStep, prvtSaaTestY1564ResultPdu }
+    ::= { prvtSaaTestY1564ResultTable 1 }
+
+PrvtSaaTestY1564ResultEntry ::= SEQUENCE {
+    prvtSaaTestY1564ResultIndex             Unsigned32,
+    prvtSaaTestY1564ResultStep              Unsigned32,
+    prvtSaaTestY1564ResultPdu               Unsigned32,
+    prvtSaaTestY1564ResultFrameloss         OCTET STRING,
+    prvtSaaTestY1564ResultThroughput        OCTET STRING,
+    prvtSaaTestY1564ResultNetThroughput     OCTET STRING,
+    prvtSaaTestY1564ResultFrameDelay        OCTET STRING,
+    prvtSaaTestY1564ResultStatus            OCTET STRING
+}
+
+prvtSaaTestY1564ResultIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "SAA y1564 test results table index."
+    ::= { prvtSaaTestY1564ResultEntry 1 }
+
+prvtSaaTestY1564ResultStep OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "SAA y1564 test results table test step/stage."
+    ::= { prvtSaaTestY1564ResultEntry 2 }
+
+prvtSaaTestY1564ResultPdu OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "SAA y1564 test results table pdu size"
+    ::= { prvtSaaTestY1564ResultEntry 3 }
+
+prvtSaaTestY1564ResultFrameloss OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Frame loss of the SAA Y1564 test measured in 0.001 of a percent"
+    ::= { prvtSaaTestY1564ResultEntry 4 }
+
+prvtSaaTestY1564ResultThroughput OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Throughput of the SAA Y1564 test measured in Kbps"
+    ::= { prvtSaaTestY1564ResultEntry 5 }
+
+prvtSaaTestY1564ResultNetThroughput OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The actual throughput of the SAA Y1564 test
+         containing only user data. It is measured in Kbps."
+    ::= { prvtSaaTestY1564ResultEntry 6 }
+
+prvtSaaTestY1564ResultFrameDelay OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Average Delay"
+    ::= { prvtSaaTestY1564ResultEntry 7 }
+
+prvtSaaTestY1564ResultStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Status of the test"
+    ::= { prvtSaaTestY1564ResultEntry 9 }
+
+prvtSaaTestY1731SlmResultTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtSaaTestY1731SlmResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains SAA results for Y1731-slm tests."
+    ::= { prvtSaaTestResult 4 }
+
+prvtSaaTestY1731SlmResultEntry OBJECT-TYPE
+    SYNTAX      PrvtSaaTestY1731SlmResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Y.1731-slm test result table"
+    INDEX       { prvtSaaTestName, prvtSaaTestOwner, 
+                  prvtSaaTestY1731SlmResultIndex }
+    ::= { prvtSaaTestY1731SlmResultTable 1 }
+
+PrvtSaaTestY1731SlmResultEntry ::= SEQUENCE {
+    prvtSaaTestY1731SlmResultIndex                  Unsigned32,
+    prvtSaaTestY1731SlmResultMep                    Unsigned32,
+    prvtSaaTestY1731SlmResultDelayNearEnd           Unsigned32,
+    prvtSaaTestY1731SlmResultDelayFarEnd            Unsigned32,
+    prvtSaaTestY1731SlmResultJitterNearEnd          Unsigned32,
+    prvtSaaTestY1731SlmResultJitterFarEnd           Unsigned32,
+    prvtSaaTestY1731SlmResultFrameLossNearEnd       Unsigned32,
+    prvtSaaTestY1731SlmResultFrameLossFarEnd        Unsigned32,
+    prvtSaaTestY1731SlmResultFramesSentNearEnd      Counter32,
+    prvtSaaTestY1731SlmResultFramesSentFarEnd       Counter32,
+    prvtSaaTestY1731SlmResultFramesReceivedNearEnd  Counter32,
+    prvtSaaTestY1731SlmResultFramesReceivedFarEnd   Counter32,
+    prvtSaaTestY1731SlmResultCompletionTime         Unsigned32,
+    prvtSaaY1731SlmTestEpsSwitchover                Unsigned32
+}
+
+prvtSaaTestY1731SlmResultIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "SAA Y1731-slm test results table index"
+    ::= { prvtSaaTestY1731SlmResultEntry 1 }
+
+prvtSaaTestY1731SlmResultMep OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Mep id"
+    ::= { prvtSaaTestY1731SlmResultEntry 2 }
+
+prvtSaaTestY1731SlmResultDelayNearEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Near end delay result in 0.001 of a microsecond"
+    ::= { prvtSaaTestY1731SlmResultEntry 3 }
+
+prvtSaaTestY1731SlmResultDelayFarEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Far end delay result in 0.001 of a microsecond"
+    ::= { prvtSaaTestY1731SlmResultEntry 4 }
+
+prvtSaaTestY1731SlmResultJitterNearEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Near end jitter result in 0.001 of a microsecond"
+    ::= { prvtSaaTestY1731SlmResultEntry 5 }
+
+prvtSaaTestY1731SlmResultJitterFarEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Far end jitter result in 0.001 of a microsecond"
+    ::= { prvtSaaTestY1731SlmResultEntry 6 }
+
+prvtSaaTestY1731SlmResultFrameLossNearEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Near end frame-loss result in 0.0000001 of a percent"
+    ::= { prvtSaaTestY1731SlmResultEntry 7 }
+
+prvtSaaTestY1731SlmResultFrameLossFarEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Far end frame-loss result in 0.0000001 of a percent"
+    ::= { prvtSaaTestY1731SlmResultEntry 8 }
+
+prvtSaaTestY1731SlmResultFramesSentNearEnd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Near end sent frames"
+    ::= { prvtSaaTestY1731SlmResultEntry 9 }
+
+prvtSaaTestY1731SlmResultFramesSentFarEnd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Far end sent frames"
+    ::= { prvtSaaTestY1731SlmResultEntry 10 }
+
+prvtSaaTestY1731SlmResultFramesReceivedNearEnd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Near end received frames"
+    ::= { prvtSaaTestY1731SlmResultEntry 11 }
+
+prvtSaaTestY1731SlmResultFramesReceivedFarEnd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Far end received frames"
+    ::= { prvtSaaTestY1731SlmResultEntry 12 }
+
+prvtSaaTestY1731SlmResultCompletionTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Completion time for the SAA Y1731 PM test (format is unix time)."
+    ::= { prvtSaaTestY1731SlmResultEntry 13 }
+
+prvtSaaY1731SlmTestEpsSwitchover OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Marks if eps switchover occured."
+    ::= { prvtSaaTestY1731SlmResultEntry 14 }
+
+prvtSaaY1731NotificationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtSaaY1731NotificationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table holds notification objects for Y1731 tests"
+    ::= { prvtSaaObjects 4 }
+
+prvtSaaY1731NotificationEntry OBJECT-TYPE
+    SYNTAX      PrvtSaaY1731NotificationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Entry in prvtSaaY1731NotificationTable"
+    INDEX       { prvtSaaTestName, prvtSaaTestOwner, prvtSaaProfileName, 
+                  prvtSaaY1731NotificationId }
+    ::= { prvtSaaY1731NotificationTable 1 }
+
+PrvtSaaY1731NotificationEntry ::= SEQUENCE {
+    prvtSaaY1731NotificationId                      Unsigned32,
+    prvtSaaY1731NotificationDelayThresholdNE        OCTET STRING,
+    prvtSaaY1731NotificationDelayCurrentNE          OCTET STRING,
+    prvtSaaY1731NotificationDelayThresholdFE        OCTET STRING,
+    prvtSaaY1731NotificationDelayCurrentFE          OCTET STRING,
+    prvtSaaY1731NotificationJitterThresholdNE       OCTET STRING,
+    prvtSaaY1731NotificationJitterCurrentNE         OCTET STRING,
+    prvtSaaY1731NotificationJitterThresholdFE       OCTET STRING,
+    prvtSaaY1731NotificationJitterCurrentFE         OCTET STRING,
+    prvtSaaY1731NotificationFramelossThresholdNE    OCTET STRING,
+    prvtSaaY1731NotificationFramelossCurrentNE      OCTET STRING,
+    prvtSaaY1731NotificationFramelossThresholdFE    OCTET STRING,
+    prvtSaaY1731NotificationFramelossCurrentFE      OCTET STRING
+}
+
+prvtSaaY1731NotificationId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Table index"
+    ::= { prvtSaaY1731NotificationEntry 1 }
+
+prvtSaaY1731NotificationDelayThresholdNE OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtSaaY1731NotificationEntry 2 }
+
+prvtSaaY1731NotificationDelayCurrentNE OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtSaaY1731NotificationEntry 3 }
+
+prvtSaaY1731NotificationDelayThresholdFE OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtSaaY1731NotificationEntry 4 }
+
+prvtSaaY1731NotificationDelayCurrentFE OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtSaaY1731NotificationEntry 5 }
+
+prvtSaaY1731NotificationJitterThresholdNE OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtSaaY1731NotificationEntry 6 }
+
+prvtSaaY1731NotificationJitterCurrentNE OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtSaaY1731NotificationEntry 7 }
+
+prvtSaaY1731NotificationJitterThresholdFE OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtSaaY1731NotificationEntry 8 }
+
+prvtSaaY1731NotificationJitterCurrentFE OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtSaaY1731NotificationEntry 9 }
+
+prvtSaaY1731NotificationFramelossThresholdNE OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtSaaY1731NotificationEntry 10 }
+
+prvtSaaY1731NotificationFramelossCurrentNE OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtSaaY1731NotificationEntry 11 }
+
+prvtSaaY1731NotificationFramelossThresholdFE OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtSaaY1731NotificationEntry 12 }
+
+prvtSaaY1731NotificationFramelossCurrentFE OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtSaaY1731NotificationEntry 13 }
+
+prvtSaaLastTestResult OBJECT IDENTIFIER
+    ::= { prvtSaaObjects 5 }
+
+prvtSaaTestY1731LastResultTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtSaaTestY1731LastResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains last SAA results for Y1731 tests."
+    ::= { prvtSaaLastTestResult 1 }
+
+prvtSaaTestY1731LastResultEntry OBJECT-TYPE
+    SYNTAX      PrvtSaaTestY1731LastResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Y.1731 test last result table"
+    INDEX       { prvtSaaTestName, prvtSaaTestOwner }
+    ::= { prvtSaaTestY1731LastResultTable 1 }
+
+PrvtSaaTestY1731LastResultEntry ::= SEQUENCE {
+    prvtSaaTestY1731LastResultIndex                     Unsigned32,
+    prvtSaaTestY1731LastResultMep                       Unsigned32,
+    prvtSaaTestY1731LastResultDelayNearEnd              Unsigned32,
+    prvtSaaTestY1731LastResultDelayFarEnd               Unsigned32,
+    prvtSaaTestY1731LastResultJitterNearEnd             Unsigned32,
+    prvtSaaTestY1731LastResultJitterFarEnd              Unsigned32,
+    prvtSaaTestY1731LastResultFrameLossNearEnd          Unsigned32,
+    prvtSaaTestY1731LastResultFrameLossFarEnd           Unsigned32,
+    prvtSaaTestY1731LastResultFramesSentNearEnd         Counter32,
+    prvtSaaTestY1731LastResultFramesSentFarEnd          Counter32,
+    prvtSaaTestY1731LastResultFramesReceivedNearEnd     Counter32,
+    prvtSaaTestY1731LastResultFramesReceivedFarEnd      Counter32,
+    prvtSaaTestY1731LastResultFramesPacketSend          Counter32,
+    prvtSaaTestY1731LastResultTimeouts                  Unsigned32,
+    prvtSaaTestY1731LastResultErrors                    Unsigned32,
+    prvtSaaTestY1731LastResultCompletionTime            Unsigned32,
+    prvtSaaTestY1731LastResultEpsSwitchover             Unsigned32
+}
+
+prvtSaaTestY1731LastResultIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "SAA Y1731 test last results table index"
+    ::= { prvtSaaTestY1731LastResultEntry 1 }
+
+prvtSaaTestY1731LastResultMep OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Mep id"
+    ::= { prvtSaaTestY1731LastResultEntry 2 }
+
+prvtSaaTestY1731LastResultDelayNearEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last near end delay result in 0.001 of a microsecond"
+    ::= { prvtSaaTestY1731LastResultEntry 3 }
+
+prvtSaaTestY1731LastResultDelayFarEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last far end delay result in 0.001 of a microsecond"
+    ::= { prvtSaaTestY1731LastResultEntry 4 }
+
+prvtSaaTestY1731LastResultJitterNearEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last near end jitter result in 0.001 of a microsecond"
+    ::= { prvtSaaTestY1731LastResultEntry 5 }
+
+prvtSaaTestY1731LastResultJitterFarEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last far end jitter result in 0.001 of a microsecond"
+    ::= { prvtSaaTestY1731LastResultEntry 6 }
+
+prvtSaaTestY1731LastResultFrameLossNearEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last near end frame-loss result in 0.001 of a percent"
+    ::= { prvtSaaTestY1731LastResultEntry 7 }
+
+prvtSaaTestY1731LastResultFrameLossFarEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last far end frame-loss result in 0.001 of a percent"
+    ::= { prvtSaaTestY1731LastResultEntry 8 }
+
+prvtSaaTestY1731LastResultFramesSentNearEnd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last near end sent frames"
+    ::= { prvtSaaTestY1731LastResultEntry 9 }
+
+prvtSaaTestY1731LastResultFramesSentFarEnd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last far end sent frames"
+    ::= { prvtSaaTestY1731LastResultEntry 10 }
+
+prvtSaaTestY1731LastResultFramesReceivedNearEnd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last near end received frames"
+    ::= { prvtSaaTestY1731LastResultEntry 11 }
+
+prvtSaaTestY1731LastResultFramesReceivedFarEnd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last far end received frames"
+    ::= { prvtSaaTestY1731LastResultEntry 12 }
+
+prvtSaaTestY1731LastResultFramesPacketSend OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last sent packets"
+    ::= { prvtSaaTestY1731LastResultEntry 13 }
+
+prvtSaaTestY1731LastResultTimeouts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last number of timeouts for the SAA Y1731 Pm test"
+    ::= { prvtSaaTestY1731LastResultEntry 14 }
+
+prvtSaaTestY1731LastResultErrors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last number of errors for the SAA Y1731 Pm test"
+    ::= { prvtSaaTestY1731LastResultEntry 15 }
+
+prvtSaaTestY1731LastResultCompletionTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last completion time for the SAA Y1731 PM test (format is unix time)."
+    ::= { prvtSaaTestY1731LastResultEntry 16 }
+
+prvtSaaTestY1731LastResultEpsSwitchover OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Marks if eps switchover occured."
+    ::= { prvtSaaTestY1731LastResultEntry 17 }
+
+prvtSaaTestY1731SlmLastResultTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtSaaTestY1731SlmLastResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains SAA results for Last Y1731-slm test."
+    ::= { prvtSaaLastTestResult 2 }
+
+prvtSaaTestY1731SlmLastResultEntry OBJECT-TYPE
+    SYNTAX      PrvtSaaTestY1731SlmLastResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Y.1731-slm test last result table"
+    INDEX       { prvtSaaTestName, prvtSaaTestOwner }
+    ::= { prvtSaaTestY1731SlmLastResultTable 1 }
+
+PrvtSaaTestY1731SlmLastResultEntry ::= SEQUENCE {
+    prvtSaaTestY1731SlmLastResultIndex                  Unsigned32,
+    prvtSaaTestY1731SlmLastResultMep                    Unsigned32,
+    prvtSaaTestY1731SlmLastResultDelayNearEnd           Unsigned32,
+    prvtSaaTestY1731SlmLastResultDelayFarEnd            Unsigned32,
+    prvtSaaTestY1731SlmLastResultJitterNearEnd          Unsigned32,
+    prvtSaaTestY1731SlmLastResultJitterFarEnd           Unsigned32,
+    prvtSaaTestY1731SlmLastResultFrameLossNearEnd       Unsigned32,
+    prvtSaaTestY1731SlmLastResultFrameLossFarEnd        Unsigned32,
+    prvtSaaTestY1731SlmLastResultFramesSentNearEnd      Counter32,
+    prvtSaaTestY1731SlmLastResultFramesSentFarEnd       Counter32,
+    prvtSaaTestY1731SlmLastResultFramesReceivedNearEnd  Counter32,
+    prvtSaaTestY1731SlmLastResultFramesReceivedFarEnd   Counter32,
+    prvtSaaTestY1731SlmLastResultCompletionTime         Unsigned32,
+    prvtSaaTestY1731SlmLastResultEpsSwitchover          Unsigned32
+}
+
+prvtSaaTestY1731SlmLastResultIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "SAA Y1731-slm test last results table index"
+    ::= { prvtSaaTestY1731SlmLastResultEntry 1 }
+
+prvtSaaTestY1731SlmLastResultMep OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Mep id"
+    ::= { prvtSaaTestY1731SlmLastResultEntry 2 }
+
+prvtSaaTestY1731SlmLastResultDelayNearEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last near end delay result in 0.001 of a microsecond"
+    ::= { prvtSaaTestY1731SlmLastResultEntry 3 }
+
+prvtSaaTestY1731SlmLastResultDelayFarEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last far end delay result in 0.001 of a microsecond"
+    ::= { prvtSaaTestY1731SlmLastResultEntry 4 }
+
+prvtSaaTestY1731SlmLastResultJitterNearEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last near end jitter result in 0.001 of a microsecond"
+    ::= { prvtSaaTestY1731SlmLastResultEntry 5 }
+
+prvtSaaTestY1731SlmLastResultJitterFarEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last far end jitter result in 0.001 of a microsecond"
+    ::= { prvtSaaTestY1731SlmLastResultEntry 6 }
+
+prvtSaaTestY1731SlmLastResultFrameLossNearEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last near end frame-loss result in 0.0000001 of a percent"
+    ::= { prvtSaaTestY1731SlmLastResultEntry 7 }
+
+prvtSaaTestY1731SlmLastResultFrameLossFarEnd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last far end frame-loss result in 0.0000001 of a percent"
+    ::= { prvtSaaTestY1731SlmLastResultEntry 8 }
+
+prvtSaaTestY1731SlmLastResultFramesSentNearEnd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last near end sent frames"
+    ::= { prvtSaaTestY1731SlmLastResultEntry 9 }
+
+prvtSaaTestY1731SlmLastResultFramesSentFarEnd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last far end sent frames"
+    ::= { prvtSaaTestY1731SlmLastResultEntry 10 }
+
+prvtSaaTestY1731SlmLastResultFramesReceivedNearEnd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last near end received frames"
+    ::= { prvtSaaTestY1731SlmLastResultEntry 11 }
+
+prvtSaaTestY1731SlmLastResultFramesReceivedFarEnd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last far end received frames"
+    ::= { prvtSaaTestY1731SlmLastResultEntry 12 }
+
+prvtSaaTestY1731SlmLastResultCompletionTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last completion time for the SAA Y1731 PM test (format is unix time)."
+    ::= { prvtSaaTestY1731SlmLastResultEntry 13 }
+
+prvtSaaTestY1731SlmLastResultEpsSwitchover OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Marks if eps switchover occured."
+    ::= { prvtSaaTestY1731SlmLastResultEntry 14 }
+
+prvtSaaRfc2544ProbeFailed NOTIFICATION-TYPE
+    OBJECTS     { prvtSaaTestRfc2544ResultStatus, prvtSaaTestRfc2544Cir, 
+                  prvtSaaTestRfc2544ResultFrameLoss }
+    STATUS      current
+    DESCRIPTION 
+        "This trap should be sent whenever a SAA probe
+         on a specific test fails."
+    ::= { prvtSaaNotifications 1 }
+
+prvtSaaRfc2544ProbeSuccess NOTIFICATION-TYPE
+    OBJECTS     { prvtSaaTestRfc2544ResultStatus, prvtSaaTestRfc2544Cir, 
+                  prvtSaaTestRfc2544ResultFrameLoss }
+    STATUS      current
+    DESCRIPTION 
+        "This trap should be sent whenever a SAA probe
+         on a specific test finishes with success."
+    ::= { prvtSaaNotifications 2 }
+
+prvtSaaTestRfc2544Finished NOTIFICATION-TYPE
+    OBJECTS     { prvtSaaTestRfc2544ResultStatus }
+    STATUS      current
+    DESCRIPTION 
+        "This trap should be sent whenever a SAA RFC2544 test is finished"
+    ::= { prvtSaaNotifications 3 }
+
+prvtSaaY1731DelayNearEndThreshold NOTIFICATION-TYPE
+    OBJECTS     { prvtSaaTestY1731ResultDelayNearEnd, 
+                  prvtSaaProfileY1731DelayNearEnd }
+    STATUS      current
+    DESCRIPTION 
+        "This trap should be sent whenever the near end delay
+         on a SAA Y1731 test will surpass one of the 2 defined
+         thresholds."
+    ::= { prvtSaaNotifications 4 }
+
+prvtSaaY1731DelayFarEndThreshold NOTIFICATION-TYPE
+    OBJECTS     { prvtSaaTestY1731ResultDelayFarEnd, 
+                  prvtSaaProfileY1731DelayFarEnd }
+    STATUS      current
+    DESCRIPTION 
+        "This trap should be sent whenever the far end delay
+         on a SAA Y1731 test will surpass one of the 2 defined
+         thresholds."
+    ::= { prvtSaaNotifications 5 }
+
+prvtSaaY1731JitterNearEndThreshold NOTIFICATION-TYPE
+    OBJECTS     { prvtSaaTestY1731ResultJitterNearEnd, 
+                  prvtSaaProfileY1731JitterNearEnd }
+    STATUS      current
+    DESCRIPTION 
+        "This trap should be sent whenever the near end jitter
+         on a SAA Y1731 test will surpass one of the 2 defined
+         thresholds."
+    ::= { prvtSaaNotifications 6 }
+
+prvtSaaY1731JitterFarEndThreshold NOTIFICATION-TYPE
+    OBJECTS     { prvtSaaTestY1731ResultJitterFarEnd, 
+                  prvtSaaProfileY1731JitterFarEnd }
+    STATUS      current
+    DESCRIPTION 
+        "This trap should be sent whenever the far end jitter
+         on a SAA Y1731 test will surpass one of the 2 defined
+         thresholds."
+    ::= { prvtSaaNotifications 7 }
+
+prvtSaaY1731FrLossNearEndThreshold NOTIFICATION-TYPE
+    OBJECTS     { prvtSaaTestY1731ResultFrameLossNearEnd, 
+                  prvtSaaProfileY1731FrameLossNearEnd }
+    STATUS      current
+    DESCRIPTION 
+        "This trap should be sent whenever the near end frameloss
+         on a SAA Y1731 test will surpass one of the 2 defined
+         thresholds."
+    ::= { prvtSaaNotifications 8 }
+
+prvtSaaY1731FrLossFEThreshold NOTIFICATION-TYPE
+    OBJECTS     { prvtSaaTestY1731ResultFrameLossFarEnd, 
+                  prvtSaaProfileY1731FrameLossFarEnd }
+    STATUS      current
+    DESCRIPTION 
+        "This trap should be sent whenever the far end frameloss
+         on a SAA Y1731 test will surpass one of the 2 defined
+         thresholds."
+    ::= { prvtSaaNotifications 9 }
+
+prvtSaaY1564ProbeFailed NOTIFICATION-TYPE
+    OBJECTS     { prvtSaaTestY1564ResultStatus, 
+                  prvtSaaTestY1564ResultThroughput, 
+                  prvtSaaTestY1564ResultFrameloss, 
+                  prvtSaaTestY1564ResultFrameDelay }
+    STATUS      current
+    DESCRIPTION 
+        "This trap should be sent whenever a SAA probe
+         on a specific test step fails."
+    ::= { prvtSaaNotifications 10 }
+
+prvtSaaY1564ProbeSuccess NOTIFICATION-TYPE
+    OBJECTS     { prvtSaaTestY1564ResultStatus, 
+                  prvtSaaTestY1564ResultThroughput, 
+                  prvtSaaTestY1564ResultFrameloss, 
+                  prvtSaaTestY1564ResultFrameDelay }
+    STATUS      current
+    DESCRIPTION 
+        "This trap should be sent whenever a SAA probe
+         on a specific test step finishes with success."
+    ::= { prvtSaaNotifications 11 }
+
+prvtSaaY1564TestFinished NOTIFICATION-TYPE
+    OBJECTS     { prvtSaaTestY1564ResultStatus }
+    STATUS      current
+    DESCRIPTION 
+        "This trap should be sent whenever a SAA Y1564 test is finished"
+    ::= { prvtSaaNotifications 12 }
+
+prvtSaaY1564DelayThreshold NOTIFICATION-TYPE
+    OBJECTS     { prvtSaaTestY1564ResultFrameDelay }
+    STATUS      current
+    DESCRIPTION 
+        "This trap should be sent whenever a delay on a SAA Y1564
+         test will surpass the defined threshold."
+    ::= { prvtSaaNotifications 13 }
+
+prvtSaaY1564FramelossThreshold NOTIFICATION-TYPE
+    OBJECTS     { prvtSaaTestY1564ResultFrameloss }
+    STATUS      current
+    DESCRIPTION 
+        "This trap should be sent whenever a frameloss on a SAA Y1564
+         test will surpass the defined threshold."
+    ::= { prvtSaaNotifications 14 }
+
+prvtSaaY1731slmDelayNearEndThreshold NOTIFICATION-TYPE
+    OBJECTS     { prvtSaaY1731NotificationDelayCurrentNE, 
+                  prvtSaaY1731NotificationDelayThresholdNE }
+    STATUS      current
+    DESCRIPTION 
+        "This trap should be sent whenever the near end delay
+         on a SAA Y1731 SLM test will surpass one of the 2 defined
+         thresholds."
+    ::= { prvtSaaNotifications 15 }
+
+prvtSaaY1731slmDelayFarEndThreshold NOTIFICATION-TYPE
+    OBJECTS     { prvtSaaY1731NotificationDelayCurrentFE, 
+                  prvtSaaY1731NotificationDelayThresholdFE }
+    STATUS      current
+    DESCRIPTION 
+        "This trap should be sent whenever the far end delay
+         on a SAA Y1731 SLM test will surpass one of the 2 defined
+         thresholds."
+    ::= { prvtSaaNotifications 16 }
+
+prvtSaaY1731slmJitterNearEndThreshold NOTIFICATION-TYPE
+    OBJECTS     { prvtSaaY1731NotificationJitterCurrentNE, 
+                  prvtSaaY1731NotificationJitterThresholdNE }
+    STATUS      current
+    DESCRIPTION 
+        "This trap should be sent whenever the near end jitter
+         on a SAA Y1731 SLM test will surpass one of the 2 defined
+         thresholds."
+    ::= { prvtSaaNotifications 17 }
+
+prvtSaaY1731slmJitterFarEndThreshold NOTIFICATION-TYPE
+    OBJECTS     { prvtSaaY1731NotificationJitterCurrentFE, 
+                  prvtSaaY1731NotificationJitterThresholdFE }
+    STATUS      current
+    DESCRIPTION 
+        "This trap should be sent whenever the far end jitter
+         on a SAA Y1731 SLM test will surpass one of the 2 defined
+         thresholds."
+    ::= { prvtSaaNotifications 18 }
+
+prvtSaaY1731slmFramelossNearEndThreshold NOTIFICATION-TYPE
+    OBJECTS     { prvtSaaY1731NotificationFramelossCurrentNE, 
+                  prvtSaaY1731NotificationFramelossThresholdNE }
+    STATUS      current
+    DESCRIPTION 
+        "This trap should be sent whenever the near end frameloss
+         on a SAA Y1731 SLM test will surpass one of the 2 defined
+         thresholds."
+    ::= { prvtSaaNotifications 19 }
+
+prvtSaaY1731slmFramelossFarEndThreshold NOTIFICATION-TYPE
+    OBJECTS     { prvtSaaY1731NotificationFramelossCurrentFE, 
+                  prvtSaaY1731NotificationFramelossThresholdFE }
+    STATUS      current
+    DESCRIPTION 
+        "This trap should be sent whenever the far end frameloss
+         on a SAA Y1731 SLM test will surpass one of the 2 defined
+         thresholds."
+    ::= { prvtSaaNotifications 20 }
+
+END -- end of module PRVT-SAA-MIB.

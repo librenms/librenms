@@ -1,0 +1,226 @@
+--  =================================================================
+-- Copyright (C) 2008 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: CE Ping MIB. 
+-- Reference:
+-- Version:     V1.0
+-- History:
+--              V1.0 zhuxiao 2008.10.16,publish 
+--              
+--  
+-- =================================================================
+
+        HUAWEI-CE-PING-MIB DEFINITIONS ::= BEGIN
+
+                IMPORTS
+                        hwDatacomm                        
+                                FROM HUAWEI-MIB                        
+                        OBJECT-GROUP                        
+                                FROM SNMPv2-CONF                        
+                        mib-2, IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY                        
+                                FROM SNMPv2-SMI                        
+                        MacAddress, RowStatus, TEXTUAL-CONVENTION                        
+                                FROM SNMPv2-TC;
+        
+        
+                hwCePing MODULE-IDENTITY 
+                        LAST-UPDATED "200810161855Z"        -- October 16, 2008 at 18:55 GMT
+                        ORGANIZATION 
+                                "Huawei Technologies Co., Ltd."
+                        CONTACT-INFO 
+                                "R&D BeiJing, Huawei Technologies co.,Ltd.
+                                 Huawei Bld.,NO.3 Xinxi Rd.,
+                                 Shang-Di Information Industry Base,
+                                 Hai-Dian District Beijing P.R. China
+                                 Zip:100085
+                                 Http://www.huawei.com
+                                 E-mail:support@huawei.com"
+                        DESCRIPTION 
+                                "HUAWEI VPLS quality detect funcion."
+                        ::= { hwDatacomm 175 }
+
+                
+        
+--
+-- Node definitions
+--
+        
+                hwCePingTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwCePingEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The table of Ce Ping."
+                        ::= { hwCePing 1 }
+
+                
+                hwCePingEntry OBJECT-TYPE
+                        SYNTAX HwCePingEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The entry of hwCePingTable."
+                        INDEX { hwCePingIndex }
+                        ::= { hwCePingTable 1 }
+
+                
+                HwCePingEntry ::=
+                        SEQUENCE { 
+                                hwCePingIndex
+                                        Integer32,
+                                hwCePingTargetAddress
+                                        IpAddress,
+                                hwCePingSourceAddress
+                                        IpAddress,
+                                hwCePingVsiName
+                                        OCTET STRING,
+                                hwCePingInterval
+                                        Integer32,
+                                hwCePingCount
+                                        Integer32,
+                                hwCePingRowStatus
+                                        RowStatus
+                         }
+
+                hwCePingIndex OBJECT-TYPE
+                        SYNTAX Integer32 (1..255)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The index of hwCePingTable,it is always 1."
+                        ::= { hwCePingEntry 1 }
+
+                
+                hwCePingTargetAddress OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Specifies the IP address to be used as the destination."
+                        ::= { hwCePingEntry 2 }
+
+                
+                hwCePingSourceAddress OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Specify an unused IP address in the same network that is associated with the VPLS."
+                        ::= { hwCePingEntry 3 }
+
+                
+                hwCePingVsiName OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (1..31))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The VSI name that is uesd by the operation."
+                        ::= { hwCePingEntry 4 }
+
+                
+                hwCePingInterval OBJECT-TYPE
+                        SYNTAX Integer32 (1..10)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "This value represents the inter-packet delay between packets and is in seconds."
+                        ::= { hwCePingEntry 5 }
+
+                
+                hwCePingCount OBJECT-TYPE
+                        SYNTAX Integer32 (1..255)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "This value represents the number of packets that need to be transmitted."
+                        ::= { hwCePingEntry 6 }
+
+                
+                hwCePingRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The operating state of the row."
+                        ::= { hwCePingEntry 51 }
+
+                
+                hwCePingResultTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwCePingResultEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The table of CE Ping result."
+                        ::= { hwCePing 2 }
+
+                
+                hwCePingResultEntry OBJECT-TYPE
+                        SYNTAX HwCePingResultEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The entry of hwCePingResultTable."
+                        INDEX { hwCePingIndex }
+                        ::= { hwCePingResultTable 1 }
+
+                
+                HwCePingResultEntry ::=
+                        SEQUENCE { 
+                                hwCePingResultOperStatus
+                                        INTEGER,
+                                hwCePingResultMac
+                                        MacAddress
+                         }
+
+                hwCePingResultOperStatus OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                sucessful(1),
+                                inProcess(2),
+                                timeout(3)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Reflects the operational state of a hwCePingEntry:
+                                  sucessful(1)  - Test is sucessful.
+                                  inProcess(2) - Test is in process.
+                                  timeout(3) - Test is timeout."
+                        ::= { hwCePingResultEntry 1 }
+
+                
+                hwCePingResultMac OBJECT-TYPE
+                        SYNTAX MacAddress
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Mac that is detected by the test."
+                        ::= { hwCePingResultEntry 2 }
+
+                
+                hwCePingGroup OBJECT IDENTIFIER ::= { hwCePing 3 }
+
+                
+                hwCePingCtrlGroup OBJECT-GROUP
+                        OBJECTS { hwCePingTargetAddress, hwCePingSourceAddress, hwCePingVsiName, hwCePingInterval, hwCePingCount, 
+                                hwCePingRowStatus }
+                        STATUS current
+                        DESCRIPTION 
+                                "Description."
+                        ::= { hwCePingGroup 1 }
+
+                
+                hwCePingResultGroup OBJECT-GROUP
+                        OBJECTS { hwCePingResultOperStatus, hwCePingResultMac }
+                        STATUS current
+                        DESCRIPTION 
+                                "Description."
+                        ::= { hwCePingGroup 2 }
+
+                
+        
+        END
+
+--
+-- HUAWEI-CE-PING-MIB.mib
+--

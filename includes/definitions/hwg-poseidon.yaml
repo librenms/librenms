@@ -1,0 +1,11 @@
+os: hwg-poseidon
+text: 'HWg Poseidon'
+type: environment
+icon: hwg-poseidon
+mib_dir:
+    - hwg
+over:
+    - { graph: device_bits, text: Traffic }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.21796.3.3

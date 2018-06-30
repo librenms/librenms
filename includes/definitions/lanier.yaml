@@ -1,0 +1,14 @@
+os: lanier
+group: printer
+text: 'Lanier Printer'
+type: printer
+icon: lanier
+over:
+    - { graph: device_toner, text: Toner }
+discovery:
+    - sysDescr:
+        - LANIER
+discovery_modules:
+    toner: true
+poller_modules:
+    toner: true

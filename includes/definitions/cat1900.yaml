@@ -1,0 +1,36 @@
+os: cat1900
+group: cisco
+text: 'Cisco Catalyst 1900'
+type: network
+icon: cisco-old
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+poller_modules:
+    cisco-ace-serverfarms: true
+    cisco-ace-loadbalancer: true
+    cisco-cbqos: true
+    cisco-cef: true
+    cisco-mac-accounting: true
+    cisco-voice: true
+    cisco-remote-access-monitor: true
+    cisco-sla: true
+    cisco-ipsec-flow-monitor: true
+    cipsec-tunnels: true
+    cisco-otv: true
+    ipmi: false
+    cisco-vpdn: true
+discovery_modules:
+    cisco-cef: true
+    cisco-sla: true
+    cisco-mac-accounting: true
+    cisco-otv: true
+    cisco-pw: true
+    vrf: true
+    cisco-vrf-lite: true
+mib_dir:
+    - cisco
+discovery:
+    - sysDescr:
+        - 'Cisco Systems Catalyst 1900'

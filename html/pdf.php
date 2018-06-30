@@ -26,13 +26,8 @@ if (strpos($_SERVER['PATH_INFO'], 'debug')) {
     ini_set('error_reporting', 0);
 }
 
-require '../includes/defaults.inc.php';
-require '../config.php';
-require_once '../includes/definitions.inc.php';
-require '../includes/functions.php';
-require 'includes/functions.inc.php';
-require 'includes/authenticate.inc.php';
-require_once 'lib/tcpdf/tcpdf.php';
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
@@ -53,7 +48,7 @@ $pdf->setTextShadow(array('enabled' => false, 'depth_w' => 0.2, 'depth_h' => 0.2
 
 if (isset($_GET['report']) && !empty($_GET['report'])) {
     $report = mres($_GET['report']);
-    $pdf->SetHeaderData('../../'.$config['title_image'], 40, ucfirst($report), $config['project_name'], array(0, 0, 0), array(0, 64, 128));
+    $pdf->SetHeaderData('../../../../../html/'.$config['title_image'], 40, ucfirst($report), $config['project_name'], array(0, 0, 0), array(0, 64, 128));
     include_once "includes/reports/$report.pdf.inc.php";
 } else {
     $report = 'report';

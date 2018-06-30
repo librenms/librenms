@@ -1,0 +1,808 @@
+-- =================================================================
+-- Copyright (C) 2002 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: HUAWEI-VGMP-MIB mib
+-- Reference:   This mib describes VRRP Group Management Protocol.
+-- Version:     V1.0
+-- History:
+--    
+-- =====================DEFINITIONS============================================
+
+        HUAWEI-VGMP-MIB DEFINITIONS ::= BEGIN 
+                IMPORTS
+                        hwDatacomm                        
+                                FROM HUAWEI-MIB                        
+                        OBJECT-GROUP, NOTIFICATION-GROUP                        
+                                FROM SNMPv2-CONF                      
+                        Integer32, Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE                        
+                                FROM SNMPv2-SMI                      
+                        RowStatus, TEXTUAL-CONVENTION,TimeStamp                        
+                                FROM SNMPv2-TC
+                        InterfaceIndex
+                                FROM IF-MIB;
+                                
+                hwVgmpMib MODULE-IDENTITY 
+                        LAST-UPDATED "200701112100Z"        -- January 11, 2007 at 21:00 GMT
+                        ORGANIZATION 
+                                "Huawei Technologies co., Ltd."
+                        CONTACT-INFO 
+                                " R&D Nanjing, Huawei Technologies co.,Ltd.
+                                Huihong Bld.,NO.91 Baixia Rd., 
+                                Bai-Xia District Nanjing P.R. China
+                                Zip:210001 
+                                Http://www.huawei.com                                       
+                                E-mail:support@huawei.com "
+                        DESCRIPTION 
+                                "This mib is used for VGMP."
+                        REVISION "200701112100Z"         -- January 11, 2007 at 21:00 GMT
+                        DESCRIPTION 
+                                "The initial revision of this MIB module."
+                        ::= { hwDatacomm 122 }
+
+-- =====================DEFINITIONS============================================
+
+-- =====================TrapSnmpCtrl============================================
+       
+                vgmpGlobalCtrl OBJECT IDENTIFIER ::= { hwVgmpMib 0 }
+                
+                hwVgmpTrapSnmpCtrl  OBJECT-TYPE
+                   SYNTAX       INTEGER {
+                       enabled     (1),
+                       disabled    (2)
+                   }
+                   MAX-ACCESS   read-write
+                   STATUS       current
+                   DESCRIPTION
+                      "A switch decides whether the system sends trap info or not."
+                   DEFVAL { disabled }
+                   ::= { vgmpGlobalCtrl 1 }
+                   
+                hwVgmpStrictCheck  OBJECT-TYPE
+                   SYNTAX       INTEGER {
+                       enabled     (1),
+                       disabled    (2)
+                   }
+                   MAX-ACCESS   read-write
+                   STATUS       current
+                   DESCRIPTION
+                      "A switch decides whether the system carries out strict check or not."
+                   DEFVAL { disabled }
+                   ::= { vgmpGlobalCtrl 2 }   
+                                                  
+                   
+-- =====================TrapSnmpCtrl============================================
+
+-- ================== Vgmp notification  ===================================
+                vgmpNotifications OBJECT IDENTIFIER ::= { hwVgmpMib 1 }  
+                              
+                hwVgmpOtherStateToMaster NOTIFICATION-TYPE
+                        OBJECTS { hwVgmpGroupCfgState,hwVgmpGroupCfgNextState }
+                        STATUS current
+                        DESCRIPTION 
+                                "The status of the vrrp-group turns to master."
+                        ::= { vgmpNotifications 1 }
+                
+                hwVgmpMasterToOtherState NOTIFICATION-TYPE
+                        OBJECTS { hwVgmpGroupCfgState,hwVgmpGroupCfgNextState }
+                        STATUS current
+                        DESCRIPTION 
+                                "The status of the vrrp-group changes from master to other state."
+                        ::= { vgmpNotifications 2 }
+                
+-- ================== Vgmp notification end ===================================   
+          
+                vgmpOperations      OBJECT IDENTIFIER ::= { hwVgmpMib 2 }
+                vgmpStatistics      OBJECT IDENTIFIER ::= { hwVgmpMib 3 }
+                vgmpConformance     OBJECT IDENTIFIER ::= { hwVgmpMib 4 }
+          
+-- ================== VGMP configuration table ==================                    
+                hwVgmpGroupCfgTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HWVgmpGroupCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The vrrp-group configuration table. "
+                        ::= { vgmpOperations 1 }
+                
+                hwVgmpGroupCfgEntry OBJECT-TYPE
+                        SYNTAX HWVgmpGroupCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "An entry in the vrrp-group configuration table."
+                        INDEX { hwVgmpGroupCfgID }
+                        ::= { hwVgmpGroupCfgTable 1 }
+                
+                HWVgmpGroupCfgEntry ::=
+                        SEQUENCE {  
+                                hwVgmpGroupCfgID
+                                        Integer32,
+                                hwVgmpGroupCfgEnable
+                                        INTEGER,
+                                hwVgmpGroupCfgPri
+                                        Integer32,
+                                hwVgmpGroupCfgUseVrrpPri
+                                        INTEGER,
+                                hwVgmpGroupCfgPriPlusValue
+                                        Integer32,
+                                hwVgmpGroupCfgPreemptEnable
+                                        INTEGER,
+                                hwVgmpGroupCfgPreemptDelayValue
+                                        Integer32,
+                                hwVgmpGroupCfgHelloInterval
+                                        Integer32,
+                                hwVgmpGroupCfgSendEnable
+                                        INTEGER,                                                                             
+                                hwVgmpGroupCfgState
+                                        INTEGER,
+                                hwVgmpGroupCfgRunPri
+                                        Integer32,
+                                hwVgmpGroupCfgCreateTime
+                                        Unsigned32,
+                                hwVgmpGroupCfgLastChangeTime
+                                        Unsigned32,
+                                hwVgmpGroupCfgPeerState
+                                        INTEGER,
+                                hwVgmpGroupCfgVrrpNum
+                                        Integer32,
+                                hwVgmpGroupCfgReset
+                                        INTEGER,
+                                hwVgmpGroupCfgOperRowStatus
+                                        RowStatus,
+                                hwVgmpGroupCfgNextState
+                                    INTEGER
+                         }
+
+                hwVgmpGroupCfgID OBJECT-TYPE
+                        SYNTAX Integer32 (1..16)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The vrrp-group ID."
+                        ::= { hwVgmpGroupCfgEntry 1 }
+                
+                hwVgmpGroupCfgEnable OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                enable(1),
+                                disable(2)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Whether to enable vrrp-group or not."
+                        DEFVAL { disable }
+                        ::= { hwVgmpGroupCfgEntry 2 }
+                
+                hwVgmpGroupCfgPri OBJECT-TYPE
+                        SYNTAX Integer32 (1..254)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The priority of the vrrp-group.
+                                
+                                This attribute cannot be configured if attribute 'hwVgmpGroupCfgUseVrrpPri' is set to 'enable'."
+                                
+                        ::= { hwVgmpGroupCfgEntry 3 }
+                
+                hwVgmpGroupCfgUseVrrpPri OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                enable(1),
+                                disable(2)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Whether using vrrp priority compute vrrp-group priority or not.
+                                
+                                This attribute is exclusive with attributes 'hwVgmpGroupCfgPri' and 'hwVgmpGroupCfgPriPlusValue',
+                                so it is suggested not to configure this attribute together with 'hwVgmpGroupCfgPri' or 'hwVgmpGroupCfgPriPlusValue'.
+'.
+                                "
+                        DEFVAL { disable }
+                        ::= { hwVgmpGroupCfgEntry 4 }
+                
+                hwVgmpGroupCfgPriPlusValue OBJECT-TYPE
+                        SYNTAX Integer32 (0..254)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The plus priority value after an interface added into a group.
+                                
+                                This attribute cannot be configured if attribute 'hwVgmpGroupCfgUseVrrpPri' is set to 'enable'."
+                        ::= { hwVgmpGroupCfgEntry 5 }
+                
+                hwVgmpGroupCfgPreemptEnable OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                enable(1),
+                                disable(2)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Whether to enable preempt switch or not."
+                        DEFVAL { disable }
+                        ::= { hwVgmpGroupCfgEntry 6 }
+                
+                hwVgmpGroupCfgPreemptDelayValue OBJECT-TYPE
+                        SYNTAX Integer32 (0..60000)
+                        UNITS  "milli-seconds"
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The delaying time of vrrp-group enters into new master state."
+                        ::= { hwVgmpGroupCfgEntry 7 }
+                
+                hwVgmpGroupCfgHelloInterval OBJECT-TYPE
+                        SYNTAX Integer32 (200..60000)
+                        UNITS  "milli-seconds"
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The interval for the vrrp-group to send vgmp hello packets."
+                        ::= { hwVgmpGroupCfgEntry 8 }
+                
+                hwVgmpGroupCfgSendEnable OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                enable(1),
+                                disable(2)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Whether to enable vrrp-group group-send or not."
+                        DEFVAL { disable }
+                        ::= { hwVgmpGroupCfgEntry 9 }
+
+                hwVgmpGroupCfgState OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                nouse(1),
+                                init(2),
+                                master(3),
+                                slave(4),
+                                master2slave(5),
+                                slave2master(6),
+                                max(7)                                
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The state of the vrrp-group."
+                        ::= { hwVgmpGroupCfgEntry 10 }       
+                                 
+                hwVgmpGroupCfgRunPri OBJECT-TYPE
+                        SYNTAX Integer32 (0..255)
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The vrrp-group current run priority, it is different from hwVgmpGroupCfgPri. 
+                                The value calculates according as configured priority attribute."
+                        ::= { hwVgmpGroupCfgEntry 11 }
+
+                hwVgmpGroupCfgCreateTime OBJECT-TYPE
+                        SYNTAX       Unsigned32
+                        MAX-ACCESS   read-only
+                        STATUS       current
+                        DESCRIPTION
+                                "A span of the current time subtract the vrrp-group create time.
+                                 This attribute is expressed as second."
+                        ::= { hwVgmpGroupCfgEntry 12 }
+
+                hwVgmpGroupCfgLastChangeTime OBJECT-TYPE
+                        SYNTAX       Unsigned32
+                        MAX-ACCESS   read-only
+                        STATUS       current
+                        DESCRIPTION
+                                "A span of the current time subtract the vrrp-group last change time.
+                                 This attribute is expressed as second."
+                        ::= { hwVgmpGroupCfgEntry 13 }                
+
+                hwVgmpGroupCfgPeerState OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                online(1),
+                                offline(2)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The vrrp-group peer state."
+                        ::= { hwVgmpGroupCfgEntry 14 }
+
+                hwVgmpGroupCfgVrrpNum OBJECT-TYPE
+                        SYNTAX Integer32 (0..64)
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The vrrp-group member number."
+                        ::= { hwVgmpGroupCfgEntry 15 }
+
+                hwVgmpGroupCfgReset OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                reset(1),
+                                unused(2)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "A reset sign of vrrp-group statistics."
+                        DEFVAL { unused }
+                        ::= { hwVgmpGroupCfgEntry 16 }
+
+                hwVgmpGroupCfgOperRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The row status variable."
+                        ::= { hwVgmpGroupCfgEntry 17 }
+                        
+                hwVgmpGroupCfgNextState OBJECT-TYPE
+                   SYNTAX INTEGER
+                        {
+                        nouse(1),
+                        init(2),
+                        master(3),
+                        slave(4),
+                        master2slave(5),
+                        slave2master(6),
+                        unknown(7)
+                        }
+                   MAX-ACCESS read-only
+                   STATUS current
+                   DESCRIPTION
+                        "The next state of vrrp-Group. It provides for trap matching, you can get only unknown state."
+                   ::= { hwVgmpGroupCfgEntry 18 }               
+                
+-- ================= VGMP configuration Table End ===========================================    
+            
+-- ================= Group member configuration table ==========================================            
+                hwVgmpMemberTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HWVgmpMemberEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The vrrp-group member configuration table."
+                        ::= { vgmpOperations 2 }
+                
+                hwVgmpMemberEntry OBJECT-TYPE
+                        SYNTAX HWVgmpMemberEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "An entry in the vrrp-group member configuration table."
+                        INDEX { hwVgmpMemberIfIndex,hwVgmpGroupCfgID,hwVgmpMemberVRID }
+                        ::= { hwVgmpMemberTable 1 }
+                
+                HWVgmpMemberEntry ::=
+                        SEQUENCE { 
+                                hwVgmpMemberIfIndex
+                                        InterfaceIndex,
+                                hwVgmpMemberVRID
+                                        Integer32,
+                                hwVgmpMemberData
+                                        INTEGER,
+                                hwVgmpMemberTran
+                                        INTEGER,
+                                hwVgmpMemberVrrpOnline
+                                        INTEGER,                                        
+                                hwVgmpMemberOperRowStatus
+                                        RowStatus
+                                }
+                                
+                hwVgmpMemberIfIndex OBJECT-TYPE
+                        SYNTAX InterfaceIndex
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The index of the member table."
+                        ::= { hwVgmpMemberEntry 1 }
+                               
+                hwVgmpMemberVRID OBJECT-TYPE
+                        SYNTAX Integer32 (1..255)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The vrrp-group member's vitual router id."
+                        ::= { hwVgmpMemberEntry 2 }
+                        
+                hwVgmpMemberData OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                enable(1),
+                                disable(2)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "It specifies the vrrp-group member's attributes. 
+                                 'enable' indicates this is the vgmp data channel."
+                        DEFVAL { disable }
+                        ::= { hwVgmpMemberEntry 3 }
+                
+                hwVgmpMemberTran OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                enable(1),
+                                disable(2)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "It identifiers a vrrp-group member's attribute,
+                                 'enable' indicates this is the vgmp data transfer-only channel.  
+                                 This attribute cannot be configured if attribute 'hwVgmpMemberData' is set to 'disable'.
+                                 "
+                        DEFVAL { disable }
+                        ::= { hwVgmpMemberEntry 4 }
+                                                
+                hwVgmpMemberVrrpOnline OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                down(1),
+                                peerDown(2),
+                                up(3)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The vrrp-group member's peer state."
+                        ::= { hwVgmpMemberEntry 5 }                        
+                
+                hwVgmpMemberOperRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The row status variable."
+                        ::= { hwVgmpMemberEntry 6 }
+                
+-- ================= Group member configuration table end ======================================    
+-- ================= BFD SESSION table ===============================================
+                hwVgmpTrackBFDTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HWVgmpTrackBFDEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The vrrp-group tracking BFD session table."
+                        ::= { vgmpOperations 3 }
+                
+                hwVgmpTrackBFDEntry OBJECT-TYPE
+                        SYNTAX HWVgmpTrackBFDEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "An entry in the vrrp-group tracking BFD session table."
+                        INDEX { hwVgmpGroupCfgID,hwVgmpTrackBFDID }
+                        ::= { hwVgmpTrackBFDTable 1 }
+                
+                HWVgmpTrackBFDEntry ::=
+                        SEQUENCE{  
+                                hwVgmpTrackBFDID
+                                        Integer32,
+                                hwVgmpTrackBFDReduceValue
+                                        Integer32,
+                                hwVgmpTrackBFDPreeEnable
+                                        INTEGER,
+                                hwVgmpTrackBFDOperRowStatus
+                                        RowStatus
+                                }               
+                hwVgmpTrackBFDID OBJECT-TYPE
+                        SYNTAX Integer32 (1..8191)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The session id of vrrp-group tracking BFD."
+                        ::= { hwVgmpTrackBFDEntry 1 }
+                
+                hwVgmpTrackBFDReduceValue OBJECT-TYPE
+                        SYNTAX Integer32 (0..254)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The value which the system will subtract from priority, 
+                                 when a bfd session is down. You can't set zero."
+                        ::= { hwVgmpTrackBFDEntry 2 }
+                
+                hwVgmpTrackBFDPreeEnable OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                enable(1),
+                                disable(2)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Whether to enable track BFD slave preempt."
+                        DEFVAL { disable }
+                        ::= { hwVgmpTrackBFDEntry 3 }
+                
+                hwVgmpTrackBFDOperRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The row status variable."
+                        ::= { hwVgmpTrackBFDEntry 4 }
+                
+-- ================= BFD SESSION table end ======================================            
+-- ================= packet statistic table ===============================================
+                hwVgmpStatisticTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HWVgmpStatisticEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The packets statistic information table."
+                        ::= { vgmpStatistics 1 }
+                
+                hwVgmpStatisticEntry OBJECT-TYPE
+                        SYNTAX HWVgmpStatisticEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "An entry in the packets statistic information table."
+                        INDEX { hwVgmpGroupCfgID }
+                        ::= { hwVgmpStatisticTable 1 }
+                
+                HWVgmpStatisticEntry ::=
+                        SEQUENCE { 
+                                hwVgmpStatisticCheckFailDropNum
+                                        Integer32,
+                                hwVgmpStatisticDisableDropNum
+                                        Integer32,
+                                hwVgmpStatisticModeTypeErrDropNum
+                                        Integer32,
+                                hwVgmpStatisticAccHelloREQ
+                                        Integer32,
+                                hwVgmpStatisticSendHelloREQ
+                                        Integer32,
+                                hwVgmpStatisticAccHelloACK
+                                        Integer32,
+                                hwVgmpStatisticSendHelloACK
+                                        Integer32,
+                                hwVgmpStatisticAccMasterToSlaveREQ
+                                        Integer32,
+                                hwVgmpStatisticSendMasterToSlaveREQ
+                                        Integer32,
+                                hwVgmpStatisticAccMasterToSlaveACK
+                                        Integer32,
+                                hwVgmpStatisticSendMasterToSlaveACK
+                                        Integer32,
+                                hwVgmpStatisticAccMasterToSlaveNACK
+                                        Integer32,
+                                hwVgmpStatisticSendMasterToSlaveNACK
+                                        Integer32,
+                                hwVgmpStatisticAccSlaveToMasterREQ
+                                        Integer32,
+                                hwVgmpStatisticSendSlaveToMasterREQ
+                                        Integer32,
+                                hwVgmpStatisticAccSlaveToMasterACK
+                                        Integer32,
+                                hwVgmpStatisticSendSlaveToMasterACK
+                                        Integer32,
+                                hwVgmpStatisticAccSlaveToMasterNACK
+                                        Integer32,
+                                hwVgmpStatisticSendSlaveToMasterNACK
+                                        Integer32
+                         }                
+                
+                hwVgmpStatisticCheckFailDropNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of dropped packets due to check failure."
+                        ::= { hwVgmpStatisticEntry 1 }
+                
+                hwVgmpStatisticDisableDropNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of dropped packets because the vrrp-group is disabled."
+                        ::= { hwVgmpStatisticEntry 2 }
+                        
+                hwVgmpStatisticModeTypeErrDropNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of dropped packets because the vrrp-group mode or type is wrong."
+                        ::= { hwVgmpStatisticEntry 3 }
+                
+                hwVgmpStatisticAccHelloREQ OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of hello REQ packets received by the vrrp-group."
+                        ::= { hwVgmpStatisticEntry 4 }
+                
+                hwVgmpStatisticSendHelloREQ OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of hello REQ packets sent by the vrrp-group."
+                        ::= { hwVgmpStatisticEntry 5 }
+                
+                hwVgmpStatisticAccHelloACK OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of hello ACK packets received by the vrrp-group."
+                        ::= { hwVgmpStatisticEntry 6 }
+                
+                hwVgmpStatisticSendHelloACK OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The vrrp-group sending hello ACK packets num."
+                        ::= { hwVgmpStatisticEntry 7 }
+                
+                hwVgmpStatisticAccMasterToSlaveREQ OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of MasterToSlave REQ packets received by the vrrp-group."
+                        ::= { hwVgmpStatisticEntry 8 }
+               
+                hwVgmpStatisticSendMasterToSlaveREQ OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of MasterToSlave REQ packets sent by the vrrp-group."
+                        ::= { hwVgmpStatisticEntry 9 }
+                
+                hwVgmpStatisticAccMasterToSlaveACK OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of MasterToSlave ACK packets received by the vrrp-group."
+                        ::= { hwVgmpStatisticEntry 10 }
+                
+                hwVgmpStatisticSendMasterToSlaveACK OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of MasterToSlave ACK packets sent by the vrrp-group."
+                        ::= { hwVgmpStatisticEntry 11 }
+
+                hwVgmpStatisticAccMasterToSlaveNACK OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of MasterToSlave NACK packets received by the vrrp-group."
+                        ::= { hwVgmpStatisticEntry 12 }
+                
+                hwVgmpStatisticSendMasterToSlaveNACK OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of MasterToSlave NACK packets sent by the vrrp-group."
+                        ::= { hwVgmpStatisticEntry 13 }
+                
+                hwVgmpStatisticAccSlaveToMasterREQ OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of SlaveToMaster REQ packets received by the vrrp-group."
+                        ::= { hwVgmpStatisticEntry 14 }
+                
+                hwVgmpStatisticSendSlaveToMasterREQ OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of SlaveToMaster REQ packets sent by the vrrp-group."
+                        ::= { hwVgmpStatisticEntry 15 }
+                
+                hwVgmpStatisticAccSlaveToMasterACK OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of SlaveToMaster ACK packets received by the vrrp-group."
+                        ::= { hwVgmpStatisticEntry 16 }
+                
+                hwVgmpStatisticSendSlaveToMasterACK OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of SlaveToMaster ACK packets sent by the vrrp-group."
+                        ::= { hwVgmpStatisticEntry 17 }
+               
+                hwVgmpStatisticAccSlaveToMasterNACK OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of SlaveToMaster NACK packets received by the vrrp-group."
+                        ::= { hwVgmpStatisticEntry 18 }
+                
+                hwVgmpStatisticSendSlaveToMasterNACK OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of SlaveToMaster NACK packets sent by the vrrp-group."
+                        ::= { hwVgmpStatisticEntry 19 }
+                
+--      Conformance information
+               
+                hwVGMPMIBCompliances OBJECT IDENTIFIER ::= { vgmpConformance 1 }                
+                hwVGMPMIBGroups OBJECT IDENTIFIER ::= { hwVGMPMIBCompliances 1 }                
+                hwVGMPGroAttrGroup OBJECT-GROUP
+                        OBJECTS { hwVgmpGroupCfgEnable, hwVgmpGroupCfgPri, hwVgmpGroupCfgUseVrrpPri, hwVgmpGroupCfgPriPlusValue,
+                                hwVgmpGroupCfgPreemptEnable, 
+                                hwVgmpGroupCfgPreemptDelayValue, hwVgmpGroupCfgHelloInterval, hwVgmpGroupCfgSendEnable,
+                                hwVgmpGroupCfgState,hwVgmpGroupCfgRunPri,hwVgmpGroupCfgCreateTime,hwVgmpGroupCfgLastChangeTime,
+                                hwVgmpGroupCfgPeerState,hwVgmpGroupCfgVrrpNum,hwVgmpGroupCfgReset,  
+                                hwVgmpGroupCfgOperRowStatus,hwVgmpGroupCfgNextState }
+                        STATUS current
+                        DESCRIPTION 
+                                " Attributes of the vrrp-group configuration."
+                        ::= { hwVGMPMIBGroups 1 }
+                
+                hwVGMPMenAttrGroup OBJECT-GROUP
+                        OBJECTS { hwVgmpMemberData, hwVgmpMemberTran, hwVgmpMemberVrrpOnline, hwVgmpMemberOperRowStatus }
+                        STATUS current
+                        DESCRIPTION 
+                                "The vrrp-group member table's atributes."
+                        ::= { hwVGMPMIBGroups 2 }
+                
+                hwVGMPBFDSessionGroup OBJECT-GROUP
+                        OBJECTS { hwVgmpTrackBFDReduceValue, hwVgmpTrackBFDPreeEnable, hwVgmpTrackBFDOperRowStatus }
+                        STATUS current
+                        DESCRIPTION 
+                                "The vrrp-group tracking BFD table's atributes."
+                        ::= { hwVGMPMIBGroups 3 }
+                
+                hwVGMPStaticGroup OBJECT-GROUP
+                        OBJECTS {hwVgmpStatisticCheckFailDropNum, hwVgmpStatisticDisableDropNum,hwVgmpStatisticModeTypeErrDropNum,
+                                hwVgmpStatisticAccHelloREQ, hwVgmpStatisticSendHelloREQ, 
+                                hwVgmpStatisticAccHelloACK, hwVgmpStatisticSendHelloACK, hwVgmpStatisticAccMasterToSlaveREQ,
+                                hwVgmpStatisticSendMasterToSlaveREQ, hwVgmpStatisticAccMasterToSlaveACK, 
+                                hwVgmpStatisticSendMasterToSlaveACK, hwVgmpStatisticAccMasterToSlaveNACK, 
+                                hwVgmpStatisticSendMasterToSlaveNACK, hwVgmpStatisticAccSlaveToMasterREQ,
+                                hwVgmpStatisticSendSlaveToMasterREQ, 
+                                hwVgmpStatisticAccSlaveToMasterACK, hwVgmpStatisticSendSlaveToMasterACK, 
+                                hwVgmpStatisticAccSlaveToMasterNACK, hwVgmpStatisticSendSlaveToMasterNACK }
+                        STATUS current
+                        DESCRIPTION 
+                                "The vrrp-group packet's statistic info."
+                        ::= { hwVGMPMIBGroups 4 }
+
+                hwVGMPGlobalsGroup OBJECT-GROUP
+                        OBJECTS { hwVgmpTrapSnmpCtrl, hwVgmpStrictCheck}
+                        STATUS current
+                        DESCRIPTION 
+                                "The vrrp-group global group."
+                        ::= { hwVGMPMIBGroups 5 }       
+                
+                hwVGMPNotificationGroup NOTIFICATION-GROUP
+                        NOTIFICATIONS { hwVgmpOtherStateToMaster, hwVgmpMasterToOtherState }
+                        STATUS current
+                        DESCRIPTION 
+                                "The vrrp-group notification group."
+                        ::= { hwVGMPMIBGroups 6 }
+                
+        END
+--
+-- HUAWEI-VGMP-MIB.mib
+--

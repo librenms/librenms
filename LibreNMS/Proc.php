@@ -44,6 +44,11 @@ class Proc
     private $_synchronous;
 
     /**
+     * @var int|null hold the exit code, we can only get this on the first process_status after exit
+     */
+    private $_exitcode = null;
+
+    /**
      * Create and run a new process
      * Most arguments match proc_open()
      *
@@ -54,8 +59,17 @@ class Proc
      * @param bool $blocking set the output pipes to blocking (default: false)
      * @throws Exception the command was unable to execute
      */
-    public function __construct($cmd, $descriptorspec, $cwd = null, $env = null, $blocking = false)
-    {
+    public function __construct(
+        $cmd,
+        $descriptorspec = array(
+            0 => array("pipe", "r"),
+            1 => array("pipe", "w"),
+            2 => array("pipe", "w")
+        ),
+        $cwd = null,
+        $env = null,
+        $blocking = false
+    ) {
         $this->_process = proc_open($cmd, $descriptorspec, $this->_pipes, $cwd, $env);
         if (!is_resource($this->_process)) {
             throw new Exception("Command failed: $cmd");
@@ -102,10 +116,7 @@ class Proc
      */
     public function sendCommand($command)
     {
-        if (!ends_with($command, PHP_EOL)) {
-            $command .= PHP_EOL;
-        }
-        $this->sendInput($command);
+        $this->sendInput($this->checkAddEOL($command));
 
         return $this->getOutput();
     }
@@ -140,22 +151,35 @@ class Proc
     }
 
     /**
+     * Close all pipes for this process
+     */
+    private function closePipes()
+    {
+        foreach ($this->_pipes as $pipe) {
+            if (is_resource($pipe)) {
+                fclose($pipe);
+            }
+        }
+    }
+
+    /**
      * Attempt to gracefully close this process
      * optionally send one last piece of input
      * such as a quit command
      *
-     * @param string $cmd the final command to send
+     * ** Warning: this will block until the process closes.
+     * Some processes might not close on their own.
+     *
+     * @param string $command the final command to send (appends newline if one is ommited)
      * @return int the exit status of this process (-1 means error)
      */
-    public function close($cmd = null)
+    public function close($command = null)
     {
-        if (isset($cmd)) {
-            $this->sendInput($cmd);
+        if (isset($command)) {
+            $this->sendInput($this->checkAddEOL($command));
         }
 
-        fclose($this->_pipes[0]);
-        fclose($this->_pipes[1]);
-        fclose($this->_pipes[2]);
+        $this->closePipes();
 
         return proc_close($this->_process);
     }
@@ -165,25 +189,39 @@ class Proc
      * Please attempt to run close() instead of this
      * This will be called when this object is destroyed if the process is still running
      *
+     * @param int $timeout how many microseconds to wait before terminating (SIGKILL)
      * @param int $signal the signal to send
      * @throws Exception
      */
-    public function terminate($signal = 15)
+    public function terminate($timeout = 3000, $signal = 15)
     {
         $status = $this->getStatus();
 
-        fclose($this->_pipes[1]);
-        fclose($this->_pipes[2]);
+        $this->closePipes();
 
         $closed = proc_terminate($this->_process, $signal);
 
+        $time = 0;
+        while ($time < $timeout) {
+            $closed = !$this->isRunning();
+            if ($closed) {
+                break;
+            }
+
+            usleep(100);
+            $time += 100;
+        }
+
         if (!$closed) {
             // try harder
-            $pid = $status['pid'];
-            $killed = posix_kill($pid, 9); //9 is the SIGKILL signal
+            if (function_exists('posix_kill')) {
+                $killed = posix_kill($status['pid'], 9); //9 is the SIGKILL signal
+            } else {
+                $killed = proc_terminate($this->_process, 9);
+            }
             proc_close($this->_process);
 
-            if (!$killed) {
+            if (!$killed && $this->isRunning()) {
                 throw new Exception("Terminate failed!");
             }
         }
@@ -197,7 +235,13 @@ class Proc
      */
     public function getStatus()
     {
-        return proc_get_status($this->_process);
+        $status = proc_get_status($this->_process);
+
+        if ($status['running'] === false && is_null($this->_exitcode)) {
+            $this->_exitcode = $status['exitcode'];
+        }
+
+        return $status;
     }
 
     /**
@@ -211,7 +255,18 @@ class Proc
             return false;
         }
         $st = $this->getStatus();
-        return isset($st['running']);
+        return isset($st['running']) && $st['running'];
+    }
+
+    /**
+     * Returns the exit code from the process.
+     * Will return null unless isRunning() or getStatus() has been run and returns false.
+     *
+     * @return int|null
+     */
+    public function getExitCode()
+    {
+        return $this->_exitcode;
     }
 
     /**
@@ -233,5 +288,20 @@ class Proc
     public function setSynchronous($synchronous)
     {
         $this->_synchronous = $synchronous;
+    }
+
+    /**
+     * Add and end of line character to a string if
+     * it doesn't already end with one
+     *
+     * @param $string
+     * @return string
+     */
+    private function checkAddEOL($string)
+    {
+        if (!ends_with($string, PHP_EOL)) {
+            $string .= PHP_EOL;
+        }
+        return $string;
     }
 }

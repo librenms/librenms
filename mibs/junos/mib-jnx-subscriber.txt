@@ -44,6 +44,9 @@ jnxSubscriberMIB  MODULE-IDENTITY
        REVISION    "201312130000Z"  -- 20-Dec-13
        DESCRIPTION
              "Added jnxSubscriberAccountingTable MIB."
+       REVISION    "201411030000Z"  -- 03-Nov-14
+       DESCRIPTION
+             "Added jnxSubscriberPicCountTable and jnxSubscriberSlotCountTable."
        ::= { jnxSubscriberMibRoot  1 }
 
 
@@ -160,6 +163,33 @@ jnxSubscriberAccountingTable OBJECT-TYPE
              "The entries in this table represent subscribers with accounting."
        ::= { jnxSubscriberGeneral 6 }
 
+jnxSubscriberAccountingTotalCount OBJECT-TYPE
+       SYNTAX      CounterBasedGauge64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "Total number of subscribers with accounting."
+       ::= { jnxSubscriberGeneral 7 }
+
+jnxSubscriberPicCountTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF JnxSubscriberPicCountEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             " The entries in this table represent each PIC.
+               Each entry contains the PIC name and the number
+               of active subscribers present on that PIC."
+       ::= { jnxSubscriberGeneral 8 }
+
+jnxSubscriberSlotCountTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF JnxSubscriberSlotCountEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             " The entries in this table represent each slot.
+               Each entry contains the slot name and the number
+               of active subscribers present on that slot."
+       ::= { jnxSubscriberGeneral 9 }
 
 jnxSubscriberInterfaceHardwareIndexEntry OBJECT-TYPE
        SYNTAX      JnxSubscriberInterfaceHardwareIndexEntry
@@ -721,5 +751,73 @@ jnxSubscriberAccountingAcctSessionId OBJECT-TYPE
        DESCRIPTION
              "The accounting session id associated with this subscriber."
        ::= { jnxSubscriberAccountingEntry 14 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- PIC Count Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+jnxSubscriberPicCountEntry OBJECT-TYPE
+       SYNTAX      JnxSubscriberPicCountEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "A specification of Pic containing the PIC name 
+              and the number of active subscribers on that PIC"
+       INDEX       { jnxSubscriberPic }
+       ::= { jnxSubscriberPicCountTable 1 }
+
+JnxSubscriberPicCountEntry ::= SEQUENCE {
+       jnxSubscriberPic                  DisplayString,
+       jnxSubscriberPicTotalCounter  CounterBasedGauge64 }
+
+jnxSubscriberPic  OBJECT-TYPE
+       SYNTAX       DisplayString (SIZE(1..32))
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+             "Name of the PIC in string"
+       ::= { jnxSubscriberPicCountEntry 1  }
+
+jnxSubscriberPicTotalCounter OBJECT-TYPE
+       SYNTAX       CounterBasedGauge64
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+             "Number of active subscribers present on the PIC"
+       ::= { jnxSubscriberPicCountEntry 2  }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Slot Count Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+jnxSubscriberSlotCountEntry OBJECT-TYPE
+       SYNTAX      JnxSubscriberSlotCountEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "A specification of Slot containing the slot name 
+              and the number of active subscribers on that slot"
+       INDEX       { jnxSubscriberSlot }
+       ::= { jnxSubscriberSlotCountTable 1 }
+
+JnxSubscriberSlotCountEntry ::= SEQUENCE {
+       jnxSubscriberSlot                  DisplayString,
+       jnxSubscriberSlotTotalCounter      CounterBasedGauge64 }
+
+jnxSubscriberSlot  OBJECT-TYPE
+       SYNTAX       DisplayString (SIZE(1..32))
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+             "Name of the slot in string"
+       ::= { jnxSubscriberSlotCountEntry 1  }
+
+jnxSubscriberSlotTotalCounter OBJECT-TYPE
+       SYNTAX       CounterBasedGauge64
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+             "Number of active subscribers present on the slot"
+       ::= { jnxSubscriberSlotCountEntry 2  }
 
 END

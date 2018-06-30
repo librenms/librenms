@@ -1,0 +1,409 @@
+-- This file was included in WWP MIB release 04-16-00-0047
+ --
+ -- CIENA-CES-LDP-MIB.my
+ --
+
+ CIENA-CES-LDP-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+   	TimeTicks, Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, IpAddress    		
+	FROM SNMPv2-SMI			
+   	DisplayString, MacAddress, RowStatus, TruthValue			
+	FROM SNMPv2-TC							
+   	MplsLdpIdentifier  
+	FROM MPLS-TC-STD-MIB
+	CienaGlobalState
+	FROM CIENA-TC							
+   	cienaCesConfig,cienaCesNotifications 
+	FROM CIENA-SMI;
+
+	
+ cienaCesLdpMIB MODULE-IDENTITY
+	    LAST-UPDATED "201607150000Z"
+	    ORGANIZATION "Ciena, Inc"
+	    CONTACT-INFO
+		    "   Mib Meister
+		  	115 North Sullivan Road
+			Spokane Valley, WA 99037
+		        USA		 		
+		        Phone:  +1 509 242 9000
+			Email:  support@ciena.com"
+
+	    DESCRIPTION
+		"This MIB module is for the Extension of the LDP MIB for CIENA Products"
+
+	    REVISION
+	    	"201607150000Z"
+	    DESCRIPTION
+		"Modified attribute cienaCesLdpGROperStatus to cienaCesLdpGRMode
+		under cienaCesLdpObjects."
+
+	    REVISION
+	    	"201607110000Z"
+	    DESCRIPTION
+		"Added support for LDP Graceful Restart functionality."
+
+	    REVISION
+	    	"201304180000Z"
+	    DESCRIPTION
+		"Fixed miscellaneous typos and descriptions."
+
+	    REVISION
+	    	"201102020000Z"
+	    DESCRIPTION
+		"Initial version."
+
+	    ::= { cienaCesConfig 17 }
+
+
+ --
+ -- Node definitions
+ --
+	
+ cienaCesLdpMIBObjects   OBJECT IDENTIFIER ::= { cienaCesLdpMIB 1 }
+ cienaCesLdpObjects      OBJECT IDENTIFIER ::= { cienaCesLdpMIBObjects 1 }
+ cienaCesLdp             OBJECT IDENTIFIER ::= { cienaCesLdpMIBObjects 2 }
+ 
+
+--
+-- Global objects 
+--
+    
+ cienaCesLdpAdminStatus OBJECT-TYPE
+     SYNTAX      CienaGlobalState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Globally enable or disable LDP."
+    ::= { cienaCesLdpObjects 1 }
+
+ cienaCesLdpOperStatus OBJECT-TYPE
+     SYNTAX      INTEGER {
+                    unknown(0),
+                    up(1),
+                    down(2)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Current operational state of LDP."
+    ::= { cienaCesLdpObjects 2 }
+
+ cienaCesLdpHelloHoldTime OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..65535)
+     UNITS       "seconds"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The 16-bit integer value which is the proposed
+        global hello hold timer (in seconds) for LDP.
+
+        An LSR maintains a record of Hellos received
+        from potential peers. This object represents
+        the Hold Time in the Common Hello Parameters TLV of
+        the Hello Message.
+
+        A value of 65535 means infinite (i.e., wait forever).
+
+        All other values represent the amount of time in
+        seconds to wait for a Hello Message. Setting the
+        hold time to a value smaller than 15 is not
+        recommended, although not forbidden according
+        to RFC3036."
+    ::= { cienaCesLdpObjects 3 }
+
+ cienaCesLdpKeepAliveHoldTime OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..65535)
+     UNITS       "seconds"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The 16-bit integer value which is the proposed global
+        keep alive hold timer for LDP."
+    ::= { cienaCesLdpObjects 4 }
+
+ cienaCesLdpGRAdminStatus OBJECT-TYPE
+     SYNTAX      CienaGlobalState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "LDP Graceful restart Admin status (Enabled/Disabled)."
+    ::= { cienaCesLdpObjects 5 }
+
+ cienaCesLdpGRMode OBJECT-TYPE
+     SYNTAX      INTEGER {
+                    helpNeighbor(1),
+                    restartCapable(2),
+                    notApplicable(3)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "LDP Graceful restart Operational status."
+    ::= { cienaCesLdpObjects 6 }
+
+ cienaCesLdpReconnectTime OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..600000)
+     UNITS       "milliseconds"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The period of time that the local node takes to 
+        restart LDP and  bring up the LDP sessions.This is 
+        advertised to neighbors in the FT Session TLV
+        in Initialization messages.
+
+        The value chosen should be large enough for LDP to be
+        terminated and restarted.
+
+        For devices which only act as the Helper node, this timer 
+        is unused and will return value 0."
+     DEFVAL {60000}
+    ::= { cienaCesLdpObjects 7 }
+
+ cienaCesLdpRecoveryTime OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..600000)
+     UNITS       "milliseconds"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The period of time that the local node is willing to 
+        retain its MPLS forwarding state, if any,that it 
+        preserved across the restart.
+
+        This field is used to calculate the Recovery Time for both
+        Control Plane and Control Channel restarts.  It is used to
+        calculate the Recovery Time advertised in the FT Session
+        TLV in the Initialization message sent to the neighbor.
+
+        For devices which only act as the Helper node, this timer 
+        is unused and will return value 0."
+     DEFVAL {180000}
+    ::= { cienaCesLdpObjects 8 }
+
+ cienaCesLdpMaxPeerReconnect OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..600000)
+     UNITS       "milliseconds"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The maximum period of time that LDP should wait for a 
+        restart capable neighbor to restore an LDP session.
+
+        LDP waits for the minimum of this time and the Reconnect
+        Timeout advertised in the FT Session TLV in the
+        Initialization message from the neighbor."
+     DEFVAL {180000}
+    ::= { cienaCesLdpObjects 9 }
+
+ cienaCesLdpMaxPeerRecovery OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..600000)
+     UNITS       "milliseconds"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The maximum period of time that LDP should wait for a 
+        restart capable neighbor to refresh Label Mappings
+        previously received from that neighbor before deleting 
+        the stale bindings.
+
+        LDP waits for the minimum of this time and the Recovery
+        Time advertised in the FT Session TLV in the
+        Initialization message from the neighbor.
+
+        This value is not used to set the Recovery Time advertised
+        in the FT Session TLV in the Initialization message sent
+        to the neighbor."
+     DEFVAL {240000}
+    ::= { cienaCesLdpObjects 10 }
+  
+--
+-- The CIENA MPLS LDP Sessions Table. It augments MPLS LDP Sessions Table
+--
+
+cienaCesLdpSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CienaCesLdpSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of Sessions between the LDP Entities
+        and LDP Peers. Each row in this table
+        represents a single session."
+    ::= {  cienaCesLdp 1 }
+
+cienaCesLdpSessionEntry OBJECT-TYPE
+    SYNTAX      CienaCesLdpSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents information on a
+        single session between an LDP Entity and LDP Peer.
+        The information contained in a row is read-only.
+
+        Note: The Path Vector Limit for the
+        Session is the value that is configured in
+        the corresponding mplsLdpEntityEntry. The
+        Peer's Path Vector Limit is in the
+        mplsLdpPeerPathVectorLimit object in the
+        mplsLdpPeerTable.
+
+        Values that may differ from those configured are
+        noted in the objects of this table, the
+        mplsLdpAtmSessionTable and the
+        mplsLdpFrameRelaySessionTable. A value 
+        differs if it was negotiated between the
+        Entity and the Peer.  Values may or may not
+        be negotiated.  For example, if the values
+        are the same then no negotiation takes place.
+        If they are negotiated, then they may differ."
+    INDEX       { cienaCesLdpEntityLdpId,
+                  cienaCesLdpEntityIndex,
+                  cienaCesLdpPeerLdpId }
+    ::= { cienaCesLdpSessionTable 1 }
+
+CienaCesLdpSessionEntry ::= SEQUENCE {
+        cienaCesLdpEntityLdpId                   MplsLdpIdentifier,
+        cienaCesLdpEntityIndex                   Unsigned32,
+        cienaCesLdpPeerLdpId                     MplsLdpIdentifier,
+        cienaCesLdpSessionConfiguredHoldTime     Unsigned32,
+        cienaCesLdpSessionPeerHoldTime           Unsigned32,
+        cienaCesLdpSessionHoldTimeInUse          Unsigned32
+        }
+
+
+ cienaCesLdpEntityLdpId OBJECT-TYPE
+     SYNTAX      MplsLdpIdentifier
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The LDP identifier. The first four octets encode an IP
+         address assigned to the LSR, and the last two octets
+         identify a specific label space within the LSR."
+    REFERENCE
+        "RFC3036, LDP Specification, Section on LDP Identifiers."
+    ::= { cienaCesLdpSessionEntry 1 }
+
+ cienaCesLdpEntityIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This index is used as a secondary index to uniquely
+        identify this row.  
+
+        A secondary index (this object) is meaningful to some
+        but not all, LDP implementations. For example,
+        an LDP implementation that uses PPP would
+        use this index to differentiate PPP sub-links.
+
+        Another way to use this index is to assign it the
+        value of ifIndex."
+    ::= { cienaCesLdpSessionEntry 2 }
+
+ cienaCesLdpPeerLdpId OBJECT-TYPE
+    SYNTAX      MplsLdpIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The LDP identifier of this LDP Peer."
+    ::= { cienaCesLdpSessionEntry 3 }
+            
+ cienaCesLdpSessionConfiguredHoldTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The locally configured keepalive hold time for this
+        session, in seconds. Note that the value of this field
+        reflects configuration at the time of session
+        initialization; this may differ from the configuration
+        that would apply to a new session, if configuration has
+        changed since this session was initialized."
+    ::= { cienaCesLdpSessionEntry 4 }
+
+  cienaCesLdpSessionPeerHoldTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The peer's advertised keepalive hold time for this session
+        in seconds. Note that the value of this field reflects
+        the peer's configuration at the time of session
+        initialization; this may differ from the configuration
+        that would apply to a new session, if the peer's
+        configuration has changed since this session was
+        initialized."
+    ::= { cienaCesLdpSessionEntry 5 }
+
+  cienaCesLdpSessionHoldTimeInUse OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The keepalive hold time that is currently in use for this
+        session, in seconds."
+    ::= { cienaCesLdpSessionEntry 6 }
+
+
+cienaCesLdpHelloAdjacencyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CienaCesLdpHelloAdjacencyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of Hello Adjacencies for Sessions."
+    ::= { cienaCesLdp 2 }
+
+cienaCesLdpHelloAdjacencyEntry OBJECT-TYPE
+    SYNTAX      CienaCesLdpHelloAdjacencyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents a single LDP Hello Adjacency.
+        An LDP Session can have one or more Hello
+        Adjacencies."
+         INDEX       { cienaCesLdpEntityLdpId,
+                       cienaCesLdpEntityIndex,
+                       cienaCesLdpPeerLdpId,
+                       cienaCesLdpHelloAdjacencyIndex }
+    ::= { cienaCesLdpHelloAdjacencyTable 1 }
+
+CienaCesLdpHelloAdjacencyEntry ::= SEQUENCE {
+    cienaCesLdpHelloAdjacencyIndex               Unsigned32,
+    cienaCesLdpHelloAdjacencyConfiguredHoldTime  Unsigned32,
+    cienaCesLdpHelloAdjacencyPeerHoldTime        Unsigned32
+}
+
+cienaCesLdpHelloAdjacencyIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An identifier for this specific adjacency."
+    ::= { cienaCesLdpHelloAdjacencyEntry 1 }
+
+cienaCesLdpHelloAdjacencyConfiguredHoldTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The locally configured hello hold time for this adjacency,
+        in seconds."
+    ::= { cienaCesLdpHelloAdjacencyEntry 2 }
+
+cienaCesLdpHelloAdjacencyPeerHoldTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The peer's advertised hello hold time for this adjacency,
+        in seconds."
+    ::= { cienaCesLdpHelloAdjacencyEntry 3 }
+
+
+
+  END
+ 
+ --
+ -- CIENA-CES-LDP-MIB
+ --
+ 

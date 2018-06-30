@@ -11,7 +11,9 @@
  * the source code distribution for details.
  */
 
-if (is_admin() === false) {
+use LibreNMS\Authentication\Auth;
+
+if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
@@ -56,8 +58,7 @@ foreach (dbFetchRows("SELECT `id`,`rule`,`name` FROM `alert_rules`", array()) as
 
 <script>
 $('#attach-alert-template').on('show.bs.modal', function(e) {
-    template_id = $(e.relatedTarget).data('template_id');
-    $("#template_id").val(template_id);
+    var template_id = $('#template_id').val();
     $.ajax({
         type: "POST",
         url: "ajax_form.php",
@@ -76,6 +77,7 @@ $('#attach-alert-template').on('show.bs.modal', function(e) {
 
 $('#attach-alert-template').on('hide.bs.modal', function(e) {
     $('#rules_list').val([]);
+    $('template_id').val('');
 });
 
 $('#alert-template-attach').click('', function(event) {
@@ -93,14 +95,14 @@ $('#alert-template-attach').click('', function(event) {
         dataType: "html",
         success: function(msg) {
             if(msg.indexOf("ERROR:") <= -1) {
-                $("#message").html('<div class="alert alert-info">'+msg+'</div>');
+                toastr.success(msg);
                 $("#attach-alert-template").modal('hide');
             } else {
-                $('#template_error').html('<div class="alert alert-info">'+msg+'</div>');
+                $('#template_error').html('<div class="alert alert-danger">'+msg+'</div>');
             }
         },
         error: function() {
-            $("#template_error").html('<div class="alert alert-info">The alert rules could not be attached to this template.</div>');
+            $("#template_error").html('<div class="alert alert-danger">The alert rules could not be attached to this template.</div>');
         }
     });
 });

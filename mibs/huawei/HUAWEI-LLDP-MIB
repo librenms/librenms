@@ -1,0 +1,333 @@
+-- Description: HUAWEI Private Extended Interface MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- Version: V1.1
+-- History:
+--              Yang Jishang,2009-05-04, Add one table for CDP compliance.       
+-- ==================================================================
+-- ==================================================================
+-- 
+-- Varibles and types be imported
+--
+-- ==================================================================
+HUAWEI-LLDP-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+     TruthValue
+        FROM SNMPv2-TC
+
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress,
+    OBJECT-IDENTITY, Unsigned32
+        FROM SNMPv2-SMI
+
+     InterfaceIndex
+        FROM IF-MIB
+
+    lldpPortConfigPortNum,lldpLocSysCapSupported,lldpLocSysCapEnabled
+      	FROM LLDP-MIB
+
+    hwDatacomm
+        FROM HUAWEI-MIB;
+ 
+    hwLldpMIB MODULE-IDENTITY
+        LAST-UPDATED "200611240000Z"          -- November 24, 2006 at 00:00 GMT
+
+        ORGANIZATION 
+            "Huawei Technologies co.,Ltd."
+        CONTACT-INFO 
+            "VRP Team Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd., 
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            http://www.huawei.com
+        Zip:100085
+            "
+        DESCRIPTION
+            "This file is an extension of LLDP-MIB. It provides such functions of 
+           globally enabling or disabling the LLDP protocol, enabling the global
+           alarm, clearing statistics on ports and configuring network management 
+           IP addresses and some alarms."
+            ::= { hwDatacomm 134 }  
+         
+      -- Textual Convention
+
+		EnabledStatus ::= TEXTUAL-CONVENTION
+    		STATUS    current
+    		DESCRIPTION
+       		 "A simple status value for the object."
+    		SYNTAX   INTEGER 
+   				 { 
+      				enabled(1),
+      				disabled(2)
+    			}
+ 		    
+    -- ============================================================================
+    -- Node definitions
+    -- ============================================================================ 
+
+    -- 1.3.6.1.4.1.2011.5.25.134
+ 
+    hwLldpObjects  OBJECT IDENTIFIER ::= { hwLldpMIB 1} 
+
+    hwLldpTraps OBJECT IDENTIFIER ::= { hwLldpMIB 2 }  
+    
+    hwLldpConformance  OBJECT IDENTIFIER ::= { hwLldpMIB 3 }
+ 
+
+  -- ============================================================================
+  --
+  -- ======================= Objects definitions=================================
+  --
+  -- ============================================================================  
+
+  hwLldpConfiguration  OBJECT IDENTIFIER ::= { hwLldpObjects 1}      
+  hwLldpRemoteSystemData  OBJECT IDENTIFIER ::= { hwLldpObjects 2} 
+
+  hwLldpEnable OBJECT-TYPE 
+	SYNTAX EnabledStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Globally enable or disable the LLDP configuration. If the hwLldpEnable 
+        is 1, LLDP is enabled. If the hwLldpEnable is 2, LLDP is disabled. 
+        By default, LLDP is disabled."   
+	DEFVAL { 2 }
+	::= { hwLldpConfiguration 1 }   
+
+  hwLldpLocManIPAddr OBJECT-TYPE 
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Specifies the management IP address of the local device. The management IP
+        address is carried in the management address TLV of LLDP packet and is used
+        to identify NM devices in network management. The management IP address 
+        configured here must be a valid one and must be an IP address in the address
+        chain. If the IP address is not valid or is not configured, the management IP 
+        address will be chosen from default IP addressees of the system. The sequence
+        of address searching is: loopback interface, management network interface, VLANIF
+        port and IP address chain (The smallest IP is chosen). If the default IP is not 
+        found, the bridge MAC of the system is used."
+		
+	::= { hwLldpConfiguration 2 }     
+	
+    hwLldpCounterReset OBJECT-TYPE 
+		SYNTAX EnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Clears the statistics of packets received and sent on all ports."   
+		::= { hwLldpConfiguration 3 } 
+		
+	hwLldpNotificationEnable OBJECT-TYPE 
+		SYNTAX EnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The global alarming that is used to control alarms on all ports.
+             If it is 1, the global alarming is enabled. If it is 2, the global
+             alarming is disabled.
+			By default, the global alarming is disabled."     
+		DEFVAL { 2 }
+
+		::= { hwLldpConfiguration 4 } 
+
+   hwLldpPortConfigTable  OBJECT-TYPE
+      SYNTAX SEQUENCE OF HwLldpPortConfigEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION 
+			"LLDP port congfiguration table."
+      ::= { hwLldpConfiguration  5 }
+
+   hwLldpPortConfigEntry OBJECT-TYPE
+        SYNTAX HwLldpPortConfigEntry
+		MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+           	"Entries of the LLDP port congfiguration table."
+        INDEX{ lldpPortConfigPortNum}
+        ::= { hwLldpPortConfigTable 1}  
+   
+   HwLldpPortConfigEntry ::=
+    	SEQUENCE  {    
+    	    hwLldpPortConfigIfIndex  
+    	    	    InterfaceIndex,
+    		hwLldpPortConfigCounterReset
+    				EnabledStatus
+        			}
+    				
+   hwLldpPortConfigIfIndex  OBJECT-TYPE
+    	SYNTAX InterfaceIndex
+    	MAX-ACCESS read-only
+    	STATUS current
+   		DESCRIPTION 
+   				"Port index."     
+   		::= {hwLldpPortConfigEntry 11}
+ 
+   hwLldpPortConfigCounterReset OBJECT-TYPE
+    	SYNTAX EnabledStatus
+    	MAX-ACCESS read-write
+    	STATUS current
+   		DESCRIPTION 
+   			"Clears the statistics of packets received and sent on the current port."     
+   		::= {hwLldpPortConfigEntry 12}
+		
+   hwLldpRemProtoTypeTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwLldpRemProtoTypeEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+	 	 	"LLDP remote neighbour protocol version table."
+        ::= { hwLldpRemoteSystemData  1 }
+
+   hwLldpRemProtoTypeEntry OBJECT-TYPE
+        SYNTAX HwLldpRemProtoTypeEntry
+		MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+           	"Entries of the LLDP remote neighbour protocol version table."
+ 	    INDEX {
+	    lldpPortConfigPortNum
+	    }
+        ::= { hwLldpRemProtoTypeTable 1}  
+   
+   HwLldpRemProtoTypeEntry ::=
+    	SEQUENCE  {    
+   hwLldpRemProtoType INTEGER
+   }
+    				 
+   hwLldpRemProtoType  OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            lldp(1),
+            cdp(2),
+            unknown(255)
+            }
+    	MAX-ACCESS read-only
+    	STATUS current
+   		DESCRIPTION 
+   				"Protocol type of the remote neighbour."     
+   		::= {hwLldpRemProtoTypeEntry 1}
+   
+  	hwLldpEnabled  NOTIFICATION-TYPE
+  	STATUS current	
+	DESCRIPTION 
+      	"Notify the NMS that the LLDP is globally enabled. This alarm is not 
+        restricted by the alarm delay."
+	::= { hwLldpTraps 1}
+
+  	hwLldpDisabled  NOTIFICATION-TYPE
+ 	STATUS current	
+	DESCRIPTION 
+      	"Notify the NMS that the LLDP is globally disabled. This alarm is not 
+        restricted by the alarm delay."
+	::= { hwLldpTraps 2}  
+	
+  hwLldpLocSysCapSupportedChange  NOTIFICATION-TYPE
+	OBJECTS {lldpLocSysCapSupported}
+	STATUS current	
+	DESCRIPTION 
+      	"Alarm on the change of capabilities supported of a local device."
+   	::= { hwLldpTraps 3}  
+	
+	hwLldpLocSysCapEnabledChange  NOTIFICATION-TYPE
+	OBJECTS {lldpLocSysCapEnabled}
+	STATUS current	
+	DESCRIPTION 
+      	"Alarm on the change of capabilities enabled of a local device."
+     ::= { hwLldpTraps 4}                      
+                         
+  hwLldpLocManIPAddrChange  NOTIFICATION-TYPE
+	OBJECTS {hwLldpLocManIPAddr}
+	STATUS current	
+	DESCRIPTION 
+      	"Alarm on the change of management IP address of a local device."
+	::= { hwLldpTraps 5}  
+		
+    --
+	-- ***********************************************************
+	--
+	-- HAUWEILLDPMIBCONFORMANCE
+	--
+	-- ***********************************************************
+	--
+     
+    hwLldpCompliances OBJECT IDENTIFIER ::= { hwLldpConformance 1 }
+	hwLldpGroups OBJECT IDENTIFIER ::= { hwLldpConformance 2 }
+	-- compliance statements
+	lldpCompliance MODULE-COMPLIANCE
+	STATUS current
+	DESCRIPTION
+		"The compliance statement for SNMP entities which implement
+		the HUAWEI-LLDP-MIB."
+	MODULE -- this module
+	MANDATORY-GROUPS { 
+	hwLldpConfigGroup,
+	hwLldpStatsGroup,
+	hwLldpPortGroup,
+	hwLldpTrapGroup
+	}
+	::= { hwLldpCompliances 1 }    
+	   
+	-- MIB groupings
+	hwLldpConfigGroup OBJECT-GROUP
+	OBJECTS {  
+	hwLldpEnable,
+	hwLldpLocManIPAddr,
+	hwLldpNotificationEnable
+	}
+	STATUS current
+	DESCRIPTION
+		"The collection of objects which are used to configure the
+		LLDP implementation behavior.
+		This group is mandatory for agents which implement the LLDP."
+	::= { hwLldpGroups 1 }     
+	
+	hwLldpStatsGroup OBJECT-GROUP
+	OBJECTS {  
+	hwLldpCounterReset,
+	
+	hwLldpPortConfigCounterReset	
+	}
+	STATUS current
+	DESCRIPTION
+		"The collection of objects which are used to represent LLDP
+		 statistics.
+		This group is mandatory for agents which implement the LLDP
+		and have the capability of receiving and transmitting LLDP frames."
+	::= { hwLldpGroups 2 } 
+     
+    
+    hwLldpPortGroup OBJECT-GROUP
+	OBJECTS {  
+	hwLldpPortConfigIfIndex ,
+	hwLldpRemProtoType
+	}
+	STATUS current
+	DESCRIPTION
+		"The collection of objects indicate index of port."
+	::= { hwLldpGroups 3 } 
+
+
+   	hwLldpTrapGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {  
+	hwLldpEnabled,
+	hwLldpDisabled,
+	hwLldpLocSysCapSupportedChange,
+	hwLldpLocSysCapEnabledChange,
+	hwLldpLocManIPAddrChange	
+	}
+	STATUS current
+	DESCRIPTION
+		"The collection of notifications used to indicate HUAWEI-LLDP-MIB
+		data consistency and general status information.
+		This group is mandatory for agents which implement the LLDP
+		and have the capability of receiving LLDP frames."
+	::= { hwLldpGroups 4 }  
+	
+END     
+    
+--
+-- HUAWEI-LLDP-MIB.mib
+--     

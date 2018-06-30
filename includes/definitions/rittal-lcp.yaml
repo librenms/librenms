@@ -1,0 +1,19 @@
+os: rittal-lcp
+text: 'Rittal LCP'
+type: environment
+icon: rittal
+over:
+    - { graph: device_temperature, text: Temperatures }
+    - { graph: device_power, text: 'Cooling capacity' }
+mib_dir:
+    - rittal
+discovery_modules:
+    storage: false
+    mempools: false
+    processors: false
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.2606.7
+    - sysDescr:
+        - 'Rittal LCP'

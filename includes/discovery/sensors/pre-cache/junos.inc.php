@@ -10,11 +10,14 @@
  * the source code distribution for details.
  */
 
-if ($device['os'] == 'junos') {
-    echo 'Pre-cache JunOS: ';
+echo 'JnxDomCurrentEntry ';
+$pre_cache['junos_oids'] = snmpwalk_cache_multi_oid($device, 'JnxDomCurrentEntry', array(), 'JUNIPER-DOM-MIB', 'junos');
 
-    $junos_oids = array();
-    echo 'Caching OIDs:';
+echo 'JnxDomCurrentLaneEntry ';
+$pre_cache['junos_multilane_oids'] = snmpwalk_cache_multi_oid($device, 'JnxDomCurrentLaneEntry', array(), 'JUNIPER-DOM-MIB', 'junos');
 
-    $junos_oids = snmpwalk_cache_multi_oid($device, 'JnxDomCurrentEntry', array(), 'JUNIPER-DOM-MIB', $config['mib_dir'].':'.$config['mib_dir'].'/junos');
-}
+echo 'jnxoptIfOTNPMFECCurrentTable';
+$pre_cache['junos_ifotn_oids'] = snmpwalk_cache_multi_oid($device, 'jnxoptIfOTNPMFECCurrentTable', array(), 'JNX-OPT-IF-EXT-MIB', 'junos', '-OQUsb');
+
+echo 'JnxoptIfOTNPMFECCurrentEntry ';
+$pre_cache['junos_prefec_oids'] = snmpwalk_cache_multi_oid($device, 'jnxoptIfOTNPMCurrentFECMinBERMantissa', array(), 'JNX-OPT-IF-EXT-MIB', 'junos');

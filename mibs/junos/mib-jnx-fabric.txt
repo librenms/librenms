@@ -1,0 +1,306 @@
+--
+-- Juniper Enterprise Specific MIB: Fabric MIB
+-- 
+-- Copyright (c) 2012, Juniper Networks, Inc.
+-- All rights reserved.
+--
+
+JUNIPER-FABRIC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Counter64
+        FROM SNMPv2-SMI
+
+    CounterBasedGauge64
+        FROM HCNUM-TC
+
+    TEXTUAL-CONVENTION 
+        FROM SNMPv2-TC
+
+    jnxFabricMibRoot
+        FROM JUNIPER-SMI;
+
+jnxFabricMib MODULE-IDENTITY
+
+    LAST-UPDATED "201410090000Z"
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                 Juniper Networks, Inc.
+                 1194 N. Mathilda Avenue
+                 Sunnyvale, CA 94089
+                 E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "The MIB modules representing Juniper Networks
+             fabric Manager"
+
+    REVISION
+        "201410090000Z" -- 09-Oct-14 
+    DESCRIPTION
+        "Initial"
+
+    ::= { jnxFabricMibRoot 1 }
+
+jnxFabricMibObjects     OBJECT IDENTIFIER ::= { jnxFabricMib 1 }
+
+--
+-- Textual Conventions
+--
+
+JnxFabricType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "A value representing fabric statistics source or destination type.
+
+         switch-fabric(1)       Indicates switch-fabric
+         linecard(2)            Indicates linecard"
+    REFERENCE   ""
+    SYNTAX       INTEGER {
+                     switch-fabric(1),
+                     linecard(2)
+                  }
+
+JnxFabricStatisticsPriority ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "A value representing fabric statisitcs priority, if applicable.
+
+         high(0)     Indicates high priority
+         low(1)      Indicates low priority
+         all(255)    Indicates no specific priority"
+    REFERENCE   ""
+    SYNTAX       INTEGER {
+                     high(0),
+                     low(1),
+                     all(255)
+                  }
+                  
+-- Juniper Fabric Manager MIB
+--
+     
+--
+-- Fabric Statistics Table
+--
+
+jnxFabricStatistics     OBJECT IDENTIFIER ::= { jnxFabricMibObjects 1 }
+
+jnxFabricSourceStatisticsTable OBJECT-TYPE
+    SYNTAX	      SEQUENCE OF JnxFabricSourceStatisticsEntry
+    MAX-ACCESS        not-accessible
+    STATUS	      current
+    DESCRIPTION
+          "A list of fabric statistics entries based on the source of statistics."
+    ::= { jnxFabricStatistics 1 }
+
+    jnxFabricSourceStatisticsEntry OBJECT-TYPE
+      SYNTAX	    JnxFabricSourceStatisticsEntry
+      MAX-ACCESS    not-accessible
+      STATUS	    current
+      DESCRIPTION
+            "An entry of fabric source statistics table."
+      INDEX       { jnxFabricSourceType,
+                    jnxFabricSourceSlot,
+                    jnxFabricSourcePfe,
+                    jnxFabricDestinationType,
+                    jnxFabricDestinationSlot,
+                    jnxFabricDestinationPfe, 
+                    jnxFabricSourceStatisticsPriority}
+      ::= { jnxFabricSourceStatisticsTable 1 }
+
+    JnxFabricSourceStatisticsEntry ::= SEQUENCE {
+          jnxFabricSourceType                          JnxFabricType,
+          jnxFabricSourceSlot                          Integer32,
+          jnxFabricSourcePfe                           Integer32,
+          jnxFabricDestinationType                     JnxFabricType,
+          jnxFabricDestinationSlot                     Integer32,
+          jnxFabricDestinationPfe                      Integer32,
+          jnxFabricSourceStatisticsPriority            JnxFabricStatisticsPriority,
+          jnxFabricSourceStatisticsPackets             Counter64,
+          jnxFabricSourceStatisticsBytes               Counter64,
+          jnxFabricSourceStatisticsPps                 CounterBasedGauge64,
+          jnxFabricSourceStatisticsBps                 CounterBasedGauge64,
+          jnxFabricSourceStatisticsDropPackets         Counter64,
+          jnxFabricSourceStatisticsDropBytes           Counter64,
+          jnxFabricSourceStatisticsDropPps             CounterBasedGauge64,
+          jnxFabricSourceStatisticsDropBps             CounterBasedGauge64,
+          jnxFabricSourceStatisticsQueueDepthAverage   CounterBasedGauge64,
+          jnxFabricSourceStatisticsQueueDepthCurrent   CounterBasedGauge64,
+          jnxFabricSourceStatisticsQueueDepthPeak      CounterBasedGauge64,
+          jnxFabricSourceStatisticsQueueDepthMaximum   CounterBasedGauge64,
+          jnxFabricSourceStatisticsErrorPackets        Counter64,
+          jnxFabricSourceStatisticsErrorPps            CounterBasedGauge64
+    }
+ 
+
+    jnxFabricSourceType OBJECT-TYPE
+      SYNTAX	    JnxFabricType
+      MAX-ACCESS    not-accessible
+      STATUS	    current
+      DESCRIPTION
+                "Source fabric type."
+      ::= { jnxFabricSourceStatisticsEntry 1 }
+
+    jnxFabricSourceSlot OBJECT-TYPE
+      SYNTAX	    Integer32 (0..1023 | 65535)
+      MAX-ACCESS    not-accessible
+      STATUS	    current
+      DESCRIPTION
+                "Denotes plane number for switch-fabric / slot number for linecard. If there is no per plane statistics available, then it shall be 65535."
+      ::= { jnxFabricSourceStatisticsEntry 2 }
+
+    jnxFabricSourcePfe OBJECT-TYPE
+      SYNTAX	    Integer32 (0..8191 | 65535)
+      MAX-ACCESS    not-accessible
+      STATUS	    current
+      DESCRIPTION
+                "Denotes pfe number. It is applicable only when source type is linecard and shall be 65535 for switch-fabric."
+      ::= { jnxFabricSourceStatisticsEntry 3 }
+
+    jnxFabricDestinationType OBJECT-TYPE
+      SYNTAX	    JnxFabricType
+      MAX-ACCESS    not-accessible
+      STATUS	    current
+      DESCRIPTION
+                "Destination fabric type."
+      ::= { jnxFabricSourceStatisticsEntry 4 }
+
+    jnxFabricDestinationSlot OBJECT-TYPE
+      SYNTAX	    Integer32 (0..1023 | 65535)
+      MAX-ACCESS    not-accessible
+      STATUS	    current
+      DESCRIPTION
+                "Denotes plane number for switch-fabric / slot number for linecard. If there is no per plane statistics available, then it shall be 65535."
+      ::= { jnxFabricSourceStatisticsEntry 5 }
+
+    jnxFabricDestinationPfe OBJECT-TYPE
+      SYNTAX	    Integer32 (0..8191 | 65535)
+      MAX-ACCESS    not-accessible
+      STATUS	    current
+      DESCRIPTION
+                "Denotes pfe number. It is applicable only when destination type is linecard and shall be 65535 for switch-fabric."
+      ::= { jnxFabricSourceStatisticsEntry 6 }
+
+    jnxFabricSourceStatisticsPriority OBJECT-TYPE
+      SYNTAX	    JnxFabricStatisticsPriority
+      MAX-ACCESS    not-accessible
+      STATUS	    current
+      DESCRIPTION
+                "Statistics priority."
+      ::= { jnxFabricSourceStatisticsEntry 7 }
+      
+    jnxFabricSourceStatisticsPackets OBJECT-TYPE
+      SYNTAX	    Counter64
+      MAX-ACCESS    read-only
+      STATUS	    current
+      DESCRIPTION
+                "Number of packets transmitted for a source."
+      ::= { jnxFabricSourceStatisticsEntry 8 }
+      
+    jnxFabricSourceStatisticsBytes OBJECT-TYPE
+      SYNTAX	    Counter64
+      MAX-ACCESS    read-only
+      STATUS	    current
+      DESCRIPTION
+                "Number of bytes transmitted for a source."
+      ::= { jnxFabricSourceStatisticsEntry 9 }
+
+    jnxFabricSourceStatisticsPps OBJECT-TYPE
+      SYNTAX	    CounterBasedGauge64
+      MAX-ACCESS    read-only
+      STATUS	    current
+      DESCRIPTION
+                "Rate of transmission in packets per second for a source."
+      ::= { jnxFabricSourceStatisticsEntry 10 }
+
+    jnxFabricSourceStatisticsBps OBJECT-TYPE
+      SYNTAX	    CounterBasedGauge64
+      MAX-ACCESS    read-only
+      STATUS	    current
+      DESCRIPTION
+                "Rate of transmission in bytes per second for a source."
+      ::= { jnxFabricSourceStatisticsEntry 11 }
+
+    jnxFabricSourceStatisticsDropPackets OBJECT-TYPE
+      SYNTAX	    Counter64
+      MAX-ACCESS    read-only
+      STATUS	    current
+      DESCRIPTION
+                "Number of packets dropped for a source."
+      ::= { jnxFabricSourceStatisticsEntry 12 }
+
+    jnxFabricSourceStatisticsDropBytes OBJECT-TYPE
+      SYNTAX	    Counter64
+      MAX-ACCESS    read-only
+      STATUS	    current
+      DESCRIPTION
+                "Number of bytes dropped for a source."
+      ::= { jnxFabricSourceStatisticsEntry 13 }
+
+    jnxFabricSourceStatisticsDropPps OBJECT-TYPE
+      SYNTAX	    CounterBasedGauge64
+      MAX-ACCESS    read-only
+      STATUS	    current
+      DESCRIPTION
+                "Drop rate in packets per second for a source."
+      ::= { jnxFabricSourceStatisticsEntry 14 }
+
+    jnxFabricSourceStatisticsDropBps OBJECT-TYPE
+      SYNTAX	    CounterBasedGauge64
+      MAX-ACCESS    read-only
+      STATUS	    current
+      DESCRIPTION
+                "Drop rate in bytes per second for a source."
+      ::= { jnxFabricSourceStatisticsEntry 15 }
+
+    jnxFabricSourceStatisticsQueueDepthAverage OBJECT-TYPE
+      SYNTAX	    CounterBasedGauge64
+      MAX-ACCESS    read-only
+      STATUS	    current
+      DESCRIPTION
+                "Average queue depth, if applicable for a source type. Else it shall be 0."
+      ::= { jnxFabricSourceStatisticsEntry 16 }
+
+    jnxFabricSourceStatisticsQueueDepthCurrent OBJECT-TYPE
+      SYNTAX	    CounterBasedGauge64
+      MAX-ACCESS    read-only
+      STATUS	    current
+      DESCRIPTION
+                "Current queue depth, if applicable for a source type. Else it shall be 0."
+      ::= { jnxFabricSourceStatisticsEntry 17 }
+
+    jnxFabricSourceStatisticsQueueDepthPeak OBJECT-TYPE
+      SYNTAX	    CounterBasedGauge64
+      MAX-ACCESS    read-only
+      STATUS	    current
+      DESCRIPTION
+                "Peak queue depth, if applicable for a source type. Else it shall be 0."
+      ::= { jnxFabricSourceStatisticsEntry 18 }
+
+    jnxFabricSourceStatisticsQueueDepthMaximum OBJECT-TYPE
+      SYNTAX	    CounterBasedGauge64
+      MAX-ACCESS    read-only
+      STATUS	    current
+      DESCRIPTION
+                "Maximum queue depth, if applicable for a source type. Else it shall be 0."
+      ::= { jnxFabricSourceStatisticsEntry 19 }
+
+    jnxFabricSourceStatisticsErrorPackets OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+                "Number of errror packets for a source."
+      ::= { jnxFabricSourceStatisticsEntry 20 }
+
+    jnxFabricSourceStatisticsErrorPps OBJECT-TYPE
+      SYNTAX        CounterBasedGauge64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+                "Error rate in packets per second for a source."
+      ::= { jnxFabricSourceStatisticsEntry 21 }
+
+END
+

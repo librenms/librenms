@@ -1,0 +1,21 @@
+os: pcoweb
+text: 'Carel pCOWeb'
+type: environment
+mib_dir:
+    - carel
+over:
+    - { graph: device_temperature, text: Temperature }
+    - { graph: device_humidity, text: Humidity }
+icon: carel
+icons:
+    - uniflair
+discovery:
+    - sysDescr: 'pCO Gateway'
+    -
+      sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+      snmpget:
+          oid: roomTemp.0
+          mib: CAREL-ug40cdz-MIB
+          mib_dir: carel
+          op: '!='
+          value: false

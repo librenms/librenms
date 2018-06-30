@@ -1,0 +1,12 @@
+os: axiscam
+text: 'AXIS Network Camera'
+type: appliance
+icon: axis
+mib_dir:
+    - axis
+discovery:
+    - sysDescr_regex: '/AXIS .* (Network Camera|Video Server|Network Video Encoder)/'
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_temperature, text: 'Device Temperature' }
+    - { graph: device_state, text: 'Device State' }

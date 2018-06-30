@@ -39,7 +39,7 @@ foreach ($COMPONENTS as $DEVICE_ID => $COMP) {
                                 $GLI = "list-group-item-danger";
                             }
                             ?>
-                            <a class="list-group-item <?php echo $GLI?> small"><span class="glyphicon glyphicon-chevron-right"></span> <?php echo $ADJACENCY['label']?> - <?php echo $ADJACENCY['endpoint']?> <?php echo $ADJ_STATUS?></a>
+                            <a class="list-group-item <?php echo $GLI?> small"><i class="fa fa-chevron-right" aria-hidden="true"></i> <?php echo $ADJACENCY['label']?> - <?php echo $ADJACENCY['endpoint']?> <?php echo $ADJ_STATUS?></a>
                         <?php
                         }
                     }

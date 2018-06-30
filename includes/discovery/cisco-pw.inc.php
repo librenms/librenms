@@ -1,6 +1,8 @@
 <?php
 
-if ($config['enable_pseudowires'] && $device['os_group'] == 'cisco') {
+use LibreNMS\Config;
+
+if (Config::get('enable_pseudowires') && $device['os_group'] == 'cisco') {
     unset($cpw_count);
     unset($cpw_exists);
 
@@ -53,7 +55,7 @@ if ($config['enable_pseudowires'] && $device['os_group'] == 'cisco') {
     // Cycle the list of pseudowires we cached earlier and make sure we saw them again.
     foreach ($device['pws_db'] as $pw_id => $pseudowire_id) {
         if (empty($device['pws'][$pw_id])) {
-            dbDelete('vlans', '`pseudowire_id` = ?', array($pseudowire_id));
+            dbDelete('pseudowires', '`pseudowire_id` = ?', array($pseudowire_id));
         }
     }
 

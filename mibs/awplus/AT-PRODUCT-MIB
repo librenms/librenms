@@ -1,0 +1,942 @@
+-- ============================================================================
+-- AT-PRODUCT.MIB, Allied Telesis enterprise MIB: products
+--
+-- Copyright (c) 2017 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-PRODUCT-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            alliedTelesis
+                FROM AT-SMI-MIB
+            MODULE-IDENTITY, OBJECT-IDENTITY
+                FROM SNMPv2-SMI;
+
+
+        products MODULE-IDENTITY
+            LAST-UPDATED "201710190000Z"
+            ORGANIZATION
+                "Allied Telesis, Inc."
+            CONTACT-INFO
+                "  http://www.alliedtelesis.com"
+            DESCRIPTION
+                "This file defines the identities of Allied Telesis products.
+                OID products is the root OBJECT IDENTIFIER. Beneath it there are subtrees
+                bridgeRouter, routerSwitch and swhub, which are defined in AT-SMI-MIB."
+            REVISION "201710190000Z"
+            DESCRIPTION
+                "Rename atx55018XSPQ to atx55018XSPQm."
+            REVISION "201703310000Z"
+            DESCRIPTION
+                "Remove '_' in the MIB object names to comply with ASN.1.
+                Remove '-' to comply with SMIv2 standard.
+                Some mib object names are slightly changed to make it more readable."
+            REVISION "201702010000Z"
+            DESCRIPTION
+                "Added GS970 products."
+            REVISION "201701180000Z"
+            DESCRIPTION
+                "Added GS970PS products."
+            REVISION "201610030000Z"
+            DESCRIPTION
+                "Added x550 products."
+            REVISION "201607250000Z"
+            DESCRIPTION
+                "Added AT-SBX81XLEM as standalone product."
+            REVISION "201605060000Z"
+            DESCRIPTION
+                "Added AT-GS900M Next Generation."
+            REVISION "201601080000Z"
+            DESCRIPTION
+                "Added AT-FS980M products."
+            REVISION "201511100000Z"
+            DESCRIPTION
+                "Added new SwitchBlade x908G2/3 products"
+            REVISION "201508050000Z"
+            DESCRIPTION
+                "Added AT-XS900MX products."
+            REVISION "201507270000Z"
+            DESCRIPTION
+                "Added SecureHUB products."
+            REVISION "201507220000Z"
+            DESCRIPTION
+                "Add Virtual Appliance (VAA)."
+            REVISION "201505060000Z"
+            DESCRIPTION
+                "Added AT-AR2050V."
+            REVISION "201504030000Z"
+            DESCRIPTION
+                "Change the product name from x230-10GPT to x350-10GPT."
+            REVISION "201411190000Z"
+            DESCRIPTION
+                "Add IE300 product family."
+            REVISION "201411180000Z"
+            DESCRIPTION
+                "Added AT-AR3050S and AT-AR4050S."
+            REVISION "201410220000Z"
+            DESCRIPTION
+                "Renaming Ix510 to IE510 and moving to Industrial Switch subtree."
+            REVISION "201409230000Z"
+            DESCRIPTION
+                "Added AT-GS924MX, AT-GS924MPX, AT-GS948MX and AT-GS948MPX."
+            REVISION "201408280000Z"
+            DESCRIPTION
+                "Added x510L products."
+            REVISION "201408200000Z"
+            DESCRIPTION
+                "Renaming IE500 Family to IE200."
+            REVISION "201407300000Z"
+            DESCRIPTION
+                "Added x510-28GTX-R and x510-52GTX-R product."
+            REVISION "201406090000Z"
+            DESCRIPTION
+                "Added x510DP-28GTX product."
+            REVISION "201406030000Z"
+            DESCRIPTION
+                "Added x510_28GSX/DC and Ix510_28GSX products. Added IE500 Family."
+            REVISION "201405160000Z"
+            DESCRIPTION
+                "Added dc2552xs product"
+            REVISION "201308010000Z"
+            DESCRIPTION
+                "Changed x950 to x930, added x230 and x310 products"
+            REVISION "201307090000Z"
+            DESCRIPTION
+                "Added x510DP and IX5 products."
+            REVISION "201304020000Z"
+            DESCRIPTION
+                "Added x950 products."
+            REVISION "201203220000Z"
+            DESCRIPTION
+                "Added x510 product."
+            REVISION "201112180500Z"
+            DESCRIPTION
+                "Added at-SBx81CFC400 and at-SBx81CFC960 products."
+            REVISION "201109150000Z"
+            DESCRIPTION
+                "Added AT-SBx8106 product."
+            REVISION "201109140000Z"
+            DESCRIPTION
+                "Added AT-SBx8112 product."
+            REVISION "201109050000Z"
+            DESCRIPTION
+                "Added systemOID 196, 197 and 198"
+            REVISION "201104040000Z"
+            DESCRIPTION
+                "Added Rapier 48x product"
+            REVISION "201010120000Z"
+            DESCRIPTION
+                "Add swhub tree and systemOID 181 and 182"
+            REVISION "201009200000Z"
+            DESCRIPTION
+                "Add Rapier24ib product"
+            REVISION "201009070000Z"
+            DESCRIPTION
+                "Generic syntax tidy up"
+            REVISION "201008190000Z"
+            DESCRIPTION
+                "Added bridgeRouter 81 at_AR560SRouter."
+            REVISION "201007220000Z"
+            DESCRIPTION
+                "Renamed at_x600_24TsPoE_220W_PSU to at_x600_24TsPoEPlus to reflect usage."
+            REVISION "201006150015Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "200905190000Z"
+            DESCRIPTION
+                "Added systemOID 93, 94, 95, 96, 97, 98, 99, 100 and 101"
+            REVISION "200905150000Z"
+            DESCRIPTION
+                " Added systemOID 91,92. "
+            REVISION "200803061300Z"
+            DESCRIPTION
+                " Added systemOID 69,70,75,76,77. "
+            REVISION "200711150000Z"
+            DESCRIPTION
+                "Changed systemOID 67 from AT-8824R to 8724SL-V2."
+            REVISION "200703210000Z"
+            DESCRIPTION
+                "Added systemOID for x900-48FS."
+            REVISION "200702070000Z"
+            DESCRIPTION
+                "Added systemOID for AT-8824R."
+            REVISION "200606140000Z"
+            DESCRIPTION
+                "Initial version of this MIB module."
+            ::= { alliedTelesis 1 }
+
+
+
+--
+-- Node definitions
+--
+
+        bridgeRouter OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "subtree beneath which brige product MIB object ids are assigned."
+            ::= { products 1 }
+
+
+        centreComAR300Router OBJECT IDENTIFIER ::= { bridgeRouter 8 }
+
+
+        centreComAR720Router OBJECT IDENTIFIER ::= { bridgeRouter 11 }
+
+
+        centreComAR300LRouter OBJECT IDENTIFIER ::= { bridgeRouter 12 }
+
+
+        centreComAR310Router OBJECT IDENTIFIER ::= { bridgeRouter 13 }
+
+
+        centreComAR300LURouter OBJECT IDENTIFIER ::= { bridgeRouter 14 }
+
+
+        centreComAR300URouter OBJECT IDENTIFIER ::= { bridgeRouter 15 }
+
+
+        centreComAR310URouter OBJECT IDENTIFIER ::= { bridgeRouter 16 }
+
+
+        centreComAR350Router OBJECT IDENTIFIER ::= { bridgeRouter 17 }
+
+
+        centreComAR370Router OBJECT IDENTIFIER ::= { bridgeRouter 18 }
+
+
+        centreComAR330Router OBJECT IDENTIFIER ::= { bridgeRouter 19 }
+
+
+        centreComAR395Router OBJECT IDENTIFIER ::= { bridgeRouter 20 }
+
+
+        centreComAR390Router OBJECT IDENTIFIER ::= { bridgeRouter 21 }
+
+
+        centreComAR370URouter OBJECT IDENTIFIER ::= { bridgeRouter 22 }
+
+
+        centreComAR740Router OBJECT IDENTIFIER ::= { bridgeRouter 23 }
+
+
+        centreComAR140SRouter OBJECT IDENTIFIER ::= { bridgeRouter 24 }
+
+
+        centreComAR140URouter OBJECT IDENTIFIER ::= { bridgeRouter 25 }
+
+
+        centreComAR320Router OBJECT IDENTIFIER ::= { bridgeRouter 26 }
+
+
+        centreComAR130SRouter OBJECT IDENTIFIER ::= { bridgeRouter 27 }
+
+
+        centreComAR130URouter OBJECT IDENTIFIER ::= { bridgeRouter 28 }
+
+
+        centreComAR160Router OBJECT IDENTIFIER ::= { bridgeRouter 29 }
+
+
+        atAR740RouterDC OBJECT IDENTIFIER ::= { bridgeRouter 43 }
+
+
+        centreComAR120Router OBJECT IDENTIFIER ::= { bridgeRouter 44 }
+
+
+        atAR410Router OBJECT IDENTIFIER ::= { bridgeRouter 47 }
+
+
+        atAR725Router OBJECT IDENTIFIER ::= { bridgeRouter 48 }
+
+
+        atAR745Router OBJECT IDENTIFIER ::= { bridgeRouter 49 }
+
+
+        atAR410v2Router OBJECT IDENTIFIER ::= { bridgeRouter 50 }
+
+
+        atAR410v3Router OBJECT IDENTIFIER ::= { bridgeRouter 51 }
+
+
+        atAR725RouterDC OBJECT IDENTIFIER ::= { bridgeRouter 52 }
+
+
+        atAR745RouterDC OBJECT IDENTIFIER ::= { bridgeRouter 53 }
+
+
+        atAR450Router OBJECT IDENTIFIER ::= { bridgeRouter 54 }
+
+
+        atAR450DualRouter OBJECT IDENTIFIER ::= { bridgeRouter 55 }
+
+
+        atAR440Router OBJECT IDENTIFIER ::= { bridgeRouter 59 }
+
+
+        atAR441Router OBJECT IDENTIFIER ::= { bridgeRouter 60 }
+
+
+        atAR442Router OBJECT IDENTIFIER ::= { bridgeRouter 61 }
+
+
+        atAR443Router OBJECT IDENTIFIER ::= { bridgeRouter 62 }
+
+
+        atAR444Router OBJECT IDENTIFIER ::= { bridgeRouter 63 }
+
+
+        atAR420Router OBJECT IDENTIFIER ::= { bridgeRouter 64 }
+
+
+        atAR415SRouter OBJECT IDENTIFIER ::= { bridgeRouter 71 }
+
+
+        atAR415SRouterDC OBJECT IDENTIFIER ::= { bridgeRouter 72 }
+
+
+        atAR550Router OBJECT IDENTIFIER ::= { bridgeRouter 73 }
+
+
+        atAR551Router OBJECT IDENTIFIER ::= { bridgeRouter 74 }
+
+
+        atAR552Router OBJECT IDENTIFIER ::= { bridgeRouter 75 }
+
+
+        atAR550SRouterDP OBJECT IDENTIFIER ::= { bridgeRouter 76 }
+
+
+        atAR570Router OBJECT IDENTIFIER ::= { bridgeRouter 78 }
+
+
+        atAR770Router OBJECT IDENTIFIER ::= { bridgeRouter 79 }
+
+
+        atAR750SRouterDP OBJECT IDENTIFIER ::= { bridgeRouter 80 }
+
+
+        atAR560SRouter OBJECT IDENTIFIER ::= { bridgeRouter 81 }
+
+
+        atAR3050SRouter OBJECT IDENTIFIER ::= { bridgeRouter 82 }
+
+
+        atAR4050SRouter OBJECT IDENTIFIER ::= { bridgeRouter 85 }
+
+
+        atAR2050VRouter OBJECT IDENTIFIER ::= { bridgeRouter 88 }
+
+
+        atAR2010VRouter OBJECT IDENTIFIER ::= { bridgeRouter 89 }
+
+
+        routerSwitch OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "subtree beneath which router and switch product MIB object ids are assigned."
+            ::= { products 14 }
+
+
+        atRapier24 OBJECT IDENTIFIER ::= { routerSwitch 1 }
+
+
+        atRapier16fSC OBJECT IDENTIFIER ::= { routerSwitch 2 }
+
+
+        atRapier16fVF OBJECT IDENTIFIER ::= { routerSwitch 3 }
+
+
+        atRapier16fMT OBJECT IDENTIFIER ::= { routerSwitch 4 }
+
+
+        atRapier48 OBJECT IDENTIFIER ::= { routerSwitch 5 }
+
+
+        atRapier8t8fSC OBJECT IDENTIFIER ::= { routerSwitch 6 }
+
+
+        atRapier8t8fSCi OBJECT IDENTIFIER ::= { routerSwitch 7 }
+
+
+        atRapier8t8fMT OBJECT IDENTIFIER ::= { routerSwitch 8 }
+
+
+        atRapier8t8fMTi OBJECT IDENTIFIER ::= { routerSwitch 9 }
+
+
+        atRapier8fSC OBJECT IDENTIFIER ::= { routerSwitch 10 }
+
+
+        atRapier8fSCi OBJECT IDENTIFIER ::= { routerSwitch 11 }
+
+
+        atRapier8fMT OBJECT IDENTIFIER ::= { routerSwitch 12 }
+
+
+        atRapier8fMTi OBJECT IDENTIFIER ::= { routerSwitch 13 }
+
+
+        atRapier16fMTi OBJECT IDENTIFIER ::= { routerSwitch 14 }
+
+
+        atRapierG6 OBJECT IDENTIFIER ::= { routerSwitch 15 }
+
+
+        atRapierG6SX OBJECT IDENTIFIER ::= { routerSwitch 16 }
+
+
+        atRapierG6LX OBJECT IDENTIFIER ::= { routerSwitch 17 }
+
+
+        atRapierG6MT OBJECT IDENTIFIER ::= { routerSwitch 18 }
+
+
+        atRapier16fSCi OBJECT IDENTIFIER ::= { routerSwitch 19 }
+
+
+        atRapier24i OBJECT IDENTIFIER ::= { routerSwitch 20 }
+
+
+        atRapier48i OBJECT IDENTIFIER ::= { routerSwitch 21 }
+
+
+        atSwitchblade4AC OBJECT IDENTIFIER ::= { routerSwitch 22 }
+
+
+        atSwitchblade4DC OBJECT IDENTIFIER ::= { routerSwitch 23 }
+
+
+        atSwitchblade8AC OBJECT IDENTIFIER ::= { routerSwitch 24 }
+
+
+        atSwitchblade8DC OBJECT IDENTIFIER ::= { routerSwitch 25 }
+
+
+        at9816GF OBJECT IDENTIFIER ::= { routerSwitch 26 }
+
+
+        at9812TF OBJECT IDENTIFIER ::= { routerSwitch 27 }
+
+
+        at9816GB OBJECT IDENTIFIER ::= { routerSwitch 28 }
+
+
+        at9812T OBJECT IDENTIFIER ::= { routerSwitch 29 }
+
+
+        at8724XL OBJECT IDENTIFIER ::= { routerSwitch 30 }
+
+
+        at8748XL OBJECT IDENTIFIER ::= { routerSwitch 31 }
+
+
+        at8724XLDC OBJECT IDENTIFIER ::= { routerSwitch 32 }
+
+
+        at8748XLDC OBJECT IDENTIFIER ::= { routerSwitch 33 }
+
+
+        at9816GbDC OBJECT IDENTIFIER ::= { routerSwitch 34 }
+
+
+        at9812tDC OBJECT IDENTIFIER ::= { routerSwitch 35 }
+
+
+        at8824 OBJECT IDENTIFIER ::= { routerSwitch 36 }
+
+
+        at8848 OBJECT IDENTIFIER ::= { routerSwitch 37 }
+
+
+        at8824DC OBJECT IDENTIFIER ::= { routerSwitch 38 }
+
+
+        at8848DC OBJECT IDENTIFIER ::= { routerSwitch 39 }
+
+
+        at8624XL80 OBJECT IDENTIFIER ::= { routerSwitch 41 }
+
+
+        at8724XL80 OBJECT IDENTIFIER ::= { routerSwitch 42 }
+
+
+        at8748XL80 OBJECT IDENTIFIER ::= { routerSwitch 43 }
+
+
+        at8948EX OBJECT IDENTIFIER ::= { routerSwitch 44 }
+
+
+        at8948i OBJECT IDENTIFIER ::= { routerSwitch 45 }
+
+
+        at8624T2M OBJECT IDENTIFIER ::= { routerSwitch 46 }
+
+
+        atRapier24iDcNEBS OBJECT IDENTIFIER ::= { routerSwitch 47 }
+
+
+        at8724XLDcNEBS OBJECT IDENTIFIER ::= { routerSwitch 48 }
+
+
+        at9924T OBJECT IDENTIFIER ::= { routerSwitch 49 }
+
+
+        at9924SP OBJECT IDENTIFIER ::= { routerSwitch 50 }
+
+
+        at9924T4SP OBJECT IDENTIFIER ::= { routerSwitch 51 }
+
+
+        at9924TEMC OBJECT IDENTIFIER ::= { routerSwitch 53 }
+
+
+        at8724MLB OBJECT IDENTIFIER ::= { routerSwitch 55 }
+
+
+        at8624POE OBJECT IDENTIFIER ::= { routerSwitch 56 }
+
+
+        at9924Ts OBJECT IDENTIFIER ::= { routerSwitch 57 }
+
+
+        at86482SP OBJECT IDENTIFIER ::= { routerSwitch 58 }
+
+
+        at9924Ti OBJECT IDENTIFIER ::= { routerSwitch 59 }
+
+
+        at9924SPi OBJECT IDENTIFIER ::= { routerSwitch 60 }
+
+
+        at9924Tsi OBJECT IDENTIFIER ::= { routerSwitch 61 }
+
+
+        at9924SPsi OBJECT IDENTIFIER ::= { routerSwitch 62 }
+
+
+        at8948iN OBJECT IDENTIFIER ::= { routerSwitch 63 }
+
+
+        at9924TsiN OBJECT IDENTIFIER ::= { routerSwitch 64 }
+
+
+        atRapier48w OBJECT IDENTIFIER ::= { routerSwitch 65 }
+
+
+        at8724SlV2 OBJECT IDENTIFIER ::= { routerSwitch 67 }
+
+
+        x90048FS OBJECT IDENTIFIER ::= { routerSwitch 68 }
+
+
+        atSwitchBladex908 OBJECT IDENTIFIER ::= { routerSwitch 69 }
+
+
+        atx90012XTS OBJECT IDENTIFIER ::= { routerSwitch 70 }
+
+
+        atRapier48wb OBJECT IDENTIFIER ::= { routerSwitch 71 }
+
+
+        atRapier48wAC OBJECT IDENTIFIER ::= { routerSwitch 72 }
+
+
+        atRapier48wbAC OBJECT IDENTIFIER ::= { routerSwitch 73 }
+
+
+        atx90024XT OBJECT IDENTIFIER ::= { routerSwitch 75 }
+
+
+        atx90024XS OBJECT IDENTIFIER ::= { routerSwitch 76 }
+
+
+        atx90024XtN OBJECT IDENTIFIER ::= { routerSwitch 77 }
+
+
+        atx60024Ts OBJECT IDENTIFIER ::= { routerSwitch 80 }
+
+
+        atx60024TsXP OBJECT IDENTIFIER ::= { routerSwitch 81 }
+
+
+        atx60048Ts OBJECT IDENTIFIER ::= { routerSwitch 82 }
+
+
+        atx60048TsXP OBJECT IDENTIFIER ::= { routerSwitch 83 }
+
+
+        atRapier24ibNEBS OBJECT IDENTIFIER ::= { routerSwitch 84 }
+
+
+        atRapier24ibDcNEBS OBJECT IDENTIFIER ::= { routerSwitch 85 }
+
+
+        atSBx8112 OBJECT IDENTIFIER ::= { routerSwitch 86 }
+
+        atSBx81CFC400  OBJECT IDENTIFIER ::= { routerSwitch 87 }
+
+        atSBx81CFC960  OBJECT IDENTIFIER ::= { routerSwitch 88 }
+
+        atx60024TsPoE OBJECT IDENTIFIER ::= { routerSwitch 91 }
+
+
+        atx60024TsPoEPlus OBJECT IDENTIFIER ::= { routerSwitch 92 }
+
+
+        x61048TsXPOEPlus OBJECT IDENTIFIER ::= { routerSwitch 93 }
+
+
+        x61048TsPOEPlus OBJECT IDENTIFIER ::= { routerSwitch 94 }
+
+
+        x61024TsXPOEPlus OBJECT IDENTIFIER ::= { routerSwitch 95 }
+
+
+        x61024TsPOEPlus OBJECT IDENTIFIER ::= { routerSwitch 96 }
+
+
+        x61048TsX OBJECT IDENTIFIER ::= { routerSwitch 97 }
+
+
+        x61048Ts OBJECT IDENTIFIER ::= { routerSwitch 98 }
+
+
+        x61024TsX OBJECT IDENTIFIER ::= { routerSwitch 99 }
+
+
+        x61024Ts OBJECT IDENTIFIER ::= { routerSwitch 100 }
+
+
+        x61024SPX OBJECT IDENTIFIER ::= { routerSwitch 101 }
+
+
+        atRP48xDC OBJECT IDENTIFIER ::= { routerSwitch 105 }
+
+
+        atx51028GTX OBJECT IDENTIFIER ::= { routerSwitch 109 }
+
+
+        atx51028GPX OBJECT IDENTIFIER ::= { routerSwitch 110 }
+
+
+        atx51028GSX OBJECT IDENTIFIER ::= { routerSwitch 111 }
+
+
+        atx51052GTX OBJECT IDENTIFIER ::= { routerSwitch 112 }
+
+
+        atx51052GPX OBJECT IDENTIFIER ::= { routerSwitch 113 }
+
+
+        atSBx8106 OBJECT IDENTIFIER ::= { routerSwitch 114 }
+
+        atx510DP52GTX OBJECT IDENTIFIER ::= { routerSwitch 116 }
+
+
+        atIX528GPX OBJECT IDENTIFIER ::= { routerSwitch 117 }
+
+
+        atx93028GTX OBJECT IDENTIFIER ::= { routerSwitch 118 }
+
+
+        atx93028GPX OBJECT IDENTIFIER ::= { routerSwitch 119 }
+
+
+        atx93028GSX OBJECT IDENTIFIER ::= { routerSwitch 120 }
+
+
+        atx93052GTX OBJECT IDENTIFIER ::= { routerSwitch 121 }
+
+
+        atx93052GPX OBJECT IDENTIFIER ::= { routerSwitch 122 }
+
+        atdc2552xs OBJECT IDENTIFIER   ::= { routerSwitch 123 }
+
+        atx51028GSXDC OBJECT IDENTIFIER ::= { routerSwitch 124 }
+
+
+        atx510DP28GTX OBJECT IDENTIFIER ::= { routerSwitch 126 }
+
+        atx510L28GT OBJECT IDENTIFIER ::= { routerSwitch 127 }
+
+        atx510L52GT OBJECT IDENTIFIER ::= { routerSwitch 128 }
+
+        atx510L28GP OBJECT IDENTIFIER ::= { routerSwitch 129 }
+
+        atx510L52GP OBJECT IDENTIFIER ::= { routerSwitch 130 }
+
+        atx51028GTXR OBJECT IDENTIFIER ::= { routerSwitch 131 }
+
+        atx51052GTXR OBJECT IDENTIFIER ::= { routerSwitch 132 }
+
+        atSH51028GTX OBJECT IDENTIFIER ::= { routerSwitch 133 }
+
+        atSH51052GTX OBJECT IDENTIFIER ::= { routerSwitch 134 }
+
+        atSH51028GPX OBJECT IDENTIFIER ::= { routerSwitch 135 }
+
+        atSH51052GPX OBJECT IDENTIFIER ::= { routerSwitch 136 }
+
+        atsbx908g2 OBJECT IDENTIFIER ::= { routerSwitch 137 }
+
+        atsbx908g3 OBJECT IDENTIFIER ::= { routerSwitch 138 }
+
+        atx55018XTQ OBJECT IDENTIFIER ::= { routerSwitch 139 }
+
+        atx55018XSQ OBJECT IDENTIFIER ::= { routerSwitch 140 }
+
+        atx55018XSPQm OBJECT IDENTIFIER ::= { routerSwitch 141 }
+
+        atSBx81XLEM  OBJECT IDENTIFIER ::= { routerSwitch 142 }
+
+        swhub OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "subtree beneath which Layer2 switch product MIB object ids are assigned."
+            ::= { products 4 }
+
+
+        atx200GE52T OBJECT IDENTIFIER ::= { swhub 181 }
+
+
+        atx200GE28T OBJECT IDENTIFIER ::= { swhub 182 }
+
+
+        atx2109GT OBJECT IDENTIFIER ::= { swhub 196 }
+
+
+        atx21016GT OBJECT IDENTIFIER ::= { swhub 197 }
+
+
+        atx21024GT OBJECT IDENTIFIER ::= { swhub 198 }
+
+
+        atx31026FT OBJECT IDENTIFIER ::= { swhub 216 }
+
+
+        atx31050FT OBJECT IDENTIFIER ::= { swhub 217 }
+
+
+        atx31026FP OBJECT IDENTIFIER ::= { swhub 218 }
+
+
+        atx31050FP OBJECT IDENTIFIER ::= { swhub 219 }
+
+
+        atx31026GT OBJECT IDENTIFIER ::= { swhub 220 }
+
+
+        atx31050GT OBJECT IDENTIFIER ::= { swhub 221 }
+
+
+        atx31026GP OBJECT IDENTIFIER ::= { swhub 222 }
+
+
+        atx31050GP OBJECT IDENTIFIER ::= { swhub 223 }
+
+
+        atx23010GT OBJECT IDENTIFIER ::= { swhub 224 }
+
+
+        atx23018GT OBJECT IDENTIFIER ::= { swhub 225 }
+
+
+        atx23028GT OBJECT IDENTIFIER ::= { swhub 226 }
+
+
+        atx23052GT OBJECT IDENTIFIER ::= { swhub 227 }
+
+
+        atx23010GP OBJECT IDENTIFIER ::= { swhub 228 }
+
+
+        atx23018GP OBJECT IDENTIFIER ::= { swhub 229 }
+
+
+        atx23028GP OBJECT IDENTIFIER ::= { swhub 230 }
+
+
+        atx23052GP OBJECT IDENTIFIER ::= { swhub 231 }
+
+
+        atx35010GPT OBJECT IDENTIFIER ::= { swhub 232 }
+
+
+        atGS924MX OBJECT IDENTIFIER ::= { swhub 253 }
+
+
+        atGS924MPX OBJECT IDENTIFIER ::= { swhub 254 }
+
+
+        atGS948MX OBJECT IDENTIFIER ::= { swhub 255 }
+
+
+        atGS948MPX OBJECT IDENTIFIER ::= { swhub 256 }
+
+
+        atXS916MXT OBJECT IDENTIFIER ::= { swhub 257 }
+
+
+        atXS916MXS OBJECT IDENTIFIER ::= { swhub 258 }
+
+
+        atXS916MXP OBJECT IDENTIFIER ::= { swhub 259 }
+
+
+        atSH23010GP OBJECT IDENTIFIER ::= { swhub 260 }
+
+
+        atSH23018GP OBJECT IDENTIFIER ::= { swhub 261 }
+
+
+        atSH23028GP OBJECT IDENTIFIER ::= { swhub 262 }
+
+
+        atSH2109GT OBJECT IDENTIFIER ::= { swhub 263 }
+
+
+        atSH21016GT OBJECT IDENTIFIER ::= { swhub 264 }
+
+
+        atSH21024GT OBJECT IDENTIFIER ::= { swhub 265 }
+
+
+        atSH31026FT OBJECT IDENTIFIER ::= { swhub 266 }
+
+
+        atSH31050FT OBJECT IDENTIFIER ::= { swhub 267 }
+
+
+        atSH31026FP OBJECT IDENTIFIER ::= { swhub 268 }
+
+
+        atSH31050FP OBJECT IDENTIFIER ::= { swhub 269 }
+
+
+        atSH23010GT OBJECT IDENTIFIER ::= { swhub 270 }
+
+
+        atSH23018GT OBJECT IDENTIFIER ::= { swhub 271 }
+
+
+        atSH23028GT OBJECT IDENTIFIER ::= { swhub 272 }
+
+
+        atFS980M9 OBJECT IDENTIFIER ::= { swhub 274 }
+
+
+        atFS980M9PS OBJECT IDENTIFIER ::= { swhub 275 }
+
+
+        atFS980M18 OBJECT IDENTIFIER ::= { swhub 276 }
+
+
+        atFS980M18PS OBJECT IDENTIFIER ::= { swhub 277 }
+
+
+        atFS980M28 OBJECT IDENTIFIER ::= { swhub 278 }
+
+
+        atFS980M28PS OBJECT IDENTIFIER ::= { swhub 279 }
+
+
+        atFS980M52 OBJECT IDENTIFIER ::= { swhub 280 }
+
+
+        atFS980M52PS OBJECT IDENTIFIER ::= { swhub 281 }
+
+
+        atGS910M OBJECT IDENTIFIER ::= { swhub 282 }
+
+
+        atGS910MP OBJECT IDENTIFIER ::= { swhub 283 }
+
+
+        atGS918M OBJECT IDENTIFIER ::= { swhub 284 }
+
+
+        atGS918MP OBJECT IDENTIFIER ::= { swhub 285 }
+
+
+        atGS928M OBJECT IDENTIFIER ::= { swhub 286 }
+
+
+        atGS928MP OBJECT IDENTIFIER ::= { swhub 287 }
+
+
+        atGS952M OBJECT IDENTIFIER ::= { swhub 288 }
+
+
+        atGS952MP OBJECT IDENTIFIER ::= { swhub 289 }
+
+
+        atGS970M28PS OBJECT IDENTIFIER ::= { swhub 312 }
+
+
+        atGS970M18PS OBJECT IDENTIFIER ::= { swhub 313 }
+
+
+        atGS970M10PS OBJECT IDENTIFIER ::= { swhub 314 }
+
+
+        atGS970M28 OBJECT IDENTIFIER ::= { swhub 315 }
+
+
+        atGS970M18 OBJECT IDENTIFIER ::= { swhub 316 }
+
+
+        atGS970M10 OBJECT IDENTIFIER ::= { swhub 317 }
+
+
+        industrialSwitch OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "subtree beneath which industrial switch product MIB object ids are assigned."
+            ::= { products 24 }
+
+
+        atIE2006GT OBJECT IDENTIFIER ::= { industrialSwitch 1 }
+
+
+        atIE2006GP OBJECT IDENTIFIER ::= { industrialSwitch 2 }
+
+
+        atIE2006GPW OBJECT IDENTIFIER ::= { industrialSwitch 3 }
+
+
+        atIE2006FT OBJECT IDENTIFIER ::= { industrialSwitch 6 }
+
+
+        atIE2006FP OBJECT IDENTIFIER ::= { industrialSwitch 7 }
+
+
+        atIE30012GT OBJECT IDENTIFIER ::= { industrialSwitch 8 }
+
+
+        atIE30012GP OBJECT IDENTIFIER ::= { industrialSwitch 9 }
+
+
+        atIE30012GS OBJECT IDENTIFIER ::= { industrialSwitch 10 }
+
+
+        atIE30020GST OBJECT IDENTIFIER ::= { industrialSwitch 11 }
+
+
+        atIE51028GSX OBJECT IDENTIFIER ::= { industrialSwitch 12 }
+
+        virtualApp OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "subtree beneath which virtual appliance MIB object ids are assigned."
+            ::= { products 26 }
+
+        atVAA OBJECT IDENTIFIER ::= { virtualApp 1 }
+
+    END
+
+--
+-- AT-PRODUCT-MIB.my
+--

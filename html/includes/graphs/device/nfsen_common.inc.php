@@ -17,7 +17,11 @@ foreach ($config['nfsen_rrds'] as $nfsenrrds) {
         $nfsensuffix = $config['nfsen_suffix'];
     }
 
-    $basefilename_underscored = preg_replace('/\./', $config['nfsen_split_char'], $device['hostname']);
+    if (isset($config['nfsen_split_char']) && !empty($config['nfsen_split_char'])) {
+        $basefilename_underscored = preg_replace('/\./', $config['nfsen_split_char'], $device['hostname']);
+    } else {
+        $basefilename_underscored = $device['hostname'];
+    }
     $nfsen_filename           = preg_replace('/'.$nfsensuffix.'/', '', $basefilename_underscored);
 
     if (is_file($nfsenrrds.$nfsen_filename.'.rrd')) {

@@ -1,0 +1,318 @@
+-- =================================================================
+-- Copyright (C) 2004 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description:This mib file is used for management of huawei BGP Accounting. 
+-- Reference:
+-- Version: V1.0
+-- History:
+-- peigangqiang,2005.4.6,publish 
+-- =================================================================
+
+    HUAWEI-BGP-ACCOUNTING-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            ifIndex            
+                FROM RFC1213-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE            
+                FROM SNMPv2-CONF            
+            Integer32, Counter64, OBJECT-TYPE, MODULE-IDENTITY            
+                FROM SNMPv2-SMI            
+            RowStatus, TEXTUAL-CONVENTION            
+                FROM SNMPv2-TC;
+    
+    
+        hwBgpAcctMIB MODULE-IDENTITY 
+            LAST-UPDATED "200705100000Z"        -- May 10, 2007 at 00:00 GMT
+            ORGANIZATION 
+                "Huawei Technologies co.,Ltd."
+            CONTACT-INFO 
+                " R&D BeiJing, Huawei Technologies co.,Ltd.
+                Huawei Bld.,NO.3 Xinxi Rd., 
+                Shang-Di Information Industry Base,
+                Hai-Dian District Beijing P.R. China
+                Zip:100085 
+                Http://www.huawei.com                                       
+                E-mail:support@huawei.com "
+            DESCRIPTION 
+                "The HUAWEI-BGP-ACCOUNTING-MIB contains objects to 
+                Manage configuration and Monitor running state 
+                for BGP Accounting feature."
+            ::= { hwDatacomm 39 }
+
+        
+    
+--
+-- Textual conventions
+--
+    
+-- AddressType               
+        AddressType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "
+                invalid(0)
+                source(1)
+                destination(2)
+                "
+            SYNTAX INTEGER
+                {
+                invalid(0),
+                source(1),
+                destination(2)
+                }
+
+-- DirectionType              
+        DirectionType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "invalid(0)
+                inbound(1)
+                outbound(2)
+                inbound-and-outbound(3)            
+                "
+            SYNTAX INTEGER
+                {
+                invalid(0),
+                inbound(1),
+                outbound(2),
+                inboundAndOutbound(3)
+                }
+
+    
+--
+-- Node definitions
+--
+    
+        hwBgpAcctMIBObjects OBJECT IDENTIFIER ::= { hwBgpAcctMIB 1 }
+
+        
+-- coonfig table    
+        hwBgpAcctCfgTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBgpAcctCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The hwBgpAcctCfgTable provides the configuration of
+                BGP Accounting."
+            ::= { hwBgpAcctMIBObjects 1 }
+
+        
+        hwBgpAcctCfgEntry OBJECT-TYPE
+            SYNTAX HwBgpAcctCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Each HwBgpAcctCfgEntry provides BGP accounting 
+                configuration for traffic of interest on an ingress and/or 
+                egress interface. "
+            INDEX { hwbgpAcctCfgIfIndex }
+            ::= { hwBgpAcctCfgTable 1 }
+
+        
+        HwBgpAcctCfgEntry ::=
+            SEQUENCE { 
+                hwbgpAcctCfgIfIndex
+                    Integer32,
+                hwbgpAcctSrcOrDest
+                    AddressType,
+                hwbgpAcctDirection
+                    DirectionType,
+                hwbgpAcctCfgRowStatus
+                    RowStatus
+             }
+
+        hwbgpAcctCfgIfIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Interface Index, equal to ifIndex."
+            ::= { hwBgpAcctCfgEntry 1 }
+
+        
+        hwbgpAcctSrcOrDest OBJECT-TYPE
+            SYNTAX AddressType
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "An integer value greater than 0, that uniquely identifies
+                BGP accounting based on source address or destination address. 
+                1 is source ,2 is destination, and the defaule value is 2"
+            DEFVAL { 2 }
+            ::= { hwBgpAcctCfgEntry 2 }
+
+        
+        hwbgpAcctDirection OBJECT-TYPE
+            SYNTAX DirectionType
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "An integer value greater than 0, that uniquely identifies
+                BGP accounting the inbound traffic or outbound traffic. 
+                1 is inbound ,2 is outbound, and 3 is both inbound and outbound"
+            DEFVAL { 1 }
+            ::= { hwBgpAcctCfgEntry 3 }
+
+        
+        hwbgpAcctCfgRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus. Three actions are used: active,
+                createAndGo, destroy"
+            ::= { hwBgpAcctCfgEntry 4 }
+
+        
+--  statistics table
+        hwBgpAcctStatTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBgpAcctStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The hwBgpAcctStatTable provides BGP accounting statistics 
+                for ingress and egress traffic on an interface. This data could be used for 
+                purposes like billing."
+            ::= { hwBgpAcctMIBObjects 2 }
+
+        
+        hwBgpAcctStatEntry OBJECT-TYPE
+            SYNTAX HwBgpAcctStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Each hwBgpAcctStatEntry provides statistics 
+                for traffic of interest on an ingress and/or egress interfaces.
+                                
+                The statistics include ingress packet counts, ingress octet
+                counts, egress packet counts and egress octet counts. Entries 
+                are created when traffic-type is configured on an interface.
+                Entries are deleted automatically when the user 
+                removes the corresponding traffic-type configuration from an
+                interface."
+            INDEX { hwbgpAcctStatIfIndex, hwbgpAcctTrafficIndex }
+            ::= { hwBgpAcctStatTable 1 }
+
+        
+        HwBgpAcctStatEntry ::=
+            SEQUENCE { 
+                hwbgpAcctStatIfIndex
+                    Integer32,
+                hwbgpAcctTrafficIndex
+                    Integer32,
+                hwbgpAcctInPacketCount
+                    Counter64,
+                hwbgpAcctInOctetCount
+                    Counter64,
+                hwbgpAcctOutPacketCount
+                    Counter64,
+                hwbgpAcctOutOctetCount
+                    Counter64
+             }
+
+        hwbgpAcctStatIfIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Interface Index, equal to ifIndex."
+            ::= { hwBgpAcctStatEntry 1 }
+
+        
+        hwbgpAcctTrafficIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..64)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "An integer value greater than 0, that uniquely identifies
+                a traffic-type. The traffic-type means the traffic coming into an interface 
+                can be differentiated into different types. It is up to the user to
+                give meaning to and configure the various traffic-types on an 
+                interface."
+            ::= { hwBgpAcctStatEntry 2 }
+
+        
+        hwbgpAcctInPacketCount OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets received for a particular
+                traffic-type on an interface."
+            ::= { hwBgpAcctStatEntry 3 }
+
+        
+        hwbgpAcctInOctetCount OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of octets received for a particular
+                traffic-type on an interface."
+            ::= { hwBgpAcctStatEntry 4 }
+
+        
+        hwbgpAcctOutPacketCount OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets transmitted for a particular
+                traffic-type on an interface."
+            ::= { hwBgpAcctStatEntry 5 }
+
+        
+        hwbgpAcctOutOctetCount OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of octets transmitted for a particular
+                traffic-type on an interface."
+            ::= { hwBgpAcctStatEntry 6 }
+
+        
+--  Conformance Information
+        hwBgpAcctConformance OBJECT IDENTIFIER ::= { hwBgpAcctMIB 2 }
+
+        
+
+        hwBgpAcctCompliances OBJECT IDENTIFIER ::= { hwBgpAcctConformance 1 }
+
+        
+        hwBgpAcctCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for entities that implement 
+                ip bgp-accouting on a router."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwBgpAcctCfgGroup, hwBgpAcctStatGroup }
+            ::= { hwBgpAcctCompliances 1 }
+
+        
+        hwBgpAcctStatGroups OBJECT IDENTIFIER ::= { hwBgpAcctConformance 2 }
+
+        
+        hwBgpAcctCfgGroup OBJECT-GROUP
+            OBJECTS { hwbgpAcctCfgIfIndex, hwbgpAcctSrcOrDest, hwbgpAcctDirection }
+            STATUS current
+            DESCRIPTION 
+                "Required objects to provide hwBgpAcctMIB objects configuration 
+                information. hwBgpAcctCfgGroup is optional."
+            ::= { hwBgpAcctStatGroups 1 }
+
+        
+        hwBgpAcctStatGroup OBJECT-GROUP
+            OBJECTS { hwbgpAcctStatIfIndex, hwbgpAcctTrafficIndex, hwbgpAcctInPacketCount, hwbgpAcctInOctetCount, hwbgpAcctOutPacketCount, 
+                hwbgpAcctOutOctetCount }
+            STATUS current
+            DESCRIPTION 
+                "Required objects to provide hwBgpAcctMIB objects configuration 
+                information. hwBgpAcctStatGroup is optional."
+            ::= { hwBgpAcctStatGroups 2 }
+
+        
+    
+    END

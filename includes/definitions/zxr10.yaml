@@ -1,0 +1,10 @@
+os: zxr10
+group: zxr10
+text: 'ZTE ZXR10'
+type: network
+icon: zte
+discovery:
+    - sysDescr:
+        - ZXR10
+        - 'ZTE Ethernet Switch'
+

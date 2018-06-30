@@ -57,10 +57,16 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
 </form>';
 } else {
     $widget_settings['title'] = $widget_settings['image_title'];
+    if (strstr($widget_settings['image_url'], '@AUTO_HEIGHT@')) {
+        $widget_settings['image_url'] = str_replace('@AUTO_HEIGHT@', $widget_dimensions['y'], $widget_settings['image_url']);
+    }
+    if (strstr($widget_settings['image_url'], '@AUTO_WIDTH@')) {
+        $widget_settings['image_url'] = str_replace('@AUTO_WIDTH@', $widget_dimensions['x'], $widget_settings['image_url']);
+    }
     if (strstr($widget_settings['image_url'], '?')) {
         $widget_settings['image_url'] .= "&".mt_rand();
     } else {
         $widget_settings['image_url'] .= "?".mt_rand();
     }
-    $common_output[]          = '<a target="_blank" href="'.$widget_settings['target_url'].'"><img class="minigraph-image" style="max-width: '.$widget_dimensions['x'].'px; max-height:'.$widget_dimensions['y'].'px;" src="'.$widget_settings['image_url'].'"/></a>';
+    $common_output[]          = '<a target="_blank" rel="noopener" href="'.$widget_settings['target_url'].'"><img class="minigraph-image" style="max-width: '.$widget_dimensions['x'].'px; max-height:'.$widget_dimensions['y'].'px;" src="'.$widget_settings['image_url'].'"/></a>';
 }

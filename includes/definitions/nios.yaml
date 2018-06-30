@@ -1,0 +1,9 @@
+os: nios
+text: Infoblox
+type: appliance
+mib_dir:
+    - infoblox
+icon: infoblox
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.7779.

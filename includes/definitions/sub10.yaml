@@ -1,0 +1,11 @@
+os: sub10
+text: 'Sub10 Systems'
+type: wireless
+icon: sub10
+over:
+    - { graph: device_bits, text: Traffic }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.39003
+poller_modules:
+    wifi: true

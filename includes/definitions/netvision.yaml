@@ -1,0 +1,8 @@
+os: netvision
+text: 'Socomec Net Vision'
+type: power
+over:
+    - { graph: device_current, text: Current }
+discovery:
+    - sysDescr:
+        - 'Net Vision'

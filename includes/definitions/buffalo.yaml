@@ -1,0 +1,9 @@
+os: buffalo
+text: Buffalo
+type: storage
+icon: buffalo
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysDescr_regex:
+        - '/^BUFFALO /'

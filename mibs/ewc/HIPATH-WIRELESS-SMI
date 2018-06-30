@@ -1,0 +1,88 @@
+	HIPATH-WIRELESS-SMI DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			enterprises			
+				FROM RFC1155-SMI			
+			MODULE-IDENTITY, OBJECT-IDENTITY			
+				FROM SNMPv2-SMI;
+	
+	
+		-- 1.3.6.1.4.1.4329.15
+		hiPathWireless MODULE-IDENTITY 
+			LAST-UPDATED "200507210237Z"		-- July 21, 2005 at 02:37 GMT
+			ORGANIZATION 
+				"Chantry Networks, Inc."
+			CONTACT-INFO 
+				"Behrouz Sultan
+				Chantry Networks, Inc.
+				
+				1900 Minnesota Court, Suite 125
+				Mississauga ON, L5N 3C9
+				
+				Email: behrouz.sultan@siemens.com
+				Phone 1-905-363-6400
+				Fax   1-905-567-0099"
+			DESCRIPTION 
+				"The root MIB module for High Path Wireless Products.
+				enterprises.siemens(4329).15"
+			REVISION "200507210237Z"		-- July 21, 2005 at 02:37 GMT
+			DESCRIPTION 
+				"Initial version."
+			::= { siemens 15 }
+
+		
+	
+--
+-- Node definitions
+--
+	
+		-- 1.3.6.1.4.1.4329
+		siemens OBJECT IDENTIFIER ::= { enterprises 4329 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.1
+		hiPathWirelessProducts OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Provides a root OID from which MIB-II sysObjectID values 
+				are assigned. Actual product OIDs are defined in
+				HIPATH-WIRELESS-PRODUCTS-MIB."
+			::= { hiPathWireless 1 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.3
+		hiPathWirelessMgmt OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Main subtree for High Path Wireless Networks management information."
+			::= { hiPathWireless 3 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.4
+		hiPathWirelessDevelopment OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Subtree for pre-release MIB development. 
+				Elements in this subtree are eventually moved to 
+				'hiPathWirelessMgmt'."
+			::= { hiPathWireless 4 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.5
+		hiPathWirelessModules OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Provides a root object identifier from which
+				MODULE-IDENTITY values are assigned."
+			::= { hiPathWireless 5 }
+
+		
+		-- 1.3.6.1.4.1.4329.15.6
+		hiPathWirelessHWM OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Sub-tree for Hipath Wireless Manager Application and its associated applications."
+			::= { hiPathWireless 6 }
+			
+
+	END

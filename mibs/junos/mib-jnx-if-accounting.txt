@@ -13,6 +13,8 @@ IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, 
     Integer32, Counter64
         FROM SNMPv2-SMI
+    CounterBasedGauge64                  
+        FROM HCNUM-TC       		
     InterfaceIndex                       
         FROM IF-MIB
     JnxCosFcIdentifier
@@ -21,7 +23,7 @@ IMPORTS
         FROM JUNIPER-IF-MIB;
         
 jnxIfAccountingStats        MODULE-IDENTITY
-    LAST-UPDATED "201305151223Z"                -- Wed May 25 12:23:51 2013 UTC
+    LAST-UPDATED "201312250000Z"                -- Wed Dec 25 12:00:00 2013 UTC
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
                  "Juniper Technical Assistance Center
@@ -38,7 +40,11 @@ jnxIfAccountingStats        MODULE-IDENTITY
     REVISION     	"201305151223Z"             -- Wed May 25 12:23:51 2013 UTC
     DESCRIPTION		"MIB module to define QoS based Interface accounting." 
    
-    
+    REVISION     	"201312250000Z"             -- Wed Dec 25 12:00:00 2013 UTC	
+    DESCRIPTION		"MIB module extended to support inline accounting for Per 
+					 Forwarding-class stats table for Aggregate
+					 (all types of traffic) pkt/byte counters & rate"
+					 
     ::= { ifJnx 10 }    
     
 -- ***************************************************************
@@ -113,7 +119,10 @@ jnxIfAccountingStats        MODULE-IDENTITY
         SYNTAX      INTEGER {
                         all (1),
                         ipv4 (2),
-                        ipv6 (3)
+                        ipv6 (3),
+                        mpls (4),
+                        layer2 (5),
+                        other (6)
         }
         MAX-ACCESS  not-accessible
         STATUS      current
@@ -194,4 +203,127 @@ jnxIfAccountingStats        MODULE-IDENTITY
         ::= { jnxIfFcAccountStatEntry 11 }
 
 
+		
+-- ***************************************************************
+--  Per Forwarding-class stats table for Aggregate(all types of traffic) pkt/byte counters & rate
+-- ***************************************************************
+    jnxIfFcInlineAccountingStatTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxIfFcInlineAccountingStatEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table presents the per forwarding-class and per family 
+        statistics without considering the traffic types."
+        ::= { jnxIfAccountingStats 2 }
+
+
+    jnxIfFcInlineAccountingStatEntry OBJECT-TYPE
+        SYNTAX      JnxIfFcInlineAccountingStatEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table presents the per forwarding-class and 
+             per protocol type statistics. The indices of the 
+             table are Interface Index, Forwarding class Index
+             and protocol(family) type as defined below."
+        INDEX       { jnxIfFcIfIndex, jnxIfFcFcIndex, jnxIfFcProtocol }
+        ::= { jnxIfFcInlineAccountingStatTable 1 }
+        
+
+    JnxIfFcInlineAccountingStatEntry ::=
+        SEQUENCE {
+            -- Indices of the table
+            jnxIfFcIfIndex                    InterfaceIndex,
+            jnxIfFcFcIndex                    JnxCosFcIdentifier,
+            jnxIfFcProtocol                   INTEGER,
+
+            -- input packet & rate stats for all types of traffic
+            jnxIfFcInlineHCInPkts                   Counter64,
+            jnxIfFcInlineHCInPktsSecRate            CounterBasedGauge64,
+            
+            -- input bytes & rate stats for all types of traffic
+            jnxIfFcInlineHCInOctets                 Counter64,
+            jnxIfFcInlineHCInOctetsSecRate          CounterBasedGauge64,
+
+            -- output packet & rate stats for all types of traffic
+            jnxIfFcInlineHCOutPkts                  Counter64,
+            jnxIfFcInlineHCOutPktsSecRate           CounterBasedGauge64,
+
+            -- output bytes & rate stats for all types of traffic            
+            jnxIfFcInlineHCOutOctets                Counter64,
+            jnxIfFcInlineHCOutOctetsSecRate         CounterBasedGauge64
+
+    }
+
+    --input packet stats for all types of traffic 
+    jnxIfFcInlineHCInPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of packets ingressed."
+        ::= { jnxIfFcInlineAccountingStatEntry 1 }
+
+    --input packets per sec rate 
+    jnxIfFcInlineHCInPktsSecRate OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The packets rate ingressed per second."
+        ::= { jnxIfFcInlineAccountingStatEntry 2 }
+
+    --input byte stats for all types of traffic
+    jnxIfFcInlineHCInOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of bytes ingressed."
+        ::= { jnxIfFcInlineAccountingStatEntry 3 }
+
+    --input bytes per sec for all types of traffic
+    jnxIfFcInlineHCInOctetsSecRate OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The bytes rate ingressed per second."
+        ::= { jnxIfFcInlineAccountingStatEntry 4 }
+
+    --output packets stats for all types of traffic 
+    jnxIfFcInlineHCOutPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of packets egressed."
+        ::= { jnxIfFcInlineAccountingStatEntry 5 }
+
+    --output packets per sec for all types of traffic 
+    jnxIfFcInlineHCOutPktsSecRate OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The packets rate egressed per second."
+        ::= { jnxIfFcInlineAccountingStatEntry 6 }
+
+    --output byte stats for all types of traffic
+    jnxIfFcInlineHCOutOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of bytes egressed."
+        ::= { jnxIfFcInlineAccountingStatEntry 7 }
+
+    --output bytes per sec for all types of traffic
+    jnxIfFcInlineHCOutOctetsSecRate OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The bytes rate egressed per second."
+        ::= { jnxIfFcInlineAccountingStatEntry 8 }		
 END

@@ -69,6 +69,7 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
              The IKE peer may be identified by one of the ID types 
 	         defined in IPSEC DOI.
                  idIpv4Addr - IPv4 Address.   
+                 idIpv6Addr - IPv6 Address.   
                  idUfqdn    - user fully qualified domain name (user@hostname).  
                  idFqdn     - full qualified domain name 
                  idDn       - distinquished name"
@@ -77,7 +78,8 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
                    idIpv4Addr           (1),   
                    idFqdn               (2),  
                    idDn                 (3),
-                   idUfqdn              (4)  
+                   idUfqdn              (4),  
+                   idIpv6Addr           (5)   
          }
 
     JnxIkeNegoMode ::= TEXTUAL-CONVENTION

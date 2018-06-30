@@ -1,0 +1,46 @@
+os: pixos
+group: cisco
+text: 'Cisco PIX-OS'
+ifname: true
+type: firewall
+icon: cisco
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+poller_modules:
+    bgp-peers: false
+    cisco-asa-firewall: true
+    cisco-cbqos: true
+    cisco-cef: true
+    cisco-mac-accounting: true
+    cisco-voice: true
+    cisco-remote-access-monitor: true
+    cisco-sla: true
+    cisco-ipsec-flow-monitor: true
+    cipsec-tunnels: true
+    cisco-otv: true
+    hr-mib: false
+    ipmi: false
+    ipSystemStats: false
+    junose-atm-vp: false
+    netscaler-vsvr: false
+    ntp: false
+    ospf: false
+    stp: false
+    ucd-diskio: false
+    ucd-mib: false
+discovery_modules:
+    bgp-peers: false
+    stp: false
+    cisco-cef: true
+    cisco-sla: true
+    cisco-mac-accounting: true
+    cisco-otv: true
+    cisco-pw: true
+    vrf: true
+    cisco-vrf-lite: true
+discovery:
+    - sysDescr:
+        - 'Cisco PIX'
+        - 'Cisco Firewall Services Module'

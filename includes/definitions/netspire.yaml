@@ -1,0 +1,9 @@
+os: netspire
+text: 'Open Access Netspire'
+type: appliance
+icon: openaccess
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.1732
+mib_dir:
+    - openaccess

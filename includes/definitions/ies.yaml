@@ -1,0 +1,11 @@
+os: ies
+text: 'ZyXEL DSLAM'
+group: zyxel
+type: network
+icon: zyxel
+discovery:
+    -
+      sysObjectID: .1.3.6.1.4.1.890.
+      sysDescr:
+        - IES-
+

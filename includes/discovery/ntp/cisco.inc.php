@@ -11,6 +11,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Util\IP;
+
 $module = 'ntp';
 
 $component = new LibreNMS\Component();
@@ -46,13 +48,13 @@ if (is_null($cntpPeersVarEntry)) {
         $result['peer'] = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][3][$index];
         $result['port'] = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][4][$index];
         $result['stratum'] = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][9][$index];
-        $result['peerref'] = hex_to_ip($cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][15][$index]);
+        $result['peerref'] = IP::fromHexString($cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][15][$index], true);
         $result['label'] = $result['peer'].":".$result['port'];
 
         // Set the status, 16 = Bad
         if ($result['stratum'] == 16) {
             $result['status'] = 2;
-            $result['error'] = 'NTP Stratum is Insane';
+            $result['error'] = 'NTP is not in sync';
         } else {
             $result['status'] = 0;
             $result['error'] = '';
@@ -121,7 +123,7 @@ if (is_null($cntpPeersVarEntry)) {
 $module = strtolower($module);
 if (count($components) > 0) {
     if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?', array($device['device_id'], $module)) == '0') {
-        dbInsert(array('device_id' => $device['device_id'], 'app_type' => $module), 'applications');
+        dbInsert(array('device_id' => $device['device_id'], 'app_type' => $module, 'app_status' => '', 'app_instance' => ''), 'applications');
     }
 } else {
     dbDelete('applications', '`device_id` = ? AND `app_type` = ?', array($device['device_id'], $module));

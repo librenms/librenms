@@ -1,0 +1,1184 @@
+-- Mitsubishi.mib  - MIB file for Mitsubishi UPSs
+
+UPS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        TRAP-TYPE
+                FROM RFC-1215
+        DisplayString
+                FROM RFC1213-MIB
+        OBJECT-TYPE
+                FROM RFC-1212
+        Gauge, Counter, TimeTicks, mgmt
+                FROM RFC1155-SMI
+            ;
+
+PositiveInteger		::= INTEGER
+NonNegativeInteger 	::= INTEGER
+TimeStamp 			::= TimeTicks
+TimeInterval 		::= INTEGER (0..2147483647)
+TestAndIncr 		::= INTEGER (0..2147483647)
+AutonomousType 		::= DisplayString
+
+Tag			OBJECT IDENTIFIER ::= { enterprises 13891 }
+MitsubishiUPS 	OBJECT IDENTIFIER ::= { Tag 101 }
+
+upsIdent OBJECT IDENTIFIER ::= { MitsubishiUPS 1 }
+
+upsIdentManufacturer OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The name of the UPS manufacturer."
+    ::= { upsIdent 1 }
+
+upsIdentModel OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The UPS Model designation."
+    ::= { upsIdent 2 }
+
+upsIdentUPSSoftwareVersion OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The UPS firmware/software version(s).  This variable
+            may or may not have the same value as
+            upsIdentAgentSoftwareVersion in some implementations."
+    ::= { upsIdent 3 }
+
+upsIdentAgentSoftwareVersion OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The UPS agent software version.  This variable may or may
+             not have the same value as upsIdentUPSSoftwareVersion in 
+             some implementations."
+    ::= { upsIdent 4 }
+
+upsIdentName OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "A string identifying the UPS.  This object should be
+            set by the administrator."
+    ::= { upsIdent 5 }
+
+upsIdentAttachedDevices OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "A string identifying the devices attached to the output
+            of the UPS.  This object should be set by the administrator."
+    ::= { upsIdent 6 }
+
+upsBattery OBJECT IDENTIFIER ::= { MitsubishiUPS 2 }
+
+upsBatteryStatus OBJECT-TYPE
+    SYNTAX  INTEGER 
+    {
+        unknown(1),
+        batteryNormal(2),
+        batteryLow(3),
+        batteryDepleted(4)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The indication of the capacity remaining in the UPS batteries.   
+            A value of batteryNormal indicates a normal battery condition.  
+            A value of batteryLow indicates the remaining battery run-time 
+            will not maintain the output load for an extended period of time.
+            A value of batteryDepleted indicates that the UPS will be unable
+            to sustain the present load when and if the utility power is lost." 
+    ::= { upsBattery 1 }
+
+upsSecondsOnBattery OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS seconds
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "If the unit is on battery power, the elapsed time in seconds
+            since the UPS last switched to battery power, or the time since 
+            the network management system was last restarted, whichever is less.  
+            Zero shall be returned if the unit is not on battery power."
+    ::= { upsBattery 2 }
+
+upsEstimatedMinutesRemaining OBJECT-TYPE
+    SYNTAX  PositiveInteger     -- UNITS minutes
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "An estimate of the time in minutes until the battery is depleted
+            under the present load conditions if the utility power is off and 
+            remains off, or if it were to be lost and remain off."
+    ::= { upsBattery 3 }
+
+upsEstimatedChargeRemaining OBJECT-TYPE
+    SYNTAX  INTEGER     -- UNITS percent
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "An estimate of the battery charge remaining expressed as a 
+            percent of full charge."
+    ::= { upsBattery 4 }
+
+upsBatteryVoltage OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS 0.1 Volt DC
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The magnitude of the present battery voltage (0.1 Volt DC)."
+    ::= { upsBattery 5 }
+
+upsBatteryCurrent OBJECT-TYPE
+    SYNTAX  INTEGER (-2147483648..2147483647)   -- UNITS 0.1 Amp DC
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present battery current (0.1 Amp DC)."
+    ::= { upsBattery 6 }
+
+upsBatteryTemperature OBJECT-TYPE
+    SYNTAX  INTEGER (-2147483648..2147483647)   -- UNITS degrees Centigrade
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The ambient temperature at or near the UPS Battery casing (degrees Centigrade)."
+    ::= { upsBattery 7 }
+
+upsInput OBJECT IDENTIFIER ::= { MitsubishiUPS 3 }
+
+upsInputLineBads OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "A count of the number of times the input entered an
+            out-of-tolerance condition as defined by the manufacturer.  
+            This count is incremented by one each time the input 
+            transitions from zero out-of-tolerance lines to one or more 
+            input lines out-of-tolerance."
+    ::= { upsInput 1 }
+
+upsInputNumLines OBJECT-TYPE
+    SYNTAX  NonNegativeInteger
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The number of input lines utilized in this device.  This
+            variable indicates the number of rows in the input table."
+    ::= { upsInput 2 }
+
+upsInputTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF UpsInputEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "A list of input table entries.  The number of entries
+            is given by the value of upsInputNumLines."
+    ::= { upsInput 3 }
+
+upsInputEntry OBJECT-TYPE
+    SYNTAX  UpsInputEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "An entry containing information applicable to a
+            particular input line."
+    INDEX   { upsInputLineIndex }
+    ::= { upsInputTable  1 }
+
+UpsInputEntry ::=
+    SEQUENCE 
+    {
+        upsInputLineIndex PositiveInteger,
+        upsInputFrequency NonNegativeInteger,
+        upsInputVoltage   NonNegativeInteger,
+        upsInputCurrent   NonNegativeInteger,
+        upsInputTruePower NonNegativeInteger
+    }
+
+upsInputLineIndex OBJECT-TYPE
+    SYNTAX  PositiveInteger
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The input line identifier."
+    ::= { upsInputEntry 1 }
+
+upsInputFrequency OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS 0.1 Hertz
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present input frequency (0.1 Hertz)."
+    ::= { upsInputEntry 2 }
+
+upsInputVoltage OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS 0.1 RMS Volt
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The magnitude of the present input voltage (0.1 RMS Volt)."
+    ::= { upsInputEntry 3 }
+
+upsInputCurrent OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS 0.1 RMS Amp
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The magnitude of the present input current (0.1 RMS Amp)."
+    ::= { upsInputEntry 4 }
+
+upsInputTruePower OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS Watts
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The magnitude of the present input true power (watts)."
+    ::= { upsInputEntry 5 }
+
+upsOutput OBJECT IDENTIFIER ::= { MitsubishiUPS 4 }
+
+upsOutputSource OBJECT-TYPE
+    SYNTAX  INTEGER 
+    {
+        other(1),
+        none(2),
+        normal(3),
+        bypass(4),
+        battery(5),
+        booster(6),
+        reducer(7)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present source of output power.  A value of none (2) indicates
+            there is no source of output power (and therefore no output power), 
+            for example, the system has opened the output breaker."
+    ::= { upsOutput 1 }
+
+upsOutputFrequency OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS 0.1 Hertz
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present output frequency (0.1 Hertz)."
+    ::= { upsOutput 2 }
+
+upsOutputNumLines OBJECT-TYPE
+    SYNTAX  NonNegativeInteger
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The number of output lines utilized in this device.  This
+            variable indicates the number of rows in the output table."
+    ::= { upsOutput 3 }
+
+upsOutputTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF UpsOutputEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "A list of output table entries.  The number of
+            entries is given by the value of upsOutputNumLines."
+    ::= { upsOutput 4 }
+
+upsOutputEntry OBJECT-TYPE
+    SYNTAX  UpsOutputEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "An entry containing information applicable to a
+            particular output line."
+    INDEX   { upsOutputLineIndex }
+    ::= { upsOutputTable 1 }
+
+UpsOutputEntry ::=
+    SEQUENCE 
+    {
+        upsOutputLineIndex          PositiveInteger,
+        upsOutputVoltage            NonNegativeInteger,
+        upsOutputCurrent            NonNegativeInteger,
+        upsOutputPower              NonNegativeInteger,
+        upsOutputPercentLoad        INTEGER
+    }
+
+upsOutputLineIndex OBJECT-TYPE
+    SYNTAX  PositiveInteger
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The output line identifier."
+    ::= { upsOutputEntry 1 }
+
+upsOutputVoltage OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS 0.1 RMS Volts
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present output voltage (0.1 RMS Volt)."
+    ::= { upsOutputEntry 2 }
+
+upsOutputCurrent OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS 0.1 RMS Amp
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present output current (0.1 RMS Amp)."
+    ::= { upsOutputEntry 3 }
+
+upsOutputPower OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS Watts
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present output true power (watts)."
+    ::= { upsOutputEntry 4 }
+
+upsOutputPercentLoad OBJECT-TYPE
+    SYNTAX  INTEGER     -- UNITS percent
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The percentage of the UPS power capacity presently being 
+            used on this output line (the greater of the percent load 
+            of true power capacity and the percent load of VA."
+    ::= { upsOutputEntry 5 }
+
+upsBypass OBJECT IDENTIFIER ::= { MitsubishiUPS 5 }
+
+upsBypassFrequency OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS 0.1 Hertz
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present bypass frequency."
+    ::= { upsBypass 1 }
+
+upsBypassNumLines OBJECT-TYPE
+    SYNTAX  NonNegativeInteger
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The number of bypass lines utilized in this device.  This
+            entry indicates the number of rows in the bypass table."
+    ::= { upsBypass 2 }
+
+upsBypassTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF UpsBypassEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "A list of bypass table entries.  The number of entries
+            is given by the value of upsBypassNumLines."
+    ::= { upsBypass 3 }
+
+upsBypassEntry OBJECT-TYPE
+    SYNTAX  UpsBypassEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "An entry containing information applicable to a
+            particular bypass input."
+    INDEX   { upsBypassLineIndex }
+    ::= { upsBypassTable 1 }
+
+UpsBypassEntry ::=
+    SEQUENCE 
+    {
+        upsBypassLineIndex          PositiveInteger,
+        upsBypassVoltage            NonNegativeInteger,
+        upsBypassCurrent            NonNegativeInteger,
+        upsBypassPower              NonNegativeInteger
+    }
+
+upsBypassLineIndex OBJECT-TYPE
+    SYNTAX  PositiveInteger
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The bypass line identifier."
+    ::= { upsBypassEntry 1 }
+
+upsBypassVoltage OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS 0.1 RMS Volts
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present bypass voltage (0.1 RMS Volt)."
+    ::= { upsBypassEntry 2 }
+
+upsBypassCurrent OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS 0.1 RMS Amp
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present bypass current (0.1 RMS Amp)."
+    ::= { upsBypassEntry 3 }
+
+upsBypassPower OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS Watts
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present true power conveyed by the bypass (watts)."
+    ::= { upsBypassEntry 4 }
+
+upsAlarm OBJECT IDENTIFIER ::= { MitsubishiUPS 6 }
+
+upsAlarmsPresent OBJECT-TYPE
+    SYNTAX  Gauge
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present number of active alarm conditions."
+    ::= { upsAlarm 1 }
+
+upsAlarmTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF UpsAlarmEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "A list of alarm table entries.  Alarms are named by 
+            an OBJECT IDENTIFIER, upsAlarmDescr, to allow a single 
+            table to reflect well known alarms plus alarms defined 
+            by a particular implementation, i.e., as documented in
+            the private enterprise MIB definition for the device.  
+            No two rows will have the same value of upsAlarmDescr,
+            since alarms define conditions.  In order to meet this
+            requirement, care should be taken in the definition of
+            alarm conditions to insure that a system cannot enter
+            the same condition multiple times simultaneously.
+
+            The number of rows in the table at any given time is
+            reflected by the value of upsAlarmsPresent."
+    ::= { upsAlarm 2 }
+
+upsAlarmEntry OBJECT-TYPE
+    SYNTAX  UpsAlarmEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "An entry containing information applicable to a
+            particular alarm."
+    INDEX   { upsAlarmId }
+    ::= { upsAlarmTable 1 }
+
+UpsAlarmEntry ::=
+    SEQUENCE 
+    {
+        upsAlarmId            PositiveInteger,
+        upsAlarmDescr         AutonomousType,
+        upsAlarmTime          TimeStamp
+    }
+
+upsAlarmId OBJECT-TYPE
+    SYNTAX  PositiveInteger
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "A unique identifier for an alarm condition.  This
+            value must remain constant."
+    ::= { upsAlarmEntry  1 }
+
+upsAlarmDescr OBJECT-TYPE
+    SYNTAX  AutonomousType
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "A reference to an alarm description object.  The object
+            referenced should not be accessible, but rather be used
+            to provide a unique description of the alarm condition."
+    ::= { upsAlarmEntry 2 }
+
+upsAlarmTime OBJECT-TYPE
+    SYNTAX  TimeStamp
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The value of sysUpTime when the alarm condition was
+            detected.  If the alarm condition was detected at the
+            time of agent startup and presumably existed before
+            agent startup, the value of upsAlarmTime shall equal 0."
+    ::= { upsAlarmEntry 3 }
+
+  upsAlarmID OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+              "A unique identifier for an alarm condition.  This
+               value must remain constant."
+      ::= { upsAlarm 4 }
+
+  upsAlarmDESCR OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..63))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+              "A reference to an alarm description object.  The object
+               references should not be accessible, but rather be used
+               to provide a unique description of the alarm condition."
+      ::= { upsAlarm 5 }
+
+upsWellKnownAlarms OBJECT IDENTIFIER ::= { upsAlarm 3 }
+
+upsAlarmBatteryBad OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+              "One or more batteries have been determined to require
+               replacement."
+      ::= { upsWellKnownAlarms 1 }
+
+upsAlarmOnBattery OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+              "The UPS is drawing power from the batteries."
+      ::= { upsWellKnownAlarms 2 }
+
+  upsAlarmLowBattery OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+               "The remaining battery run-time is less than or equal
+                to upsConfigLowBattTime."
+      ::= { upsWellKnownAlarms 3 }
+
+  upsAlarmDepletedBattery OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+              "The UPS will be unable to sustain the present load
+               when and if the utility power is lost."
+      ::= { upsWellKnownAlarms 4 }
+
+  upsAlarmTempBad OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+              "A temperature is out of tolerance."
+      ::= { upsWellKnownAlarms 5 }
+
+   upsAlarmInputBad OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+       DESCRIPTION
+               "An input condition is out of tolerance."
+       ::= { upsWellKnownAlarms  6 }
+
+   upsAlarmOutputBad OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+       DESCRIPTION
+               "An output condition (other than OutputOverload) is
+               out of tolerance."
+       ::= { upsWellKnownAlarms  7 }
+
+  upsAlarmOutputOverload OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+              "The output load exceeds the UPS output capacity."
+      ::= { upsWellKnownAlarms 8 }
+
+    upsAlarmOnBypass OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+       DESCRIPTION
+               "The Bypass is presently engaged on the UPS."
+       ::= { upsWellKnownAlarms  9 }
+
+   upsAlarmBypassBad OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+       DESCRIPTION
+               "The Bypass is out of tolerance."
+       ::= { upsWellKnownAlarms 10 }
+
+ upsAlarmOutputOffAsRequested OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+               "The UPS has shut down as requested, i.e., the output
+                is off."
+      ::= { upsWellKnownAlarms 11 }
+
+upsAlarmUpsOffAsRequested OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+       DESCRIPTION
+               "The entire UPS has shutdown as commanded."
+       ::= { upsWellKnownAlarms 12 }
+
+upsAlarmChargerFailed OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+       DESCRIPTION
+               "An uncorrected problem has been detected within the
+                UPS charger subsystem."
+       ::= { upsWellKnownAlarms 13 }
+
+upsAlarmUpsOutputOff OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+               "The output of the UPS is in the off state."
+      ::= { upsWellKnownAlarms 14 }
+
+upsAlarmUpsSystemOff OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+       DESCRIPTION
+               "The UPS system is in the off state."
+       ::= { upsWellKnownAlarms 15 }
+
+upsAlarmFanFailure OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+               "The failure of one or more fans in the UPS has been
+               detected."
+       ::= { upsWellKnownAlarms 16 }
+
+upsAlarmFuseFailure OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+               "The failure of one or more fuses has been detected."
+      ::= { upsWellKnownAlarms 17 }
+
+upsAlarmGeneralFault OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+               "A general fault in the UPS has been detected."
+      ::= { upsWellKnownAlarms 18 }
+
+ upsAlarmDiagnosticTestFailed OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+              "The result of the last diagnostic test indicates a
+               failure."
+      ::= { upsWellKnownAlarms 19 }
+
+  upsAlarmCommunicationsLost OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+              "A problem has been encountered in the
+               communications between the agent and the UPS."
+      ::= { upsWellKnownAlarms 20 }
+
+upsAlarmAwaitingPower OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+               "The UPS output is off and the UPS is awaiting the
+                return of input power."
+      ::= { upsWellKnownAlarms 21 }
+
+ upsAlarmShutdownPending OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+              "A upsShutdownAfterDelay countdown is underway."
+      ::= { upsWellKnownAlarms 22 }
+
+  upsAlarmShutdownImminent OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+       DESCRIPTION
+               "The UPS will turn off power to the load in less than
+                5 seconds; this may be either a timed shutdown or a
+                low battery shutdown."
+      ::= { upsWellKnownAlarms 23 }
+
+  upsAlarmTestInProgress OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+       DESCRIPTION
+               "A test is in progress, as initiated and indicated by
+                the Test Group.  Tests initiated via other
+                implementation-specific mechanisms can indicate the
+                presence of the testing in the alarm table, if
+                desired, via a OBJECT-TYPE macro in the MIB
+                document specific to that implementation and are
+                outside the scope of this OBJECT-TYPE."
+       ::= { upsWellKnownAlarms 24 }
+
+upsTest OBJECT IDENTIFIER ::= { MitsubishiUPS 7 }
+
+  upsTestId OBJECT-TYPE
+      SYNTAX OBJECT IDENTIFIER 
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+              "The test named by an OBJECT IDENTIFIER which
+               allows a standard mechanism for the initiation of
+               a test, including the well known tests identified in
+               this document."
+      ::= { upsTest 1 }
+
+upsTestSpinLock OBJECT-TYPE
+    SYNTAX  TestAndIncr
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "A spin lock on the test subsystem."
+    ::= { upsTest 2 }
+
+upsTestResultsSummary OBJECT-TYPE
+    SYNTAX  INTEGER 
+    {
+        donePass(1),
+        doneWarning(2),
+        doneError(3),
+        aborted(4),
+        inProgress(5),
+        noTestsInitiated(6)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The results of the current or last UPS diagnostics
+            test performed.  The values for donePass(1),
+            doneWarning(2), and doneError(3) indicate that the
+            test completed either successfully, with a warning, or
+            with an error, respectively.  The value aborted(4) is
+            returned for tests which are aborted by setting the
+            value of upsTestId to upsTestAbortTestInProgress.
+            Tests which have not yet concluded are indicated by
+            inProgress(5).  The value noTestsInitiated(6)
+            indicates that no previous test results are available,
+            such as is the case when no tests have been run since
+            the last reinitialization of the network management
+            subsystem and the system has no provision for non-
+            volatile storage of test results."
+    ::= { upsTest 3 }
+
+upsTestResultsDetail OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "Additional information about upsTestResultsSummary.
+            If no additional information available, a zero length
+            string is returned."
+    ::= { upsTest 4 }
+
+upsTestStartTime OBJECT-TYPE
+    SYNTAX  TimeStamp
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The value of sysUpTime at the time the test in
+            progress was initiated, or, if no test is in progress,
+            the time the previous test was initiated.  If the
+            value of upsTestResultsSummary is noTestsInitiated(6),
+            upsTestStartTime has the value 0."
+    ::= { upsTest 5 }
+
+upsTestElapsedTime OBJECT-TYPE
+    SYNTAX  TimeInterval
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The amount of time, in TimeTicks, since the test in
+            progress was initiated, or, if no test is in progress,
+            the previous test took to complete.  If the value of
+            upsTestResultsSummary is noTestsInitiated(6),
+            upsTestElapsedTime has the value 0."
+    ::= { upsTest 6 }
+
+upsWellKnownTests OBJECT IDENTIFIER ::= { upsTest  7 }
+
+upsTestNoTestsInitiated OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+           "No tests have been initiated and no test is in progress."
+    ::= { upsWellKnownTests 1 }
+
+upsTestAbortTestInProgress OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+           "The test in progress is to be aborted / the test in
+            progress was aborted."
+    ::= { upsWellKnownTests 2 }
+
+upsTestGeneralSystemsTest OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+           "The manufacturer's standard test of UPS device systems."
+    ::= { upsWellKnownTests  3 }
+
+upsTestQuickBatteryTest OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+           "A test that is sufficient to determine if the battery
+            needs replacement."
+    ::= { upsWellKnownTests 4 }
+
+upsTestDeepBatteryCalibration OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+           "The system is placed on battery to a discharge level,
+            set by the manufacturer, sufficient to determine
+            battery replacement and battery run-time with a high
+            degree of confidence.  WARNING:  this test will leave
+            the battery in a low charge state and will require
+            time for recharging to a level sufficient to provide
+            normal battery duration for the protected load."
+    ::= { upsWellKnownTests 5 }
+
+upsControl OBJECT IDENTIFIER ::= { MitsubishiUPS 8 }
+
+upsShutdownType OBJECT-TYPE
+    SYNTAX  INTEGER 
+    {
+        output(1),
+        system(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "This object determines the nature of the action to be
+            taken at the time when the countdown of the
+            upsShutdownAfterDelay and upsRebootWithDuration
+            objects reaches zero.
+
+            Setting this object to output(1) indicates that
+            shutdown requests should cause only the output of the
+            UPS to turn off.  Setting this object to system(2)
+            indicates that shutdown requests will cause the entire
+            UPS system to turn off."
+    ::= { upsControl 1 }
+
+upsShutdownAfterDelay OBJECT-TYPE
+    SYNTAX  INTEGER     -- UNITS seconds
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "Setting this object will shutdown (i.e., turn off)
+            either the UPS output or the UPS system (as determined
+            by the value of upsShutdownType at the time of
+            shutdown) after the indicated number of seconds, or
+            less if the UPS batteries become depleted. Setting
+            this object to 0 will cause the shutdown to occur
+            immediately.  Setting this object to -1 will abort the
+            countdown.  If the system is already in the desired
+            state at the time the countdown reaches 0, then
+            nothing will happen.  That is, there is no additional
+            action at that time if upsShutdownType = system and
+            the system is already off.  Similarly, there is no
+            additional action at that time if upsShutdownType =
+            output and the output is already off.  When read,
+            upsShutdownAfterDelay will return the number of
+            seconds remaining until shutdown, or -1 if no shutdown
+            countdown is in effect.  On some systems, if the agent
+            is restarted while a shutdown countdown is in effect,
+            the countdown may be aborted.  Sets to this object
+            override any upsShutdownAfterDelay already in effect."
+    ::= { upsControl 2 }
+
+upsStartupAfterDelay OBJECT-TYPE
+    SYNTAX  INTEGER     -- UNITS seconds
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "Setting this object will start the output after the
+            indicated number of seconds, including starting the
+            UPS, if necessary.  Setting this object to 0 will
+            cause the startup to occur immediately.  Setting this
+            object to -1 will abort the countdown.  If the output
+            is already on at the time the countdown reaches 0,
+            then nothing will happen.  Sets to this object
+            override the effect of any upsStartupAfterDelay
+            countdown or upsRebootWithDuration countdown in
+            progress.  When read, upsStartupAfterDelay will return
+            the number of seconds until startup, or -1 if no
+            startup countdown is in effect.  If the countdown
+            expires during a utility failure, the startup shall
+            not occur until the utility power is restored.  On
+            some systems, if the agent is restarted while a
+            startup countdown is in effect, the countdown is
+            aborted."
+    ::= { upsControl 3 }
+
+upsRebootWithDuration OBJECT-TYPE
+    SYNTAX  INTEGER     -- UNITS seconds
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "Setting this object will immediately shutdown (i.e.,
+            turn off) either the UPS output or the UPS system (as
+            determined by the value of upsShutdownType at the time
+            of shutdown) for a period equal to the indicated
+            number of seconds, after which time the output will be
+            started, including starting the UPS, if necessary.  If
+            the number of seconds required to perform the request
+            is greater than the requested duration, then the
+            requested shutdown and startup cycle shall be
+            performed in the minimum time possible, but in no case
+            shall this require more than the requested duration
+            plus 60 seconds.  When read, upsRebootWithDuration
+            shall return the number of seconds remaining in the
+            countdown, or -1 if no countdown is in progress.  If
+            the startup should occur during a utility failure, the
+            startup shall not occur until the utility power is
+            restored."
+    ::= { upsControl 4 }
+
+upsAutoRestart OBJECT-TYPE
+    SYNTAX  INTEGER 
+    {
+        on(1),
+        off(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "Setting this object to 'on' will cause the UPS system
+            to restart after a shutdown if the shutdown occurred
+            during a power loss as a result of either a
+            upsShutdownAfterDelay or an internal battery depleted
+            condition.  Setting this object to 'off' will prevent
+            the UPS system from restarting after a shutdown until
+            an operator manually or remotely explicitly restarts
+            it.  If the UPS is in a startup or reboot countdown,
+            then the UPS will not restart until that delay has
+            been satisfied."
+    ::= { upsControl 5 }
+
+upsConfig OBJECT IDENTIFIER ::= { MitsubishiUPS 9 }
+
+upsConfigInputVoltage OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS RMS Volts
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "The magnitude of the nominal input voltage (RMS Volts).  
+            On those systems which support read-write access to this
+            object, if there is an attempt to set this variable to
+            a value that is not supported, the request must be
+            rejected and the agent shall respond with an
+            appropriate error message, i.e., badValue for SNMPv1,
+            or inconsistentValue for SNMPv2."
+    ::= { upsConfig 1 }
+
+upsConfigInputFreq OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS 0.1 Hertz
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "The nominal input frequency (0.1 Hertz).  On those systems
+            which support read-write access to this object, if there is
+            an attempt to set this variable to a value that is not
+            supported, the request must be rejected and the agent
+            shall respond with an appropriate error message, i.e.,
+            badValue for SNMPv1, or inconsistentValue for SNMPv2."
+    ::= { upsConfig 2 }
+
+upsConfigOutputVoltage OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS RMS Volts
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "The magnitude of the nominal output voltage (RMS Volts).  
+            On those systems which support read-write access to this
+            object, if there is an attempt to set this variable to
+            a value that is not supported, the request must be
+            rejected and the agent shall respond with an
+            appropriate error message, i.e., badValue for SNMPv1,
+            or inconsistentValue for SNMPv2."
+    ::= { upsConfig 3 }
+
+upsConfigOutputFreq OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS 0.1 Hertz
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "The nominal output frequency (0.1 Hertz).  On those systems 
+            which support read-write access to this object, if there is
+            an attempt to set this variable to a value that is not
+            supported, the request must be rejected and the agent
+            shall respond with an appropriate error message, i.e.,
+            badValue for SNMPv1, or inconsistentValue for SNMPv2."
+    ::= { upsConfig 4 }
+
+upsConfigOutputVA OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS Volt-Amps
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The magnitude of the nominal Volt-Amp rating (Volt-Amps)."
+    ::= { upsConfig 5 }
+
+upsConfigOutputPower OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS Watts
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The magnitude of the nominal true power rating (watts)."
+    ::= { upsConfig 6 }
+
+upsConfigLowBattTime OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS minutes
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "The value of upsEstimatedMinutesRemaining at which a
+            lowBattery condition is declared.  For agents which
+            support only discrete (discontinuous) values, then the
+            agent shall round up to the next supported value.  If
+            the requested value is larger than the largest
+            supported value, then the largest supported value
+            shall be selected."
+    ::= { upsConfig 7 }
+
+upsConfigAudibleStatus OBJECT-TYPE
+    SYNTAX  INTEGER 
+    {
+        disabled(1),
+        enabled(2),
+        muted(3)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "The requested state of the audible alarm.  When in
+            the disabled state, the audible alarm should never
+            sound.  The enabled state is self-describing.  Setting
+            this object to muted(3) when the audible alarm is
+            sounding shall temporarily silence the alarm.  It will
+            remain muted until it would normally stop sounding and
+            the value returned for read operations during this
+            period shall equal muted(3).  At the end of this
+            period, the value shall revert to enabled(2).  Writes
+            of the value muted(3) when the audible alarm is not
+            sounding shall be accepted but otherwise shall have no
+            effect."
+    ::= { upsConfig 8 }
+
+upsConfigLowVoltageTransferPoint OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS RMS Volts
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "The minimum input line voltage (RMS Volts) allowed before 
+            the UPS system transfers to battery backup."
+    ::= { upsConfig 9 }
+
+upsConfigHighVoltageTransferPoint OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS RMS Volts
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "The maximum line voltage (RMS Volts) allowed before the UPS
+            system transfers to battery backup."
+    ::= { upsConfig  10 }
+
+-- UPS trap information group
+upsTrapInfo OBJECT IDENTIFIER ::= { MitsubishiUPS 10 }
+
+trapCode OBJECT-TYPE
+	SYNTAX Unsigned32
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"A number identifying the event for that last trap that was sent."
+	::= { upsTrapInfo 1 }
+
+trapDescription OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..63))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"A string identifying the event for that last trap that was sent."
+	::= { upsTrapInfo 2 }
+
+-- UPS Traps
+-- upsTraps OBJECT IDENTIFIER ::= { Tag 101 }
+
+alarmCritical TRAP-TYPE
+	ENTERPRISE MitsubishiUPS 
+	VARIABLES  { trapCode, trapDescription }
+	DESCRIPTION
+		"Critical alarm."
+	::= 1
+
+alarmWarning TRAP-TYPE
+	ENTERPRISE MitsubishiUPS
+	VARIABLES  { trapCode, trapDescription }
+	DESCRIPTION
+		"Warning alarm."
+	::= 2
+
+alarmInformation TRAP-TYPE
+	ENTERPRISE MitsubishiUPS 
+	VARIABLES  { trapCode, trapDescription }
+	DESCRIPTION
+		"Information alarm."
+	::= 3
+
+upsAlarmCleared TRAP-TYPE
+	ENTERPRISE MitsubishiUPS
+	VARIABLES  { trapCode, trapDescription }
+	DESCRIPTION
+		"Alarm cleared."
+	::= 4
+
+upsTrapInitialization TRAP-TYPE
+	ENTERPRISE  MitsubishiUPS 
+	VARIABLES   { upsIdentName }
+	DESCRIPTION
+		"This trap is sent each time a NetCom device is initialized."
+	::= 5
+
+END

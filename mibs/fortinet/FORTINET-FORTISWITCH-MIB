@@ -1,0 +1,223 @@
+--
+-- MODULE-IDENTITY
+--  OrgName
+--     Fortinet Technologies, Inc.
+--  ContactInfo
+--     Technical Support
+--     e-mail: support@fortinet.com
+--     http://www.fortinet.com
+--
+
+FORTINET-FORTISWITCH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    fnSysSerial, fortinet
+        FROM FORTINET-CORE-MIB
+    sysName
+        FROM SNMPv2-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+        FROM SNMPv2-CONF 	
+    Gauge32, MODULE-IDENTITY, 
+    NOTIFICATION-TYPE, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC;
+
+fnFortiSwitchMib MODULE-IDENTITY
+    LAST-UPDATED "201109280000Z"
+    ORGANIZATION 
+        "Fortinet Technologies, Inc."
+    CONTACT-INFO 
+        "
+         Technical Support
+         email: support@fortinet.com
+         http://www.fortinet.com"
+    DESCRIPTION 
+        "MIB module for Fortinet FortiSwitch devices."
+    REVISION    "201109280000Z"
+    DESCRIPTION
+        "Initial version of FORTINET-FORTISWITCH-MIB."
+    ::= { fortinet 106 }
+    
+--
+-- fortinet.fnFortiSwitchMib.fsModel
+--
+
+fsModel OBJECT IDENTIFIER
+    ::= { fnFortiSwitchMib 1 }
+
+--
+-- fortinet.fnFortiSwitchMib.fsTraps
+--
+
+fsTraps OBJECT IDENTIFIER
+    ::= { fnFortiSwitchMib 2 }
+
+fsTrapPrefix OBJECT IDENTIFIER
+    ::= { fsTraps 0 }
+
+--
+-- fortinet.fnFortiSwitchMib.fsTrunkMemPrefix
+--
+
+fsTrunkMemPrefix OBJECT IDENTIFIER
+    ::= { fnFortiSwitchMib 3 }
+
+fsTrunkMember OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..82))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Trunk members of the device, including this trunk member's corresponding blade's serial number and its slot name"
+    ::= { fsTrunkMemPrefix 1 }
+
+fsTrapHBFail NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fsTrunkMember}
+    STATUS      current
+    DESCRIPTION 
+        "Indicates no heart beat packets received."
+    ::= { fsTrapPrefix 701 }
+
+fsTrapHBReceived NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial,sysName, fsTrunkMember}
+    STATUS      current
+    DESCRIPTION 
+        "Indicates heart beat pacekts have been received."
+    ::= { fsTrapPrefix 702 }
+
+fsTrapMemberDown NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial,sysName,fsTrunkMember }
+    STATUS      current
+    DESCRIPTION 
+        "A trunk member has left this trunk."
+    ::= { fsTrapPrefix 703 }
+
+fsTrapMemberUp NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial,sysName, fsTrunkMember}
+    STATUS      current
+    DESCRIPTION 
+        "A trunk member has joined this trunk"
+    ::= { fsTrapPrefix 704 }
+
+--
+-- fortinet.fnFortiSwitchMib.fsSystem
+--
+
+fsSystem OBJECT IDENTIFIER
+    ::= { fnFortiSwitchMib 4 }
+
+fsSystemInfo OBJECT IDENTIFIER
+    ::= { fsSystem 1 }
+
+fsSysVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Firmware version of the device"
+    ::= { fsSystemInfo 1 }
+
+fsSysCpuUsage OBJECT-TYPE
+    SYNTAX      Gauge32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current CPU usage (percentage)"
+    ::= { fsSystemInfo 2 }
+
+fsSysMemUsage OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current system memory usage (KB)"
+    ::= { fsSystemInfo 3 }
+
+fsSysMemCapacity OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total physical memory (RAM) installed (KB)"
+    ::= { fsSystemInfo 4 }
+
+fsSysDiskUsage OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current hard disk usage (KB), if disk is present"
+    ::= { fsSystemInfo 5 }
+
+fsSysDiskCapacity OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total hard disk capacity (KB), if disk is present"
+    ::= { fsSystemInfo 6 }
+
+fsSoftware OBJECT IDENTIFIER
+    ::= { fsSystem 2 }
+
+fsDirverVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current driver version of this device"
+    ::= { fsSoftware 1 }
+
+--
+-- fortinet.fnFortiSwitchMib.fsMibConformance
+--
+
+fsMibConformance OBJECT IDENTIFIER
+    ::= { fnFortiSwitchMib 100 }
+
+fsNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { fsTrapHBFail, fsTrapHBReceived, fsTrapMemberDown, fsTrapMemberUp }
+    STATUS      current
+    DESCRIPTION 
+        "Notifications that can be generated from a FortiSwitch device."
+    ::= { fsMibConformance 1 }
+
+fsSystemObjectGroup OBJECT-GROUP
+    OBJECTS     { fsSysVersion, fsSysCpuUsage,
+                  fsSysMemUsage, fsSysMemCapacity,
+                  fsSysDiskUsage, fsSysDiskCapacity,
+		  fsDirverVersion }
+    STATUS      current
+    DESCRIPTION
+        "Objects pertaining to the system status of the device."
+    ::= { fsMibConformance 2 }
+
+fsTrunkObjectGroup OBJECT-GROUP
+    OBJECTS     { fsTrunkMember }
+    STATUS      current
+    DESCRIPTION
+        "Objects pertaining to the information of the trunk."
+    ::= { fsMibConformance 3 }
+
+fsMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "The compliance statement for the application MIB."
+
+    MODULE      -- this module
+
+        GROUP   fsNotificationGroup
+        DESCRIPTION   
+              "Notifications are feature dependant. See manual for feature information."
+	
+	GROUP   fsSystemObjectGroup
+        DESCRIPTION
+              "Model and feature specific."
+
+	GROUP   fsTrunkObjectGroup
+        DESCRIPTION
+              "Model and feature specific."
+
+    ::= { fsMibConformance 100 }
+
+END -- end of module FORTINET-FORTISWITCH-MIB.

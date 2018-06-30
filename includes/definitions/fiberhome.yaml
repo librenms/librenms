@@ -1,0 +1,33 @@
+os: fiberhome
+text: Fiberhome
+type: network
+icon: fiberhome
+discovery:
+    - sysDescr_regex: '/^AN5516-0(1|6|4|4B)$/'
+discovery_modules:
+    arp-table: false
+    bgp-peers: false
+    cisco-vrf-lite: false
+    entity-physical: false
+    ports: false
+    ports-stack: false
+    wireless: false
+    discovery-protocols: false
+    storage: false
+    ucd-diskio: false
+poller_modules:
+    applications: false
+    bgp-peers: false
+    entity-physical: false
+    hr-mib: false
+    ipSystemStats: false
+    ipmi: false
+    ntp: false
+    ospf: false
+    ports: false
+    services: false
+    storage: false
+    stp: false
+    ucd-diskio: false
+    ucd-mib: false
+    wireless: false

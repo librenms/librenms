@@ -103,7 +103,7 @@
 
     var grid = $("#table").bootgrid({
         ajax: true,
-        rowCount: [50,100,250,-1],
+        rowCount: [50, 100, 250, -1],
         post: function ()
         {
             return {

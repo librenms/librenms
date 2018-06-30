@@ -1,0 +1,138 @@
+-- ============================================================================
+-- AT-ETH.MIB, Allied Telesis enterprise MIB: FIREWALL module
+--
+-- Extracted from ATROUTER.MIB of pre 2.9.1 release
+--
+-- June 2006, Stan Xiang
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-FIREWALL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    NOTIFICATION-TYPE
+    	FROM SNMPv2-SMI
+
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+
+	ifIndex
+		FROM IF-MIB
+
+	modules,
+	DisplayStringUnsized
+		FROM AT-SMI-MIB
+;
+                                 
+firewall	MODULE-IDENTITY
+	    LAST-UPDATED "200606281222Z"
+    	ORGANIZATION "Allied Telesis, Inc"
+		CONTACT-INFO
+		    "http://www.alliedtelesis.com"
+		DESCRIPTION
+		    "This MIB file contains definitions of managed objects for the
+	    	FIREWALL module. "
+
+	    REVISION "200606281222Z"
+		DESCRIPTION
+			"Initial Revision"
+
+::= { modules 77 }
+									  
+-- The firewall group. This consists of a single variable which is the last
+-- TRAP message sent.
+
+-- The last TRAP message sent from the firewall.
+firewallTrapMessage OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The last message sent in a firewall TRAP. This variable is really
+            just a placeholder for the object sent in the firewall TRAP, but can
+            be read independently if required. Note however that a new TRAP will
+            cause this variable to be overwritten."
+    ::= { firewall 1 }
+
+firewallTraps 		OBJECT IDENTIFIER ::= { firewall 0 }	
+firewallTrap		NOTIFICATION-TYPE
+    OBJECTS   	{ firewallTrapMessage }
+	STATUS		current
+    DESCRIPTION
+                "A firewall trap is generated when the firewall detects an intrusion or attack
+                and notifies the router manager. Firewall trap notifications are enabled with
+                the command ENABLE FIREWALL NOTIFY=SNMP."
+    ::= { firewallTraps 1 }
+
+firewallSessionsStatistics OBJECT IDENTIFIER ::= { firewall 2 }
+totalNumberOfSessions OBJECT-TYPE
+	SYNTAX 		Gauge32
+	MAX-ACCESS  read-only
+	STATUS  	mandatory
+	DESCRIPTION
+				"The total number of sessions going through the firewall. It will be the sum of the 
+				number of sessions on all individual nodes."
+	::= { firewallSessionsStatistics 1 }
+
+numberOfSessionsPerNodeCountingStatus OBJECT-TYPE
+	SYNTAX 		INTEGER {
+				enabled(1),  
+				disabled(2)
+				}
+	MAX-ACCESS 	read-write
+	STATUS 		mandatory
+	DESCRIPTION
+				"The status of counting the number of sessions per node, ie, when
+				this particular ferture is on, the status will be enabled, other
+				wise it will be disabled, which is the default status."
+	::= { firewallSessionsStatistics 2 }
+
+numberOfSessionsPerNodeTable OBJECT-TYPE
+	SYNTAX 		SEQUENCE OF NumberOfSessionsPerNodeEntry
+	MAX-ACCESS 	not-accessible
+	STATUS 		current
+	DESCRIPTION
+				"This is a table of nodes in the network with their corresponding
+				ip address and number of sessions"
+	::= { firewallSessionsStatistics 3 }
+
+numberOfSessionsPerNodeEntry OBJECT-TYPE
+	SYNTAX 		NumberOfSessionsPerNodeEntry
+	MAX-ACCESS	not-accessible
+	STATUS 		current
+	DESCRIPTION
+				"An entry includes the information about a node and numbers of 
+				sessions belongs to it."
+	INDEX { nodeIpAddress }
+	::= { numberOfSessionsPerNodeTable 1 }
+
+NumberOfSessionsPerNodeEntry ::=
+	SEQUENCE{
+		nodeIpAddress     			IpAddress,
+		numberOfSessionsPerNode   	Gauge32
+	}
+
+nodeIpAddress OBJECT-TYPE
+	SYNTAX 		IpAddress
+	MAX-ACCESS	read-only
+	STATUS 		current
+	DESCRIPTION
+				"The ip address of each node that has firewall limit rules 
+				attached and needs to be monitored"
+	::= { numberOfSessionsPerNodeEntry 1 }
+
+numberOfSessionsPerNode OBJECT-TYPE
+	SYNTAX 		Gauge32
+	MAX-ACCESS 	read-only
+	STATUS 		current
+	DESCRIPTION
+				"Number of active sessions created by the corresponding node"
+	::= { numberOfSessionsPerNodeEntry 2 }
+
+END

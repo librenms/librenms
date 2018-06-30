@@ -1,0 +1,19 @@
+os: extrahop
+type: network
+group: unix
+text: 'Extrahop Appliance'
+icon: extrahop
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+processor_stacked: true
+discovery:
+    -
+      sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+      snmpget:
+          oid: extrahopInfoVersionString
+          mib: EXTRAHOP-MIB
+          mib_dir: extrahop
+          op: '!='
+          value: false

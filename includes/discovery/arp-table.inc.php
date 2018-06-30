@@ -1,88 +1,133 @@
 <?php
+/**
+ * arp-table.php
+ *
+ * Collect arp table entries from devices and update the database
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ * @copyright  2016 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
+ */
 
-unset($mac_table);
+use LibreNMS\Config;
 
 if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=0)) {
     $vrfs_lite_cisco = $device['vrf_lite_cisco'];
 } else {
-    $vrfs_lite_cisco = array(array('context_name'=>null));
+    $vrfs_lite_cisco = array(array('context_name'=>''));
 }
 
 foreach ($vrfs_lite_cisco as $vrf) {
-    $device['context_name']=$vrf['context_name'];
+    $context = $vrf['context_name'];
+    $device['context_name']=$context;
 
-    $ipNetToPhysical_data = snmp_walk($device, 'ipNetToPhysicalPhysAddress', '-Oq', 'IP-MIB');
-    $ipNetToPhysical_data = str_replace('IP-MIB::ipNetToPhysicalPhysAddress.', '', trim($ipNetToPhysical_data));
-    $ipNetToPhysical_data = str_replace('"', '', trim($ipNetToPhysical_data));
-    foreach (explode("\n", $ipNetToPhysical_data) as $data) {
-        list($oid, $mac) = explode(' ', $data);
-        list($if, $ipv, $first, $second, $third, $fourth) = explode('.', $oid);
-        $ip = $first.'.'.$second.'.'.$third.'.'.$fourth;
-        if ($ip != '...' && $ipv === 'ipv4' && $mac != '0:0:0:0:0:0') {
-            $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', array($device['device_id'], $if));
+    if (file_exists(Config::get('install_dir') . "/includes/discovery/arp-table/{$device['os']}.inc.php")) {
+        include Config::get('install_dir') . "/includes/discovery/arp-table/{$device['os']}.inc.php";
+    } else {
+        $arp_data = snmpwalk_group($device, 'ipNetToPhysicalPhysAddress', 'IP-MIB');
+        $arp_data = snmpwalk_group($device, 'ipNetToMediaPhysAddress', 'IP-MIB', 1, $arp_data);
+    }
 
-            list($m_a, $m_b, $m_c, $m_d, $m_e, $m_f) = explode(':', $mac);
-            $m_a  = zeropad($m_a);
-            $m_b  = zeropad($m_b);
-            $m_c  = zeropad($m_c);
-            $m_d  = zeropad($m_d);
-            $m_e  = zeropad($m_e);
-            $m_f  = zeropad($m_f);
-            $md_a = hexdec($m_a);
-            $md_b = hexdec($m_b);
-            $md_c = hexdec($m_c);
-            $md_d = hexdec($m_d);
-            $md_e = hexdec($m_e);
-            $md_f = hexdec($m_f);
-            $mac  = "$m_a:$m_b:$m_c:$m_d:$m_e:$m_f";
+    $sql = "SELECT * from `ipv4_mac` WHERE `device_id`=? AND `context_name`=?";
+    $existing_data = dbFetchRows($sql, array($device['device_id'], $context));
 
-            $mac_table[$if][$mac]['ip']       = $ip;
-            $mac_table[$if][$mac]['ciscomac'] = "$m_a$m_b.$m_c$m_d.$m_e$m_f";
-            $clean_mac = $m_a.$m_b.$m_c.$m_d.$m_e.$m_f;
-            $mac_table[$if][$mac]['cleanmac'] = $clean_mac;
-            $port_id = $interface['port_id'];
-            $mac_table[$port_id][$clean_mac] = 1;
+    $ipv4_addresses = array_map(function ($data) {
+        return $data['ipv4_address'];
+    }, $existing_data);
 
-            if (dbFetchCell('SELECT COUNT(*) from ipv4_mac WHERE port_id = ? AND ipv4_address = ?', array($interface['port_id'], $ip))) {
-                // Commented below, no longer needed but leaving for reference.
-                // $sql = "UPDATE `ipv4_mac` SET `mac_address` = '$clean_mac' WHERE port_id = '".$interface['port_id']."' AND ipv4_address = '$ip'";
-                $old_mac = dbFetchCell('SELECT mac_address from ipv4_mac WHERE ipv4_address=? AND port_id=?', array($ip, $interface['port_id']));
+    $arp_table = array();
+    $insert_data = array();
+    foreach ($arp_data as $ifIndex => $data) {
+        $interface = get_port_by_index_cache($device['device_id'], $ifIndex);
+        $port_id = $interface['port_id'];
 
-                if ($clean_mac != $old_mac && $clean_mac != '' && $old_mac != '') {
-                    d_echo("Changed mac address for $ip from $old_mac to $clean_mac\n");
+        $port_arp = array_merge(
+            (array)$data['ipNetToMediaPhysAddress'],
+            (array)$data['ipNetToPhysicalPhysAddress']['ipv4']
+        );
 
-                    log_event("MAC change: $ip : ".mac_clean_to_readable($old_mac).' -> '.mac_clean_to_readable($clean_mac), $device, 'interface', $interface['port_id']);
+        echo "{$interface['ifName']}: \n";
+        foreach ($port_arp as $ip => $raw_mac) {
+            if (empty($ip) || empty($raw_mac) || $raw_mac == '0:0:0:0:0:0' || isset($arp_table[$port_id][$ip])) {
+                continue;
+            }
+
+            $mac = implode(array_map('zeropad', explode(':', $raw_mac)));
+            $arp_table[$port_id][$ip] = $mac;
+
+            $index = array_search($ip, $ipv4_addresses);
+            if ($index !== false) {
+                $old_mac = $existing_data[$index]['mac_address'];
+                if ($mac != $old_mac && $mac != '') {
+                    d_echo("Changed mac address for $ip from $old_mac to $mac\n");
+                    log_event("MAC change: $ip : " . mac_clean_to_readable($old_mac) . ' -> ' . mac_clean_to_readable($mac), $device, 'interface', 4, $port_id);
+                    dbUpdate(array('mac_address' => $mac), 'ipv4_mac', 'port_id=? AND ipv4_address=? AND context_name=?', array($port_id, $ip, $context));
                 }
-
-                dbUpdate(array('mac_address' => $clean_mac, 'context_name' => $device['context_name']), 'ipv4_mac', 'port_id=? AND ipv4_address=?', array($interface['port_id'], $ip));
-                echo '.';
+                d_echo("$raw_mac => $ip\n", '.');
             } elseif (isset($interface['port_id'])) {
-                echo '+';
-                // echo("Add MAC $mac\n");
-                $insert_data = array(
-                            'port_id'      => $interface['port_id'],
-                            'mac_address'  => $clean_mac,
-                            'ipv4_address' => $ip,
-                            'context_name' => $device['context_name'],
-                           );
-                dbInsert($insert_data, 'ipv4_mac');
-            }//end if
-        }//end if
-    }//end foreach
+                d_echo("$raw_mac => $ip\n", '+');
+                $insert_data[] = array(
+                    'port_id'      => $port_id,
+                    'device_id'    => $device['device_id'],
+                    'mac_address'  => $mac,
+                    'ipv4_address' => $ip,
+                    'context_name' => (string)$context,
+                );
+            }
+        }
+        echo PHP_EOL;
+    }
 
-    $sql = "SELECT * from ipv4_mac AS M, ports as I WHERE M.port_id = I.port_id and I.device_id = '".$device['device_id']."'";
-    foreach (dbFetchRows($sql) as $entry) {
+    unset(
+        $interface,
+        $arp_data,
+        $ipv4_addresses,
+        $data
+    );
+
+    // add new entries
+    if (!empty($insert_data)) {
+        dbBulkInsert($insert_data, 'ipv4_mac');
+    }
+
+    // remove stale entries
+    foreach ($existing_data as $entry) {
         $entry_mac = $entry['mac_address'];
         $entry_if  = $entry['port_id'];
-        if (!$mac_table[$entry_if][$entry_mac]) {
-            dbDelete('ipv4_mac', '`port_id` = ? AND `mac_address` = ?', array($entry_if, $entry_mac));
-            d_echo("Removing MAC $entry_mac from interface ".$interface['ifName']);
-
-            echo '-';
+        $entry_ip  = $entry['ipv4_address'];
+        if ($arp_table[$entry_if][$entry_ip] != $entry_mac) {
+            dbDelete('ipv4_mac', '`port_id` = ? AND `mac_address`=? AND `ipv4_address`=? AND `context_name`=?', array($entry_if, $entry_mac, $entry_ip, $context));
+            d_echo(null, '-');
         }
     }
-    echo "\n";
-    unset($mac);
-    unset($device['context_name']);
+
+    // remove entries that no longer have an owner
+    dbDeleteOrphans('ipv4_mac', array('ports.port_id', 'devices.device_id'));
+
+    echo PHP_EOL;
+    unset(
+        $existing_data,
+        $arp_table,
+        $insert_data,
+        $sql,
+        $params,
+        $context,
+        $entry,
+        $device['context_name']
+    );
 }
-unset($vrfs_c);
+unset($vrfs_lite_cisco);

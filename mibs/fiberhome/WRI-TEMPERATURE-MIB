@@ -1,0 +1,215 @@
+WRI-TEMPERATURE-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,enterprises,
+			NOTIFICATION-TYPE,Unsigned32                        
+							FROM SNMPv2-SMI       
+			TEXTUAL-CONVENTION
+							FROM SNMPv2-TC
+			wri,wriProducts			
+							FROM WRI-SMI;
+	
+
+
+	-- temperature monitor
+	msppTemperature			MODULE-IDENTITY
+        LAST-UPDATED    "201001110000Z"
+        ORGANIZATION    "Wuhan FiberHome Networks Co.,Ltd."
+        CONTACT-INFO
+                "  FHN Customer Service
+                   Tel: 027-87693784"
+        DESCRIPTION
+                "The MIB module to describe the monitor for temperature."
+        REVISION        "201001110000Z" 
+        DESCRIPTION
+                "Add description for oid."
+        REVISION        "200901110000Z" 
+        DESCRIPTION
+                "Init version for temperature monitor."
+        ::=   {msppChassis 6}
+
+	mspp         	OBJECT IDENTIFIER ::= { wriProducts 8012 }
+	msppChassis		OBJECT IDENTIFIER ::=   {mspp 1}
+
+	
+	DisplayString ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"8 bit octet."
+		SYNTAX OCTET STRING
+		
+	
+--	msppTemperature			OBJECT IDENTIFIER ::=   {msppChassis 6}
+	
+	temperatureGeneral			OBJECT IDENTIFIER ::=   {msppTemperature 1}
+					
+		temperatureTrapEnable OBJECT-TYPE
+				SYNTAX  INTEGER{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Enable temperature trap or not."
+				::= { temperatureGeneral 1 }
+				
+		temperatureMonitorEnable OBJECT-TYPE
+				SYNTAX  INTEGER{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Enable temperature monitor or not."
+				::= { temperatureGeneral 2 }
+				
+		temperatureNumber OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Temperature numbers"
+				::= { temperatureGeneral 3 }
+		
+		temperatureTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF TemperatureEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "Temperature information table."
+			::= { msppTemperature 2 }
+
+		temperatureEntry OBJECT-TYPE
+			SYNTAX TemperatureEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"An entry in the temperature table."
+			INDEX {temperatureIndex }
+			::= { temperatureTable 1 }
+		
+		TemperatureEntry ::=
+		    SEQUENCE {
+		    temperatureIndex          		Unsigned32,
+		    temperatureDescr          		DisplayString,
+		    temperatureLThreshold			INTEGER,
+		    temperatureHThreshold	       	INTEGER,
+		    temperatureValue        		INTEGER,
+		    temperatureState		       	INTEGER,
+			temperatureTrapEna		      	INTEGER,
+		    temperatureAllSetting			OCTET STRING,
+			--xf add 2014-7-2
+			temperatureIndexDescr			OCTET STRING,
+			temperatureRebootHThreshold	    INTEGER
+			}
+		-- The following section describes the components of the table.
+
+			temperatureIndex OBJECT-TYPE
+				SYNTAX  Unsigned32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Unique index for the temperature."
+				::= { temperatureEntry 1 }
+
+			temperatureDescr OBJECT-TYPE
+				SYNTAX  DisplayString (SIZE(0..64))
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"temperature description.slot-1-temp1,slot-1-tem2,eg."
+				::= { temperatureEntry 2 }
+				
+			temperatureLThreshold OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"temperature low threshold"
+				::= { temperatureEntry 3 }
+				
+			temperatureHThreshold OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"temperature high threshold"
+				::= { temperatureEntry 4 }
+				
+			temperatureValue OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"temperature value."
+				::= { temperatureEntry 5 }
+			
+			temperatureState OBJECT-TYPE
+				SYNTAX  INTEGER {
+				normal(0),
+		     	lowtrap(1),
+		    	hightrap(2)
+		    }
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"temperature state."
+				::= { temperatureEntry 6 }
+				
+			temperatureTrapEna OBJECT-TYPE
+				SYNTAX  INTEGER{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Enable temperature trap or not."
+				::= { temperatureEntry 7 }
+				
+			temperatureAllSetting OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"All oid operation of this table."
+				::= { temperatureEntry 8 }
+				
+			--xf add 2014-7-2
+			temperatureIndexDescr	OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Temperature index descrption."
+				::= { temperatureEntry 9 }
+			                                      
+			temperatureRebootHThreshold OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"temperature high threshold for reboot"
+				::= { temperatureEntry 10 }
+			                                      
+		temperatureTrap			OBJECT IDENTIFIER ::=   {msppTemperature 3}
+		
+		
+		temperatureOk NOTIFICATION-TYPE
+       		OBJECTS {temperatureDescr,temperatureValue}
+       		STATUS  current
+       		DESCRIPTION
+               	"mspp temperature ok trap."
+			::= { temperatureTrap 1}
+		
+		temperatureFault NOTIFICATION-TYPE
+	       	OBJECTS {temperatureDescr,temperatureValue,temperatureLThreshold,temperatureHThreshold}
+       		STATUS  current
+       		DESCRIPTION
+               	"mspp temperature fault trap."
+			::= { temperatureTrap 2}
+				
+END
+

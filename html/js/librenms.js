@@ -87,22 +87,24 @@ $(document).ready(function() {
         var $this = $(this);
         var config_id = $this.data("config_id");
         var config_value = $this.val();
-        $.ajax({
-            type: 'POST',
-            url: 'ajax_form.php',
-            data: {type: "update-config-item", config_id: config_id, config_value: config_value},
-            dataType: "json",
-            success: function (data) {
-                if (data.status == 'ok') {
-                    toastr.success('Config updated');
-                } else {
+        if ($this[0].checkValidity()) {
+            $.ajax({
+                type: 'POST',
+                url: 'ajax_form.php',
+                data: {type: "update-config-item", config_id: config_id, config_value: config_value},
+                dataType: "json",
+                success: function (data) {
+                    if (data.status == 'ok') {
+                        toastr.success('Config updated');
+                    } else {
+                        toastr.error(data.message);
+                    }
+                },
+                error: function () {
                     toastr.error(data.message);
                 }
-            },
-            error: function () {
-                toastr.error(data.message);
-            }
-        });
+            });
+        }
     });
 
     // Select config ajax calls
@@ -146,7 +148,7 @@ function submitCustomRange(frmdata) {
 
 function updateResolution(refresh)
 {
-    $.post('ajax_setresolution.php', 
+    $.post('ajax/set_resolution',
         {
             width: $(window).width(),
             height:$(window).height()
@@ -167,7 +169,7 @@ var newW;
 
 $(window).on('resize', function(){
     rtime = new Date();
-    if (timeout === false) {
+    if (timeout === false && !(typeof no_refresh === 'boolean' && no_refresh === true)) {
         timeout = true;
         setTimeout(resizeend, delta);
     }
@@ -176,7 +178,7 @@ $(window).on('resize', function(){
 function resizeend() {
     if (new Date() - rtime < delta) {
         setTimeout(resizeend, delta);
-    } 
+    }
     else {
         newH=$(window).height();
         newW=$(window).width();
@@ -190,7 +192,7 @@ function resizeend() {
             resizeGraphs();
         }
         updateResolution(refresh);
-    }  
+    }
 };
 
 function resizeGraphs() {
@@ -213,13 +215,13 @@ $(document).on("click", '.collapse-neighbors', function(event)
     var list = caller.find('.neighbors-interface-list');
     var continued = caller.find('.neighbors-list-continued');
 
-    if(button.hasClass("glyphicon-plus")) {
-        button.addClass('glyphicon-minus').removeClass('glyphicon-plus');
+    if(button.hasClass("fa-plus")) {
+        button.addClass('fa-minus').removeClass('fa-plus');
     }
     else {
-        button.addClass('glyphicon-plus').removeClass('glyphicon-minus');
+        button.addClass('fa-plus').removeClass('fa-minus');
     }
-   
+
     list.toggle();
     continued.toggle();
 });

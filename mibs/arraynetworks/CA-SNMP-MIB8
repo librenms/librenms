@@ -1,0 +1,3040 @@
+CA-SNMP-MIB8 DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY,
+    Integer32, Counter32, Gauge32, Counter64, Opaque, IpAddress, enterprises
+        FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION, DisplayString, TruthValue, TimeStamp
+	FROM SNMPv2-TC
+
+    MODULE-COMPLIANCE, OBJECT-GROUP
+	FROM SNMPv2-CONF
+
+    InetAddressType, InetAddress
+    FROM INET-ADDRESS-MIB;
+
+arrayNetworks MODULE-IDENTITY
+    LAST-UPDATED "201203090000Z"
+    ORGANIZATION "Array Networks, Inc."
+    CONTACT-INFO    
+	 "	    Array Networks
+		    Customer Service
+
+         postal:    1371 McCarthy Blvd Milpitas, CA 95035 USA
+
+         phone:     +1 877 992-7729
+
+         email:     support@arraynetworks.net"
+    DESCRIPTION
+	"This file defines the private CA SNMP MIB extensions."
+    REVISION	 "200509140000Z"
+    DESCRIPTION
+	"Added raw CPU and IO counters."
+    REVISION	 "9912090000Z"
+    DESCRIPTION
+	"SMIv2 version converted from older MIB definitions."
+    ::= { enterprises 7564 }
+
+
+
+-- IMPORTANT:
+-- Listed below are the arrayNetworks Indecies that are currently being used. 
+
+-- Current ArrayNetworks MIB Table Entries:
+--   processes        OBJECT IDENTIFIER ::= { arrayNetworks 1 }
+--                    NO LONGER SUPPORTED
+--
+--   prTable          OBJECT IDENTIFIER ::= { arrayNetworks 2 }
+--                    NO LONGER SUPPORTED
+--
+--   systemInfo           OBJECT IDENTIFIER ::= { arrayNetworks 3 }
+--                    SYSTEM INFO
+--
+--   memory           OBJECT IDENTIFIER ::= { arrayNetworks 4 }
+--                    MEMORY STATS 
+--
+--   xxxxxx           OBJECT IDENTIFIER ::= { arrayNetworks 5 }
+--                    REMOVED FROM MIB 
+--
+--   disk             OBJECT IDENTIFIER ::= { arrayNetworks 6 }
+--                    NO LONGER SUPPORTED
+--
+--   load             OBJECT IDENTIFIER ::= { arrayNetworks 7 }
+--                    NO LONGER SUPPORTED
+--
+--   extTable         OBJECT IDENTIFIER ::= { arrayNetworks 8 }
+--                    NO LONGER SUPPORTED
+--
+--   diskTable        OBJECT IDENTIFIER ::= { arrayNetworks 9 }
+--                    NO LONGER SUPPORTED
+--
+--   loadTable        OBJECT IDENTIFIER ::= { arrayNetworks 10 }
+--                    NO LONGER SUPPORTED
+--
+--   systemStats      OBJECT IDENTIFIER ::= { arrayNetworks 11 }
+--                    NO LONGER SUPPORTED
+--
+--   caInternal       OBJECT IDENTIFIER ::= { arrayNetworks 12 }
+--                    NO LONGER SUPPORTED
+--
+--   caExperimental   OBJECT IDENTIFIER ::= { arrayNetworks 13 }
+--                    NO LONGER SUPPORTED
+--
+--   caDemoMIB        OBJECT IDENTIFIER ::= { arrayNetworks 14 }
+--                    NO LONGER SUPPORTED
+--
+--   fileTable        OBJECT IDENTIFIER ::= { arrayNetworks 15 }
+--                    NO LONGER SUPPORTED
+--
+--   revProxyCache    OBJECT IDENTIFIER ::= { arrayNetworks 16 }
+--                    REVERSE PROXY STATS
+--
+--   xxxxxx           OBJECT IDENTIFIER ::= { arrayNetworks 17 }
+--                    CURRENTLY NOT USED
+--
+--   vrrp             OBJECT IDENTIFIER ::= { arrayNetworks 18 }
+--                    CLUSTER STATS
+--
+--   slbMIB           OBJECT IDENTIFIER ::= { arrayNetworks 19 }
+--                    SERVER LOAD BALANCING STATS
+--
+--   sslMIB           OBJECT IDENTIFIER ::= { arrayNetworks 20 }
+--                    SECURE SOCKET LAYER STATS
+--
+--   secProxyStats    OBJECT IDENTIFIER ::= { arrayNetworks 21 }
+--                    SECURITY PROXY STATS
+--
+--   vipStats         OBJECT IDENTIFIER ::= { arrayNetworks 22 }
+--                    VIP STATS
+--
+--   ifTraffic        OBJECT IDENTIFIER ::= { arrayNetworks 23 }
+--                    INTERFACE TRAFFIC STATS
+--
+--   caSyslog         OBJECT IDENTIFIER ::= { arrayNetworks 24 }
+--                    SYSLOG STATS & MESSAGES
+--
+--   clickTcp         OBJECT IDENTIFIER ::= { arrayNetworks 25 }
+--                    CLICKTCP STATS & CONNECTION TABLE
+--
+--   accesslog        OBJECT IDENTIFIER ::= { arrayNetworks 26 }
+--                    NO LONGER SUPPORTED
+--
+--   healthCheck      OBJECT IDENTIFIER ::= { arrayNetworks 27 }
+--                    HEALTH CHECK STATS
+--
+--   compression      OBJECT IDENTIFIER ::= { arrayNetworks 28 }
+--                    HTTP COMPRESSION STATS
+--
+--   clientApp        OBJECT IDENTIFIER ::= { arrayNetworks 29 }
+--                    SECURITY PROXY CLIENT APP STATS
+--
+--   performance      OBJECT IDENTIFIER ::= { arrayNetworks 30 }
+--                    SYSTEM PERFORMANCE STATS
+--
+--   sdns             OBJECT IDENTIFIER ::= { arrayNetworks 31 }
+--                    SMART DNS STATS
+--
+--   monitor          OBJECT IDENTIFIER ::= { arrayNetworks 32 }
+--                    MONITOR CPU TEMPRATURE AND FAN SPEED ,POWER STATE
+--
+--   version          OBJECT IDENTIFIER ::= { arrayNetworks 100 }
+--                    NO LONGER SUPPORTED
+--
+--   snmperrs         OBJECT IDENTIFIER ::= { arrayNetworks 101 }
+--                    NO LONGER SUPPORTED
+--
+--   mibRegistryTable OBJECT IDENTIFIER ::= { arrayNetworks 102 }
+--                    NO LONGER SUPPORTED
+--
+--   caSnmpAgent      OBJECT IDENTIFIER ::= { arrayNetworks 250 }
+--                    NO LONGER SUPPORTED
+--
+--   caTraps          OBJECT IDENTIFIER ::= { arrayNetworks 251 }
+--                    CUSTOM TRAPS
+
+-- End of arrayNetworks indices description --------------------------
+
+--
+-- Define the Float Textual Convention
+--   This definition was written by David Perkins.
+--
+
+Float ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A single precision floating-point number.  The semantics
+         and encoding are identical for type 'single' defined in
+         IEEE Standard for Binary Floating-Point,
+         ANSI/IEEE Std 754-1985.
+         The value is restricted to the BER serialization of
+         the following ASN.1 type:
+             FLOATTYPE ::= [120] IMPLICIT FloatType
+         (note: the value 120 is the sum of '30'h and '48'h)
+         The BER serialization of the length for values of
+         this type must use the definite length, short
+         encoding form.
+
+         For example, the BER serialization of value 123
+         of type FLOATTYPE is '9f780442f60000'h.  (The tag
+         is '9f78'h; the length is '04'h; and the value is
+         '42f60000'h.) The BER serialization of value
+         '9f780442f60000'h of data type Opaque is
+         '44079f780442f60000'h. (The tag is '44'h; the length
+         is '07'h; and the value is '9f780442f60000'h."
+    SYNTAX Opaque (SIZE (7))
+
+
+caTraps OBJECT IDENTIFIER ::= { arrayNetworks 251 }
+
+caStart NOTIFICATION-TYPE
+    STATUS	current
+    DESCRIPTION
+	"This trap is sent when the agent starts"
+    ::= { caTraps 1 }
+    
+caShutdown	NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+	"This trap is sent when the agent terminates"
+    ::= { caTraps 2 }
+
+licenseRemainingDays NOTIFICATION-TYPE 
+    STATUS current
+    DESCRIPTION
+    "license remaining days"
+    ::= { caTraps 3}
+ 
+---
+--- The statistics of arrayNetworks' Reverse Proxy Cache MIB
+revProxyCache        OBJECT IDENTIFIER ::= { arrayNetworks 16 }
+
+-- Requests with Get method in cache BasicStats
+cacheBasicStats	     OBJECT IDENTIFIER ::= { revProxyCache 1 }
+
+-- The advanced statistics are puly to allow developer to gauge the
+-- condition of the cache.  Please do not try to assume that certain 
+-- statistics should sum up to some other ones.
+
+
+cacheStatus             OBJECT-TYPE
+	    SYNTAX      INTEGER {
+	        on (1),
+		off (0)
+	 }
+            MAX-ACCESS	read-only
+            STATUS	current
+            DESCRIPTION  
+	        "Current status of the reverse proxy cache - on or off"
+            ::= { cacheBasicStats 1 }
+ 
+requestsReceived        OBJECT-TYPE
+        SYNTAX          Counter32 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "Total number of requests received by the reverse proxy cache."
+	::= {  cacheBasicStats 2 }
+
+getRequests             OBJECT-TYPE
+        SYNTAX          Counter32 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "Total GET requests received by the reverse proxy cache."
+	::= { cacheBasicStats 3 }
+
+headRequests             OBJECT-TYPE
+        SYNTAX          Counter32 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "Total HEAD requests received by the reverse proxy cache."
+	::= { cacheBasicStats 4 }
+
+purgeRequests             OBJECT-TYPE
+        SYNTAX          Counter32 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "Total PURGE requests received by the reverse proxy cache."
+	::= { cacheBasicStats 5 }
+
+postRequests            OBJECT-TYPE
+        SYNTAX          Counter32 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "Total POST requests received by the reverse proxy cache."
+	::= { cacheBasicStats 6 }
+
+clientEstabConn         OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of current client connections (e.g. from the browsers)."
+	::= { cacheBasicStats 7 }
+
+serverEstabConn         OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of current backend server connections."
+	::= { cacheBasicStats 8 }
+
+requestsToHttps         OBJECT-TYPE
+        SYNTAX          Counter32 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "Requests redirected to HTTPS."
+	::= { cacheBasicStats 9 }
+	
+requestsOnRegex         OBJECT-TYPE
+        SYNTAX          Counter32 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "Requests redirected based on regex match"
+	::= { cacheBasicStats 10 }	
+
+requestsToUrl           OBJECT-TYPE
+        SYNTAX          Counter32 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "Requests forwarded with rewritten url."
+	::= { cacheBasicStats 11 }	
+
+responsesToHttps        OBJECT-TYPE
+        SYNTAX          Counter32 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "Locations rewritten to HTTPS."
+	::= { cacheBasicStats 12 }
+
+responsesOnRegex        OBJECT-TYPE
+        SYNTAX          Counter32 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "Locations rewritten based on regex match."
+	::= { cacheBasicStats 13 }
+
+cacheSkip               OBJECT-TYPE
+        SYNTAX          Counter32 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "Cache skip, cache off."
+	::= { cacheBasicStats 14 }
+
+hitsReply          OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "We found the requested URL in the cache.  The object was fresh 
+	       and we did not have to revalidate.  The object was served from 
+	       our cache."
+	::= { cacheBasicStats 15 }
+
+hitsReplyWNotModified   OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "We got an IMS header in the request.  We validated the 
+	       timestamp and decided that the client's copy of this object is 
+	       fresh.  So we generated a 304 response and sent it out to the 
+	       client."
+	::= { cacheBasicStats 16 }
+
+hitsReplyWPreFailed     OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Cache hit, reply with Precondition Failed."
+	::= { cacheBasicStats 17 }
+
+hitRevalidate             OBJECT-TYPE
+        SYNTAX		  Counter32
+	MAX-ACCESS	  read-only
+	STATUS		  current
+	DESCRIPTION
+               "The requested object was found in the cache.  However, the 
+	       request required revalidation (due to client generated 
+	       revalidate, proxy generated revalidate or proxy generated forced 
+	       miss)."
+	::= { cacheBasicStats 18 }
+
+cacheMissWNoncacheReq   OBJECT-TYPE
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The request does not result in a cache table search. 
+	       Something in the request made us deem it non-cacheable (eg. 
+	       very long URL, a 'Cache-Control: no-store' header etc." 
+	::= { cacheBasicStats 19 }
+
+cacheMissWNewEntry      OBJECT-TYPE
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Count of times the cache table was searched, no matching entry 
+	       was found and a new entry was created.  However, note
+	       that sometimes, an entry is created temporarily (eg. for an IMS 
+	       request resulting in a 304) and is deleted after sending it 
+	       out to the client (delayed delete)."
+	::= { cacheBasicStats 20 }
+
+cacheMissWRespNo        OBJECT-TYPE
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Cache miss, create new entry, resp noncacheable."
+	::= { cacheBasicStats 21 }
+
+cacheHitRatio OBJECT-TYPE
+        SYNTAX		  Counter32
+	MAX-ACCESS	  read-only
+	STATUS		  current
+	DESCRIPTION
+               "Cache hit reply using cache + cache reply with 'not modified'."
+	::= { cacheBasicStats 22 }
+
+---
+--- The statistics of arrayNetworks' Server Load Balance MIB
+slbMIB          OBJECT IDENTIFIER ::= { arrayNetworks 19 }
+slbGeneral      OBJECT IDENTIFIER ::= { slbMIB 1 }
+slbStats        OBJECT IDENTIFIER ::= { slbMIB 2 }
+realServer      OBJECT IDENTIFIER ::= { slbGeneral 1 } 
+virtualServer   OBJECT IDENTIFIER ::= { slbGeneral 2 }
+groupCurCfg     OBJECT IDENTIFIER ::= { slbGeneral 3 }
+realStats       OBJECT IDENTIFIER ::= { slbStats 1 } 
+virtualStats    OBJECT IDENTIFIER ::= { slbStats 2 } 
+groupStats      OBJECT IDENTIFIER ::= { slbStats 3 } 
+
+rsCount     	        OBJECT-TYPE
+	SYNTAX		Integer32 	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of real services currently configured."
+	::= { realServer 1 }
+
+rsTable                 OBJECT-TYPE
+	SYNTAX		SEQUENCE OF RsEntry
+	MAX-ACCESS	not-accessible
+	STATUS          current
+	DESCRIPTION
+              "A table containing the configuration of real services."
+	      ::= { realServer 2 }
+
+rsEntry                 OBJECT-TYPE
+	SYNTAX		RsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+               "A rsTable entry containing the information of one real service."
+	INDEX  { rsIndex }       
+	::= { rsTable 1 }
+
+
+RsEntry       ::= SEQUENCE {
+	rsIndex            Integer32,     
+	rsID               DisplayString,
+	rsProtocol         INTEGER,
+	rsIpAddr           IpAddress,
+	rsPort             INTEGER,
+	rsMaxConn          Integer32,
+	rsStatus           INTEGER,
+	rsAvgRespTime      Integer32,
+	rsIpAddressType    InetAddressType,
+	rsIpAddress        InetAddress
+}                        
+        
+
+rsIndex                 OBJECT-TYPE
+        SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Reference index for each real service."       
+	::= { rsEntry 1 }
+
+rsID                    OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The name of the real service"
+	::= { rsEntry 2 }
+
+rsProtocol              OBJECT-TYPE
+	SYNTAX		INTEGER {
+		tcp	(0),
+		udp	(1),
+		ftp	(2),
+		ftps	(3),
+		http	(4),
+		https	(5),
+		tcps	(6),
+		dns	(7),
+		l2ip	(8),
+		l2mac	(9),
+		ip	(10),
+		siptcp	(11),
+		sipudp	(12),
+		radacct	(13),
+		radauth	(14),
+		rtsp	(15),
+		vlink	(16), 
+		rdp	(17)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The protocol of the real service."
+	::= { rsEntry 3 }
+
+rsIpAddr                OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The real service IP address."
+	::= { rsEntry 4 }
+
+rsPort                  OBJECT-TYPE
+	SYNTAX		INTEGER(0..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The port number of the real service."
+	DEFVAL  { 80 }       
+	::= { rsEntry 5 }
+
+rsMaxConn               OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Maximum number of connections per real service."
+	DEFVAL   { 1000 }       
+	::= { rsEntry 6 }
+
+rsStatus                OBJECT-TYPE
+	SYNTAX		INTEGER {
+	    up (1),
+	    down (0)
+	    }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The current status of real service - up or down."
+	::= { rsEntry 8 } 
+
+
+rsAvgRespTime                    OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Server Average Response Time (in microseconds)"
+	::= { rsEntry 9 }
+
+rsIpAddressType         OBJECT-TYPE
+	SYNTAX		InetAddressType
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The IP address type of rsIpAddress."
+	::= { rsEntry 10 }
+
+rsIpAddress             OBJECT-TYPE
+	SYNTAX		InetAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The real service IP address."
+	::= { rsEntry 11 }
+	
+vsCount     	        OBJECT-TYPE
+	SYNTAX		Integer32 	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of virtual services currently configured."
+	::= { virtualServer 1 }
+
+vsTable                 OBJECT-TYPE
+	SYNTAX		SEQUENCE OF VsEntry
+	MAX-ACCESS	not-accessible
+	STATUS          current
+	DESCRIPTION
+              "A table containing the configuration of virtual services."
+	      ::= { virtualServer 2 }
+
+vsEntry                 OBJECT-TYPE
+	SYNTAX		VsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+               "A vsTable entry containing the configuration of one virtual service."
+	INDEX  { vsIndex }       
+	::= { vsTable 1 }
+
+
+VsEntry       ::= SEQUENCE {
+	 vsIndex            Integer32,
+	 vsID               DisplayString,
+	 vsProtocol	    INTEGER,
+	 vsIpAddr           IpAddress,
+	 vsPort             INTEGER,
+	 vsMaxConn          Integer32,
+	 vsIpAddressType    InetAddressType,
+	 vsIpAddress        InetAddress
+	 }                        
+        
+
+vsIndex                 OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Reference index for each virtual service."
+	::= { vsEntry 1 } 
+
+vsID                    OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Name of the virtual service."
+	::= { vsEntry 2 }
+
+vsProtocol              OBJECT-TYPE
+	SYNTAX		INTEGER {
+		tcp	(0),
+		udp	(1),
+		ftp	(2),
+		ftps	(3),
+		http	(4),
+		https	(5),
+		tcps	(6),
+		dns	(7),
+		l2ip	(8),
+		l2mac	(9),
+		ip	(10),
+		siptcp	(11),
+		sipudp	(12),
+		radacct	(13),
+		radauth	(14),
+		rtsp	(15),
+		vlink	(16), 
+		rdp	(17)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The protocol of the virtual service."
+	::= { vsEntry 3 }
+
+
+vsIpAddr                OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The virtual service IP address."
+	::= { vsEntry 4 }
+
+vsPort                  OBJECT-TYPE
+	SYNTAX		INTEGER(0..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The port of the virtual service."
+	DEFVAL { 80 }
+	::= { vsEntry 5 }
+
+vsMaxConn               OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Maximum number of connections of the virtual service."
+	DEFVAL   { 0 }       
+	::= { vsEntry 6 }
+
+vsIpAddressType         OBJECT-TYPE
+	SYNTAX		InetAddressType
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The IP address type of vsIpAddress."
+	::= { vsEntry 7 }
+
+vsIpAddress             OBJECT-TYPE
+	SYNTAX		InetAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The virtual service IP address."
+	::= { vsEntry 8 }
+
+groupCount     	        OBJECT-TYPE
+	SYNTAX		Integer32 	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of groups currently configured."
+	::= { groupCurCfg 1 }
+
+gpTable                 OBJECT-TYPE
+	SYNTAX		SEQUENCE OF GpEntry
+	MAX-ACCESS	not-accessible
+	STATUS          current
+	DESCRIPTION
+              "A table containing group member configuration."
+	      ::= { groupCurCfg 2 }
+
+gpEntry                 OBJECT-TYPE
+	SYNTAX		GpEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+               "A gpTable entry containing one group member configuration."
+	INDEX  { gpIndex }       
+	::= { gpTable 1 }
+
+
+GpEntry       ::= SEQUENCE {
+	 gpIndex            Integer32,     
+	 gpID               DisplayString,
+	 realID             DisplayString,
+	 gpMetrics          INTEGER
+	 }                         
+
+gpIndex                 OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Reference index for each group member."
+	::= { gpEntry 1 }
+
+gpID                    OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Name of the group."
+	::= { gpEntry 2 }
+
+realID                  OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Name of the real service."
+	::= { gpEntry 3 }
+
+gpMetrics               OBJECT-TYPE
+	SYNTAX		INTEGER {
+	   invalid (0),
+	   rr (1),
+	   lc (2),
+	   sr (3),
+	   pu (4),
+	   ph (5),
+	   pi (6),
+	   pc (7),
+	   hc (8),
+	   hh (9),
+	   ic (10),
+	   rc (11),
+	   sslsid (12),
+	   hi (13),
+	   hip (14),
+	   chi (15),
+	   prox (16),
+	   snmp (17),
+	   sipcid (18),
+	   sipuid (19),
+	   ec (20),
+	   chh (21),
+	   radchu (22),
+	   radchs (23),
+	   hq (24),
+	   rdprt (25),
+	   persistence (26)
+	   }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Metric used to balance real services within the group."
+	::= { gpEntry 4 }
+
+
+rsStatsTable            OBJECT-TYPE
+	SYNTAX		SEQUENCE OF RsStatsEntry
+	MAX-ACCESS	not-accessible
+	STATUS          current
+	DESCRIPTION
+              "Real service statistics table."
+	      ::= { realStats 1 }
+
+rsStatsEntry            OBJECT-TYPE
+	SYNTAX		RsStatsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+               "A rsStatsTable entry containing the statistics of one real service."
+	INDEX  { realIndex }       
+	::= { rsStatsTable 1 }
+
+
+RsStatsEntry       ::= SEQUENCE {
+	 realIndex          Integer32,
+	 realServerID       DisplayString,
+	 realAddr           IpAddress,
+	 realPort           INTEGER,
+	 rsCntOfReq         Integer32,
+	 rsConnCnt	    Integer32,
+	 rsTotalHits        Integer32,
+	 realStatus         INTEGER,
+	 realAddressType    InetAddressType,
+	 realAddress        InetAddress
+	 }                        
+        
+
+realIndex	       OBJECT-TYPE
+	SYNTAX	       Integer32
+	MAX-ACCESS     read-only
+	STATUS	       current
+	DESCRIPTION
+               "Reference index for each real service."
+	::= { rsStatsEntry 1 } 	
+
+realServerID           OBJECT-TYPE
+	SYNTAX	       DisplayString
+	MAX-ACCESS     read-only
+	STATUS	       current
+	DESCRIPTION
+               "Name of the real service."
+	::= { rsStatsEntry 2 } 
+
+realAddr                OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Real service IP address."
+	::= { rsStatsEntry 3 } 
+
+realPort                OBJECT-TYPE
+	SYNTAX		INTEGER(0..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The port number of the real service."
+	::= { rsStatsEntry 4 } 
+
+rsCntOfReq            OBJECT-TYPE
+	SYNTAX	      Integer32
+	MAX-ACCESS    read-only
+	STATUS	      current
+	DESCRIPTION
+               "Number of outstanding requests to the real service."
+	::= { rsStatsEntry 5 }
+
+rsConnCnt             OBJECT-TYPE
+	SYNTAX	      Integer32
+	MAX-ACCESS    read-only
+	STATUS	      current
+	DESCRIPTION
+               "Number of open connections to the real service."
+	::= { rsStatsEntry 6 }
+
+rsTotalHits             OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The total number of requests sent to the real service."
+	::= { rsStatsEntry 7 } 
+
+realStatus                OBJECT-TYPE
+	SYNTAX		INTEGER {
+	    up (1),
+	    down (0)
+	    }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The health status (up or down) of the real service."
+	::= { rsStatsEntry 8 } 
+
+realAddressType         OBJECT-TYPE
+	SYNTAX		InetAddressType
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The IP address type of realAddress."
+	::= { rsStatsEntry 9 } 
+
+realAddress             OBJECT-TYPE
+	SYNTAX		InetAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Real service IP address."
+	::= { rsStatsEntry 10 } 
+
+vsStatsTable            OBJECT-TYPE
+	SYNTAX		SEQUENCE OF VsStatsEntry
+	MAX-ACCESS	not-accessible
+	STATUS          current
+	DESCRIPTION
+              "A statistics table for virtual service."
+	      ::= { virtualStats 1 }
+
+vsStatsEntry            OBJECT-TYPE
+	SYNTAX		VsStatsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+               "A vsStatsTable entry containing the statistics of one virtual service."
+	INDEX  { virtualIndex }       
+	::= { vsStatsTable 1 }
+
+
+VsStatsEntry       ::= SEQUENCE {
+         virtualIndex          Integer32,		   
+	 virtServerID          DisplayString,
+	 virtualAddr           IpAddress,
+	 virtualPort           INTEGER,
+	 vsURLHits             Integer32,
+	 vsHostnameHits        Integer32,
+	 vsPerstntCookieHits   Integer32,
+	 vsQosCookieHits       Integer32,
+	 vsDefaultHits         Integer32,
+	 vsPerstntURLHits      Integer32,
+	 vsStaticHits	       Integer32,
+	vsQosNetworkHits	   Integer32,
+	vsQosURLHits		   Integer32,
+	vsBackupHits		   Integer32,
+	vsCacheHits			   Integer32,
+	vsRegexHits			   Integer32,
+	vsRCookieHits		   Integer32,
+	vsICookieHits		   Integer32,
+	 vsConnCnt			   Integer32,
+	 virtualAddressType    InetAddressType,
+	 virtualAddress        InetAddress,
+     vsQosClientPortHits   Integer32,
+     vsQosBodyHits         Integer32,
+     vsHeaderHits          Integer32,
+     vsHashURLHits         Integer32,
+     vsRedirectHits        Integer32
+}                        
+        
+virtualIndex            OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Reference index for each virtual service."
+	::= { vsStatsEntry 1 }	
+   
+virtServerID            OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Name of the virtual service."
+	::= { vsStatsEntry 2 }
+
+virtualAddr             OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "IP address of the virtual service."
+	::= { vsStatsEntry 3 }
+
+virtualPort             OBJECT-TYPE
+	SYNTAX		INTEGER(0..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Port number of the virtual service."
+	::= { vsStatsEntry 4 }
+
+vsURLHits               OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of QoS URL policy hits for the virtual service."
+	::= { vsStatsEntry 5 }
+
+vsHostnameHits          OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of QoS Hostname policy hits for the virtual service."
+	::= { vsStatsEntry 6 }
+
+vsPerstntCookieHits     OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of Persistent Cookie policy hits for the virtual service."
+	::= { vsStatsEntry 7 }
+
+vsQosCookieHits         OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of QoS Cookie hits for the virtual service."
+	::= { vsStatsEntry 8 }
+
+vsDefaultHits           OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of Default policy hits for the virtual service."
+	::= { vsStatsEntry 9 }
+
+vsPerstntURLHits        OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of Persistent URL policy hits for the virtual service."
+	::= { vsStatsEntry 10 }    
+
+vsStaticHits            OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of Static policy hits for the virtual service."
+	::= { vsStatsEntry 11 }   
+
+vsQosNetworkHits            OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of QoS Network policy hits for the virtual service."
+	::= { vsStatsEntry 12 }   
+
+vsQosURLHits            OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of QoS URL policy hits for the virtual service."
+	::= { vsStatsEntry 13 }   
+
+vsBackupHits            OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of Backup policy hits for the virtual service."
+	::= { vsStatsEntry 14 }   
+
+vsCacheHits            OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of Cache hits for the virtual service."
+	::= { vsStatsEntry 15 }   
+
+vsRegexHits            OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of Regex policy hits for the virtual service."
+	::= { vsStatsEntry 16 }   
+
+vsRCookieHits            OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of Rewrite Cookie policy hits for the virtual service."
+	::= { vsStatsEntry 17 }   
+
+vsICookieHits            OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of Insert Cookie policy hits for the virtual service."
+	::= { vsStatsEntry 18 }   
+
+vsConnCnt             OBJECT-TYPE
+	SYNTAX	      Integer32
+	MAX-ACCESS    read-only
+	STATUS	      current
+	DESCRIPTION
+               "Number of open connections to the virtual service."
+	::= { vsStatsEntry 19 }
+
+virtualAddressType      OBJECT-TYPE
+	SYNTAX		InetAddressType
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The IP address type of virtualAddress."
+	::= { vsStatsEntry 20 }
+
+virtualAddress          OBJECT-TYPE
+	SYNTAX		InetAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "IP address of the virtual service."
+	::= { vsStatsEntry 21 }
+
+vsQosClientPortHits             OBJECT-TYPE
+	SYNTAX	      Integer32
+	MAX-ACCESS    read-only
+	STATUS	      current
+	DESCRIPTION
+               "Number of QoS Client Port policy hits for the virtual service."
+	::= { vsStatsEntry 22 }
+
+vsQosBodyHits             OBJECT-TYPE
+	SYNTAX	      Integer32
+	MAX-ACCESS    read-only
+	STATUS	      current
+	DESCRIPTION
+               "Number of QoS Body policy hits for the virtual service."
+	::= { vsStatsEntry 23 }
+
+vsHeaderHits             OBJECT-TYPE
+	SYNTAX	      Integer32
+	MAX-ACCESS    read-only
+	STATUS	      current
+	DESCRIPTION
+               "Number of Header policy hits for the virtual service."
+	::= { vsStatsEntry 24 }
+
+vsHashURLHits             OBJECT-TYPE
+	SYNTAX	      Integer32
+	MAX-ACCESS    read-only
+	STATUS	      current
+	DESCRIPTION
+               "Number of Hash URL policy hits for the virtual service."
+	::= { vsStatsEntry 25 }
+
+vsRedirectHits             OBJECT-TYPE
+	SYNTAX	      Integer32
+	MAX-ACCESS    read-only
+	STATUS	      current
+	DESCRIPTION
+               "Number of Redirect policy hits for the virtual service."
+	::= { vsStatsEntry 26 }
+
+gpStatsTable            OBJECT-TYPE
+	SYNTAX		SEQUENCE OF GpStatsEntry
+	MAX-ACCESS	not-accessible
+	STATUS          current
+	DESCRIPTION
+              "A statistics table of the group."
+	      ::= { groupStats 1 }
+
+gpStatsEntry            OBJECT-TYPE
+	SYNTAX		GpStatsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+               "A gpStatsTable entry containing the statistics of one group."
+	INDEX  { groupIndex }       
+	::= { gpStatsTable 1 }
+
+
+GpStatsEntry       ::= SEQUENCE {
+	 groupIndex         Integer32,
+	 groupID            DisplayString,
+	 gpTotalHits        Integer32
+	 }                        
+        
+groupIndex              OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Reference index for each group."
+	::= { gpStatsEntry 1 } 
+     
+groupID                 OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Name of the group."
+	::= { gpStatsEntry 2 } 
+
+gpTotalHits             OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Total hits for the group."
+	::= { gpStatsEntry 3 } 
+
+
+
+
+--- 
+--- The information of ArrayNetworks's Health Check MIB. 
+---
+healthCheck     OBJECT IDENTIFIER ::= { arrayNetworks 27 }
+hcStats         OBJECT IDENTIFIER ::= { healthCheck 1 }
+--hcGeneral       OBJECT IDENTIFIER ::= { healthCheck 2 }
+
+
+hcRSCount     	        OBJECT-TYPE
+	SYNTAX		Integer32 	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The number of real services being checked."
+	::= { hcStats 1 }
+
+hcStatsTable            OBJECT-TYPE
+	SYNTAX		SEQUENCE OF HcStatsEntry
+	MAX-ACCESS	not-accessible
+	STATUS          current
+	DESCRIPTION
+              "Health Check statistics table."
+	    ::= { hcStats 2 }
+
+hcStatsEntry            OBJECT-TYPE
+	SYNTAX		HcStatsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+               "A hcStatsTable entry containing health check statistics for one real service."
+	INDEX  { hcIndex }       
+	::= { hcStatsTable 1 }
+
+
+HcStatsEntry       ::= SEQUENCE {
+	hcIndex          Integer32,
+	hcName             DisplayString,
+	hcAddr             IpAddress,
+	hcPort             INTEGER,
+	hcStatus           INTEGER,
+	hcCause				 DisplayString,
+	hcNumDowns			 Integer32,
+	hcNumUps             Integer32,
+	hcConnAttempt	 	 Integer32,
+	hcConnSuccess		 Integer32,
+	hcConnFail			 Integer32,
+	hcAddressType      InetAddressType,
+	hcAddress          InetAddress
+}                        
+        
+
+hcIndex	       OBJECT-TYPE
+	SYNTAX	       Integer32
+	MAX-ACCESS     read-only
+	STATUS	       current
+	DESCRIPTION
+               "Reference index for each real service being checked."
+	::= { hcStatsEntry 1 } 	
+
+hcName           OBJECT-TYPE
+	SYNTAX	       DisplayString
+	MAX-ACCESS     read-only
+	STATUS	       current
+	DESCRIPTION
+               "Real service name."
+	::= { hcStatsEntry 2 } 
+
+hcAddr                OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Health Check IP address."
+	::= { hcStatsEntry 3 } 
+
+hcPort                OBJECT-TYPE
+	SYNTAX		INTEGER(0..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Health Check port."
+	::= { hcStatsEntry 4 } 
+
+hcStatus            OBJECT-TYPE
+	SYNTAX		INTEGER {
+	    up (1),
+	    down (0)
+	}
+	MAX-ACCESS    read-only
+	STATUS	      current
+	DESCRIPTION
+               "The status (UP/DOWN) of the health check."
+	::= { hcStatsEntry 5 }
+
+hcCause             OBJECT-TYPE
+	SYNTAX	      DisplayString
+	MAX-ACCESS    read-only
+	STATUS	      current
+	DESCRIPTION
+               "The reason why the health check is being marked UP/DOWN."
+	::= { hcStatsEntry 6 }
+
+hcNumDowns             OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The number of times the health check is down."
+	::= { hcStatsEntry 7 } 
+
+hcNumUps             OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The number of times the health check is up."
+	::= { hcStatsEntry 8 } 
+
+hcConnAttempt             OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The number of connections attempted."
+	::= { hcStatsEntry 9 } 
+
+hcConnSuccess             OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The number of successful connections."
+	::= { hcStatsEntry 10 } 
+
+hcConnFail             OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The number of connection failures."
+	::= { hcStatsEntry 11 } 
+
+hcAddressType         OBJECT-TYPE
+	SYNTAX		InetAddressType
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The IP address type of hcAddress."
+	::= { hcStatsEntry 12 } 
+
+hcAddress             OBJECT-TYPE
+	SYNTAX		InetAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Health Check IP address."
+	::= { hcStatsEntry 13 } 
+
+--- End of Health Check MIBS
+
+---
+--- ArrayNetworks Compression Statistics MIB
+---
+
+compression         OBJECT IDENTIFIER ::= { arrayNetworks 28 }
+
+totalBytesRcvd OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Total number of bytes received."
+    ::= { compression 1 }
+
+
+totalBytesSent    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total number of bytes sent."
+    ::= { compression 2 }
+
+rcvdBytesPerSec    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of bytes received per second."
+    ::= { compression 3 }
+
+sentBytesPerSec    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of bytes sent per second."
+    ::= { compression 4 }
+
+peakRcvdBytesPerSec    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Peak received bytes per second"
+    ::= { compression 5 }
+
+peakSentBytesPerSec    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Peak sent bytes per second"
+    ::= { compression 6 }
+
+activeTransac    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of currently active transactions"
+    ::= { compression 7 }
+
+
+--- End of ArrayNetworks Compression Statistics MIB 
+
+---
+--- ArrayNetworks performance Statistics MIB
+---
+
+memory		OBJECT IDENTIFIER ::= { arrayNetworks 4 }
+
+sysMemory OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Curren system total available memory"
+    ::= { memory 1 }
+
+sysMemoryUtilization OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Current percentage of Network memory utilization"
+    ::= { memory 2 }
+
+sysSwapUsed OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Currently used swap space in MB"
+    ::= { memory 3 }
+	
+sysSwapCapacity OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Current swap space usage"
+    ::= { memory 4 }
+
+
+--- End of ArrayNetworks System memory MIB
+
+---
+--- ArrayNetworks performance Statistics MIB
+---
+
+performance         OBJECT IDENTIFIER ::= { arrayNetworks 30 }
+
+cpuUtilization OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Current percentage of CPU utilization"
+    ::= { performance 1 }
+
+
+connectionsPerSec    OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of connections per second"
+    ::= { performance 2 }
+
+requestsPerSec    OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of requests per second"
+    ::= { performance 3 }
+
+--- End of ArrayNetworks performance Statistics MIB 
+
+---
+--- ArrayNetworks monitor Statistics MIB
+---
+monitor         OBJECT IDENTIFIER ::= { arrayNetworks 32 }
+
+cputemp            OBJECT-TYPE
+    SYNTAX      DisplayString  (SIZE (0..511))
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+            "current cpu temprature of cpu and sys"
+    ::= { monitor 1 }
+
+
+fanspeed           OBJECT-TYPE
+    SYNTAX       DisplayString  (SIZE (0..1023))  
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "current fan speed"
+    ::= { monitor 2 }
+
+powerstate         OBJECT-TYPE
+    SYNTAX       INTEGER {   
+                   ok (0), 
+                   one-of-the-power-supply-modules-has-failed(1) 
+                 }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "current dual power supply state (0 (ok),1(error))"
+    ::= { monitor 3 }
+
+--- End of ArrayNetworks monitor Statistics MIB
+
+--- ArrayNetworks Sdns Statistics MIB
+---
+
+sdns         OBJECT IDENTIFIER ::= { arrayNetworks 31 }
+
+totalReq OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Total DNS requests."
+    ::= { sdns 1 }
+
+
+totalSucc OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total successful DNS resolvings."
+    ::= { sdns 2 }
+
+totalFail OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total failed DNS resolvings."
+    ::= { sdns 3 }
+
+reqLastSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total DNS requests in the last second." 
+    ::= { sdns 4 }
+
+succLastSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total successful DNS resolvings in the last second." 
+    ::= { sdns 5 }
+
+failLastSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total failed DNS resolvings in the last second." 
+    ::= { sdns 6 }
+
+reqPeakSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Peak DNS requests in a second."
+    ::= { sdns 7 }
+
+succPeakSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Peak successful DNS resolvings in a second."
+    ::= { sdns 8 }
+
+reqLastMin OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total DNS requests in the last minute." 
+    ::= { sdns 9 }
+
+succLastMin OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total successful DNS resolvings in the last minute." 
+    ::= { sdns 10 }
+
+failLastMin OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total failed DNS resolvings in the last minute." 
+    ::= { sdns 11 }
+
+reqPeakMin OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Peak DNS requests in a minute."
+    ::= { sdns 12 }
+
+succPeakMin OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Peak successful DNS resolvings in a minute."
+    ::= { sdns 13 }
+
+reqLastHour OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total DNS requests in the last hour." 
+    ::= { sdns 14 }
+
+succLastHour OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total successful DNS resolvings in the last hour." 
+    ::= { sdns 15 }
+
+failLastHour OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total failed DNS resolvings in the last hour." 
+    ::= { sdns 16 }
+
+reqPeakHour OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Peak DNS requests in an hour."
+    ::= { sdns 17 }
+
+succPeakHour OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Peak successful DNS resolvings in an hour."
+    ::= { sdns 18 }
+
+reqLastDay OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total DNS requests in the last day." 
+    ::= { sdns 19 }
+
+succLastDay OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total successful DNS resolvings in the last day." 
+    ::= { sdns 20 }
+
+failLastDay OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total failed DNS resolvings in the last day." 
+    ::= { sdns 21 }
+
+reqPeakDay OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Peak DNS requests in a day."
+    ::= { sdns 22 }
+
+succPeakDay OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Peak successful DNS resolvings in a day."
+    ::= { sdns 23 }
+
+reqLastSec5 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total DNS requests in the last 5 seconds." 
+    ::= { sdns 24 }
+
+succLastSec5 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total successful DNS resolvings in the last 5 seconds." 
+    ::= { sdns 25 }
+
+failLastSec5 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total failed DNS resolvings in the last 5 seconds." 
+    ::= { sdns 26 }
+
+reqPeakSec5 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Peak DNS requests in 5 seconds."
+    ::= { sdns 27 }
+
+succPeakSec5 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Peak successful DNS resolvings in 5 seconds."
+    ::= { sdns 28 }
+
+--- End of ArrayNetworks Sdns Statistics MIB 
+
+---
+--- The information of arrayNetworks' Virtual Router Redundancy Protocol MIB
+
+vrrp                   OBJECT IDENTIFIER ::= { arrayNetworks 18 }
+clusterVrrp            OBJECT IDENTIFIER ::= { vrrp 1 }
+-- vrrpStatistics      OBJECT IDENTIFIER ::= { caVrrp 2 }
+
+maxCluster              OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "Current maximum possible number of entries in the vrrpTable,
+	       which is 255 * (number of interfaces for which a cluster is 
+	       defined). 255 is the max number of VIPs in a cluster."
+	::= { clusterVrrp  1 }
+
+clusterNum              OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "Current number of entries in the vrrpTable."
+	::= { clusterVrrp  2 }
+
+vrrpTable         OBJECT-TYPE
+        SYNTAX       SEQUENCE OF VrrpEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "A table containing clustering configuration"
+        ::= { clusterVrrp 3 }
+
+vrrpEntry         OBJECT-TYPE
+        SYNTAX       VrrpEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "An entry in the vrrpTable. Each entry represents a cluster VIP
+	    and not the cluster itself. If a cluster has n VIPs, then there
+	    will be n entries for the cluster in the vrrpTable (0 <= n <= 255).
+	    All the entries in the vrrpTable belonging to a single cluster
+	    will have the same values for all the fields except 
+	    clusterVirIndex and clusterVirAddr"
+	INDEX    { clusterVirIndex }
+        ::= { vrrpTable 1 }
+
+VrrpEntry ::= SEQUENCE {
+	     clusterVirIndex        Integer32,
+	     clusterId              Integer32,
+	     clusterVirState        INTEGER,
+	     clusterVirIfname       DisplayString,
+	     clusterVirAddr         IpAddress,
+	     clusterVirAuthType     INTEGER,
+	     clusterVirAuthPasswd   DisplayString,
+	     clusterVirPreempt	    INTEGER,
+	     clusterVirInterval     Integer32,
+	     clusterVirPriority     Integer32,
+	     clusterVirAddressType  InetAddressType,
+	     clusterVirAddress      InetAddress
+	     }	
+ 
+clusterVirIndex        OBJECT-TYPE
+         SYNTAX        Integer32
+         MAX-ACCESS    read-only
+         STATUS	       current
+         DESCRIPTION  
+	        "The cluster virtual table index"
+            ::= { vrrpEntry 1 }
+ 
+clusterId               OBJECT-TYPE
+	    SYNTAX      Integer32 (1..255) 
+            MAX-ACCESS	read-only
+            STATUS	current
+            DESCRIPTION  
+	        "Cluster identifier"
+            ::= { vrrpEntry 2 }
+
+clusterVirState         OBJECT-TYPE
+        SYNTAX          INTEGER {
+	           incomplete (0),
+		   reserverd  (1),
+	           init       (2),
+		   backup     (3),
+		   master     (4)
+	      }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "The current state of the cluster"       
+	::= { vrrpEntry  3 }
+
+ 
+clusterVirIfname        OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "The interface name on which the cluster is defined"
+	::= { vrrpEntry 4 }
+
+clusterVirAddr          OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "A virtual ip address (VIP) in the cluster"
+	::= { vrrpEntry 5 }
+
+clusterVirAuthType          OBJECT-TYPE
+	SYNTAX		INTEGER {
+            none(0),             
+            simple-text-password(1)    
+        }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Type of authentication being used.
+	        none(0) - no authentication
+		simple-text-password(1) - use password specified in cluster 
+		virtual for authentication."
+	DEFVAL       { none }
+	::= { vrrpEntry 6 }
+
+clusterVirAuthPasswd	OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The password for authentication."
+	::= { vrrpEntry 7 } 
+
+clusterVirPreempt	OBJECT-TYPE
+	SYNTAX		INTEGER {
+			false (0),
+			true  (1)
+			} 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "This is for controling whether a higher priority Backup
+	        VRRP virtual preempts a low priority Master."
+	       DEFVAL       { true }
+	::= { vrrpEntry 8 }
+
+clusterVirInterval      OBJECT-TYPE
+	SYNTAX		Integer32 (3..60)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "VRRP advertisement interval"
+	DEFVAL       { 5 }
+	::= { vrrpEntry 9 }
+
+clusterVirPriority      OBJECT-TYPE
+	SYNTAX		Integer32 (0..255)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Priority of the local node in the cluster"
+	DEFVAL       { 100 }       
+	::= { vrrpEntry 10 }
+ 
+clusterVirAddressType   OBJECT-TYPE
+	SYNTAX		InetAddressType
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The IP address type of clusterVirAddress."
+	::= { vrrpEntry 11 }
+
+clusterVirAddress       OBJECT-TYPE
+	SYNTAX		InetAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "A virtual ip address (VIP) in the cluster"
+	::= { vrrpEntry 12 }
+
+	
+---
+--- The information of arrayNetworks' Secure Sockets Layer MIB
+sslMIB                 OBJECT IDENTIFIER ::= { arrayNetworks 20 }
+sslGeneral	       OBJECT IDENTIFIER ::= { sslMIB 1 }
+sslStats               OBJECT IDENTIFIER ::= { sslMIB 2 }
+
+vhostNum                OBJECT-TYPE
+        SYNTAX          Integer32(1..128)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "Number of SSL hosts currently configured."      
+	::= { sslGeneral  2 }
+
+totalOpenSSLConns               OBJECT-TYPE
+	SYNTAX                  Integer32
+	MAX-ACCESS              read-only
+	STATUS	                current
+	DESCRIPTION
+                "Total number of open SSL connections (all SSL hosts)"
+	::= { sslStats 1 }
+
+totalAcceptedConns              OBJECT-TYPE
+	SYNTAX                  Integer32
+	MAX-ACCESS              read-only
+	STATUS	                current
+	DESCRIPTION
+                "Total number of accepted SSL connections (all SSL hosts)"
+	::= { sslStats 2 }
+
+totalRequestedConns             OBJECT-TYPE
+	SYNTAX                  Integer32
+	MAX-ACCESS              read-only
+	STATUS	                current
+	DESCRIPTION
+                "Total number of requested SSL connections (all SSL hosts)"
+	::= { sslStats 3 }
+
+sslTable             OBJECT-TYPE
+        SYNTAX       SEQUENCE OF SslEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "SSL host statistics table"
+        ::= { sslStats 4 }
+
+sslEntry             OBJECT-TYPE
+        SYNTAX       SslEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "sslTable entry for one SSL host"
+	INDEX    { sslIndex }
+        ::= { sslTable 1 }
+
+SslEntry ::= SEQUENCE {
+	     sslIndex               Integer32,
+	     vhostName              DisplayString,
+	     openSSLConns	    Integer32,
+	     acceptedConns          Integer32,
+	     requestedConns         Integer32,
+	     resumedSess            Integer32,
+	     resumableSess          Integer32,
+	     missSess	            Integer32,
+	     connsPerSec            Integer32
+	     }	
+ 
+sslIndex               OBJECT-TYPE
+         SYNTAX        Integer32
+         MAX-ACCESS    read-only
+         STATUS	       current
+         DESCRIPTION  
+	        "The SSL table index "
+            ::= { sslEntry 1 }
+ 
+vhostName               OBJECT-TYPE
+	    SYNTAX      DisplayString
+            MAX-ACCESS	read-only
+            STATUS	current
+            DESCRIPTION  
+	        "Name of the SSL host"
+            ::= { sslEntry 2 }
+
+openSSLConns            OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "Open SSL connections for SSL hostName"       
+	::= { sslEntry  3 }
+
+ 
+acceptedConns           OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "Number of accepted SSL connections for SSL hostName"       
+	::= { sslEntry  4 }
+
+ 
+requestedConns          OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "Number of requested SSL connections for SSL hostName"
+	::= { sslEntry 5 }
+
+resumedSess             OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of resumed SSL sessions for SSL hostName"
+	::= { sslEntry 6 }
+
+resumableSess           OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of resumable SSL sessions for SSL hostName"
+	::= { sslEntry 7 }
+
+missSess        	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of SSL session misses for SSL hostName"
+	::= { sslEntry 8 } 
+
+connsPerSec             OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Number of SSL connections established per second"
+	::= { sslEntry 9 } 
+
+---
+--- The information of arrayNetworks' Syslog Message MIB File
+caSyslog               OBJECT IDENTIFIER ::= { arrayNetworks 24 }
+logBasic	       OBJECT IDENTIFIER ::= { caSyslog 1 }
+logHistory             OBJECT IDENTIFIER ::= { caSyslog 2 }
+caSyslogTrap           OBJECT IDENTIFIER ::= { caSyslog 3 }
+-- Textual Conventions
+
+SyslogSeverity ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION
+	       "The severity of a syslog message.  The enumeration
+		values are equal to the values that syslog uses + 1.
+		For example, with syslog, emergency=0."
+	SYNTAX	INTEGER {
+			emergency(0),
+			alert(1),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6),
+			debug(7)
+		}
+
+
+-- Basic syslog objects
+
+logNotificationsSent OBJECT-TYPE
+        SYNTAX          Counter32
+	UNITS		"notifications"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "The number of syslog notifications that
+		have been sent. This number may include notifications 
+		that were prevented from being transmitted due to 
+		reasons such as resource limitations and/or 
+		non-connectivity.  If one is receiving notifications,
+		one can periodically poll this object to determine if
+		any notifications were missed.  If so, a poll of the
+		logHistoryTable might be appropriate."
+	::= { logBasic 1 }
+
+logNotificationsEnabled OBJECT-TYPE
+        SYNTAX          INTEGER
+			{
+			 enable (1),
+			 disable (0)
+			 }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "Indicates whether logMessageGenerated notifications
+		will or will not be sent when a syslog message is
+		generated by the device.  Disabling notifications
+		does not prevent syslog messages from being added
+		to the logHistoryTable."
+	DEFVAL { disable }
+	::= { logBasic 2 }
+
+logMaxSeverity OBJECT-TYPE
+        SYNTAX          SyslogSeverity
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "Indicates which syslog severity levels will be
+		processed.  Any syslog message with a severity value
+		greater	than this value will be ignored by the agent.
+		note: severity numeric values increase as their
+		severity decreases, e.g. error(3) is more severe than
+		debug(7)."
+	DEFVAL { warning }
+	::= { logBasic 3 }
+
+-- Syslog message history table
+
+logHistTableMaxLength OBJECT-TYPE
+        SYNTAX          Integer32 (0..500)
+	UNITS		"entries"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "The upper limit on the number of entries that the
+		logHistoryTable may contain.  A value of 0 will
+		prevent any history from being retained. When this
+		table is full, the oldest entry will be deleted and
+		a new one will be created."
+        DEFVAL  { 1 }
+	::= { logHistory 1 }
+
+logHistoryTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF LogHistoryEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+	       "A table of syslog messages generated by this device.
+		All 'interesting' syslog messages (i.e. severity <=
+		logMaxSeverity) are entered into this table."
+	::= { logHistory 2 }
+
+logHistoryEntry OBJECT-TYPE
+	SYNTAX     LogHistoryEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+	       "A syslog message that was previously generated by this
+		device.  Each entry is indexed by a message index."
+	INDEX	{ index }
+	::= { logHistoryTable 1 }
+
+LogHistoryEntry ::= SEQUENCE {
+	         index	Integer32,
+	         severity	SyslogSeverity,
+	         msgText	DisplayString
+		 }
+
+index                OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "A monotonically increasing integer for the sole
+		purpose of indexing messages.  When it reaches the
+		maximum value the agent flushes the table and wraps 
+		the value back to 1."
+	::= { logHistoryEntry 1 }
+
+severity             OBJECT-TYPE
+        SYNTAX          SyslogSeverity
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "The severity of the message."
+	::= { logHistoryEntry 2 }
+
+msgText              OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (1..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The text of the message.  If the text of the message
+		exceeds 255 bytes, the message will be truncated to
+		254 bytes and a '*' character will be appended,
+		indicating that the message has been truncated."
+	::= { logHistoryEntry 3 }
+
+-- notifications
+
+syslogTrap            NOTIFICATION-TYPE
+	OBJECTS	   {	severity,
+			msgText
+		   }
+	STATUS	   current
+	DESCRIPTION
+	       "When a syslogTrap message is generated by the device a
+		syslogTrap notification is sent.  The
+		sending of these notifications can be enabled/disabled
+		via the logNotificationsEnabled object."
+	::= { caSyslogTrap 1 }
+
+
+---
+--- The statistics of arrayNetworks' VIP Group MIB
+
+vipStats       OBJECT IDENTIFIER ::= { arrayNetworks 22 }
+
+vipStatus             OBJECT-TYPE
+	    SYNTAX      INTEGER {
+	        on (1),
+		off (0)
+	 }
+            MAX-ACCESS	read-only
+            STATUS	current
+            DESCRIPTION  
+	        "Status of VIP statistics gathering - on or off"
+            ::= { vipStats 1 }
+
+
+hostName                OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "The hostname that the VIP is representing (hostname of the appliance)"
+	::= { vipStats 2 }
+
+currentTime OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The current time in the format of MM/DD/YY HH:MM "
+    ::= { vipStats 3 }
+
+totalIPPktsIn                   OBJECT-TYPE
+	SYNTAX                  Counter64
+	MAX-ACCESS              read-only
+	STATUS	                current
+	DESCRIPTION
+                "Total number of ip packets received on all VIPs"
+	::= { vipStats 4 }
+
+totalIPPktsOut                  OBJECT-TYPE
+	SYNTAX                  Counter64
+	MAX-ACCESS              read-only
+	STATUS	                current
+	DESCRIPTION
+                "Total number of ip packets sent out on all VIPs"
+	::= { vipStats 5 }
+
+totalIPBytesIn                  OBJECT-TYPE
+	SYNTAX                  Counter64
+	MAX-ACCESS              read-only
+	STATUS	                current
+	DESCRIPTION
+                "Total number of IP bytes received on all VIPs"
+	::= { vipStats 6 }
+
+totalIPBytesOut                 OBJECT-TYPE
+	SYNTAX                  Counter64
+	MAX-ACCESS              read-only
+	STATUS	                current
+	DESCRIPTION
+                "Total number of IP bytes sent out on all VIPs"
+	::= { vipStats 7 }
+
+ipStatsTable    OBJECT-TYPE
+	SYNTAX  SEQUENCE OF IpStatsEntry
+	MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A table of VIP statistics."
+
+        ::= { vipStats 8 }
+
+ipStatsEntry   OBJECT-TYPE
+        SYNTAX IpStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+		"An entry in the ipStatsTable is created
+		for each VIP."
+ 
+        INDEX {
+		ipAddrType, ipAddr
+	}
+        ::= { ipStatsTable 1 }
+
+IpStatsEntry ::=
+	SEQUENCE {
+		ipIndex     Integer32,
+		ipAddress   IpAddress,
+		ipPktsIn    Counter64,
+		ipBytesIn   Counter64,
+		ipPktsOut   Counter64,
+		ipBytesOut  Counter64,
+		startTime   DisplayString,
+		ipAddrType  InetAddressType,
+		ipAddr      InetAddress		
+	}
+
+ipIndex                 OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	       "The VIP statistics table index"
+	::= { ipStatsEntry 1 }
+
+
+ipAddress               OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The VIP address"
+	::= { ipStatsEntry 2 }
+
+ipPktsIn                OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Total number of IP packets received on the VIP"
+	::= { ipStatsEntry 3 }
+
+
+ipBytesIn               OBJECT-TYPE
+	SYNTAX		Counter64 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Total number of bytes received on the VIP"
+	::= { ipStatsEntry 4 }
+
+ipPktsOut               OBJECT-TYPE
+	SYNTAX		Counter64 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Total number of packets sent out on the VIP"
+	::= { ipStatsEntry 5 }
+
+ipBytesOut              OBJECT-TYPE
+	SYNTAX		Counter64 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "Total number of bytes sent out on the VIP"
+	::= { ipStatsEntry 6 }
+
+startTime   OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The time statistics gathering was enabled for the VIP"
+    ::= { ipStatsEntry 7 }
+
+ipAddrType              OBJECT-TYPE
+	SYNTAX		InetAddressType
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The IP address type of ipAddress"
+	::= { ipStatsEntry 8 }
+
+ipAddr                  OBJECT-TYPE
+	SYNTAX		InetAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+               "The VIP address"
+	::= { ipStatsEntry 9 }
+
+
+-- Implementation of the Interfaces group is mandatory for
+-- all systems.
+
+
+ifTraffic         OBJECT IDENTIFIER ::= { arrayNetworks 23 }
+
+infNumber OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of network interfaces present on this system."
+    ::= { ifTraffic 1 }
+
+
+infTotalInOctets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total accumulated number of octets received on all the
+            active interfaces (loopback is not included)"
+    ::= { ifTraffic 2 }
+
+infTotalOutOctets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total accumulated number of octets transmitted out on
+            all the active interfaces (loopback is not included)"
+    ::= { ifTraffic 3 }
+
+infTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF InfEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A table of interface statistics.  The number of
+            entries is given by the value of infNumber."
+    ::= { ifTraffic 4 }
+
+infEntry OBJECT-TYPE
+    SYNTAX  InfEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "An infTable entry for one interface"
+    INDEX   { infIndex }
+    ::= { infTable 1 }
+
+InfEntry ::=
+    SEQUENCE {
+        infIndex
+            INTEGER,
+        infDescr
+            DisplayString,
+	infOperStatus
+            INTEGER,
+	infAddress           
+	    IpAddress,
+	infInOctets
+	    Counter64,
+	infInUcastPkts
+	    Counter64,
+	infInNUcastPkts
+	    Counter64,
+	infInDiscards
+	    Counter64,
+	infInErrors
+	    Counter64,
+	infInUnknownProtos
+	    Counter64,
+	infOutOctets
+	    Counter64,
+	infOutUcastPkts
+	    Counter64,
+	infOutNUcastPkts
+	    Counter64,
+	infOutErrors
+	    Counter64,
+	infIpv4AddressType
+	    InetAddressType,
+	infIpv4Address
+	    InetAddress,
+	infIpv6AddressType
+	    InetAddressType,
+	infIpv6Address
+	    InetAddress,
+	infInBandwidth
+	    Counter64,
+	infOutBandwidth
+	    Counter64,
+	infInMcastPkts
+	    Counter64,
+	infOutMcastPkts
+	    Counter64,
+	infInBcastPkts
+	    Counter64,
+	infOutBcastPkts
+	    Counter64
+       }	
+
+
+infIndex OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "A unique value for each interface.  Its value
+            ranges between 1 and the value of infNumber.  The
+            value for each interface must remain constant at
+            least from one re-initialization of the entity's
+            network management system to the next re-
+            initialization."
+    ::= { infEntry 1 }
+     
+infDescr OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Name of the interface"
+    ::= { infEntry 2 }
+
+infOperStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                up(1),       -- ready to pass packets
+                down(2)      -- plug off the cable and delete interface address
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The current operational state of the interface (up or down)."
+    ::= { infEntry 3 }
+
+infAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The interface's IP address"
+    ::= { infEntry 4 }
+
+infInOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of octets received on the interface,
+            including framing characters."
+    ::= { infEntry 5 }
+
+infInUcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of packets, delivered by this sub-layer to a
+            higher (sub-)layer, which were not addressed to a multicast
+            or broadcast address at this sub-layer."
+    ::= { infEntry 6 }
+
+infInNUcastPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The number of packets, delivered by this sub-layer to a
+            higher (sub-)layer, which were addressed to a multicast or
+            broadcast address at this sub-layer."
+    ::= { infEntry 7 }
+
+infInDiscards OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of inbound packets which were chosen to be
+            discarded even though no errors had been detected to prevent
+            their being deliverable to a higher-layer protocol.  One
+            possible reason for discarding such a packet could be to
+            free up buffer space."
+    ::= { infEntry 8 }
+
+infInErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "For packet-oriented interfaces, the number of inbound
+            packets that contained errors preventing them from being
+            deliverable to a higher-layer protocol.  For character-
+            oriented or fixed-length interfaces, the number of inbound
+            transmission units that contained errors preventing them
+            from being deliverable to a higher-layer protocol."
+    ::= { infEntry 9 }
+
+infInUnknownProtos OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "For packet-oriented interfaces, the number of packets
+            received via the interface which were discarded because of
+            an unknown or unsupported protocol.  For character-oriented
+            or fixed-length interfaces that support protocol
+            multiplexing the number of transmission units received via
+            the interface which were discarded because of an unknown or
+            unsupported protocol.  For any interface that does not
+            support protocol multiplexing, this counter will always be
+            0."
+    ::= { infEntry 10 }
+
+
+infOutOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of octets transmitted out of the
+            interface, including framing characters."
+    ::= { infEntry 11 }
+
+infOutUcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of packets that higher-level protocols
+            requested be transmitted, and which were not addressed to a
+            multicast or broadcast address at this sub-layer, including
+            those that were discarded or not sent."
+    ::= { infEntry 12 }
+
+infOutNUcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "The total number of packets that higher-level protocols
+            requested be transmitted, and which were addressed to a
+            multicast or broadcast address at this sub-layer, including
+            those that were discarded or not sent."
+    ::= { infEntry 13 }
+
+infOutErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "For packet-oriented interfaces, the number of outbound
+            packets that could not be transmitted because of errors.
+            For character-oriented or fixed-length interfaces, the
+            number of outbound transmission units that could not be
+            transmitted because of errors."
+    ::= { infEntry 14 }
+
+infIpv4AddressType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The IP address type of infIpv4Address(should always ipv4)."
+    ::= { infEntry 15 }
+
+infIpv4Address     OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The interface's IPv4 address"
+    ::= { infEntry 16 }
+
+infIpv6AddressType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The IP address type of infIpv6Address(should always ipv6)."
+    ::= { infEntry 17 }
+
+infIpv6Address     OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The interface's IPv6 address"
+    ::= { infEntry 18 }
+
+infInBandwidth OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "Inside throughput(bits/second) of the last 5 minutes for
+            the interfaces."
+    ::= { infEntry 19 }
+
+infOutBandwidth OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "Outside throughput(bits/second) of the last 5 minutes for
+            the interfaces."
+    ::= { infEntry 20 }
+
+infInMcastPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of packets, delivered by this sub-layer to a
+            higher (sub-)layer, which were addressed to a multicast 
+            address at this sub-layer."
+    ::= { infEntry 21 }
+		
+infOutMcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of packets that higher-level protocols
+            requested be transmitted, and which were addressed to a
+            multicast address at this sub-layer, including those that
+            were discarded or not sent."
+    ::= { infEntry 22 }
+	
+infInBcastPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of packets, delivered by this sub-layer to a
+            higher (sub-)layer, which were addressed to a broadcast 
+            address at this sub-layer."
+    ::= { infEntry 23 }
+		
+infOutBcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of packets that higher-level protocols
+            requested be transmitted, and which were addressed to a
+            broadcast address at this sub-layer, including those that
+            were discarded or not sent."
+    ::= { infEntry 24 }
+
+-- Implementation of the ClickTCP is mandatory for all systems.
+
+clickTcp         OBJECT IDENTIFIER ::= { arrayNetworks 25 }
+
+
+ctcpActiveOpens OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of times ClickTCP connections have made a direct
+            transition to the SYN-SENT state from the CLOSED state."
+    ::= { clickTcp 1 }
+
+ctcpPassiveOpens OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of times ClickTCP connections have made a direct
+            transition to the SYN-RCVD state from the LISTEN state."
+    ::= { clickTcp 2 }
+
+ctcpAttemptFails OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of times ClickTCP connections have made a direct
+            transition to the CLOSED state from either the SYN-SENT
+            state or the SYN-RCVD state, plus the number of times TCP
+            connections have made a direct transition to the LISTEN
+            state from the SYN-RCVD state."
+    ::= { clickTcp 3 }
+
+ctcpEstabResets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of times ClickTCP connections have made a direct
+            transition to the CLOSED state from either the ESTABLISHED
+            state or the CLOSE-WAIT state."
+    ::= { clickTcp 4 }
+
+ctcpCurrEstab OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of ClickTCP connections for which the current state
+            is either ESTABLISHED or CLOSE-WAIT."
+    ::= { clickTcp 5 }
+
+ctcpInSegs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of ClickTCP segments received, including those
+            received in error.  This count includes segments received on
+            currently established connections."
+    ::= { clickTcp 6 }
+
+ctcpOutSegs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of ClickTCP segments sent, including those on
+            current connections but excluding those containing only
+            retransmitted octets."
+    ::= { clickTcp 7 }
+
+ctcpRetransSegs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of segments retransmitted - that is, the
+            number of ClickTCP segments transmitted containing one or more
+            previously transmitted octets."
+    ::= { clickTcp 8 }
+
+ctcpInErrs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of segments received in error (e.g., bad
+            ClickTCP checksums)."
+    ::= { clickTcp 9 }
+
+ctcpOutRsts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of ClickTCP segments sent containing the RST flag."
+    ::= { clickTcp 10 }
+
+
+-- the ClickTCP Connection table
+
+-- The ClickTCP connection table contains information about this
+-- entity's existing ClickTCP connections.
+
+ctcpConnTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CtcpConnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table containing ClickTCP connection-specific information."
+    ::= { clickTcp 11 }
+
+ctcpConnEntry OBJECT-TYPE
+    SYNTAX      CtcpConnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row of the ctcpConnTable containing information
+            about a particular current TCP connection.  Each row of this
+            table is transient, in that it ceases to exist when (or soon
+            after) the connection makes the transition to the CLOSED
+            state."
+    INDEX   { 
+             ctcpIndex
+	     }
+    ::= { ctcpConnTable 1 }
+
+CtcpConnEntry ::= SEQUENCE {
+        ctcpIndex	       INTEGER,
+        ctcpConnState          INTEGER,
+        ctcpConnLocalAddress   IpAddress,
+        ctcpConnLocalPort      INTEGER,
+        ctcpConnRemAddress     IpAddress,
+        ctcpConnRemPort        INTEGER,
+        ctcpConnLocalAddrType  InetAddressType,
+        ctcpConnLocalAddr      InetAddress,
+        ctcpConnRemAddrType    InetAddressType,
+        ctcpConnRemAddr        InetAddress
+    }
+
+ctcpIndex OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "A unique value for each clicktcp connection. "
+    ::= { ctcpConnEntry 1 }
+     
+
+ctcpConnState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    closed(1),
+                    listen(2),
+                    synSent(3),
+                    synReceived(4),
+                    established(5),
+                    finWait1(6),
+                    finWait2(7),
+                    closeWait(8),
+                    lastAck(9),
+                    closing(10),
+                    timeWait(11),
+		    deleteTCB(12)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The state of this TCP connection."
+    ::= { ctcpConnEntry 2 }
+
+ctcpConnLocalAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The local IP address for this TCP connection.  In the case
+            of a connection in the listen state which is willing to
+            accept connections for any IP interface associated with the
+            node, the value 0.0.0.0 is used."
+    ::= { ctcpConnEntry 3 }
+
+ctcpConnLocalPort OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The local port number for this TCP connection."
+    ::= { ctcpConnEntry 4 }
+
+ctcpConnRemAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The remote IP address for this TCP connection."
+    ::= { ctcpConnEntry 5 }
+
+ctcpConnRemPort OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The remote port number for this TCP connection."
+    ::= { ctcpConnEntry 6 }
+
+ctcpConnLocalAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The IP address type of ctcpConnLocalAddress."
+    ::= { ctcpConnEntry 7 }
+
+ctcpConnLocalAddr        OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The local IP address for this TCP connection.  In the case
+            of a connection in the listen state which is willing to
+            accept connections for any IP interface associated with the
+            node, the value 0.0.0.0/:: is used."
+    ::= { ctcpConnEntry 8 }
+
+ctcpConnRemAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The IP address type of ctcpConnRemAddress."
+    ::= { ctcpConnEntry 9 }
+
+ctcpConnRemAddr        OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The remote IP address for this TCP connection."
+    ::= { ctcpConnEntry 10 }
+	
+-- ArrayNetworks system information MIB 
+systemInfo         OBJECT IDENTIFIER ::= { arrayNetworks 3 }
+
+serialNumber OBJECT-TYPE 
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION 
+	    "Serial Number of the equipment" 
+    ::= { systemInfo 1 }
+
+-- End of ArrayNetworks system information MIB
+
+END

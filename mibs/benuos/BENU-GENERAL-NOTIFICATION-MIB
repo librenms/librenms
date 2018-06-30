@@ -1,0 +1,51 @@
+BENU-GENERAL-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, mib-2, NOTIFICATION-TYPE,
+    IpAddress, Integer32
+    FROM SNMPv2-SMI
+     DisplayString
+    FROM SNMPv2-TC
+     benuPlatform
+    FROM BENU-PLATFORM-MIB;
+
+
+benuGeneralNotif MODULE-IDENTITY
+    LAST-UPDATED "201412150000Z" -- December 15, 2014
+    ORGANIZATION "Benu Networks"
+    CONTACT-INFO "Benu Networks Inc,
+      300 Concord Road,
+      Billerca MA 01821
+      Email: support@benunets.com"
+    DESCRIPTION
+       "Initial creation
+        MIB module containing general trap definition.
+        Copyright (C) 2001, 2008 by Benu Networks, Inc.
+        All rights reserved."
+
+    REVISION "201412150000Z" -- December 15, 2014
+    DESCRIPTION "Changed bGeneralNotifyMIBTraps from index 2 to 0"
+
+    ::= { benuPlatform 4 }
+
+-- MIB OBJECTS
+bGeneralNotifyMIBObjects    OBJECT IDENTIFIER ::= { benuGeneralNotif 1 }
+
+--TRAP Definitions
+bGeneralNotifyMIBTraps      OBJECT IDENTIFIER ::= { benuGeneralNotif 0 }
+
+bNotifyAgentShutDown NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+       "An indication that the agent is in the process of being shut down."
+    ::= { bGeneralNotifyMIBTraps 1 }
+
+bNotifyAgentRestart NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+        "An indication that the agent has been restarted.
+         This does not imply anything about whether the configuration has
+         changed or not (unlike the standard coldStart or warmStart traps)"
+    ::= { bGeneralNotifyMIBTraps 2 }
+
+END

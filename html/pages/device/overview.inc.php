@@ -11,14 +11,14 @@ $services = get_service_status($device['device_id']);
 $services['total'] = array_sum($services);
 
 if ($services[2]) {
-    $services_colour = $warn_colour_a;
+    $services_colour = $config['warn_colour'];
 } else {
-    $services_colour = $list_colour_a;
+    $services_colour = $config['list_colour']['even'];
 }
 if ($ports['down']) {
-    $ports_colour = $warn_colour_a;
+    $ports_colour = $config['warn_colour'];
 } else {
-    $ports_colour = $list_colour_a;
+    $ports_colour = $config['list_colour']['even'];
 }
 
 echo('
@@ -36,6 +36,11 @@ require 'includes/dev-overview-data.inc.php';
 LibreNMS\Plugins::call('device_overview_container', array($device));
 
 require 'overview/ports.inc.php';
+
+if ($device['os'] == 'cimc') {
+    require 'overview/cimc.inc.php';
+}
+
 echo('
     </div>
     <div class="col-md-6">
@@ -51,17 +56,28 @@ if (is_array($entity_state['group']['c6kxbar'])) {
 
 require 'overview/toner.inc.php';
 require 'overview/sensors/charge.inc.php';
-require 'overview/sensors/temperatures.inc.php';
+require 'overview/sensors/temperature.inc.php';
 require 'overview/sensors/humidity.inc.php';
-require 'overview/sensors/fanspeeds.inc.php';
+require 'overview/sensors/fanspeed.inc.php';
 require 'overview/sensors/dbm.inc.php';
-require 'overview/sensors/voltages.inc.php';
+require 'overview/sensors/voltage.inc.php';
 require 'overview/sensors/current.inc.php';
+require 'overview/sensors/runtime.inc.php';
 require 'overview/sensors/power.inc.php';
-require 'overview/sensors/frequencies.inc.php';
+require 'overview/sensors/frequency.inc.php';
 require 'overview/sensors/load.inc.php';
 require 'overview/sensors/state.inc.php';
 require 'overview/sensors/signal.inc.php';
+require 'overview/sensors/airflow.inc.php';
+require 'overview/sensors/snr.inc.php';
+require 'overview/sensors/pressure.inc.php';
+require 'overview/sensors/cooling.inc.php';
+require 'overview/sensors/delay.inc.php';
+require 'overview/sensors/quality_factor.inc.php';
+require 'overview/sensors/chromatic_dispersion.inc.php';
+require 'overview/sensors/ber.inc.php';
+require 'overview/sensors/eer.inc.php';
+require 'overview/sensors/waterflow.inc.php';
 require 'overview/eventlog.inc.php';
 require 'overview/services.inc.php';
 require 'overview/syslog.inc.php';

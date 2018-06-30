@@ -1,57 +1,59 @@
 <?php
+/*
+ * LibreNMS
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2017 LibreNMS
+ * @author     LibreNMS Contributors
+*/
 
-$graph_type = 'toner_usage';
+$pagetitle[] = "Health :: Toner";
+?>
+<div class="panel panel-default panel-condensed">
+    <div class="panel-heading">
+        <div class="row" style="padding:0px 10px 0px 10px;">
+            <div class="pull-left">
+                <?php echo $navbar; ?>
+            </div>
 
-echo "<div style='padding: 5px;'>
-        <table width=100% cellspacing=0 cellpadding=6 class='sortable'>";
-
-echo '<tr class=tablehead>
-        <th width=280>Device</th>
-        <th>Toner</th>
-        <th width=100></th>
-        <th width=280>Usage</th>
-        <th width=50>Used</th>
-      </tr>';
-
-foreach (dbFetchRows('SELECT * FROM `toner` AS S, `devices` AS D WHERE S.device_id = D.device_id ORDER BY D.hostname, S.toner_descr') as $toner) {
-    if (device_permitted($toner['device_id'])) {
-        $total = $toner['toner_capacity'];
-        $perc  = $toner['toner_current'];
-
-        $graph_array['type']        = $graph_type;
-        $graph_array['id']          = $toner['toner_id'];
-        $graph_array['from']        = $config['time']['day'];
-        $graph_array['to']          = $config['time']['now'];
-        $graph_array['height']      = '20';
-        $graph_array['width']       = '80';
-        $graph_array_zoom           = $graph_array;
-        $graph_array_zoom['height'] = '150';
-        $graph_array_zoom['width']  = '400';
-        $link       = 'graphs/id='.$graph_array['id'].'/type='.$graph_array['type'].'/from='.$graph_array['from'].'/to='.$graph_array['to'].'/';
-        $mini_graph = overlib_link($link, generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), null);
-
-        $background = get_percentage_colours(100 - $perc);
-
-        echo "<tr class='health'><td>".generate_device_link($toner).'</td><td class=tablehead>'.$toner['toner_descr']."</td>
-         <td>$mini_graph</td>
-         <td>
-          <a href='#' $store_popup>".print_percentage_bar(400, 20, $perc, "$perc%", 'ffffff', $background['left'], $free, 'ffffff', $background['right'])."</a>
-          </td><td>$perc".'%</td></tr>';
-
-        if ($vars['view'] == 'graphs') {
-            echo "<tr></tr><tr class='health'><td colspan=5>";
-
-            $graph_array['height'] = '100';
-            $graph_array['width']  = '216';
-            $graph_array['to']     = $config['time']['now'];
-            $graph_array['id']     = $toner['toner_id'];
-            $graph_array['type']   = $graph_type;
-
-            include 'includes/print-graphrow.inc.php';
-
-            echo '</td></tr>';
-        }
-    }
-}
-
-echo '</table></div>';
+            <div class="pull-right">
+                <?php echo $displayoptions; ?>
+            </div>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table id="mempool" class="table table-hover table-condensed mempool">
+            <thead>
+            <tr>
+                <th data-column-id="hostname">Device</th>
+                <th data-column-id="toner_descr">Toner</th>
+                <th data-column-id="graph" data-sortable="false" data-searchable="false"></th>
+                <th data-column-id="toner_used" data-searchable="false">Used</th>
+                <th data-column-id="toner_current" data-searchable="false">Usage</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+<script>
+    var grid = $("#mempool").bootgrid({
+        ajax: true,
+        rowCount: [50, 100, 250, -1],
+        post: function ()
+        {
+            return {
+                id: "toner",
+                view: '<?php echo $vars['view']; ?>'
+            };
+        },
+        url: "ajax_table.php"
+    });
+</script>

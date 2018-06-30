@@ -14,7 +14,6 @@ foreach ($hrDevice_oids as $oid) {
 d_echo($hrDevices);
 
 if (is_array($hrDevices)) {
-    $hrDevices = $hrDevices;
     foreach ($hrDevices as $hrDevice) {
         if (is_array($hrDevice) && is_numeric($hrDevice['hrDeviceIndex'])) {
             if (dbFetchCell('SELECT COUNT(*) FROM `hrDevice` WHERE device_id = ? AND hrDeviceIndex = ?', array($device['device_id'], $hrDevice['hrDeviceIndex']))) {

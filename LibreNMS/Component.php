@@ -41,6 +41,28 @@ class Component
         'error'     => '',
     );
 
+    public function getComponentCount($device_id = null)
+    {
+        if (is_null($device_id)) {
+            // SELECT type, count(*) as count FROM component GROUP BY type
+            $SQL = "SELECT `type` as `name`, count(*) as count FROM `component` GROUP BY `type`";
+            $rows = dbFetchRows($SQL, array());
+        } else {
+            $SQL = "SELECT `type` as `name`, count(*) as count FROM `component` WHERE `device_id` = ? GROUP BY `type`";
+            $rows = dbFetchRows($SQL, array($device_id));
+        }
+
+        if (isset($rows)) {
+            // We found some, lets re-process to make more accessible
+            $result = array();
+            foreach ($rows as $value) {
+                $result[$value['name']] = $value['count'];
+            }
+            return $result;
+        }
+        // We didn't find any components
+        return false;
+    }
     public function getComponentType($TYPE = null)
     {
         if (is_null($TYPE)) {
@@ -196,11 +218,11 @@ class Component
         return $count;
     }
 
-    public function getComponentStatusLog($component = null, $start = null, $end = null)
+    public function getComponentStatusLog($component_id, $start, $end)
     {
-        if (($component == null) || ($start == null) || ($end == null)) {
+        if (($component_id == null) || ($start == null) || ($end == null)) {
             // Error...
-            d_echo("Required arguments are missing. Component: ".$component.", Start: ".$start.", End: ".$end."\n");
+            d_echo("Required arguments are missing. Component ID: ".$component_id.", Start: ".$start.", End: ".$end."\n");
             return false;
         }
 
@@ -208,8 +230,8 @@ class Component
         $return = array();
 
         // 1. find the previous value, this is the value when $start occurred.
-        $sql_query = "SELECT status FROM component_statuslog WHERE `component` = ? AND time < ? ORDER BY `id` desc LIMIT 1";
-        $sql_param = array($component,$start);
+        $sql_query = "SELECT status FROM `component_statuslog` WHERE `component_id` = ? AND `timestamp` < ? ORDER BY `id` desc LIMIT 1";
+        $sql_param = array($component_id, $start);
         $result = dbFetchRow($sql_query, $sql_param);
         if ($result == false) {
             $return['initial'] = false;
@@ -218,8 +240,8 @@ class Component
         }
 
         // 2. Then we just need a list of all the entries for the time period.
-        $sql_query = "SELECT status, time, message FROM component_statuslog WHERE `component` = ? AND time >= ? AND time < ? ORDER BY `time`";
-        $sql_param = array($component,$start,$end);
+        $sql_query = "SELECT status, `timestamp`, message FROM `component_statuslog` WHERE `component_id` = ? AND `timestamp` >= ? AND `timestamp` < ? ORDER BY `timestamp`";
+        $sql_param = array($component_id, $start,$end);
         $return['data'] = dbFetchRows($sql_query, $sql_param);
 
         d_echo("Status Log Data: ".print_r($return, true)."\n");
@@ -248,11 +270,11 @@ class Component
         return $ARRAY;
     }
 
-    public function createStatusLogEntry($component, $status, $message)
+    public function createStatusLogEntry($component_id, $status, $message)
     {
         // Add an entry to the statuslog table for a particular component.
         $DATA = array(
-            'component'     => $component,
+            'component_id'  => $component_id,
             'status'        => $status,
             'message'       => $message,
         );
@@ -280,12 +302,12 @@ class Component
             }
 
             // Ignore type, we cant change that.
-            unset($AVP['type'],$OLD[$device_id][$COMPONENT]['type']);
+            unset($AVP['type'], $OLD[$device_id][$COMPONENT]['type']);
 
             // If the Status has changed we need to add a log entry
             if ($AVP['status'] != $OLD[$device_id][$COMPONENT]['status']) {
                 d_echo("Status Changed - Old: ".$OLD[$device_id][$COMPONENT]['status'].", New: ".$AVP['status']."\n");
-                $this->createStatusLogEntry($COMPONENT, $AVP['status'], $AVP['error']);
+                $this->createStatusLogEntry($COMPONENT['id'], $AVP['status'], $AVP['error']);
             }
 
             // Process our reserved components first.
@@ -300,7 +322,7 @@ class Component
                     }
 
                     // Unset the reserved field. We don't want to insert it below.
-                    unset($AVP[$k],$OLD[$device_id][$COMPONENT][$k]);
+                    unset($AVP[$k], $OLD[$device_id][$COMPONENT][$k]);
                 }
             }
 
@@ -315,7 +337,7 @@ class Component
                     $MSG .= $k." => ".$v.",";
                 }
                 $MSG = substr($MSG, 0, -1);
-                log_event($MSG, $device_id, 'component', $COMPONENT);
+                log_event($MSG, $device_id, 'component', 3, $COMPONENT);
             }
 
             // Process our AVP Adds and Updates
@@ -328,14 +350,14 @@ class Component
                     dbInsert($DATA, 'component_prefs');
 
                     // Log the addition to the Eventlog.
-                    log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $ATTR . ", was added with value: " . $VALUE, $device_id, 'component', $COMPONENT);
+                    log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $ATTR . ", was added with value: " . $VALUE, $device_id, 'component', 3, $COMPONENT);
                 } elseif ($OLD[$device_id][$COMPONENT][$ATTR] != $VALUE) {
                     // Attribute exists but the value is different, need to update
                     $DATA = array('value'=>$VALUE);
                     dbUpdate($DATA, 'component_prefs', '`component` = ? AND `attribute` = ?', array($COMPONENT, $ATTR));
 
                     // Add the modification to the Eventlog.
-                    log_event("Component: ".$AVP[$COMPONENT]['type']."(".$COMPONENT."). Attribute: ".$ATTR.", was modified from: ".$OLD[$COMPONENT][$ATTR].", to: ".$VALUE, $device_id, 'component', $COMPONENT);
+                    log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $ATTR . ", was modified from: " . $OLD[$COMPONENT][$ATTR] . ", to: " . $VALUE, $device_id, 'component', 3, $COMPONENT);
                 }
             } // End Foreach AVP
 
@@ -346,10 +368,30 @@ class Component
                 dbDelete('component_prefs', "`component` = ? AND `attribute` = ?", array($COMPONENT,$KEY));
 
                 // Log the addition to the Eventlog.
-                log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $KEY . ", was deleted.", $COMPONENT);
+                log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $KEY . ", was deleted.", 4, $COMPONENT);
             }
         }
 
         return true;
+    }
+
+    /**
+     * Get the component id for the first component in the array
+     * Only set $device_id if using the array from getCompenents(), which is keyed by device_id
+     *
+     * @param array $component_array
+     * @param int $device_id
+     * @return int the component id
+     */
+    public function getFirstComponentID($component_array, $device_id = null)
+    {
+        if (!is_null($device_id) && isset($component_array[$device_id])) {
+            $component_array = $component_array[$device_id];
+        }
+
+        foreach ($component_array as $id => $array) {
+            return $id;
+        }
+        return -1;
     }
 }

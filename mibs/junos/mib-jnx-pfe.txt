@@ -13,7 +13,7 @@ IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
     Counter32, Counter64, Integer32
         FROM SNMPv2-SMI
-    DisplayString
+    TEXTUAL-CONVENTION, DisplayString
         FROM SNMPv2-TC
     jnxPfeMibRoot
         FROM JUNIPER-SMI;
@@ -31,6 +31,14 @@ jnxPfeMib MODULE-IDENTITY
     DESCRIPTION
             "The MIB provides PFE specific data."
 
+    REVISION      "201411140000Z"
+    DESCRIPTION 
+               "Added jnxPfeMemoryTrapVars and jnxPfeMemoryNotifications."
+    REVISION      "201403120000Z"
+    DESCRIPTION 
+               "Added new Table jnxPfeNotifyGlParAccSec which counts
+                notifications for the packets parsed/processed by
+                access-security." 
     REVISION      "201109090000Z"
     DESCRIPTION
                "Added new Table jnxPfeMemoryErrorsTable which gives parity and
@@ -39,11 +47,6 @@ jnxPfeMib MODULE-IDENTITY
     REVISION      "201002070000Z"
     DESCRIPTION
                "Added new notification types."
-    REVISION      "201403120000Z"
-    DESCRIPTION 
-               "Added new Table jnxPfeNotifyGlParAccSec which counts
-                notifications for the packets parsed/processed by
-                access-security." 
     --REVISION      "201001070000Z"
     --DESCRIPTION
     --         "Added new notification types."
@@ -51,6 +54,14 @@ jnxPfeMib MODULE-IDENTITY
     --DESCRIPTION
     --           "Initial revision."
     ::= { jnxPfeMibRoot 1 }
+    
+    JnxPfeMemoryTypeEnum ::= TEXTUAL-CONVENTION 
+    STATUS      current
+    DESCRIPTION
+                "PFE memory type, nh (1), fw (2), encap (3)"
+    SYNTAX      INTEGER { nh(1),
+                        fw(2),
+                        encap(3)}
 
     --
     -- This branch contains all PFE Notification statistics data.
@@ -501,5 +512,221 @@ pfeMemoryErrors NOTIFICATION-TYPE
 
     ::= { pfeMemoryErrorsNotificationPrefix 1 }
 
+--
+-- This contains all PFE Memory statistics data.
+--
+jnxPfeMemory    OBJECT IDENTIFIER ::= { jnxPfeMib 2 }
+
+--
+-- This table provide global PFE Memory ASIC and Ukern stats for each PFE slot,
+--
+jnxPfeMemoryUkernTable OBJECT-TYPE
+   SYNTAX          SEQUENCE OF JnxPfeMemoryUkernEntry
+   MAX-ACCESS      not-accessible
+   STATUS          current
+   DESCRIPTION
+            "This table provides global PFE ukern memory statistics for
+specified slot."
+   ::= { jnxPfeMemory 1 }
+
+jnxPfeMemoryUkernEntry OBJECT-TYPE
+   SYNTAX          JnxPfeMemoryUkernEntry
+   MAX-ACCESS      not-accessible
+   STATUS          current
+   DESCRIPTION
+            "Entry represent ukern memory percentage free."
+    INDEX { jnxPfeGlSlot }
+   ::= { jnxPfeMemoryUkernTable 1 }
+
+JnxPfeMemoryUkernEntry ::=
+   SEQUENCE {
+        jnxPfeGlSlot                    Unsigned32,
+        jnxPfeMemoryUkernFreePercent    Unsigned32
+   }
+
+jnxPfeMemoryUkernFreePercent  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The percent PFE ukern memory free within ukern heap."
+    ::= { jnxPfeMemoryUkernEntry 2 }
+--
+-- This table provide global PFE NH (Trio) /JTREE Memory(I-Chip) and FW /
+-- Filter and Encap (I-chip Iwo SRAM) memory stats for each PFE slot,
+--
+jnxPfeMemoryForwardingTable OBJECT-TYPE
+   SYNTAX          SEQUENCE OF JnxPfeMemoryForwardingEntry
+   MAX-ACCESS      not-accessible
+   STATUS          current
+   DESCRIPTION
+            "This table provides PFE ASIC memory - NH/JTREE or FW/Filter or Encap 
+             memory utilization statistics."
+   ::= { jnxPfeMemory 2 }
+
+jnxPfeMemoryForwardingEntry OBJECT-TYPE
+   SYNTAX          JnxPfeMemoryForwardingEntry
+   MAX-ACCESS      not-accessible
+   STATUS          current
+   DESCRIPTION
+            "Entry represent ASIC memory free percent of a specific type 
+             in specified pfe instance"
+    INDEX { jnxPfeGlSlot, jnxPfeMemoryForwardingChipSlot, jnxPfeMemoryType }
+   ::= { jnxPfeMemoryForwardingTable 1 }
+
+JnxPfeMemoryForwardingEntry ::=
+   SEQUENCE {
+       jnxPfeMemoryForwardingChipSlot         Unsigned32,
+       jnxPfeMemoryType                       JnxPfeMemoryTypeEnum,
+       jnxPfeMemoryForwardingPercentFree      Unsigned32
+   }
+
+jnxPfeMemoryForwardingChipSlot  OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "ASIC instance number or pfe complex instance number."
+    ::= { jnxPfeMemoryForwardingEntry 1 }
+
+jnxPfeMemoryType  OBJECT-TYPE
+    SYNTAX      JnxPfeMemoryTypeEnum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "PFE ASIC memory type, nh = 1, fw = 2, encap = 3."
+    ::= { jnxPfeMemoryForwardingEntry 2 }
+
+jnxPfeMemoryForwardingPercentFree  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Percentage ASIC memory free for a specific memory type. For Trio based linecards Encap memory is not available.Hence no value is returned"
+    ::= { jnxPfeMemoryForwardingEntry 3 }
+
+--
+-- PFE Memory Notification Variables/Objects
+--
+    jnxPfeMemoryTrapVars OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "PFE notification object definitions."
+        ::= { jnxPfeMemory 3 }
+    jnxPfeGlSlot OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..4294967295)
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "Global slot number for line card resource monitoring."
+        ::= { jnxPfeMemoryTrapVars 1 }
+
+    jnxPfeInstanceNumber OBJECT-TYPE
+        SYNTAX      Integer32 (0..3)
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "PFE instance number in pfe complex."
+        ::= { jnxPfeMemoryTrapVars 2 }
+ 
+    jnxPfeMemoryThreshold OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..100)
+        UNITS       "percent"
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Configured high memory utilization threshold."
+        ::= { jnxPfeMemoryTrapVars 3 }
+
+jnxPfeMemoryNotificationsPrefix OBJECT IDENTIFIER ::= { jnxPfeMemory 4 }
+jnxPfeMemoryNotifications OBJECT IDENTIFIER ::= { jnxPfeMemoryNotificationsPrefix 0 }
+
+jnxPfeHeapMemoryThresholdExceeded NOTIFICATION-TYPE
+    OBJECTS {
+        jnxPfeGlSlot,
+        jnxPfeMemoryThreshold }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the Heap Memory utilization has crossed the
+         configured watermark."
+    ::= { jnxPfeMemoryNotifications 1 }
+
+jnxPfeHeapMemoryThresholdAbated NOTIFICATION-TYPE
+    OBJECTS {
+        jnxPfeGlSlot,
+        jnxPfeMemoryThreshold }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the Heap Memory utilization has fallen below the
+         configured watermark."
+    ::= { jnxPfeMemoryNotifications 2 }
+
+jnxPfeNextHopMemoryThresholdExceeded NOTIFICATION-TYPE
+    OBJECTS {
+        jnxPfeGlSlot,
+        jnxPfeInstanceNumber,
+        jnxPfeMemoryThreshold }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the Next Hop Memory utilization has crossed the
+         configured watermark."
+    ::= { jnxPfeMemoryNotifications 3 }
+
+jnxPfeNextHopMemoryThresholdAbated NOTIFICATION-TYPE
+    OBJECTS {
+        jnxPfeGlSlot,
+        jnxPfeInstanceNumber,
+        jnxPfeMemoryThreshold }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the Next Hop Memory utilization has fallen below the
+         configured watermark."
+    ::= { jnxPfeMemoryNotifications 4 }
+
+jnxPfeFilterMemoryThresholdExceeded NOTIFICATION-TYPE
+    OBJECTS {
+        jnxPfeGlSlot,
+        jnxPfeInstanceNumber,
+        jnxPfeMemoryThreshold }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the Filter Memory utilization has crossed the
+         configured watermark."
+    ::= { jnxPfeMemoryNotifications 5 }
+
+jnxPfeFilterMemoryThresholdAbated NOTIFICATION-TYPE
+    OBJECTS {
+        jnxPfeGlSlot,
+        jnxPfeInstanceNumber,
+        jnxPfeMemoryThreshold }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the Filter Memory utilization has fallen below the
+         configured watermark."
+    ::= { jnxPfeMemoryNotifications 6 }
+
+jnxPfeEncapMemoryThresholdExceeded NOTIFICATION-TYPE
+    OBJECTS {
+        jnxPfeGlSlot,
+        jnxPfeInstanceNumber,
+        jnxPfeMemoryThreshold }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the ENCAP Memory utilization has crossed the
+         configured watermark."
+    ::= { jnxPfeMemoryNotifications 7 }
+
+jnxPfeEncapMemoryThresholdAbated NOTIFICATION-TYPE
+    OBJECTS {
+        jnxPfeGlSlot,
+        jnxPfeInstanceNumber,
+        jnxPfeMemoryThreshold }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the ENCAP Memory utilization has fallen below the
+         configured watermark."
+    ::= { jnxPfeMemoryNotifications 8 }
 
 END

@@ -1,0 +1,1182 @@
+--
+-- Accedian Enterprise Specific MIB
+--
+-- Copyright (c) 2005-2010, Accedian Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document is subject to change without notice.
+--
+
+
+ACD-SFP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    acdMibs
+        FROM ACCEDIAN-SMI;
+
+acdSfp MODULE-IDENTITY
+
+    LAST-UPDATED "201011100100Z"
+    ORGANIZATION "Accedian Networks, Inc."
+    CONTACT-INFO
+            "Accedian Technical Assistance Center
+             Accedian Networks, Inc.
+             4878 Levy, suite 202
+             Saint-Laurent, Quebec Canada H4R 2P1
+             E-mail: support@accedian.com"
+    DESCRIPTION
+            "The SFPs database for this Accedian Networks device."
+
+    REVISION "201011100100Z"        -- 10 November 2010
+    DESCRIPTION
+            "Add compliance section."
+
+    REVISION "200804220100Z"        -- 22 April 2008
+    DESCRIPTION
+            "Add acdSfpInfoIdType, acdSfpInfoExtIdType and acdSfpInfoTransCode support."
+
+    REVISION "200608060100Z"        -- 6 Aug 2006
+    DESCRIPTION
+            "Initial version of MIB module ACD-SFP-MIB."
+
+    ::= { acdMibs 4 }
+
+acdSfpNotifications   OBJECT IDENTIFIER ::= { acdSfp 5 }
+acdSfpMIBObjects      OBJECT IDENTIFIER ::= { acdSfp 6 }
+acdSfpConformance     OBJECT IDENTIFIER ::= { acdSfp 7 }
+
+-----------------------------------------------------------------------
+ -- The information SFP table
+ -- This table contains all SFP Info.
+---------------------------------------------------------------------------
+
+acdSfpInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdSfpInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table of all SFP info"
+    ::= { acdSfp 1 }
+
+acdSfpInfoEntry OBJECT-TYPE
+    SYNTAX      AcdSfpInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This is a part of the content of the SFP's 0xA0 EEPROM"
+    INDEX   { acdSfpInfoID }
+    ::=  { acdSfpInfoTable 1 }
+
+
+AcdSfpInfoEntry ::= SEQUENCE {
+    acdSfpInfoID                Unsigned32,
+    acdSfpInfoConnIdx           Unsigned32,
+    acdSfpInfoConnType          INTEGER,
+    acdSfpInfoVendor            DisplayString,
+    acdSfpInfoVendorOui         DisplayString,
+    acdSfpInfoVendorPn          DisplayString,
+    acdSfpInfoVendorRev         DisplayString,
+    acdSfpInfoWavelength        Unsigned32,
+    acdSfpInfoSerialNum         DisplayString,
+    acdSfpInfoYear              Unsigned32,
+    acdSfpInfoMonth             Unsigned32,
+    acdSfpInfoDay               Unsigned32,
+    acdSfpInfoLot               Unsigned32,
+    acdSfpInfoRev8472           INTEGER,
+    acdSfpInfoPresent           TruthValue,
+    acdSfpInfoDiag              TruthValue,
+    acdSfpInfoInternal          TruthValue,
+    acdSfpInfoAlm               TruthValue,
+    acdSfpInfoIdType            Unsigned32,
+    acdSfpInfoExtIdType         Unsigned32,
+    acdSfpInfoTransCode         DisplayString
+}
+
+acdSfpInfoID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each SFP. Its value ranges from 1 to
+        MAXINT (4 bytes). "
+   ::= { acdSfpInfoEntry 1 }
+
+acdSfpInfoConnIdx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the connector index on the box. The index
+         is assigned form left to rigth starting with 1."
+   ::= { acdSfpInfoEntry 2 }
+
+acdSfpInfoConnType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    sfpSC(1),
+                    sfpFC1COPPER(2),
+                    sfpFC2COPPER(3),
+                    sfpBNC(4),
+                    sfpFCCOAX(5),
+                    sfpFIBERJACK(6),
+                    sfpLC(7),
+                    sfpMTRJ(8),
+                    sfpMU(9),
+                    sfpSG(10),
+                    sfpPIGTAIL(11),
+                    sfpHSSDCII(32),
+                    sfpCOPPERPIGTAIL(33)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The connector value indicates the external optical or electrical
+         cable connector provided as the media interface."
+    ::= { acdSfpInfoEntry 3 }
+
+acdSfpInfoVendor OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The vendor name is a 16 character field that contains ASCII 
+         characters, left-aligned and padded on the right with ASCII 
+         spaces (20h). The vendor name shall be the full name of the
+         corporation, a commonly accepted abbreviation of the name of
+         the corporation, the SCSI company code for the corporation, 
+         or the stock exchange code for the corporation. At least one
+         of the vendor name or the vendor OUI fields shall contain 
+         valid serial data."
+    ::= { acdSfpInfoEntry 4 }
+
+acdSfpInfoVendorOui OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (3))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The vendor organizationally unique identifier field (vendor OUI)
+         is a 3-byte field that contains the IEEE Company Identifier for 
+         the vendor. A value of all zero in the 3-byte field indicates 
+         that the Vendor OUI is unspecified."
+    ::= { acdSfpInfoEntry 5 }
+
+acdSfpInfoVendorPn OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The vendor part number (vendor PN) is a 16-byte field that
+         contains ASCII characters, leftaligned and padded on the 
+         right with ASCII spaces (20h), defining the vendor's part 
+         number or product name. A value of all zero in the 16-byte
+         field indicates that the vendor PN is unspecified."
+    ::= { acdSfpInfoEntry 6 }
+
+acdSfpInfoVendorRev OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The vendor revision number (vendor rev) is a 4-byte field that
+         contains ASCII characters, leftaligned and padded on the right
+         with ASCII spaces (20h), defining the vendor's product revision
+         number. A value of all zero in the 4-byte field indicates that
+         the vendor PN is unspecified."
+    ::= { acdSfpInfoEntry 7 }
+
+acdSfpInfoWavelength  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Nominal transmitter output wavelength at room temperature. 16 bit
+         value with byte 60 as high order byte and byte 61 as low order 
+         byte. The laser wavelength is equal to the 16 bit integer
+         value in nm. This field allows the user to read the laser 
+         wavelength directly, so it is not necessary to infer it from the
+         transceiver Code for Electronic Compatibility."
+   ::= { acdSfpInfoEntry 8 }
+
+acdSfpInfoSerialNum OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The vendor serial number (vendor SN) is a 16 character field that
+        contains ASCII characters, left-aligned and padded on the right 
+        with ASCII spaces (20h), defining the vendor's serial number for
+        the transceiver. A value of all zero in the 16-byte field indicates
+        that the vendor PN is unspecified."
+    ::= { acdSfpInfoEntry 9 }
+
+acdSfpInfoYear  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the year of manufacturing."
+   ::= { acdSfpInfoEntry 10 }
+
+acdSfpInfoMonth  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the month of manufacturing."
+   ::= { acdSfpInfoEntry 11 }
+
+acdSfpInfoDay  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the day of manufacturing."
+   ::= { acdSfpInfoEntry 12 }
+
+acdSfpInfoLot  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the Lot number of manufacturing."
+   ::= { acdSfpInfoEntry 13 }
+
+
+acdSfpInfoRev8472  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    undefined(0),
+                    rev93(1),
+                    rev94(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate to which revision this SFP is compatible."
+   ::= { acdSfpInfoEntry 14 }
+
+acdSfpInfoPresent  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the SFP is present or not."
+   ::= { acdSfpInfoEntry 15 }
+
+acdSfpInfoDiag  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the SFP supports Digital Diagnostics."
+   ::= { acdSfpInfoEntry 16 }
+
+acdSfpInfoInternal  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the SFP supports internal calibration. If
+         externally calibrated, the measurements are raw A/D values and must
+         be converted to real world units using calibration constants 
+         stored in EEPROM locations 56 to 95 at 2 wire serial bus address
+         A2h. Calibration is valid over vendor specified operating 
+         temperature and voltage. Alarm and warning threshold values
+         should be interpreted in the same manner as real time 16 bit data."
+   ::= { acdSfpInfoEntry 17 }
+
+acdSfpInfoAlm  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the SFP supports Alarm and warning 
+        thresholds for the Digital Diagnostics."
+   ::= { acdSfpInfoEntry 18 }
+
+acdSfpInfoIdType  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The identifier value specifies the physical device described by
+        the two-wire interface information. This value shall be included
+        in the two-wire interface data (see SFF-8472 for details)."
+   ::= { acdSfpInfoEntry 19 }
+
+acdSfpInfoExtIdType  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The extended identifier value provides additional information
+        about the transceiver. The field should be set to 04h for all SFP
+        modules indicating two-wire interface ID module definition (see
+        SFF-8472 for details)."
+   ::= { acdSfpInfoEntry 20 }
+
+acdSfpInfoTransCode OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The following bit significant indicators define the electronic
+        or optical interfaces that are supported by the transceiver. At
+        least one bit shall be set in this field (see SFF-8472 for details)."
+    ::= { acdSfpInfoEntry 21 }
+
+-----------------------------------------------------------------------
+ -- The Digital Diagnostics SFP table
+ -- This table contains all SFP Digital Diagnostics.
+---------------------------------------------------------------------------
+
+acdSfpDiagTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AcdSfpDiagEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "Table of all SFP Digital Diagnostics"
+    ::= { acdSfp 2 }
+
+acdSfpDiagEntry OBJECT-TYPE
+    SYNTAX  AcdSfpDiagEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This is a part the content of the SFP's 0xA0 EEPROM"
+    INDEX   { acdSfpDiagID }
+    ::=  { acdSfpDiagTable 1 }
+
+
+AcdSfpDiagEntry ::= SEQUENCE {
+    acdSfpDiagID                Unsigned32,
+    acdSfpDiagConnIdx           Unsigned32,
+    acdSfpDiagTemp              Integer32,
+    acdSfpDiagVcc               Unsigned32,
+    acdSfpDiagLbc               Unsigned32,
+    acdSfpDiagTxPwr             Unsigned32,
+    acdSfpDiagRxPwr             Unsigned32,
+    acdSfpDiagTxPwrdBm          DisplayString,
+    acdSfpDiagRxPwrdBm          DisplayString
+}
+
+acdSfpDiagID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each SFP. Its value ranges from 1 to
+        MAXINT (4 bytes). "
+   ::= { acdSfpDiagEntry 1 }
+
+acdSfpDiagConnIdx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the connector index on the box. The index
+         is assigned form left to rigth starting with 1."
+   ::= { acdSfpDiagEntry 2 }
+
+acdSfpDiagTemp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Internally measured transceiver temperature. Represented as a
+         16 bit signed twos complement value in degrees Celsius, yielding
+         a total range of -128C to +128C."
+    ::= { acdSfpDiagEntry 3 }
+
+acdSfpDiagVcc OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Internally measured transceiver supply voltage. Represented as
+         a 16 bit unsigned integer with the voltage defined as the full
+         16 bit value (0 to 65535) with LSB equal to 100 micro-Volt,
+         yielding a total range of 0 to +6.55 Volts."
+    ::= { acdSfpDiagEntry 4 }
+
+acdSfpDiagLbc OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Measured TX bias current in micro-Amps yielding a total range of
+         0 to 131 mA."
+    ::= { acdSfpDiagEntry 5 }
+
+acdSfpDiagTxPwr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Measured TX output power in mW. Represented as a 16 bit unsigned
+         integer with the power defined as the full 16 bit value (0 to 65535)
+         with LSB equal to 0.1 micro-Watt, yielding a total range of 0 
+         to 6.5535 mW (~ -40 to +8.2 dBm)."
+    ::= { acdSfpDiagEntry 6 }
+
+acdSfpDiagRxPwr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Measured Rx input power in mW. Represented as a 16 bit unsigned
+         integer with the power defined as the full 16 bit value (0 to 65535)
+         with LSB equal to 0.1 micro-Watt, yielding a total range of 0 
+         to 6.5535 mW (~ -40 to +8.2 dBm)."
+    ::= { acdSfpDiagEntry 7 }
+
+acdSfpDiagTxPwrdBm OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Measured TX output power in dBm (~ -40 to +8.2 dBm)."
+    ::= { acdSfpDiagEntry 8 }
+
+acdSfpDiagRxPwrdBm OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Measured Rx input power in dBm (~ -40 to +8.2 dBm)."
+    ::= { acdSfpDiagEntry 9 }
+
+-----------------------------------------------------------------------
+ -- The Alarm and Warning Thresholds SFP table
+ -- This table contains all SFP Alarm and Warning Thresholds.
+---------------------------------------------------------------------------
+
+acdSfpThreshTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdSfpThreshEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table of all SFP Alarm and Warning Thresholds"
+    ::= { acdSfp 3 }
+
+acdSfpThreshEntry OBJECT-TYPE
+    SYNTAX      AcdSfpThreshEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            " This is a part the content of the SFP's 0xA0 EEPROM"
+    INDEX   { acdSfpThreshID }
+    ::=  { acdSfpThreshTable 1 }
+
+
+AcdSfpThreshEntry ::= SEQUENCE {
+    acdSfpThreshID                Unsigned32,
+    acdSfpThreshConnIdx           Unsigned32,
+    acdSfpThreshTempHighAlm       Integer32,
+    acdSfpThreshTempLowAlm        Integer32,
+    acdSfpThreshTempHighWarn      Integer32,
+    acdSfpThreshTempLowWarn       Integer32,
+    acdSfpThreshVccHighAlm        Unsigned32,
+    acdSfpThreshVccLowAlm         Unsigned32,
+    acdSfpThreshVccHighWarn       Unsigned32,
+    acdSfpThreshVccLowWarn        Unsigned32,
+    acdSfpThreshLbcHighAlm        Unsigned32,
+    acdSfpThreshLbcLowAlm         Unsigned32,
+    acdSfpThreshLbcHighWarn       Unsigned32,
+    acdSfpThreshLbcLowWarn        Unsigned32,
+    acdSfpThreshTxPwrHighAlm      Unsigned32,
+    acdSfpThreshTxPwrLowAlm       Unsigned32,
+    acdSfpThreshTxPwrHighWarn     Unsigned32,
+    acdSfpThreshTxPwrLowWarn      Unsigned32,
+    acdSfpThreshRxPwrHighAlm      Unsigned32,
+    acdSfpThreshRxPwrLowAlm       Unsigned32,
+    acdSfpThreshRxPwrHighWarn     Unsigned32,
+    acdSfpThreshRxPwrLowWarn      Unsigned32,
+    acdSfpThreshTxPwrHighAlmdBm   DisplayString,
+    acdSfpThreshTxPwrLowAlmdBm    DisplayString,
+    acdSfpThreshTxPwrHighWarndBm  DisplayString,
+    acdSfpThreshTxPwrLowWarndBm   DisplayString,
+    acdSfpThreshRxPwrHighAlmdBm   DisplayString,
+    acdSfpThreshRxPwrLowAlmdBm    DisplayString,
+    acdSfpThreshRxPwrHighWarndBm  DisplayString,
+    acdSfpThreshRxPwrLowWarndBm   DisplayString
+
+}
+
+acdSfpThreshID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each SFP. Its value ranges from 1 to
+        MAXINT (4 bytes). "
+   ::= { acdSfpThreshEntry 1 }
+
+acdSfpThreshConnIdx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the connector index on the box. The index
+         is assigned form left to rigth starting with 1."
+   ::= { acdSfpThreshEntry 2 }
+
+acdSfpThreshTempHighAlm OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "High Alarm transceiver temperature. Represented as a 16 bit
+         signed twos complement value in degrees Celsius, yielding
+         a total range of -128C to +128C."
+    ::= { acdSfpThreshEntry 3 }
+
+acdSfpThreshTempLowAlm OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Low Alarm transceiver temperature. Represented as a 16 bit
+         signed twos complement value in degrees Celsius, yielding
+         a total range of -128C to +128C."
+    ::= { acdSfpThreshEntry 4 }
+
+acdSfpThreshTempHighWarn OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "High Warning transceiver temperature. Represented as a 16 bit
+         signed twos complement value in degrees Celsius, yielding
+         a total range of -128C to +128C."
+    ::= { acdSfpThreshEntry 5 }
+
+acdSfpThreshTempLowWarn OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Low Warning transceiver temperature. Represented as a 16 bit
+         signed twos complement value in degrees Celsius, yielding
+         a total range of -128C to +128C."
+    ::= { acdSfpThreshEntry 6 }
+
+acdSfpThreshVccHighAlm OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "High Alarm transceiver supply voltage. Represented as
+         a 16 bit unsigned integer with the voltage defined as the full
+         16 bit value (0 to 65535) with LSB equal to 100 micro-Volt,
+         yielding a total range of 0 to +6.55 Volts."
+    ::= { acdSfpThreshEntry 7 }
+
+acdSfpThreshVccLowAlm OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Low Alarm transceiver supply voltage. Represented as
+         a 16 bit unsigned integer with the voltage defined as the full
+         16 bit value (0 to 65535) with LSB equal to 100 micro-Volt,
+         yielding a total range of 0 to +6.55 Volts."
+    ::= { acdSfpThreshEntry 8 }
+
+acdSfpThreshVccHighWarn OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "High Warning transceiver supply voltage. Represented as
+         a 16 bit unsigned integer with the voltage defined as the full
+         16 bit value (0 to 65535) with LSB equal to 100 micro-Volt,
+         yielding a total range of 0 to +6.55 Volts."
+    ::= { acdSfpThreshEntry 9 }
+
+acdSfpThreshVccLowWarn OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Low Warning transceiver supply voltage. Represented as
+         a 16 bit unsigned integer with the voltage defined as the full
+         16 bit value (0 to 65535) with LSB equal to 100 micro-Volt,
+         yielding a total range of 0 to +6.55 Volts."
+    ::= { acdSfpThreshEntry 10 }
+
+acdSfpThreshLbcHighAlm OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "High Alarm TX bias current in micro-Amps yielding a total range of
+         0 to 131 mA."
+    ::= { acdSfpThreshEntry 11 }
+
+acdSfpThreshLbcLowAlm OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Low Alarm TX bias current in micro-Amps yielding a total range of
+         0 to 131 mA."
+    ::= { acdSfpThreshEntry 12 }
+
+acdSfpThreshLbcHighWarn OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "High Warning TX bias current in micro-Amps yielding a total range of
+         0 to 131 mA."
+    ::= { acdSfpThreshEntry 13 }
+
+acdSfpThreshLbcLowWarn OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Low Warning TX bias current in micro-Amps yielding a total range of
+         0 to 131 mA."
+    ::= { acdSfpThreshEntry 14 }
+
+acdSfpThreshTxPwrHighAlm OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "High Alarm TX output power in mW. Represented as a 16 bit unsigned
+         integer with the power defined as the full 16 bit value (0 to 65535)
+         with LSB equal to 0.1 micro-Watt, yielding a total range of 0 
+         to 6.5535 mW (~ -40 to +8.2 dBm)."
+    ::= { acdSfpThreshEntry 15 }
+
+acdSfpThreshTxPwrLowAlm OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Low Alarm TX output power in mW. Represented as a 16 bit unsigned
+         integer with the power defined as the full 16 bit value (0 to 65535)
+         with LSB equal to 0.1 micro-Watt, yielding a total range of 0 
+         to 6.5535 mW (~ -40 to +8.2 dBm)."
+    ::= { acdSfpThreshEntry 16 }
+
+acdSfpThreshTxPwrHighWarn OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "High Warning TX output power in mW. Represented as a 16 bit unsigned
+         integer with the power defined as the full 16 bit value (0 to 65535)
+         with LSB equal to 0.1 micro-Watt, yielding a total range of 0 
+         to 6.5535 mW (~ -40 to +8.2 dBm)."
+    ::= { acdSfpThreshEntry 17 }
+
+acdSfpThreshTxPwrLowWarn OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Low Warning TX output power in mW. Represented as a 16 bit unsigned
+         integer with the power defined as the full 16 bit value (0 to 65535)
+         with LSB equal to 0.1 micro-Watt, yielding a total range of 0 
+         to 6.5535 mW (~ -40 to +8.2 dBm)."
+    ::= { acdSfpThreshEntry 18 }
+
+acdSfpThreshRxPwrHighAlm OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "High Alarm RX input power in mW. Represented as a 16 bit unsigned
+         integer with the power defined as the full 16 bit value (0 to 65535)
+         with LSB equal to 0.1 micro-Watt, yielding a total range of 0 
+         to 6.5535 mW (~ -40 to +8.2 dBm)."
+    ::= { acdSfpThreshEntry 19 }
+
+acdSfpThreshRxPwrLowAlm OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Low Alarm RX input power in mW. Represented as a 16 bit unsigned
+         integer with the power defined as the full 16 bit value (0 to 65535)
+         with LSB equal to 0.1 micro-Watt, yielding a total range of 0 
+         to 6.5535 mW (~ -40 to +8.2 dBm)."
+    ::= { acdSfpThreshEntry 20 }
+
+acdSfpThreshRxPwrHighWarn OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "High Warning RX input power in mW. Represented as a 16 bit unsigned
+         integer with the power defined as the full 16 bit value (0 to 65535)
+         with LSB equal to 0.1 micro-Watt, yielding a total range of 0 
+         to 6.5535 mW (~ -40 to +8.2 dBm)."
+    ::= { acdSfpThreshEntry 21 }
+
+acdSfpThreshRxPwrLowWarn OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Low Warning RX input power in mW. Represented as a 16 bit unsigned
+         integer with the power defined as the full 16 bit value (0 to 65535)
+         with LSB equal to 0.1 micro-Watt, yielding a total range of 0 
+         to 6.5535 mW (~ -40 to +8.2 dBm)."
+    ::= { acdSfpThreshEntry 22 }
+
+acdSfpThreshTxPwrHighAlmdBm OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "High Alarm TX output power in dBm (~ -40 to +8.2 dBm)."
+    ::= { acdSfpThreshEntry 23 }
+
+acdSfpThreshTxPwrLowAlmdBm OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Low Alarm TX output power in dBm (~ -40 to +8.2 dBm)."
+    ::= { acdSfpThreshEntry 24 }
+
+acdSfpThreshTxPwrHighWarndBm OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "High Warning TX output power in dBm (~ -40 to +8.2 dBm)."
+    ::= { acdSfpThreshEntry 25 }
+
+acdSfpThreshTxPwrLowWarndBm OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Low Warning TX output power in dBm (~ -40 to +8.2 dBm)."
+    ::= { acdSfpThreshEntry 26 }
+
+acdSfpThreshRxPwrHighAlmdBm OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "High Alarm Rx input power in dBm (~ -40 to +8.2 dBm)."
+    ::= { acdSfpThreshEntry 27 }
+
+acdSfpThreshRxPwrLowAlmdBm OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Low Alarm Rx input power in dBm (~ -40 to +8.2 dBm)."
+    ::= { acdSfpThreshEntry 28 }
+
+acdSfpThreshRxPwrHighWarndBm OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "High Warning Rx input power in dBm (~ -40 to +8.2 dBm)."
+    ::= { acdSfpThreshEntry 29 }
+
+acdSfpThreshRxPwrLowWarndBm OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Low Warning Rx input power in dBm (~ -40 to +8.2 dBm)."
+    ::= { acdSfpThreshEntry 30 }
+
+------------------------------------------------------------------------------
+ -- The Alarm and Warning Thresholds SFP Status table
+ -- This table contains all statuses for the SFP Alarm and Warning Thresholds.
+------------------------------------------------------------------------------
+
+acdSfpThreshStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdSfpThreshStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table of all SFP Digital Diagnostics Thresholds statuses"
+    ::= { acdSfp 4 }
+
+acdSfpThreshStatusEntry OBJECT-TYPE
+    SYNTAX      AcdSfpThreshStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This is a part the content of the SFP's 0xA2 EEPROM"
+    INDEX   { acdSfpThreshStatusID }
+    ::=  { acdSfpThreshStatusTable 1 }
+
+
+AcdSfpThreshStatusEntry ::= SEQUENCE {
+    acdSfpThreshStatusID                Unsigned32,
+    acdSfpThreshStatusConnIdx           Unsigned32,
+    acdSfpThreshStatusTempHighAlm       TruthValue,
+    acdSfpThreshStatusTempLowAlm        TruthValue,
+    acdSfpThreshStatusTempHighWarn      TruthValue,
+    acdSfpThreshStatusTempLowWarn       TruthValue,
+    acdSfpThreshStatusVccHighAlm        TruthValue,
+    acdSfpThreshStatusVccLowAlm         TruthValue,
+    acdSfpThreshStatusVccHighWarn       TruthValue,
+    acdSfpThreshStatusVccLowWarn        TruthValue,
+    acdSfpThreshStatusLbcHighAlm        TruthValue,
+    acdSfpThreshStatusLbcLowAlm         TruthValue,
+    acdSfpThreshStatusLbcHighWarn       TruthValue,
+    acdSfpThreshStatusLbcLowWarn        TruthValue,
+    acdSfpThreshStatusTxPwrHighAlm      TruthValue,
+    acdSfpThreshStatusTxPwrLowAlm       TruthValue,
+    acdSfpThreshStatusTxPwrHighWarn     TruthValue,
+    acdSfpThreshStatusTxPwrLowWarn      TruthValue,
+    acdSfpThreshStatusRxPwrHighAlm      TruthValue,
+    acdSfpThreshStatusRxPwrLowAlm       TruthValue,
+    acdSfpThreshStatusRxPwrHighWarn     TruthValue,
+    acdSfpThreshStatusRxPwrLowWarn      TruthValue
+}
+
+acdSfpThreshStatusID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each SFP. Its value ranges from 1 to
+        MAXINT (4 bytes). "
+   ::= { acdSfpThreshStatusEntry 1 }
+
+acdSfpThreshStatusConnIdx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the connector index on the box. The index
+         is assigned form left to rigth starting with 1."
+   ::= { acdSfpThreshStatusEntry 2 }
+
+acdSfpThreshStatusTempHighAlm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the temperature reaches or overpasses the High 
+         alarm threshold."
+   ::= { acdSfpThreshStatusEntry 3 }
+
+acdSfpThreshStatusTempLowAlm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the temperature reaches or underpasses the Low 
+         alarm threshold."
+   ::= { acdSfpThreshStatusEntry 4 }
+
+acdSfpThreshStatusTempHighWarn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the temperature reaches or overpasses the High 
+         warning threshold."
+   ::= { acdSfpThreshStatusEntry 5 }
+
+acdSfpThreshStatusTempLowWarn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the temperature reaches or underpasses the Low
+         warning threshold."
+   ::= { acdSfpThreshStatusEntry 6 }
+
+acdSfpThreshStatusVccHighAlm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the supply voltage reaches or overpasses the High 
+         alarm threshold."
+   ::= { acdSfpThreshStatusEntry 7 }
+
+acdSfpThreshStatusVccLowAlm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the supply voltage reaches or underpasses the Low
+         alarm threshold."
+   ::= { acdSfpThreshStatusEntry 8 }
+
+acdSfpThreshStatusVccHighWarn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the supply voltage reaches or overpasses the High 
+         warning threshold."
+   ::= { acdSfpThreshStatusEntry 9 }
+
+acdSfpThreshStatusVccLowWarn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the supply voltage reaches or underpasses the Low
+         warning threshold."
+   ::= { acdSfpThreshStatusEntry 10 }
+
+acdSfpThreshStatusLbcHighAlm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the Laser Bias Current reaches or overpasses
+         the High alarm threshold."
+   ::= { acdSfpThreshStatusEntry 11 }
+
+acdSfpThreshStatusLbcLowAlm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the Laser Bias Current reaches or underpasses
+         the Low alarm threshold."
+   ::= { acdSfpThreshStatusEntry 12 }
+
+acdSfpThreshStatusLbcHighWarn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the Laser Bias Current reaches or overpasses
+         the High warning threshold."
+   ::= { acdSfpThreshStatusEntry 13 }
+
+acdSfpThreshStatusLbcLowWarn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the Laser Bias Current reaches or underpasses
+         the Low warning threshold."
+   ::= { acdSfpThreshStatusEntry 14 }
+
+acdSfpThreshStatusTxPwrHighAlm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the Transmit Power reaches or overpasses the High 
+         alarm threshold."
+   ::= { acdSfpThreshStatusEntry 15 }
+
+acdSfpThreshStatusTxPwrLowAlm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the Transmit Power reaches or underpasses the Low
+         alarm threshold."
+   ::= { acdSfpThreshStatusEntry 16 }
+
+acdSfpThreshStatusTxPwrHighWarn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the Transmit Power reaches or overpasses the High 
+         warning threshold."
+   ::= { acdSfpThreshStatusEntry 17 }
+
+acdSfpThreshStatusTxPwrLowWarn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the Transmit Power reaches or underpasses the Low
+         warning threshold."
+   ::= { acdSfpThreshStatusEntry 18 }
+
+acdSfpThreshStatusRxPwrHighAlm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the Receive Power reaches or overpasses the High 
+         alarm threshold."
+   ::= { acdSfpThreshStatusEntry 19 }
+
+acdSfpThreshStatusRxPwrLowAlm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the Receive Power reaches or underpasses the Low 
+         alarm threshold."
+   ::= { acdSfpThreshStatusEntry 20 }
+
+acdSfpThreshStatusRxPwrHighWarn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the Receive Power reaches or overpasses the High 
+         warning threshold."
+   ::= { acdSfpThreshStatusEntry 21 }
+
+acdSfpThreshStatusRxPwrLowWarn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the Receive Power reaches or underpasses the Low 
+         warning threshold."
+   ::= { acdSfpThreshStatusEntry 22 }
+
+---------------------------------------------------------------------------
+ -- ACD-SFP-MIB Module - Conformance Information
+---------------------------------------------------------------------------
+
+acdSfpCompliances  OBJECT IDENTIFIER ::= { acdSfpConformance 1 }
+acdSfpGroups       OBJECT IDENTIFIER ::= { acdSfpConformance 2 }
+
+---------------------------------------------------------------------------
+ -- Units of conformance
+---------------------------------------------------------------------------
+
+acdSfpInfoGroup OBJECT-GROUP
+    OBJECTS {
+        acdSfpInfoConnIdx,
+        acdSfpInfoConnType,
+        acdSfpInfoVendor,
+        acdSfpInfoVendorOui,
+        acdSfpInfoVendorPn,
+        acdSfpInfoVendorRev,
+        acdSfpInfoWavelength,
+        acdSfpInfoSerialNum,
+        acdSfpInfoYear,
+        acdSfpInfoMonth,
+        acdSfpInfoDay,
+        acdSfpInfoLot,
+        acdSfpInfoRev8472,
+        acdSfpInfoPresent,
+        acdSfpInfoDiag,
+        acdSfpInfoInternal,
+        acdSfpInfoAlm,
+        acdSfpInfoIdType,
+        acdSfpInfoExtIdType,
+        acdSfpInfoTransCode
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the SFP information Group."
+    ::= { acdSfpGroups 1 }
+
+acdSfpDiagGroup OBJECT-GROUP
+    OBJECTS {
+        acdSfpDiagConnIdx,
+        acdSfpDiagTemp,
+        acdSfpDiagVcc,
+        acdSfpDiagLbc,
+        acdSfpDiagTxPwr,
+        acdSfpDiagRxPwr,
+        acdSfpDiagTxPwrdBm,
+        acdSfpDiagRxPwrdBm
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the SFP diagnostics Group."
+    ::= { acdSfpGroups 2 }
+
+acdSfpThreshGroup OBJECT-GROUP
+    OBJECTS {
+        acdSfpThreshConnIdx,
+        acdSfpThreshTempHighAlm,
+        acdSfpThreshTempLowAlm,
+        acdSfpThreshTempHighWarn,
+        acdSfpThreshTempLowWarn,
+        acdSfpThreshVccHighAlm,
+        acdSfpThreshVccLowAlm,
+        acdSfpThreshVccHighWarn,
+        acdSfpThreshVccLowWarn,
+        acdSfpThreshLbcHighAlm,
+        acdSfpThreshLbcLowAlm,
+        acdSfpThreshLbcHighWarn,
+        acdSfpThreshLbcLowWarn,
+        acdSfpThreshTxPwrHighAlm,
+        acdSfpThreshTxPwrLowAlm,
+        acdSfpThreshTxPwrHighWarn,
+        acdSfpThreshTxPwrLowWarn,
+        acdSfpThreshRxPwrHighAlm,
+        acdSfpThreshRxPwrLowAlm,
+        acdSfpThreshRxPwrHighWarn,
+        acdSfpThreshRxPwrLowWarn,
+        acdSfpThreshTxPwrHighAlmdBm,
+        acdSfpThreshTxPwrLowAlmdBm,
+        acdSfpThreshTxPwrHighWarndBm,
+        acdSfpThreshTxPwrLowWarndBm,
+        acdSfpThreshRxPwrHighAlmdBm,
+        acdSfpThreshRxPwrLowAlmdBm,
+        acdSfpThreshRxPwrHighWarndBm,
+        acdSfpThreshRxPwrLowWarndBm
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the SFP thresholds Group."
+    ::= { acdSfpGroups 3 }
+
+acdSfpThreshStatusGroup OBJECT-GROUP
+    OBJECTS {
+        acdSfpThreshStatusConnIdx,
+        acdSfpThreshStatusTempHighAlm,
+        acdSfpThreshStatusTempLowAlm,
+        acdSfpThreshStatusTempHighWarn,
+        acdSfpThreshStatusTempLowWarn,
+        acdSfpThreshStatusVccHighAlm,
+        acdSfpThreshStatusVccLowAlm,
+        acdSfpThreshStatusVccHighWarn,
+        acdSfpThreshStatusVccLowWarn,
+        acdSfpThreshStatusLbcHighAlm,
+        acdSfpThreshStatusLbcLowAlm,
+        acdSfpThreshStatusLbcHighWarn,
+        acdSfpThreshStatusLbcLowWarn,
+        acdSfpThreshStatusTxPwrHighAlm,
+        acdSfpThreshStatusTxPwrLowAlm,
+        acdSfpThreshStatusTxPwrHighWarn,
+        acdSfpThreshStatusTxPwrLowWarn,
+        acdSfpThreshStatusRxPwrHighAlm,
+        acdSfpThreshStatusRxPwrLowAlm,
+        acdSfpThreshStatusRxPwrHighWarn,
+        acdSfpThreshStatusRxPwrLowWarn
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the SFP threshold status Group."
+    ::= { acdSfpGroups 4 }
+
+acdSfpCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+       "The compliance statement for support of the ACD-SFP-MIB module."
+    MODULE
+        MANDATORY-GROUPS {
+            acdSfpInfoGroup,
+            acdSfpDiagGroup,
+            acdSfpThreshGroup,
+            acdSfpThreshStatusGroup
+         }
+
+    ::= { acdSfpCompliances 1 }
+
+END

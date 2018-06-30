@@ -1,7 +1,6 @@
 {
     "name": "leaflet.markercluster",
-    "version": "0.4.0",
-    "main": "dist/leaflet.markercluster-src.js",
+    "version": "1.2.0",
     "homepage": "https://github.com/Leaflet/Leaflet.markercluster",
     "authors": [
         "Dave Leaver <danzel@localhost.geek.nz>"
@@ -23,6 +22,6 @@
         "tests"
     ],
     "dependencies": {
-        "leaflet": ">= 0.7.0"
+        "leaflet": ">= 1.0.3"
     }
 }

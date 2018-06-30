@@ -1,0 +1,13 @@
+os: powercode
+group: unix
+text: 'Powercode BMU'
+icon: powercode
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+type: server
+processor_stacked: true
+discovery:
+    - sysDescr:
+        - 'Powercode BMU'

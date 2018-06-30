@@ -47,11 +47,11 @@ class ObjectCache implements ArrayAccess
         if (isset($GLOBALS['_ObjCache'][$obj])) {
             $this->data = $GLOBALS['_ObjCacheSkell'][$obj];
         } else {
-            if (!is_array($GLOBALS['_ObjCacheSkell'])) {
+            if (!isset($GLOBALS['_ObjCacheSkell']) || !is_array($GLOBALS['_ObjCacheSkell'])) {
                 $GLOBALS['_ObjCacheSkell'] = array();
             }
 
-            if (!is_array($GLOBALS['_ObjCache'])) {
+            if (!isset($GLOBALS['_ObjCache']) || !is_array($GLOBALS['_ObjCache'])) {
                 $GLOBALS['_ObjCache'] = array();
             }
 
@@ -60,7 +60,7 @@ class ObjectCache implements ArrayAccess
                 include $config['install_dir'].'/includes/caches/'.$obj.'.inc.php';
                 $this->data = $data;
                 $GLOBALS['_ObjCacheSkell'][$obj] = $this->data;
-                if (!is_array($GLOBALS['_ObjCache'][$obj])) {
+                if (!(isset($GLOBALS['_ObjCache'][$obj]) && is_array($GLOBALS['_ObjCache'][$obj]))) {
                     $GLOBALS['_ObjCache'][$obj] = $this->data;
                 }
             }
@@ -96,7 +96,7 @@ class ObjectCache implements ArrayAccess
             } elseif (isset($GLOBALS['_ObjCache'][$this->obj][$obj]['value'])) {
                 return $GLOBALS['_ObjCache'][$this->obj][$obj]['value'];
             } else {
-                $GLOBALS['_ObjCache'][$this->obj][$obj]['value'] = dbFetchRows($this->data[$obj]['query'], $this->data[$obj]['params']);
+                $GLOBALS['_ObjCache'][$this->obj][$obj]['value'] = dbFetchRows($this->data[$obj]['query'], isset($this->data[$obj]['params']) ? $this->data[$obj]['params'] : array());
                 if (sizeof($GLOBALS['_ObjCache'][$this->obj][$obj]['value']) == 1 && sizeof($GLOBALS['_ObjCache'][$this->obj][$obj]['value'][0]) == 1) {
                     $GLOBALS['_ObjCache'][$this->obj][$obj]['value'] = current($GLOBALS['_ObjCache'][$this->obj][$obj]['value'][0]);
                 }

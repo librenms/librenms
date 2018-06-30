@@ -1,0 +1,23 @@
+os: arista_eos
+text: 'Arista EOS'
+type: network
+icon: arista
+group: arista
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysDescr:
+        - Arista Networks EOS
+poller_modules:
+    wireless: false
+    ipmi: false
+    applications: false
+    services: false
+    ntp: false
+discovery_modules:
+    cisco-vrf-lite: false
+    services: false
+    ntp: false
+    wireless: false

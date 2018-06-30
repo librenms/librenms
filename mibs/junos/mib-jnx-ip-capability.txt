@@ -1,0 +1,87 @@
+-- *****************************************************************
+-- JNX-IP-CAPABILITY.mib: Juniper IP-MIB AGENT-CAPABILITIES
+--
+-- Copyright (c) 2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+JNX-IP-CAPABILITY DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    jnxAgentCapability
+        FROM JUNIPER-SMI;
+
+
+jnxIpCapability MODULE-IDENTITY
+    LAST-UPDATED    "201306180000Z"
+    ORGANIZATION    "Juniper Networks, Inc."
+    CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+             E-mail: support@juniper.net"
+
+    DESCRIPTION
+        "The capabilities description of IP-MIB."
+    ::= { jnxAgentCapability 3 }
+
+
+
+jnxIpCapJunos AGENT-CAPABILITIES
+    PRODUCT-RELEASE "All JUNOS Version"
+    STATUS          current
+    DESCRIPTION
+        "IP-MIB capabilities."
+
+    SUPPORTS        IP-MIB
+    INCLUDES        {
+                        ipSystemStatsGroup,
+                        ipAddressGroup,
+                        ipNetToPhysicalGroup,
+                        icmpStatsGroup,
+                        ipGroup,
+                        icmpGroup
+                    }
+
+    VARIATION       ipForwarding
+    ACCESS          read-only
+    DESCRIPTION     "Write is not supported."
+
+    VARIATION       ipDefaultTTL
+    ACCESS          read-only
+    DESCRIPTION     "Write is not supported."
+    
+    VARIATION       ipSystemStatsInBcastPkts
+    ACCESS          not-implemented
+    DESCRIPTION
+        "This object is not implemented."
+
+    VARIATION       ipSystemStatsHCInBcastPkts
+    ACCESS          not-implemented
+    DESCRIPTION
+        "This object is not implemented."
+
+    VARIATION       ipSystemStatsOutBcastPkts
+    ACCESS          not-implemented
+    DESCRIPTION
+        "This object is not implemented."
+
+    VARIATION       ipSystemStatsHCOutBcastPkts
+    ACCESS          not-implemented
+    DESCRIPTION
+        "This object is not implemented."
+
+    VARIATION       ipAddressSpinLock
+    ACCESS          not-implemented
+    DESCRIPTION
+        "This object is not implemented."
+
+    ::= { jnxIpCapability 1 }
+
+END

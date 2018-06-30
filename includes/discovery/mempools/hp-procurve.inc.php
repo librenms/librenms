@@ -14,8 +14,8 @@
 // NETSWITCH-MIB::hpGlobalMemTotalBytes.1 = INTEGER: 11337704
 // NETSWITCH-MIB::hpGlobalMemFreeBytes.1 = INTEGER: 9669104
 // NETSWITCH-MIB::hpGlobalMemAllocBytes.1 = INTEGER: 1668728
-$array = snmpwalk_cache_oid($device, 'hpLocal', null, 'NETSWITCH-MIB', $config['mibdir'].':'.$config['mibdir'].'/hp');
-$array = snmpwalk_cache_oid($device, 'hpGlobal', $array, 'NETSWITCH-MIB', $config['mibdir'].':'.$config['mibdir'].'/hp');
+$array = snmpwalk_cache_oid($device, 'hpLocal', null, 'NETSWITCH-MIB', 'hp');
+$array = snmpwalk_cache_oid($device, 'hpGlobal', $array, 'NETSWITCH-MIB', 'hp');
 
 if (is_array($array)) {
     echo 'Procurve : ';

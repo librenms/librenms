@@ -13,6 +13,7 @@
       <tr>
         <th>Module</th>
         <th>Global</th>
+        <th>OS</th>
         <th>Device</th>
         <th></th>
       </tr>
@@ -35,6 +36,22 @@ foreach ($poller_modules as $module => $module_status) {
 
     echo('
         </td>
+        <td>');
+
+    if (isset($config['os'][$device['os']]['poller_modules'][$module])) {
+        if ($config['os'][$device['os']]['poller_modules'][$module]) {
+            echo('<span class="text-success">Enabled</span>');
+            $module_status = 1;
+        } else {
+            echo('<span class="text-danger">Disabled</span>');
+            $module_status = 0;
+        }
+    } else {
+        echo('<span>Unset</span>');
+    }
+
+    echo('
+        </td>
         <td>
         ');
 
@@ -47,11 +64,10 @@ foreach ($poller_modules as $module => $module_status) {
             $module_checked = '';
         }
     } else {
+        echo('<span id="poller-module-'.$module.'">Unset</span>');
         if ($module_status == 1) {
-            echo('<span id="poller-module-'.$module.'"class="text-success">Enabled</span>');
             $module_checked = 'checked';
         } else {
-            echo('<span id="poller-module-'.$module.'"class="text-danger">Disabled</span>');
             $module_checked = '';
         }
     }
@@ -61,7 +77,8 @@ foreach ($poller_modules as $module => $module_status) {
        <td>
        ');
 
-    echo('<input type="checkbox" name="poller-module" data-poller_module="'.$module.'" data-device_id="'.$device['device_id'].'" '.$module_checked.'>');
+    echo '<input type="checkbox" style="visibility:hidden;width:100px;" name="poller-module" data-poller_module="'
+        .$module.'" data-device_id="'.$device['device_id'].'" '.$module_checked.'>';
 
     echo('
        </td>
@@ -78,6 +95,7 @@ foreach ($poller_modules as $module => $module_status) {
       <tr>
         <th>Module</th>
         <th>Global</th>
+        <th>OS</th>
         <th>Device</th>
         <th></th>
       </tr>
@@ -105,6 +123,22 @@ foreach ($discovery_modules as $module => $module_status) {
         </td>
         <td>');
 
+    if (isset($config['os'][$device['os']]['discovery_modules'][$module])) {
+        if ($config['os'][$device['os']]['discovery_modules'][$module]) {
+            echo('<span class="text-success">Enabled</span>');
+            $module_status = 1;
+        } else {
+            echo('<span class="text-danger">Disabled</span>');
+            $module_status = 0;
+        }
+    } else {
+        echo('<span>Unset</span>');
+    }
+
+    echo('
+        </td>
+        <td>');
+
     if (isset($attribs['discover_'.$module])) {
         if ($attribs['discover_'.$module]) {
             echo('<span id="discovery-module-'.$module.'" class="text-success">Enabled</span>');
@@ -114,11 +148,10 @@ foreach ($discovery_modules as $module => $module_status) {
             $module_checked = '';
         }
     } else {
+        echo('<span id="discovery-module-'.$module.'">Unset</span>');
         if ($module_status == 1) {
-            echo('<span id="discovery-module-'.$module.'" class="text-success">Enabled</span>');
             $module_checked = 'checked';
         } else {
-            echo('<span id="discovery-module-'.$module.'" class="text-danger">Disabled</span>');
             $module_checked = '';
         }
     }
@@ -127,7 +160,8 @@ foreach ($discovery_modules as $module => $module_status) {
         </td>
         <td>');
 
-    echo('<input type="checkbox" name="discovery-module" data-discovery_module="'.$module.'" data-device_id="'.$device['device_id'].'" '.$module_checked.'>');
+    echo '<input type="checkbox" style="visibility:hidden;width:100px;" name="discovery-module" data-discovery_module="'
+        .$module.'" data-device_id="'.$device['device_id'].'" '.$module_checked.'>';
 
     echo('
         </td>

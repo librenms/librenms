@@ -1,0 +1,23 @@
+os: ciscoepc
+group: cisco
+text: 'Cisco EPC'
+type: network
+icon: cisco
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_storage, text: 'Storage Usage' }
+poller_modules:
+    bgp-peers: false
+    hr-mib: false
+    ntp: false
+    ospf: false
+    ucd-diskio: false
+    ucd-mib: false
+discovery_modules:
+    bgp-peers: false
+    cisco-vrf-lite: false
+    ntp: false
+    ucd-diskio: false
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.1429.3940.

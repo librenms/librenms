@@ -20,7 +20,7 @@ JNX-L2TP-MIB DEFINITIONS ::= BEGIN
                FROM JUNIPER-SMI;
 
    jnxL2tp    MODULE-IDENTITY
-           LAST-UPDATED    "201311210000Z" -- 21 November 2013
+           LAST-UPDATED    "201405020000Z" -- 02 May 2014
            ORGANIZATION    "Juniper Networks Inc."
            CONTACT-INFO
             "        Juniper Technical Assistance Center
@@ -55,6 +55,11 @@ JNX-L2TP-MIB DEFINITIONS ::= BEGIN
            REVISION    "201311210000Z"  -- 21-Nov-13 03:12 PM EST - JUNOS 13.1 
            DESCRIPTION 
            "Corrected order of revision history" 
+
+           REVISION    "201405020000Z"  -- 02-May-14 02:14 AM EST - JUNOS 14.1 
+           DESCRIPTION 
+           "Changed the data type of jnxL2tpSessionStatsInterfaceUnit from
+           Integer32 to Unsigned32." 
            ::= { jnxL2tpMibRoot 1 }
 
    --
@@ -826,7 +831,7 @@ JNX-L2TP-MIB DEFINITIONS ::= BEGIN
                jnxL2tpSessionStatsRemoteSID
                    Integer32,
                jnxL2tpSessionStatsInterfaceUnit
-                   Integer32,
+                   Unsigned32,
                jnxL2tpSessionStatsEncapType
                    INTEGER,
                jnxL2tpSessionStatsBundleID
@@ -1000,7 +1005,7 @@ JNX-L2TP-MIB DEFINITIONS ::= BEGIN
            ::= { jnxL2tpSessionStatsEntry 5 }
 
    jnxL2tpSessionStatsInterfaceUnit OBJECT-TYPE
-           SYNTAX          Integer32  (0..65535)
+           SYNTAX          Unsigned32
            MAX-ACCESS      read-only
            STATUS          current
            DESCRIPTION

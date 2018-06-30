@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 if ($device['os_group'] == 'unix') {
     echo $config['project_name'].' UNIX Agent: ';
 
@@ -22,7 +24,7 @@ if ($device['os_group'] == 'unix') {
     $agentinfo = stream_get_meta_data($agent);
 
     if (!$agent) {
-        echo 'Connection to UNIX agent failed on port '.$port.'.';
+        echo 'Connection to UNIX agent failed on port '.$agent_port.'.';
     } else {
         // fetch data while not eof and not timed-out
         while ((!feof($agent)) && (!$agentinfo['timed_out'])) {
@@ -31,7 +33,7 @@ if ($device['os_group'] == 'unix') {
         }
 
         if ($agentinfo['timed_out']) {
-            echo 'Connection to UNIX agent timed out during fetch on port '.$port.'.';
+            echo 'Connection to UNIX agent timed out during fetch on port '.$agent_port.'.';
         }
     }
 
@@ -42,7 +44,7 @@ if ($device['os_group'] == 'unix') {
         echo 'execution time: '.$agent_time.'ms';
 
         $tags = array(
-            'rrd_def' => 'DS:time:GAUGE:600:0:U',
+            'rrd_def' => RrdDefinition::make()->addDataset('time', 'GAUGE', 0),
         );
         $fields = array(
             'time' => $agent_time,
@@ -61,7 +63,9 @@ if ($device['os_group'] == 'unix') {
             "powerdns-recursor",
             "proxmox",
             "rrdcached",
-            "tinydns");
+            "tinydns",
+            "gpsd",
+          );
 
         foreach (explode('<<<', $agent_raw) as $section) {
             list($section, $data) = explode('>>>', $section);
@@ -97,7 +101,7 @@ if ($device['os_group'] == 'unix') {
             dbDelete('processes', 'device_id = ?', array($device['device_id']));
             $data=array();
             foreach (explode("\n", $agent_data['ps']) as $process) {
-                $process = preg_replace('/\((.*),([0-9]*),([0-9]*),([0-9\:\.]*),([0-9]*)\)\ (.*)/', '\\1|\\2|\\3|\\4|\\5|\\6', $process);
+                $process = preg_replace('/\((.*),([0-9]*),([0-9]*),([0-9\:\.\-]*),([0-9]*)\)\ (.*)/', '\\1|\\2|\\3|\\4|\\5|\\6', $process);
                 list($user, $vsz, $rss, $cputime, $pid, $command) = explode('|', $process, 6);
                 if (!empty($command)) {
                     $data[]=array('device_id' => $device['device_id'], 'pid' => $pid, 'user' => $user, 'vsz' => $vsz, 'rss' => $rss, 'cputime' => $cputime, 'command' => $command);
@@ -152,6 +156,10 @@ if ($device['os_group'] == 'unix') {
     if (!empty($agent_sensors)) {
         echo 'Sensors: ';
         check_valid_sensors($device, 'temperature', $valid['sensor'], 'agent');
+        d_echo($agent_sensors);
+        if (count($agent_sensors) > 0) {
+            record_sensor_data($device, $agent_sensors);
+        }
         echo "\n";
     }
 

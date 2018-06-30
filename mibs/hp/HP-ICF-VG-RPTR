@@ -1,0 +1,1094 @@
+       HP-ICF-VG-RPTR DEFINITIONS ::= BEGIN
+
+       IMPORTS
+           Integer32, Counter32, Counter64, 
+           OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+               FROM SNMPv2-SMI
+           DisplayString, TruthValue
+               FROM SNMPv2-TC
+           MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+               FROM SNMPv2-CONF
+           icfVgPortStatus
+               FROM ICF-VG-RPTR
+           hpicfObjectModules, hpicfVg, hpicfVgRptrTrapsPrefix
+               FROM HP-ICF-OID;
+
+       hpicfVgRptrMib MODULE-IDENTITY
+            LAST-UPDATED "200011032225Z"  -- November 3, 2000
+            ORGANIZATION "Hewlett Packard Company,
+                          Network Infrastructure Solutions"
+            CONTACT-INFO
+                    "Hewlett Packard Company
+                     8000 Foothills Blvd.
+                     Roseville, CA 95747"
+            DESCRIPTION
+                    "This MIB module contains objects that provide
+                    HP-specific extensions to the 802.12 Repeater MIB."
+
+            REVISION     "200011032225Z"  -- November 3, 2000
+            DESCRIPTION  "Updated division name."
+
+            REVISION     "9703060345Z"  -- March 6, 1997
+            DESCRIPTION
+                    "Added NOTIFICATION-GROUP information."
+            REVISION     "9609100236Z"  -- September 10, 1996
+            DESCRIPTION
+                    "Updated division name and STATUS clauses."
+            REVISION     "9602142253Z"  -- February 14, 1996
+            DESCRIPTION
+                    "Split this MIB module from the former monolithic
+                    hp-icf MIB.  Added redundant uplink support and
+                    additional global counters for standard-compliant
+                    hardware support."
+            REVISION     "9501180000Z"  -- January 18, 1995
+            DESCRIPTION
+                    "Initial version of this MIB module.  Released with
+                    the HPJ2414A agent card for the HPJ2410A 100VG
+                    repeater."
+            ::= { hpicfObjectModules 11 }
+
+
+
+       hpVgBasic          OBJECT IDENTIFIER ::= { hpicfVg 1 }
+       hpVgBasicGlobal    OBJECT IDENTIFIER ::= { hpVgBasic 1 }
+
+       hpVgEntityName OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE (0..15))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The local name of this 100BaseVG repeater.  This is
+                   the same value as hpicfEntityName in the case where 
+                   there is Distributed Management Protocol to access
+                   this device.
+
+                   For SNMPv1, this name is appended to the agent 
+                   community name to obtain a community name to use
+                   to specify that the agent should proxy to this
+                   repeater.  For example, if this agent has a 
+                   community with a community name of 'public', and
+                   the value of this object is 'repeater1', the 
+                   community 'public/repeater1' will specify that the
+                   agent should proxy to the public community of the
+                   repeater1 box to obtain management information
+                   about this repeater.
+
+                   If an agent receives a management request where 
+                   the localEntity is not specified, it will default 
+                   to the local repeater on which this agent is 
+                   executing."
+           ::= { hpVgBasicGlobal 1 }
+
+       hpVgRedundantUpLinksFlag  OBJECT-TYPE
+           SYNTAX     TruthValue
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "This object is used to indicate that the hub 
+                   is configured with redundant uplink ports."
+           ::= {  hpVgBasicGlobal 2 }
+
+       hpVgXcvrTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpVgXcvrEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A table containing information about transceivers.
+                   All uplink, downlink, and redundent links are 
+                   represented in this table"
+           ::= { hpVgBasicGlobal 3 }
+
+       hpVgXcvrEntry OBJECT-TYPE
+           SYNTAX     HpVgXcvrEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An entry in the transceiver table"
+           INDEX      { hpVgXcvrGroupIndex , hpVgXcvrIndex }
+           ::= { hpVgXcvrTable 1 }
+
+       HpVgXcvrEntry ::=
+           SEQUENCE {
+               hpVgXcvrGroupIndex              Integer32,
+               hpVgXcvrIndex                   Integer32,
+               hpVgXcvrType                    INTEGER,  
+               hpVgXcvrAssociatedPort          Integer32,  
+               hpVgXcvrState                   INTEGER,
+               hpVgXcvrAbandonments            Counter32,
+               hpVgXcvrIsMovable               TruthValue
+           }
+
+       hpVgXcvrGroupIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..1024)
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "The group within the repeater for which this entry 
+                   contains information.  This object has the same value
+                   as the corresponding instance of icfVgGroupIndex."
+           ::= {  hpVgXcvrEntry 1 }
+
+       hpVgXcvrIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..1024)
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "The transceiver within the group for which this
+                   entry contains information."
+           ::= { hpVgXcvrEntry 2 }
+
+       hpVgXcvrType OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          other(1),
+                          unknown(2),
+                          pmdMissing(3),
+                          utp4(4),
+                          stp2(5),
+                          fibre(6)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The type of physical media supported by this
+                   transceiver.  One of the following values:
+
+                          other       undefined
+                          unknown     true state not known
+                          pmdMissing  PMD device not attached
+                          utp4        4-pair unshielded twisted pair
+                          stp2        2-pair shielded twisted pair
+                          fibre       802.12 fibre optic cabling
+
+                   This object may be 'unknown' if the implementation is
+                   not capable of identifying the PMD media type, or
+                   whether or not the PMD is even present."
+           ::= {  hpVgXcvrEntry 3 }
+
+       hpVgXcvrAssociatedPort OBJECT-TYPE
+           SYNTAX     Integer32 (1..1024)
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "The port within the group that this transceiver is 
+                   associated with.  There may be multiple transceivers
+                   associated with a single port.  Also, a transceiver
+                   may be moved between ports."
+           ::= { hpVgXcvrEntry 4 }
+
+       hpVgXcvrState OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          unknown(1),
+                          inUse(2),
+                          standby(3),
+                          silent(4),
+                          linkFailure(5)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is set to 'unknown' if the transceiver
+                   is not present or its status cannot be determined.
+                   'inUse' indicates that the transceiver is currently
+                   selected for use by its associated port.  'standby'
+                   indicates the associated port is using another
+                   tranceiver, but this tranceiver could be used if
+                   needed.  'silent' indicates that the tranceiver is
+                   not detecting any tones on the link.   'linkFailure'
+                   indicates that the tranceiver was unable to train for
+                   some reason."
+           ::= { hpVgXcvrEntry 5 }
+
+       hpVgXcvrAbandonments OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The total number of times the corresponding instance
+                   of the hpVgXcvrState object has entered the
+                   'abandoned' state.  For downlink  ports this object
+                   will have the value 0."
+           ::= { hpVgXcvrEntry 6 }
+
+       hpVgXcvrIsMovable  OBJECT-TYPE
+           SYNTAX     TruthValue
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "A true value indicates that the transceiver can be
+                   associated with a single port from a set of multiple
+                   ports.  A false value indicates that a transceiver
+                   can only be associated with a single, fixed, port"
+           ::= { hpVgXcvrEntry 7 }
+
+
+       hpVgNullAddrTraining OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          preventNullAddr(1),
+                          allowNullAddr(2)
+                      }
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "This object is used to control whether the repeater
+                   will allow completion of training by end-nodes using
+                   null MAC addresses.  The 802.12 standard is written
+                   to disallow such training.  However, some end-nodes
+                   may use this configuration at power-up before any
+                   software is loaded.  If so, the user may see frequent
+                   training occurring on the repeater because of this.
+                   In addition, some end-node applications may not work
+                   when initial training fails due to the locking out of
+                   null MAC addresses.
+
+                   The default setting of this object is to allow null
+                   MAC addresses to train.  This is recommended for most
+                   situations, despite the fact that it contradicts the
+                   802.12 standard.
+
+                   For repeaters that have First Learned address
+                   security on this hub, disallowing null-address
+                   training provides the most extensive security until
+                   the ports' authorized addresses are learned.
+                   However, if this creates problems for the end-node
+                   applications, it may be necessary to instead
+                   explicitly assign the ports' authorized addresses
+                   and configure this object to allow null-address
+                   training."
+           ::= { hpVgBasicGlobal 4 }
+
+
+       hpVgBasicGroup  OBJECT IDENTIFIER ::= { hpVgBasic 2 }
+
+       hpVgBasicGroupTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpVgBasicGroupEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "HP specific extensions to the vgBasicGroupTable."
+           ::= { hpVgBasicGroup 1 }
+
+       hpVgBasicGroupEntry OBJECT-TYPE
+           SYNTAX     HpVgBasicGroupEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An entry in the table, containing HP extensions 
+                   for a specific group."
+           INDEX      { hpVgGrpGroupIndex }
+           ::= { hpVgBasicGroupTable 1 }
+
+       HpVgBasicGroupEntry ::=
+           SEQUENCE {
+               hpVgGrpGroupIndex               Integer32,
+               hpVgGrpPortsAdminStatus         OCTET STRING,
+               hpVgGrpPortsTrained             OCTET STRING,
+               hpVgGrpPortsInTraining          OCTET STRING,
+               hpVgGrpPortsCascaded            OCTET STRING,
+               hpVgGrpPortsPromiscuous         OCTET STRING
+           }
+
+       hpVgGrpGroupIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..1024)
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "The group within the repeater for which this entry 
+                   contains information.  This object has the same value
+                   as the corresponding instance of icfVgGroupIndex."
+           ::= {  hpVgBasicGroupEntry 1 }
+
+       hpVgGrpPortsAdminStatus OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE (1..128))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The hpVgGrpPortsAdminStatus is a bit map of the
+                   state of the icfVgPortAdminStatus object for all
+                   of the ports in this group.  The object  has a one
+                   bit for each port for which the value of
+                   icfVgPortAdminStatus is equal to 'enabled(1)' and
+                   a zero bit for each port for which the value of
+                   icfVgPortAdminStatus is equal to 'disabled(2)'.
+
+                   The bits are placed into the OCTET STRING in the 
+                   following order:
+
+                       octet   0  octet    1  octet     2  ...
+                       bits  7-0  bits   7-0  bits    7-0  ...
+                       ports 1-8  ports 9-16  ports 17-24  ...
+
+                   Values of unused bits in the last octet are 
+                   undefined."
+           ::= { hpVgBasicGroupEntry 2 }
+
+       hpVgGrpPortsTrained OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE (1..128))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The hpVgGrpPortsTrained is a bit map which indicates
+                   which ports in this group are currently online.  The
+                   object  has a one bit for each port for which meets
+                   the following conditions:
+
+                     1. The value of the corresponding instance of the
+                        ifVgPortAdminStatus object is equal to
+                        'enabled(1)'.
+                     2. The value of the corresponding instance of the
+                        icfVgPortStatus object is equal to 'active(1)'. 
+
+                   The object has a zero bit for each port which does
+                   not meet the above conditions.
+
+                   The bits are placed into the OCTET STRING in the 
+                   following order:
+
+                       octet   0  octet    1  octet     2  ...
+                       bits  7-0  bits   7-0  bits    7-0  ...
+                       ports 1-8  ports 9-16  ports 17-24  ...
+
+                   Values of unused bits in the last octet are 
+                   undefined."
+           ::= { hpVgBasicGroupEntry 3 }
+
+       hpVgGrpPortsInTraining OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE (1..128))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The hpVgGrpPortsInTraining is a bit map which
+                   indicates which ports in this group are currently in
+                   the training state.  The object has a one bit for
+                   each port which meets the following conditions:
+
+                     1. The value of the corresponding instance of the
+                        ifVgPortAdminStatus object is equal to
+                        'enabled(1)'.
+                     2. The value of the corresponding instance of the
+                        icfVgPortStatus object is equal to 
+                        'training(3)'. 
+
+                   The object has a zero bit for each port which does
+                   not meet the above conditions.
+
+                   The bits are placed into the OCTET STRING in the 
+                   following order:
+
+                       octet   0  octet    1  octet     2  ...
+                       bits  7-0  bits   7-0  bits    7-0  ...
+                       ports 1-8  ports 9-16  ports 17-24  ...
+
+                   Values of unused bits in the last octet are 
+                   undefined."
+           ::= { hpVgBasicGroupEntry 4 }
+
+       hpVgGrpPortsCascaded OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE (1..128))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The hpVgGrpPortsCascaded is a bit map which
+                   indicates which ports in this group have trained as
+                   cascaded repeater ports.  The object has a one bit
+                   for each port which meets the following conditions:
+
+                     1. The value of the corresponding instance of the
+                        ifVgPortAdminStatus object is equal to
+                        'enabled(1)'.
+                     2. The value of the corresponding instance of the
+                        icfVgPortStatus object is equal to 
+                        'active(1)'.
+                     3. The value of the 'R' bit in the corresponding
+                        instance of the icfVgPortTrainingResult object
+                        is equal to one.
+
+                   The object has a zero bit for each port which does
+                   not meet the above conditions.
+
+                   The bits are placed into the OCTET STRING in the 
+                   following order:
+
+                       octet   0  octet    1  octet     2  ...
+                       bits  7-0  bits   7-0  bits    7-0  ...
+                       ports 1-8  ports 9-16  ports 17-24  ...
+
+                   Values of unused bits in the last octet are 
+                   undefined."
+           ::= { hpVgBasicGroupEntry 5 }
+
+       hpVgGrpPortsPromiscuous OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE (1..128))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The hpVgGrpPortsPromiscuous is a bit map which
+                   indicates which ports in this group have trained for
+                   promiscuous operation.  The object has a one bit for
+                   each port which meets the following conditions:
+
+                     1. The value of the corresponding instance of the
+                        ifVgPortAdminStatus object is equal to
+                        'enabled(1)'.
+                     2. The value of the corresponding instance of the
+                        icfVgPortStatus object is equal to 
+                        'active(1)'.
+                     3. The value of the 'PP' field in the corresponding
+                        instance of the icfVgPortTrainingResult object
+                        is equal to 01.
+
+                   The object has a zero bit for each port which does
+                   not meet the above conditions.
+
+                   The bits are placed into the OCTET STRING in the 
+                   following order:
+
+                       octet   0  octet    1  octet     2  ...
+                       bits  7-0  bits   7-0  bits    7-0  ...
+                       ports 1-8  ports 9-16  ports 17-24  ...
+
+                   Values of unused bits in the last octet are 
+                   undefined."
+           ::= { hpVgBasicGroupEntry 6 }
+
+       hpVgBasicPort  OBJECT IDENTIFIER ::= { hpVgBasic 3 }
+
+       hpVgBasicPortTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpVgBasicPortEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "HP specific extensions to the vg port table."
+           ::= { hpVgBasicPort 1 }
+
+       hpVgBasicPortEntry OBJECT-TYPE
+           SYNTAX     HpVgBasicPortEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "HP extended information about a specific vg port."
+           INDEX      { hpVgPortGroupIndex, hpVgPortIndex }
+           ::= { hpVgBasicPortTable 1 }
+
+       HpVgBasicPortEntry ::=
+           SEQUENCE {
+               hpVgPortGroupIndex              Integer32,
+               hpVgPortIndex                   Integer32,
+               hpVgPortPolarityReversed        TruthValue,
+               hpVgPortWireSkewError           TruthValue,
+               hpVgPortAssociatedXcvrIndex     Integer32,
+               hpVgPortNumAssociatedXcvrs      Integer32
+           }
+
+       hpVgPortGroupIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..1024)
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "The group that contains the port for which this
+                   entry contains information."
+           ::= { hpVgBasicPortEntry 1 }
+
+       hpVgPortIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..1024)
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "The port within the group for which this entry
+                   contains information."
+           ::= { hpVgBasicPortEntry 2 }
+
+       hpVgPortPolarityReversed OBJECT-TYPE
+           SYNTAX     TruthValue
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is used to indicate that the hub port
+                   was wired with the positive/negative polarity of its
+                   wire pairs reversed.  Note that the port will
+                   continue to operate in this state, with the hub
+                   inverting the polarity internally."
+           ::= { hpVgBasicPortEntry 3 }
+
+       hpVgPortWireSkewError OBJECT-TYPE
+           SYNTAX     TruthValue
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is used to indicate that a wire skew
+                   error has been detected on this port."
+           ::= { hpVgBasicPortEntry 4 }
+
+       hpVgPortAssociatedXcvrIndex OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "This object is the index into the transceiver table,
+                   hpVgXcvrTable.  The transceiver entry defines which
+                   transceiver is connected to the port.  This object 
+                   will be set to 0 if the port is not currently
+                   associated with a transceiver"
+           ::= { hpVgBasicPortEntry 5 }
+
+       hpVgPortNumAssociatedXcvrs  OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is the number of transceivers that are
+                   currently associated with this port via the
+                   hpVgXcvrTable."
+           ::= { hpVgBasicPortEntry 6 }
+
+       hpVgMonitor   OBJECT IDENTIFIER ::= { hpicfVg 2 }
+
+       hpVgMonitorGlobal OBJECT IDENTIFIER ::= { hpVgMonitor 1 }
+
+       -- Note: The hpVgMonitorGlobal counters that are composed of
+       -- other objects are provided to allow for event testing on 
+       -- global error conditions.
+
+       hpVgMonCounters OBJECT IDENTIFIER ::= { hpVgMonitorGlobal 1 }
+
+       hpVgMonGlbReadableFrames OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is the total number of good frames of
+                   valid frame length that have been received on all
+                   ports in this repeater.  This counter is the
+                   summation of the values of the
+                   icfVgPortReadableFrames counter for all of the ports
+                   in this repeater."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aReadableFramesReceived."
+           ::= { hpVgMonCounters 1 }
+
+       hpVgMonGlbReadableOctets OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the total number of octets
+                   contained in good frames that have been received on
+                   all ports in this repeater.  This counter is the
+                   summation of the values of the
+                   icfVgPortReadableOctets counter for all of the ports
+                   in this repeater.
+
+                   Note that this counter will roll over very quickly.
+                   It is provided for backward compatibility for Network
+                   Management protocols that do not support 64 bit
+                   counters (e.g. SNMP version 1)."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aReadableOctetsReceived."
+           ::= { hpVgMonCounters 2 }
+
+       hpVgMonGlbUnreadableOctets OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the total number of octets
+                   contained in invalid frames that have been received
+                   on all ports in this repeater.  This counter is the
+                   summation of the values of icfVgPortUnreadableOctets
+                   counter for all of the ports in this repeater.
+
+                   Note that this counter will roll over very quickly.
+                   It is provided for backward compatibility for Network
+                   Management protocols that do not support 64 bit
+                   counters (e.g. SNMP version 1)."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aOctetsInUnreadableFramesRcvd."
+           ::= { hpVgMonCounters 3 }
+
+       hpVgMonGlbHighPriorityFrames OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the total number of high
+                   priority frames that have been received on all ports
+                   in this repeater.  This counter is a summation of the
+                   values of the icfVgPortHighPriorityFrames counter for
+                   all of the ports in this repeater."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aHighPriorityFramesReceived."
+           ::= { hpVgMonCounters 4 }
+
+       hpVgMonGlbHighPriorityOctets OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the total number of octets
+                   contained in high priority frames that have been
+                   received on all ports of this repeater.  This counter
+                   is a summation of the values of the
+                   icfVgPortHighPriorityOctets counter for all of the
+                   ports in this repeater.
+
+                   Note that this counter will roll over very quickly.
+                   It is provided for backward compatibility for Network
+                   Management protocols that do not support 64 bit
+                   counters (e.g. SNMP version 1)."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aHighPriorityOctetsReceived."
+           ::= { hpVgMonCounters 5 }
+
+       hpVgMonGlbBroadcastFrames OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the total number of
+                   broadcast packets that have been received on all
+                   ports in this repeater.  This counter is a summation
+                   of the values of the icfVgPortBroadcastFrames counter
+                   for all of the ports in this repeater."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aBroadcastFramesReceived."
+           ::= { hpVgMonCounters 6 }
+
+       hpVgMonGlbMulticastFrames OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the total number of
+                   multicast packets that have been received on all
+                   ports in this repeater.  This counter is a summation
+                   of the values of the icfVgPortMulticastFrames counter
+                   for all of the ports in this repeater."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aMulticastFramesReceived."
+           ::= { hpVgMonCounters 7 }
+
+       hpVgMonGlbIPMFrames OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the total number of frames
+                   that have been received on all ports in this repeater
+                   with an invalid packet marker.  This counter is a
+                   summation of the values of the icfVgPortIPMFrames
+                   counter for all of the ports in this repeater."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aIPMFramesReceived."
+           ::= { hpVgMonCounters 8 }
+
+       hpVgMonGlbDataErrorFrames OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the total number of
+                   errored frames received on all ports in this
+                   repeater.  This counter is a summation of the values
+                   of the icfVgPortDataErrorFrames counter for all of
+                   the ports in this repeater."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aDataErrorFramesReceived."
+           ::= { hpVgMonCounters 9 }
+
+       hpVgMonGlbPriorityPromotions OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the total number of
+                   times the priority promotion timer has expired on
+                   any port in this repeater.  This counter is a
+                   summation of the values of the 
+                   icfVgPortPriorityPromotions counter for all of the
+                   ports in this repeater."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aPriorityPromotions."
+           ::= { hpVgMonCounters 10 }
+
+       hpVgMonGlbHCReadableOctets OBJECT-TYPE
+           SYNTAX     Counter64
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the total number of octets
+                   contained in good frames that have been received on
+                   all ports in this repeater.  This counter is the
+                   summation of the values of the
+                   icfVgPortReadableOctets counter for all of the ports
+                   in this repeater.
+
+                   This counter is a 64 bit version of
+                   hpVgMonGlbReadableOctets.  It should be used by
+                   Network Management protocols which support 64 bit
+                   counters (e.g. SNMPv2)."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aReadableOctetsReceived."
+           ::= { hpVgMonCounters 11 }
+
+       hpVgMonGlbHCUnreadableOctets OBJECT-TYPE
+           SYNTAX     Counter64
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the total number of octets
+                   contained in invalid frames that have been received
+                   on all ports in this repeater.  This counter is the
+                   summation of the values of icfVgPortUnreadableOctets
+                   counter for all of the ports in this repeater.
+
+                   This counter is a 64 bit version of
+                   hpVgMonGlbUnreadableOctets.  It should be used by
+                   Network Management protocols which support 64 bit
+                   counters (e.g. SNMPv2)."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aOctetsInUnreadableFramesRcvd."
+           ::= { hpVgMonCounters 12 }
+
+       hpVgMonGlbHCHighPriorityOctets OBJECT-TYPE
+           SYNTAX     Counter64
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the total number of octets
+                   contained in high priority frames that have been
+                   received on all ports of this repeater.  This counter
+                   is a summation of the values of the
+                   icfVgPortHighPriorityOctets counter for all of the
+                   ports in this repeater.
+
+                   This counter is a 64 bit version of
+                   hpVgMonGlbHighPriorityOctets.  It should be used by
+                   Network Management protocols which support 64 bit
+                   counters (e.g. SNMPv2)."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aHighPriorityOctetsReceived."
+           ::= { hpVgMonCounters 13 }
+
+       hpVgMonGlbHCNormPriorityOctets OBJECT-TYPE
+           SYNTAX     Counter64
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the total number of octets
+                   contained in normal  priority frames that have been
+                   received on all ports of this repeater.  This counter
+                   is a summation of the values of the
+                   icfVgPortNormPriorityOctets counter for all of the
+                   ports in this repeater.
+
+                   This counter is a 64 bit version of
+                   hpVgMonGlbNormPriorityOctets.  It should be used by
+                   Network Management protocols which support 64 bit
+                   counters (e.g. SNMPv2)."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aNormalPriorityOctetsReceived."
+           ::= { hpVgMonCounters 14 }
+
+       hpVgMonGlbNormPriorityFrames OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the total number of
+                   normal priority frames received on all ports in this
+                   repeater.  This counter is a summation of the values
+                   of the icfVgPortNormPriorityFrames counter for all of
+                   the ports in this repeater."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aNormalPriorityFramesReceived."
+           ::= { hpVgMonCounters 15 }
+
+       hpVgMonGlbNormPriorityOctets OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the total number of
+                   normal priority octets received on all ports in this
+                   repeater.  This counter is a summation of the values
+                   of the icfVgPortNormPriorityOctets counter for all of
+                   the ports in this repeater."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aNormalPriorityOctetsReceived."
+           ::= { hpVgMonCounters 16 }
+
+       hpVgMonGlbNullAddressedFrames OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the total number of null
+                   addressed packets that have been received on all
+                   ports. This counter is a summation of the values of
+                   the  icfVgPortNullAddressedFrames counter for the
+                   ports in this repeater."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aNullAddressedFramesReceived."
+           ::= { hpVgMonCounters 17 }
+
+       hpVgMonGlbOversizeFrames OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the total number of 
+                   oversized frames that have been received on all
+                   ports. This counter is a summation of the values of
+                   the  icfVgPortOversizeFrames counter for the ports in
+                   this repeater."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aOversizeFramesReceived."
+           ::= { hpVgMonCounters 18 }
+
+       hpVgMonGlbTransitionToTrainings OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the total number of 
+                   transitions to training on all ports. This counter is
+                   a summation of the values of the
+                   icfVgPortTransitionToTrainings counter for the ports
+                   in this repeater."
+           REFERENCE
+                  "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                  13.2.4.5.1, aTransitionsIntoTraining."
+           ::= { hpVgMonCounters 19 }
+
+
+       hpVgMonitorGroup OBJECT IDENTIFIER ::= { hpVgMonitor 2 }
+       -- unused
+
+       hpVgMonitorPort  OBJECT IDENTIFIER ::= { hpVgMonitor 3 }
+       -- unused
+
+       -- VG Repeater Specific traps
+
+
+       hpVgRedundantUplinkTrap NOTIFICATION-TYPE
+           OBJECTS    { hpVgXcvrState }
+           STATUS     current
+           DESCRIPTION
+                   "An hpVgRedundantUplinkTrap is sent anytime one of
+                   the tranceivers being used in a redundant uplink
+                   transitions from one of the 'unknown', 'inUse' or
+                   'standby' states to either the 'silent' or
+                   'linkFailure' state.
+
+                   The hpVgXcvrState is the new value of the tranceiver
+                   state for the tranceiver that made the transition."
+           ::= { hpicfVgRptrTrapsPrefix 1 }
+
+       hpVgLossOfActiveTrap NOTIFICATION-TYPE
+           OBJECTS    { icfVgPortStatus }
+           STATUS     current
+           DESCRIPTION
+                   "An hpVgLossOfActiveTrap is sent whenever an enabled
+                   port transitions from the active state to either the
+                   inactive or training state.  The new value of the
+                   port's status is returned in the trap."
+           ::= { hpicfVgRptrTrapsPrefix 2 }
+
+
+       -- conformance information
+
+       hpicfVgRptrConformance
+           OBJECT IDENTIFIER ::= { hpicfVgRptrMib 1 }
+
+       hpicfVgRptrCompliances
+           OBJECT IDENTIFIER ::= { hpicfVgRptrConformance 1 }
+       hpicfVgRptrGroups
+           OBJECT IDENTIFIER ::= { hpicfVgRptrConformance 2 }
+
+       -- compliance statements
+
+       hpicfVgRptrPreDot12Compliance MODULE-COMPLIANCE
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS COMPLIANCE IS OBSOLETE *********
+
+                   The compliance statement for pre-standard HP 100VG
+                   repeaters."
+           MODULE
+               MANDATORY-GROUPS { hpicfVgRptrPreDot12BasicGroup,
+                                  hpicfVgRptrPreDot12MonitorGroup }
+
+           ::= { hpicfVgRptrCompliances 1 }
+
+       hpicfVgRptrCompliance MODULE-COMPLIANCE
+           STATUS     current
+           DESCRIPTION
+                   "The compliance statement for HP 802.12 repeaters."
+           MODULE
+               MANDATORY-GROUPS { hpicfVgRptrBasicGroup,
+                                  hpicfVgRptrMonitorGroup,
+                                  hpicfVgRptrXcvrGroup,
+                                  hpicfVgRptrBasicTraps }
+
+               GROUP      hpicfVgRptrRedundantUplinkGroup
+               DESCRIPTION
+                       "This group should be implemented on 802.12
+                       repeaters that support redundant uplinks."
+
+               GROUP      hpicfVgRptrRedundantUplinkTraps
+               DESCRIPTION
+                       "This group should be implemented on 802.12
+                       repeaters that support redundant uplinks."
+
+           ::= { hpicfVgRptrCompliances 2 }
+
+
+       -- units of conformance
+
+       hpicfVgRptrPreDot12BasicGroup OBJECT-GROUP
+           OBJECTS    { hpVgEntityName,
+                        hpVgGrpPortsAdminStatus,
+                        hpVgGrpPortsTrained,
+                        hpVgGrpPortsInTraining,
+                        hpVgGrpPortsCascaded,
+                        hpVgGrpPortsPromiscuous,
+                        hpVgPortPolarityReversed,
+                        hpVgPortWireSkewError
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   HP specific extensions to the 802.12 Repeater MIB
+                   providing status and configuration of pre-standard
+                   802.12 repeaters."
+           ::= { hpicfVgRptrGroups 1 }
+
+       hpicfVgRptrBasicGroup OBJECT-GROUP
+           OBJECTS    { hpVgEntityName,
+                        hpVgNullAddrTraining,
+                        hpVgGrpPortsAdminStatus,
+                        hpVgGrpPortsTrained,
+                        hpVgGrpPortsInTraining,
+                        hpVgGrpPortsCascaded,
+                        hpVgGrpPortsPromiscuous,
+                        hpVgPortPolarityReversed,
+                        hpVgPortWireSkewError
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "HP specific extensions to the 802.12 Repeater MIB
+                   providing status and configuration of 802.12
+                   repeaters."
+           ::= { hpicfVgRptrGroups 2 }
+
+       hpicfVgRptrPreDot12MonitorGroup OBJECT-GROUP
+           OBJECTS    { hpVgMonGlbReadableFrames,
+                        hpVgMonGlbReadableOctets,
+                        hpVgMonGlbUnreadableOctets,
+                        hpVgMonGlbHighPriorityFrames,
+                        hpVgMonGlbHighPriorityOctets,
+                        hpVgMonGlbBroadcastFrames,
+                        hpVgMonGlbMulticastFrames,
+                        hpVgMonGlbIPMFrames,
+                        hpVgMonGlbDataErrorFrames,
+                        hpVgMonGlbPriorityPromotions,
+                        hpVgMonGlbHCReadableOctets,
+                        hpVgMonGlbHCUnreadableOctets,
+                        hpVgMonGlbHCHighPriorityOctets
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   HP specific extensions to the 802.12 Repeater MIB
+                   providing global counters for pre-standard 802.12
+                   repeaters."
+           ::= { hpicfVgRptrGroups 3 }
+
+       hpicfVgRptrMonitorGroup OBJECT-GROUP
+           OBJECTS    { hpVgMonGlbReadableFrames,
+                        hpVgMonGlbReadableOctets,
+                        hpVgMonGlbUnreadableOctets,
+                        hpVgMonGlbHighPriorityFrames,
+                        hpVgMonGlbHighPriorityOctets,
+                        hpVgMonGlbBroadcastFrames,
+                        hpVgMonGlbMulticastFrames,
+                        hpVgMonGlbIPMFrames,
+                        hpVgMonGlbDataErrorFrames,
+                        hpVgMonGlbPriorityPromotions,
+                        hpVgMonGlbHCReadableOctets,
+                        hpVgMonGlbHCUnreadableOctets,
+                        hpVgMonGlbHCHighPriorityOctets,
+                        hpVgMonGlbHCNormPriorityOctets,
+                        hpVgMonGlbNormPriorityFrames,
+                        hpVgMonGlbNormPriorityOctets,
+                        hpVgMonGlbNullAddressedFrames,
+                        hpVgMonGlbOversizeFrames,
+                        hpVgMonGlbTransitionToTrainings
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "HP specific extensions to the 802.12 Repeater MIB
+                   providing global counters for 802.12 repeaters."
+           ::= { hpicfVgRptrGroups 4 }
+
+       hpicfVgRptrXcvrGroup OBJECT-GROUP
+           OBJECTS    { hpVgXcvrType,
+                        hpVgXcvrAssociatedPort,
+                        hpVgXcvrState,
+                        hpVgXcvrAbandonments,
+                        hpVgXcvrIsMovable,
+                        hpVgPortAssociatedXcvrIndex,
+                        hpVgPortNumAssociatedXcvrs
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for configuring and
+                   monitoring tranceivers on 802.12 repeaters."
+           ::= { hpicfVgRptrGroups 5 }
+
+       hpicfVgRptrRedundantUplinkGroup OBJECT-GROUP
+           OBJECTS    { hpVgRedundantUpLinksFlag }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for configuring 
+                   redundant uplinks on 802.12 repeaters."
+           ::= { hpicfVgRptrGroups 6 }
+
+       hpicfVgRptrBasicTraps NOTIFICATION-GROUP
+           NOTIFICATIONS { hpVgLossOfActiveTrap }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of notifications used to indicate
+                   port status changes on 802.12 repeaters."
+           ::= { hpicfVgRptrGroups 7 }
+
+       hpicfVgRptrRedundantUplinkTraps NOTIFICATION-GROUP
+           NOTIFICATIONS { hpVgRedundantUplinkTrap }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of notifications used to indicate
+                   status changes on the redundant uplinks on
+                   802.12 repeaters."
+           ::= { hpicfVgRptrGroups 8 }
+
+       END
+

@@ -11,13 +11,14 @@
  * the source code distribution for details.
  */
 
-if (is_admin() !== false) {
+use LibreNMS\Authentication\Auth;
+
+if (Auth::user()->hasGlobalAdmin()) {
     // Build the types list.
     $dir = $config['nagios_plugins'];
     if (file_exists($dir) && is_dir($dir)) {
         $files = scandir($dir);
         $dir .= DIRECTORY_SEPARATOR;
-        d_print_r($files);
         foreach ($files as $file) {
             if (is_executable($dir.$file) && is_file($dir.$file) && strstr($file, 'check_')) {
                 list(,$check_name) = explode('_', $file, 2);
@@ -56,7 +57,7 @@ if (is_admin() !== false) {
                     <div class='form-service'>
                         <label for='desc' class='col-sm-3 control-label'>Description: </label>
                         <div class='col-sm-9'>
-                            <input type='text' id='desc' name='desc' class='form-control'/>
+                            <textarea id='desc' name='desc' class='form-control'></textarea>
                         </div>
                     </div>
                     <div class="form-service">

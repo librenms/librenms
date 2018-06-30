@@ -11,7 +11,9 @@
  * the source code distribution for details.
  */
 
-if (is_admin() !== false) {
+use LibreNMS\Authentication\Auth;
+
+if (Auth::user()->hasGlobalAdmin()) {
 ?>
 
  <div class="modal fade bs-example-modal-sm" id="create-group" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
@@ -181,11 +183,13 @@ $('#and, #or').click('', function(e) {
            strategy: 'array',
            tagFieldName: 'patterns[]'
         });
-        if(entity.indexOf("%") >= 0) {
-            $('#response').data('tagmanager').populate([ entity+' '+condition+' '+value+' '+glue ]);
-        } else {
-            $('#response').data('tagmanager').populate([ '%'+entity+' '+condition+' "'+value+'" '+glue ]);
+        if(value.indexOf("%") < 0 && isNaN(value)) {
+            value = '"'+value+'"';
         }
+        if(entity.indexOf("%") < 0) {
+            entity = '%'+entity;
+        }
+        $('#response').data('tagmanager').populate([ entity+' '+condition+' '+value+' '+glue ]);
     }
 });
 

@@ -1,0 +1,39 @@
+os: iosxe
+group: cisco
+text: 'Cisco IOS-XE'
+type: network
+ifXmcbc: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+icon: cisco
+poller_modules:
+    cisco-ace-serverfarms: true
+    cisco-ace-loadbalancer: true
+    cisco-cbqos: true
+    cisco-cef: true
+    cisco-mac-accounting: true
+    cisco-voice: true
+    cisco-remote-access-monitor: true
+    cisco-sla: true
+    cisco-ipsec-flow-monitor: true
+    cipsec-tunnels: true
+    cisco-otv: true
+    ipmi: false
+    cisco-vpdn: true
+discovery_modules:
+    cisco-cef: true
+    cisco-sla: true
+    cisco-mac-accounting: true
+    cisco-otv: true
+    cisco-pw: true
+    vrf: true
+    cisco-vrf-lite: true
+register_mibs:
+    ciscoAAASessionMIB: CISCO-AAA-SESSION-MIB
+discovery:
+    - sysDescr:
+        - IOS-XE
+        - LINUX_IOSD
+        - CAT3K_CAA

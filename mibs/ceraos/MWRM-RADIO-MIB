@@ -1,0 +1,5521 @@
+--MWRM-RADIO-MIB VERSION 1.8.3.1
+--MWRM (MicroWave-Radio-MIB)
+MWRM-RADIO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises, IpAddress 	FROM SNMPv2-SMI
+	DisplayString	  		FROM RFC1213-MIB
+	RowStatus				FROM SNMPv2-TC
+	MacAddress				FROM SNMPv2-TC
+	OBJECT-TYPE          	FROM SNMPv2-SMI
+
+	EnableDisable			FROM MWRM-UNIT-MIB
+	EnableDisableSMI2  		FROM MWRM-UNIT-MIB
+	OffOn					FROM MWRM-UNIT-MIB
+	MetricImperial			FROM MWRM-UNIT-MIB
+	AllowedNotAllowed 		FROM MWRM-UNIT-MIB
+	ProgressStatus 			FROM MWRM-UNIT-MIB
+	Severity 				FROM MWRM-UNIT-MIB
+	NoYes					FROM MWRM-UNIT-MIB
+	DownUp					FROM MWRM-UNIT-MIB
+	SupportedNotsupported	FROM MWRM-UNIT-MIB
+	TrailIfType 			FROM MWRM-UNIT-MIB
+	PmTableType 			FROM MWRM-UNIT-MIB
+	RateMbps				FROM MWRM-UNIT-MIB
+	HalfFull				FROM MWRM-UNIT-MIB
+	BerLevel				FROM MWRM-UNIT-MIB
+	SignalLevel				FROM MWRM-UNIT-MIB
+	LoopbackType			FROM MWRM-UNIT-MIB
+	QueueName				FROM MWRM-UNIT-MIB
+	RadioId					FROM MWRM-UNIT-MIB
+	RfuId					FROM MWRM-UNIT-MIB
+	SwCommand 				FROM MWRM-UNIT-MIB
+	TrailProtectedType		FROM MWRM-UNIT-MIB
+	ClockSrc 				FROM MWRM-UNIT-MIB
+	SlotId 					FROM MWRM-UNIT-MIB
+	Integrity				FROM MWRM-UNIT-MIB
+	GreenYellow 			FROM MWRM-UNIT-MIB
+	InputSeverity 			FROM MWRM-UNIT-MIB
+	SwCommandTimer 			FROM MWRM-UNIT-MIB;
+
+MuteOnOff ::= INTEGER {
+						on(2),
+						off(3)
+		}
+
+RfuGrade ::= INTEGER {
+						unknown(0),
+						grade-1(1),
+						grade-2(2),
+						grade-3(3)
+		}
+
+MrmcBitRate     ::= INTEGER (1..1000000000)
+MrmcScriptId    ::= INTEGER (1..999999)
+QamOrder        ::= INTEGER (0..2048)
+MrmcProfile     ::= INTEGER {
+					profile-0(0),
+					profile-1(1),
+					profile-2(2),
+					profile-3(3),
+					profile-4(4),
+					profile-5(5),
+					profile-6(6),
+					profile-7(7),
+					profile-8(8),
+					profile-9(9),
+					profile-10(10),
+					profile-11(11),
+					profile-12(12),
+					profile-13(13),
+					profile-14(14),
+					profile-15(15)
+		}
+
+ThresholdExponent ::= INTEGER {
+                    n1e-1(0),
+                    n1e-2(1),
+                    n1e-3(2),
+                    n1e-4(3),
+                    n1e-5(4),
+                    n1e-6(5),
+                    n1e-7(6),
+                    n1e-8(7),
+                    n1e-9(8),
+                    n1e-11(10),
+                    n1e-12(11),
+                    n1e-13(12),
+                    n1e-14(13),
+                    n1e-15(14),
+                    n1e-16(15),
+                    n1e-17(16),
+                    n1e-18(17),
+                    n1e-0(18)
+        }
+
+RFUSoftwareInstallStat ::= INTEGER {
+					ready(0),
+					verifying-files(1),
+					transferring-files(2),
+					installation-in-progress(3),
+					installation-success(4),
+					installation-failure(5)
+		}
+
+RadioProtectionCmd ::= INTEGER {
+					clear(0),
+					manual-switch(1),
+					force-switch(2),
+					lockout(3)
+				}
+
+RfuMajorType ::= INTEGER {
+					unknown(0),
+					rfu-HC(1),
+					rfu-HP(2),
+					rfu-SP(3),
+					rfu-C(4),
+					rfu-H(5),
+					rfu-HP-2(6),
+					rfu-A(7),
+					rfu-D(8)
+				}
+
+Copy2mate ::= INTEGER {
+				noAction(0),
+				copyToMate(1)
+		     }
+
+XpicState ::= INTEGER {
+				init(0),
+				xpicDisabled(1),
+				singleChannel(2),
+				xrsmDisabled(3),
+				xrsmRecovery(4),
+				xpicIdle(5)
+			 }
+
+HcModeType ::= INTEGER {
+				legacy(0),
+				disabled(1),
+				layer2(2),
+				mpls(3),
+				layer3(4),
+				layer4(5),
+				tunnel(6),
+				tunnel-layer3(7),
+				tunnel-layer4(8)
+			}
+
+EnhancedHCExclRuleType ::= INTEGER {
+				vlan(0),
+				mac-da(1),
+				mac-sa(2),
+				ethertype(3),
+				flow-type(4)
+}
+
+HcType ::= INTEGER {
+				legacy(0),
+				no-compression(1),
+				multi-layer-header-compression(2),
+				deep-header-compression(3)
+}
+
+
+CommunicationChannel ::= INTEGER {
+				ftp(0),
+				sftp(1),
+				http(2),
+				https(3)
+}
+
+FalseTrue		::= INTEGER { false(0), true(1) }
+
+WaysideBandwidth ::= INTEGER {
+				n0(0),
+				n64(64),
+				n128(128),
+				n192(192),
+				n256(256),
+				n320(320),
+				n384(384),
+				n448(448),
+				n512(512),
+				n1024(1024),
+				n2048(2048)
+}
+
+microwave-radio OBJECT IDENTIFIER ::= { enterprises 2281 }
+genEquip OBJECT IDENTIFIER ::= { microwave-radio 10}
+genEquipUnit OBJECT IDENTIFIER ::= { genEquip 1}
+
+-- RFU
+genEquipRFU	OBJECT IDENTIFIER ::= {genEquip 5}
+
+genEquipRfuStatusTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRfuStatusEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table indicates the RFU Status Data."
+        ::= { genEquipRFU 1 }
+
+genEquipRfuStatusEntry OBJECT-TYPE
+        SYNTAX GenEquipRfuStatusEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Entry containing the data of the RFU."
+        INDEX { genEquipRfuStatusId }
+        ::= { genEquipRfuStatusTable 1 }
+
+GenEquipRfuStatusEntry ::=
+            SEQUENCE {
+		genEquipRfuStatusId
+			RfuId,
+        genEquipRfuStatusRxLevel
+			INTEGER,
+        genEquipRfuStatusTxLevel
+			INTEGER,
+        genEquipRfuStatusTemperature
+			INTEGER,
+        genEquipRfuStatusRunningVersion
+			DisplayString,
+		genEquipRfuStatusRFUType
+			INTEGER,
+		genEquipRfuStatusRFUGrade
+			RfuGrade,
+		genEquipRfuStatusTxRxFreqSeparation
+			INTEGER,
+		genEquipRfuStatusRFUMode
+			INTEGER,
+		genEquipRfuStatusRxLevelDiversity
+			INTEGER,
+		genEquipRfuStatusRxLevelCombined
+			INTEGER,
+		genEquipRfuStatusAutoDelayCalStatus
+		    INTEGER,
+		genEquipRfuStatusRFUSerialNumber
+			DisplayString,
+		genEquipRfuStatusRFUPartNumber
+			DisplayString,
+		genEquipRfuStatusRFUmateCarrier
+			INTEGER,
+		genEquipRfuStatusRFUMaxTxFreq
+			INTEGER,
+		genEquipRfuStatusRFUMinTxFreq
+			INTEGER,
+		genEquipRfuStatusRFUMaxRxFreq
+			INTEGER,
+		genEquipRfuStatusRFUMinRxFreq
+			INTEGER,
+		genEquipRfuStatusInstallation
+			INTEGER,
+		genEquipRfuStatusDataSciErrors
+			INTEGER,
+		genEquipRfuStatusDeviceError
+			INTEGER,
+		genEquipRfuStatusBand
+			INTEGER,
+		genEquipRfuStatusPATemp
+			INTEGER,
+		genEquipRfuStatusTxMute
+			OffOn,
+		genEquipRfuStatusMinTxLevel
+			INTEGER,
+		genEquipRfuStatusMaxTxLevel
+			INTEGER,
+		genEquipRfuStatusMinBW
+			INTEGER,
+		genEquipRfuStatusMaxBW
+			INTEGER,
+		genEquipRfuStatusCommunication
+			DownUp,
+		genEquipRfuCfgATPCOverrideTimerState
+			INTEGER,
+		genEquipRfuStatusIfCombSupport
+			SupportedNotsupported,
+		genEquipRfuStatusMinRxLevel
+			INTEGER,
+		genEquipRfuStatusMaxRxLevel
+			INTEGER
+	}
+
+genEquipRfuStatusId OBJECT-TYPE
+        SYNTAX  RfuId
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates an index of a specific RFU"
+        ::= { genEquipRfuStatusEntry 1 }
+
+genEquipRfuStatusRxLevel	OBJECT-TYPE
+		SYNTAX		INTEGER (-199..0)
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the RFU Receive Level Status."
+		::= { genEquipRfuStatusEntry 2 }
+
+genEquipRfuStatusTxLevel	OBJECT-TYPE
+        SYNTAX		INTEGER (-99..34)
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the RFU Transmit Level Status."
+		::= { genEquipRfuStatusEntry 3 }
+
+genEquipRfuStatusTemperature  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "This value indicates the RFU temperature.
+		The value depends on the represented measurement system.
+		with genEquipUnitMeasurementSystem parameter."
+        ::= { genEquipRfuStatusEntry 4 }
+
+genEquipRfuStatusRunningVersion  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "This value indicates the running SW version on the RFU."
+        ::= { genEquipRfuStatusEntry 5 }
+
+
+genEquipRfuStatusRFUType OBJECT-TYPE
+		SYNTAX INTEGER {
+                       	unknown(2),
+                        rfu-1500p(3),
+                        rfu-1500hp(5),
+                        rfu-1500sp(6),
+                        rfu-c(7),
+                        rfu-h(8),
+                        rfu-c(9),
+                        rfu-h(10),
+                        rfu-1500sp(11),
+                        rfu-hp(12),
+                        rfu-a(13),
+                        rfu-d(14),
+                        rfu-1500p(32),
+                        rfu-1500hp(34),
+                        rfu-1500sp(35),
+                        rfu-c(36),
+                        rfu-h(37),
+                        rfu-c(38),
+                        rfu-h(39),
+                        rfu-1500sp(40),
+                        rfu-hp(41),
+                        rfu-a(42),
+                        rfu-d(43)
+ 		}
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The different types of the supported RFUs"
+		::= { genEquipRfuStatusEntry 6 }
+
+genEquipRfuStatusRFUGrade	OBJECT-TYPE
+        SYNTAX		RfuGrade
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The grade of the RFU"
+		::= { genEquipRfuStatusEntry 7 }
+
+genEquipRfuStatusTxRxFreqSeparation	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Tx to Rx frequency separation (MHz),
+		For some RFUs the user cannot set the Tx and Rx frequencies separately (one of them affects the other one's value)."
+		::= { genEquipRfuStatusEntry 8 }
+
+
+genEquipRfuStatusRFUMode	OBJECT-TYPE
+        SYNTAX		INTEGER {
+						main(2),
+						diversity(3),
+						combined(4)
+		}
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"IF combining parameter - The mode of the RFU"
+		::= { genEquipRfuStatusEntry 9 }
+
+genEquipRfuStatusRxLevelDiversity	OBJECT-TYPE
+        SYNTAX		INTEGER (-199..0)
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"IF combining parameter - The Rx Diversity level (dBm)"
+		::= { genEquipRfuStatusEntry 10 }
+
+genEquipRfuStatusRxLevelCombined	OBJECT-TYPE
+        SYNTAX		INTEGER (-199..0)
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"IF combining parameter - The Rx Combined level (dBm)"
+		::= { genEquipRfuStatusEntry 11 }
+
+
+genEquipRfuStatusAutoDelayCalStatus	OBJECT-TYPE
+        SYNTAX		INTEGER {
+						no-action(2),
+						pass(3),
+						error(4)
+		}
+		ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"IF combining parameter - the automatic delay calibration status.
+		Supported only for specific RFUs."
+		::= { genEquipRfuStatusEntry 12 }
+
+genEquipRfuStatusRFUSerialNumber	OBJECT-TYPE
+        SYNTAX		DisplayString
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"RFU Serial number."
+		::= { genEquipRfuStatusEntry 13 }
+
+genEquipRfuStatusRFUPartNumber	OBJECT-TYPE
+        SYNTAX		DisplayString
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"RFU Part number."
+		::= { genEquipRfuStatusEntry 14 }
+
+genEquipRfuStatusRFUmateCarrier	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"The returned value indicates the slot number of the 'copartner RFU-D carrier'.
+		The returned value will be '-1' when the RFU is not RFU-D, or if the
+		'copartner RFU-D' carrier is not found."
+		::= { genEquipRfuStatusEntry 15 }
+
+genEquipRfuStatusRFUMaxTxFreq	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"The maximum Tx frequency of the RFU that is allowed by the RFU."
+		::= { genEquipRfuStatusEntry 16 }
+
+genEquipRfuStatusRFUMinTxFreq	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"The minimum Tx frequency of the RFU that is allowed by the RFU."
+		::= { genEquipRfuStatusEntry 17 }
+
+genEquipRfuStatusRFUMaxRxFreq	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"The maximum Rx frequency of the RFU that is allowed by the RFU."
+		::= { genEquipRfuStatusEntry 18 }
+
+genEquipRfuStatusRFUMinRxFreq	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"The minimum Rx frequency of the RFU that is allowed by the RFU."
+		::= { genEquipRfuStatusEntry 19 }
+
+genEquipRfuStatusInstallation	OBJECT-TYPE
+        SYNTAX		INTEGER {
+        					split-mount(0),
+        					all-indoor(1)
+        			}
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"Returns 'all-indoor' or 'split' according to the RFU installation."
+		::= { genEquipRfuStatusEntry 20 }
+
+genEquipRfuStatusDataSciErrors	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"Data Sci Errors"
+		::= { genEquipRfuStatusEntry 21 }
+
+genEquipRfuStatusDeviceError	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"Status Device Error"
+		::= { genEquipRfuStatusEntry 22 }
+
+
+genEquipRfuStatusBand 	OBJECT-TYPE
+        SYNTAX		INTEGER {
+        				unknown(0),
+        				band-18(2),
+        				band-23(3),
+        				band-26(4),
+        				band-28(5),
+        				band-38(6),
+        				band-29(7),
+        				band-31(8),
+        				band-15(9),
+        				band-13(10),
+        				band-10dot5-11(11),
+        				band-7-8(12),
+        				band-6L-6H(13),
+        				band-32(14)
+        			}
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"The Band of the RF-Module in GHz"
+		::= { genEquipRfuStatusEntry 23 }
+
+genEquipRfuStatusPATemp 	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"The measured temperature in celsius of the PA (Power Amplifier) of the RF module"
+		::= { genEquipRfuStatusEntry 24 }
+
+genEquipRfuStatusTxMute 	OBJECT-TYPE
+        SYNTAX		OffOn
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"The mute status, whether it is on (mute) or off (un-mute) of the RF-Module"
+		::= { genEquipRfuStatusEntry 25 }
+
+genEquipRfuStatusMinTxLevel 	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"The minimum feasible TX signal level (TSL) in dBm of the RF-Module"
+		::= { genEquipRfuStatusEntry 26 }
+
+genEquipRfuStatusMaxTxLevel 	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"The maximum feasible TX signal level (TSL) in dBm of the RF-Module"
+		::= { genEquipRfuStatusEntry 27 }
+
+genEquipRfuStatusMinBW 	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"The minimum supported bandwidth in KHz of the RF-Module"
+		::= { genEquipRfuStatusEntry 28 }
+
+genEquipRfuStatusMaxBW 	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"The maximum supported bandwidth in KHz of the RF-Module"
+		::= { genEquipRfuStatusEntry 29 }
+
+genEquipRfuStatusCommunication 	OBJECT-TYPE
+        SYNTAX		DownUp
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"The communication status between the host and the RFU"
+		::= { genEquipRfuStatusEntry 30 }
+
+genEquipRfuCfgATPCOverrideTimerState 	OBJECT-TYPE
+        SYNTAX		INTEGER {
+        				normal(0),
+        				expired(1)
+        			}
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"Returns the state of the ATPC 'override timer', whether it is regular or expired"
+		::= { genEquipRfuStatusEntry 31 }
+
+genEquipRfuStatusIfCombSupport 	OBJECT-TYPE
+        SYNTAX		SupportedNotsupported
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"Indicates if the IF-Combiner function is supported"
+		::= { genEquipRfuStatusEntry 32 }
+
+genEquipRfuStatusMinRxLevel 	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"The minimum feasible RX signal level (RSL) in dBm of the RF-Module"
+		::= { genEquipRfuStatusEntry 33 }
+
+genEquipRfuStatusMaxRxLevel 	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"The maximum feasible RX signal level (RSL) in dBm of the RF-Module"
+		::= { genEquipRfuStatusEntry 34 }
+
+
+
+
+-- RFU CFG TABLE
+genEquipRfuCfgTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRfuCfgEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table indicates the RFU Configuration."
+        ::= { genEquipRFU 2 }
+
+genEquipRfuCfgEntry OBJECT-TYPE
+        SYNTAX GenEquipRfuCfgEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table indicates the RFU Configuration."
+        INDEX { genEquipRfuCfgId }
+        ::= { genEquipRfuCfgTable 1 }
+
+GenEquipRfuCfgEntry ::=
+            SEQUENCE {
+		genEquipRfuCfgId
+			RfuId,
+		genEquipRfuCfgMaxTxLevel
+			INTEGER,
+		genEquipRfuCfgTxFreq
+			INTEGER,
+		genEquipRfuCfgRxFreq
+			INTEGER,
+		genEquipRfuCfgATPCAdmin
+			EnableDisable,
+		genEquipRfuCfgATPCRefRSL
+			INTEGER,
+		genEquipRfuCfgMuteTx
+			MuteOnOff,
+		genEquipRfuCfgRSLConnSrc
+			INTEGER,
+		genEquipRfuCfgDelayCal
+			INTEGER,
+		genEquipRfuCfgLoopback
+			LoopbackType,
+		genEquipRfuCfgLogAdmin
+			EnableDisable,
+		genEquipRfuCfgClearComDeviceError
+			OffOn,
+		genEquipRfuCfgGreenModeAdmin
+			EnableDisable,
+		genEquipRfuCfgGreenModeReferenceLevel
+			INTEGER,
+		genEquipRfuCfgATPCOverrideTxLevel
+			INTEGER,
+		genEquipRfuCfgATPCOverrideTimeout
+			INTEGER,
+		genEquipRfuCfgATPCOverrideTimerCounter
+			INTEGER,
+		genEquipRfuCfgATPCOverrideTimerCancel
+			OffOn
+	}
+
+genEquipRfuCfgId OBJECT-TYPE
+        SYNTAX  RfuId
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates an index of a specific RFU"
+        ::= { genEquipRfuCfgEntry 1 }
+
+genEquipRfuCfgMaxTxLevel		OBJECT-TYPE
+		SYNTAX 		INTEGER (-50..34)
+		ACCESS		read-write
+        STATUS		mandatory
+        DESCRIPTION
+		"This value indicates the RFU Maximum Transmit Level Configuration."
+		::= { genEquipRfuCfgEntry 2 }
+
+genEquipRfuCfgTxFreq	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Tx Frequency configuration (Mhz)"
+		::= { genEquipRfuCfgEntry 3 }
+
+genEquipRfuCfgRxFreq	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Rx Frequency configuration (Mhz)"
+		::= { genEquipRfuCfgEntry 4 }
+
+genEquipRfuCfgATPCAdmin	OBJECT-TYPE
+        SYNTAX		EnableDisable
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"ATPC configuration - Admin mode
+		Possible values:
+		 - enable(2)
+		 - disable(3)"
+		::= { genEquipRfuCfgEntry 5 }
+
+genEquipRfuCfgATPCRefRSL	OBJECT-TYPE
+        SYNTAX		INTEGER (-70..-30)
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"ATPC configuration - reference RSL level (dBm)"
+		::= { genEquipRfuCfgEntry 6 }
+
+
+genEquipRfuCfgMuteTx	OBJECT-TYPE
+        SYNTAX		MuteOnOff
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"The required TX mute status of the RF-Module"
+		::= { genEquipRfuCfgEntry 7 }
+
+
+genEquipRfuCfgRSLConnSrc	OBJECT-TYPE
+        SYNTAX		INTEGER {
+						main(2),
+						diversity(3)
+		}
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"IF combining - RFU RSL (Received Signal Level) connector source "
+		::= { genEquipRfuCfgEntry 8 }
+
+genEquipRfuCfgDelayCal	OBJECT-TYPE
+        SYNTAX		INTEGER (-130..130)
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"IF combining - Delay calibration"
+		::= { genEquipRfuCfgEntry 9 }
+
+genEquipRfuCfgLoopback	OBJECT-TYPE
+        SYNTAX		INTEGER {
+						off(0),
+						towardsSystem(1)
+						}
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"RFU RF loopback command"
+		::= { genEquipRfuCfgEntry 10 }
+
+genEquipRfuCfgLogAdmin	OBJECT-TYPE
+        SYNTAX		EnableDisable
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"RFU internal log file admin
+		Possible values:
+		 - enable(2)
+		 - disable(3)"
+		::= { genEquipRfuCfgEntry 11 }
+
+genEquipRfuCfgClearComDeviceError	OBJECT-TYPE
+        SYNTAX		OffOn
+        ACCESS		read-write
+        STATUS		mandatory
+        DESCRIPTION
+		"Clear Com device Error."
+		::= { genEquipRfuCfgEntry 12 }
+
+genEquipRfuCfgGreenModeAdmin	OBJECT-TYPE
+        SYNTAX		EnableDisable
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Enables/disables RFU green mode.
+		This mode will minimize power consumption while ensuring the highest transmission power
+		possible to get an RSL not higher than defined in the reference level genEquipRfuCfgGreenModeReferenceLevel"
+		::= { genEquipRfuCfgEntry 13 }
+
+genEquipRfuCfgGreenModeReferenceLevel	OBJECT-TYPE
+        SYNTAX		INTEGER (-70..-30)
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"RSL reference level (in dB) for green mode operation"
+		::= { genEquipRfuCfgEntry 14 }
+
+genEquipRfuCfgATPCOverrideTxLevel	OBJECT-TYPE
+        SYNTAX		INTEGER (-50..34)
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"This parameter configures the default transmission signal level in case of ATPC override due to expiration
+		of maximum power timer as defined in genEquipRfuCfgATPCOverrideTimeout."
+		::= { genEquipRfuCfgEntry 15 }
+
+genEquipRfuCfgATPCOverrideTimeout	OBJECT-TYPE
+        SYNTAX		INTEGER (0..600)
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"This parameter configures the timer to be counted while in ATPC in case of maximum power transmission.
+		If this timer expires, the system will transmit at a default level defined in genEquipRfuCfgATPCOverrideTxLevel"
+		::= { genEquipRfuCfgEntry 16 }
+
+genEquipRfuCfgATPCOverrideTimerCounter	OBJECT-TYPE
+        SYNTAX		INTEGER (0..600)
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This parameter shows the time left in the timer defined by genEquipRfuCfgATPCOverrideTxLevel"
+		::= { genEquipRfuCfgEntry 17 }
+
+genEquipRfuCfgATPCOverrideTimerCancel	OBJECT-TYPE
+        SYNTAX		OffOn
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Setting this parameter to ON will cancel the ATPC override mode.
+		This will only be effective while in this mode  i.e. the system had been transmitting
+		at maximum power for a time longer than defined in genEquipRfuCfgATPCOverrideTxLevel
+		and now is transmitting at the default level defined in genEquipRfuCfgATPCOverrideTxLevel.
+		Following execution, the system will go back to normal ATPC operating mode"
+		::= { genEquipRfuCfgEntry 18 }
+
+
+-- Upload table
+genEquipRfuUploadTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRfuUploadEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "RFU Upload Data table."
+        ::= { genEquipRFU 3 }
+
+genEquipRfuUploadEntry OBJECT-TYPE
+        SYNTAX GenEquipRfuUploadEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Entry containing the data of the RFU."
+        INDEX { genEquipRfuUploadId }
+        ::= { genEquipRfuUploadTable 1 }
+
+GenEquipRfuUploadEntry ::=
+            SEQUENCE {
+		genEquipRfuUploadId					RadioId,
+		genEquipRfuUploadSwCommand			INTEGER,
+	    genEquipRfuUploadSwStatus			INTEGER,
+	    genEquipRfuUploadCounter			INTEGER
+	}
+
+genEquipRfuUploadId OBJECT-TYPE
+        SYNTAX  RadioId
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates an index of a specific RFU"
+        ::= { genEquipRfuUploadEntry 1 }
+
+genEquipRfuUploadSwCommand  OBJECT-TYPE
+        SYNTAX 		INTEGER{
+					uploadSW(1),
+					noOperation(2)
+					}
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "This value initiates SW upload to the RFU."
+        ::= { genEquipRfuUploadEntry 2 }
+
+genEquipRfuUploadSwStatus  OBJECT-TYPE
+        SYNTAX  INTEGER{
+				noLoad(0),
+				loadError(1),
+				loadStart(2),
+				loadSendBlock(3),
+				loadDone(5)
+        }
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "This value indicates the status of the SW load operation on the RFU."
+        ::= { genEquipRfuUploadEntry 3 }
+
+genEquipRfuUploadCounter  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "This parameter shows the progress (in blocks) of RFU software download"
+        ::= { genEquipRfuUploadEntry 4 }
+
+-- RFU tables for NG
+genEquipRFUNG	OBJECT IDENTIFIER ::= {genEquipRFU 4}
+
+--
+-- rfu-software-mgt-table-install-config
+--
+
+genEquipRfuSwInstallTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRfuSwInstallEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "RFU software managemet install configuration."
+        ::= { genEquipRFUNG 2 }
+
+genEquipRfuSwInstallEntry OBJECT-TYPE
+        SYNTAX GenEquipRfuSwInstallEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "RFU software managemet install configuration."
+        INDEX { genEquipRfuSwInstallIfIndex }
+        ::= { genEquipRfuSwInstallTable 1 }
+
+GenEquipRfuSwInstallEntry ::=
+            SEQUENCE {
+		genEquipRfuSwInstallIfIndex
+			INTEGER,
+		genEquipRfuSwInstallOperation
+			INTEGER,
+	    genEquipRfuSwInstallTimedInstallation
+			NoYes,
+	    genEquipRfuSwInstallTimer
+			INTEGER
+	}
+
+genEquipRfuSwInstallIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RFU ifIndex"
+        ::= { genEquipRfuSwInstallEntry 1 }
+
+genEquipRfuSwInstallOperation  OBJECT-TYPE
+        SYNTAX 		INTEGER{
+					no-operation(0),
+					update-version-from-bundle(1),
+					install-existing-version(2),
+					abort-timer(3)
+					}
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "RFU software installation operation to be performed."
+        ::= { genEquipRfuSwInstallEntry 2 }
+
+genEquipRfuSwInstallTimedInstallation  OBJECT-TYPE
+        SYNTAX  NoYes
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Determines whether the installation will be carried out after a configured timer."
+        ::= { genEquipRfuSwInstallEntry 3 }
+
+genEquipRfuSwInstallTimer  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Timer for timed installations"
+        ::= { genEquipRfuSwInstallEntry 4 }
+
+--
+-- rfu-software-mgt-table-installed-versions
+--
+
+genEquipRfuInstalledVersionsTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRfuInstalledVersionsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "RFU software managemet installed versuion."
+        ::= { genEquipRFUNG 3 }
+
+genEquipRfuInstalledVersionsEntry OBJECT-TYPE
+        SYNTAX GenEquipRfuInstalledVersionsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "RFU software managemet installed version."
+        INDEX { genEquipRfuInstalledVersionsIfIndex }
+        ::= { genEquipRfuInstalledVersionsTable 1 }
+
+GenEquipRfuInstalledVersionsEntry ::=
+            SEQUENCE {
+		genEquipRfuInstalledVersionsIfIndex
+			INTEGER,
+		genEquipRfuInstalledVersionsDSP
+			DisplayString,
+	    genEquipRfuInstalledVersionsConfigurations
+			DisplayString,
+	    genEquipRfuInstalledVersionsConstants
+			DisplayString,
+	    genEquipRfuInstalledVersionsScripts
+			DisplayString,
+	    genEquipRfuInstalledVersionsFirmware
+			DisplayString
+	}
+
+genEquipRfuInstalledVersionsIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RFU ifIndex"
+        ::= { genEquipRfuInstalledVersionsEntry 1 }
+
+genEquipRfuInstalledVersionsDSP  OBJECT-TYPE
+        SYNTAX 	DisplayString
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "RFU version DSP."
+        ::= { genEquipRfuInstalledVersionsEntry 2 }
+
+genEquipRfuInstalledVersionsConfigurations  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Configuration tables."
+        ::= { genEquipRfuInstalledVersionsEntry 3 }
+
+genEquipRfuInstalledVersionsConstants  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Constant tables"
+        ::= { genEquipRfuInstalledVersionsEntry 4 }
+
+genEquipRfuInstalledVersionsScripts  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "RFU scripts"
+        ::= { genEquipRfuInstalledVersionsEntry 5 }
+
+genEquipRfuInstalledVersionsFirmware  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Firmware"
+        ::= { genEquipRfuInstalledVersionsEntry 6 }
+
+--
+-- rfu-software-mgt-table-install-status
+--
+
+genEquipRfuSwStatusTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRfuSwStatusEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "RFU software managemet installed status."
+        ::= { genEquipRFUNG 4 }
+
+genEquipRfuSwStatusEntry OBJECT-TYPE
+        SYNTAX GenEquipRfuSwStatusEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "RFU software managemet installed status."
+        INDEX { genEquipRfuSwStatusIfIndex }
+        ::= { genEquipRfuSwStatusTable 1 }
+
+GenEquipRfuSwStatusEntry ::=
+            SEQUENCE {
+		genEquipRfuSwStatusIfIndex
+			INTEGER,
+		genEquipRfuSwStatusCurrentState
+			RFUSoftwareInstallStat,
+	    genEquipRfuSwStatusProgress
+			INTEGER
+	}
+
+genEquipRfuSwStatusIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RFU ifIndex"
+        ::= { genEquipRfuSwStatusEntry 1 }
+
+genEquipRfuSwStatusCurrentState  OBJECT-TYPE
+        SYNTAX 	RFUSoftwareInstallStat
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Current state of the install operation."
+        ::= { genEquipRfuSwStatusEntry 2 }
+
+genEquipRfuSwStatusProgress  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Progress of the current install operation in percentage."
+        ::= { genEquipRfuSwStatusEntry 3 }
+
+--
+-- rfu-software-mgt-table-running-versions
+--
+
+genEquipRfuRunningVersionsTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRfuRunningVersionsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "RFU software managemet rinning versions."
+        ::= { genEquipRFUNG 5 }
+
+genEquipRfuRunningVersionsEntry OBJECT-TYPE
+        SYNTAX GenEquipRfuRunningVersionsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "RFU software managemet running versions."
+        INDEX { genEquipRfuRunningVersionsIfIndex }
+        ::= { genEquipRfuRunningVersionsTable 1 }
+
+GenEquipRfuRunningVersionsEntry ::=
+            SEQUENCE {
+		genEquipRfuRunningVersionsIfIndex
+			INTEGER,
+		genEquipRfuRunningVersionsDSP
+			DisplayString,
+	    genEquipRfuRunningVersionsConfigurations
+			DisplayString,
+	    genEquipRfuRunningVersionsConstants
+			DisplayString,
+	    genEquipRfuRunningVersionsScripts
+			DisplayString,
+	    genEquipRfuRunningVersionsFirmware
+			DisplayString
+	}
+
+genEquipRfuRunningVersionsIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RFU ifIndex"
+        ::= { genEquipRfuRunningVersionsEntry 1 }
+
+genEquipRfuRunningVersionsDSP  OBJECT-TYPE
+        SYNTAX 	DisplayString
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "DSP."
+        ::= { genEquipRfuRunningVersionsEntry 2 }
+
+genEquipRfuRunningVersionsConfigurations  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Configuration tables."
+        ::= { genEquipRfuRunningVersionsEntry 3 }
+
+genEquipRfuRunningVersionsConstants  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Constant tables."
+        ::= { genEquipRfuRunningVersionsEntry 4 }
+
+genEquipRfuRunningVersionsScripts  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "RFU scripts."
+        ::= { genEquipRfuRunningVersionsEntry 5 }
+
+genEquipRfuRunningVersionsFirmware  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Firmware."
+        ::= { genEquipRfuRunningVersionsEntry 6 }
+
+--
+-- rfu-software-mgt-table-available-versions
+--
+
+genEquipRfuAvailableVersionsTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRfuAvailableVersionsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "RFU software managemet available versions."
+        ::= { genEquipRFUNG 6 }
+
+genEquipRfuAvailableVersionsEntry OBJECT-TYPE
+        SYNTAX GenEquipRfuAvailableVersionsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "RFU software managemet available versions."
+        INDEX { genEquipRfuAvailableVersionsRfuType }
+        ::= { genEquipRfuAvailableVersionsTable 1 }
+
+GenEquipRfuAvailableVersionsEntry ::=
+            SEQUENCE {
+		genEquipRfuAvailableVersionsRfuType
+			RfuMajorType,
+		genEquipRfuAvailableVersionsDSP
+			DisplayString,
+	    genEquipRfuAvailableVersionsConfigurations
+			DisplayString,
+	    genEquipRfuAvailableVersionsConstants
+			DisplayString,
+	    genEquipRfuAvailableVersionsScripts
+			DisplayString,
+	    genEquipRfuAvailableVersionsFirmware
+			DisplayString
+	}
+
+genEquipRfuAvailableVersionsRfuType OBJECT-TYPE
+        SYNTAX  RfuMajorType
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RFU Type"
+        ::= { genEquipRfuAvailableVersionsEntry 1 }
+
+genEquipRfuAvailableVersionsDSP  OBJECT-TYPE
+        SYNTAX 	DisplayString
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "DSP."
+        ::= { genEquipRfuAvailableVersionsEntry 2 }
+
+genEquipRfuAvailableVersionsConfigurations  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Configuration tables."
+        ::= { genEquipRfuAvailableVersionsEntry 3 }
+
+genEquipRfuAvailableVersionsConstants  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Constant tables."
+        ::= { genEquipRfuAvailableVersionsEntry 4 }
+
+genEquipRfuAvailableVersionsScripts  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "RFU scripts."
+        ::= { genEquipRfuAvailableVersionsEntry 5 }
+
+genEquipRfuAvailableVersionsFirmware  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Firmware."
+        ::= { genEquipRfuAvailableVersionsEntry 6 }
+
+
+
+-- Radio Configuration
+genEquipRadio	OBJECT IDENTIFIER ::= {genEquip 7}
+
+-- Radio Status Table
+genEquipRadioStatusTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioStatusEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Radio status table"
+        ::= { genEquipRadio 1 }
+
+genEquipRadioStatusEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioStatusEntry
+        ACCESS not-accessible
+        STATUS mandatory
+          DESCRIPTION
+          "Radio status table"
+        INDEX { genEquipRadioStatusRadioId }
+        ::= { genEquipRadioStatusTable 1 }
+
+GenEquipRadioStatusEntry ::=
+		SEQUENCE {
+			genEquipRadioStatusRadioId
+				RadioId,
+			genEquipRadioStatusMSE
+            	INTEGER,
+			genEquipRadioStatusDefectedBlocks
+            	INTEGER,
+			genEquipRadioStatusBER
+				ThresholdExponent,
+			genEquipRadioStatusXPI
+				INTEGER,
+			genEquipRadioStatusXPICEnabled
+				EnableDisableSMI2
+}
+
+genEquipRadioStatusRadioId	OBJECT-TYPE
+        SYNTAX		RadioId
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value is the radio ID that serves as the table Index."
+		::= { genEquipRadioStatusEntry 1 }
+
+genEquipRadioStatusMSE	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"MSE (Mean Square Error) of the Rx signal (measured in dB * 100).
+		-9900 value (-99.00 dB) means that the signal is not locked.
+		~ -3500 value (-35.00 dB) is a good MSE."
+		::= { genEquipRadioStatusEntry 2 }
+
+genEquipRadioStatusDefectedBlocks	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The number of counted defective radio blocks."
+		::= { genEquipRadioStatusEntry 3 }
+
+genEquipRadioStatusBER	OBJECT-TYPE
+        SYNTAX		ThresholdExponent
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The measured BER (Bit Error Rate) level of the modem."
+		::= { genEquipRadioStatusEntry 4 }
+
+genEquipRadioStatusXPI	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"XPI (Cross Polar Interference) level measured by the modem."
+		::= { genEquipRadioStatusEntry 5 }
+
+genEquipRadioStatusXPICEnabled	OBJECT-TYPE
+        SYNTAX		EnableDisableSMI2
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This parameter indicates whether an XPIC script is currently loaded."
+		::= { genEquipRadioStatusEntry 6 }
+
+-- Radio Configuration table
+genEquipRadioCfgTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioCfgEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Radio Configuration table."
+        ::= { genEquipRadio 2 }
+
+genEquipRadioCfgEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioCfgEntry
+        ACCESS not-accessible
+        STATUS mandatory
+          DESCRIPTION
+          "Radio Configuration table."
+        INDEX { genEquipRadioCfgRadioId }
+        ::= { genEquipRadioCfgTable 1 }
+
+GenEquipRadioCfgEntry ::=
+		SEQUENCE {
+			genEquipRadioCfgRadioId
+				RadioId,
+			genEquipRadioCfgLinkId
+            	INTEGER,
+			genEquipRadioCfgMACHeaderCompression
+            	EnableDisable,
+			genEquipRadioCfgClearCounters
+            	OffOn,
+			genEquipRadioCfgIfLoopback
+            	INTEGER,
+			genEquipRadioCfgExcessiveBERThreshold
+				ThresholdExponent,
+			genEquipRadioCfgSignalDegradeThreshold
+				ThresholdExponent,
+			genEquipRadioCfgRadioAdmin
+            	EnableDisable,
+			genEquipRadioCfgRadioOperationalStatus
+            	DownUp,
+			genEquipRadioCfgRadioTrafficPriorityScheme
+				INTEGER,
+			genEquipRadioCfgRadioHiPriorityEthernetBW
+				INTEGER,
+			genEquipRadioCfgRadioMultiRadioEnable
+				EnableDisable,
+			genEquipRadioCfgRadioMultiRadioBlockLocalTraffic
+				INTEGER,
+			genEquipRadioCfgRadioMultiRadioBlockMateTraffic
+				INTEGER,
+			genEquipRadioCfgRadioCurrentAvailableCapacity
+				INTEGER,
+			genEquipRadioCfgRadioMultiRadioExcessiveBERAdmin
+				EnableDisable,
+			genEquipRadioCfgRadioMultiRadioSignalDegradeAdmin
+				EnableDisable,
+			genEquipRadioCfgEnAlarmGenOnRslDegrade
+				EnableDisable,
+			genEquipRadioCfgAlarmGenRslNominalLevel
+				INTEGER,
+			genEquipRadioCfgAlarmGenRslDegradationMargin
+				INTEGER,
+			genEquipRadioCfgLinkShutDownOnRadioFailure
+				EnableDisable,
+			genEquipRadioCfgLoopbackTimeout
+				INTEGER,
+			genEquipRadioCfgAbcMode
+				INTEGER
+
+}
+
+genEquipRadioCfgRadioId	OBJECT-TYPE
+        SYNTAX		RadioId
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value is the radio ID that serves as this table Index"
+		::= { genEquipRadioCfgEntry 1 }
+
+genEquipRadioCfgLinkId	OBJECT-TYPE
+        SYNTAX		INTEGER (1..65535)
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Radio configuration link ID"
+		::= { genEquipRadioCfgEntry 2 }
+
+
+genEquipRadioCfgMACHeaderCompression	OBJECT-TYPE
+        SYNTAX		EnableDisable
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"The Admin state of the MAC header compression."
+		::= { genEquipRadioCfgEntry 3 }
+
+genEquipRadioCfgClearCounters	OBJECT-TYPE
+        SYNTAX		OffOn
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Setting this parameter to ON will clear the radio counters."
+		::= { genEquipRadioCfgEntry 4 }
+
+genEquipRadioCfgIfLoopback	OBJECT-TYPE
+        SYNTAX		INTEGER {
+						off(0),
+						towardsSystem(1)
+						}
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"The administrative state of the IF loopback."
+		::= { genEquipRadioCfgEntry 5 }
+
+genEquipRadioCfgExcessiveBERThreshold	OBJECT-TYPE
+        SYNTAX		ThresholdExponent
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"The BER threshold that when exceeded will be considered as 'Excessive BER'."
+		::= { genEquipRadioCfgEntry 6 }
+
+genEquipRadioCfgSignalDegradeThreshold	OBJECT-TYPE
+        SYNTAX		ThresholdExponent
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"The BER (Bit Error Rate) threshold that when exceeded will be considered as 'Signal Degrade'."
+		::= { genEquipRadioCfgEntry 7 }
+
+genEquipRadioCfgRadioAdmin	OBJECT-TYPE
+        SYNTAX		EnableDisable
+        ACCESS  	read-write
+        STATUS 		obsolete
+        DESCRIPTION
+		"Radio Admin state (Enable,Disable) can be used in ifTable::ifAdminStatus"
+		::= { genEquipRadioCfgEntry 8 }
+
+genEquipRadioCfgRadioOperationalStatus	OBJECT-TYPE
+        SYNTAX		DownUp
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The operational status of the radio interface."
+		::= { genEquipRadioCfgEntry 9 }
+
+genEquipRadioCfgRadioTrafficPriorityScheme	OBJECT-TYPE
+        SYNTAX		INTEGER {
+						high-tdm-over-ethernet (0),
+						high-ethernet-over-tdm (1),
+						high-tdm-over-high-ethernet (2)
+					}
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"this parameter configures the relative priority of different traffic streams.
+		High-tdm-over-high-ethernet gives priorities as follows:
+		(1) TDM high priority (2) Ethernet high priority (3) TDM low priority (4) Etherenet low priority.
+		High-Ethernet-over-tdm gives priorities as follows: (1) Ethernet high priority (2) TDM high priority (3) TDM low priority (4) Etherenet low priority.
+		Tdm-over-ethernet gives priorities as follows: (1) TDM high priority (2) TDM low priority (3) Ethernet"
+		::= { genEquipRadioCfgEntry 10 }
+
+genEquipRadioCfgRadioHiPriorityEthernetBW	OBJECT-TYPE
+        SYNTAX		INTEGER (0..500000)
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"this parameter configures the amount of bandwith reserved for high-priority Ethernet.
+		It must be a number in resolution of 2.048 Mbit/s for E1 systems or 1.544 Mbit/s for T1 systems.
+		The maximum possible capacity is given by genEquipRadioCfgRadioCurrentAvailableCapacity"
+		::= { genEquipRadioCfgEntry 11 }
+
+genEquipRadioCfgRadioMultiRadioEnable	OBJECT-TYPE
+        SYNTAX		EnableDisable
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"this parameter enables/disables the multi-radio feature for this radio.
+		Notice that for the feature to work it must be configured in two adjacent radios (odd and even slots)"
+		::= { genEquipRadioCfgEntry 12 }
+
+genEquipRadioCfgRadioMultiRadioBlockLocalTraffic	OBJECT-TYPE
+        SYNTAX		INTEGER {
+						dont-block (0),
+						block-this-radio (1)
+						}
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"this parameter allows stopping distribution of data to different radios in Multi-Radio mode for debugging purposes"
+		::= { genEquipRadioCfgEntry 13 }
+
+genEquipRadioCfgRadioMultiRadioBlockMateTraffic	OBJECT-TYPE
+        SYNTAX		INTEGER {
+						dont-block (0),
+						block-this-radio (1)
+						}
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"this parameter allows stopping distribution of data to the radio in the mate IDU in Multi-Radio mode for debugging purposes"
+		::= { genEquipRadioCfgEntry 14 }
+
+genEquipRadioCfgRadioCurrentAvailableCapacity	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This parameter indicates the maximum possible capacity available for Ethernet.
+		This sets a top limit for amount of high-priority Ethernet bandwidth"
+		::= { genEquipRadioCfgEntry 15 }
+
+genEquipRadioCfgRadioMultiRadioExcessiveBERAdmin	OBJECT-TYPE
+        SYNTAX		EnableDisable
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"This parameter configures whether in Multi-Radio mode data stops being distributed to the radio in
+		case of an excessive BER condition"
+		::= { genEquipRadioCfgEntry 16 }
+
+genEquipRadioCfgRadioMultiRadioSignalDegradeAdmin	OBJECT-TYPE
+        SYNTAX		EnableDisable
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"This parameter configures whether in Multi-Radio mode data stops being distributed to the radio in
+		case of a signal degraded condition"
+		::= { genEquipRadioCfgEntry 17 }
+
+genEquipRadioCfgEnAlarmGenOnRslDegrade	OBJECT-TYPE
+        SYNTAX		EnableDisable
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"TEnable/Disable alarm and trapgeneration on RSL degradationbelow user defined threshold.If enabled,
+		trap and alarm willbe generated when current RSLlevel degrades below userdefined threshold for 5subsequent seconds.
+		Alarm willbe cleared after RSL level staysabove the threshold for at leastanother 5 seconds.
+		Thresholdis calculated as a nominal RSLlevel minus the degradationmargin."
+		::= { genEquipRadioCfgEntry 18 }
+
+genEquipRadioCfgAlarmGenRslNominalLevel	OBJECT-TYPE
+        SYNTAX		INTEGER (-100..0)
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"RSL nominal level [in dBm] foralarm and event generation."
+		::= { genEquipRadioCfgEntry 19 }
+
+genEquipRadioCfgAlarmGenRslDegradationMargin	OBJECT-TYPE
+        SYNTAX		INTEGER (10..30)
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"RSL degradation margin [in dB]for alarm and eventgeneration. The margin isrelative to the nominal RSLlevel"
+		::= { genEquipRadioCfgEntry 20 }
+
+genEquipRadioCfgLinkShutDownOnRadioFailure	OBJECT-TYPE
+        SYNTAX		EnableDisable
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"This parameter enables shutting down the link and initiating automatic
+		state propagation upon a failure in each one of the radios.
+		Radio failure condition is determined by user configurations and can be
+		one of the following:
+		Radio LOF, Link ID mismatch, Radio excessive BER, Radio signal degrade, Link ID mismatch."
+		::= { genEquipRadioCfgEntry 21 }
+
+genEquipRadioCfgLoopbackTimeout	OBJECT-TYPE
+        SYNTAX		INTEGER (0..1440)
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"The timeout in minutes for automatic termination of the loopback. The value '0' refers to 'no timeout'."
+		::= { genEquipRadioCfgEntry 22 }
+
+genEquipRadioCfgAbcMode OBJECT-TYPE
+        SYNTAX		INTEGER {
+						multi-carrier-abc(2),
+						multi-directional(3)
+					}
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"TThe radio mode (multi direction or multi carrier)."
+		::= { genEquipRadioCfgEntry 23 }
+
+
+-- Remote Radio
+genEquipRemoteRadio	OBJECT IDENTIFIER ::= {genEquipRadio 3}
+
+genEquipRemoteRadioTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRemoteRadioEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Remote radio table."
+        ::= { genEquipRemoteRadio 1 }
+
+genEquipRemoteRadioEntry OBJECT-TYPE
+        SYNTAX GenEquipRemoteRadioEntry
+        ACCESS not-accessible
+        STATUS mandatory
+          DESCRIPTION
+          "Remote radio table."
+        INDEX { genEquipRemoteRadioRadioId }
+        ::= { genEquipRemoteRadioTable 1 }
+
+GenEquipRemoteRadioEntry ::=
+		SEQUENCE {
+			genEquipRemoteRadioRadioId
+				RadioId,
+			genEquipRemoteRadioRemoteCommunication
+				DownUp,
+			genEquipRemoteRadioRemoteIPAddr
+				IpAddress,
+			genEquipRemoteRadioRemoteRxLevel
+				INTEGER,
+			genEquipRemoteRadioRemoteForceMaxTxLevel
+				INTEGER,
+			genEquipRemoteRadioRemoteTxFreq
+				INTEGER,
+			genEquipRemoteRadioRemoteRxFreq
+				INTEGER,
+			genEquipRemoteRadioRemoteATPCReferenceRxLevel
+				INTEGER,
+			genEquipRemoteRadioRemoteFloatingIPAddr
+				IpAddress,
+			genEquipRemoteRadioRemoteDefaultGateway
+				IpAddress,
+			genEquipRemoteRadioRemoteMostSevereAlarm
+				Severity,
+			genEquipRemoteRadioRemoteSubnetMask
+				IpAddress,
+			genEquipRemoteRadioRemoteSlotID
+				INTEGER,
+			genEquipRemoteRadioRemoteForceTxMute
+				OffOn,
+			genEquipRemoteRadioRemoteLinkId
+				INTEGER,
+			genEquipRemoteRadioRemoteATPCoverrideState
+				NoYes,
+			genEquipRemoteRadioRemoteATPCoverrideStateCancel
+				NoYes,
+			genEquipRemoteRadioRemoteDataLoopBackAdmin
+				EnableDisable,
+			genEquipRemoteRadioRemoteDataLoopBackDuration
+				INTEGER,
+			genEquipRemoteRadioRemoteDataLoopBackSwitchAddress
+				EnableDisable,
+			genEquipRemoteRadioRemoteGreenReferenceRxLevel
+				INTEGER,
+			genEquipRemoteRadioRemoteMNGvlan
+				INTEGER,
+			genEquipRemoteRadioRemoteReset
+				FalseTrue,
+			genEquipRemoteRadioRemoteGreenModeAdmin
+				EnableDisable,
+			genEquipRemoteRadioRemoteWebProtocol
+				CommunicationChannel,
+			genEquipRemoteRadioRemoteIPv6Addr
+				OCTET STRING,
+			genEquipRemoteRadioRemotePrefixLength
+				INTEGER,
+			genEquipRemoteRadioRemoteDefaultGatewayIpv6
+				OCTET STRING,
+			genEquipRemoteRadioRemoteResetSlot
+				FalseTrue
+}
+
+genEquipRemoteRadioRadioId	OBJECT-TYPE
+        SYNTAX		RadioId
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value is the radio ID that serves as this table Index"
+		::= { genEquipRemoteRadioEntry 1 }
+
+
+genEquipRemoteRadioRemoteCommunication	OBJECT-TYPE
+        SYNTAX		DownUp
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The operational status of the remote radio."
+		::= { genEquipRemoteRadioEntry 2 }
+
+genEquipRemoteRadioRemoteIPAddr	OBJECT-TYPE
+        SYNTAX		IpAddress
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"The remote Ip address."
+		::= { genEquipRemoteRadioEntry 3 }
+
+genEquipRemoteRadioRemoteRxLevel	OBJECT-TYPE
+        SYNTAX		INTEGER (-199..0)
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The Rx level of the remote radio (in dBm)"
+		::= { genEquipRemoteRadioEntry 4 }
+
+genEquipRemoteRadioRemoteForceMaxTxLevel	OBJECT-TYPE
+        SYNTAX		INTEGER (-50..34)
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Command that forces the remote radio maximum Tx level (in dBm)"
+		::= { genEquipRemoteRadioEntry 5 }
+
+genEquipRemoteRadioRemoteTxFreq	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"The remote radio Tx frequancy (in MHz)."
+		::= { genEquipRemoteRadioEntry 6 }
+
+genEquipRemoteRadioRemoteRxFreq	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"The remote radio Rx frequancy (in MHz)."
+		::= { genEquipRemoteRadioEntry 7 }
+
+genEquipRemoteRadioRemoteATPCReferenceRxLevel	OBJECT-TYPE
+        SYNTAX		INTEGER (0..199)
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"The RSL reference level for the ATPC mechanism in the remote radio."
+		::= { genEquipRemoteRadioEntry 8 }
+
+genEquipRemoteRadioRemoteFloatingIPAddr	OBJECT-TYPE
+        SYNTAX		IpAddress
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the floating IP address used in
+		the remote shelf if its main units are in 1+1 protection mode."
+		::= { genEquipRemoteRadioEntry 9 }
+
+genEquipRemoteRadioRemoteDefaultGateway	OBJECT-TYPE
+        SYNTAX		IpAddress
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Default gateway of remote NE (Network Element) across this radio link."
+		::= { genEquipRemoteRadioEntry 10 }
+
+genEquipRemoteRadioRemoteMostSevereAlarm	OBJECT-TYPE
+        SYNTAX		Severity
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Most severe alarm of remote NE (Network Element) across this radio link."
+		::= { genEquipRemoteRadioEntry 11 }
+
+genEquipRemoteRadioRemoteSubnetMask	OBJECT-TYPE
+        SYNTAX		IpAddress
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Subnet mask of remote NE (Network Element) across this radio link."
+		::= { genEquipRemoteRadioEntry 12 }
+
+genEquipRemoteRadioRemoteSlotID	OBJECT-TYPE
+        SYNTAX		INTEGER (1..6)
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The remote radio slot number."
+		::= { genEquipRemoteRadioEntry 13 }
+
+genEquipRemoteRadioRemoteForceTxMute	OBJECT-TYPE
+        SYNTAX		OffOn
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Force the mute state of the remote unit radio interface."
+		::= { genEquipRemoteRadioEntry 14 }
+
+genEquipRemoteRadioRemoteLinkId	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"The Link Id of the remote unit radio interface."
+		::= { genEquipRemoteRadioEntry 15 }
+
+genEquipRemoteRadioRemoteATPCoverrideState	OBJECT-TYPE
+        SYNTAX		NoYes
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Remote Radio ATPC Override Timer expire state."
+		::= { genEquipRemoteRadioEntry 16 }
+
+genEquipRemoteRadioRemoteATPCoverrideStateCancel	OBJECT-TYPE
+        SYNTAX		NoYes
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"his coomand cancel remote ATPC override state."
+		::= { genEquipRemoteRadioEntry 17 }
+
+genEquipRemoteRadioRemoteDataLoopBackAdmin	OBJECT-TYPE
+        SYNTAX		EnableDisable
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Remote unit administrator  state of data loopback."
+		::= { genEquipRemoteRadioEntry 18 }
+
+genEquipRemoteRadioRemoteDataLoopBackDuration	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Remote Data LoopBack Duration at remote unit[Minutes], zero for infinite loop back."
+		::= { genEquipRemoteRadioEntry 19 }
+
+genEquipRemoteRadioRemoteDataLoopBackSwitchAddress	OBJECT-TYPE
+        SYNTAX		EnableDisable
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Remote Unit switch MAC DA."
+		::= { genEquipRemoteRadioEntry 20 }
+
+genEquipRemoteRadioRemoteGreenReferenceRxLevel	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Remote Radio Green RSL reference level[dBm]."
+		::= { genEquipRemoteRadioEntry 21 }
+
+genEquipRemoteRadioRemoteMNGvlan	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Remote Management Vlan."
+		::= { genEquipRemoteRadioEntry 22 }
+
+genEquipRemoteRadioRemoteReset	OBJECT-TYPE
+        SYNTAX		FalseTrue
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Remote reset of unit."
+		::= { genEquipRemoteRadioEntry 23 }
+
+genEquipRemoteRadioRemoteGreenModeAdmin	OBJECT-TYPE
+        SYNTAX		EnableDisable
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Remote Unit Tx Green Mode Admin."
+		::= { genEquipRemoteRadioEntry 24 }
+
+genEquipRemoteRadioRemoteWebProtocol	OBJECT-TYPE
+        SYNTAX		CommunicationChannel
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Remote web protocol."
+		::= { genEquipRemoteRadioEntry 25 }
+
+genEquipRemoteRadioRemoteIPv6Addr	OBJECT-TYPE
+        SYNTAX		OCTET STRING (SIZE(0..16))
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Remote IPv6 Address."
+		::= { genEquipRemoteRadioEntry 26 }
+
+genEquipRemoteRadioRemotePrefixLength	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Remote IPv6 Subnet-Mask."
+		::= { genEquipRemoteRadioEntry 27 }
+
+genEquipRemoteRadioRemoteDefaultGatewayIpv6	OBJECT-TYPE
+        SYNTAX		OCTET STRING (SIZE(0..16))
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Remote IPv6 Default Gateway."
+		::= { genEquipRemoteRadioEntry 28 }
+
+genEquipRemoteRadioRemoteResetSlot 	OBJECT-TYPE
+        SYNTAX		FalseTrue
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Remote Unit Reset Slot."
+		::= { genEquipRemoteRadioEntry 29 }
+
+
+-- Radio MRMC
+genEquipRadioMRMC	OBJECT IDENTIFIER ::= {genEquipRadio 4}
+
+genEquipRadioMRMCTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioMRMCEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "MRMC stauts table (Multi rate multi constellation)"
+        ::= { genEquipRadioMRMC 1 }
+
+genEquipRadioMRMCEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioMRMCEntry
+        ACCESS not-accessible
+        STATUS mandatory
+          DESCRIPTION
+          "MRMC status table (Multi rate multi constellation)"
+        INDEX { genEquipRadioMRMCRadioId }
+        ::= { genEquipRadioMRMCTable 1 }
+
+GenEquipRadioMRMCEntry ::=
+		SEQUENCE {
+			genEquipRadioMRMCRadioId
+				RadioId,
+			genEquipRadioMRMCSelectedScriptIndex
+            	INTEGER,
+			genEquipRadioMRMCOccupidBandwidth
+            	INTEGER,
+			genEquipRadioMRMCOperMode
+            	INTEGER,
+			genEquipRadioMRMCCurrTxProfile
+            	MrmcProfile,
+			genEquipRadioMRMCCurrTxQAM
+            	INTEGER,
+			genEquipRadioMRMCCurrTxBitrate
+            	MrmcBitRate,
+			genEquipRadioMRMCCurrTxVc
+            	INTEGER,
+			genEquipRadioMRMCCurrRxProfile
+            	MrmcProfile,
+			genEquipRadioMRMCCurrRxQAM
+            	INTEGER,
+			genEquipRadioMRMCCurrRxBitrate
+            	MrmcBitRate,
+			genEquipRadioMRMCCurrRxVc
+            	INTEGER,
+            genEquipRadioMRMCCurrGrade
+            	RfuGrade,
+			genEquipRadioMRMCEnAlarmOnAcmProfileDegrade
+				EnableDisable,
+			genEquipRadioMRMCAlarmOnAcmProfileDegradeThreshold
+				INTEGER
+}
+
+genEquipRadioMRMCRadioId	OBJECT-TYPE
+        SYNTAX		RadioId
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value is the radio ID that serves as this table Index"
+		::= { genEquipRadioMRMCEntry 1 }
+
+genEquipRadioMRMCSelectedScriptIndex	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"The index of the MRMC script. The description of the script located in the genEquipRadioMRMCScriptTable."
+		::= { genEquipRadioMRMCEntry 2 }
+
+genEquipRadioMRMCOccupidBandwidth	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The Occupid Bandwidth (in KHz)."
+		::= { genEquipRadioMRMCEntry 3 }
+
+genEquipRadioMRMCOperMode	OBJECT-TYPE
+        SYNTAX		INTEGER {
+						regular-mode(0),
+						acm-fixed-mode(1),
+						acm-adaptive-mode(2)
+		}
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The Mode of the MRMC script."
+		::= { genEquipRadioMRMCEntry 4 }
+
+genEquipRadioMRMCCurrTxProfile	OBJECT-TYPE
+        SYNTAX		MrmcProfile
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The Tx profile number."
+		::= { genEquipRadioMRMCEntry 5 }
+
+genEquipRadioMRMCCurrTxQAM	OBJECT-TYPE
+        SYNTAX		INTEGER (4..2048)
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The current Tx QAM (modulation)."
+		::= { genEquipRadioMRMCEntry 6 }
+
+genEquipRadioMRMCCurrTxBitrate	OBJECT-TYPE
+        SYNTAX		MrmcBitRate
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The current Tx bit rate (in Kbps)"
+		::= { genEquipRadioMRMCEntry 7 }
+
+genEquipRadioMRMCCurrTxVc	OBJECT-TYPE
+        SYNTAX		INTEGER (0..1024)
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The current number of Tx TDM channels."
+		::= { genEquipRadioMRMCEntry 8 }
+
+genEquipRadioMRMCCurrRxProfile	OBJECT-TYPE
+        SYNTAX		MrmcProfile
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The current Rx profile number"
+		::= { genEquipRadioMRMCEntry 9 }
+
+genEquipRadioMRMCCurrRxQAM	OBJECT-TYPE
+        SYNTAX		INTEGER (4..2048)
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The current Rx QAM (modulation)."
+		::= { genEquipRadioMRMCEntry 10 }
+
+genEquipRadioMRMCCurrRxBitrate	OBJECT-TYPE
+        SYNTAX		MrmcBitRate
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The current total Rx bit rate (in Kbps)"
+		::= { genEquipRadioMRMCEntry 11 }
+
+genEquipRadioMRMCCurrRxVc	OBJECT-TYPE
+        SYNTAX		INTEGER (0..1024)
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The current number of Rx TDM channels."
+		::= { genEquipRadioMRMCEntry 12 }
+
+genEquipRadioMRMCCurrGrade  OBJECT-TYPE
+        SYNTAX		RfuGrade
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The grade of the current script."
+		::= { genEquipRadioMRMCEntry 13 }
+
+genEquipRadioMRMCEnAlarmOnAcmProfileDegrade	OBJECT-TYPE
+        SYNTAX		EnableDisable
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Enable/Disable event and trapgeneration on ACM profiledegrade.
+		When enabled and ifcurrent radio script supports Adaptive Code Modulation(ACM) event and trap will
+		begenerated upon ACM profiledegradation below userdefinedthreshold.
+		Alarm willbe generated only if the ACMprofile stays below thethreshold for at least 5 subsequent seconds.
+		Alarm willbe cleared after ACM profilereturns to be above thethreshold again."
+		::= { genEquipRadioMRMCEntry 14 }
+
+genEquipRadioMRMCAlarmOnAcmProfileDegradeThreshold	OBJECT-TYPE
+        SYNTAX		INTEGER (1..7)
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"ACM profile threshold foralarm generation"
+		::= { genEquipRadioMRMCEntry 15 }
+
+
+
+genEquipRadioMRMCScriptTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioMRMCScriptEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "The MRMC script table."
+        ::= { genEquipRadioMRMC 2 }
+
+genEquipRadioMRMCScriptEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioMRMCScriptEntry
+        ACCESS not-accessible
+        STATUS mandatory
+          DESCRIPTION
+          "The MRMC script table."
+        INDEX { genEquipRadioMRMCScriptRadioId, genEquipRadioMRMCScriptIndex }
+        ::= { genEquipRadioMRMCScriptTable 1 }
+
+GenEquipRadioMRMCScriptEntry ::=
+		SEQUENCE {
+			genEquipRadioMRMCScriptRadioId
+				RadioId,
+			genEquipRadioMRMCScriptIndex
+				INTEGER,
+			genEquipRadioMRMCScriptName
+            	DisplayString,
+			genEquipRadioMRMCScriptOperMode
+				INTEGER,
+			genEquipRadioMRMCScriptProfile
+				MrmcProfile,
+			genEquipRadioMRMCScriptProfileBitrate
+				MrmcBitRate,
+			genEquipRadioMRMCScriptAdaptivePower
+				INTEGER,
+			genEquipRadioMRMCScriptReference
+				INTEGER,
+			genEquipRadioMRMCScriptMinProfile
+				MrmcProfile
+}
+
+genEquipRadioMRMCScriptRadioId	OBJECT-TYPE
+        SYNTAX		RadioId
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value is the radio ID that serves as this table Index"
+		::= { genEquipRadioMRMCScriptEntry 1 }
+
+
+genEquipRadioMRMCScriptIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The index of the MRMC scripts."
+        ::= { genEquipRadioMRMCScriptEntry 2 }
+
+genEquipRadioMRMCScriptName OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The MRMC script name."
+        ::= { genEquipRadioMRMCScriptEntry 3 }
+
+genEquipRadioMRMCScriptOperMode OBJECT-TYPE
+        SYNTAX		INTEGER {
+						regular-mode(0),
+						acm-fixed-mode(1),
+						acm-adaptive-mode(2)
+		}
+		ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The script operational mode."
+        ::= { genEquipRadioMRMCScriptEntry 4 }
+
+genEquipRadioMRMCScriptProfile OBJECT-TYPE
+        SYNTAX MrmcProfile
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The profile number of the script"
+        ::= { genEquipRadioMRMCScriptEntry 5 }
+
+genEquipRadioMRMCScriptProfileBitrate OBJECT-TYPE
+        SYNTAX MrmcBitRate
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The Bit rate of the MRMC profile (in Kbps)."
+        ::= { genEquipRadioMRMCScriptEntry 6 }
+
+genEquipRadioMRMCScriptAdaptivePower OBJECT-TYPE
+        SYNTAX INTEGER {
+					enable-adaptive-power(0),
+					disable-adaptive-power(1)
+		}
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "'Adaptive Power' option which is available only when operation mode is ACM-adaptive"
+        ::= { genEquipRadioMRMCScriptEntry 7 }
+
+
+genEquipRadioMRMCScriptReference OBJECT-TYPE
+        SYNTAX INTEGER {
+					calss-2(0),
+					class-4(1),
+					class-5b(2),
+					class-6a(3),
+					fcc(4)
+		}
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "'Reference Class' option which is available only when operation mode 'ACM-adaptive' AND 'Adaptive Power' are enabled."
+        ::= { genEquipRadioMRMCScriptEntry 8 }
+
+genEquipRadioMRMCScriptMinProfile OBJECT-TYPE
+        SYNTAX MrmcProfile
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "'Minimum Profile' option which is available only when operation mode 'ACM-adaptive' AND 'Adaptive Power' are enabled.
+        It state the minimum profile level for this script."
+        ::= { genEquipRadioMRMCScriptEntry 9 }
+
+
+
+
+
+
+
+
+genEquipRadioMRMCFilteredTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioMRMCFilteredEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Filtered MRMC scripts table."
+        ::= { genEquipRadioMRMC 3 }
+
+genEquipRadioMRMCFilteredEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioMRMCFilteredEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "List of the filtered MRMC scripts."
+        INDEX { genEquipRadioMRMCFilteredRadioId, genEquipRadioMRMCFilteredScriptId }
+        ::= { genEquipRadioMRMCFilteredTable 1 }
+
+GenEquipRadioMRMCFilteredEntry ::=
+		SEQUENCE {
+			genEquipRadioMRMCFilteredRadioId
+				RadioId,
+			genEquipRadioMRMCFilteredScriptId
+				MrmcScriptId
+}
+
+genEquipRadioMRMCFilteredRadioId	OBJECT-TYPE
+        SYNTAX		RadioId
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The index of the radio interface"
+		::= { genEquipRadioMRMCFilteredEntry 1 }
+
+
+genEquipRadioMRMCFilteredScriptId OBJECT-TYPE
+        SYNTAX MrmcScriptId
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The MRMC filtered script IDs that are available in the specific radio."
+        ::= { genEquipRadioMRMCFilteredEntry 2 }
+
+
+
+genEquipRadioMRMCProfileAttrTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioMRMCProfileAttrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "MRMC profile attribute table."
+        ::= { genEquipRadioMRMC 4 }
+
+genEquipRadioMRMCProfileAttrEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioMRMCProfileAttrEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "MRMC script profile's attributes."
+        INDEX { genEquipRadioMRMCProfileAttrScriptId, genEquipRadioMRMCProfileAttrTxProfile, genEquipRadioMRMCProfileAttrRxProfile }
+        ::= { genEquipRadioMRMCProfileAttrTable 1 }
+
+GenEquipRadioMRMCProfileAttrEntry ::=
+		SEQUENCE {
+			genEquipRadioMRMCProfileAttrScriptId
+				MrmcScriptId,
+			genEquipRadioMRMCProfileAttrTxProfile
+				MrmcProfile,
+			genEquipRadioMRMCProfileAttrRxProfile
+				MrmcProfile,
+			genEquipRadioMRMCProfileAttrTxQAM
+				QamOrder,
+			genEquipRadioMRMCProfileAttrTxBitRate
+				MrmcBitRate,
+			genEquipRadioMRMCProfileAttrRxQAM
+				QamOrder,
+			genEquipRadioMRMCProfileAttrRxBitRate
+				MrmcBitRate
+}
+
+genEquipRadioMRMCProfileAttrScriptId	OBJECT-TYPE
+        SYNTAX		MrmcScriptId
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The index of the table"
+		::= { genEquipRadioMRMCProfileAttrEntry 1 }
+
+genEquipRadioMRMCProfileAttrTxProfile OBJECT-TYPE
+        SYNTAX MrmcProfile
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The profile number of the TX channel."
+        ::= { genEquipRadioMRMCProfileAttrEntry 2 }
+
+genEquipRadioMRMCProfileAttrRxProfile OBJECT-TYPE
+        SYNTAX MrmcProfile
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The profile number of the RX channel."
+        ::= { genEquipRadioMRMCProfileAttrEntry 3 }
+
+genEquipRadioMRMCProfileAttrTxQAM OBJECT-TYPE
+        SYNTAX QamOrder
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Indicates the QAM level of the TX channel."
+        ::= { genEquipRadioMRMCProfileAttrEntry 4 }
+
+genEquipRadioMRMCProfileAttrTxBitRate OBJECT-TYPE
+        SYNTAX MrmcBitRate
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Indicates the TX bit-rate of the profile."
+        ::= { genEquipRadioMRMCProfileAttrEntry 5 }
+
+genEquipRadioMRMCProfileAttrRxQAM OBJECT-TYPE
+        SYNTAX QamOrder
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Indicates the QAM level of the RX channel."
+        ::= { genEquipRadioMRMCProfileAttrEntry 6 }
+
+genEquipRadioMRMCProfileAttrRxBitRate OBJECT-TYPE
+        SYNTAX MrmcBitRate
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "RX bit-rate of the profile."
+        ::= { genEquipRadioMRMCProfileAttrEntry 7 }
+
+
+
+
+genEquipRadioMRMCScriptAttrTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioMRMCScriptAttrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "MRMC script attribute table."
+        ::= { genEquipRadioMRMC 5 }
+
+genEquipRadioMRMCScriptAttrEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioMRMCScriptAttrEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "MRMC script attributes."
+        INDEX { genEquipRadioMRMCScriptAttrScriptId }
+        ::= { genEquipRadioMRMCScriptAttrTable 1 }
+
+GenEquipRadioMRMCScriptAttrEntry ::=
+		SEQUENCE {
+			genEquipRadioMRMCScriptAttrScriptId
+				MrmcScriptId,
+			genEquipRadioMRMCScriptAttrScriptName
+				DisplayString,
+			genEquipRadioMRMCScriptAttrSupportACM
+				NoYes,
+			genEquipRadioMRMCScriptAttrStandard
+				INTEGER,
+			genEquipRadioMRMCScriptAttrMultiCarrier
+				INTEGER,
+			genEquipRadioMRMCScriptAttrAdjChannel
+				NoYes,
+			genEquipRadioMRMCScriptAttrModScheme
+				INTEGER,
+			genEquipRadioMRMCScriptAttrSymmetry
+				INTEGER,
+			genEquipRadioMRMCScriptAttrLatency
+				INTEGER,
+			genEquipRadioMRMCScriptAttrTxBW
+				INTEGER,
+			genEquipRadioMRMCScriptAttrRxBW
+				INTEGER,
+			genEquipRadioMRMCScriptAttrTxOccupiedBW
+				INTEGER,
+			genEquipRadioMRMCScriptAttrRxOccupiedBW
+				INTEGER,
+			genEquipRadioMRMCScriptAttrLinkGrade
+				RfuGrade,
+			genEquipRadioMRMCScriptAttrDiffGrade
+				RfuGrade,
+			genEquipRadioMRMCScriptAttrChannelBW
+				INTEGER,
+			genEquipRadioMRMCScriptAttrTxMaxProfile
+				MrmcProfile,
+			genEquipRadioMRMCScriptAttrRxMaxProfile
+				MrmcProfile
+}
+
+genEquipRadioMRMCScriptAttrScriptId OBJECT-TYPE
+        SYNTAX MrmcScriptId
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The ID of the MRMC script."
+        ::= { genEquipRadioMRMCScriptAttrEntry 1 }
+
+genEquipRadioMRMCScriptAttrScriptName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..100))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The name that identifies the script."
+        ::= { genEquipRadioMRMCScriptAttrEntry 2 }
+
+genEquipRadioMRMCScriptAttrSupportACM	OBJECT-TYPE
+        SYNTAX		NoYes
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Indicates if the MRMC script supports ACM (Adaptive Coding Modulation) functionality"
+		::= { genEquipRadioMRMCScriptAttrEntry 3 }
+
+genEquipRadioMRMCScriptAttrStandard OBJECT-TYPE
+        SYNTAX INTEGER {
+					unknown(0),
+					etsi(1),
+					fcc(2),
+					etsi-fcc(3)
+		}
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The standard that the MRMC script is designed to comply with."
+        ::= { genEquipRadioMRMCScriptAttrEntry 4 }
+
+genEquipRadioMRMCScriptAttrMultiCarrier OBJECT-TYPE
+        SYNTAX INTEGER {
+					single-carrier(0),
+					xpic(1),
+					mimo(2)
+		}
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Indicates whether the MRMC script support a single carrier or any kind of multi carrier."
+        ::= { genEquipRadioMRMCScriptAttrEntry 5 }
+
+genEquipRadioMRMCScriptAttrAdjChannel	OBJECT-TYPE
+        SYNTAX		NoYes
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Indicates whether the MRMC script supports adjacent channel"
+		::= { genEquipRadioMRMCScriptAttrEntry 6 }
+
+genEquipRadioMRMCScriptAttrModScheme OBJECT-TYPE
+        SYNTAX INTEGER {
+					regular(2),
+					fixed(3),
+					adaptive(4),
+					fixed-adaptive(5),
+					manual(6)
+		}
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Indicates whether the MRMC script supports fixed or adaptive (ACM) modulation scheme."
+        ::= { genEquipRadioMRMCScriptAttrEntry 7 }
+
+genEquipRadioMRMCScriptAttrSymmetry OBJECT-TYPE
+        SYNTAX INTEGER {
+					normal(0),
+					asymmetry(1)
+		}
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Indicates whether the MRMC script is designed to normal (symmetrical) BW or an Asymmetrical BW."
+        ::= { genEquipRadioMRMCScriptAttrEntry 8 }
+
+genEquipRadioMRMCScriptAttrLatency OBJECT-TYPE
+        SYNTAX INTEGER {
+					normal(0),
+					low(1)
+		}
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The Latency level of the MRMC Script."
+        ::= { genEquipRadioMRMCScriptAttrEntry 9 }
+
+genEquipRadioMRMCScriptAttrTxBW OBJECT-TYPE
+        SYNTAX INTEGER (1..512000)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The TX channel bandwidth (channel spacing) of the MRMC script."
+        ::= { genEquipRadioMRMCScriptAttrEntry 10 }
+
+genEquipRadioMRMCScriptAttrRxBW OBJECT-TYPE
+        SYNTAX INTEGER (1..512000)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The RX channel bandwidth (channel spacing) of the MRMC script."
+        ::= { genEquipRadioMRMCScriptAttrEntry 11 }
+
+genEquipRadioMRMCScriptAttrTxOccupiedBW OBJECT-TYPE
+        SYNTAX INTEGER (1..512000)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The TX channel occupied bandwidth of the MRMC script."
+        ::= { genEquipRadioMRMCScriptAttrEntry 12 }
+
+genEquipRadioMRMCScriptAttrRxOccupiedBW OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The RX channel occupied bandwidth of the MRMC script."
+        ::= { genEquipRadioMRMCScriptAttrEntry 13 }
+
+genEquipRadioMRMCScriptAttrLinkGrade OBJECT-TYPE
+        SYNTAX RfuGrade
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The link grade level that the MRMC script is designed to cope with."
+        ::= { genEquipRadioMRMCScriptAttrEntry 14 }
+
+genEquipRadioMRMCScriptAttrDiffGrade OBJECT-TYPE
+        SYNTAX RfuGrade
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The Differential grade level that the MRMC script is designed to cope with."
+        ::= { genEquipRadioMRMCScriptAttrEntry 15 }
+
+genEquipRadioMRMCScriptAttrChannelBW OBJECT-TYPE
+        SYNTAX INTEGER (1..512000)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The channel bandwidth (channel spacing) the MRMC script is designed to."
+        ::= { genEquipRadioMRMCScriptAttrEntry 16 }
+
+genEquipRadioMRMCScriptAttrTxMaxProfile OBJECT-TYPE
+        SYNTAX MrmcProfile
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The maximum available TX profile of the MRMC script."
+        ::= { genEquipRadioMRMCScriptAttrEntry 17 }
+
+genEquipRadioMRMCScriptAttrRxMaxProfile OBJECT-TYPE
+        SYNTAX MrmcProfile
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The maximum available RX profile of the MRMC script."
+        ::= { genEquipRadioMRMCScriptAttrEntry 18 }
+
+
+
+
+genEquipRadioMRMCConfigTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioMRMCConfigEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "MRMC script configuration."
+        ::= { genEquipRadioMRMC 6 }
+
+genEquipRadioMRMCConfigEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioMRMCConfigEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "The configured parameters of the MRMC script."
+        INDEX { genEquipRadioMRMCConfigRadioId }
+        ::= { genEquipRadioMRMCConfigTable 1 }
+
+GenEquipRadioMRMCConfigEntry ::=
+		SEQUENCE {
+			genEquipRadioMRMCConfigRadioId
+				RadioId,
+			genEquipRadioMRMCConfigActiveScriptId
+				MrmcScriptId,
+			genEquipRadioMRMCConfigStandbyScriptId
+				MrmcScriptId,
+			genEquipRadioMRMCConfigOperMode
+				INTEGER,
+			genEquipRadioMRMCConfigMaxProfile
+				MrmcProfile,
+			genEquipRadioMRMCConfigMinProfile
+				MrmcProfile,
+			genEquipRadioMRMCConfigAdaptivePowerAdmin
+				EnableDisable,
+			genEquipRadioMRMCConfigAdaptivePowerRefClass
+				INTEGER
+}
+
+genEquipRadioMRMCConfigRadioId	OBJECT-TYPE
+        SYNTAX		RadioId
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The index of the MRMC Configuration Table."
+		::= { genEquipRadioMRMCConfigEntry 1 }
+
+
+genEquipRadioMRMCConfigActiveScriptId	OBJECT-TYPE
+        SYNTAX		MrmcScriptId
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"The script ID of required MRMC script."
+		::= { genEquipRadioMRMCConfigEntry 2 }
+
+genEquipRadioMRMCConfigStandbyScriptId	OBJECT-TYPE
+        SYNTAX		MrmcScriptId
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"The script ID which is in standby."
+		::= { genEquipRadioMRMCConfigEntry 3 }
+
+genEquipRadioMRMCConfigOperMode OBJECT-TYPE
+        SYNTAX INTEGER {
+					fixed(2),
+					adaptive(3),
+					manual(4)
+		}
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The operational mode of the MRMC script, whether it is fixed or adaptive modulation functionality."
+        ::= { genEquipRadioMRMCConfigEntry 4 }
+
+genEquipRadioMRMCConfigMaxProfile	OBJECT-TYPE
+        SYNTAX		MrmcProfile
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"The maximum profile which is required for the MRMC script"
+		::= { genEquipRadioMRMCConfigEntry 5 }
+
+genEquipRadioMRMCConfigMinProfile	OBJECT-TYPE
+        SYNTAX		MrmcProfile
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"The minimum profile which is required for the MRMC script"
+		::= { genEquipRadioMRMCConfigEntry 6 }
+
+genEquipRadioMRMCConfigAdaptivePowerAdmin OBJECT-TYPE
+        SYNTAX EnableDisable
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Enable or disable the adaptive power functionality during ACM operation."
+        ::= { genEquipRadioMRMCConfigEntry 7 }
+
+genEquipRadioMRMCConfigAdaptivePowerRefClass OBJECT-TYPE
+        SYNTAX INTEGER {
+					class-2(0),
+					class-4(1),
+					class-5b(2),
+					class-6a(3),
+					fcc(4),
+					class-7a(5),
+					class-7b(6)
+		}
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Determines the efficiency class for the adaptive power functionality in ACM operation."
+        ::= { genEquipRadioMRMCConfigEntry 8 }
+
+-- Radio Compression Table
+genEquipRadioComp OBJECT IDENTIFIER ::= {genEquipRadio 5}
+
+genEquipRadioCompCfgTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioCompCfgEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Radio Compression table"
+        ::= { genEquipRadioComp 1 }
+
+genEquipRadioCompCfgEntry	OBJECT-TYPE
+        SYNTAX GenEquipRadioCompCfgEntry
+        ACCESS not-accessible
+        STATUS mandatory
+          DESCRIPTION
+          "Radio Compression table"
+        INDEX { genEquipRadioCfgRadioId }
+        ::= { genEquipRadioCompCfgTable  1 }
+
+GenEquipRadioCompCfgEntry::=
+		SEQUENCE {
+			genEquipRadioCompMode
+            			INTEGER,
+			genEquipRadioEnhHeaderCompAdmin
+            			AllowedNotAllowed,
+			genEquipRadioEnhDataCompAdmin
+				EnableDisable,
+			genEquipRadioEnhHeaderCompMode
+				INTEGER
+}
+
+genEquipRadioCompMode	OBJECT-TYPE
+        SYNTAX		INTEGER {
+        		legacy(0),
+				enhanced(1)
+				}
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Setting Ethernet packet header & payload compression mode. In Enhanced mode packet header can be compressed up to L4 and data compression can be activated.
+		Legacy mode is back compatible to earlier software and hardware releases."
+		::= { genEquipRadioCompCfgEntry 1 }
+
+genEquipRadioEnhHeaderCompAdmin	OBJECT-TYPE
+        SYNTAX		AllowedNotAllowed
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Enable/Disable Enhanced Header compression."
+		::= { genEquipRadioCompCfgEntry 2 }
+
+genEquipRadioEnhDataCompAdmin	OBJECT-TYPE
+        SYNTAX		EnableDisable
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Enable/Disable Enhanced Data compression."
+		::= { genEquipRadioCompCfgEntry 3 }
+
+genEquipRadioEnhHeaderCompMode	OBJECT-TYPE
+        SYNTAX		INTEGER {
+				l2(0),
+				l3(1),
+				l4(2)
+				}
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Setting Enhanced Header Compression depth."
+		::= { genEquipRadioCompCfgEntry 4 }
+
+genEquipRadioCompStatusTable	OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioCompStatusEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Radio Compression status table."
+        ::= { genEquipRadioComp 2 }
+
+genEquipRadioCompStatusEntry	OBJECT-TYPE
+        SYNTAX GenEquipRadioCompStatusEntry
+        ACCESS not-accessible
+        STATUS mandatory
+          DESCRIPTION
+          "Radio Compression status table."
+        INDEX { genEquipRadioCfgRadioId }
+        ::= { genEquipRadioCompStatusTable 1 }
+
+GenEquipRadioCompStatusEntry::=
+		SEQUENCE {
+			genEquipRadioCompOperationalState
+            			INTEGER
+}
+
+genEquipRadioCompOperationalState	OBJECT-TYPE
+        SYNTAX		INTEGER {
+				legacy(0),
+				enhanced-HC-DC-bypass(1),
+				enhanced-HC-active-DC-bypass(2),
+				enhanced-DC-active-HC-bypass(3),
+				enhanced-HC-DC-active(4),
+				undefined(5)
+				}
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Current compression mode operational status."
+		::= { genEquipRadioCompStatusEntry 1 }
+
+genEquipRadioCompExclRulesTable	OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioCompExclRulesEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Enhanced Header Compression excluding rules table."
+        ::= { genEquipRadioComp 3 }
+
+genEquipRadioCompExclRulesEntry	OBJECT-TYPE
+        SYNTAX GenEquipRadioCompExclRulesEntry
+        ACCESS not-accessible
+        STATUS mandatory
+          DESCRIPTION
+          "Enhanced Header Compression excluding rules table."
+        INDEX { genEquipRadioCfgRadioId, genEquipRadioCompExclRuleId }
+        ::= { genEquipRadioCompExclRulesTable 1 }
+
+GenEquipRadioCompExclRulesEntry::=
+		SEQUENCE {
+			genEquipRadioCompExclRuleId
+            			INTEGER,
+			genEquipRadioCompExclRuleType
+            			INTEGER,
+			genEquipRadioCompExclRuleName
+				DisplayString,
+			genEquipRadioCompExclRuleValue
+				OCTET STRING,
+			genEquipRadioCompExclRuleRowStatus
+				INTEGER
+}
+
+genEquipRadioCompExclRuleId	OBJECT-TYPE
+        SYNTAX		INTEGER (1..32)
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Excluding rule number index."
+		::= { genEquipRadioCompExclRulesEntry 1 }
+
+genEquipRadioCompExclRuleType	OBJECT-TYPE
+        SYNTAX		INTEGER {
+        		flow-Id(0),
+        		vlan(1),
+				mac-DA(2),
+				mac-SA(3),
+				ethertype(4),
+				none(5)
+				}
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Add excluding rule for enhanced header compression. Excluding rule must have a number (rule-id),
+		text description (rule-name) and excluding rule type whichcan be one of the following:
+		VLAN Id or MAC destination address or MAC source address or Ethernet ethertype or user defined flow type."
+		::= { genEquipRadioCompExclRulesEntry 2 }
+
+genEquipRadioCompExclRuleName	OBJECT-TYPE
+        SYNTAX		DisplayString
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Excluding rule name. User specified."
+		::= { genEquipRadioCompExclRulesEntry 3 }
+
+genEquipRadioCompExclRuleValue	OBJECT-TYPE
+        SYNTAX		OCTET STRING
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Excluding rule value. For example: MAC address or Ethertype."
+		::= { genEquipRadioCompExclRulesEntry 4 }
+
+genEquipRadioCompExclRuleRowStatus	OBJECT-TYPE
+        SYNTAX		RowStatus
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Row status for this table."
+		::= { genEquipRadioCompExclRulesEntry 30 }
+
+
+-- NG ESS
+genEquipRadioCompNG OBJECT IDENTIFIER ::= {genEquipRadioComp 4}
+
+--
+-- Radio Ethernet and compression config table radio-ethernet-config-table
+--
+genEquipRadioCompNGCfgTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioCompNGCfgEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Radio Ethernet and compression config table"
+        ::= { genEquipRadioCompNG 1 }
+
+genEquipRadioCompNGCfgEntry	OBJECT-TYPE
+        SYNTAX GenEquipRadioCompNGCfgEntry
+        ACCESS not-accessible
+        STATUS mandatory
+          DESCRIPTION
+          "Radio Ethernet and compression config table entry"
+        INDEX { genEquipRadioCompNGCfgifIndex }
+        ::= { genEquipRadioCompNGCfgTable  1 }
+
+GenEquipRadioCompNGCfgEntry::=
+		SEQUENCE {
+			genEquipRadioCompNGCfgifIndex
+				INTEGER,
+			genEquipRadioHeaderCompNGCfgClearStats
+            	NoYes,
+			genEquipRadioHeaderCompNGCfgUserFlowType
+				INTEGER,
+			genEquipRadioHeaderCompNGCfgMode
+				INTEGER,
+			genEquipRadioCutThroughNGCfgMode
+				NoYes
+}
+
+genEquipRadioCompNGCfgifIndex	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Interface Index."
+		::= { genEquipRadioCompNGCfgEntry 1 }
+
+genEquipRadioHeaderCompNGCfgClearStats	OBJECT-TYPE
+        SYNTAX		NoYes
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Clear counters on the radio port. This includes: compression counters,
+		PTP optimized transport and cut-through counters."
+		::= { genEquipRadioCompNGCfgEntry 2 }
+
+genEquipRadioHeaderCompNGCfgUserFlowType	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"User configured flow type for enhanced HC.
+		This flow type is used for statistics and performance evaluation of the enhanced HC."
+		::= { genEquipRadioCompNGCfgEntry 3 }
+
+genEquipRadioHeaderCompNGCfgMode	OBJECT-TYPE
+        SYNTAX 		HcModeType
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Legacy mode is compatible for old platforms. Disabled mode disables compression.
+		Other modes specify compression depth."
+		::= { genEquipRadioCompNGCfgEntry 4 }
+
+genEquipRadioCutThroughNGCfgMode	OBJECT-TYPE
+        SYNTAX 		NoYes
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Enable/Disable cut-through."
+		::= { genEquipRadioCompNGCfgEntry 5 }
+
+
+--
+-- Enhanced HC excluding rules table radio-ethernet-hc-excl-rules-table
+--
+genEquipRadioCompNGExclRulesTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioCompNGExclRulesEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Enhanced HC excluding rules table"
+        ::= { genEquipRadioCompNG 2 }
+
+genEquipRadioCompNGExclRulesEntry	OBJECT-TYPE
+        SYNTAX GenEquipRadioCompNGExclRulesEntry
+        ACCESS not-accessible
+        STATUS mandatory
+          DESCRIPTION
+          "Enhanced HC excluding rules table entry"
+        INDEX { genEquipRadioCompNGExclRulesifIndex, genEquipRadioCompNGExclRuleId }
+        ::= { genEquipRadioCompNGExclRulesTable  1 }
+
+GenEquipRadioCompNGExclRulesEntry::=
+		SEQUENCE {
+			genEquipRadioCompNGExclRulesifIndex
+            	INTEGER,
+			genEquipRadioCompNGExclRuleId
+            	INTEGER,
+			genEquipRadioCompNGExclRuleName
+				DisplayString,
+			genEquipRadioCompNGExclRuleType
+				EnhancedHCExclRuleType,
+			genEquipRadioCompNGExclRuleValue
+				OCTET STRING
+}
+
+genEquipRadioCompNGExclRulesifIndex	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Interface Index."
+		::= { genEquipRadioCompNGExclRulesEntry 1 }
+
+genEquipRadioCompNGExclRuleId	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Excluding rule number."
+		::= { genEquipRadioCompNGExclRulesEntry 2 }
+
+genEquipRadioCompNGExclRuleName	OBJECT-TYPE
+        SYNTAX		DisplayString (SIZE(0..10))
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Excluding rule name."
+		::= { genEquipRadioCompNGExclRulesEntry 3 }
+
+genEquipRadioCompNGExclRuleType	OBJECT-TYPE
+        SYNTAX 		EnhancedHCExclRuleType
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Excluding rule type. Possible options are: DA MAC, SA MAC, VLAN(4 bytes), Ethertype or Flow type."
+		::= { genEquipRadioCompNGExclRulesEntry 4 }
+
+genEquipRadioCompNGExclRuleValue	OBJECT-TYPE
+        SYNTAX 		OCTET STRING
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Excluding rule value. The value may be MAC address, VLAN(4 bytes), Ethertype(2 bytes) or Flow type(1 byte)."
+		::= { genEquipRadioCompNGExclRulesEntry 5 }
+
+
+--
+-- Port counters table radio-ethernet-queue-counters-table
+--
+genEquipRadioCutThroughNGCountersTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioCutThroughNGCountersEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Port counters table"
+        ::= { genEquipRadioCompNG 3 }
+
+genEquipRadioCutThroughNGCountersEntry	OBJECT-TYPE
+        SYNTAX GenEquipRadioCutThroughNGCountersEntry
+        ACCESS not-accessible
+        STATUS mandatory
+          DESCRIPTION
+          "Port counters table entry"
+        INDEX { genEquipRadioCutThroughNGCountersifIndex }
+        ::= { genEquipRadioCutThroughNGCountersTable  1 }
+
+GenEquipRadioCutThroughNGCountersEntry::=
+		SEQUENCE {
+			genEquipRadioCutThroughNGCountersifIndex
+				INTEGER,
+			genEquipRadioCutThroughNGCountersRxFrames
+            	Counter64,
+			genEquipRadioCutThroughNGCountersRxBytes
+            	Counter64,
+			genEquipRadioCutThroughNGCountersTxFrames
+				Counter64,
+			genEquipRadioCutThroughNGCountersTxBytes
+				Counter64,
+			genEquipRadioCutThroughNGCountersTotalRxFrames
+				Counter64,
+			genEquipRadioCutThroughNGCountersTotalRxBytes
+				Counter64,
+			genEquipRadioCutThroughNGCountersTotalTxBytesOut
+				Counter64,
+			genEquipRadioCutThroughNGCountersTotalTxFrames
+				Counter64,
+			genEquipRadioCutThroughNGCountersTotalTxIdleBytes
+				Counter64,
+			genEquipRadioCutThroughNGCountersTotalTxBytesIn
+				Counter64
+}
+
+genEquipRadioCutThroughNGCountersifIndex	OBJECT-TYPE
+        SYNTAX 		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Interface Index."
+		::= { genEquipRadioCutThroughNGCountersEntry 1 }
+
+genEquipRadioCutThroughNGCountersRxFrames	OBJECT-TYPE
+        SYNTAX 		Counter64
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Counter of good cut-through bytes received."
+		::= { genEquipRadioCutThroughNGCountersEntry 2 }
+
+genEquipRadioCutThroughNGCountersRxBytes	OBJECT-TYPE
+        SYNTAX		Counter64
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Counter of good cut-through bytes received."
+		::= { genEquipRadioCutThroughNGCountersEntry 3 }
+
+genEquipRadioCutThroughNGCountersTxFrames	OBJECT-TYPE
+        SYNTAX		Counter64
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Counter of cut-through frames transmitted."
+		::= { genEquipRadioCutThroughNGCountersEntry 4 }
+
+genEquipRadioCutThroughNGCountersTxBytes	OBJECT-TYPE
+        SYNTAX 		Counter64
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Counter of cut-through bytes transmitted."
+		::= { genEquipRadioCutThroughNGCountersEntry 5 }
+
+genEquipRadioCutThroughNGCountersTotalRxFrames	OBJECT-TYPE
+        SYNTAX 		Counter64
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Counter of total good frames received on the port."
+		::= { genEquipRadioCutThroughNGCountersEntry 6 }
+
+genEquipRadioCutThroughNGCountersTotalRxBytes	OBJECT-TYPE
+        SYNTAX 		Counter64
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Counter of total good bytes received on the port."
+		::= { genEquipRadioCutThroughNGCountersEntry 7 }
+
+genEquipRadioCutThroughNGCountersTotalTxBytesOut	OBJECT-TYPE
+        SYNTAX 		Counter64
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Counter of total transmitted bytes."
+		::= { genEquipRadioCutThroughNGCountersEntry 8 }
+
+genEquipRadioCutThroughNGCountersTotalTxFrames	OBJECT-TYPE
+        SYNTAX 		Counter64
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Counter of total transmitted frames."
+		::= { genEquipRadioCutThroughNGCountersEntry 9 }
+
+genEquipRadioCutThroughNGCountersTotalTxIdleBytes	OBJECT-TYPE
+        SYNTAX 		Counter64
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Counter of total transmitted idle bytes."
+		::= { genEquipRadioCutThroughNGCountersEntry 10 }
+
+genEquipRadioCutThroughNGCountersTotalTxBytesIn OBJECT-TYPE
+        SYNTAX 		Counter64
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Counter of total transmitted bytes."
+		::= { genEquipRadioCutThroughNGCountersEntry 11 }
+
+
+--
+-- Radio Ethernet and compression status table radio-ethernet-status-table
+--
+genEquipRadioCompNGStatusTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioCompNGStatusEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Radio Ethernet and compression status table"
+        ::= { genEquipRadioCompNG 4 }
+
+genEquipRadioCompNGStatusEntry	OBJECT-TYPE
+        SYNTAX GenEquipRadioCompNGStatusEntry
+        ACCESS not-accessible
+        STATUS mandatory
+          DESCRIPTION
+          "Radio Ethernet and compression status table entry"
+        INDEX { genEquipRadioCompNGStatusifindex }
+        ::= { genEquipRadioCompNGStatusTable  1 }
+
+GenEquipRadioCompNGStatusEntry::=
+		SEQUENCE {
+			genEquipRadioCompNGStatusifindex
+            	INTEGER,
+			genEquipRadioCompNGStatusOperationalState
+            	HcModeType,
+			genEquipRadioCompNGStatusType
+				HcType
+}
+
+genEquipRadioCompNGStatusifindex	OBJECT-TYPE
+        SYNTAX 		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Interface location."
+		::= { genEquipRadioCompNGStatusEntry 1 }
+
+genEquipRadioCompNGStatusOperationalState	OBJECT-TYPE
+        SYNTAX		HcModeType
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Header Compression operational state."
+		::= { genEquipRadioCompNGStatusEntry 2 }
+
+genEquipRadioCompNGStatusType	OBJECT-TYPE
+        SYNTAX		HcType
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Header Compression type."
+		::= { genEquipRadioCompNGStatusEntry 3 }
+
+
+--
+-- Enhanced HC counters table radio-ethernet-hc-counters-table
+--
+
+genEquipRadioCompNGCountersTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioCompNGCountersEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Enhanced HC counters table"
+        ::= { genEquipRadioCompNG 7 }
+
+genEquipRadioCompNGCountersEntry	OBJECT-TYPE
+        SYNTAX GenEquipRadioCompNGCountersEntry
+        ACCESS not-accessible
+        STATUS mandatory
+          DESCRIPTION
+          "Enhanced HC counters table entry"
+        INDEX { genEquipRadioCompNGCountersifIndex }
+        ::= { genEquipRadioCompNGCountersTable  1 }
+
+GenEquipRadioCompNGCountersEntry::=
+		SEQUENCE {
+			genEquipRadioCompNGCountersifIndex
+				INTEGER,
+			genEquipRadioCompNGCountersHCInBytes
+            	Counter64,
+			genEquipRadioCompNGCountersHCOutBytes
+            	Counter64,
+			genEquipRadioCompNGCountersHCCompFrm
+				Counter64,
+			genEquipRadioCompNGCountersHCFrmUncmpExclRule
+				Counter64,
+			genEquipRadioCompNGCountersHCFrmUcompInternal
+				Counter64,
+			genEquipRadioCompNGCountersHCLearningFrm
+				Counter64,
+			genEquipRadioCompNGCountersHCUserFlowTypeActiveFlows
+				Counter64,
+			genEquipRadioCompNGCountersHCTotalActiveFlows
+				Counter64
+}
+
+genEquipRadioCompNGCountersifIndex	OBJECT-TYPE
+        SYNTAX 		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Interface location."
+		::= { genEquipRadioCompNGCountersEntry 1 }
+
+genEquipRadioCompNGCountersHCInBytes	OBJECT-TYPE
+        SYNTAX 		Counter64
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Counter of bytes on the TX side before enhanced header compression."
+		::= { genEquipRadioCompNGCountersEntry 2 }
+
+genEquipRadioCompNGCountersHCOutBytes	OBJECT-TYPE
+        SYNTAX		Counter64
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Counter of bytes on the TX side compressed by enhanced header compression."
+		::= { genEquipRadioCompNGCountersEntry 3 }
+
+genEquipRadioCompNGCountersHCCompFrm	OBJECT-TYPE
+        SYNTAX		Counter64
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Counter of frames on the TX side compressed by enhanced header compression."
+		::= { genEquipRadioCompNGCountersEntry 4 }
+
+genEquipRadioCompNGCountersHCFrmUncmpExclRule	OBJECT-TYPE
+        SYNTAX 		Counter64
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Counter of frames on the TX side not compressed by enhanced header compression due to excluding rules."
+		::= { genEquipRadioCompNGCountersEntry 5 }
+
+genEquipRadioCompNGCountersHCFrmUcompInternal	OBJECT-TYPE
+        SYNTAX 		Counter64
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Counter of frames on the TX side not compressed by enhanced header compression due to other resons."
+		::= { genEquipRadioCompNGCountersEntry 6 }
+
+genEquipRadioCompNGCountersHCLearningFrm	OBJECT-TYPE
+        SYNTAX 		Counter64
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Counter of learning frames transmitted by enhanced header compression."
+		::= { genEquipRadioCompNGCountersEntry 7 }
+
+genEquipRadioCompNGCountersHCUserFlowTypeActiveFlows	OBJECT-TYPE
+        SYNTAX 		Counter64
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Number of enhanced HC active flows occupied by user selected flow type."
+		::= { genEquipRadioCompNGCountersEntry 8 }
+
+genEquipRadioCompNGCountersHCTotalActiveFlows	OBJECT-TYPE
+        SYNTAX 		Counter64
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Number of enhanced HC active flows on the TX side."
+		::= { genEquipRadioCompNGCountersEntry 9 }
+
+
+--
+--
+--
+genEquipRadioPtpTransport OBJECT IDENTIFIER ::= {genEquipRadio 6}
+
+genEquipRadioPtpTransportCfgTable	OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioPtpTransportCfgEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "PTP optimized transport channel configuration table."
+        ::= { genEquipRadioPtpTransport 1 }
+
+genEquipRadioPtpTransportCfgEntry	OBJECT-TYPE
+        SYNTAX GenEquipRadioPtpTransportCfgEntry
+        ACCESS not-accessible
+        STATUS mandatory
+          DESCRIPTION
+          "PTP optimized transport channel configuration table."
+        INDEX { genEquipRadioCfgRadioId }
+        ::= { genEquipRadioPtpTransportCfgTable 1 }
+
+GenEquipRadioPtpTransportCfgEntry::=
+		SEQUENCE {
+			genEquipRadioPtpTransportChannelAdmin
+            			EnableDisable,
+			genEquipRadioPtpTransportChannelMode
+				INTEGER
+}
+
+genEquipRadioPtpTransportChannelAdmin	OBJECT-TYPE
+        SYNTAX		EnableDisable
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"PTP optimized transport admin."
+		::= { genEquipRadioPtpTransportCfgEntry 1 }
+
+genEquipRadioPtpTransportChannelMode	OBJECT-TYPE
+        SYNTAX		INTEGER {
+				h-cos(0),
+				ieee-1588(1)
+				}
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"PTP optimized transport operational mode."
+		::= { genEquipRadioPtpTransportCfgEntry 2 }
+
+
+genEquipRadioPtpTransportCountersTable	OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioPtpTransportCountersEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "PTP optimized transport channel counters table."
+        ::= { genEquipRadioPtpTransport 2 }
+
+genEquipRadioPtpTransportCountersEntry	OBJECT-TYPE
+        SYNTAX GenEquipRadioPtpTransportCountersEntry
+        ACCESS not-accessible
+        STATUS mandatory
+          DESCRIPTION
+          "PTP optimized transport channel counters table."
+        INDEX { genEquipRadioCfgRadioId}
+        ::= { genEquipRadioPtpTransportCountersTable 1 }
+
+GenEquipRadioPtpTransportCountersEntry::=
+		SEQUENCE {
+			genEquipRadioPtpTransportTxFrames
+            			INTEGER,
+			genEquipRadioPtpTransportTxDroppedFrames
+            			INTEGER,
+			genEquipRadioPtpTransportTxBytes
+				INTEGER,
+			genEquipRadioPtpTransportTxDroppedBytes
+				INTEGER,
+			genEquipRadioPtpTransportRxFrames
+				INTEGER,
+			genEquipRadioPtpTransportRxBytes
+				INTEGER
+}
+
+genEquipRadioPtpTransportTxFrames	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"PTP optimized transport TX frames."
+		::= { genEquipRadioPtpTransportCountersEntry 1 }
+
+genEquipRadioPtpTransportTxDroppedFrames	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"PTP optimized transport TX dropped frames."
+		::= { genEquipRadioPtpTransportCountersEntry 2 }
+
+genEquipRadioPtpTransportTxBytes	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"PTP optimized transport TX bytes."
+		::= { genEquipRadioPtpTransportCountersEntry 3 }
+
+genEquipRadioPtpTransportTxDroppedBytes	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"PTP optimized transport TX dropped bytes."
+		::= { genEquipRadioPtpTransportCountersEntry 4 }
+
+genEquipRadioPtpTransportRxFrames	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"PTP optimized transport RX frames."
+		::= { genEquipRadioPtpTransportCountersEntry 5 }
+
+genEquipRadioPtpTransportRxBytes	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"PTP optimized transport RX bytes."
+		::= { genEquipRadioPtpTransportCountersEntry 6 }
+
+genEquipRadioCutThrough OBJECT IDENTIFIER ::= {genEquipRadio 7}
+
+genEquipRadioCutThroughCfgTable	OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioCutThroughCfgEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Cut through configuration table."
+        ::= { genEquipRadioCutThrough 1 }
+
+genEquipRadioCutThroughCfgEntry	OBJECT-TYPE
+        SYNTAX GenEquipRadioCutThroughCfgEntry
+        ACCESS not-accessible
+        STATUS mandatory
+          DESCRIPTION
+          "Cut through configuration table."
+        INDEX { genEquipRadioCfgRadioId }
+        ::= { genEquipRadioCutThroughCfgTable 1 }
+
+GenEquipRadioCutThroughCfgEntry::=
+		SEQUENCE {
+			genEquipRadioCutThroughChannelAdmin
+            		EnableDisable
+}
+
+genEquipRadioCutThroughChannelAdmin	OBJECT-TYPE
+        SYNTAX		EnableDisable
+        ACCESS  	read-write
+        STATUS 		mandatory
+        DESCRIPTION
+		"Enable/Disable cut through mode."
+		::= { genEquipRadioCutThroughCfgEntry 1 }
+
+genEquipRadioCutThroughCountersTable	OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioCutThroughCountersEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Cut through mode counters table."
+        ::= { genEquipRadioCutThrough 2 }
+
+genEquipRadioCutThroughCountersEntry	OBJECT-TYPE
+        SYNTAX GenEquipRadioCutThroughCountersEntry
+        ACCESS not-accessible
+        STATUS mandatory
+          DESCRIPTION
+          "Cut through mode counters table."
+        INDEX { genEquipRadioCfgRadioId}
+        ::= { genEquipRadioCutThroughCountersTable 1 }
+
+GenEquipRadioCutThroughCountersEntry::=
+		SEQUENCE {
+			genEquipRadioCutThroughTxFrames
+            	INTEGER,
+			genEquipRadioCutThroughTxBytes
+				INTEGER,
+			genEquipRadioCutThroughRxFrames
+            	INTEGER,
+			genEquipRadioCutThroughRxBytes
+				INTEGER
+}
+
+genEquipRadioCutThroughTxFrames	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Cut through TX frames."
+		::= { genEquipRadioCutThroughCountersEntry 1 }
+
+genEquipRadioCutThroughTxBytes	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Cut through TX bytes."
+		::= { genEquipRadioCutThroughCountersEntry 2 }
+
+genEquipRadioCutThroughRxFrames	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Cut through RX frames."
+		::= { genEquipRadioCutThroughCountersEntry 3 }
+
+genEquipRadioCutThroughRxBytes	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Cut through RX bytes."
+		::= { genEquipRadioCutThroughCountersEntry 4 }
+
+--
+-- Radio groups
+--
+genEquipRadioGroups OBJECT IDENTIFIER ::= {genEquipRadio 8}
+
+--
+-- Radio group protection
+--
+genEquipRadioGroupsProtection OBJECT IDENTIFIER ::= {genEquipRadioGroups 1}
+
+--
+-- Radio protection attribute table - radio-protection-attribute-table
+--
+
+genEquipRadioGroupsProtectionAttrTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioGroupsProtectionAttrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table contains the attributes of the radio protection groups."
+        ::= { genEquipRadioGroupsProtection 1 }
+
+genEquipRadioGroupsProtectionAttrEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioGroupsProtectionAttrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table entry contains the attributes of the radio protection groups."
+        INDEX { genEquipRadioGroupsProtectionAttrGroupIfIndex }
+        ::= { genEquipRadioGroupsProtectionAttrTable 1 }
+
+GenEquipRadioGroupsProtectionAttrEntry ::=
+    SEQUENCE {
+		genEquipRadioGroupsProtectionAttrGroupIfIndex
+			INTEGER,
+		genEquipRadioGroupsProtectionAttrGroupId
+			INTEGER,
+	    genEquipRadioGroupsProtectionAttrCommand
+			RadioProtectionCmd,
+	    genEquipRadioGroupsProtectionAttrCopyToMate
+			OffOn,
+	    genEquipRadioGroupsProtectionAttrCopyToMateSourceIfIndex
+			INTEGER,
+		genEquipRadioGroupsProtectionAttrRevertiveAdmin
+			EnableDisable,
+		genEquipRadioGroupsProtectionAttrRevertivePrimaryIfIndex
+			INTEGER
+	}
+
+genEquipRadioGroupsProtectionAttrGroupIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The location of the group"
+        ::= { genEquipRadioGroupsProtectionAttrEntry 1 }
+
+genEquipRadioGroupsProtectionAttrGroupId  OBJECT-TYPE
+        SYNTAX 	INTEGER (1..4)
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The Id of the radio protection group."
+        ::= { genEquipRadioGroupsProtectionAttrEntry 2 }
+
+genEquipRadioGroupsProtectionAttrCommand  OBJECT-TYPE
+        SYNTAX  RadioProtectionCmd
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Radio protection user commands for maintenance purposes: force-switch, lockout and manual-switch."
+        ::= { genEquipRadioGroupsProtectionAttrEntry 3 }
+
+genEquipRadioGroupsProtectionAttrCopyToMate  OBJECT-TYPE
+        SYNTAX  OffOn
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Copy to mate command that copies the configuration from one radio to another in order to achieve configuration alignment."
+        ::= { genEquipRadioGroupsProtectionAttrEntry 4 }
+
+genEquipRadioGroupsProtectionAttrCopyToMateSourceIfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The radio location which is required to be the source of configuration for copy-to-mate command."
+        ::= { genEquipRadioGroupsProtectionAttrEntry 5 }
+
+genEquipRadioGroupsProtectionAttrRevertiveAdmin OBJECT-TYPE
+        SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Enable or disable revertive mode of radio protection."
+        ::= { genEquipRadioGroupsProtectionAttrEntry 6 }
+
+genEquipRadioGroupsProtectionAttrRevertivePrimaryIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The radio which the system is required to revert to."
+        ::= { genEquipRadioGroupsProtectionAttrEntry 7 }
+
+
+--
+-- Radio protection members table - radio-protection-members-table
+--
+
+genEquipRadioGroupsProtectionMembersTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioGroupsProtectionMembersEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table contains the radio protection groups members."
+        ::= { genEquipRadioGroupsProtection 2 }
+
+genEquipRadioGroupsProtectionMembersEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioGroupsProtectionMembersEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table entry contains the radio protection groups members."
+        INDEX { genEquipRadioGroupsProtectionMembersIfIndexGroup }
+        ::= { genEquipRadioGroupsProtectionMembersTable 1 }
+
+GenEquipRadioGroupsProtectionMembersEntry ::=
+    SEQUENCE {
+		genEquipRadioGroupsProtectionMembersIfIndexGroup
+			INTEGER,
+		genEquipRadioGroupsProtectionMembersGroupId
+			INTEGER,
+	    genEquipRadioGroupsProtectionMembersMem1IfIndex
+			INTEGER,
+	    genEquipRadioGroupsProtectionMembersMem2IfIndex
+			INTEGER,
+	    genEquipRadioGroupsProtectionMembersRowStatus
+			RowStatus
+	}
+
+genEquipRadioGroupsProtectionMembersIfIndexGroup OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The location of the radio protection group"
+        ::= { genEquipRadioGroupsProtectionMembersEntry 1 }
+
+genEquipRadioGroupsProtectionMembersGroupId  OBJECT-TYPE
+        SYNTAX 	INTEGER (1..4)
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The Id of the radio protection group."
+        ::= { genEquipRadioGroupsProtectionMembersEntry 2 }
+
+genEquipRadioGroupsProtectionMembersMem1IfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The radio location of member 1."
+        ::= { genEquipRadioGroupsProtectionMembersEntry 3 }
+
+genEquipRadioGroupsProtectionMembersMem2IfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The radio location of member 2."
+        ::= { genEquipRadioGroupsProtectionMembersEntry 4 }
+
+genEquipRadioGroupsProtectionMembersRowStatus  OBJECT-TYPE
+        SYNTAX  RowStatus
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Row status to allow user add entries dynamically."
+        ::= { genEquipRadioGroupsProtectionMembersEntry 30 }
+
+
+--
+-- Radio protection status table - radio-protection-status-table
+--
+
+genEquipRadioGroupsProtectionStatusTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioGroupsProtectionStatusEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table contains the status of the radio protection."
+        ::= { genEquipRadioGroupsProtection 3 }
+
+genEquipRadioGroupsProtectionStatusEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioGroupsProtectionStatusEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table entry contains the status of the radio protection."
+        INDEX { genEquipRadioGroupsProtectionStatusGroupIfIndex }
+        ::= { genEquipRadioGroupsProtectionStatusTable 1 }
+
+GenEquipRadioGroupsProtectionStatusEntry ::=
+    SEQUENCE {
+		genEquipRadioGroupsProtectionStatusGroupIfIndex
+			INTEGER,
+		genEquipRadioGroupsProtectionStatusActiveIfIndex
+			INTEGER,
+		genEquipRadioGroupsProtectionStatusStandbyIfIndex
+			INTEGER,
+	    genEquipRadioGroupsProtectionStatusLockout
+			NoYes
+	}
+
+genEquipRadioGroupsProtectionStatusGroupIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The location of the group"
+        ::= { genEquipRadioGroupsProtectionStatusEntry 1 }
+
+genEquipRadioGroupsProtectionStatusActiveIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The active radio location"
+        ::= { genEquipRadioGroupsProtectionStatusEntry 2 }
+
+genEquipRadioGroupsProtectionStatusStandbyIfIndex  OBJECT-TYPE
+        SYNTAX 	INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The standby radio location."
+        ::= { genEquipRadioGroupsProtectionStatusEntry 3 }
+
+genEquipRadioGroupsProtectionStatusLockout  OBJECT-TYPE
+        SYNTAX  NoYes
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The radio location of member 1."
+        ::= { genEquipRadioGroupsProtectionStatusEntry 4 }
+
+
+--
+-- Radio group protection BBSSD
+--
+genEquipRadioGroupsProtectionBBSSD OBJECT IDENTIFIER ::= {genEquipRadioGroupsProtection 10}
+
+--
+-- Radio protection bbs-sd attribute table - radio-protection-bbs-sd-attribute-table
+--
+
+genEquipRadioGroupsProtectionBBSSDAttrTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioGroupsProtectionBBSSDAttrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table contains the BBS-SD attributes of the radio protection groups."
+        ::= { genEquipRadioGroupsProtectionBBSSD 1 }
+
+genEquipRadioGroupsProtectionBBSSDAttrEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioGroupsProtectionBBSSDAttrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table entry contains the BBS-SD attributes of the radio protection groups."
+        INDEX { genEquipRadioGroupsProtectionBBSSDAttrGroupIfIndex }
+        ::= { genEquipRadioGroupsProtectionBBSSDAttrTable 1 }
+
+GenEquipRadioGroupsProtectionBBSSDAttrEntry ::=
+    SEQUENCE {
+		genEquipRadioGroupsProtectionBBSSDAttrGroupIfIndex
+			INTEGER,
+		genEquipRadioGroupsProtectionBBSSDAttrRevertive
+			EnableDisable,
+	    genEquipRadioGroupsProtectionBBSSDAttrClrSwCnt
+			OffOn,
+	    genEquipRadioGroupsProtectionBBSSDAttrFWAuto
+			EnableDisable
+	}
+
+genEquipRadioGroupsProtectionBBSSDAttrGroupIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The location of the group"
+        ::= { genEquipRadioGroupsProtectionBBSSDAttrEntry 1 }
+
+genEquipRadioGroupsProtectionBBSSDAttrRevertive  OBJECT-TYPE
+        SYNTAX 	EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Enable or disable revertive mode for BBS-SD Rx switch."
+        ::= { genEquipRadioGroupsProtectionBBSSDAttrEntry 2 }
+
+genEquipRadioGroupsProtectionBBSSDAttrClrSwCnt  OBJECT-TYPE
+        SYNTAX  OffOn
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Clear BBS-SD Rx switch counter."
+        ::= { genEquipRadioGroupsProtectionBBSSDAttrEntry 3 }
+
+genEquipRadioGroupsProtectionBBSSDAttrFWAuto  OBJECT-TYPE
+        SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Enable or disable automatic Rx switching in BBS-SD."
+        ::= { genEquipRadioGroupsProtectionBBSSDAttrEntry 4 }
+
+
+--
+-- Radio protection bbs-sd status table - radio-protection-bbs-sd-status-table
+--
+
+genEquipRadioGroupsProtectionBBSSDStatusTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioGroupsProtectionBBSSDStatusEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table contains the BBS-SD status of the radio protection groups."
+        ::= { genEquipRadioGroupsProtectionBBSSD 2 }
+
+genEquipRadioGroupsProtectionBBSSDStatusEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioGroupsProtectionBBSSDStatusEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table entry contains the BBS-SD status of the radio protection groups."
+        INDEX { genEquipRadioGroupsProtectionBBSSDStatusGroupIfIndex }
+        ::= { genEquipRadioGroupsProtectionBBSSDStatusTable 1 }
+
+GenEquipRadioGroupsProtectionBBSSDStatusEntry ::=
+    SEQUENCE {
+		genEquipRadioGroupsProtectionBBSSDStatusGroupIfIndex
+			INTEGER,
+		genEquipRadioGroupsProtectionBBSSDStatusAbcGroupIfIndex
+			INTEGER,
+	    genEquipRadioGroupsProtectionBBSSDStatusActiveRxQuality
+			INTEGER,
+	    genEquipRadioGroupsProtectionBBSSDStatusActiveRxRadioIfIndex
+			INTEGER,
+	    genEquipRadioGroupsProtectionBBSSDStatusActiveTxRadioIfIndex
+			INTEGER,
+	    genEquipRadioGroupsProtectionBBSSDStatusLockout
+			NoYes,
+	    genEquipRadioGroupsProtectionBBSSDStatusRxChId
+			INTEGER,
+	    genEquipRadioGroupsProtectionBBSSDStatusStdbyRxQuality
+			INTEGER,
+	    genEquipRadioGroupsProtectionBBSSDStatusStdbyRxRadioIfIndex
+			INTEGER,
+	    genEquipRadioGroupsProtectionBBSSDStatusStandbyTxRadioIfIndex
+			INTEGER
+	}
+
+genEquipRadioGroupsProtectionBBSSDStatusGroupIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The location of the group"
+        ::= { genEquipRadioGroupsProtectionBBSSDStatusEntry 1 }
+
+genEquipRadioGroupsProtectionBBSSDStatusAbcGroupIfIndex  OBJECT-TYPE
+        SYNTAX 	INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The attached MC-ABC group if_index."
+        ::= { genEquipRadioGroupsProtectionBBSSDStatusEntry 2 }
+
+genEquipRadioGroupsProtectionBBSSDStatusActiveRxQuality  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The active MC-ABC channel quality."
+        ::= { genEquipRadioGroupsProtectionBBSSDStatusEntry 3 }
+
+genEquipRadioGroupsProtectionBBSSDStatusActiveRxRadioIfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The active rx radio if_index."
+        ::= { genEquipRadioGroupsProtectionBBSSDStatusEntry 4 }
+
+genEquipRadioGroupsProtectionBBSSDStatusActiveTxRadioIfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The active Tx radio if_index."
+        ::= { genEquipRadioGroupsProtectionBBSSDStatusEntry 5 }
+
+genEquipRadioGroupsProtectionBBSSDStatusLockout  OBJECT-TYPE
+        SYNTAX  NoYes
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Indicates whether the radio protection is currently in lockout."
+        ::= { genEquipRadioGroupsProtectionBBSSDStatusEntry 6 }
+
+genEquipRadioGroupsProtectionBBSSDStatusRxChId  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The attached MC-ABC channel ID."
+        ::= { genEquipRadioGroupsProtectionBBSSDStatusEntry 7 }
+
+genEquipRadioGroupsProtectionBBSSDStatusStdbyRxQuality  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The standby MC-ABC channel quality."
+        ::= { genEquipRadioGroupsProtectionBBSSDStatusEntry 8 }
+
+genEquipRadioGroupsProtectionBBSSDStatusStdbyRxRadioIfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The standby rx radio if_index."
+        ::= { genEquipRadioGroupsProtectionBBSSDStatusEntry 9 }
+
+genEquipRadioGroupsProtectionBBSSDStatusStandbyTxRadioIfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The standby Tx radio if_index."
+        ::= { genEquipRadioGroupsProtectionBBSSDStatusEntry 10 }
+
+
+--
+-- Radio group XPIC
+--
+genEquipRadioGroupsXpic OBJECT IDENTIFIER ::= {genEquipRadioGroups 2}
+
+--
+-- Radio XPIC configuration table
+--
+
+genEquipRadioGroupsXPICAttrTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioGroupsXPICAttrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table contains the configuration of the radio XPIC groups."
+        ::= { genEquipRadioGroupsXpic 1 }
+
+genEquipRadioGroupsXPICAttrEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioGroupsXPICAttrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table entry contains the configuration of the radio XPIC groups."
+        INDEX { genEquipRadioGroupsXPICAttrGroupIfIndex }
+        ::= { genEquipRadioGroupsXPICAttrTable 1 }
+
+GenEquipRadioGroupsXPICAttrEntry ::=
+    SEQUENCE {
+		genEquipRadioGroupsXPICAttrGroupIfIndex
+			INTEGER,
+		genEquipRadioGroupsXPICAttrCopyToMateSourceIfIndex
+			INTEGER,
+	    genEquipRadioGroupsXPICAttrGroupId
+			INTEGER,
+		genEquipRadioGroupsXPICAttrXRSMAdmin
+		    EnableDisable,
+		genEquipRadioGroupsXPICAttrAdmin
+		    EnableDisable,
+		genEquipRadioGroupsXPICAttrCopyToMate
+		    Copy2mate
+	}
+
+genEquipRadioGroupsXPICAttrGroupIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The location of the group."
+        ::= { genEquipRadioGroupsXPICAttrEntry 1 }
+
+genEquipRadioGroupsXPICAttrCopyToMateSourceIfIndex  OBJECT-TYPE
+        SYNTAX 	INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+        "The radio location which is required to be the source of configuration for copy-to-mate command."
+        ::= { genEquipRadioGroupsXPICAttrEntry 2 }
+
+genEquipRadioGroupsXPICAttrGroupId  OBJECT-TYPE
+        SYNTAX  INTEGER (1..4)
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "XPIC group id."
+        ::= { genEquipRadioGroupsXPICAttrEntry 3 }
+
+genEquipRadioGroupsXPICAttrXRSMAdmin  OBJECT-TYPE
+        SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+        "Administrative state of XPIC recovery state machine."
+        ::= { genEquipRadioGroupsXPICAttrEntry 4 }
+
+genEquipRadioGroupsXPICAttrAdmin  OBJECT-TYPE
+        SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Administrative state of XPIC."
+        ::= { genEquipRadioGroupsXPICAttrEntry 5 }
+
+genEquipRadioGroupsXPICAttrCopyToMate  OBJECT-TYPE
+        SYNTAX  Copy2mate
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "User Command to resolve the mismatch between the two carriers in the XPIC group."
+        ::= { genEquipRadioGroupsXPICAttrEntry 6 }
+
+
+--
+-- Radio XPIC members table
+--
+
+genEquipRadioGroupsXPICMembersTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioGroupsXPICMembersEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table contains the radio XPIC groups members."
+        ::= { genEquipRadioGroupsXpic 2 }
+
+genEquipRadioGroupsXPICMembersEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioGroupsXPICMembersEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table entry contains the radio XPIC groups members."
+        INDEX { genEquipRadioGroupsXPICMembersIfIndexGroup }
+        ::= { genEquipRadioGroupsXPICMembersTable 1 }
+
+GenEquipRadioGroupsXPICMembersEntry ::=
+    SEQUENCE {
+		genEquipRadioGroupsXPICMembersIfIndexGroup
+			INTEGER,
+		genEquipRadioGroupsXPICMembersMem1IfIndex
+			INTEGER,
+	    genEquipRadioGroupsXPICMembersMem2IfIndex
+			INTEGER,
+	    genEquipRadioGroupsXPICMembersRowStatus
+			RowStatus
+	}
+
+genEquipRadioGroupsXPICMembersIfIndexGroup OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The location of the radio XPIC group."
+        ::= { genEquipRadioGroupsXPICMembersEntry 1 }
+
+genEquipRadioGroupsXPICMembersMem1IfIndex  OBJECT-TYPE
+        SYNTAX 	INTEGER (1..4)
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The radio location of member 1."
+        ::= { genEquipRadioGroupsXPICMembersEntry 2 }
+
+genEquipRadioGroupsXPICMembersMem2IfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The radio location of member 2."
+        ::= { genEquipRadioGroupsXPICMembersEntry 3 }
+
+genEquipRadioGroupsXPICMembersRowStatus  OBJECT-TYPE
+        SYNTAX  RowStatus
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Row status to allow user add entries dynamically."
+        ::= { genEquipRadioGroupsXPICMembersEntry 30 }
+
+
+--
+-- Radio XPIC status table
+--
+
+genEquipRadioGroupsXPICStatusTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioGroupsXPICStatusEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table contains the status of the XPIC."
+        ::= { genEquipRadioGroupsXpic 3 }
+
+genEquipRadioGroupsXPICStatusEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioGroupsXPICStatusEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table entry contains the status of the XPIC."
+        INDEX { genEquipRadioGroupsXPICStatusGroupIfIndex }
+        ::= { genEquipRadioGroupsXPICStatusTable 1 }
+
+GenEquipRadioGroupsXPICStatusEntry ::=
+    SEQUENCE {
+		genEquipRadioGroupsXPICStatusGroupIfIndex
+			INTEGER,
+	    genEquipRadioGroupsXPICStatusState
+			XpicState
+	}
+
+genEquipRadioGroupsXPICStatusGroupIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The location of the group"
+        ::= { genEquipRadioGroupsXPICStatusEntry 1 }
+
+genEquipRadioGroupsXPICStatusState OBJECT-TYPE
+        SYNTAX  XpicState
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The state of XPIC State Machine"
+        ::= { genEquipRadioGroupsXPICStatusEntry 2 }
+
+--
+-- Radio group Multi Radio
+--
+genEquipRadioGroupsMR OBJECT IDENTIFIER ::= {genEquipRadioGroups 3}
+
+--
+-- Radio Groups MR attribute table - mr-config-table
+--
+
+genEquipRadioGroupsMRAttrTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioGroupsMRAttrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "MR config table."
+        ::= { genEquipRadioGroupsMR 1 }
+
+genEquipRadioGroupsMRAttrEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioGroupsMRAttrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "MR config table entry."
+        INDEX { genEquipRadioGroupsMRAttrGroupIfIndex }
+        ::= { genEquipRadioGroupsMRAttrTable 1 }
+
+GenEquipRadioGroupsMRAttrEntry ::=
+    SEQUENCE {
+		genEquipRadioGroupsMRAttrGroupIfIndex
+			INTEGER,
+		genEquipRadioGroupsMRAttrGroupId
+			INTEGER,
+	    genEquipRadioGroupsMRAttrAdmin
+			EnableDisable,
+	    genEquipRadioGroupsMRAttrBlockRadioIfindex
+			INTEGER,
+	    genEquipRadioGroupsMRAttrBlockRadioAdmin
+			EnableDisable,
+		genEquipRadioGroupsMRAttrCopy2MateIfindex
+			INTEGER,
+		genEquipRadioGroupsMRAttrCopy2MateAdmin
+			EnableDisable,
+		genEquipRadioGroupsMRAttrExBerAdmin
+			EnableDisable,
+		genEquipRadioGroupsMRAttrMinNumRadio
+			INTEGER,
+		genEquipRadioGroupsMRAttrMinProfileAdmin
+			EnableDisable,
+		genEquipRadioGroupsMRAttrSigDegardeAdmin
+			EnableDisable
+	}
+
+genEquipRadioGroupsMRAttrGroupIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The location of the group"
+        ::= { genEquipRadioGroupsMRAttrEntry 1 }
+
+genEquipRadioGroupsMRAttrGroupId  OBJECT-TYPE
+        SYNTAX 	INTEGER (1..4)
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The Id of the radio MR group."
+        ::= { genEquipRadioGroupsMRAttrEntry 2 }
+
+genEquipRadioGroupsMRAttrAdmin  OBJECT-TYPE
+        SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "MR Admin."
+        ::= { genEquipRadioGroupsMRAttrEntry 3 }
+
+genEquipRadioGroupsMRAttrBlockRadioIfindex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Block Radio ifindex."
+        ::= { genEquipRadioGroupsMRAttrEntry 4 }
+
+genEquipRadioGroupsMRAttrBlockRadioAdmin  OBJECT-TYPE
+        SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Block Radio Admin."
+        ::= { genEquipRadioGroupsMRAttrEntry 5 }
+
+genEquipRadioGroupsMRAttrCopy2MateIfindex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Copy2mate Radio ifindex."
+        ::= { genEquipRadioGroupsMRAttrEntry 6 }
+
+genEquipRadioGroupsMRAttrCopy2MateAdmin  OBJECT-TYPE
+        SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Copy2Mate Admin."
+        ::= { genEquipRadioGroupsMRAttrEntry 7 }
+
+genEquipRadioGroupsMRAttrExBerAdmin  OBJECT-TYPE
+        SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Excessive BER Admin."
+        ::= { genEquipRadioGroupsMRAttrEntry 8 }
+
+genEquipRadioGroupsMRAttrMinNumRadio  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Minimal num of radios."
+        ::= { genEquipRadioGroupsMRAttrEntry 9 }
+
+genEquipRadioGroupsMRAttrMinProfileAdmin  OBJECT-TYPE
+        SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Min ACM profile admin."
+        ::= { genEquipRadioGroupsMRAttrEntry 10 }
+
+genEquipRadioGroupsMRAttrSigDegardeAdmin  OBJECT-TYPE
+        SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Signal Degrade Admin."
+        ::= { genEquipRadioGroupsMRAttrEntry 11 }
+
+--
+-- Radio MR members table - mr-members-table
+--
+
+genEquipRadioGroupsMRMembersTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioGroupsMRMembersEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "MR members table."
+        ::= { genEquipRadioGroupsMR 2 }
+
+genEquipRadioGroupsMRMembersEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioGroupsMRMembersEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "MR members table entry."
+        INDEX { genEquipRadioGroupsMRMembersIfIndexGroup }
+        ::= { genEquipRadioGroupsMRMembersTable 1 }
+
+GenEquipRadioGroupsMRMembersEntry ::=
+    SEQUENCE {
+		genEquipRadioGroupsMRMembersIfIndexGroup
+			INTEGER,
+		genEquipRadioGroupsMRMembersMem1IfIndex
+			INTEGER,
+	    genEquipRadioGroupsMRMembersMem2IfIndex
+			INTEGER,
+	    genEquipRadioGroupsMRMembersRowStatus
+			RowStatus
+	}
+
+genEquipRadioGroupsMRMembersIfIndexGroup OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The location of the radio MR group"
+        ::= { genEquipRadioGroupsMRMembersEntry 1 }
+
+genEquipRadioGroupsMRMembersMem1IfIndex  OBJECT-TYPE
+        SYNTAX 	INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The radio location of member 1."
+        ::= { genEquipRadioGroupsMRMembersEntry 2 }
+
+genEquipRadioGroupsMRMembersMem2IfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The radio location of member 2."
+        ::= { genEquipRadioGroupsMRMembersEntry 3 }
+
+genEquipRadioGroupsMRMembersRowStatus  OBJECT-TYPE
+        SYNTAX  RowStatus
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Row status to allow user add entries dynamically."
+        ::= { genEquipRadioGroupsMRMembersEntry 30 }
+
+--
+-- Radio MR status table - mr-status-table
+--
+
+genEquipRadioGroupsMRStatusTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioGroupsMRStatusEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "MR Status table."
+        ::= { genEquipRadioGroupsMR 3 }
+
+genEquipRadioGroupsMRStatusEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioGroupsMRStatusEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "MR Status table entry."
+        INDEX { genEquipRadioGroupsMRStatusGroupIfIndex }
+        ::= { genEquipRadioGroupsMRStatusTable 1 }
+
+GenEquipRadioGroupsMRStatusEntry ::=
+    SEQUENCE {
+		genEquipRadioGroupsMRStatusGroupIfIndex
+			INTEGER,
+		genEquipRadioGroupsMRStatusOpertionalState
+			INTEGER,
+		genEquipRadioGroupsMRStatusRemoteOpertionalState
+			INTEGER
+	}
+
+genEquipRadioGroupsMRStatusGroupIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The location of the group"
+        ::= { genEquipRadioGroupsMRStatusEntry 1 }
+
+genEquipRadioGroupsMRStatusOpertionalState OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Operational State"
+        ::= { genEquipRadioGroupsMRStatusEntry 2 }
+
+genEquipRadioGroupsMRStatusRemoteOpertionalState  OBJECT-TYPE
+        SYNTAX 	INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Remote Operational State."
+        ::= { genEquipRadioGroupsMRStatusEntry 3 }
+
+
+--
+-- MIMO Radio Group
+--
+genEquipRadioGroupsMIMO OBJECT IDENTIFIER ::= {genEquipRadioGroups 4}
+
+--
+-- Radio MIMO Configuration table - mimo-config-table
+--
+
+genEquipRadioGroupsMIMOAttrTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioGroupsMIMOAttrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "The configuration table of the MIMO groups."
+        ::= { genEquipRadioGroupsMIMO 1 }
+
+genEquipRadioGroupsMIMOAttrEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioGroupsMIMOAttrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "The configuration table of the MIMO groups entry."
+        INDEX { genEquipRadioGroupsMIMOAttrGroupIfIndex }
+        ::= { genEquipRadioGroupsMIMOAttrTable 1 }
+
+GenEquipRadioGroupsMIMOAttrEntry ::=
+    SEQUENCE {
+		genEquipRadioGroupsMIMOAttrGroupIfIndex
+			INTEGER,
+		genEquipRadioGroupsMIMOAttrRole
+			INTEGER,
+	    genEquipRadioGroupsMIMOAttrAdmin
+			EnableDisable,
+		genEquipRadioGroupsMIMOAttrResetStateMachine
+			OffOn
+	}
+
+genEquipRadioGroupsMIMOAttrGroupIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "MIMO configuration table index"
+        ::= { genEquipRadioGroupsMIMOAttrEntry 1 }
+
+genEquipRadioGroupsMIMOAttrRole  OBJECT-TYPE
+        SYNTAX 	INTEGER {
+					slave(0),
+					master(1),
+					not-relevant(2)
+				}
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Role can be Master or Slave."
+        ::= { genEquipRadioGroupsMIMOAttrEntry 2 }
+
+genEquipRadioGroupsMIMOAttrAdmin  OBJECT-TYPE
+        SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Administrating state of the MIMO group."
+        ::= { genEquipRadioGroupsMIMOAttrEntry 3 }
+
+genEquipRadioGroupsMIMOAttrResetStateMachine OBJECT-TYPE
+        SYNTAX  OffOn
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Reset MIMO state machine."
+        ::= { genEquipRadioGroupsMIMOAttrEntry 4 }
+
+
+--
+-- Radio MIMO Members table - mimo-members-table
+--
+
+genEquipRadioGroupsMIMOMembersTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioGroupsMIMOMembersEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "The description the radio carrier members of the MIMO groups."
+        ::= { genEquipRadioGroupsMIMO 2 }
+
+genEquipRadioGroupsMIMOMembersEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioGroupsMIMOMembersEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "The description the radio carrier members of the MIMO groups entry."
+        INDEX { genEquipRadioGroupsMIMOMembersGroupIfIndex }
+        ::= { genEquipRadioGroupsMIMOMembersTable 1 }
+
+GenEquipRadioGroupsMIMOMembersEntry ::=
+    SEQUENCE {
+		genEquipRadioGroupsMIMOMembersGroupIfIndex
+			INTEGER,
+		genEquipRadioGroupsMIMOMembersGroupType
+			INTEGER,
+		genEquipRadioGroupsMIMOMembersMem1IfIndex
+			INTEGER,
+	    genEquipRadioGroupsMIMOMembersMem2IfIndex
+			INTEGER,
+		genEquipRadioGroupsMIMOMembersMem3IfIndex
+			INTEGER,
+	    genEquipRadioGroupsMIMOMembersMem4IfIndex
+			INTEGER,
+	    genEquipRadioGroupsMIMOMembersRowStatus
+			RowStatus
+	}
+
+genEquipRadioGroupsMIMOMembersGroupIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "MIMO members table index"
+        ::= { genEquipRadioGroupsMIMOMembersEntry 1 }
+
+genEquipRadioGroupsMIMOMembersGroupType OBJECT-TYPE
+        SYNTAX INTEGER {
+					mimo-2x2(0),
+					mimo-4x4(1),
+					base-band-combining-2x2(2),
+					base-band-combining-4x4(3)
+				}
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Type of MIMO group: 2x2 or 4x4 etc..."
+        ::= { genEquipRadioGroupsMIMOMembersEntry 2 }
+
+genEquipRadioGroupsMIMOMembersMem1IfIndex  OBJECT-TYPE
+        SYNTAX 	INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The radio location of member 1."
+        ::= { genEquipRadioGroupsMIMOMembersEntry 3 }
+
+genEquipRadioGroupsMIMOMembersMem2IfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The radio location of member 2."
+        ::= { genEquipRadioGroupsMIMOMembersEntry 4 }
+
+genEquipRadioGroupsMIMOMembersMem3IfIndex  OBJECT-TYPE
+        SYNTAX 	INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The radio location of member 3."
+        ::= { genEquipRadioGroupsMIMOMembersEntry 5 }
+
+genEquipRadioGroupsMIMOMembersMem4IfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The radio location of member 4."
+        ::= { genEquipRadioGroupsMIMOMembersEntry 6 }
+
+genEquipRadioGroupsMIMOMembersRowStatus  OBJECT-TYPE
+        SYNTAX  RowStatus
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Row status to allow user add entries dynamically."
+        ::= { genEquipRadioGroupsMIMOMembersEntry 30 }
+
+--
+-- Radio MIMO Status table - mimo-status-table
+--
+
+genEquipRadioGroupsMIMOStatusTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioGroupsMIMOStatusEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "The current status table of the MIMO groups."
+        ::= { genEquipRadioGroupsMIMO 3 }
+
+genEquipRadioGroupsMIMOStatusEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioGroupsMIMOStatusEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "The current status table of the MIMO groups entry."
+        INDEX { genEquipRadioGroupsMIMOStatusGroupIfIndex }
+        ::= { genEquipRadioGroupsMIMOStatusTable 1 }
+
+GenEquipRadioGroupsMIMOStatusEntry ::=
+    SEQUENCE {
+		genEquipRadioGroupsMIMOStatusGroupIfIndex
+			INTEGER,
+		genEquipRadioGroupsMIMOStatusState
+			INTEGER,
+		genEquipRadioGroupsMIMOStatus1stMMI
+			INTEGER,
+		genEquipRadioGroupsMIMOStatus2ndMMI
+			INTEGER,
+		genEquipRadioGroupsMIMOStatus3rdMMI
+			INTEGER,
+		genEquipRadioGroupsMIMOStatus4thMMI
+			INTEGER,
+		genEquipRadioGroupsMIMOStatusAdvancedState
+			INTEGER
+	}
+
+genEquipRadioGroupsMIMOStatusGroupIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "MIMO status table index"
+        ::= { genEquipRadioGroupsMIMOStatusEntry 1 }
+
+genEquipRadioGroupsMIMOStatusState OBJECT-TYPE
+        SYNTAX  INTEGER {
+        			slave(0),
+        			init(1),
+        			disabled(2),
+        			idle(3),
+        			recovery(4),
+        			half-capacity(5)
+        }
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "MIMO-State"
+        ::= { genEquipRadioGroupsMIMOStatusEntry 2 }
+
+genEquipRadioGroupsMIMOStatus1stMMI  OBJECT-TYPE
+        SYNTAX 	INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "MIMO interference in dB of the 1st carrier."
+        ::= { genEquipRadioGroupsMIMOStatusEntry 3 }
+
+genEquipRadioGroupsMIMOStatus2ndMMI  OBJECT-TYPE
+        SYNTAX 	INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "MIMO interference in dB of the 2nd carrier."
+        ::= { genEquipRadioGroupsMIMOStatusEntry 4 }
+
+genEquipRadioGroupsMIMOStatus3rdMMI  OBJECT-TYPE
+        SYNTAX 	INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "MIMO interference in dB of the 3rd carrier."
+        ::= { genEquipRadioGroupsMIMOStatusEntry 5 }
+
+genEquipRadioGroupsMIMOStatus4thMMI  OBJECT-TYPE
+        SYNTAX 	INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "MIMO interference in dB of the 4th carrier."
+        ::= { genEquipRadioGroupsMIMOStatusEntry 6 }
+
+
+genEquipRadioGroupsMIMOStatusAdvancedState OBJECT-TYPE
+        SYNTAX 	INTEGER {
+					disabled(0),
+					initializing(1),
+					init-retry(2),
+					init-retry-checkup(3),
+					init-retry-bringup(4),
+					idle(5),
+					unsuitable-hw(6),
+					half-capacity(7),
+					master-failure(8),
+					remote-master-failure(9),
+					remote-has-no-master(10),
+					mute-slave(11),
+					slave-init(12),
+					slave-idle(13),
+					slave-mutted(14),
+					self-mute-comm-fail-to-master(15),
+					half-capacity-no-master(16),
+					half-capacity-master-failure(17)
+			}
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "MIMO advanced state."
+        ::= { genEquipRadioGroupsMIMOStatusEntry 7 }
+
+
+--
+-- Multi Carrier ABC group
+--
+genEquipRadioGroupsAbc OBJECT IDENTIFIER ::= {genEquipRadioGroups 5}
+
+--
+-- Multi Carrier ABC configuration table - abc-config-table
+--
+
+genEquipRadioGroupsAbcAttrTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioGroupsAbcAttrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Multi Carrier ABC configuration table."
+        ::= { genEquipRadioGroupsAbc 1 }
+
+genEquipRadioGroupsAbcAttrEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioGroupsAbcAttrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Multi Carrier ABC configuration table."
+        INDEX { genEquipRadioGroupsAbcAttrIfIndex }
+        ::= { genEquipRadioGroupsAbcAttrTable 1 }
+
+GenEquipRadioGroupsAbcAttrEntry ::=
+    SEQUENCE {
+		genEquipRadioGroupsAbcAttrIfIndex
+			INTEGER,
+		genEquipRadioGroupsAbcAttrGroupName
+			DisplayString,
+	    genEquipRadioGroupsAbcAttrAdminState
+			EnableDisable,
+		genEquipRadioGroupsAbcAttrQnumberOfRadioMembers
+			INTEGER,
+		genEquipRadioGroupsAbcAttrProtectionEnable
+			EnableDisable,
+		genEquipRadioGroupsAbcAttrHighPriEthernetBandwidth
+			INTEGER,
+		genEquipRadioGroupsAbcAttrQualityThreshold
+			INTEGER,
+		genEquipRadioGroupsAbcAttrRowStatus
+			RowStatus
+	}
+
+genEquipRadioGroupsAbcAttrIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The interface-index of the ABC group"
+        ::= { genEquipRadioGroupsAbcAttrEntry 1 }
+
+genEquipRadioGroupsAbcAttrGroupName  OBJECT-TYPE
+        SYNTAX 	DisplayString
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Textual description of the ABC group."
+        ::= { genEquipRadioGroupsAbcAttrEntry 2 }
+
+genEquipRadioGroupsAbcAttrAdminState  OBJECT-TYPE
+        SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The Administrative state of ABC radio group which decides if the Multi Carrier ABC group is enabled or disabled."
+        ::= { genEquipRadioGroupsAbcAttrEntry 3 }
+
+genEquipRadioGroupsAbcAttrQnumberOfRadioMembers OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The number of radios that can be members of the Multi Carrier ABC group."
+        ::= { genEquipRadioGroupsAbcAttrEntry 4 }
+
+genEquipRadioGroupsAbcAttrProtectionEnable OBJECT-TYPE
+        SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "When Protection is Enabled protecion groups can be added to the Multi-carrier ABC group.
+		When disabled regular channels can be attached."
+        ::= { genEquipRadioGroupsAbcAttrEntry 5 }
+
+genEquipRadioGroupsAbcAttrHighPriEthernetBandwidth OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Bandwidth reserved for high priority ethernet in Kbps.
+		Values range from from 0 (i.e. No high pri ethernet) to max capacity (I.e. no STM-1s) in Kbps."
+        ::= { genEquipRadioGroupsAbcAttrEntry 6 }
+
+genEquipRadioGroupsAbcAttrQualityThreshold OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Members degrading below this threshold will be set to 'do not use' in the group."
+        ::= { genEquipRadioGroupsAbcAttrEntry 7 }
+
+genEquipRadioGroupsAbcAttrRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "This is the row status."
+        ::= { genEquipRadioGroupsAbcAttrEntry 30 }
+
+
+--
+-- Multi Carrier ABC members table - abc-members-table
+--
+
+genEquipRadioGroupsAbcMembersTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioGroupsAbcMembersEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Multi Carrier ABC members table."
+        ::= { genEquipRadioGroupsAbc 2 }
+
+genEquipRadioGroupsAbcMembersEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioGroupsAbcMembersEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Multi Carrier ABC members table entry."
+        INDEX { genEquipRadioGroupsAbcMembersGroupIfIndex }
+        ::= { genEquipRadioGroupsAbcMembersTable 1 }
+
+GenEquipRadioGroupsAbcMembersEntry ::=
+    SEQUENCE {
+		genEquipRadioGroupsAbcMembersGroupIfIndex
+			INTEGER,
+		genEquipRadioGroupsAbcMembersGroupId
+			INTEGER,
+	    genEquipRadioGroupsAbcMembersChannel1MemberIfIndex
+			INTEGER,
+		genEquipRadioGroupsAbcMembersChannel1adminState
+			EnableDisable,
+	    genEquipRadioGroupsAbcMembersChannel2MemberIfIndex
+			INTEGER,
+		genEquipRadioGroupsAbcMembersChannel2adminState
+			EnableDisable,
+	    genEquipRadioGroupsAbcMembersChannel3MemberIfIndex
+			INTEGER,
+		genEquipRadioGroupsAbcMembersChannel3adminState
+			EnableDisable,
+	    genEquipRadioGroupsAbcMembersChannel4MemberIfIndex
+			INTEGER,
+		genEquipRadioGroupsAbcMembersChannel4adminState
+			EnableDisable,
+	    genEquipRadioGroupsAbcMembersChannel5MemberIfIndex
+			INTEGER,
+		genEquipRadioGroupsAbcMembersChannel5adminState
+			EnableDisable,
+	    genEquipRadioGroupsAbcMembersChannel6MemberIfIndex
+			INTEGER,
+		genEquipRadioGroupsAbcMembersChannel6adminState
+			EnableDisable,
+	    genEquipRadioGroupsAbcMembersChannel7MemberIfIndex
+			INTEGER,
+		genEquipRadioGroupsAbcMembersChannel7adminState
+			EnableDisable,
+	    genEquipRadioGroupsAbcMembersChannel8MemberIfIndex
+			INTEGER,
+		genEquipRadioGroupsAbcMembersChannel8adminState
+			EnableDisable
+	}
+
+genEquipRadioGroupsAbcMembersGroupIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Integer representing the group interface ifindex"
+        ::= { genEquipRadioGroupsAbcMembersEntry 1 }
+
+genEquipRadioGroupsAbcMembersGroupId  OBJECT-TYPE
+        SYNTAX 	INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Integer representing the group interface ID."
+        ::= { genEquipRadioGroupsAbcMembersEntry 2 }
+
+genEquipRadioGroupsAbcMembersChannel1MemberIfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "IfIndex representing the group member connect to this ABC channel."
+        ::= { genEquipRadioGroupsAbcMembersEntry 3 }
+
+genEquipRadioGroupsAbcMembersChannel1adminState OBJECT-TYPE
+        SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The Administrative state of an ABC channel."
+        ::= { genEquipRadioGroupsAbcMembersEntry 4 }
+
+genEquipRadioGroupsAbcMembersChannel2MemberIfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "IfIndex representing the group member connect to this ABC channel."
+        ::= { genEquipRadioGroupsAbcMembersEntry 5 }
+
+genEquipRadioGroupsAbcMembersChannel2adminState OBJECT-TYPE
+        SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The Administrative state of an ABC channel."
+        ::= { genEquipRadioGroupsAbcMembersEntry 6 }
+
+genEquipRadioGroupsAbcMembersChannel3MemberIfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "IfIndex representing the group member connect to this ABC channel."
+        ::= { genEquipRadioGroupsAbcMembersEntry 7 }
+
+genEquipRadioGroupsAbcMembersChannel3adminState OBJECT-TYPE
+        SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The Administrative state of an ABC channel."
+        ::= { genEquipRadioGroupsAbcMembersEntry 8 }
+
+genEquipRadioGroupsAbcMembersChannel4MemberIfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "IfIndex representing the group member connect to this ABC channel."
+        ::= { genEquipRadioGroupsAbcMembersEntry 9 }
+
+genEquipRadioGroupsAbcMembersChannel4adminState OBJECT-TYPE
+        SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The Administrative state of an ABC channel."
+        ::= { genEquipRadioGroupsAbcMembersEntry 10 }
+
+genEquipRadioGroupsAbcMembersChannel5MemberIfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "IfIndex representing the group member connect to this ABC channel."
+        ::= { genEquipRadioGroupsAbcMembersEntry 11 }
+
+genEquipRadioGroupsAbcMembersChannel5adminState OBJECT-TYPE
+        SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The Administrative state of an ABC channel."
+        ::= { genEquipRadioGroupsAbcMembersEntry 12 }
+
+genEquipRadioGroupsAbcMembersChannel6MemberIfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "IfIndex representing the group member connect to this ABC channel."
+        ::= { genEquipRadioGroupsAbcMembersEntry 13 }
+
+genEquipRadioGroupsAbcMembersChannel6adminState OBJECT-TYPE
+        SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The Administrative state of an ABC channel."
+        ::= { genEquipRadioGroupsAbcMembersEntry 14 }
+
+genEquipRadioGroupsAbcMembersChannel7MemberIfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "IfIndex representing the group member connect to this ABC channel."
+        ::= { genEquipRadioGroupsAbcMembersEntry 15 }
+
+genEquipRadioGroupsAbcMembersChannel7adminState OBJECT-TYPE
+        SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The Administrative state of an ABC channel."
+        ::= { genEquipRadioGroupsAbcMembersEntry 16 }
+
+genEquipRadioGroupsAbcMembersChannel8MemberIfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "IfIndex representing the group member connect to this ABC channel."
+        ::= { genEquipRadioGroupsAbcMembersEntry 17 }
+
+genEquipRadioGroupsAbcMembersChannel8adminState OBJECT-TYPE
+        SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The Administrative state of an ABC channel."
+        ::= { genEquipRadioGroupsAbcMembersEntry 18 }
+
+
+--
+-- Multi Carrier ABC status table - abc-status-table
+--
+
+genEquipRadioGroupsAbcStatusTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipRadioGroupsAbcStatusEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Multi Carrier ABC status table."
+        ::= { genEquipRadioGroupsAbc 3 }
+
+genEquipRadioGroupsAbcStatusEntry OBJECT-TYPE
+        SYNTAX GenEquipRadioGroupsAbcStatusEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Multi Carrier ABC status table entry."
+        INDEX { genEquipRadioGroupsAbcStatusIfIndex }
+        ::= { genEquipRadioGroupsAbcStatusTable 1 }
+
+GenEquipRadioGroupsAbcStatusEntry ::=
+    SEQUENCE {
+		genEquipRadioGroupsAbcStatusIfIndex
+			INTEGER,
+		genEquipRadioGroupsAbcStatusOperState
+			DownUp,
+	    genEquipRadioGroupsAbcStatusRemoteOperState
+			DownUp,
+		genEquipRadioGroupsAbcStatusCurrentAggregatedCapacityRX
+			INTEGER,
+	    genEquipRadioGroupsAbcStatusCurrentAggregatedCapacityTX
+			INTEGER,
+		genEquipRadioGroupsAbcStatusChannel1Operstate
+			DownUp,
+	    genEquipRadioGroupsAbcStatusChannel1Capacity
+			INTEGER,
+		genEquipRadioGroupsAbcStatusChannel2Operstate
+			DownUp,
+	    genEquipRadioGroupsAbcStatusChannel2Capacity
+			INTEGER,
+		genEquipRadioGroupsAbcStatusChannel3OperState
+			DownUp,
+	    genEquipRadioGroupsAbcStatusChannel3Capacity
+			INTEGER,
+		genEquipRadioGroupsAbcStatusChannel4OperState
+			DownUp,
+	    genEquipRadioGroupsAbcStatusChannel4Capacity
+			INTEGER,
+		genEquipRadioGroupsAbcStatusChannel5OperState
+			DownUp,
+		genEquipRadioGroupsAbcStatusChannel5Capacity
+			INTEGER,
+		genEquipRadioGroupsAbcStatusChannel6OperState
+			DownUp,
+		genEquipRadioGroupsAbcStatusChannel6Capacity
+			INTEGER,
+		genEquipRadioGroupsAbcStatusChannel7OperState
+			DownUp,
+		genEquipRadioGroupsAbcStatusChannel7Capacity
+			INTEGER,
+		genEquipRadioGroupsAbcStatusChannel8OperState
+			DownUp,
+		genEquipRadioGroupsAbcStatusChannel8Capacity
+			INTEGER
+	}
+
+genEquipRadioGroupsAbcStatusIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The interface-index of the ABC group"
+        ::= { genEquipRadioGroupsAbcStatusEntry 1 }
+
+genEquipRadioGroupsAbcStatusOperState  OBJECT-TYPE
+        SYNTAX 	DownUp
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The operational state of the ABC group as a WAN."
+        ::= { genEquipRadioGroupsAbcStatusEntry 2 }
+
+genEquipRadioGroupsAbcStatusRemoteOperState  OBJECT-TYPE
+        SYNTAX  DownUp
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The remote ABC groups operational state."
+        ::= { genEquipRadioGroupsAbcStatusEntry 3 }
+
+genEquipRadioGroupsAbcStatusCurrentAggregatedCapacityRX OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The combined current RX throughput capacity of the ABC group in Kbps."
+        ::= { genEquipRadioGroupsAbcStatusEntry 4 }
+
+genEquipRadioGroupsAbcStatusCurrentAggregatedCapacityTX  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The combined current TX throughput capacity of the ABC group in Kbps."
+        ::= { genEquipRadioGroupsAbcStatusEntry 5 }
+
+genEquipRadioGroupsAbcStatusChannel1Operstate OBJECT-TYPE
+        SYNTAX  DownUp
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The operational state of the ABC channel."
+        ::= { genEquipRadioGroupsAbcStatusEntry 6 }
+
+genEquipRadioGroupsAbcStatusChannel1Capacity  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The current throughput capacity of the ABC channel in Kbps."
+        ::= { genEquipRadioGroupsAbcStatusEntry 7 }
+
+genEquipRadioGroupsAbcStatusChannel2Operstate OBJECT-TYPE
+        SYNTAX  DownUp
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The operational state of the ABC channel."
+        ::= { genEquipRadioGroupsAbcStatusEntry 8 }
+
+genEquipRadioGroupsAbcStatusChannel2Capacity  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The current throughput capacity of the ABC channel in Kbps."
+        ::= { genEquipRadioGroupsAbcStatusEntry 9 }
+
+genEquipRadioGroupsAbcStatusChannel3OperState OBJECT-TYPE
+        SYNTAX  DownUp
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The operational state of the ABC channel."
+        ::= { genEquipRadioGroupsAbcStatusEntry 10 }
+
+genEquipRadioGroupsAbcStatusChannel3Capacity  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The current throughput capacity of the ABC channel in Kbps."
+        ::= { genEquipRadioGroupsAbcStatusEntry 11 }
+
+genEquipRadioGroupsAbcStatusChannel4OperState OBJECT-TYPE
+        SYNTAX  DownUp
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The operational state of the ABC channel."
+        ::= { genEquipRadioGroupsAbcStatusEntry 12 }
+
+genEquipRadioGroupsAbcStatusChannel4Capacity  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The current throughput capacity of the ABC channel in Kbps."
+        ::= { genEquipRadioGroupsAbcStatusEntry 13 }
+
+genEquipRadioGroupsAbcStatusChannel5OperState OBJECT-TYPE
+        SYNTAX  DownUp
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The operational state of the ABC channel."
+        ::= { genEquipRadioGroupsAbcStatusEntry 14 }
+
+genEquipRadioGroupsAbcStatusChannel5Capacity  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The current throughput capacity of the ABC channel in Kbps."
+        ::= { genEquipRadioGroupsAbcStatusEntry 15 }
+
+genEquipRadioGroupsAbcStatusChannel6OperState OBJECT-TYPE
+        SYNTAX  DownUp
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The operational state of the ABC channel."
+        ::= { genEquipRadioGroupsAbcStatusEntry 16 }
+
+genEquipRadioGroupsAbcStatusChannel6Capacity  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The current throughput capacity of the ABC channel in Kbps."
+        ::= { genEquipRadioGroupsAbcStatusEntry 17 }
+
+genEquipRadioGroupsAbcStatusChannel7OperState OBJECT-TYPE
+        SYNTAX  DownUp
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The operational state of the ABC channel."
+        ::= { genEquipRadioGroupsAbcStatusEntry 18 }
+
+genEquipRadioGroupsAbcStatusChannel7Capacity  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The current throughput capacity of the ABC channel in Kbps."
+        ::= { genEquipRadioGroupsAbcStatusEntry 19 }
+
+genEquipRadioGroupsAbcStatusChannel8OperState OBJECT-TYPE
+        SYNTAX  DownUp
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The operational state of the ABC channel."
+        ::= { genEquipRadioGroupsAbcStatusEntry 20 }
+
+genEquipRadioGroupsAbcStatusChannel8Capacity  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The current throughput capacity of the ABC channel in Kbps."
+        ::= { genEquipRadioGroupsAbcStatusEntry 21 }
+
+--
+-- Multi Carrier ABC stm1 table - abc-stm1-table
+--
+
+genEquipStm1AbcAttrTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipStm1AbcAttrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Multi Carrier ABC stm1 table."
+        ::= { genEquipRadioGroupsAbc 5 }
+
+genEquipStm1AbcAttrEntry OBJECT-TYPE
+        SYNTAX GenEquipStm1AbcAttrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Multi Carrier ABC stm1 table entry."
+        INDEX { genEquipStm1AbcAttrIfIndex }
+        ::= { genEquipStm1AbcAttrTable 1 }
+
+GenEquipStm1AbcAttrEntry ::=
+    SEQUENCE {
+		genEquipStm1AbcAttrIfIndex
+			INTEGER,
+		genEquipStm1AbcAttrGroupId
+			INTEGER,
+	    genEquipStm1AbcAttrNumberOfMembers
+			INTEGER,
+		genEquipStm1AbcAttrPri1IfIndex
+			INTEGER,
+	    genEquipStm1AbcAttrPri2IfIndex
+			INTEGER,
+		genEquipStm1AbcAttrPri3IfIndex
+			INTEGER,
+	    genEquipStm1AbcAttrPri4IfIndex
+			INTEGER
+	}
+
+genEquipStm1AbcAttrIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The interface-index of the ABC group"
+        ::= { genEquipStm1AbcAttrEntry 1 }
+
+genEquipStm1AbcAttrGroupId  OBJECT-TYPE
+        SYNTAX 	INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Integer representing the group interface ID."
+        ::= { genEquipStm1AbcAttrEntry 2 }
+
+genEquipStm1AbcAttrNumberOfMembers  OBJECT-TYPE
+        SYNTAX 	INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The number of STM-1/OC-3 channels that can be members of the Multi Carrier ABC group."
+        ::= { genEquipStm1AbcAttrEntry 3 }
+
+genEquipStm1AbcAttrPri1IfIndex  OBJECT-TYPE
+        SYNTAX 	INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Location of the highest priority STM-1/OC-3 interface."
+        ::= { genEquipStm1AbcAttrEntry 4 }
+
+genEquipStm1AbcAttrPri2IfIndex  OBJECT-TYPE
+        SYNTAX 	INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Location of the highest priority STM-1/OC-3 interface."
+        ::= { genEquipStm1AbcAttrEntry 5 }
+
+genEquipStm1AbcAttrPri3IfIndex  OBJECT-TYPE
+        SYNTAX 	INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Location of the highest priority STM-1/OC-3 interface."
+        ::= { genEquipStm1AbcAttrEntry 6 }
+
+genEquipStm1AbcAttrPri4IfIndex  OBJECT-TYPE
+        SYNTAX 	INTEGER
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Location of the highest priority STM-1/OC-3 interface."
+        ::= { genEquipStm1AbcAttrEntry 7 }
+
+
+END

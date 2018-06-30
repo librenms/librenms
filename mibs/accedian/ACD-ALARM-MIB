@@ -1,0 +1,510 @@
+--
+-- Accedian Enterprise Specific MIB: Structure of Management Information
+--
+-- Copyright (c) 2005-2011, Accedian Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+ACD-ALARM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, TruthValue, DateAndTime
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    sysName
+        FROM SNMPv2-MIB
+    acdMibs
+        FROM ACCEDIAN-SMI;
+
+acdAlarm MODULE-IDENTITY
+
+    LAST-UPDATED "201110100100Z"
+    ORGANIZATION "Accedian Networks, Inc."
+    CONTACT-INFO
+            "Accedian Technical Assistance Center
+             Accedian Networks, Inc.
+             4878 Levy, suite 202
+             Saint-Laurent, Quebec Canada H4R 2P1
+             E-mail: support@accedian.com"
+    DESCRIPTION
+            "The alarm Table for this Accedian Networks device."
+
+    REVISION "201110100100Z"        -- 10 October 2011
+    DESCRIPTION
+            "Add acdAlarmCfgTableLastChangeTid and
+             acdAlarmStatusTableLastChangeTid."
+
+    REVISION "201011100100Z"        -- 10 November 2010
+    DESCRIPTION
+            "Fix compliance section."
+
+    REVISION "200902040100Z"        -- 4 Feb 2009
+    DESCRIPTION
+            "Add new fields in acdAlarmCfgEntry, acdAlarmActiveState and
+             acdAlarmClearState."
+
+    REVISION "200802010100Z"        -- 1 Feb 2008
+    DESCRIPTION
+            "Add UNITS clause to object, where appropriate."
+
+    REVISION "200705220100Z"        -- 22 May 2007
+    DESCRIPTION
+            "Add acdAlarmCfgNumber object to Alarm traps."
+
+    REVISION "200612190100Z"        -- 19 Dec 2006
+    DESCRIPTION
+            "Add 802.3AH notification enable and msg field in status table."
+
+    REVISION "200608060100Z"        -- 6 Aug 2006
+    DESCRIPTION
+            "Initial version of MIB module ACD-ALARM-MIB."
+
+    ::= { acdMibs 1 }
+
+acdAlarmMIBObjects      OBJECT IDENTIFIER ::= { acdAlarm 15 }
+acdAlarmConfig          OBJECT IDENTIFIER ::= { acdAlarmMIBObjects 1 }
+acdAlarmStatus          OBJECT IDENTIFIER ::= { acdAlarmMIBObjects 2 }
+acdAlarmConformance     OBJECT IDENTIFIER ::= { acdAlarmMIBObjects 3 }
+
+acdAlarmTableTid        OBJECT IDENTIFIER ::= { acdAlarmMIBObjects 4 }
+
+---------------------------------------------------------------------------
+ -- Alarm General configuration
+---------------------------------------------------------------------------
+acdAlarmGenThreshOn OBJECT-TYPE
+    SYNTAX      Unsigned32 (500..50000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This value represents the Alarm On Hysteris. This is the time since the
+        detection of the On event inside the system versus the report. This is
+        to avoid storm of notifications."
+   ::= { acdAlarm 1 }
+ 
+acdAlarmGenThreshOff OBJECT-TYPE
+    SYNTAX      Unsigned32 (500..50000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This value represents the Alarm Off Hysteris. This is the time since the
+        detection of the Off event inside the system versus the report. This is
+        to avoid storm of notifications."
+   ::= { acdAlarm 2 }
+
+acdAlarmGenLedEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This is to Enable the alarms reporting through the LEDs."
+   ::= { acdAlarm 3 }
+
+acdAlarmGenSyslogEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This is to Enable the alarms reporting through the syslog system."
+   ::= { acdAlarm 4 }
+
+acdAlarmGenSNMPEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This is to Enable the alarms reporting through the SNMP agent."
+   ::= { acdAlarm 5 }
+
+acdAlarmGen8023AHEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This is to Enable the alarms reporting through the 802.3AH protocol."
+   ::= { acdAlarm 6 }
+
+---------------------------------------------------------------------------
+ -- The Alarm configuration table
+ -- This table contains the configuration for each alarm.
+---------------------------------------------------------------------------
+
+acdAlarmCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdAlarmCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of all alarms."
+    ::= { acdAlarm 10 }
+
+acdAlarmCfgEntry OBJECT-TYPE
+    SYNTAX      AcdAlarmCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An alarm is an exceptional event that requires user notificaton."
+    INDEX   { acdAlarmCfgID }
+    ::=  { acdAlarmCfgTable 1 }
+
+AcdAlarmCfgEntry ::= SEQUENCE {
+    acdAlarmCfgID                   Unsigned32,
+    acdAlarmCfgNumber               Unsigned32,
+    acdAlarmCfgDesc                 DisplayString,
+    acdAlarmCfgEnable               TruthValue,
+    acdAlarmCfgSeverity             INTEGER,
+    acdAlarmCfgServiceAffecting     TruthValue,
+    acdAlarmCfgExtNumber            DisplayString,
+    acdAlarmCfgConditionType        DisplayString,
+    acdAlarmCfgAMOType              DisplayString
+
+}
+
+acdAlarmCfgID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Unique value for each alarm. Its value ranges from 1 to
+    MAXINT (4 bytes). "
+   ::= { acdAlarmCfgEntry 1 }
+
+acdAlarmCfgNumber  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Unique number that identifies this alarm. Assigned by the unit. The
+        alarm identifier is compose of 3 fields, the module number, the instance
+        number and the error number. The alarm number looks like this:
+        A.BBB.CC and is expressed in decimal, A is the module number, BBB is
+        the instance number (1-999) and CC is the error number (1-99). A module
+        number is assigned for each source of alarm in the system. For example
+        the port module is set to 1, the SFP module is set to 2, the PAA is set
+        to 3 and the environmental is set to 8."
+   ::= { acdAlarmCfgEntry 2 }
+
+acdAlarmCfgDesc  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This string is to describe the alarm in a readable way, e.g.:
+        +5Vdc Power supply fail."
+   ::= { acdAlarmCfgEntry 3 }
+
+acdAlarmCfgEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This is to indicate if the alarm is reported or not."
+   ::= { acdAlarmCfgEntry 4 }
+
+acdAlarmCfgSeverity  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    info(0),
+                    minor(1),
+                    major(2),
+                    critical(3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Accedian Networks classifies alarms into four severity types. These types
+        and their associated decimal codes are, informational(0), minor(1),
+        major(2) and critical(3)."
+   ::= { acdAlarmCfgEntry 5 }
+
+acdAlarmCfgServiceAffecting  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This is to indicate if the alarm is service affecting or not. This
+        value depends on the utilization of the box. For instance in an
+        application where the monitoring of the traffic is mandatory the link
+        down event on the monitor port is service affecting."
+   ::= { acdAlarmCfgEntry 6 }
+
+acdAlarmCfgExtNumber  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Unique number that identifies this alarm. Assigned by the unit. The
+        alarm identifier is compose of 3 fields, the module number, the instance
+        number and the error number. The alarm number looks like this:
+        A.B.C and is expressed in decimal, A is the module number, B is
+        the instance number and C is the error number. A module number is
+        assigned for each source of alarm in the system (see Accedian 
+        documentation for more detail)."
+   ::= { acdAlarmCfgEntry 7 }
+
+acdAlarmCfgConditionType  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the type of alarm condition."
+   ::= { acdAlarmCfgEntry 8 }
+
+acdAlarmCfgAMOType  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the Alarm Maintenance Object."
+   ::= { acdAlarmCfgEntry 9 }
+
+---------------------------------------------------------------------------
+ -- The Alarms Status table
+ -- This table contains the status of all alarms.
+---------------------------------------------------------------------------
+
+acdAlarmStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdAlarmStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of all alarms"
+    ::= { acdAlarm 11 }
+
+acdAlarmStatusEntry OBJECT-TYPE
+    SYNTAX  AcdAlarmStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "An alarm is an exceptional event that requires user notificaton."
+    INDEX   { acdAlarmStatusID }
+    ::=  { acdAlarmStatusTable 1 }
+
+AcdAlarmStatusEntry ::= SEQUENCE {
+    acdAlarmStatusID            Unsigned32,
+    acdAlarmStatusNumber        Unsigned32,
+    acdAlarmStatusOn            TruthValue,
+    acdAlarmStatusLastChange    DateAndTime,
+    acdAlarmStatusMsg           DisplayString
+}
+
+acdAlarmStatusID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Unique value for each alarm. Its value ranges from 1 to
+        MAXINT (4 bytes). "
+    ::= { acdAlarmStatusEntry 1 }
+
+acdAlarmStatusNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Unique number that identifies this alarm. Assigned by the unit. The
+        alarm identifier is compose of 3 fields, the module number, the instance
+        number and the error number. The alarm number looks like this:
+        AAA.BBB.CC and is expressed in decimal, AAA is the module number, BBB is
+        the instance number (1-999) and CC is the error number (1-99). A module
+        number is assigned for each source of alarm in the system. For example
+        the port module is set to 1, the SFP module is set to 2, the PAA is set
+        to 3 and the environmental is set to 8."
+    ::= { acdAlarmStatusEntry 2 }
+
+acdAlarmStatusOn  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is to indicate if the alarm is On or Off."
+    ::= { acdAlarmStatusEntry 3 }
+
+acdAlarmStatusLastChange OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the time of the last change for this alarm. A value of zero
+        means that nothing happened to this alarm since the last reboot."
+    ::= { acdAlarmStatusEntry 4 }
+
+acdAlarmStatusMsg  OBJECT-TYPE
+    SYNTAX      DisplayString  (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This string is to add information why the alarm is reported."
+    ::= { acdAlarmStatusEntry 5 }
+
+--  Accedian Alarm Traps
+---------------------------------------------------------------------------
+--    DESCRIPTION "Definition point for Accedian Alarm notifications."
+---------------------------------------------------------------------------
+
+acdAlarmV2 OBJECT IDENTIFIER ::= { acdAlarm 12 }
+
+acdAlarmActiveState NOTIFICATION-TYPE
+    OBJECTS  {  acdAlarmCfgID,
+                acdAlarmCfgNumber,
+                acdAlarmCfgSeverity,
+                acdAlarmCfgServiceAffecting,
+                acdAlarmCfgDesc,
+                acdAlarmStatusLastChange,
+                acdAlarmCfgExtNumber,
+                acdAlarmCfgConditionType,
+                acdAlarmCfgAMOType,
+                sysName }
+    STATUS      current
+    DESCRIPTION
+        "The SNMP trap that is generated when an alarm
+         entry crosses its rising threshold and generates
+         an event that is configured for sending SNMP
+         traps."
+
+    ::= { acdAlarmV2 1 }
+
+acdAlarmClearState NOTIFICATION-TYPE
+    OBJECTS  {  acdAlarmCfgID,
+                acdAlarmCfgNumber,
+                acdAlarmCfgSeverity,
+                acdAlarmCfgServiceAffecting,
+                acdAlarmCfgDesc,
+                acdAlarmStatusLastChange,
+                acdAlarmCfgExtNumber,
+                acdAlarmCfgConditionType,
+                acdAlarmCfgAMOType,
+                sysName }
+    STATUS      current
+    DESCRIPTION
+        "The SNMP trap that is generated when an alarm
+         entry crosses its falling threshold and generates
+         an event that is configured for sending SNMP
+         traps."
+
+    ::= { acdAlarmV2 2 }
+
+---------------------------------------------------------------------------
+ -- Transaction ID Information
+---------------------------------------------------------------------------
+
+acdAlarmCfgTableLastChangeTid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the transaction ID of the last change of the acdAlarmCfgTable
+        table.  If this value is different since the last read this is indicate 
+        a table change."
+    ::= { acdAlarmTableTid 1 }
+
+acdAlarmStatusTableLastChangeTid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the transaction ID of the last change of the acdAlarmStatusTable
+        table.  If this value is different since the last read this is indicate 
+        a table change."
+    ::= { acdAlarmTableTid 2 }
+    
+---------------------------------------------------------------------------
+ -- ACD-ALARM-MIB Module - Conformance Information
+---------------------------------------------------------------------------
+
+acdAlarmCompliances  OBJECT IDENTIFIER ::= { acdAlarmConformance 1 }
+acdAlarmGroups       OBJECT IDENTIFIER ::= { acdAlarmConformance 2 }
+
+---------------------------------------------------------------------------
+-- Units of conformance
+---------------------------------------------------------------------------
+
+acdAlarmGenGroup OBJECT-GROUP
+    OBJECTS {
+        acdAlarmGenThreshOn,
+        acdAlarmGenThreshOff,
+        acdAlarmGenLedEnable,
+        acdAlarmGenSyslogEnable,
+        acdAlarmGenSNMPEnable,
+        acdAlarmGen8023AHEnable
+    }
+    STATUS      current
+    DESCRIPTION
+       "."
+    ::= { acdAlarmGroups 1 }
+
+acdAlarmCfgGroup OBJECT-GROUP
+    OBJECTS {
+        acdAlarmCfgID,
+        acdAlarmCfgNumber,
+        acdAlarmCfgDesc,
+        acdAlarmCfgEnable,
+        acdAlarmCfgSeverity,
+        acdAlarmCfgServiceAffecting,
+        acdAlarmCfgExtNumber,
+        acdAlarmCfgConditionType,
+        acdAlarmCfgAMOType
+    }
+    STATUS      current
+    DESCRIPTION
+       "."
+    ::= { acdAlarmGroups 2 }
+
+acdAlarmStatusGroup OBJECT-GROUP
+    OBJECTS {
+        acdAlarmStatusID,
+        acdAlarmStatusNumber,
+        acdAlarmStatusOn,
+        acdAlarmStatusLastChange,
+        acdAlarmStatusMsg
+    }
+    STATUS      current
+    DESCRIPTION
+       "."
+    ::= { acdAlarmGroups 3 }
+
+acdAlarmNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        acdAlarmActiveState,
+        acdAlarmClearState
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Notifications group."
+    ::= { acdAlarmGroups 4 }
+
+acdAlarmTidGroup OBJECT-GROUP
+    OBJECTS {
+        acdAlarmCfgTableLastChangeTid,
+        acdAlarmStatusTableLastChangeTid
+    }
+    STATUS      current
+    DESCRIPTION
+       "List of scalars to monitior changes in tables."
+    ::= { acdAlarmGroups 5 }
+
+---------------------------------------------------------------------------
+-- MIB Module Compliance statements
+---------------------------------------------------------------------------
+acdAlarmCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+       "The compliance statement for support of the ACD-ALARM-MIB module."
+    MODULE
+        MANDATORY-GROUPS {
+            acdAlarmGenGroup,
+            acdAlarmCfgGroup,
+            acdAlarmStatusGroup,
+            acdAlarmNotificationsGroup,
+            acdAlarmTidGroup
+        }
+
+    ::= { acdAlarmCompliances 1 }
+
+END

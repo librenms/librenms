@@ -1,0 +1,140 @@
+ARRIS-C3-POST-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    cmtsC3
+        FROM ARRIS-MIB;
+
+    cmtsC3POSTMIB  MODULE-IDENTITY
+        LAST-UPDATED "200403300000Z" -- 30th March 2004
+        ORGANIZATION "Arris International"
+        CONTACT-INFO
+            "   Network Management
+                Postal: Arris International.
+                        4400 Cork Airport Business Park
+                        Cork Airport, Kinsale Road
+                        Cork, Ireland.
+                Tel:    +353 21 7305 800
+                Fax:    +353 21 4321 972"
+
+        DESCRIPTION
+            "This MIB reports POST result on the Arris CMTS C3"
+        ::= { cmtsC3 13 }
+
+    dcxPOSTObjects OBJECT IDENTIFIER ::= { cmtsC3POSTMIB 1 }
+   
+    dcxCPUWANPOSTGroup OBJECT IDENTIFIER ::= {dcxPOSTObjects 1}
+
+    dcxCPUWANPOSTTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF DcxCPUWANPOSTEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+        "This table contains a list WAN and CPU test results."
+        ::= { dcxCPUWANPOSTGroup 1 }
+
+    dcxCPUWANPOSTEntry	OBJECT-TYPE
+        SYNTAX	DcxCPUWANPOSTEntry
+        MAX-ACCESS	not-accessible
+        STATUS			current
+        DESCRIPTION
+            "An entry describing an POST result."
+        INDEX { dcxCPUWANPOSTType }
+        ::= { dcxCPUWANPOSTTable 1 }
+
+    DcxCPUWANPOSTEntry ::= SEQUENCE {
+        dcxCPUWANPOSTType 	Integer32,
+        dcxCPUWANPOSTDescr	DisplayString,
+        dcxCPUWANPOSTResult	INTEGER
+    }
+
+
+    dcxCPUWANPOSTType  OBJECT-TYPE
+        SYNTAX      Integer32(0..100)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "POST type"
+        ::= { dcxCPUWANPOSTEntry 1 } 
+
+
+    dcxCPUWANPOSTDescr  OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..40))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "POST Description"
+        ::= { dcxCPUWANPOSTEntry 2 } 
+
+    dcxCPUWANPOSTResult  OBJECT-TYPE
+        SYNTAX      INTEGER {
+            passed  (0),
+            skipped (1),
+            failed  (2)
+		}
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+		    "Test result"
+		::= { dcxCPUWANPOSTEntry 3 }
+
+    dcx3212POSTGroup OBJECT IDENTIFIER ::= {dcxPOSTObjects 2}
+
+    dcx3212POSTTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF Dcx3212POSTEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+        "This table contains a list WAN and CPU test results."
+        ::= { dcx3212POSTGroup 1 }
+
+    dcx3212POSTEntry	OBJECT-TYPE
+        SYNTAX	Dcx3212POSTEntry
+        MAX-ACCESS	not-accessible
+        STATUS			current
+        DESCRIPTION
+            "An entry describing an POST result."
+        INDEX { dcx3212POSTType }
+        ::= { dcx3212POSTTable 1 }
+
+    Dcx3212POSTEntry ::= SEQUENCE {
+        dcx3212POSTType 	Integer32,
+        dcx3212POSTDescr	DisplayString,
+        dcx3212POSTResult	INTEGER
+    }
+
+
+    dcx3212POSTType   OBJECT-TYPE
+        SYNTAX      Integer32(0..100)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "POST type"
+        ::= { dcx3212POSTEntry 1 } 
+
+
+    dcx3212POSTDescr  OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..40))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "POST Description"
+        ::= { dcx3212POSTEntry 2 } 
+
+
+    dcx3212POSTResult  OBJECT-TYPE
+        SYNTAX      INTEGER {
+            passed  (0),
+            failed  (1),
+            skipped (2)
+		}
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+		    "Test result"
+		::= { dcx3212POSTEntry 3 }
+
+ END

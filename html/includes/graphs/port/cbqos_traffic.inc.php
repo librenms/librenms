@@ -61,7 +61,7 @@ foreach ($components as $id => $array) {
             d_echo("\n  Class: ".$components[$id]['label']."\t+ added to the graph");
             $rrd_filename = rrd_name($device['hostname'], array('port', $array['ifindex'], 'cbqos', $array['sp-id'], $array['sp-obj']));
 
-            if (file_exists($rrd_filename)) {
+            if (rrdtool_check_rrd_exists($rrd_filename)) {
                 // Stack the area on the second and subsequent DS's
                 $stack = "";
                 if ($count != 0) {

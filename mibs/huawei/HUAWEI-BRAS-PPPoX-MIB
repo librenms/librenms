@@ -1,0 +1,397 @@
+-- =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:HUAWEI-BRAS-PPPoX-MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--     
+-- =================================================================
+
+    HUAWEI-BRAS-PPPoX-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwBRASMib            
+                FROM HUAWEI-MIB
+            IpAddress
+                FROM SNMPv2-SMI    
+            TruthValue            
+                FROM SNMPv2-TC    
+            InterfaceIndex 
+                FROM IF-MIB
+            OBJECT-TYPE, MODULE-IDENTITY            
+                FROM SNMPv2-SMI;
+    
+        hwBRASPPPoX MODULE-IDENTITY 
+            LAST-UPDATED "200403031508Z"
+            ORGANIZATION 
+                "Huawei Technologies Co., Ltd.
+                "
+              CONTACT-INFO 
+                                "Floor 5, Block 4, R&D Building,
+                Huawei Longgang Production Base,
+                Shenzhen,   P.R.C.
+                http://www.huawei.com
+                Zip:518057
+                "
+            
+                DESCRIPTION 
+                    "The MIB contains objects of module PPP."
+        ::= { hwBRASMib 2 }
+    
+        hwPPPoXMibObjects OBJECT IDENTIFIER ::= { hwBRASPPPoX 1 }
+        
+        hwPppConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPppConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "PPP configuration information table.
+                "
+            ::= { hwPPPoXMibObjects 1 }
+        
+        hwPppConfigEntry OBJECT-TYPE
+            SYNTAX HwPppConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Description."
+            INDEX { hwVtIndex }
+            ::= { hwPppConfigTable 1 }
+        
+        HwPppConfigEntry ::=
+            SEQUENCE { 
+                hwVtIndex
+                    Integer32,
+                hwPppAuthMode
+                    INTEGER,
+                hwPppNegTimeout
+                    Integer32,
+                hwPppKeepInterval
+                    Integer32,
+                hwPppKeepRetransmit                    
+                    Integer32,
+                hwPppCHAPUserName
+                    OCTET STRING,
+                hwPppCHAPUserPassword
+                    OCTET STRING,   
+                hwPppPAPUserName
+                        OCTET STRING, 
+                hwPppPAPUserPassword   
+                        OCTET STRING,                 
+                        hwPppServiceName1
+                            OCTET STRING,
+                        hwPppServiceName2
+                            OCTET STRING,
+                        hwPppServiceName3
+                            OCTET STRING,
+                        hwPppServiceName4
+                            OCTET STRING,
+                        hwPppServiceName5
+                            OCTET STRING,
+                        hwPppServiceName6
+                            OCTET STRING,
+                        hwPppServiceName7
+                            OCTET STRING,
+                        hwPppServiceName8
+                            OCTET STRING,
+                    hwPppServiceNameType
+                            INTEGER,
+                        hwPppAcName
+                            OCTET STRING
+             }
+
+            hwVtIndex OBJECT-TYPE
+                SYNTAX Integer32 (0..1023)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Vt index.
+                    "
+                ::= { hwPppConfigEntry 1 }
+            
+        hwPppAuthMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                pap(0),
+                chap(1),
+                auto(2),
+                mschapv1(3),
+                mschapv2(4)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "PPP authentication method.
+                "
+            DEFVAL { 1 }
+            ::= { hwPppConfigEntry 2 }
+        
+        hwPppNegTimeout OBJECT-TYPE
+            SYNTAX Integer32 (1..10)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Config PPP overtime.
+                "
+            DEFVAL { 3 }
+            ::= { hwPppConfigEntry 3 }
+        
+        hwPppKeepInterval OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            UNITS "seconds"
+                MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Config interval of sending ECHO packet(second).
+                "
+            DEFVAL { 20 }
+            ::= { hwPppConfigEntry 4 }
+
+        hwPppKeepRetransmit OBJECT-TYPE
+            SYNTAX Integer32 (1..10)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Config retransmission times of ECHO packet."
+            DEFVAL { 3 }
+            ::= { hwPppConfigEntry 5 }
+
+        hwPppCHAPUserName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..65))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Config CHAP authentication username.
+                "
+            ::= { hwPppConfigEntry 6 }
+                
+        hwPppCHAPUserPassword OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Config CHAP authentication password(only support simple password).
+                "
+            ::= { hwPppConfigEntry 7 }
+
+        hwPppPAPUserName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..65))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Config PAP authentication username.
+                "
+            ::= { hwPppConfigEntry 8 }
+                
+        hwPppPAPUserPassword OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Config PAP authentication password(only support simple password).
+                "
+            ::= { hwPppConfigEntry 9 }
+        hwPppServiceName1 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Service name one .
+                "
+            ::= { hwPppConfigEntry 10 }
+        hwPppServiceName2 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Service name two .
+                "
+            ::= { hwPppConfigEntry 11 }
+        hwPppServiceName3 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Service name three .
+                "
+            ::= { hwPppConfigEntry 12 }
+        hwPppServiceName4 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Service name four .
+                "
+            ::= { hwPppConfigEntry 13 }
+        hwPppServiceName5 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Service name five .
+                "
+            ::= { hwPppConfigEntry 14 }
+        hwPppServiceName6 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Service name six .
+                "
+            ::= { hwPppConfigEntry 15 }
+        hwPppServiceName7 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Service name seven .
+                "
+            ::= { hwPppConfigEntry 16 }
+        hwPppServiceName8 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Service name eight .
+                "
+            ::= { hwPppConfigEntry 17 }
+        hwPppServiceNameType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                exactMatch(1),
+                normalMatch(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Config servicename kind of match.
+                1 exact match.
+                2 fuzzy match(default).
+                "
+            DEFVAL { 2 }
+            ::= { hwPppConfigEntry 18 }
+        hwPppAcName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                AcName.
+                "
+            ::= { hwPppConfigEntry 19 }
+
+        hwPppVTBindTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPppVTBindEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "PPP VT and interface binding configuration information table.
+                "
+            ::= { hwPPPoXMibObjects 2 }
+        
+        hwPppVTBindEntry OBJECT-TYPE
+            SYNTAX HwPppVTBindEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Description."
+            INDEX { hwPppVTBindIfIndex }
+            ::= { hwPppVTBindTable 1 }
+        
+        HwPppVTBindEntry ::=
+            SEQUENCE { 
+                hwPppVTBindIfIndex
+                    InterfaceIndex,
+                hwVtNumber
+                    Integer32
+                }
+    
+            hwPppVTBindIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Interface index.
+                "
+            ::= { hwPppVTBindEntry 1 }
+    
+        hwVtNumber OBJECT-TYPE
+            SYNTAX Integer32 (0..1023|65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Vt index.
+                "
+            DEFVAL { 65535 }
+            ::= { hwPppVTBindEntry 2 }
+            
+            
+    --  ============== conformance information ==============
+        hwPppConformance OBJECT IDENTIFIER ::= { hwBRASPPPoX 2 }
+        
+        
+        hwPppCompliances OBJECT IDENTIFIER ::= { hwPppConformance 1 }
+        hwPppCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hwPppConfigGroup, hwPppVTBindGroup }  
+                                               
+              ::= { hwPppCompliances 1 }  
+              
+          
+        --  ============== groups ==============  
+        hwPppGroups OBJECT IDENTIFIER ::= { hwPppConformance 2 } 
+        
+        hwPppConfigGroup OBJECT-GROUP
+            OBJECTS {
+                hwVtIndex,
+                hwPppAuthMode,
+                hwPppNegTimeout,
+                hwPppKeepInterval,
+                hwPppKeepRetransmit,
+                hwPppCHAPUserName,
+                hwPppCHAPUserPassword,   
+                hwPppPAPUserName, 
+                hwPppPAPUserPassword,                 
+                        hwPppServiceName1,
+                        hwPppServiceName2,
+                        hwPppServiceName3,
+                        hwPppServiceName4,
+                        hwPppServiceName5,
+                        hwPppServiceName6,
+                        hwPppServiceName7,
+                        hwPppServiceName8,
+                    hwPppServiceNameType,
+                    hwPppAcName
+             }       
+            STATUS current
+            DESCRIPTION 
+                "The ppp config group."
+            ::= { hwPppGroups 1 }
+
+
+        hwPppVTBindGroup OBJECT-GROUP
+            OBJECTS { hwPppVTBindIfIndex, hwVtNumber }            
+            STATUS current
+            DESCRIPTION 
+                "The ppp VT Bind group."
+            ::= { hwPppGroups 2 }
+             
+                    
+        --  ============== conformance information define end ==============
+    
+    END
+

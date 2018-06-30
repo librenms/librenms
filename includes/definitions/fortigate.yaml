@@ -1,0 +1,15 @@
+os: fortigate
+text: 'Fortinet Fortigate'
+type: firewall
+icon: fortinet
+mib_dir:
+    - fortinet
+empty_ifdescr: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_fortigate_cpu, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.12356.15
+        - .1.3.6.1.4.1.12356.101.1 #FortiGate

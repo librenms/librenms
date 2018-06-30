@@ -1,0 +1,321 @@
+-- This file was included in WWP MIB release 04-16-00-0047
+ --
+ -- CIENA-CES-RMON-MIB.my
+ --
+
+ CIENA-CES-RMON-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS                
+   OBJECT-TYPE, MODULE-IDENTITY                  
+            FROM SNMPv2-SMI
+   DisplayString, TruthValue
+        FROM SNMPv2-TC                                                     
+   cienaCommon, cienaCesConfig
+        FROM CIENA-SMI;
+
+ cienaCesRmonMIB MODULE-IDENTITY
+            LAST-UPDATED "201411110000Z"
+            ORGANIZATION "Ciena, Inc"
+            CONTACT-INFO
+                    "   Mib Meister
+                                        115 North Sullivan Road
+                                        Spokane Valley, WA 99037
+                                USA                             
+                                Phone:  +1 509 242 9000
+                                        Email:  support@ciena.com"
+	    DESCRIPTION
+	            "The MIB module for proprietary Ciena RMON configuration."
+            
+            REVISION    "201411110000Z"        
+            DESCRIPTION
+                    "Initial creation."
+            
+            ::= { cienaCesConfig 34 }
+                                                
+ --
+ -- Node definitions
+ --
+        
+ cienaCesRmonMIBObjects OBJECT IDENTIFIER ::= { cienaCesRmonMIB 1 }
+ 
+
+ -- Ciena Rmon Config
+ --
+ cienaCesRmon OBJECT IDENTIFIER ::= { cienaCesRmonMIBObjects 1 }
+
+ cienaCesRmonTransfer OBJECT IDENTIFIER ::= { cienaCesRmon 1 }
+ cienaCesRmonAutoConfigure OBJECT IDENTIFIER ::= { cienaCesRmon 2 }
+  
+ -- Notifications 
+  
+ cienaCesRmonMIBNotificationPrefix OBJECT IDENTIFIER ::= { cienaCesRmonMIB 2 }
+ cienaCesRmonMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { cienaCesRmonMIBNotificationPrefix 0 }
+ -- Conformance information 
+ 
+ cienaCesRmonMIBConformance OBJECT IDENTIFIER ::= { cienaCesRmonMIB 3 } 
+ cienaCesRmonsMIBCompliances OBJECT IDENTIFIER ::= { cienaCesRmonMIBConformance 1 }              
+ cienaCesRmonMIBGroups      OBJECT IDENTIFIER ::= { cienaCesRmonMIBConformance 2 }
+
+--
+-- Ciena RMON configuration
+--
+ cienaCesRmonTransferServerTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesRmonTransferServerEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The table specifying RMON file configuration."
+     ::= { cienaCesRmonTransfer 1 }  
+ 
+ cienaCesRmonTransferServerEntry OBJECT-TYPE
+     SYNTAX       CienaCesRmonTransferServerEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "An entry in the port stats table."
+     INDEX{cienaCesRmonTransferServerIndex}
+     ::= { cienaCesRmonTransferServerTable 1 }       
+   
+     CienaCesRmonTransferServerEntry ::= SEQUENCE {
+     cienaCesRmonTransferServerIndex                             INTEGER,
+     cienaCesRmonTransferServerServer                            DisplayString,
+     cienaCesRmonTransferServerLastRemoteName                    DisplayString,
+     cienaCesRmonTransferServerLastPushTime                      DisplayString,
+     cienaCesRmonTransferServerLastPushStatus                    DisplayString,
+     cienaCesRmonTransferServerXftpTransferMode                  INTEGER,
+     cienaCesRmonTransferServerXftpLoginId                       DisplayString,
+     cienaCesRmonTransferServerXftpPassword                      DisplayString,
+     cienaCesRmonTransferServerXftpSecret                        OCTET STRING
+ }
+
+
+  cienaCesRmonTransferServerIndex OBJECT-TYPE
+    SYNTAX        INTEGER (0..10)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "Placeholder for index."
+    ::= { cienaCesRmonTransferServerEntry 1 }
+
+ cienaCesRmonTransferServerServer OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE(0..64))
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+            "The name of the file server."
+    ::= { cienaCesRmonTransferServerEntry 2 }
+
+  
+ cienaCesRmonTransferServerLastRemoteName OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE(0..127))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "The name and location on the remote server of the last file."
+    ::= { cienaCesRmonTransferServerEntry 3 }
+
+ cienaCesRmonTransferServerLastPushTime OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "The time of the last file push."
+    ::= { cienaCesRmonTransferServerEntry 4 }
+
+ cienaCesRmonTransferServerLastPushStatus OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE(0..127))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "The status of the last RMON file push."
+    ::= { cienaCesRmonTransferServerEntry 5 }
+
+
+  cienaCesRmonTransferServerXftpTransferMode  OBJECT-TYPE
+     SYNTAX               INTEGER {
+			     tftp(1),                            
+                             ftp(2),
+                             sftp(3),
+                             defaultTftp(4),
+                             defaultFtp(5),
+                             defaultSftp(6),
+                             default(7)      
+                          }
+     MAX-ACCESS           read-write
+     STATUS               current
+     DESCRIPTION
+    	     "The type of server to use."               
+       ::= { cienaCesRmonTransferServerEntry 6  }      
+
+
+  cienaCesRmonTransferServerXftpLoginId OBJECT-TYPE
+     SYNTAX      DisplayString(SIZE(0..32))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "The username to use for xftp downloads."
+     DEFVAL { "" }        
+     ::= { cienaCesRmonTransferServerEntry 7 }
+
+  cienaCesRmonTransferServerXftpPassword OBJECT-TYPE
+     SYNTAX      DisplayString(SIZE(0..128))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "The password to use for xftp downloads."
+     DEFVAL { "" }        
+     ::= { cienaCesRmonTransferServerEntry 8  }
+
+  cienaCesRmonTransferServerXftpSecret OBJECT-TYPE
+     SYNTAX      OCTET STRING(SIZE(0..259))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "The secret to use for xftp downloads."
+     DEFVAL { "" }        
+     ::= { cienaCesRmonTransferServerEntry 9 }
+
+
+ cienaCesRmonTransferName OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE(0..16))
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+            "The RMON file names."
+    ::= { cienaCesRmonTransfer 2 }
+
+ cienaCesRmonTransferRemoteDir OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE(0..127))
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+            "The location on the remote server to place the files."
+    ::= { cienaCesRmonTransfer 3 }
+
+  cienaCesRmonTransferInterval OBJECT-TYPE
+    SYNTAX        INTEGER (3600..31536000)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "The automatic RMON file push interval."
+    ::= { cienaCesRmonTransfer 4 }
+
+ cienaCesRmonTransferUserFilesKept OBJECT-TYPE
+    SYNTAX        INTEGER (1..4)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "Must be less than or equal to cienaCesRmonTransferMaxFiles."
+    ::= { cienaCesRmonTransfer 5 }
+
+ cienaCesRmonTransferMaxFiles OBJECT-TYPE
+    SYNTAX        INTEGER (1..4)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "Only 1 file is supported on LEOS 4.x devices and the 3902, 3911 and 3920."
+    ::= { cienaCesRmonTransfer 6 }
+
+  cienaCesRmonTransferPushRecentFiles OBJECT-TYPE
+    SYNTAX        TruthValue
+
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "Retransmit all stored rmon files to the server."
+    ::= { cienaCesRmonTransfer 7 }
+
+  cienaCesRmonTransferState OBJECT-TYPE
+    SYNTAX        INTEGER {   disable(1),
+                              enable(2)}
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "The current operational state of the file push."
+    ::= { cienaCesRmonTransfer 8 }
+
+  cienaCesRmonHistAutoConfigState OBJECT-TYPE
+    SYNTAX        INTEGER {   enable(1),
+                              disable(2)}
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "Automatically create RMON history entries when ports go operationally enabled."
+    ::= { cienaCesRmonAutoConfigure 1 }
+
+ cienaCesRmonHistAutoConfigFileLogging OBJECT-TYPE
+    SYNTAX        INTEGER {   on(1),
+                              off(2)}
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "File logging setting to use when creating the next autogenerated etherHistory entry."
+    ::= { cienaCesRmonAutoConfigure 2 }
+
+ cienaCesRmonHistAutoConfigInterval OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "Interval to use when creating the next autogenerated etherHistory entry."
+    ::= { cienaCesRmonAutoConfigure 3 }
+
+ cienaCesRmonHistAutoConfigNumBuckets OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "Number of buckets to request when creating the next autogenerated etherHistory entry."
+    ::= { cienaCesRmonAutoConfigure 4 }
+
+ cienaCesRmonHistAutoConfigOwner OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..127))
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+            "The owner to use when creating the next autogenerated etherHistory entry."
+    ::= { cienaCesRmonAutoConfigure 5 }
+
+  cienaCesRmonHistAutoConfigStatistics OBJECT-TYPE
+    SYNTAX        INTEGER  {none (0),
+                           basicTx(1),
+                           basicRx(2),
+                           basicRxBasicTx(3),
+                           basicError(4),
+                           basicTxBasicError(5),
+                           basicRxBasicError(6),
+                           basicAll(7),
+                           txAll(9),
+                           txAllBasicRx(10),
+                           txAllBasicError(13),
+                           rxAllBasicRx(18),
+                           rxAllBasicError(22),
+                           errorAll(36),
+                           basicTxErrorAll(37),
+                           basicRxErrorAll(38),
+                           basicRxBasicTxErroAll(39),
+                           txAllErrorAll(45),
+                           txAllRxBasicErrorAll(47),
+                           rxTxAll(51),
+                           rxAllErrorAll(54),
+                           rxAllTxBasicErrorAll(55),
+                           allStatsNoStandard(63),
+                           standardRmon(71),
+                           standardRxAll(87),
+                           standardTxAll(79),
+                           standardRxAllTxAll(95),
+                           standardErrorAll(103),
+                           standardTxAllErrorAll(111),
+                           standardRxAllErrorAll(119),
+                           allStatsWithStandard(127)}
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "The statistics to gather when using the etherHistory."
+    ::= { cienaCesRmonAutoConfigure 6 }
+   
+END     
+
+ 
+

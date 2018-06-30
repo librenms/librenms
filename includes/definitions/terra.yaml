@@ -1,0 +1,10 @@
+os: terra
+text: Terra
+type: appliance
+group: terra
+icon: terra
+over:
+    - { graph: device_processor, text: 'CPU Usage' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.30631.1.

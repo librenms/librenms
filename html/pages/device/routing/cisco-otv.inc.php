@@ -11,7 +11,7 @@ global $config;
 ?>
 <div class="panel panel-default" id="overlays">
     <div class="panel-heading">
-        <h3 class="panel-title">Overlay's & Adjacencies</h3>
+        <h3 class="panel-title">Overlay's &amp; Adjacencies</h3>
     </div>
     <div class="panel list-group">
 <?php
@@ -39,7 +39,7 @@ foreach ($components as $aid => $adjacency) {
             $gli = "list-group-item-danger";
         }
 ?>
-    <a class="list-group-item <?php echo $gli?> small"><span class="glyphicon glyphicon-chevron-right"></span> <?php echo $adjacency['label']?> - <?php echo $adjacency['endpoint']?> <?php echo $adj_status?></a>
+    <a class="list-group-item <?php echo $gli?> small"><i class="fa fa-chevron-right" aria-hidden="true"></i> <?php echo $adjacency['label']?> - <?php echo $adjacency['endpoint']?> <?php echo $adj_status?></a>
 <?php
     }
 }

@@ -1,0 +1,1784 @@
+-- extracted from draft-ietf-idr-bgp4-mibv2-13.txt
+-- at Tue Mar 13 06:12:27 2012
+
+-- Renumbered to sit underneath Arista's enterprise, and
+-- renamed aristaBgp4V2.
+
+ARISTA-BGP4V2-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        Counter32, Gauge32, Unsigned32
+            FROM SNMPv2-SMI
+        InetAddressType, InetAddress, InetPortNumber,
+        InetAutonomousSystemNumber, InetAddressPrefixLength
+            FROM INET-ADDRESS-MIB
+        TruthValue, RowPointer, TimeStamp
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+        aristaExperiment FROM ARISTA-SMI-MIB
+        AristaBgp4V2IdentifierTC, AristaBgp4V2AddressFamilyIdentifierTC,
+        AristaBgp4V2SubsequentAddressFamilyIdentifierTC
+            FROM ARISTA-BGP4V2-TC-MIB;
+
+        aristaBgp4V2 MODULE-IDENTITY
+            LAST-UPDATED "201408150000Z"
+            ORGANIZATION "Arista Networks, Inc."
+            CONTACT-INFO
+                "Arista Networks, Inc.
+
+                 Postal: 5453 Great America Parkway
+                         Santa Clara, CA 95054
+
+                 Tel: +1 408 547-5500
+
+                 E-mail: snmp@arista.com"
+            DESCRIPTION
+                    "The MIB module for the BGP-4 protocol.
+                     This version was published in
+                     draft-ietf-idr-bgp4-mibv2-13, and
+                     modified to be homed inside the Arista
+                     enterprise.  There were no other
+                     modifications.
+
+                     Copyright (C) The IETF Trust (2012).  This
+                     version of this MIB module is part of
+                     draft-ietf-idr-bgp4-mibv2-13.txt;
+                     see the draft itself for full legal notices."
+
+            REVISION "201408150000Z"
+            DESCRIPTION
+                   "Updated postal and e-mail addresses."
+            REVISION "201210190000Z"
+            DESCRIPTION
+                   "Renumbered inside the Arista enterprise space."
+            REVISION "201203110000Z"
+            DESCRIPTION
+                   "This MIB updates and replaces the BGP MIB defined in
+                    RFC 4273."
+            ::= { aristaExperiment 1 }
+
+    -- Top level components of this MIB module
+
+    -- Notifications
+    aristaBgp4V2Notifications OBJECT IDENTIFIER ::= { aristaBgp4V2 0 }
+
+    -- Objects
+    aristaBgp4V2Objects OBJECT IDENTIFIER ::= { aristaBgp4V2 1 }
+
+    -- Conformance
+    aristaBgp4V2Conformance OBJECT IDENTIFIER ::= { aristaBgp4V2 2 }
+
+
+    --
+    -- Per-instance BGP discontinuities
+    --
+
+    aristaBgp4V2DiscontinuityTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF AristaBgp4V2DiscontinuityEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Table of BGP-4 discontinuities.  Discontinuities that have
+             external visibility occur on a per-BGP instance basis.
+             Transitions by a given BGP peer will result in a consistent
+             BGP view within that instance and thus do not represent a
+             discontinuity from a protocol standpoint."
+        ::= { aristaBgp4V2Objects 1 }
+
+    aristaBgp4V2DiscontinuityEntry OBJECT-TYPE
+        SYNTAX     AristaBgp4V2DiscontinuityEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Entry repsenting information about a discontinuity event
+             for a given BGP instance."
+        INDEX {
+            aristaBgp4V2PeerInstance
+        }
+        ::= { aristaBgp4V2DiscontinuityTable 1 }
+
+    AristaBgp4V2DiscontinuityEntry ::= SEQUENCE {
+        aristaBgp4V2DiscontinuityTime
+            TimeStamp
+        }
+
+    aristaBgp4V2DiscontinuityTime OBJECT-TYPE
+        SYNTAX     TimeStamp
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The value of sysUpTime at the most recent occasion at which
+             this BGP management instance has suffered a discontinuity."
+         ::= { aristaBgp4V2DiscontinuityEntry 1 }
+
+    --
+    -- Per-peer session management information.
+    --
+
+    aristaBgp4V2PeerTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF AristaBgp4V2PeerEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "BGP peer table.  This table contains, one entry per BGP
+             peer, information about the connections with BGP peers."
+        ::= { aristaBgp4V2Objects 2 }
+
+    aristaBgp4V2PeerEntry OBJECT-TYPE
+        SYNTAX     AristaBgp4V2PeerEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Entry containing information about the connection with
+             a remote BGP peer."
+        INDEX {
+            aristaBgp4V2PeerInstance,
+            aristaBgp4V2PeerRemoteAddrType,
+            aristaBgp4V2PeerRemoteAddr
+        }
+        ::= { aristaBgp4V2PeerTable 1 }
+
+    AristaBgp4V2PeerEntry ::= SEQUENCE {
+        -- INDEX information
+        aristaBgp4V2PeerInstance
+            Unsigned32,
+        aristaBgp4V2PeerLocalAddrType
+            InetAddressType,
+        aristaBgp4V2PeerLocalAddr
+            InetAddress,
+        aristaBgp4V2PeerRemoteAddrType
+            InetAddressType,
+        aristaBgp4V2PeerRemoteAddr
+            InetAddress,
+
+        -- Local
+        aristaBgp4V2PeerLocalPort
+            InetPortNumber,
+        aristaBgp4V2PeerLocalAs
+            InetAutonomousSystemNumber,
+        aristaBgp4V2PeerLocalIdentifier
+            AristaBgp4V2IdentifierTC,
+
+        -- Remote
+        aristaBgp4V2PeerRemotePort
+            InetPortNumber,
+        aristaBgp4V2PeerRemoteAs
+            InetAutonomousSystemNumber,
+        aristaBgp4V2PeerRemoteIdentifier
+            AristaBgp4V2IdentifierTC,
+
+        -- Session status
+        aristaBgp4V2PeerAdminStatus
+            INTEGER,
+        aristaBgp4V2PeerState
+            INTEGER,
+        aristaBgp4V2PeerDescription
+            SnmpAdminString
+    }
+
+    aristaBgp4V2PeerInstance OBJECT-TYPE
+        SYNTAX     Unsigned32 (1..4294967295)
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The routing instance index.
+
+             Some BGP implementations permit the creation of
+             multiple instances of a BGP routing process. An
+             example includes routers running BGP/MPLS IP Virtual
+             Private Networks.
+
+             Implementations that do not support multiple
+             routing instances should return 1 for this object."
+        ::= { aristaBgp4V2PeerEntry 1 }
+
+    aristaBgp4V2PeerLocalAddrType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The address family of the local end of the peering
+             session."
+        ::= { aristaBgp4V2PeerEntry 2 }
+
+    aristaBgp4V2PeerLocalAddr OBJECT-TYPE
+        SYNTAX     InetAddress
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The local IP address of this entry's BGP connection.
+
+             An implementation is required to support IPv4 peering
+             sessions in which case the length of this object is 4.
+             An implementation MAY support IPv6 peering
+             sessions in which case the length of this object is 16.
+             IPv6 link-local peering sessions MAY be supported by
+             this MIB.  In this case the length of this object is 20."
+        ::= { aristaBgp4V2PeerEntry 3 }
+
+    aristaBgp4V2PeerRemoteAddrType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The address family of the remote end of the peering
+             session.
+
+             An implementation is required to support IPv4 peering
+             sessions in which case the length of this object is 4.
+             An implementation MAY support IPv6 peering
+             sessions in which case the length of this object is 16.
+             IPv6 link-local peering sessions MAY be supported by
+             this MIB.  In this case the length of this object is 20."
+        ::= { aristaBgp4V2PeerEntry 4 }
+
+    aristaBgp4V2PeerRemoteAddr OBJECT-TYPE
+        SYNTAX     InetAddress
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The remote IP address of this entry's BGP peer."
+        ::= { aristaBgp4V2PeerEntry 5 }
+
+    aristaBgp4V2PeerLocalPort OBJECT-TYPE
+        SYNTAX     InetPortNumber
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The local port for the TCP connection between the BGP
+             peers."
+        ::= { aristaBgp4V2PeerEntry 6 }
+
+    aristaBgp4V2PeerLocalAs OBJECT-TYPE
+        SYNTAX     InetAutonomousSystemNumber
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Some implementations of BGP can represent themselves
+             as multiple ASes. This is the AS that this peering
+             session is representing itself as to the remote peer."
+        ::= { aristaBgp4V2PeerEntry 7 }
+
+    aristaBgp4V2PeerLocalIdentifier OBJECT-TYPE
+        SYNTAX     AristaBgp4V2IdentifierTC
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The BGP Identifier of the local system for this peering
+             session.  It is REQUIRED that all aristaBgp4V2PeerLocalIdentifier
+             values for the same aristaBgp4V2PeerInstance be identical."
+        REFERENCE
+            "RFC 4271, Section 4.2, 'BGP Identifier'."
+        ::= { aristaBgp4V2PeerEntry 8 }
+
+    aristaBgp4V2PeerRemotePort OBJECT-TYPE
+        SYNTAX     InetPortNumber
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The remote port for the TCP connection between the BGP
+             peers.
+
+             Note that the objects aristaBgp4V2PeerLocalAddr,
+             aristaBgp4V2PeerLocalPort, aristaBgp4V2PeerRemoteAddr and
+             aristaBgp4V2PeerRemotePort provide the appropriate reference to
+             the standard MIB TCP connection table, or even the ipv6
+             TCP MIB as in RFC 4022."
+        REFERENCE
+            "RFC 2012 - SNMPv2 Management Information Base for the
+             Transmission Control Protocol using SMIv2.
+             RFC 4022 - IP Version 6 Management Information Base
+             for the Transmission Control Protocol."
+        ::= { aristaBgp4V2PeerEntry 9 }
+
+    aristaBgp4V2PeerRemoteAs OBJECT-TYPE
+        SYNTAX     InetAutonomousSystemNumber
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The remote autonomous system number received in the BGP
+             OPEN message."
+        REFERENCE
+            "RFC 4271, Section 4.2."
+        ::= { aristaBgp4V2PeerEntry 10 }
+
+    aristaBgp4V2PeerRemoteIdentifier OBJECT-TYPE
+        SYNTAX     AristaBgp4V2IdentifierTC
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The BGP Identifier of this entry's remote BGP peer.
+
+             This entry should be 0.0.0.0 unless the
+             aristaBgp4V2PeerState is in the openconfirm or the
+             established state."
+
+        REFERENCE
+            "RFC 4271, Section 4.2, 'BGP Identifier'."
+        ::= { aristaBgp4V2PeerEntry 11 }
+
+    aristaBgp4V2PeerAdminStatus OBJECT-TYPE
+        SYNTAX     INTEGER {
+            halted(1),
+            running(2)
+        }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Whether or not the BGP FSM for this remote peer is
+             halted or running. The BGP FSM for a remote peer is
+             halted after processing a Stop event. Likewise, it is
+             in the running state after a Start event.
+
+             The aristaBgp4V2PeerState will generally be in the idle state
+             when the FSM is halted, although some extensions such
+             as Graceful Restart will leave the peer in the Idle
+             state but with the FSM running."
+        REFERENCE
+            "RFC 4271, Section 8.1.2."
+        ::= { aristaBgp4V2PeerEntry 12 }
+
+    aristaBgp4V2PeerState OBJECT-TYPE
+        SYNTAX     INTEGER {
+            idle(1),
+            connect(2),
+            active(3),
+            opensent(4),
+            openconfirm(5),
+            established(6)
+        }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The BGP peer connection state."
+        REFERENCE
+            "RFC 4271, Section 8.2.2."
+        ::= { aristaBgp4V2PeerEntry 13 }
+
+
+    aristaBgp4V2PeerDescription OBJECT-TYPE
+        SYNTAX     SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "A user configured description identifying this peer.  When
+             this object is not the empty string, this object SHOULD
+             contain a description that is unique within a given BGP
+             instance for this peer."
+        ::= { aristaBgp4V2PeerEntry 14 }
+
+
+    --
+    -- Per-peer error management information.
+    --
+
+    aristaBgp4V2PeerErrorsTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF AristaBgp4V2PeerErrorsEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "On a per-peer basis, this table reflects the last
+             protocol-defined error encountered and reported on
+             the peer session."
+        ::= { aristaBgp4V2Objects 3 }
+
+    aristaBgp4V2PeerErrorsEntry OBJECT-TYPE
+        SYNTAX     AristaBgp4V2PeerErrorsEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Each entry contains information about errors sent
+             and received for a particular BGP peer."
+        AUGMENTS {
+            aristaBgp4V2PeerEntry
+        }
+        ::= { aristaBgp4V2PeerErrorsTable 1 }
+
+    AristaBgp4V2PeerErrorsEntry ::= SEQUENCE {
+        aristaBgp4V2PeerLastErrorCodeReceived
+            Unsigned32,
+        aristaBgp4V2PeerLastErrorSubCodeReceived
+            Unsigned32,
+        aristaBgp4V2PeerLastErrorReceivedTime
+            TimeStamp,
+        aristaBgp4V2PeerLastErrorReceivedText
+            SnmpAdminString,
+        aristaBgp4V2PeerLastErrorReceivedData
+            OCTET STRING,
+        aristaBgp4V2PeerLastErrorCodeSent
+            Unsigned32,
+        aristaBgp4V2PeerLastErrorSubCodeSent
+            Unsigned32,
+
+        aristaBgp4V2PeerLastErrorSentTime
+            TimeStamp,
+        aristaBgp4V2PeerLastErrorSentText
+            SnmpAdminString,
+        aristaBgp4V2PeerLastErrorSentData
+            OCTET STRING
+    }
+
+    aristaBgp4V2PeerLastErrorCodeReceived OBJECT-TYPE
+        SYNTAX     Unsigned32 (0..255)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The last error code received from this peer via
+             NOTIFICATION message on this connection.  If no error has
+             occurred, this field is zero."
+        REFERENCE
+            "RFC 4271, Section 4.5.
+             RFC 4486 optionally supported.
+             RFC 3362, Section 5 optionally supported."
+        ::= { aristaBgp4V2PeerErrorsEntry 1 }
+
+    aristaBgp4V2PeerLastErrorSubCodeReceived OBJECT-TYPE
+        SYNTAX     Unsigned32 (0..255)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The last subcode received from this peer via NOTIFICATION
+             message on this connection.  If no error has occurred, this
+             field is zero."
+        REFERENCE
+            "RFC 4271, Section 4.5.
+             RFC 4486 optionally supported.
+             RFC 3362, Section 5 optionally supported."
+        ::= { aristaBgp4V2PeerErrorsEntry 2 }
+
+    aristaBgp4V2PeerLastErrorReceivedTime OBJECT-TYPE
+        SYNTAX     TimeStamp
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The timestamp that the last NOTIFICATION was received from
+             this peer."
+        REFERENCE
+            "RFC 4271, Section 4.5."
+        ::= { aristaBgp4V2PeerErrorsEntry 3 }
+
+    aristaBgp4V2PeerLastErrorReceivedText OBJECT-TYPE
+        SYNTAX     SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object contains an implementation specific
+             explanation of the error that was reported."
+        ::= { aristaBgp4V2PeerErrorsEntry 4 }
+
+    aristaBgp4V2PeerLastErrorReceivedData OBJECT-TYPE
+        SYNTAX     OCTET STRING (SIZE(0..4075))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The last error code's data seen by this peer.
+
+             Per RFC 2578, some implementations may have limitations
+             dealing with OCTET STRINGS larger than 255.  Thus, this
+             data may be truncated."
+        REFERENCE
+            "RFC 4271, Section 4.5,
+             RFC 2578, Section 7.1.2,
+             RFC 4486 optionally supported.
+             RFC 3362, Section 5 optionally supported."
+        ::= { aristaBgp4V2PeerErrorsEntry 5 }
+
+    aristaBgp4V2PeerLastErrorCodeSent OBJECT-TYPE
+        SYNTAX     Unsigned32 (0..255)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The last error code sent to this peer via NOTIFICATION
+             message on this connection.  If no error has occurred, this
+             field is zero."
+        REFERENCE
+            "RFC 4271, Section 4.5.
+             RFC 4486 optionally supported.
+             RFC 3362, Section 5 optionally supported."
+        ::= { aristaBgp4V2PeerErrorsEntry 6 }
+
+    aristaBgp4V2PeerLastErrorSubCodeSent OBJECT-TYPE
+        SYNTAX     Unsigned32 (0..255)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The last subcode sent to this peer via NOTIFICATION
+             message on this connection.  If no error has occurred, this
+             field is zero."
+        REFERENCE
+            "RFC 4271, Section 4.5.
+             RFC 4486 optionally supported.
+             RFC 3362, Section 5 optionally supported."
+        ::= { aristaBgp4V2PeerErrorsEntry 7 }
+
+    aristaBgp4V2PeerLastErrorSentTime OBJECT-TYPE
+        SYNTAX     TimeStamp
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The timestamp that the last NOTIFICATION was sent to
+             this peer."
+        REFERENCE
+            "RFC 4271, Section 4.5."
+        ::= { aristaBgp4V2PeerErrorsEntry 8 }
+
+    aristaBgp4V2PeerLastErrorSentText OBJECT-TYPE
+        SYNTAX     SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object contains an implementation specific
+             explanation of the error that is being reported."
+        ::= { aristaBgp4V2PeerErrorsEntry 9 }
+
+    aristaBgp4V2PeerLastErrorSentData OBJECT-TYPE
+        SYNTAX     OCTET STRING (SIZE(0..4075))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The last error code's data sent to this peer.
+
+             Per RFC 2578, some implementations may have limitations
+             dealing with OCTET STRINGS larger than 255.  Thus, this
+             data may be truncated."
+        REFERENCE
+            "RFC 4271, Section 4.5,
+             RFC 2578, Section 7.1.2
+             RFC 4486 optionally supported.
+             RFC 3362, Section 5 optionally supported."
+        ::= { aristaBgp4V2PeerErrorsEntry 10 }
+
+
+    --
+    -- Per-peer Event Times
+    --
+
+    aristaBgp4V2PeerEventTimesTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF AristaBgp4V2PeerEventTimesEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "A table reporting the per-peering session amount
+             of time elapsed and update events since the peering
+             session advanced into the established state."
+        ::= { aristaBgp4V2Objects 4 }
+
+    aristaBgp4V2PeerEventTimesEntry OBJECT-TYPE
+        SYNTAX     AristaBgp4V2PeerEventTimesEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Each row contains a set of statistics about time
+             spent and events encountered in the peer session
+             established state."
+        AUGMENTS {
+            aristaBgp4V2PeerEntry
+        }
+        ::= { aristaBgp4V2PeerEventTimesTable 1 }
+
+    AristaBgp4V2PeerEventTimesEntry ::= SEQUENCE {
+        aristaBgp4V2PeerFsmEstablishedTime
+            Gauge32,
+        aristaBgp4V2PeerInUpdatesElapsedTime
+            Gauge32
+    }
+
+    aristaBgp4V2PeerFsmEstablishedTime OBJECT-TYPE
+        SYNTAX     Gauge32
+        UNITS      "seconds"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This timer indicates how long (in seconds) this peer
+             has been in the established state or how long since this
+             peer was last in the established state.  It is set to
+             zero when a new peer is configured or when the router is
+             booted.  If the peer has never reached the established
+             state, the value remains zero."
+        REFERENCE
+            "RFC 4271, Section 8."
+        ::= { aristaBgp4V2PeerEventTimesEntry 1 }
+
+    aristaBgp4V2PeerInUpdatesElapsedTime OBJECT-TYPE
+        SYNTAX     Gauge32
+        UNITS      "seconds"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Elapsed time (in seconds) since the last BGP UPDATE
+             message was received from the peer.  Each time
+             bgpPeerInUpdates is incremented, the value of this
+             object is set to zero (0)."
+        REFERENCE
+            "RFC 4271, Section 4.3.
+             RFC 4271, Section 8.2.2, Established state."
+
+        ::= { aristaBgp4V2PeerEventTimesEntry 2 }
+
+    --
+    -- Per-Peer Configured Timers
+    --
+
+    aristaBgp4V2PeerConfiguredTimersTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF AristaBgp4V2PeerConfiguredTimersEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Per peer management data on BGP session timers."
+        ::= { aristaBgp4V2Objects 5 }
+
+    aristaBgp4V2PeerConfiguredTimersEntry OBJECT-TYPE
+        SYNTAX     AristaBgp4V2PeerConfiguredTimersEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Each entry corresponds to the current state of
+             BGP timers on a given peering session."
+        AUGMENTS {
+            aristaBgp4V2PeerEntry
+        }
+        ::= { aristaBgp4V2PeerConfiguredTimersTable 1 }
+
+    AristaBgp4V2PeerConfiguredTimersEntry ::= SEQUENCE {
+        aristaBgp4V2PeerConnectRetryInterval
+            Unsigned32,
+        aristaBgp4V2PeerHoldTimeConfigured
+            Unsigned32,
+        aristaBgp4V2PeerKeepAliveConfigured
+            Unsigned32,
+        aristaBgp4V2PeerMinASOrigInterval
+            Unsigned32,
+        aristaBgp4V2PeerMinRouteAdverInterval
+            Unsigned32
+
+    }
+
+    aristaBgp4V2PeerConnectRetryInterval OBJECT-TYPE
+        SYNTAX     Unsigned32 (1..65535)
+        UNITS      "seconds"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Time interval (in seconds) for the ConnectRetry timer.
+             The suggested value for this timer is 120 seconds."
+        REFERENCE
+            "RFC 4271, Section 8.2.2.  This is the value used
+             to initialize the 'ConnectRetryTimer'."
+        ::= { aristaBgp4V2PeerConfiguredTimersEntry 1 }
+
+    aristaBgp4V2PeerHoldTimeConfigured OBJECT-TYPE
+        SYNTAX     Unsigned32 ( 0 | 3..65535 )
+        UNITS      "seconds"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Time interval (in seconds) for the Hold Timer
+             established with the peer.  The value of this object is
+             calculated by this BGP speaker, using the smaller of the
+             values in bgpPeerHoldTimeConfigured and the Hold Time
+             received in the OPEN message.
+
+             This value must be at least three seconds if it is not
+             zero (0).
+
+             If the Hold Timer has not been established with the
+             peer this object MUST have a value of zero (0).
+
+             If the bgpPeerHoldTimeConfigured object has a value of
+             (0), then this object MUST have a value of (0)."
+        REFERENCE
+            "RFC 4271, Section 4.2."
+        ::= { aristaBgp4V2PeerConfiguredTimersEntry 2 }
+
+    aristaBgp4V2PeerKeepAliveConfigured OBJECT-TYPE
+        SYNTAX     Unsigned32 ( 0 | 1..21845 )
+        UNITS      "seconds"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Time interval (in seconds) for the KeepAlive timer
+             configured for this BGP speaker with this peer.  The
+             value of this object will only determine the KEEPALIVE
+             messages' frequency relative to the value specified in
+             bgpPeerHoldTimeConfigured; the actual time interval for
+             the KEEPALIVE messages is indicated by bgpPeerKeepAlive.
+
+             A reasonable maximum value for this timer would be one
+             third of that of bgpPeerHoldTimeConfigured.
+
+             If the value of this object is zero (0), no periodic
+             KEEPALIVE messages are sent to the peer after the BGP
+             connection has been established.  The suggested value
+             for this timer is 30 seconds."
+        REFERENCE
+            "RFC 4271, Section 4.4.
+             RFC 4271, Section 10."
+        ::= { aristaBgp4V2PeerConfiguredTimersEntry 3 }
+
+    aristaBgp4V2PeerMinASOrigInterval OBJECT-TYPE
+        SYNTAX     Unsigned32 (0..65535)
+        UNITS      "seconds"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Time interval (in seconds) for the
+             MinASOriginationInterval timer.
+
+             The suggested value for this timer is 15 seconds."
+        REFERENCE
+            "RFC 4271, Section 9.2.1.2.
+             RFC 4271, Section 10."
+        ::= { aristaBgp4V2PeerConfiguredTimersEntry 4 }
+
+    aristaBgp4V2PeerMinRouteAdverInterval OBJECT-TYPE
+        SYNTAX     Unsigned32 (0..65535)
+        UNITS      "seconds"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Time interval (in seconds) for the
+             MinRouteAdvertisementInterval timer.
+
+             The suggested value for this timer is 30 seconds for
+             EBGP connections and 5 seconds for IBGP connections."
+        REFERENCE
+            "RFC 4271, Section 9.2.1.1.
+             RFC 4271, Section 10."
+        ::= { aristaBgp4V2PeerConfiguredTimersEntry 5 }
+
+    --
+    -- Per-Peer Negotiated Timers
+    --
+
+    aristaBgp4V2PeerNegotiatedTimersTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF AristaBgp4V2PeerNegotiatedTimersEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Configured values of per-peer timers are seen
+             in the aristaBgp4V2PeerConfiguredTimersTable.
+
+             Values in this table reflect the current
+             operational values, after negotiation from values
+             derived from initial configuration."
+        ::= { aristaBgp4V2Objects 6 }
+
+    aristaBgp4V2PeerNegotiatedTimersEntry OBJECT-TYPE
+        SYNTAX     AristaBgp4V2PeerNegotiatedTimersEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Each entry reflects a value of the currently
+             operational, negotiated timer as reflected in the
+             AristaBgp4V2PeerNegotiatedTimersEntry."
+        AUGMENTS {
+            aristaBgp4V2PeerEntry
+        }
+        ::= { aristaBgp4V2PeerNegotiatedTimersTable 1 }
+
+    AristaBgp4V2PeerNegotiatedTimersEntry ::= SEQUENCE {
+        aristaBgp4V2PeerHoldTime
+            Unsigned32,
+        aristaBgp4V2PeerKeepAlive
+            Unsigned32
+    }
+
+    aristaBgp4V2PeerHoldTime OBJECT-TYPE
+        SYNTAX     Unsigned32 ( 0 | 3..65535 )
+        UNITS      "seconds"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The value of this object is calculated by this BGP
+             Speaker as being;
+
+             zero (0) - if this was the value sent by the peer and
+             this value is permitted by this BGP Speaker. In this
+             case, no keepalive messages are sent and the Hold Timer
+             is not set.
+
+             At least three (3). This value is the smaller of
+             the value sent by this peer in the OPEN message and
+             aristaBgp4V2PeerHoldTimeConfigured for this peer.
+
+             If the peer is not in the established state, the value
+             of this object is zero (0)."
+        REFERENCE
+            "RFC 4271, Section 4.2."
+        ::= { aristaBgp4V2PeerNegotiatedTimersEntry 1 }
+
+    aristaBgp4V2PeerKeepAlive OBJECT-TYPE
+        SYNTAX     Unsigned32 ( 0 | 1..21845 )
+        UNITS      "seconds"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Time interval in seconds for the KeepAlive timer
+             established with the peer. The value of this object
+             is calculated by this BGP speaker such that, when
+             compared with aristaBgp4V2PeerHoldTime, it has the same
+             proportion as what aristaBgp4V2PeerKeepAliveConfigured has
+             when compared with aristaBgp4V2PeerHoldTimeConfigured. If
+             the value of this object is zero (0), it indicates
+             that the KeepAlive timer has not been established
+             with the peer, or, the value of
+             aristaBgp4V2PeerKeepAliveConfigured is zero (0).
+
+             If the peer is not in the established state, the value
+             of this object is zero (0)."
+        REFERENCE
+            "RFC 4271, Section 4.4."
+        ::= { aristaBgp4V2PeerNegotiatedTimersEntry 2 }
+
+    --
+    -- Per-peer counters
+    --
+
+    aristaBgp4V2PeerCountersTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF AristaBgp4V2PeerCountersEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The counters associated with a BGP Peer."
+        ::= { aristaBgp4V2Objects 7 }
+
+    aristaBgp4V2PeerCountersEntry OBJECT-TYPE
+        SYNTAX     AristaBgp4V2PeerCountersEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Each entry contains counters of message transmissions
+             and FSM transitions for a given BGP Peering session."
+        AUGMENTS {
+            aristaBgp4V2PeerEntry
+        }
+        ::= { aristaBgp4V2PeerCountersTable 1 }
+
+    AristaBgp4V2PeerCountersEntry ::= SEQUENCE {
+        aristaBgp4V2PeerInUpdates
+            Counter32,
+        aristaBgp4V2PeerOutUpdates
+            Counter32,
+        aristaBgp4V2PeerInTotalMessages
+            Counter32,
+        aristaBgp4V2PeerOutTotalMessages
+            Counter32,
+        aristaBgp4V2PeerFsmEstablishedTransitions
+            Counter32
+    }
+
+    aristaBgp4V2PeerInUpdates OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The number of BGP UPDATE messages received on this
+             connection."
+        ::= { aristaBgp4V2PeerCountersEntry 1 }
+
+    aristaBgp4V2PeerOutUpdates OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The number of BGP UPDATE messages transmitted on this
+             connection."
+        ::= { aristaBgp4V2PeerCountersEntry 2 }
+
+    aristaBgp4V2PeerInTotalMessages OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The total number of messages received from the remote
+             peer on this connection."
+        ::= { aristaBgp4V2PeerCountersEntry 3 }
+
+    aristaBgp4V2PeerOutTotalMessages OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The total number of messages transmitted to the remote
+             peer on this connection."
+        ::= { aristaBgp4V2PeerCountersEntry 4 }
+
+    aristaBgp4V2PeerFsmEstablishedTransitions OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The total number of times the BGP FSM transitioned into
+             the established state for this peer."
+        ::= { aristaBgp4V2PeerCountersEntry 5 }
+
+    --
+    -- Per-Peer Prefix Gauges
+    --
+
+    aristaBgp4V2PrefixGaugesTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF AristaBgp4V2PrefixGaugesEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Additional per-peer, per AFI-SAFI counters for
+             prefixes"
+        ::= { aristaBgp4V2Objects 8 }
+
+    aristaBgp4V2PrefixGaugesEntry OBJECT-TYPE
+        SYNTAX     AristaBgp4V2PrefixGaugesEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Entry containing information about a bgp-peers prefix
+             counters."
+        INDEX {
+            aristaBgp4V2PeerInstance,
+            aristaBgp4V2PeerRemoteAddrType,
+            aristaBgp4V2PeerRemoteAddr,
+            aristaBgp4V2PrefixGaugesAfi,
+            aristaBgp4V2PrefixGaugesSafi
+        }
+        ::= { aristaBgp4V2PrefixGaugesTable 1 }
+
+    AristaBgp4V2PrefixGaugesEntry ::= SEQUENCE {
+        aristaBgp4V2PrefixGaugesAfi
+            AristaBgp4V2AddressFamilyIdentifierTC,
+        aristaBgp4V2PrefixGaugesSafi
+            AristaBgp4V2SubsequentAddressFamilyIdentifierTC,
+        aristaBgp4V2PrefixInPrefixes
+            Gauge32,
+        aristaBgp4V2PrefixInPrefixesAccepted
+            Gauge32,
+        aristaBgp4V2PrefixOutPrefixes
+            Gauge32
+    }
+
+    aristaBgp4V2PrefixGaugesAfi OBJECT-TYPE
+        SYNTAX     AristaBgp4V2AddressFamilyIdentifierTC
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The AFI index of the per-peer, per prefix counters"
+        ::= { aristaBgp4V2PrefixGaugesEntry 1 }
+
+    aristaBgp4V2PrefixGaugesSafi OBJECT-TYPE
+        SYNTAX     AristaBgp4V2SubsequentAddressFamilyIdentifierTC
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The SAFI index of the per-peer, per prefix counters"
+        ::= { aristaBgp4V2PrefixGaugesEntry 2 }
+
+    aristaBgp4V2PrefixInPrefixes OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The number of prefixes received from a peer and are
+             stored in the Adj-Ribs-In for that peer.
+
+             Note that this number does not reflect prefixes that
+             have been discarded due to policy."
+        REFERENCE
+            "RFC 4271, Sections 3.2 and 9."
+        ::= { aristaBgp4V2PrefixGaugesEntry 3 }
+
+    aristaBgp4V2PrefixInPrefixesAccepted OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The number of prefixes for a peer that are installed
+             in the Adj-Ribs-In and are eligible to become active
+             in the Loc-Rib."
+        REFERENCE
+            "RFC 4271, Sections 3.2 and 9."
+        ::= { aristaBgp4V2PrefixGaugesEntry 4 }
+
+    aristaBgp4V2PrefixOutPrefixes OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The number of prefixes for a peer that are installed
+             in that peer's Adj-Ribs-Out."
+        REFERENCE
+            "RFC 4271, Sections 3.2 and 9."
+        ::= { aristaBgp4V2PrefixGaugesEntry 5 }
+
+    --
+    -- BGP NLRI
+    --
+
+    aristaBgp4V2NlriTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF AristaBgp4V2NlriEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The BGP-4 Received Path Attribute Table contains
+             information about paths to destination networks
+             received from all BGP4 peers. Collectively, this
+             represents the Adj-Ribs-In. The route where
+             aristaBgp4V2NlriBest is true represents, for this NLRI,
+             the route that is installed in the LocRib from the
+             Adj-Ribs-In."
+        REFERENCE
+            "RFC 4271, Sections 3.2 and 9."
+        ::= { aristaBgp4V2Objects 9 }
+
+    aristaBgp4V2NlriEntry OBJECT-TYPE
+        SYNTAX     AristaBgp4V2NlriEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Information about a path to a network."
+        INDEX {
+            aristaBgp4V2PeerInstance,
+            aristaBgp4V2NlriAfi,
+            aristaBgp4V2NlriSafi,
+            aristaBgp4V2NlriPrefixType,
+            aristaBgp4V2NlriPrefix,
+            aristaBgp4V2NlriPrefixLen,
+            aristaBgp4V2PeerRemoteAddrType,
+            aristaBgp4V2PeerRemoteAddr,
+            aristaBgp4V2NlriIndex
+        }
+        ::= { aristaBgp4V2NlriTable 1 }
+
+    AristaBgp4V2NlriEntry ::= SEQUENCE {
+        aristaBgp4V2NlriIndex
+            Unsigned32,
+        aristaBgp4V2NlriAfi
+            AristaBgp4V2AddressFamilyIdentifierTC,
+        aristaBgp4V2NlriSafi
+            AristaBgp4V2SubsequentAddressFamilyIdentifierTC,
+        aristaBgp4V2NlriPrefixType
+             InetAddressType,
+        aristaBgp4V2NlriPrefix
+            InetAddress,
+        aristaBgp4V2NlriPrefixLen
+            InetAddressPrefixLength,
+        aristaBgp4V2NlriBest
+            TruthValue,
+        aristaBgp4V2NlriCalcLocalPref
+            Unsigned32,
+        aristaBgp4V2NlriOrigin
+            INTEGER,
+        aristaBgp4V2NlriNextHopAddrType
+            InetAddressType,
+        aristaBgp4V2NlriNextHopAddr
+            InetAddress,
+        aristaBgp4V2NlriLinkLocalNextHopAddrType
+            InetAddressType,
+        aristaBgp4V2NlriLinkLocalNextHopAddr
+            InetAddress,
+        aristaBgp4V2NlriLocalPrefPresent
+            TruthValue,
+        aristaBgp4V2NlriLocalPref
+            Unsigned32,
+        aristaBgp4V2NlriMedPresent
+            TruthValue,
+        aristaBgp4V2NlriMed
+            Unsigned32,
+        aristaBgp4V2NlriAtomicAggregate
+            TruthValue,
+
+        aristaBgp4V2NlriAggregatorPresent
+            TruthValue,
+        aristaBgp4V2NlriAggregatorAS
+            InetAutonomousSystemNumber,
+        aristaBgp4V2NlriAggregatorAddr
+            AristaBgp4V2IdentifierTC,
+        aristaBgp4V2NlriAsPathCalcLength
+            Unsigned32,
+        aristaBgp4V2NlriAsPathString
+            SnmpAdminString,
+        aristaBgp4V2NlriAsPath
+            OCTET STRING,
+        aristaBgp4V2NlriPathAttrUnknown
+            OCTET STRING
+    }
+
+    aristaBgp4V2NlriIndex OBJECT-TYPE
+        SYNTAX     Unsigned32 (1..4294967295)
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "This index allows for multiple instances of a base
+             prefix for a certain AFI-SAFI from a given peer.
+             This is currently useful for two things:
+             1. Allowing for a peer in future implementations to
+                send more than a single route instance.
+             2. Allow for extensions which extend the NLRI field
+                to send the same prefix while utilizing other
+                extension specific information. An example of
+                this is RFC 3107 - Carrying MPLS labels in BGP."
+        REFERENCE
+            "RFC 3107 - Carrying Label Information in BGP-4."
+        ::= { aristaBgp4V2NlriEntry 1 }
+
+    aristaBgp4V2NlriAfi OBJECT-TYPE
+        SYNTAX     AristaBgp4V2AddressFamilyIdentifierTC
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The address family of the prefix for this NLRI.
+
+             Note that the AFI is not necessarily equivalent to
+             the an InetAddressType."
+        REFERENCE
+            "RFC 4760 - Multiprotocol Extensions for BGP-4"
+        ::= { aristaBgp4V2NlriEntry 2 }
+
+    aristaBgp4V2NlriSafi OBJECT-TYPE
+        SYNTAX     AristaBgp4V2SubsequentAddressFamilyIdentifierTC
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The subsequent address family of the prefix for
+             this NLRI"
+        REFERENCE
+            "RFC 4760 - Multiprotocol Extensions for BGP-4"
+        ::= { aristaBgp4V2NlriEntry 3 }
+
+    aristaBgp4V2NlriPrefixType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The type of the IP address prefix in the
+             Network Layer Reachability Information field.
+             The value of this object is derived from the
+             appropriate value from the aristaBgp4V2NlriAfi field.
+             Where an appropriate InetAddressType is not
+             available, the value of the object must be
+             unknown(0)."
+        ::= { aristaBgp4V2NlriEntry 4 }
+
+    aristaBgp4V2NlriPrefix OBJECT-TYPE
+        SYNTAX     InetAddress
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "An IP address prefix in the Network Layer
+             Reachability Information field. This object
+             is an IP address containing the prefix with
+             length specified by aristaBgp4V2NlriPrefixLen.
+             Any bits beyond the length specified by
+             aristaBgp4V2NlriPrefixLen are zeroed.
+
+             An implementation is required to support IPv4
+             prefixes.  In this case, the object length
+             is (0..4).
+
+             An implementation MAY support IPv6 prefixes.
+             In this case, the object length is (0..16)"
+        REFERENCE
+            "RFC 4271, Section 4.3."
+        ::= { aristaBgp4V2NlriEntry 5 }
+
+    aristaBgp4V2NlriPrefixLen OBJECT-TYPE
+        SYNTAX     InetAddressPrefixLength
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Length in bits of the address prefix in
+             the Network Layer Reachability Information field."
+        ::= { aristaBgp4V2NlriEntry 6 }
+
+    aristaBgp4V2NlriBest OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "An indication of whether or not this route
+             was chosen as the best BGP4 route for this
+             destination."
+        REFERENCE
+            "RFC 4271, Section 9.1.2."
+        ::= { aristaBgp4V2NlriEntry 7 }
+
+    aristaBgp4V2NlriCalcLocalPref OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The degree of preference calculated by the
+             receiving BGP4 speaker for an advertised
+             route.
+
+             In the case where this prefix is ineligible, the
+             value of this object will be zero (0)."
+        REFERENCE
+            "RFC 4271, Section 9.1.1"
+        ::= { aristaBgp4V2NlriEntry 8 }
+
+    aristaBgp4V2NlriOrigin OBJECT-TYPE
+        SYNTAX     INTEGER {
+            igp(1),-- networks are interior
+            egp(2),-- networks learned via the EGP protocol
+            incomplete(3) -- networks that
+                          -- are learned by some other
+                          -- means
+            }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The ultimate origin of the path information."
+        REFERENCE
+            "RFC 4271, Section 4.3.
+             RFC 4271, Section 5.1.1."
+        ::= { aristaBgp4V2NlriEntry 9 }
+
+    aristaBgp4V2NlriNextHopAddrType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The address family of the address for
+             the border router that should be used
+             to access the destination network."
+        ::= { aristaBgp4V2NlriEntry 10 }
+
+    aristaBgp4V2NlriNextHopAddr OBJECT-TYPE
+        SYNTAX     InetAddress (SIZE(4..20))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The address of the border router that
+             should be used to access the destination
+             network. This address is the nexthop
+             address received in the UPDATE packet associated with
+             this prefix.
+
+             Note that for RFC2545 style double nexthops,
+             this object will always contain the global scope
+             nexthop. bgpPathAttrLinkLocalNextHop will contain
+             the linklocal scope nexthop, if it is present.
+
+             In the case a mechanism is developed to use only a link
+             local nexthop, aristaBgp4V2NlriNextHopAddr will contain the
+             link local nexthop."
+        REFERENCE
+            "RFC 4271, Section 4.3,
+             RFC 4271, Section 5.1.3,
+             RFC 2545, Section 3."
+        ::= { aristaBgp4V2NlriEntry 11 }
+
+    aristaBgp4V2NlriLinkLocalNextHopAddrType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The address type for IPv6 link local addresses.
+             This is present only when receiving RFC 2545
+             style double nexthops.
+
+             This object is optionally present in BGP
+             implementations that do not support IPv6.
+
+             When no IPv6 link local nexthop is present, the value of
+             this object should be unknown(0)."
+        REFERENCE
+            "RFC 2545, Section 3."
+        ::= { aristaBgp4V2NlriEntry 12 }
+
+    aristaBgp4V2NlriLinkLocalNextHopAddr OBJECT-TYPE
+        SYNTAX     InetAddress
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This value contains an IPv6 link local address
+             and is present only when receiving RFC 2545 style
+             double nexthops.
+
+             This object is optionally present in BGP
+             implementations that do not support IPv6.
+
+             When no IPv6 link local nexthop is present, the length of
+             this object should be zero."
+        REFERENCE
+            "RFC 2545, Section 3."
+        ::= { aristaBgp4V2NlriEntry 13 }
+
+    aristaBgp4V2NlriLocalPrefPresent OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This value is true when the LOCAL_PREF value was sent in
+             the UPDATE message."
+        ::= { aristaBgp4V2NlriEntry 14 }
+
+    aristaBgp4V2NlriLocalPref OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The originating BGP4 speakers degree of preference for an
+             advertised route."
+        REFERENCE
+            "RFC 4271, Section 4.3.
+             RFC 4271, Section 5.1.5."
+        ::= { aristaBgp4V2NlriEntry 15 }
+
+    aristaBgp4V2NlriMedPresent OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This value is true when the MED value was sent in
+             the UPDATE message."
+        ::= { aristaBgp4V2NlriEntry 16 }
+
+    aristaBgp4V2NlriMed OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This metric is used to discriminate between multiple
+             exit points to an adjacent autonomous system.  When the MED
+             value is absent but has a calculated default value, this
+             object will contain the calculated value."
+        REFERENCE
+            "RFC 4271, Section 4.3.
+             RFC 4271, Section 5.1.4."
+        ::= { aristaBgp4V2NlriEntry 17 }
+
+    aristaBgp4V2NlriAtomicAggregate OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This value is true when the ATOMIC_AGGREGATE Path Attribute
+             is present and indicates that the NLRI MUST NOT be made
+             more specific."
+        REFERENCE
+            "RFC 4271, Sections 5.1.6 and 9.1.4."
+        ::= { aristaBgp4V2NlriEntry 18 }
+
+    aristaBgp4V2NlriAggregatorPresent OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This value is true when the AGGREGATOR path attribute
+             was sent in the UPDATE message."
+        ::= { aristaBgp4V2NlriEntry 19 }
+
+    aristaBgp4V2NlriAggregatorAS OBJECT-TYPE
+        SYNTAX     InetAutonomousSystemNumber
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The AS number of the last BGP4 speaker that performed route
+             aggregation. When aristaBgp4V2NlriAggregatorPresent is
+             false, the value of this object should be zero (0)."
+        REFERENCE
+            "RFC 4271, Section 5.1.7.
+             RFC 4271, Section 9.2.2.2."
+        ::= { aristaBgp4V2NlriEntry 20 }
+
+    aristaBgp4V2NlriAggregatorAddr OBJECT-TYPE
+        SYNTAX     AristaBgp4V2IdentifierTC
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The IP address of the last BGP4 speaker that performed
+             route aggregation.  When aristaBgp4V2NlriAggregatorPresent is
+             false, the value of this object should be 0.0.0.0"
+        REFERENCE
+            "RFC 4271, Section 5.1.7.
+             RFC 4271, Section 9.2.2.2."
+        ::= { aristaBgp4V2NlriEntry 21 }
+
+    aristaBgp4V2NlriAsPathCalcLength OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This value represents the calculated length of the
+             AS Path according to the rules of the BGP
+             specification.  This value is used in route selection."
+        REFERENCE
+            "RFC 4271, Section 9.1.2.2.a"
+        ::= { aristaBgp4V2NlriEntry 22 }
+
+    aristaBgp4V2NlriAsPathString OBJECT-TYPE
+        SYNTAX     SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This is a string depicting the autonomous system
+             path to this network which was received from the
+             peer which advertised it. The format of the string
+             is implementation-dependent, and should be designed
+             for operator readability.
+
+             Note that SnmpAdminString is only capable of representing a
+             maximum of 255 characters.  This may lead to the string
+             being truncated in the presence of a large AS Path.  It is
+             RECOMMENDED that when this object's contents will be
+             truncated that the final 3 octets be reserved for the
+             ellipses string, '...'.  aristaBgp4V2NlriAsPath may give access
+             to the full AS Path."
+         ::= { aristaBgp4V2NlriEntry 23 }
+
+    -- Maximum size of the following is derived as
+    -- 4096 max message size
+    -- - 16 BGP message marker bytes
+    -- - 2 BGP message size
+    -- - 1 BGP message type (UPDATE with unknown attr)
+    -- - 2 UPDATE routes length (even assuming no routes)
+    -- - 2 UPDATE path attributes length
+    -- - 1 path attribute flag octet
+    -- ---------
+    -- 4072 bytes maximum per-message attribute value data
+
+    aristaBgp4V2NlriAsPath OBJECT-TYPE
+        SYNTAX     OCTET STRING (SIZE(2..4072))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "In order to provide a canonicalized form of the BGP-4
+             AS_PATH along with the human-readable
+             aristaBgp4V2NlriAsPathString, which may be truncated, this object
+             contains the contents of the BGP-4 AS_PATH Path Attribute.
+             This object may be parsed using the rules defined for
+             Four-octet ASes as defined in RFC 4893.  RFC 4271, Section
+             4.3, 'Path Attributes: b) AS_PATH' as amended by RFC 5065,
+             Section 3 defines the general format of the AS_PATH path
+             attribute and its code points.
+
+             In brief, the AS_PATH is composed of a sequence of AS
+             Segments.  Each AS Segment is represented by a triple:
+             <path segment type, path segment length,
+             path segment value>.
+
+             The path segment type and path segment length fields are
+             one octet in length each.
+
+             The path segment type field may be one of:
+               1 - AS_SET (RFC 4721, Section 4.3)
+               2 - AS_SEQUENCE (RFC 4721, Section 4.3)
+               3 - AS_CONFED_SEQUENCE (RFC 3065, Section 5)
+               4 - AS_CONFED_SET (RFC 3065, Section 5)
+
+             The path segment length field contains the number of ASes
+             (not the number of octets) in the path segment value field.
+             The path segment value field contains one or more AS
+             numbers, each encoded as a 4-octet length field in network
+             byte order.
+
+             Note that since an SNMP agent may truncate this object to
+             less than its maximum theoretical length of 4072 octets
+             users of this object should be prepared to deal with a
+             truncated and thus malformed AS_PATH.  It is RECOMMENDED
+             that when such truncation would occur on the boundary of an
+             encoded AS that the partial AS be discarded from this
+             object and the object's size be adjusted accordingly.
+             Further, it is also RECOMMENDED that when such truncation,
+             either alone or in conjuction with the truncation of a
+             partially encoded AS described previously, would yield an
+             empty path segment value field that the path segment type
+             and path segment length components of the truncated AS_PATH
+             also be discarded and the object's size be adjusted
+             accordingly."
+         REFERENCE
+             "RFC 4271, Section 4.3.
+              RFC 5065, Section 5.
+              RFC 4893."
+         ::= { aristaBgp4V2NlriEntry 24 }
+
+    aristaBgp4V2NlriPathAttrUnknown OBJECT-TYPE
+        SYNTAX     OCTET STRING (SIZE(0..4072))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Path Attributes not understood by this implementation
+             SHOULD be be presented in this object.  Those Path
+             Attributes use the type, length, value encoding documented
+             in RFC 4271, Section 4.3, 'Path Attributes'.
+
+             Note that since an SNMP agent may truncate this object to
+             less than its maximum theoretical length of 4072 octets
+             users of this object should be prepared to deal with a
+             truncated and thus malformed Path Attribute."
+         REFERENCE
+             "RFC 4271, Section 4.3."
+         ::= { aristaBgp4V2NlriEntry 25 }
+
+
+
+    --
+    -- Adj-Ribs-Out Table
+    --
+    aristaBgp4V2AdjRibsOutTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF AristaBgp4V2AdjRibsOutEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "This table contains on a per-peer basis one or more
+             routes from the aristaBgp4V2NlriTable that have been
+             placed in this peer's Adj-Ribs-Out."
+        REFERENCE
+            "RFC 4271, Section 3.2."
+        ::= { aristaBgp4V2Objects 10 }
+
+    aristaBgp4V2AdjRibsOutEntry OBJECT-TYPE
+        SYNTAX     AristaBgp4V2AdjRibsOutEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "List of BGP routes that have been placed into a
+             peer's Adj-Ribs-Out."
+        INDEX {
+            aristaBgp4V2PeerInstance,
+            aristaBgp4V2NlriAfi,
+            aristaBgp4V2NlriSafi,
+            aristaBgp4V2NlriPrefixType,
+            aristaBgp4V2NlriPrefix,
+            aristaBgp4V2NlriPrefixLen,
+            aristaBgp4V2PeerRemoteAddrType,
+            aristaBgp4V2PeerRemoteAddr,
+            aristaBgp4V2AdjRibsOutIndex
+        }
+        ::= { aristaBgp4V2AdjRibsOutTable 1 }
+
+    AristaBgp4V2AdjRibsOutEntry ::= SEQUENCE {
+        aristaBgp4V2AdjRibsOutIndex
+            Unsigned32,
+        aristaBgp4V2AdjRibsOutRoute
+            RowPointer
+    }
+
+    aristaBgp4V2AdjRibsOutIndex OBJECT-TYPE
+        SYNTAX     Unsigned32 (1..4294967295)
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Certain extensions to BGP permit multiple instance of
+             a per afi, per safi prefix to be advertised to a peer.
+             This object allows the enumeration of them."
+        ::= { aristaBgp4V2AdjRibsOutEntry 1 }
+
+    aristaBgp4V2AdjRibsOutRoute OBJECT-TYPE
+        SYNTAX     RowPointer
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object points to the route in the aristaBgp4V2NlriTable
+             that corresponds to the entry in the peer's
+             Adj-Rib-Out. Outgoing route maps are not
+             reflected at this point as those are part of the
+             Update-Send process."
+        REFERENCE
+            "RFC 4271, Section 9.2."
+        ::= { aristaBgp4V2AdjRibsOutEntry 2 }
+
+    --
+    -- Notifications
+    --
+
+    aristaBgp4V2EstablishedNotification NOTIFICATION-TYPE
+        OBJECTS {
+            aristaBgp4V2PeerState,
+            aristaBgp4V2PeerLocalPort,
+            aristaBgp4V2PeerRemotePort
+        }
+        STATUS current
+        DESCRIPTION
+            "The BGP Established event is generated when
+             the BGP FSM enters the established state."
+        ::= { aristaBgp4V2Notifications 1 }
+
+    aristaBgp4V2BackwardTransitionNotification NOTIFICATION-TYPE
+        OBJECTS {
+            aristaBgp4V2PeerState,
+            aristaBgp4V2PeerLocalPort,
+            aristaBgp4V2PeerRemotePort,
+            aristaBgp4V2PeerLastErrorCodeReceived,
+            aristaBgp4V2PeerLastErrorSubCodeReceived,
+            aristaBgp4V2PeerLastErrorReceivedText
+        }
+        STATUS current
+        DESCRIPTION
+            "The BGPBackwardTransition Event is generated
+             when the BGP FSM moves from a higher numbered
+             state to a lower numbered state.
+
+             Due to the nature of the BGP state machine, an
+             implementation MAY rate limit the generation of this event.
+             An implementation MAY also generate this notification ONLY
+             when the state machine moves out of the established state.
+             An implementation should document its specific behavior."
+        ::= { aristaBgp4V2Notifications 2 }
+
+    --
+    -- Conformance Information
+    --
+
+    aristaBgp4V2Compliances OBJECT IDENTIFIER ::=
+        { aristaBgp4V2Conformance 1 }
+
+    aristaBgp4V2Groups OBJECT IDENTIFIER ::=
+        { aristaBgp4V2Conformance 2 }
+
+    aristaBgp4V2Compliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for entities which
+            implement the BGP4 mib."
+        MODULE -- this module
+        MANDATORY-GROUPS {
+            aristaBgp4V2StdMIBTimersGroup,
+            aristaBgp4V2StdMIBCountersGroup,
+            aristaBgp4V2StdMIBErrorsGroup,
+            aristaBgp4V2StdMIBPeerGroup,
+            aristaBgp4V2StdMIBNlriGroup,
+            aristaBgp4V2GlobalsGroup
+            }
+        GROUP aristaBgp4V2StdMIBNotificationGroup
+        DESCRIPTION
+            "Implementation of BGP Notifications are completely
+             optional in this MIB."
+
+        OBJECT aristaBgp4V2NlriLinkLocalNextHopAddrType
+        SYNTAX InetAddressType
+        DESCRIPTION
+            "This object is only present when RFC 2545 extensions for
+             IPv6 are supported by the implementation.  When present,
+             this object shall only have a value of ipv6z or none."
+
+        OBJECT aristaBgp4V2NlriLinkLocalNextHopAddr
+        SYNTAX InetAddress (SIZE(0|20))
+        DESCRIPTION
+            "This object is only present when RFC 2545 extensions for
+             IPv6 are supported by the implementation.  When present,
+             this object shall only have a size of 20 or 0 when no
+             RFC 2545 double-nexthop is present."
+        ::= { aristaBgp4V2Compliances 4 }
+
+    aristaBgp4V2GlobalsGroup OBJECT-GROUP
+        OBJECTS { aristaBgp4V2DiscontinuityTime }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects providing information on global
+             BGP state."
+        ::= { aristaBgp4V2Groups 1 }
+
+    aristaBgp4V2StdMIBTimersGroup OBJECT-GROUP
+        OBJECTS {
+            aristaBgp4V2PeerFsmEstablishedTime,
+            aristaBgp4V2PeerInUpdatesElapsedTime,
+            aristaBgp4V2PeerConnectRetryInterval,
+            aristaBgp4V2PeerHoldTimeConfigured,
+            aristaBgp4V2PeerKeepAliveConfigured,
+            aristaBgp4V2PeerMinASOrigInterval,
+            aristaBgp4V2PeerMinRouteAdverInterval,
+            aristaBgp4V2PeerHoldTime,
+            aristaBgp4V2PeerKeepAlive
+        }
+        STATUS current
+        DESCRIPTION
+            "Objects associated with BGP peering timers."
+        ::= { aristaBgp4V2Groups 2 }
+
+    aristaBgp4V2StdMIBCountersGroup OBJECT-GROUP
+        OBJECTS {
+            aristaBgp4V2PeerInUpdates,
+            aristaBgp4V2PeerOutUpdates,
+            aristaBgp4V2PeerInTotalMessages,
+            aristaBgp4V2PeerOutTotalMessages,
+            aristaBgp4V2PeerFsmEstablishedTransitions,
+            aristaBgp4V2PrefixInPrefixes,
+            aristaBgp4V2PrefixInPrefixesAccepted,
+            aristaBgp4V2PrefixOutPrefixes
+        }
+        STATUS current
+        DESCRIPTION
+            "Objects to count discrete events and exchanges on BGP
+             sessions."
+         ::= { aristaBgp4V2Groups 3 }
+
+    aristaBgp4V2StdMIBErrorsGroup OBJECT-GROUP
+        OBJECTS {
+            aristaBgp4V2PeerLastErrorCodeReceived,
+            aristaBgp4V2PeerLastErrorSubCodeReceived,
+            aristaBgp4V2PeerLastErrorReceivedData,
+            aristaBgp4V2PeerLastErrorReceivedTime,
+            aristaBgp4V2PeerLastErrorReceivedText,
+            aristaBgp4V2PeerLastErrorCodeSent,
+            aristaBgp4V2PeerLastErrorSubCodeSent,
+            aristaBgp4V2PeerLastErrorSentData,
+            aristaBgp4V2PeerLastErrorSentTime,
+            aristaBgp4V2PeerLastErrorSentText
+        }
+        STATUS current
+        DESCRIPTION
+            "Errors received on BGP peering sessions."
+        ::= { aristaBgp4V2Groups 5 }
+
+    aristaBgp4V2StdMIBPeerGroup OBJECT-GROUP
+        OBJECTS {
+            aristaBgp4V2PeerState,
+            aristaBgp4V2PeerAdminStatus,
+            aristaBgp4V2PeerLocalAddrType,
+            aristaBgp4V2PeerLocalAddr,
+            aristaBgp4V2PeerLocalPort,
+            aristaBgp4V2PeerLocalAs,
+            aristaBgp4V2PeerRemotePort,
+            aristaBgp4V2PeerRemoteAs,
+            aristaBgp4V2PeerLocalIdentifier,
+            aristaBgp4V2PeerRemoteIdentifier,
+            aristaBgp4V2PeerDescription
+        }
+        STATUS current
+        DESCRIPTION
+            "Core object types on BGP peering sessions."
+        ::= { aristaBgp4V2Groups 6 }
+
+    aristaBgp4V2StdMIBNlriGroup OBJECT-GROUP
+        OBJECTS {
+            aristaBgp4V2NlriAsPathCalcLength,
+            aristaBgp4V2NlriAsPathString,
+            aristaBgp4V2NlriBest,
+            aristaBgp4V2NlriCalcLocalPref,
+            aristaBgp4V2AdjRibsOutRoute,
+            aristaBgp4V2NlriAggregatorPresent,
+            aristaBgp4V2NlriAggregatorAS,
+            aristaBgp4V2NlriAggregatorAddr,
+            aristaBgp4V2NlriAtomicAggregate,
+            aristaBgp4V2NlriLocalPref,
+            aristaBgp4V2NlriLocalPrefPresent,
+            aristaBgp4V2NlriMed,
+            aristaBgp4V2NlriMedPresent,
+            aristaBgp4V2NlriNextHopAddr,
+            aristaBgp4V2NlriNextHopAddrType,
+            aristaBgp4V2NlriLinkLocalNextHopAddrType,
+            aristaBgp4V2NlriLinkLocalNextHopAddr,
+            aristaBgp4V2NlriOrigin,
+            aristaBgp4V2NlriAsPath,
+            aristaBgp4V2NlriPathAttrUnknown
+        }
+        STATUS current
+        DESCRIPTION
+            "Attributes received on BGP peering sessions."
+        ::= { aristaBgp4V2Groups 7 }
+
+    aristaBgp4V2StdMIBNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            aristaBgp4V2EstablishedNotification,
+            aristaBgp4V2BackwardTransitionNotification
+        }
+        STATUS current
+        DESCRIPTION
+            "Notifications in this modules are completely optional."
+        ::= { aristaBgp4V2Groups 8 }
+
+END

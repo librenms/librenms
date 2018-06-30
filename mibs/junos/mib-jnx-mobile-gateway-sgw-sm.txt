@@ -1,0 +1,815 @@
+-- ******************************************************************
+-- Juniper Mobile Gateway SGW Subscriber Manager objects MIB.
+--
+-- Copyright (c) 2011-2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- ******************************************************************
+
+JUNIPER-MOBILE-GATEWAY-SGW-SM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+     Counter64,  Unsigned32, Gauge32
+        FROM SNMPv2-SMI
+
+    CounterBasedGauge64
+        FROM HCNUM-TC    
+ 
+   TEXTUAL-CONVENTION, DisplayString
+        FROM SNMPv2-TC
+
+    jnxMbgGwIndex, jnxMbgGwName
+        FROM JUNIPER-MOBILE-GATEWAYS
+
+    jnxMobileGatewaySgw
+        FROM JUNIPER-MBG-SMI;
+
+--
+-- Defines MIB for Serving Gateway
+--
+
+jnxMbgSgwSMMib MODULE-IDENTITY
+    LAST-UPDATED "201110031200Z" -- Oct 03, 2011, 12:00:00 UT
+     ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Juniper Technical Assistance Center
+        Juniper Networks, Inc.
+        1194 N. Mathilda Avenue
+        Sunnyvale, CA 94089
+        E-mail: support@juniper.net"
+    DESCRIPTION
+        "This module defines objects pertaining to Serving Gateway 
+        Subscriber Management for Mobile Edge."
+    REVISION "201110031200Z" -- Oct 03, 2011, 12:00:00 UTC
+    DESCRIPTION "Initial version"
+
+    REVISION "201203221200Z" -- Mar 22, 2012, 12:00:00
+    DESCRIPTION
+        "Updated jnxMbgSgwSMStatsTable. Deprecated unsupported objects.
+         Added objects to jnxMbgSgwSMStatsTable"
+
+    REVISION "201210121200Z" -- Oct 12, 2012, 12:00:00
+    DESCRIPTION
+        "Added new trap jnxMbgSgwGatewayMMStateChange .
+         Added table jnxMbgSgwSMClRateStatsTable "
+
+    ::= { jnxMobileGatewaySgw 4 }
+
+jnxMbgSgwSMNotifications    OBJECT IDENTIFIER ::=
+                                    { jnxMbgSgwSMMib 0 }
+jnxMbgSgwSMObjects          OBJECT IDENTIFIER ::=
+                                    { jnxMbgSgwSMMib 1 }
+
+--
+-- Stats Table for SGW 
+--
+
+jnxMbgSgwSMStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgSgwSMStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table lists gateway level statistics for Serving Gateway.
+        Key is Gateway Id."
+    ::= { jnxMbgSgwSMObjects 1 }
+
+JnxMbgSgwSMStatsEntry ::= SEQUENCE {
+    jnxMbgSgwSessnEstAttmpts        Counter64,
+    jnxMbgSgwSuccSessnEst           Counter64,
+    jnxMbgSgwPeerInitDeactv         Counter64,    
+    jnxMbgSgwPeerInitSuccDeactv     Counter64,
+    jnxMbgSgwGwInitDeactv           Counter64,
+    jnxMbgSgwGwInitSuccDeactv       Counter64,
+    jnxMbgSgwGtpStatsGnS5S8InpPkt   Counter64,
+    jnxMbgSgwGtpStatsGnS5S8InpByt   Counter64,
+    jnxMbgSgwGtpStatsGnS5S8OutPkt   Counter64,
+    jnxMbgSgwGtpStatsGnS5S8OutByt   Counter64,
+    jnxMbgSgwGtpStatsS1uInpPkt      Counter64,
+    jnxMbgSgwGtpStatsS1uInpByt      Counter64,
+    jnxMbgSgwGtpStatsS1uOutPkt      Counter64,
+    jnxMbgSgwGtpStatsS1uOutByt      Counter64,
+    jnxMbgSgwDedBrCrtAttmpts        Counter64,
+    jnxMbgSgwSuccDedBrCrt           Counter64,
+    jnxMbgSgwSessnDeActvAttmpts     Counter64,
+    jnxMbgSgwSuccSessnDeActv        Counter64,
+    jnxMbgSgwDedBrDeActvAttmpts     Counter64,
+    jnxMbgSgwSuccDedBrDeActv        Counter64,
+    jnxMbgSgwIntrRatHoAttmpts       Counter64,
+    jnxMbgSgwSuccIntrRatHo          Counter64,
+    jnxMbgSgwX2HoAttmpts            Counter64,
+    jnxMbgSgwSuccX2Ho               Counter64,
+    jnxMbgSgwS1HoAttmpts            Counter64,
+    jnxMbgSgwSuccS1Ho               Counter64,
+    jnxMbgSgwIdlMdTauRauAttmpts     Counter64,
+    jnxMbgSgwSuccIdlMdTauRau        Counter64,
+    jnxMbgSgwServReqAttmempts       Counter64,
+    jnxMbgSgwSuccServReq            Counter64
+}    
+
+jnxMbgSgwSMStatsEntry OBJECT-TYPE
+    SYNTAX      JnxMbgSgwSMStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing Serving Gateway Statistics."
+    INDEX       { jnxMbgGwIndex }
+    ::= { jnxMbgSgwSMStatsTable 1 }
+
+jnxMbgSgwSessnEstAttmpts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Session establishment attempts."
+    ::= { jnxMbgSgwSMStatsEntry 1 }
+
+jnxMbgSgwSuccSessnEst OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Sessions established successfully."
+    ::= { jnxMbgSgwSMStatsEntry 2 }
+    
+jnxMbgSgwPeerInitDeactv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Total MS/peer initiated session deactivation attempts.
+        Deprecated : Reported as zero"
+    ::= { jnxMbgSgwSMStatsEntry 3 }    
+    
+jnxMbgSgwPeerInitSuccDeactv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated 
+    DESCRIPTION
+        "Total MS/peer initiated successful session deactivations.
+        Deprecated : Reported as zero"
+    ::= { jnxMbgSgwSMStatsEntry 4 }    
+
+jnxMbgSgwGwInitDeactv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated 
+    DESCRIPTION
+        "Total Gateway initiated session deactivation attempts.
+        Deprecated : Reported as zero"
+    ::= { jnxMbgSgwSMStatsEntry 5 }    
+
+jnxMbgSgwGwInitSuccDeactv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated 
+    DESCRIPTION
+        "Total Gateway initiated successful session deactivations.
+        Deprecated : Reported as zero"
+    ::= { jnxMbgSgwSMStatsEntry 6 }    
+
+jnxMbgSgwGtpStatsGnS5S8InpPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics (Gn/S5/S8) Input packets."
+    ::= { jnxMbgSgwSMStatsEntry 7 }    
+
+jnxMbgSgwGtpStatsGnS5S8InpByt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics (Gn/S5/S8) Input bytes."
+    ::= {  jnxMbgSgwSMStatsEntry 8  } 
+
+jnxMbgSgwGtpStatsGnS5S8OutPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics (Gn/S5/S8) Output packets."
+    ::= { jnxMbgSgwSMStatsEntry 9 }    
+
+jnxMbgSgwGtpStatsGnS5S8OutByt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics (Gn/S5/S8) Output bytes."
+    ::= {  jnxMbgSgwSMStatsEntry 10 }     
+    
+jnxMbgSgwGtpStatsS1uInpPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics S1-U Input packets."
+    ::= { jnxMbgSgwSMStatsEntry 11 }    
+
+jnxMbgSgwGtpStatsS1uInpByt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics S1-U Input bytes."
+    ::= { jnxMbgSgwSMStatsEntry 12 } 
+
+jnxMbgSgwGtpStatsS1uOutPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics S1-U Output packets."
+    ::= { jnxMbgSgwSMStatsEntry 13 }    
+
+jnxMbgSgwGtpStatsS1uOutByt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics S1-U Output bytes."
+    ::= { jnxMbgSgwSMStatsEntry 14 }     
+ 
+jnxMbgSgwDedBrCrtAttmpts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Dedicated bearer creation attempts."
+    ::= { jnxMbgSgwSMStatsEntry 15 }
+
+jnxMbgSgwSuccDedBrCrt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Dedicated bearer creations successful."
+    ::= { jnxMbgSgwSMStatsEntry 16 }
+    
+    
+jnxMbgSgwSessnDeActvAttmpts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Session deactivation attempts."
+    ::= { jnxMbgSgwSMStatsEntry 17 }
+
+jnxMbgSgwSuccSessnDeActv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Sessions deactivations successful."
+    ::= { jnxMbgSgwSMStatsEntry 18 }    
+    
+jnxMbgSgwDedBrDeActvAttmpts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Dedicated bearer deactivation attempts."
+    ::= { jnxMbgSgwSMStatsEntry 19 }
+    
+jnxMbgSgwSuccDedBrDeActv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Dedicated bearers deactivation successful."
+    ::= { jnxMbgSgwSMStatsEntry 20 }
+
+jnxMbgSgwIntrRatHoAttmpts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Inter RAT Handover attempts."
+    ::= { jnxMbgSgwSMStatsEntry 21 }
+
+jnxMbgSgwSuccIntrRatHo OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Inter RAT Handover successful."
+    ::= { jnxMbgSgwSMStatsEntry 22 }
+
+jnxMbgSgwX2HoAttmpts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total X2 based handover attempts."
+    ::= { jnxMbgSgwSMStatsEntry 23 }   
+
+jnxMbgSgwSuccX2Ho OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total X2 based handovers successful."
+    ::= { jnxMbgSgwSMStatsEntry 24 }
+    
+jnxMbgSgwS1HoAttmpts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total S1 based handover attempts."
+    ::= { jnxMbgSgwSMStatsEntry 25 }   
+
+jnxMbgSgwSuccS1Ho OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total S1 based handovers successful."
+    ::= { jnxMbgSgwSMStatsEntry 26 }    
+    
+jnxMbgSgwIdlMdTauRauAttmpts  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Idle mode TAU/RAU attempts."
+    ::= { jnxMbgSgwSMStatsEntry 27 }
+
+jnxMbgSgwSuccIdlMdTauRau  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Idle mode TAU/RAU successful."
+    ::= { jnxMbgSgwSMStatsEntry 28 }
+
+jnxMbgSgwServReqAttmempts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Service request attempts."
+    ::= { jnxMbgSgwSMStatsEntry 29 }
+
+ jnxMbgSgwSuccServReq OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Service requests successful."
+    ::= { jnxMbgSgwSMStatsEntry 30 }
+
+--
+-- Status Table for SGW 
+--
+
+jnxMbgSgwSMStatusTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgSgwSMStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table listing gateway level status for Serving Gateway.
+         Key is Gateway Name."
+    ::= { jnxMbgSgwSMObjects 2 }
+
+JnxMbgSgwSMStatusEntry ::= SEQUENCE {
+    jnxMbgSgwActvSubscribers        CounterBasedGauge64,
+    jnxMbgSgwActvSessions           CounterBasedGauge64,
+    jnxMbgSgwActvBearers            CounterBasedGauge64,
+    jnxMbgSgwIdleSubscribers        CounterBasedGauge64,
+    jnxMbgSgwIdleSessions           CounterBasedGauge64,
+    jnxMbgSgwIdleBearers            CounterBasedGauge64,
+    jnxMbgSgwSuspSubscribers        CounterBasedGauge64,
+    jnxMbgSgwSuspSessions           CounterBasedGauge64,
+    jnxMbgSgwSuspBearers            CounterBasedGauge64,
+    jnxMbgSgwCPUUtil                Gauge32,
+    jnxMbgSgwMemoryUtil             Gauge32    
+}    
+
+jnxMbgSgwSMStatusEntry OBJECT-TYPE
+    SYNTAX      JnxMbgSgwSMStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing Serving Gateway Status."
+    INDEX       { jnxMbgGwIndex }
+    ::= { jnxMbgSgwSMStatusTable 1 }
+
+jnxMbgSgwActvSubscribers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active subscribers."
+    ::= { jnxMbgSgwSMStatusEntry 1 }
+
+jnxMbgSgwActvSessions OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active sessions."
+    ::= { jnxMbgSgwSMStatusEntry 2 }
+
+jnxMbgSgwActvBearers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total active bearers."
+    ::= { jnxMbgSgwSMStatusEntry 3 }
+
+jnxMbgSgwIdleSubscribers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total idle subscribers."
+    ::= { jnxMbgSgwSMStatusEntry 4 }
+
+jnxMbgSgwIdleSessions OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total idle sessions."
+    ::= { jnxMbgSgwSMStatusEntry 5 }
+
+jnxMbgSgwIdleBearers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total idle bearers."
+    ::= { jnxMbgSgwSMStatusEntry 6 }
+
+jnxMbgSgwSuspSubscribers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total suspended subscribers."
+    ::= { jnxMbgSgwSMStatusEntry 7 }
+
+jnxMbgSgwSuspSessions OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total suspended sessions."
+    ::= { jnxMbgSgwSMStatusEntry 8 }
+
+jnxMbgSgwSuspBearers OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total suspended bearers."
+    ::= { jnxMbgSgwSMStatusEntry 9 }
+    
+jnxMbgSgwCPUUtil OBJECT-TYPE
+    SYNTAX      Gauge32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current CPU Utilization."
+    ::= { jnxMbgSgwSMStatusEntry 10 }
+
+jnxMbgSgwMemoryUtil OBJECT-TYPE
+    SYNTAX      Gauge32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current Memory Utilization."
+    ::= { jnxMbgSgwSMStatusEntry 11 }
+
+jnxMbgSgwSMClRateStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxMbgSgwClRateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table lists the call rate statistics for 
+         the most recent configured interval for Serving Gateway.
+         Gateway ID is used as a key."
+    ::= { jnxMbgSgwSMObjects 4 }
+
+JnxMbgSgwClRateEntry ::= SEQUENCE {
+    jnxMbgSgwClRateIntervalMin      Unsigned32,
+    jnxMbgSgwClRateSuccSessnEst     Counter64,
+    jnxMbgSgwClRateSuccSessnDel     Counter64,
+    jnxMbgSgwClRateStatsGnInpPkt    Counter64,
+    jnxMbgSgwClRateStatsGnOutPkt    Counter64,
+    jnxMbgSgwClRateStatsGnInpByt    Counter64,
+    jnxMbgSgwClRateStatsGnOutByt    Counter64
+}
+
+jnxMbgSgwSMClRateStatsEntry OBJECT-TYPE
+    SYNTAX      JnxMbgSgwClRateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing a Mobile PDN Gateway Call Rate Statistics."
+    INDEX       { jnxMbgGwIndex }
+    ::= { jnxMbgSgwSMClRateStatsTable 1 }
+
+jnxMbgSgwClRateIntervalMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Aggregation interval for call rate statisitcs in minutes."
+    ::= { jnxMbgSgwSMClRateStatsEntry 1 }
+    
+
+jnxMbgSgwClRateSuccSessnEst OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total sessions successfully established."
+    ::= { jnxMbgSgwSMClRateStatsEntry 2 }
+    
+jnxMbgSgwClRateSuccSessnDel OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total sessions successfully deleted."
+    ::= { jnxMbgSgwSMClRateStatsEntry 3 }
+
+jnxMbgSgwClRateStatsGnInpPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics Gn Input packets."
+    ::= { jnxMbgSgwSMClRateStatsEntry 4 }
+
+jnxMbgSgwClRateStatsGnOutPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics Gn Output packets."
+    ::= { jnxMbgSgwSMClRateStatsEntry 5 }
+
+jnxMbgSgwClRateStatsGnInpByt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics Gn Input bytes."
+    ::= { jnxMbgSgwSMClRateStatsEntry 6 }
+
+jnxMbgSgwClRateStatsGnOutByt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total GTP statistics Gn Output bytes."
+    ::= { jnxMbgSgwSMClRateStatsEntry 7 }
+    
+--
+-- Notifications Variables
+--
+
+jnxMbgSgwSMNotificationVars  OBJECT IDENTIFIER
+    ::= { jnxMbgSgwSMObjects 3 }
+
+jnxMbgGwSpicName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+ 
+    DESCRIPTION
+    "This identifies the session-pic"
+    ::= { jnxMbgSgwSMNotificationVars 1 }
+
+jnxMbgSgwTrapGwIndex   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS accessible-for-notify 
+    STATUS      current
+    DESCRIPTION
+    "Gateway Index."
+    ::= { jnxMbgSgwSMNotificationVars 2 }
+
+jnxMbgSgwTrapGwName   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify 
+    STATUS      current
+    DESCRIPTION
+    "Gateway Name."
+    ::= { jnxMbgSgwSMNotificationVars 3 }
+
+jnxMbgSgwSMInterfaceName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that uniquely identifies SGW interface"
+    ::= { jnxMbgSgwSMNotificationVars 4 }
+
+jnxMbgSgwPrevMMState OBJECT-TYPE
+    SYNTAX        INTEGER {
+                   mmdefault(0) ,
+                   mmnormalphase(1) ,
+                   mminphase(2) ,
+                   mmactivephase(3),
+                   mmoutphase(4)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that indicates the maintenance-mode previous state ."
+    ::= { jnxMbgSgwSMNotificationVars 5 }
+
+jnxMbgSgwNewMMState OBJECT-TYPE
+    SYNTAX        INTEGER {
+                   mmdefault(0) ,
+                   mmnormalphase(1) ,
+                   mminphase(2) ,
+                   mmactivephase(3),
+                   mmoutphase(4)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A string that indicates the maintenance-mode new state ."
+    ::= { jnxMbgSgwSMNotificationVars 6 }
+
+--------------------------------------------------
+--
+-- SGW Alarms List
+--
+
+jnxMbgSgwCpuThrStatusHi NOTIFICATION-TYPE
+    OBJECTS { 
+                jnxMbgSgwTrapGwIndex,
+                jnxMbgSgwTrapGwName        
+            }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the configured high threshold
+          for CPU Utilization has been exceeded."
+    ::= { jnxMbgSgwSMNotifications 1 }  
+
+jnxMbgSgwCpuThrStatusLow NOTIFICATION-TYPE
+    OBJECTS { 
+                jnxMbgSgwTrapGwIndex, 
+                jnxMbgSgwTrapGwName
+            }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the configured low threshold
+          for CPU Utilization has been reached."
+    ::= { jnxMbgSgwSMNotifications 2 }  
+
+jnxMbgSgwCpuThrStatusClear NOTIFICATION-TYPE
+    OBJECTS { 
+                jnxMbgSgwTrapGwIndex,
+                jnxMbgSgwTrapGwName        
+            }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that normal thresholds
+          for CPU Utilization has been reached."
+    ::= { jnxMbgSgwSMNotifications 3 }  
+
+jnxMbgSgwMemThrStatusHi NOTIFICATION-TYPE
+    OBJECTS { 
+                jnxMbgSgwTrapGwIndex, 
+                jnxMbgSgwTrapGwName
+            }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the configured high threshold 
+          for Memory Utilization has been exceeded."
+    ::= { jnxMbgSgwSMNotifications 4 }  
+
+
+jnxMbgSgwMemThrStatusLow NOTIFICATION-TYPE
+    OBJECTS { 
+                jnxMbgSgwTrapGwIndex, 
+                jnxMbgSgwTrapGwName
+            }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the configured low threshold 
+          for Memory Utilization has been reached."
+    ::= { jnxMbgSgwSMNotifications 5 }  
+
+jnxMbgSgwMemThrStatusClear NOTIFICATION-TYPE
+    OBJECTS { 
+                jnxMbgSgwTrapGwIndex, 
+                jnxMbgSgwTrapGwName
+            }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the normal threshold 
+          for Memory Utilization has been reached."
+    ::= { jnxMbgSgwSMNotifications 6 }  
+
+jnxMbgSgwPFEMMStateChange NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgSgwTrapGwIndex,
+                  jnxMbgSgwTrapGwName,
+                  jnxMbgSgwSMInterfaceName,
+                  jnxMbgSgwPrevMMState,
+                  jnxMbgSgwNewMMState }
+    STATUS      current
+    DESCRIPTION
+        "This notification indicates that the gateway name, PFE interfce name, 
+         interface previous state and new state information during the 
+         in the PFE interface maintenance mode."
+    ::= { jnxMbgSgwSMNotifications 7 }
+
+jnxMbgSgwMSMMStateChange NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgSgwTrapGwIndex,
+                  jnxMbgSgwTrapGwName,
+                  jnxMbgSgwSMInterfaceName,
+                  jnxMbgSgwPrevMMState,
+                  jnxMbgSgwNewMMState }
+    STATUS      current
+    DESCRIPTION
+        "This notification indicates that the gateway name, MS interfce name, 
+         interface previous state and new state information during the 
+         in the MS interface maintenance mode."
+    ::= { jnxMbgSgwSMNotifications 8 }
+
+jnxMbgSgwAPFEMMStateChange NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgSgwTrapGwIndex,
+                  jnxMbgSgwTrapGwName,
+                  jnxMbgSgwSMInterfaceName,
+                  jnxMbgSgwPrevMMState,
+                  jnxMbgSgwNewMMState }
+    STATUS      current
+    DESCRIPTION
+        "This notification indicates that the gateway name, APFE interfce name, 
+         interface previous state and new state information during the 
+         in the APFE interface maintenance mode."
+    ::= { jnxMbgSgwSMNotifications 9 }
+jnxMbgSgwAMSMMStateChange NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgSgwTrapGwIndex,
+                  jnxMbgSgwTrapGwName,
+                  jnxMbgSgwSMInterfaceName,
+                  jnxMbgSgwPrevMMState,
+                  jnxMbgSgwNewMMState }
+    STATUS      current
+    DESCRIPTION
+        "This notification indicates that the gateway name, AMS interfce name, 
+         interface previous state and new state information during the 
+         in the AMS interface maintenance mode."
+    ::= { jnxMbgSgwSMNotifications 10 }
+
+jnxMbgSgwQosBearerThrStatusHi NOTIFICATION-TYPE
+    OBJECTS { 
+                jnxMbgSgwTrapGwIndex, 
+                jnxMbgSgwTrapGwName
+            }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the configured high threshold
+          for bearers at gateway level has been exceeded."
+    ::= { jnxMbgSgwSMNotifications 11 }  
+
+jnxMbgSgwQosBearerThrStatusLow NOTIFICATION-TYPE
+    OBJECTS { 
+                jnxMbgSgwTrapGwIndex, 
+                jnxMbgSgwTrapGwName
+            }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the configured low threshold
+          for bearers at gateway level has been reached."
+    ::= { jnxMbgSgwSMNotifications 12 }  
+
+
+jnxMbgSgwQosBearerThrStatusClear NOTIFICATION-TYPE
+    OBJECTS { 
+                jnxMbgSgwTrapGwIndex, 
+                jnxMbgSgwTrapGwName
+            }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the normal threshold
+          for bearers at gateway level has been reached."
+    ::= { jnxMbgSgwSMNotifications 13 }  
+
+
+jnxMbgSgwGatewayMMStateChange NOTIFICATION-TYPE
+    OBJECTS { 
+              jnxMbgSgwTrapGwName,
+              jnxMbgSgwPrevMMState,
+              jnxMbgSgwNewMMState 
+            }
+    STATUS    current
+    DESCRIPTION
+        "This notification indicates that the Gateway identified by
+         jnxMbgSgwGatewayName undergoes a change in the maintenance 
+         mode state."
+    ::= { jnxMbgSgwSMNotifications 14 }
+
+END
+    

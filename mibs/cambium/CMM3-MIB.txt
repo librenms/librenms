@@ -1,0 +1,2171 @@
+
+--
+-- 	    cmm3-mib.txt
+--
+--      ********************************************************************
+--	    Copyright 2003-2012 (c), Cambium Networks
+--      Cambium Networks Confidential Proprietary
+--      ********************************************************************
+--
+--      Canopy CMM3 MIB definitions.
+--      
+--      ********************************************************************
+--	    $Id: ui_db.cmm.xml,v 1.48 2012/01/09 19:31:18 aschnei2 Exp $
+--
+--      Revision History:
+--
+--      <Date>    <Author>      <Changes<
+--      Nov/12/2002     Y.G					Initial release.
+--		Mar/03/2003		Y.G 		      	Add CMM config/status/GPS info
+--      Mar/02/2004		Y.G		      		Add port configuration/description
+--      Jun/07/2006		M.D		      		Fix integer range definition causing MIB 
+--										  	compiler errors
+--		5/27/2009		A.S.				Added OIDs for Management Port, GPS ReInit Count
+--											and general updates for 3.0 release. See Release
+--											Notes for more information.
+--		6/4/2009		A.S.				Added user configuration table
+--      ********************************************************************
+
+CMM3-MIB   DEFINITIONS ::= BEGIN
+IMPORTS
+		MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Counter64, IpAddress, NOTIFICATION-TYPE
+				FROM SNMPv2-SMI
+		DisplayString
+				FROM SNMPv2-TC
+		OBJECT-GROUP
+				FROM SNMPv2-CONF
+		WhispLUID, WhispMACAddress, EventString
+				FROM WHISP-TCV2-MIB
+		whispModules, whispBox, whispCMM
+				FROM WHISP-GLOBAL-REG-MIB
+				;
+
+cmmIIIMibModule  MODULE-IDENTITY
+	LAST-UPDATED	"200305150000Z"
+	ORGANIZATION	"Cambium Networks"
+	CONTACT-INFO
+		"
+            Canopy Technical Support
+            email: technical-support@canopywireless.com"
+	DESCRIPTION
+		"This module contains CMM3 MIB definitions."
+	::= {whispModules 15}
+
+-- -------------------------------------------------------------------------
+-- Top Level Registrations
+
+cmmGroups		OBJECT IDENTIFIER ::= {whispCMM 1}
+cmmSwitch		OBJECT IDENTIFIER ::= {whispCMM 2}
+cmmConfig		OBJECT IDENTIFIER ::= {whispCMM 3}
+cmmStatus		OBJECT IDENTIFIER ::= {whispCMM 4}
+cmmGps		OBJECT IDENTIFIER ::= {whispCMM 5}
+cmmEventLog		OBJECT IDENTIFIER ::= {whispCMM 6}
+cmmControls		OBJECT IDENTIFIER ::= {whispCMM 7}
+
+-- -------------------------------------------------------------------------
+
+
+	cmmSwitchGroup	OBJECT-GROUP
+			OBJECTS {
+					portNumber,
+					rxDropPkts,
+					rxOctets,
+					rxBroadcastPkts,
+					rxMulticastPkts,
+					rxSAChanges,
+					rxUndersizePkts,
+					rxOversizePkts,
+					rxFragments,
+					rxJabbers,
+					rxUnicastPkts,
+					rxAlignmentErrors,
+					rxFCSErrors,
+					rxGoodOctets,
+					rxExcessSizeDisc,
+					rxPausePkts,
+					rxSymbolErrors,
+					txDropPkts,
+					txOctets,
+					txBroadcastPkts,
+					txMulticastPkts,
+					txCollisions,
+					txUnicastPkts,
+					txSingleCollision,
+					txMultipleCollision,
+					txDeferredTransmit,
+					txLateCollision,
+					txExcessiveCollision,
+					txPausePkts,
+					txFrameInDisc,
+					pkts64Octets,
+					pkts65to127Octets,
+					pkts128to255Octets,
+					pkts256to511Octets,
+					pkts512to1023Octets,
+					pkts1024to1522Octets,
+					mirSrcPortNumber,
+					mirSrcRxEnable,
+					mirSrcTxEnable,
+					portMirrorEnable,
+					mirrorCapturePort}
+		STATUS		current
+		DESCRIPTION
+			"CMMIII switch group."
+		::= {cmmGroups 1}
+
+	cmmConfigGroup	OBJECT-GROUP
+			OBJECTS {
+					gpsTimingPulse,
+					lan1Ip,
+					lan1SubnetMask,
+					defaultGateway,
+					port1PowerCtr,
+					port2PowerCtr,
+					port3PowerCtr,
+					port4PowerCtr,
+					port5PowerCtr,
+					port6PowerCtr,
+					port7PowerCtr,
+					port8PowerCtr,
+					displayOnlyAccess,
+					fullAccess,
+					displayOnlyStatus,
+					fullAccessStatus,
+					webAutoUpdate,
+					port1Config,
+					port2Config,
+					port3Config,
+					port4Config,
+					port5Config,
+					port6Config,
+					port7Config,
+					port8Config,
+					port1Description,
+					port2Description,
+					port3Description,
+					port4Description,
+					port5Description,
+					port6Description,
+					port7Description,
+					port8Description,
+					snmpTrap1,
+					snmpTrap2,
+					snmpTrap3,
+					snmpTrap4,
+					snmpTrap5,
+					snmpTrap6,
+					snmpTrap7,
+					snmpTrap8,
+					snmpTrap9,
+					snmpTrap10,
+					vlanTagEnable,
+					vlanTagId,
+					port1Uplink,
+					port2Uplink,
+					port3Uplink,
+					port4Uplink,
+					port5Uplink,
+					port6Uplink,
+					port7Uplink,
+					port8Uplink,
+					port1Management,
+					port2Management,
+					port3Management,
+					port4Management,
+					port5Management,
+					port6Management,
+					port7Management,
+					port8Management,
+					rebootIfRequired,
+					port1VlanConf,
+					port2VlanConf,
+					port3VlanConf,
+					port4VlanConf,
+					port5VlanConf,
+					port6VlanConf,
+					port7VlanConf,
+					port8VlanConf,
+					port1PwrReset,
+					port2PwrReset,
+					port3PwrReset,
+					port4PwrReset,
+					port5PwrReset,
+					port6PwrReset,
+					port7PwrReset,
+					port8PwrReset,
+					snmpReadOnly,
+					snmpCommunityString,
+					snmpAccessSubnet,
+					snmpAccessSubnet2,
+					snmpAccessSubnet3,
+					snmpAccessSubnet4,
+					snmpAccessSubnet5,
+					snmpAccessSubnet6,
+					snmpAccessSubnet7,
+					snmpAccessSubnet8,
+					snmpAccessSubnet9,
+					snmpAccessSubnet10,
+					sessionTimeout,
+					ipAccessFilterEnable,
+					allowedIPAccess1,
+					allowedIPAccess2,
+					allowedIPAccess3,
+					cmm3SnmpGPSSyncTrapEnable,
+					siteInfoViewable,
+					verifyGPSChecksum}
+		STATUS		current
+		DESCRIPTION
+			"CMMIII configuration group."
+		::= {cmmGroups 2}
+
+	cmmStatusGroup	OBJECT-GROUP
+			OBJECTS {
+					portIndex,
+					linkStatus,
+					linkSpeed,
+					duplexStatus,
+					powerStatus,
+					uplinkStatus,
+					managementStatus,
+					deviceType,
+					pldVersion,
+					softwareVersion,
+					systemTime,
+					upTime,
+					satellitesVisible,
+					satellitesTracked,
+					latitude,
+					longitude,
+					height,
+					trackingMode,
+					syncStatus,
+					macAddress}
+		STATUS		current
+		DESCRIPTION
+			"CMMIII configuration group."
+		::= {cmmGroups 3}
+
+	cmmGPSGroup	OBJECT-GROUP
+			OBJECTS {
+					gpsTrackingMode,
+					gpsTime,
+					gpsDate,
+					gpsSatellitesVisible,
+					gpsSatellitesTracked,
+					gpsHeight,
+					gpsAntennaConnection,
+					gpsLatitude,
+					gpsLongitude,
+					gpsInvalidMsg,
+					gpsRestartCount,
+					gpsReceiverInfo,
+					gpsReInitCount}
+		STATUS		current
+		DESCRIPTION
+			"CMMIII GPS status group."
+		::= {cmmGroups 4}
+
+	cmmUserTableGroup	OBJECT-GROUP
+			OBJECTS {
+					entryIndex,
+					userLoginName,
+					userPswd,
+					accessLevel}
+		STATUS		current
+		DESCRIPTION
+			"CMMIII User Information Table group."
+		::= {cmmGroups 5}
+
+	portMirrorEnable	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"A unique value for each CMM port.  Its value starts from 1"
+		::={cmmSwitch 2}
+
+	mirrorCapturePort	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					port1(1),
+					port2(2),
+					port3(3),
+					port4(4),
+					port5(5),
+					port6(6),
+					port7(7),
+					port8(8)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"A unique value for each CMM port.  Its value starts from 1"
+		::={cmmSwitch 3}
+
+	cmmSwitchTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF CmmSwitchEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Table of CMM MIB counters."
+		::= {cmmSwitch 1}
+
+	cmmSwitchEntry OBJECT-TYPE
+		SYNTAX		CmmSwitchEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"CMM MIB counters"
+		INDEX		{mirSrcPortNumber}
+		::= {cmmSwitchTable 1}
+
+		CmmSwitchEntry ::= SEQUENCE{
+			portNumber		INTEGER,
+			rxDropPkts		Counter32,
+			rxOctets		Counter64,
+			rxBroadcastPkts		Counter32,
+			rxMulticastPkts		Counter32,
+			rxSAChanges		Counter32,
+			rxUndersizePkts		Counter32,
+			rxOversizePkts		Counter32,
+			rxFragments		Counter32,
+			rxJabbers		Counter32,
+			rxUnicastPkts		Counter32,
+			rxAlignmentErrors		Counter32,
+			rxFCSErrors		Counter32,
+			rxGoodOctets		Counter64,
+			rxExcessSizeDisc		Counter32,
+			rxPausePkts		Counter32,
+			rxSymbolErrors		Counter32,
+			txDropPkts		Counter32,
+			txOctets		Counter64,
+			txBroadcastPkts		Counter32,
+			txMulticastPkts		Counter32,
+			txCollisions		Counter32,
+			txUnicastPkts		Counter32,
+			txSingleCollision		Counter32,
+			txMultipleCollision		Counter32,
+			txDeferredTransmit		Counter32,
+			txLateCollision		Counter32,
+			txExcessiveCollision		Counter32,
+			txPausePkts		Counter32,
+			txFrameInDisc		Counter32,
+			pkts64Octets		Counter32,
+			pkts65to127Octets		Counter32,
+			pkts128to255Octets		Counter32,
+			pkts256to511Octets		Counter32,
+			pkts512to1023Octets		Counter32,
+			pkts1024to1522Octets	Counter32
+			}
+
+	portNumber	OBJECT-TYPE
+		SYNTAX		INTEGER (1..9)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"A unique value for each CMM port.  Its value starts from 1"
+		::={cmmSwitchEntry 1}
+
+	rxDropPkts	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of good packets received by a port that 
+             were dropped due to lack of resources(e.g., lack of 
+             input buffers)or were dropped due to lack of resources 
+             before a determination of the validity of the packet was 
+             able to be made (e.g., receive FIFO overflow). The counter 
+             is only incremented if the receive error was not counted 
+             by either the RxExcessSizeDisc, the RxAlignmentErrors or 
+             the RxRCSErrors counters."
+		::={cmmSwitchEntry 2}
+
+	rxOctets	OBJECT-TYPE
+		SYNTAX		Counter64
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of bytes of data received by a port
+             (excluding preamble but including FCS), including
+             bad packets."
+		::={cmmSwitchEntry 3}
+
+	rxBroadcastPkts	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of good packets received by a port that
+             are directed to the broadcast address. This counter
+             does not include error broadcast packets or valid
+             multicast packets."
+		::={cmmSwitchEntry 4}
+
+	rxMulticastPkts	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of good packets received by a port that
+             are directed to the multicast address. This counter
+             does not include error multicast packets or valid
+             broadcast packets."
+		::={cmmSwitchEntry 5}
+
+	rxSAChanges	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of times the SA of good receive packets
+             has changed from the previous value. A count greater
+             than 1 generally indicates the port if connected to
+             a repeater based network."
+		::={cmmSwitchEntry 6}
+
+	rxUndersizePkts	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of good packets received by a port that are
+             less than 64 bytes long (excluding framing bits but
+             including the FCS)."
+		::={cmmSwitchEntry 7}
+
+	rxOversizePkts	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of good packets received by a port that are
+             greater than 1522 bytes inclusive (excluding framing bits 
+             but including the FCS). Note that this counter alone will
+             be incremented for packets in the range 1523-1536 bytes
+             inclusive, whereas both this counter and the RxExcessSizeDisc
+             counter will be incremented for packets of 1537 bytes and 
+             higher."
+		::={cmmSwitchEntry 8}
+
+	rxFragments	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of packets received by a port that are less than
+             64 bytes(excluding framing bits) and have either an FCS error
+             or an alignment error"
+		::={cmmSwitchEntry 9}
+
+	rxJabbers	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of packets received by a port that are longer 
+             than 1522 bytes and have either an FCS error or an alignment
+             error."
+		::={cmmSwitchEntry 10}
+
+	rxUnicastPkts	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of good packets received by a port that are
+             addressed to a unicast address."
+		::={cmmSwitchEntry 11}
+
+	rxAlignmentErrors	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of packets received by a port that have a 
+             length (excluding framing bits but including FCS) 
+             between 64 and 1522 bytes, inclusive, and have a bad
+             FCS with a non-integral number of bytes."
+		::={cmmSwitchEntry 12}
+
+	rxFCSErrors	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of packets received by a port that have a
+             length (excluding framing bits but including FCS) 
+             between 64 and 152 bytes, and have a bad FCS with an
+             integral number of bytes."
+		::={cmmSwitchEntry 13}
+
+	rxGoodOctets	OBJECT-TYPE
+		SYNTAX		Counter64
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The total number of bytes in all good packets received
+             by a port (excluding framing bits but including FCS)."
+		::={cmmSwitchEntry 14}
+
+	rxExcessSizeDisc	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of good packets received by a port that 
+             are greater than 1536 bytes (excluding framing bits
+             but including FCS) and were discarded due to excessive
+             length. Note that the RxOversizePkts counter alone is
+             incremented for packets in the range of 1523-1536 bytes
+             inclusive, whereas both this counter and the RxOversizePkts
+             are incremented for packets of 1537 bytes and higher."
+		::={cmmSwitchEntry 15}
+
+	rxPausePkts	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of PAUSE frame received by a port. The PAUSE
+             frame must have a valid MAC Control Frame EtherType field
+             (88-08h), have a destination MAC address of either the MAC
+             Control frame reserved multicast address(01-80-c2-00-00-011)
+             or the unique MAC address associated with the specific port,
+             a valid PAUSE Opcode (00-01), be a minimum of 64 bytes in
+             length (excluding preamble but including FCS), and have a 
+             valid CRC. Although an 802.3 compliant MAC is only permitted
+             to transmit PAUSE frames when in full duplex mode, with
+             flow control enabled, and with the transfer of PAUSE frames
+             determined by the result of auto-negotiation, an 802.3 MAC
+             receiver is required to count all received PAUSE frames,
+             regardless of its half/full-duplex status. An indication
+             that a MAC is in half-duplex with the RxPausePkts
+             incrementing indicates a non-compliant transmitting device
+             on the network."
+		::={cmmSwitchEntry 16}
+
+	rxSymbolErrors	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The total number of times a valid length packet was received
+             at a port and at least one invalid data symbol was detected.
+             Counter only increment once per carrier event and does not
+             increment on detection of collision during the carrier event."
+		::={cmmSwitchEntry 17}
+
+	txDropPkts	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The total number of good bytes of data transmitted by a
+             port (excluding preamble but including FCS)."
+		::={cmmSwitchEntry 18}
+
+	txOctets	OBJECT-TYPE
+		SYNTAX		Counter64
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of good packets received by a port that
+             are directed to the multicast address. This counter
+             does not include error multicast packets or valid
+             broadcast packets."
+		::={cmmSwitchEntry 19}
+
+	txBroadcastPkts	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of good packets transmitted by a port that
+             are directed to a broadcast address. This counter
+             does not include errored broadcast packets or valid
+             multicast packets."
+		::={cmmSwitchEntry 20}
+
+	txMulticastPkts	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of good packets transmitted by a port that
+             are directed to a multicast address. This counter
+             does not include errored multicast packets or valid
+             broadcast packets."
+		::={cmmSwitchEntry 21}
+
+	txCollisions	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of collision experienced by a port during
+             packet transmissions."
+		::={cmmSwitchEntry 22}
+
+	txUnicastPkts	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of good packets transmitted by a port 
+             that are addressed to a unicast address."
+		::={cmmSwitchEntry 23}
+
+	txSingleCollision	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number packets successfully transmitted by a port
+             that experienced exactly one collision."
+		::={cmmSwitchEntry 24}
+
+	txMultipleCollision	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number packets successfully transmitted by a port
+             that experienced more than one collision"
+		::={cmmSwitchEntry 25}
+
+	txDeferredTransmit	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number packets successfully transmitted by a port
+             for which the first transmission attempt is delayed
+             because medium is busy."
+		::={cmmSwitchEntry 26}
+
+	txLateCollision	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of times that a collision is detected
+             later than 512 bit-times into the transmission of
+             a packet."
+		::={cmmSwitchEntry 27}
+
+	txExcessiveCollision	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of packets that are not transmitted from
+             a port because the packet experienced 16 transmission
+             attempts."
+		::={cmmSwitchEntry 28}
+
+	txPausePkts	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of PAUSE frame transmitted by a port.
+             The MAC resolve to full duplex mode, with 803.3x
+             flow control PAUSE frame exchange enabled at the
+             completion of auto-negotiation."
+		::={cmmSwitchEntry 29}
+
+	txFrameInDisc	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of valid packets  received which are
+             discarded by the forwarding process due to lack
+             of space on an output queue. Note: not maintained
+             or reported in the MIB counters. Located in
+             Congestion registers. This attribute only increments
+             if a network device is not acting in compliance with
+             a flow control request, or the BCM5327M internal
+             flow control/buffering scheme has been misconfigured."
+		::={cmmSwitchEntry 30}
+
+	pkts64Octets	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of packets (including error packets) 
+             that are 64 bytes long."
+		::={cmmSwitchEntry 31}
+
+	pkts65to127Octets	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of packets (including error packets) 
+             that are between 65 and 127 bytes long."
+		::={cmmSwitchEntry 32}
+
+	pkts128to255Octets	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of packets (including error packets) 
+             that are between 128 and 255 bytes long."
+		::={cmmSwitchEntry 33}
+
+	pkts256to511Octets	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of packets (including error packets) 
+             that are between 256 and 511 bytes long."
+		::={cmmSwitchEntry 34}
+
+	pkts512to1023Octets	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of packets (including error packets) 
+             that are between 512 and 1023 bytes long."
+		::={cmmSwitchEntry 35}
+
+	pkts1024to1522Octets	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of packets (including error packets) 
+             that are between 1024 and 1522 bytes long."
+		::={cmmSwitchEntry 36}
+
+	cmmSwitchMirrorSrcPortsTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF CmmSwitchMirrorSrcPorts
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Table of CMM Switch Mirror Source Ports."
+		::= {cmmSwitch 4}
+
+	cmmSwitchMirrorSrcPortsEntry OBJECT-TYPE
+		SYNTAX		CmmSwitchMirrorSrcPorts
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"CMM Switch Mirror Source Ports"
+		INDEX		{mirSrcPortNumber}
+		::= {cmmSwitchMirrorSrcPortsTable 1}
+
+		CmmSwitchMirrorSrcPorts ::= SEQUENCE{
+			mirSrcPortNumber		INTEGER,
+			mirSrcRxEnable		INTEGER,
+			mirSrcTxEnable	INTEGER
+			}
+
+	mirSrcPortNumber	OBJECT-TYPE
+		SYNTAX		INTEGER (1..9)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"A unique value for each CMM port.  Its value starts from 1"
+		::={cmmSwitchMirrorSrcPortsEntry 1}
+
+	mirSrcRxEnable	OBJECT-TYPE
+		SYNTAX		INTEGER (0..1)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"A unique value for each CMM port.  Its value starts from 1"
+		::={cmmSwitchMirrorSrcPortsEntry 2}
+
+	mirSrcTxEnable	OBJECT-TYPE
+		SYNTAX		INTEGER (0..1)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"A unique value for each CMM port.  Its value starts from 1"
+		::={cmmSwitchMirrorSrcPortsEntry 3}
+
+	gpsTimingPulse	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					master(1),
+					slave(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"(1) -- Master.
+             (0) -- Slave."
+		::={cmmConfig 1}
+
+	lan1Ip	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"LAN 1 IP."
+		::={cmmConfig 2}
+
+	lan1SubnetMask	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"LAN 1 subnet mask."
+		::={cmmConfig 3}
+
+	defaultGateway	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Default gateway"
+		::={cmmConfig 4}
+
+	port1PowerCtr	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Power control for port 1.
+             (1) -- Power on.
+             (0) -- Power off"
+		::={cmmConfig 5}
+
+	port2PowerCtr	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Power control for port 2.
+             (1) -- Power on.
+             (0) -- Power off."
+		::={cmmConfig 6}
+
+	port3PowerCtr	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Power control for port 3.
+             (1) -- Power on.
+             (0) -- Power off"
+		::={cmmConfig 7}
+
+	port4PowerCtr	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Power control for port 4.
+             (1) -- Power on.
+             (0) -- Power off"
+		::={cmmConfig 8}
+
+	port5PowerCtr	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Power control for port 5.
+             (1) -- Power on.
+             (0) -- Power off"
+		::={cmmConfig 9}
+
+	port6PowerCtr	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Power control for port 6.
+             (1) -- Power on.
+             (0) -- Power off"
+		::={cmmConfig 10}
+
+	port7PowerCtr	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Power control for port 7.
+             (1) -- Power on.
+             (0) -- Power off"
+		::={cmmConfig 11}
+
+	port8PowerCtr	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Power control for port 8.
+             (1) -- Power on.
+             (0) -- Power off"
+		::={cmmConfig 12}
+
+	displayOnlyAccess	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Display only access to web interface and telnet."
+		::={cmmConfig 13}
+
+	fullAccess	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Full access password to web interface and telnet."
+		::={cmmConfig 14}
+
+	displayOnlyStatus	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		obsolete
+		DESCRIPTION		
+			"Display only password status."
+		::={cmmConfig 15}
+
+	fullAccessStatus	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		obsolete
+		DESCRIPTION		
+			"Full access password status."
+		::={cmmConfig 16}
+
+	webAutoUpdate	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"Seconds"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Web page auto update in seconds. 0 means disabled."
+		::={cmmConfig 17}
+
+	port1Config	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					auto(1),
+					hundredFDX(2),
+					hundredHDX(3),
+					tenFDX(4),
+					tenHDX(5)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Link speed configuration on port 1."
+		::={cmmConfig 18}
+
+	port2Config	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					auto(1),
+					hundredFDX(2),
+					hundredHDX(3),
+					tenFDX(4),
+					tenHDX(5)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Link speed configuration on port 2."
+		::={cmmConfig 19}
+
+	port3Config	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					auto(1),
+					hundredFDX(2),
+					hundredHDX(3),
+					tenFDX(4),
+					tenHDX(5)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Link speed configuration on port 3."
+		::={cmmConfig 20}
+
+	port4Config	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					auto(1),
+					hundredFDX(2),
+					hundredHDX(3),
+					tenFDX(4),
+					tenHDX(5)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Link speed configuration on port 4."
+		::={cmmConfig 21}
+
+	port5Config	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					auto(1),
+					hundredFDX(2),
+					hundredHDX(3),
+					tenFDX(4),
+					tenHDX(5)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Link speed configuration on port 5."
+		::={cmmConfig 22}
+
+	port6Config	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					auto(1),
+					hundredFDX(2),
+					hundredHDX(3),
+					tenFDX(4),
+					tenHDX(5)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Link speed configuration on port 6."
+		::={cmmConfig 23}
+
+	port7Config	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					auto(1),
+					hundredFDX(2),
+					hundredHDX(3),
+					tenFDX(4),
+					tenHDX(5)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Link speed configuration on port 7."
+		::={cmmConfig 24}
+
+	port8Config	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					auto(1),
+					hundredFDX(2),
+					hundredHDX(3),
+					tenFDX(4),
+					tenHDX(5)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Link speed configuration on port 8."
+		::={cmmConfig 25}
+
+	port1Description	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Port 1 text description."
+		::={cmmConfig 26}
+
+	port2Description	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Port 2 text description."
+		::={cmmConfig 27}
+
+	port3Description	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Port 3 text description."
+		::={cmmConfig 28}
+
+	port4Description	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Port 4 text description."
+		::={cmmConfig 29}
+
+	port5Description	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Port 5 text description."
+		::={cmmConfig 30}
+
+	port6Description	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Port 6 text description."
+		::={cmmConfig 31}
+
+	port7Description	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Port 7 text description."
+		::={cmmConfig 32}
+
+	port8Description	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Port 8 text description."
+		::={cmmConfig 33}
+
+	snmpTrap1	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Trap Address 1."
+		::={cmmConfig 34}
+
+	snmpTrap2	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Trap Address 2."
+		::={cmmConfig 35}
+
+	snmpTrap3	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Trap Address 3."
+		::={cmmConfig 36}
+
+	snmpTrap4	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Trap Address 4."
+		::={cmmConfig 37}
+
+	snmpTrap5	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Trap Address 5."
+		::={cmmConfig 38}
+
+	snmpTrap6	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Trap Address 6."
+		::={cmmConfig 39}
+
+	snmpTrap7	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Trap Address 7."
+		::={cmmConfig 40}
+
+	snmpTrap8	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Trap Address 8."
+		::={cmmConfig 41}
+
+	snmpTrap9	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Trap Address 9."
+		::={cmmConfig 42}
+
+	snmpTrap10	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Trap Address 10."
+		::={cmmConfig 43}
+
+	vlanTagEnable	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enable/Disable 802.1Q VLAN tagging.P
+             (1) -- Enable Tagging.
+             (0) -- Disable Tagging."
+		::={cmmConfig 44}
+
+	vlanTagId	OBJECT-TYPE
+		SYNTAX		INTEGER (1..4094)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"802.1q VLAN Tag ID, 1-4094."
+		::={cmmConfig 45}
+
+	port1Uplink	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Configure Port 1 as Uplink Port.
+             (1) -- Port 1 is an uplink port.
+             (0) -- Port 1 is not an uplink port."
+		::={cmmConfig 46}
+
+	port2Uplink	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Configure Port 2 as Uplink Port.
+             (1) -- Port 2 is an uplink port.
+             (0) -- Port 2 is not an uplink port."
+		::={cmmConfig 47}
+
+	port3Uplink	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Configure Port 3 as Uplink Port.
+             (1) -- Port 3 is an uplink port.
+             (0) -- Port 3 is not an uplink port."
+		::={cmmConfig 48}
+
+	port4Uplink	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Configure Port 4 as Uplink Port.
+             (1) -- Port 4 is an uplink port.
+             (0) -- Port 4 is not an uplink port."
+		::={cmmConfig 49}
+
+	port5Uplink	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Configure Port 5 as Uplink Port.
+             (1) -- Port 5 is an uplink port.
+             (0) -- Port 5 is not an uplink port."
+		::={cmmConfig 50}
+
+	port6Uplink	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Configure Port 6 as Uplink Port.
+             (1) -- Port 6 is an uplink port.
+             (0) -- Port 6 is not an uplink port."
+		::={cmmConfig 51}
+
+	port7Uplink	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Configure Port 7 as Uplink Port.
+             (1) -- Port 7 is an uplink port.
+             (0) -- Port 7 is not an uplink port."
+		::={cmmConfig 52}
+
+	port8Uplink	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Configure Port 8 as Uplink Port.
+             (1) -- Port 8 is an uplink port.
+             (0) -- Port 8 is not an uplink port."
+		::={cmmConfig 53}
+
+	rebootIfRequired	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Reboot CMM if required.
+             (1) -- Check if CMM reboot is required and do so.
+             (0) -- Do not check for reboot."
+		::={cmmConfig 54}
+
+	port1VlanConf	OBJECT-TYPE
+		SYNTAX		INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Port 1 VLAN Port Configuration.
+             Bitmap determines which Port(s) Port 1 will egress data.
+             0 means no ports, 2 means port 2, 6 means ports 2 and 3, etc."
+		::={cmmConfig 55}
+
+	port2VlanConf	OBJECT-TYPE
+		SYNTAX		INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Port 2 VLAN Port Configuration.
+             Bitmap determines which Port(s) Port 2 will egress data.
+             0 means no ports, 1 means port 1, 3 means ports 1 and 2, etc."
+		::={cmmConfig 56}
+
+	port3VlanConf	OBJECT-TYPE
+		SYNTAX		INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Port 3 VLAN Port Configuration.
+             Bitmap determines which Port(s) Port 3 will egress data.
+             0 means no ports, 1 means port 1, 3 means ports 1 and 2, etc."
+		::={cmmConfig 57}
+
+	port4VlanConf	OBJECT-TYPE
+		SYNTAX		INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Port 4 VLAN Port Configuration.
+             Bitmap determines which Port(s) Port 4 will egress data.
+             0 means no ports, 1 means port 1, 3 means ports 1 and 2, etc."
+		::={cmmConfig 58}
+
+	port5VlanConf	OBJECT-TYPE
+		SYNTAX		INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Port 5 VLAN Port Configuration.
+             Bitmap determines which Port(s) Port 5 will egress data.
+             0 means no ports, 1 means port 1, 3 means ports 1 and 2, etc."
+		::={cmmConfig 59}
+
+	port6VlanConf	OBJECT-TYPE
+		SYNTAX		INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Port 6 VLAN Port Configuration.
+             Bitmap determines which Port(s) Port 6 will egress data.
+             0 means no ports, 1 means port 1, 3 means ports 1 and 2, etc."
+		::={cmmConfig 60}
+
+	port7VlanConf	OBJECT-TYPE
+		SYNTAX		INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Port 7 VLAN Port Configuration.
+             Bitmap determines which Port(s) Port 7 will egress data.
+             0 means no ports, 1 means port 1, 3 means ports 1 and 2, etc."
+		::={cmmConfig 61}
+
+	port8VlanConf	OBJECT-TYPE
+		SYNTAX		INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Port 8 VLAN Port Configuration.
+             Bitmap determines which Port(s) Port 8 will egress data.
+             0 means no ports, 1 means port 1, 3 means ports 1 and 2, etc."
+		::={cmmConfig 62}
+
+	port1PwrReset	OBJECT-TYPE
+		SYNTAX		INTEGER (0..1)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"If Port 1 is Powered, attched device will be reset when set to 1.
+             If Port 1 is Not Powered, nothing will happen."
+		::={cmmConfig 63}
+
+	port2PwrReset	OBJECT-TYPE
+		SYNTAX		INTEGER (0..1)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"If Port 2 is Powered, attched device will be reset when set to 1.
+             If Port 2 is Not Powered, nothing will happen."
+		::={cmmConfig 64}
+
+	port3PwrReset	OBJECT-TYPE
+		SYNTAX		INTEGER (0..1)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"If Port 3 is Powered, attched device will be reset when set to 1.
+             If Port 3 is Not Powered, nothing will happen."
+		::={cmmConfig 65}
+
+	port4PwrReset	OBJECT-TYPE
+		SYNTAX		INTEGER (0..1)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"If Port 4 is Powered, attched device will be reset when set to 1.
+             If Port 4 is Not Powered, nothing will happen."
+		::={cmmConfig 66}
+
+	port5PwrReset	OBJECT-TYPE
+		SYNTAX		INTEGER (0..1)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"If Port 5 is Powered, attched device will be reset when set to 1.
+             If Port 5 is Not Powered, nothing will happen."
+		::={cmmConfig 67}
+
+	port6PwrReset	OBJECT-TYPE
+		SYNTAX		INTEGER (0..1)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"If Port 6 is Powered, attched device will be reset when set to 1.
+             If Port 6 is Not Powered, nothing will happen."
+		::={cmmConfig 68}
+
+	port7PwrReset	OBJECT-TYPE
+		SYNTAX		INTEGER (0..1)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"If Port 7 is Powered, attched device will be reset when set to 1.
+             If Port 7 is Not Powered, nothing will happen."
+		::={cmmConfig 69}
+
+	port8PwrReset	OBJECT-TYPE
+		SYNTAX		INTEGER (0..1)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"If Port 8 is Powered, attched device will be reset when set to 1.
+             If Port 8 is Not Powered, nothing will happen."
+		::={cmmConfig 70}
+
+	snmpReadOnly	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					readOnlyPermissions(1),
+					readWritePermissions(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Permissions
+             1 - Read Only
+             0 - Read/Write."
+		::={cmmConfig 71}
+
+	snmpCommunityString	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Community String"
+		::={cmmConfig 72}
+
+	snmpAccessSubnet	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Accessing Subnet 1.  In x.x.x.x/y form where x.x.x.x is network and y is mask length."
+		::={cmmConfig 73}
+
+	snmpAccessSubnet2	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Accessing Subnet 2.  In x.x.x.x/y form where x.x.x.x is network and y is mask length."
+		::={cmmConfig 74}
+
+	snmpAccessSubnet3	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Accessing Subnet 3.  In x.x.x.x/y form where x.x.x.x is network and y is mask length."
+		::={cmmConfig 75}
+
+	snmpAccessSubnet4	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Accessing Subnet 4.  In x.x.x.x/y form where x.x.x.x is network and y is mask length."
+		::={cmmConfig 76}
+
+	snmpAccessSubnet5	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Accessing Subnet 5.  In x.x.x.x/y form where x.x.x.x is network and y is mask length."
+		::={cmmConfig 77}
+
+	snmpAccessSubnet6	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Accessing Subnet 6.  In x.x.x.x/y form where x.x.x.x is network and y is mask length."
+		::={cmmConfig 78}
+
+	snmpAccessSubnet7	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Accessing Subnet 7.  In x.x.x.x/y form where x.x.x.x is network and y is mask length."
+		::={cmmConfig 79}
+
+	snmpAccessSubnet8	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Accessing Subnet 8.  In x.x.x.x/y form where x.x.x.x is network and y is mask length."
+		::={cmmConfig 80}
+
+	snmpAccessSubnet9	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Accessing Subnet 9.  In x.x.x.x/y form where x.x.x.x is network and y is mask length."
+		::={cmmConfig 81}
+
+	snmpAccessSubnet10	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Accessing Subnet 10.  In x.x.x.x/y form where x.x.x.x is network and y is mask length."
+		::={cmmConfig 82}
+
+	port1Management	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Configure Port 1 as a Management Port.
+             (1) -- Port 1 is a Management port.
+             (0) -- Port 1 is not a Management port."
+		::={cmmConfig 83}
+
+	port2Management	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Configure Port 2 as a Management Port.
+             (1) -- Port 2 is a Managementport.
+             (0) -- Port 2 is not a Management port."
+		::={cmmConfig 84}
+
+	port3Management	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Configure Port 3 as a Management Port.
+             (1) -- Port 3 is a Management port.
+             (0) -- Port 3 is not a Management port."
+		::={cmmConfig 85}
+
+	port4Management	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Configure Port 4 as a Management Port.
+             (1) -- Port 4 is a Management port.
+             (0) -- Port 4 is not a Management port."
+		::={cmmConfig 86}
+
+	port5Management	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Configure Port 5 as a Management Port.
+             (1) -- Port 5 is a Management port.
+             (0) -- Port 5 is not a Management port."
+		::={cmmConfig 87}
+
+	port6Management	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Configure Port 6 as a Management Port.
+             (1) -- Port 6 is a Management port.
+             (0) -- Port 6 is not a Management port."
+		::={cmmConfig 88}
+
+	port7Management	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Configure Port 7 as a Management Port.
+             (1) -- Port 7 is a Management port.
+             (0) -- Port 7 is not a Management port."
+		::={cmmConfig 89}
+
+	port8Management	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Configure Port 8 as a Management Port.
+             (1) -- Port 8 is a Management port.
+             (0) -- Port 8 is not a Management port."
+		::={cmmConfig 90}
+
+	sessionTimeout	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Timer for Telnet, Web and FTP sessions."
+		::={cmmConfig 91}
+
+	siteInfoViewable	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					enable(1),
+					disable(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enable non login users the ability to view Site Information"
+		::={cmmConfig 92}
+
+	ipAccessFilterEnable	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					enable(1),
+					disable(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"To enable or disable IP access filtering to Management functions.
+            (0) - IP access will be allowed from all addresses.
+            (1) - IP access will be controlled using allowedIPAccess1-3 entries."
+		::={cmmConfig 93}
+
+	allowedIPAccess1	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Allow access to CMM Management from this IP.
+            0 is default setting to allow from all IPs."
+		::={cmmConfig 94}
+
+	allowedIPAccess2	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Allow access to CMM Management from this IP.
+            0 is default setting to allow from all IPs."
+		::={cmmConfig 95}
+
+	allowedIPAccess3	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Allow access to CMM Management from this IP.
+            0 is default setting to allow from all IPs."
+		::={cmmConfig 96}
+
+	verifyGPSChecksum	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					doNotVerifyGPSMessageChecksum(0),
+					verifyGPSMessageChecksum(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enable/Disable verification of GPS message checksums."
+		::={cmmConfig 97}
+
+	cmm3SnmpGPSSyncTrapEnable	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					enable(1),
+					disable(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Variable to enable/disable GPS sync/out-sync traps."
+		::={cmmConfig 98}
+
+	deviceType	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"A textual string containing information about device type."
+		::={cmmStatus 2}
+
+	pldVersion	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Version of PLD code."
+		::={cmmStatus 3}
+
+	softwareVersion	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM-III software version. It includes the operation system
+             and software build time."
+		::={cmmStatus 4}
+
+	systemTime	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The current time."
+		::={cmmStatus 5}
+
+	upTime	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Time since last system reboot."
+		::={cmmStatus 6}
+
+	satellitesVisible	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of satellites the GPS should see."
+		::={cmmStatus 7}
+
+	satellitesTracked	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Current number of satellites that GPS actually tracks."
+		::={cmmStatus 8}
+
+	latitude	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM-III latitude."
+		::={cmmStatus 9}
+
+	longitude	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM-III longitude."
+		::={cmmStatus 10}
+
+	height	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The height of CMM-III unit."
+		::={cmmStatus 11}
+
+	trackingMode	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM-III GPS tracking mode."
+		::={cmmStatus 12}
+
+	syncStatus	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM-III GPS sync pulse status."
+		::={cmmStatus 13}
+
+	macAddress	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"MAC address of the unit."
+		::={cmmStatus 14}
+
+	cmmPortTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF CmmPortEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A list of CMM III port entries."
+		::= {cmmStatus 1}
+
+	cmmPortEntry OBJECT-TYPE
+		SYNTAX		CmmPortEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A CMM port entry containing objects with port status."
+		INDEX		{portIndex}
+		::= {cmmPortTable 1}
+
+		CmmPortEntry ::= SEQUENCE{
+			portIndex		INTEGER,
+			linkStatus		INTEGER,
+			linkSpeed		INTEGER,
+			duplexStatus		INTEGER,
+			powerStatus		INTEGER,
+			uplinkStatus		INTEGER,
+			managementStatus	INTEGER
+			}
+
+	portIndex	OBJECT-TYPE
+		SYNTAX		INTEGER (1..8)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"A unique value for each CMM port."
+		::={cmmPortEntry 1}
+
+	linkStatus	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The current operational state of the port."
+		::={cmmPortEntry 2}
+
+	linkSpeed	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					hundredBaseT(1),
+					tenBaseT(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Network connectivity, 100BaseT or 10BaseT."
+		::={cmmPortEntry 3}
+
+	duplexStatus	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					fullDuplex(1),
+					halfDuplex(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Half-duplex data transmission or Full-duplex data transmission."
+		::={cmmPortEntry 4}
+
+	powerStatus	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Port power status indicates power on or power off."
+		::={cmmPortEntry 5}
+
+	uplinkStatus	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Port Uplink status indicates whether port is configred as an Uplink Port."
+		::={cmmPortEntry 6}
+
+	managementStatus	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Management Port status indicates whether port is configred as a CMM3 Management Port."
+		::={cmmPortEntry 7}
+
+	gpsTrackingMode	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM-III GPS tracking mode."
+		::={cmmGps 1}
+
+	gpsTime	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM-III GPS time."
+		::={cmmGps 2}
+
+	gpsDate	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM-III GPS date."
+		::={cmmGps 3}
+
+	gpsSatellitesVisible	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of satellites the GPS is supposed to see."
+		::={cmmGps 4}
+
+	gpsSatellitesTracked	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Current number of satellites GPS tracked."
+		::={cmmGps 5}
+
+	gpsHeight	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM height."
+		::={cmmGps 6}
+
+	gpsAntennaConnection	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Antenna Connection status."
+		::={cmmGps 7}
+
+	gpsLatitude	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM Latitude."
+		::={cmmGps 8}
+
+	gpsLongitude	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM longitude."
+		::={cmmGps 9}
+
+	gpsInvalidMsg	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of invalid messages."
+		::={cmmGps 10}
+
+	gpsRestartCount	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of unit restart."
+		::={cmmGps 11}
+
+	gpsReceiverInfo	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"A textual string contains information on GPS receiver."
+		::={cmmGps 12}
+
+	gpsReInitCount	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of times the GPS device has been completely re-initialized."
+		::={cmmGps 13}
+
+	eventLog	OBJECT-TYPE
+		SYNTAX		EventString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM Event log."
+		::={cmmEventLog 1}
+
+	ntpLog	OBJECT-TYPE
+		SYNTAX		EventString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM3 NTP Log"
+		::={cmmEventLog 2}
+
+	reboot	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					reboot(1),
+					finishedReboot(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Setting the variable to 1 will reboot the unit. When the
+             unit finishs rebooting, it will be in finishedReboot state."
+		::={cmmControls 1}
+
+	clearEventLog	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					clear(1),
+					notClear(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Setting the variable to 1 will clear the event log."
+		::={cmmControls 2}
+
+	cmmUserTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF CmmUserEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"User information table."
+		::= {whispCMM 8}
+
+	cmmUserEntry OBJECT-TYPE
+		SYNTAX		CmmUserEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"User entry."
+		INDEX		{entryIndex}
+		::= {cmmUserTable 1}
+
+		CmmUserEntry ::= SEQUENCE{
+			entryIndex		INTEGER,
+			userLoginName		DisplayString,
+			userPswd		DisplayString,
+			accessLevel	INTEGER
+			}
+
+	entryIndex	OBJECT-TYPE
+		SYNTAX		INTEGER (1..5)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"User information table index."
+		::={cmmUserEntry 1}
+
+	userLoginName	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"User name."
+		::={cmmUserEntry 2}
+
+	userPswd	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"User password."
+		::={cmmUserEntry 3}
+
+	accessLevel	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					noAdmin(0),
+					guest(1),
+					installer(2),
+					administrator(3),
+					technician(4),
+					engineering(5)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"User access level."
+		::={cmmUserEntry 4}
+
+
+END

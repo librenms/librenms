@@ -1,0 +1,2365 @@
+--
+--  Copyright(C) 2003-2016 Server Technology, Inc.
+--
+
+    Sentry3-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, NOTIFICATION-TYPE,
+        OBJECT-TYPE, enterprises                            FROM SNMPv2-SMI
+        DisplayString                                       FROM SNMPv2-TC;
+
+
+    sentry3 MODULE-IDENTITY
+        LAST-UPDATED "201601251630Z" -- 25 January 2016
+        ORGANIZATION "Server Technology, Inc."
+        CONTACT-INFO
+            "Server Technology, Inc.
+             1040 Sandhill Road
+             Reno, NV 89521
+             Tel: (775) 284-2000
+             Fax: (775) 284-2065
+             Email: mibmaster@servertech.com"
+        DESCRIPTION
+            "This is the MIB module for the third generation of the
+             Sentry product family.  This includes the Sentry Remote
+             Power Manager (RPM), Sentry Power Distribution Unit (PDU),
+             Sentry Environmental Monitor (EM), Sentry Smart and
+             Switched Cabinet Distribution Unit (CDU), and Sentry
+             Switched -48 VDC."
+        REVISION "201601251630Z" -- 25 January 2016
+        DESCRIPTION
+            "Adjusted the upper limit of infeedLoadValue to 60000.
+             Adjusted the upper limit of infeedLoadHighThresh to 600.
+             Adjusted the upper limit of infeedCapacity to 600."
+        REVISION "201406251200Z" -- 25 June 2014
+        DESCRIPTION
+            "Adjusted the upper limit of tempHumidSensorTempRecDelta
+             to 54."
+        REVISION "201401161800Z" -- 16 January 2014
+        DESCRIPTION
+            "Added an eventInformationGroup with two new objects:
+             eventStatusText and eventStatusCondition.  Added these
+             objects to all traps and updated the trap annotations
+             to use the eventStatusText string value instead of the
+             integer value of the status object in the trap."
+        REVISION "201311250900Z" -- 25 November 2013
+        DESCRIPTION
+            "Added a new object: tempHumidSensorHumidRecDelta."
+        REVISION "201309161000Z" -- 16 September 2013
+        DESCRIPTION
+            "Adjusted the upper limit of infeedLoadValue to 30000.
+             Adjusted the upper limit of infeedLoadHighThresh to 300.
+             Adjusted the upper limit of infeedCapacity to 300.
+             Adjusted the upper limit of branchLoadValue to 4000."
+        REVISION "201302140930Z" -- 14 February 2013
+        DESCRIPTION
+            "Added a branch table with new objects for branch status
+             and current measurements.  Added 'branchOnSense' and
+             'branchLoadSense' bits to infeedCapabilities.  Added
+             'reading', 'offFuse', and 'onFuse' bits to infeedStatus.
+             Added branchStatusEvent and branchLoadEvent notifications.
+             Added 'outOfBalance' to the list of error conditions
+             enumerated by the towerStatus object."
+        REVISION "201211071400Z" -- 7 November 2012
+        DESCRIPTION
+            "Adjusted the upper limit of systemVersion to 80.  Adjusted
+             the upper limit of infeedOutletCount and outletIndex to 64."
+        REVISION "201204181400Z" -- 18 April 2012
+        DESCRIPTION
+            "Adjusted the upper limit of outletIndex to 32."
+        REVISION "201201041100Z" -- 4 January 2012
+        DESCRIPTION
+            "Added 'nvmFail' to the list of error conditions enumerated
+             by the towerStatus object."
+        REVISION "201107111640Z" -- 11 July 2011
+        DESCRIPTION
+            "Added 'outletControlInhibit' to the list of key-activated
+             features enumerated by the systemFeatures object.  Changed
+             the upper limit of tempHumidSensorTempRecDelta to 18 to
+             accommodate the maximum Fahrenheit value."
+        REVISION "201106151300Z" -- 15 June 2011
+        DESCRIPTION
+            "Added a new object: tempHumidSensorTempRecDelta."
+        REVISION "201105051100Z" -- 5 May 2011
+        DESCRIPTION
+            "Added several new objects: systemOutletSeqInterval,
+             systemOutletRebootDelay, systemConfigModifiedCount,
+             outletWakeupState, and outletPostOnDelay.  Removed the
+             'snmpPOPS' feature-key activation requirement from
+             descriptions of POPS objects."
+        REVISION "201007071215Z" -- 7 July 2010
+        DESCRIPTION
+            "Added support for Per-Inlet Power Sensing (PIPS) hardware.
+             Added several new objects: towerVACapacity,
+             towerVACapacityUsed, towerActivePower, towerApparentPower,
+             towerPowerFactor, towerEnergy, towerLineFrequency,
+             infeedReactance, infeedPhaseCurrent, infeedPhaseVoltage,
+             infeedCapacityUsed, infeedLineID, infeedLineToLineID,
+             infeedPhaseID, infeedVACapacity, and infeedVACapacityUsed.
+             Changed the UNITS of infeedEnergy.  Adjusted the limits of
+             INTEGER data types for various objects.  Updated the
+             descriptions of various infeedTable objects to distinguish
+             between line and phase measurements with three-phase PIPS
+             hardware."
+        REVISION "200903101600Z" -- 10 March 2009
+        DESCRIPTION
+            "Added support for Per-Outlet Power Sensing (POPS) hardware.
+             Added several new objects: systemFeatures, systemFeatureKey,
+             infeedApparentPower, infeedPowerFactor, infeedCrestFactor,
+             infeedEnergy, outletCapacity, outletVoltage, outletPower,
+             outletApparentPower, outletPowerFactor, outletCrestFactor,
+             and outletEnergy.  Added 'voltageSense' and 'powerSense'
+             bit definitions to the input feed and outlet capabilities
+             objects.  Increased the size of systemVersion to 50."
+        REVISION "200805071520Z" -- 7 May 2008
+        DESCRIPTION
+            "Added systemAreaUnit and systemPowerFactor objects.  Renamed
+             the systemWattsPerUnitArea object to systemWattsPerAreaUnit.
+             Changed systemArea from read-only to read-write."
+        REVISION "200707091445Z" -- 9 July 2007
+        DESCRIPTION
+            "Added support for products with fan rotation sensing and
+             internal temperature sensing.  Added 'fanSense' and
+             'tempSense' bit definitions to the tower capabilities
+             object.  Added 'fanFail' and 'overTemp' states to the
+             towerStatus object.  Modified the description of the
+             towerStatusEvent trap to reflect these additions."
+        REVISION "200701091410Z" -- 9 January 2007
+        DESCRIPTION
+            "Added several new objects: systemArea, systemTotalPower,
+             systemWattsPerUnitArea, towerProductSN, towerModelNumber,
+             towerCapabilities, infeedCapacity, infeedVoltage, and
+             infeedPower.  Added six states to the outletControlState
+             object."
+        REVISION "200607201200Z" -- 20 July 2006
+        DESCRIPTION
+            "Changed the upper limit of systemTowerCount from 2 to 4."
+        REVISION "200606120930Z" -- 12 June 2006
+        DESCRIPTION
+            "Added a tempHumidSensorTempScale object to select either
+             Celsius or Fahrenheit as the scale for temperature values.
+             To accommodate the maximum Fahrenheit value, the upper limit
+             of tempHumidSensorTempValue was changed to 2540, and the
+             upper limit of tempHumidSensorTempHighThresh was changed to
+             254.  Removed 'Celsius' from the UNITS clause and description
+             of temperature objects.  Added the tempHumidSensorTempScale
+             object to the tempHumidSensorTempEvent trap.  Changed the
+             upper limit of towerIndex from 2 to 4, to accommodate new
+             products with additional link capabilities."
+        REVISION "200507271105Z" -- 27 July 2005
+        DESCRIPTION
+            "Changed the upper limit of tempHumidSensorTempLowThresh to
+             123.  Changed the upper limit of tempHumidSensorTempValue
+             to 1235."
+        REVISION "200502181145Z" -- 18 February 2005
+        DESCRIPTION
+            "Added CDU products to the MIB description.  Corrected syntax
+             of outletID to specify SIZE(2..4)."
+        REVISION "200501071220Z" -- 7 January 2005
+        DESCRIPTION
+            "Added a 'fusedBranch' bit definition to the outlet
+             capabilities object.  Added 'offFuse' and 'onFuse' states
+             to the outlet status object.  Modified the descriptions of
+             objects and traps to reflect support for these additions."
+        REVISION "200412091320Z" -- 9 December 2004
+        DESCRIPTION
+            "Corrected spelling errors.  Removed product acronyms from the
+             trap annotations."
+        REVISION "200411111200Z" -- 11 November 2004
+        DESCRIPTION
+            "Changed the upper limit of tempHumidSensorTempHighThresh to
+             123.  Renamed systemSerialNumber to systemNICSerialNumber."
+        REVISION "200311201300Z" -- 20 November 2003
+        DESCRIPTION
+            "Changed the MIB description to reflect that there are
+             multiple products in the Sentry product family supported by
+             this MIB."
+        REVISION "200310231900Z" -- 23 October 2003
+        DESCRIPTION
+            "Added annotations to the trap definitions.  Added a
+             'reading' state to the outletStatus object.  Renamed
+             'notificationGroup' to 'sentry3Traps'.  Corrected the
+             the description of the tempHumidSensorStatusEvent trap."
+        REVISION "200310021100Z" -- 2 October 2003
+        DESCRIPTION
+            "Added a 'failSafe' bit definition to the infeed capabilities
+             object, and corrected the definition of the 'defaultOff'
+             infeed capabilities bit."
+        REVISION "200308271600Z" -- 27 August 2003
+        DESCRIPTION
+            "Added new bit definitions to the infeed and outlet
+             capabilities objects."
+        REVISION "200303281700Z" -- 28 March 2003
+        DESCRIPTION
+            "Added environmental monitor objects and traps."
+        REVISION "200303271700Z" -- 27 March 2003
+        DESCRIPTION
+            "Initial release."
+        ::= { serverTech 3 }
+
+    serverTech OBJECT IDENTIFIER ::= { enterprises 1718 }
+
+
+--
+--  System Group
+--
+
+    systemGroup OBJECT IDENTIFIER ::= { sentry3 1 }
+
+    systemVersion OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..80))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The firmware version of the system."
+        ::= { systemGroup 1 }
+
+    systemNICSerialNumber OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..8))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The serial number of the network interface card in the
+             system."
+        ::= { systemGroup 2 }
+
+    systemLocation OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The location of the system."
+        ::= { systemGroup 3 }
+
+    systemTowerCount OBJECT-TYPE
+        SYNTAX      INTEGER(0..4)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of towers in the system."
+        ::= { systemGroup 4 }
+
+    systemEnvMonCount OBJECT-TYPE
+        SYNTAX      INTEGER(0..4)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of environmental monitors in the system."
+        ::= { systemGroup 5 }
+
+    systemTotalPower OBJECT-TYPE
+        SYNTAX      INTEGER(-1..150000)
+        UNITS       "Watts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total power consumption of all of the input feeds in the
+             system.  A non-negative value indicates the total power
+             consumption in Watts.  A negative value indicates that the
+             total power consumption was not available."
+        ::= { systemGroup 6 }
+
+    systemArea OBJECT-TYPE
+        SYNTAX      INTEGER(0..1000)
+        UNITS       "tenth area units"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The area that the footprint of the system occupies.  A
+             non-zero non-negative value indicates the area in tenths of
+             area units as selected by the systemAreaUnit object.  A zero
+             or negative value indicates that the area was not available."
+        ::= { systemGroup 7 }
+
+    systemWattsPerAreaUnit OBJECT-TYPE
+        SYNTAX      INTEGER(-1..1500000)
+        UNITS       "Watts per area unit"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The system Watts per area unit.  A non-negative value
+             indicates the power consumption per area unit as selected by
+             the systemAreaUnit object.  A negative value indicates that
+             the power consumption per area unit was not available."
+        ::= { systemGroup 8 }
+
+    systemAreaUnit OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        squareMeter(0),
+                        squareFoot(1)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The unit of area for the systemArea and systemWattsPerAreaUnit
+             objects.  If the agent does not support this object, then the
+             unit of area is a square foot."
+        ::= { systemGroup 9 }
+
+    systemPowerFactor OBJECT-TYPE
+        SYNTAX      INTEGER(50..100)
+        UNITS       "hundredths"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The power factor used in power calculations performed by the
+             system."
+        ::= { systemGroup 10 }
+
+    systemFeatures OBJECT-TYPE
+        SYNTAX      BITS {
+                        smartLoadShedding(0),
+                        snmpPOPS(1),
+                        outletControlInhibit(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The key-activated features enabled in the system."
+        ::= { systemGroup 11 }
+
+    systemFeatureKey OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..19))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "A valid feature key written to this object will enable a
+             feature in the system.  A valid feature key is in the form
+             xxxx-xxxx-xxxx-xxxx.  A read of this object returns an
+             empty string."
+        ::= { systemGroup 12 }
+
+    systemOutletSeqInterval OBJECT-TYPE
+        SYNTAX      INTEGER(0..15)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The power-on sequencing interval for all outlets."
+        ::= { systemGroup 13 }
+
+    systemOutletRebootDelay OBJECT-TYPE
+        SYNTAX      INTEGER(5..600)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The reboot delay for all outlets."
+        ::= { systemGroup 14 }
+
+    systemConfigModifiedCount OBJECT-TYPE
+        SYNTAX      INTEGER(0..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of times the system configuration has
+             changed."
+        ::= { systemGroup 15 }
+
+--
+--  System Tables
+--
+
+    systemTables OBJECT IDENTIFIER ::= { sentry3 2 }
+
+    --
+    --  Tower Table
+    --
+
+    towerTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF TowerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table of towers."
+        ::= { systemTables 1 }
+
+    towerEntry OBJECT-TYPE
+        SYNTAX      TowerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Row definition for the tower table."
+        INDEX       { towerIndex }
+        ::= { towerTable 1 }
+
+    TowerEntry ::= SEQUENCE {
+        towerIndex           INTEGER,
+        towerID              DisplayString,
+        towerName            DisplayString,
+        towerStatus          INTEGER,
+        towerInfeedCount     INTEGER,
+        towerProductSN       DisplayString,
+        towerModelNumber     DisplayString,
+        towerCapabilities    BITS,
+        towerVACapacity      INTEGER,
+        towerVACapacityUsed  INTEGER,
+        towerActivePower     INTEGER,
+        towerApparentPower   INTEGER,
+        towerPowerFactor     INTEGER,
+        towerEnergy          INTEGER,
+        towerLineFrequency   INTEGER
+    }
+
+    towerIndex OBJECT-TYPE
+        SYNTAX      INTEGER(0..4)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Index for the tower table."
+        ::= { towerEntry 1 }
+
+    towerID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(1))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The ID of the tower."
+        ::= { towerEntry 2 }
+
+    towerName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..24))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The name of the tower."
+        ::= { towerEntry 3 }
+
+    towerStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        normal(0),
+                        noComm(1),
+                        fanFail(2),
+                        overTemp(3),
+                        nvmFail(4),
+                        outOfBalance(5)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The operational status of the tower."
+        ::= { towerEntry 4 }
+
+    towerInfeedCount OBJECT-TYPE
+        SYNTAX      INTEGER(0..4)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of input feeds on the tower."
+        ::= { towerEntry 5 }
+
+    towerProductSN OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..16))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The product serial number of the tower."
+        ::= { towerEntry 6 }
+
+    towerModelNumber OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..24))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The model number of the tower."
+        ::= { towerEntry 7 }
+
+    towerCapabilities OBJECT-TYPE
+        SYNTAX      BITS {
+                        failSafe(0),
+                        fuseSense(1),
+                        directCurrent(2),
+                        threePhase(3),
+                        fanSense(4),
+                        tempSense(5)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The capabilities of the tower."
+        ::= { towerEntry 8 }
+
+    towerVACapacity OBJECT-TYPE
+        SYNTAX      INTEGER(-1..50000)
+        UNITS       "Volt-Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total apparent power capacity of the tower circuit.
+             A non-negative value indicates the maximum total apparent
+             power in Volt-Amps.  A negative value indicates that the
+             total apparent power capacity was not available."
+        ::= { towerEntry 9 }
+
+    towerVACapacityUsed OBJECT-TYPE
+        SYNTAX      INTEGER(-1..1500)
+        UNITS       "tenth percentage"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The used percentage of the tower circuit total apparent power
+             capacity (towerApparentPower / towerVACapacity x 100).  A
+             non-negative value indicates the percentage of capacity used
+             in tenths.  A negative value indicates that the percentage of
+             capacity used was not available."
+        ::= { towerEntry 10 }
+
+    towerActivePower OBJECT-TYPE
+        SYNTAX      INTEGER(-1..50000)
+        UNITS       "Watts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total active power consumption of the tower circuit.
+             A non-negative value indicates the total active power
+             consumption in Watts.  A negative value indicates that the
+             total active power consumption was not available."
+        ::= { towerEntry 11 }
+
+    towerApparentPower OBJECT-TYPE
+        SYNTAX      INTEGER(-1..50000)
+        UNITS       "Volt-Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total apparent power consumption of the tower circuit.
+             A non-negative value indicates the total apparent power
+             consumption in Volt-Amps.  A negative value indicates that
+             the total apparent power consumption was not available."
+        ::= { towerEntry 12 }
+
+    towerPowerFactor OBJECT-TYPE
+        SYNTAX      INTEGER(-1..100)
+        UNITS       "hundredths"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The overall power factor of the tower circuit.  A non-
+             negative value indicates the overall power factor in
+             hundredths.  A negative value indicates that the overall
+             power factor was not able to be measured."
+        ::= { towerEntry 13 }
+
+    towerEnergy OBJECT-TYPE
+        SYNTAX      INTEGER(-1..2147483647)
+        UNITS       "Kilowatt-Hours"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total energy consumption of the tower circuit.  A non-
+             negative value indicates the total energy consumption in
+             Kilowatt-Hours.  A negative value indicates that the total
+             energy consumption was not available."
+        ::= { towerEntry 14 }
+
+    towerLineFrequency OBJECT-TYPE
+        SYNTAX      INTEGER(-1..60)
+        UNITS       "Hertz"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The frequency of the input feed line voltage.  A non-
+             negative value indicates the frequency in Hertz.  A negative
+             value indicates that the frequency was not available."
+        ::= { towerEntry 15 }
+
+    --
+    --  Input Feed Table
+    --
+
+    infeedTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF InfeedEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table of input feeds."
+        ::= { systemTables 2 }
+
+    infeedEntry OBJECT-TYPE
+        SYNTAX      InfeedEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Row definition for the input feed table."
+        INDEX       { towerIndex, infeedIndex }
+        ::= { infeedTable 1 }
+
+    InfeedEntry ::= SEQUENCE {
+        infeedIndex          INTEGER,
+        infeedID             DisplayString,
+        infeedName           DisplayString,
+        infeedCapabilities   BITS,
+        infeedStatus         INTEGER,
+        infeedLoadStatus     INTEGER,
+        infeedLoadValue      INTEGER,
+        infeedLoadHighThresh INTEGER,
+        infeedOutletCount    INTEGER,
+        infeedCapacity       INTEGER,
+        infeedVoltage        INTEGER,
+        infeedPower          INTEGER,
+        infeedApparentPower  INTEGER,
+        infeedPowerFactor    INTEGER,
+        infeedCrestFactor    INTEGER,
+        infeedEnergy         INTEGER,
+        infeedReactance      INTEGER,
+        infeedPhaseVoltage   INTEGER,
+        infeedPhaseCurrent   INTEGER,
+        infeedCapacityUsed   INTEGER,
+        infeedLineID         DisplayString,
+        infeedLineToLineID   DisplayString,
+        infeedPhaseID        DisplayString,
+        infeedVACapacity     INTEGER,
+        infeedVACapacityUsed INTEGER
+    }
+
+    infeedIndex OBJECT-TYPE
+        SYNTAX      INTEGER(0..4)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Index for the input feed table."
+        ::= { infeedEntry 1 }
+
+    infeedID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(2))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The ID of the input feed."
+        ::= { infeedEntry 2 }
+
+    infeedName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..24))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The name of the input feed."
+        ::= { infeedEntry 3 }
+
+    infeedCapabilities OBJECT-TYPE
+        SYNTAX      BITS {
+                        onSense(0),
+                        loadSense(1),
+                        powerControl(2),
+                        failSafe(3),
+                        defaultOff(4),
+                        voltageSense(5),
+                        powerSense(6),
+                        branchOnSense(7),
+                        branchLoadSense(8)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The capabilities of the input feed."
+        ::= { infeedEntry 4 }
+
+    infeedStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        off(0),
+                        on(1),
+                        offWait(2),
+                        onWait(3),
+                        offError(4),
+                        onError(5),
+                        noComm(6),
+                        reading(7),
+                        offFuse(8),
+                        onFuse(9)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the input feed line.  If the infeedCapabilities
+             'onSense' bit is TRUE, then all of the states are supported
+             and indicate the sensed state of the input feed.  If the
+             infeedCapabilities 'onSense' bit is FALSE, then only the
+             'on' and 'noComm' states are supported, and 'on' indicates
+             a derived state, not a sensed state."
+        ::= { infeedEntry 5 }
+
+    infeedLoadStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        normal(0),
+                        notOn(1),
+                        reading(2),
+                        loadLow(3),
+                        loadHigh(4),
+                        overLoad(5),
+                        readError(6),
+                        noComm(7)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the load measured on the input feed line.  If
+             the infeedCapabilities 'loadSense' bit is TRUE, then all of
+             the states are supported.  If the infeedCapabilities
+             'loadSense' bit is FALSE, then only the 'normal' and 'noComm'
+             states are supported."
+        ::= { infeedEntry 6 }
+
+    infeedLoadValue OBJECT-TYPE
+        SYNTAX      INTEGER(-1..60000)
+        UNITS       "hundredth Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The load measured on the input feed line.  A non-negative
+             value indicates the measured load in hundredths of Amps.  A
+             negative value indicates that a load value was not able to
+             be measured."
+        ::= { infeedEntry 7 }
+
+    infeedLoadHighThresh OBJECT-TYPE
+        SYNTAX      INTEGER(0..600)
+        UNITS       "Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The load high threshold value of the input feed line in Amps."
+        ::= { infeedEntry 8 }
+
+    infeedOutletCount OBJECT-TYPE
+        SYNTAX      INTEGER(0..64)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of controlled and/or monitored outlets on the
+             input feed."
+        ::= { infeedEntry 9 }
+
+    infeedCapacity OBJECT-TYPE
+        SYNTAX      INTEGER(-1..600)
+        UNITS       "Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The load capacity of the input feed line.  A non-negative
+             value indicates the maximum load in Amps.  A negative
+             value indicates that the capacity was not available."
+        ::= { infeedEntry 10 }
+
+    infeedVoltage OBJECT-TYPE
+        SYNTAX      INTEGER(-1..4800)
+        UNITS       "tenth Volts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The line-to-line voltage of the input feed.  A non-negative
+             value indicates the voltage in tenths of Volts.  A negative
+             value indicates that the voltage was not available."
+        ::= { infeedEntry 11 }
+
+    infeedPower OBJECT-TYPE
+        SYNTAX      INTEGER(-1..25000)
+        UNITS       "Watts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The active power consumption of the input feed phase.  A non-
+             negative value indicates the active power consumption in
+             Watts.  A negative value indicates that the active power
+             consumption was not available."
+        ::= { infeedEntry 12 }
+
+    infeedApparentPower OBJECT-TYPE
+        SYNTAX      INTEGER(-1..25000)
+        UNITS       "Volt-Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The apparent power consumption of the input feed phase.  A
+             non-negative value indicates the apparent power consumption
+             in Volt-Amps.  A negative value indicates that the apparent
+             power consumption was not available."
+        ::= { infeedEntry 13 }
+
+    infeedPowerFactor OBJECT-TYPE
+        SYNTAX      INTEGER(-1..100)
+        UNITS       "hundredths"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The power factor of the input feed phase.  A non-negative
+             value indicates the power factor in hundredths.  A negative
+             value indicates that the power factor was not able to be
+             measured."
+        ::= { infeedEntry 14 }
+
+    infeedCrestFactor OBJECT-TYPE
+        SYNTAX      INTEGER(-1..1000)
+        UNITS       "tenths"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The crest factor for the load of the input feed phase.  A
+             non-negative value indicates the crest factor in tenths.  A
+             negative value indicates that the crest factor was not able
+             to be measured."
+        ::= { infeedEntry 15 }
+
+    infeedEnergy OBJECT-TYPE
+        SYNTAX      INTEGER(-1..2147483647)
+        UNITS       "tenth Kilowatt-Hours"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The energy consumption of the input feed phase.  A non-
+             negative value indicates the energy consumption in tenths of
+             Kilowatt-Hours.  A negative value indicates that the energy
+             consumption was not available."
+        ::= { infeedEntry 16 }
+
+    infeedReactance OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        unknown(0),
+                        capacitive(1),
+                        inductive(2),
+                        resistive(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The characterization of the phase relation between the
+             voltage and current of the input feed phase."
+        ::= { infeedEntry 17 }
+
+    infeedPhaseVoltage OBJECT-TYPE
+        SYNTAX      INTEGER(-1..2640)
+        UNITS       "tenth Volts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The voltage measured for the input feed phase.  A non-
+             negative value indicates the voltage in tenths of Volts.  A
+             negative value indicates that the voltage was not available."
+        ::= { infeedEntry 18 }
+
+    infeedPhaseCurrent OBJECT-TYPE
+        SYNTAX      INTEGER(-1..25500)
+        UNITS       "hundredth Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current measured for the input feed phase.  A non-
+             negative value indicates the measured load in hundredths of
+             Amps.  A negative value indicates that a load value was not
+             able to be measured."
+        ::= { infeedEntry 19 }
+
+    infeedCapacityUsed OBJECT-TYPE
+        SYNTAX      INTEGER(-1..1500)
+        UNITS       "tenth percentage"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The used percentage of the input feed line load capacity
+             (infeedLoadValue / infeedCapacity x 100).  A non-negative
+             value indicates the percentage of capacity used in tenths.
+             A negative value indicates that the percentage of capacity
+             used was not available."
+        ::= { infeedEntry 20 }
+
+    infeedLineID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..4))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The ID of the input feed line."
+        ::= { infeedEntry 21 }
+
+    infeedLineToLineID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..7))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The line-to-line ID of the input feed."
+        ::= { infeedEntry 22 }
+
+    infeedPhaseID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..6))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The ID of the input feed phase."
+        ::= { infeedEntry 23 }
+
+    infeedVACapacity OBJECT-TYPE
+        SYNTAX      INTEGER(-1..25000)
+        UNITS       "Volt-Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The apparent power capacity of the input feed circuit.  A
+             non-negative value indicates the maximum apparent power in
+             Volt-Amps.  A negative value indicates that the apparent
+             power capacity was not available."
+        ::= { infeedEntry 24 }
+
+    infeedVACapacityUsed OBJECT-TYPE
+        SYNTAX      INTEGER(-1..1500)
+        UNITS       "tenth percentage"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The used percentage of the input feed circuit apparent power
+             capacity (infeedApparentPower / infeedVACapacity x 100).  A
+             non-negative value indicates the percentage of capacity used
+             in tenths.  A negative value indicates that the percentage of
+             capacity used was not available."
+        ::= { infeedEntry 25 }
+
+    --
+    --  Outlet Table
+    --
+
+    outletTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF OutletEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table of outlets."
+        ::= { systemTables 3 }
+
+    outletEntry OBJECT-TYPE
+        SYNTAX      OutletEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Row definition for the outlet table."
+        INDEX       { towerIndex, infeedIndex, outletIndex }
+        ::= { outletTable 1 }
+
+    OutletEntry ::= SEQUENCE {
+        outletIndex          INTEGER,
+        outletID             DisplayString,
+        outletName           DisplayString,
+        outletCapabilities   BITS,
+        outletStatus         INTEGER,
+        outletLoadStatus     INTEGER,
+        outletLoadValue      INTEGER,
+        outletLoadLowThresh  INTEGER,
+        outletLoadHighThresh INTEGER,
+        outletControlState   INTEGER,
+        outletControlAction  INTEGER,
+        outletCapacity       INTEGER,
+        outletVoltage        INTEGER,
+        outletPower          INTEGER,
+        outletApparentPower  INTEGER,
+        outletPowerFactor    INTEGER,
+        outletCrestFactor    INTEGER,
+        outletEnergy         INTEGER,
+        outletWakeupState    INTEGER,
+        outletPostOnDelay    INTEGER
+    }
+
+    outletIndex OBJECT-TYPE
+        SYNTAX      INTEGER(0..64)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Index for the outlet table."
+        ::= { outletEntry 1 }
+
+    outletID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(2..4))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The ID of the outlet."
+        ::= { outletEntry 2 }
+
+    outletName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..24))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The name of the outlet."
+        ::= { outletEntry 3 }
+
+    outletCapabilities OBJECT-TYPE
+        SYNTAX      BITS {
+                        onSense(0),
+                        loadSense(1),
+                        powerControl(2),
+                        shutdown(3),
+                        defaultOn(4),
+                        ownInfeed(5),
+                        fusedBranch(6),
+                        voltageSense(7),
+                        powerSense(8)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The capabilities of the outlet."
+        ::= { outletEntry 4 }
+
+    outletStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        off(0),
+                        on(1),
+                        offWait(2),
+                        onWait(3),
+                        offError(4),
+                        onError(5),
+                        noComm(6),
+                        reading(7),
+                        offFuse(8),
+                        onFuse(9)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the outlet.  If the outletCapabilities
+             'onSense' bit is TRUE, then the state indicates the sensed
+             state of the outlet, not a derived state, and 'offError'
+             and 'onError' are supported to indicate a mismatch between
+             the control and sensed state.  If the outletCapabilities
+             'fusedBranch' bit is TRUE, then the outlet is on a fused
+             branch circuit that can detect the fuse state, and 'offFuse'
+             and 'onFuse' are supported to indicate a fuse error."
+        ::= { outletEntry 5 }
+
+    outletLoadStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        normal(0),
+                        notOn(1),
+                        reading(2),
+                        loadLow(3),
+                        loadHigh(4),
+                        overLoad(5),
+                        readError(6),
+                        noComm(7)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the load measured on the outlet.  If the 
+             outletCapabilities 'loadSense' bit is TRUE, then all of the
+             states are supported.  If the outletCapabilities 'loadSense'
+             bit is FALSE, then only the 'normal' and 'noComm' states are
+             supported."
+        ::= { outletEntry 6 }
+
+    outletLoadValue OBJECT-TYPE
+        SYNTAX      INTEGER(-1..25500)
+        UNITS       "hundredth Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The load measured on the outlet.  A non-negative value
+             indicates the measured load in hundredths of Amps.  A
+             negative value indicates that a load value was not able to
+             be measured."
+        ::= { outletEntry 7 }
+
+    outletLoadLowThresh OBJECT-TYPE
+        SYNTAX      INTEGER(0..255)
+        UNITS       "Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The load low threshold value of the outlet in Amps."
+        ::= { outletEntry 8 }
+
+    outletLoadHighThresh OBJECT-TYPE
+        SYNTAX      INTEGER(0..255)
+        UNITS       "Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The load high threshold value of the outlet in Amps."
+        ::= { outletEntry 9 }
+
+    outletControlState OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        idleOff(0),
+                        idleOn(1),
+                        wakeOff(2),
+                        wakeOn(3),
+                        off(4),
+                        on(5),
+                        lockedOff(6),
+                        lockedOn(7),
+                        reboot(8),
+                        shutdown(9),
+                        pendOn(10),
+                        pendOff(11),
+                        minimumOff(12),
+                        minimumOn(13),
+                        eventOff(14),
+                        eventOn(15),
+                        eventReboot(16),
+                        eventShutdown(17)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The control state of the outlet.  The supported states are
+             dependent upon the outletCapabilities 'powerControl' and
+             'shutdown' bits, as well as the supported features of the
+             firmware version."
+        ::= { outletEntry 10 }
+
+    outletControlAction OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        none(0),
+                        on(1),
+                        off(2),
+                        reboot(3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "An action to change the control state of the outlet.  If
+             the outletCapabilities 'powerControl' bit is TRUE, then the
+             'on', 'off', and 'reboot' actions can be used to change the
+             control state of the outlet.  If the outletCapabilities
+             'powerControl' bit is FALSE, then the actions have no
+             effect."
+        ::= { outletEntry 11 }
+
+    outletCapacity OBJECT-TYPE
+        SYNTAX      INTEGER(-1..255)
+        UNITS       "Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The load capacity of the outlet.  A non-negative value
+             indicates the maximum load in Amps.  A negative value
+             indicates that the capacity was not available."
+        ::= { outletEntry 12 }
+
+    outletVoltage OBJECT-TYPE
+        SYNTAX      INTEGER(-1..2640)
+        UNITS       "tenth Volts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The voltage of the outlet.  A non-negative value indicates
+             the voltage in tenths of Volts.  A negative value indicates
+             that the voltage was not available."
+        ::= { outletEntry 13 }
+
+    outletPower OBJECT-TYPE
+        SYNTAX      INTEGER(-1..10000)
+        UNITS       "Watts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The active power consumption of the device plugged into the
+             outlet.  A non-negative value indicates the active power
+             consumption in Watts.  A negative value indicates that the
+             active power consumption was not available."
+        ::= { outletEntry 14 }
+
+    outletApparentPower OBJECT-TYPE
+        SYNTAX      INTEGER(-1..10000)
+        UNITS       "Volt-Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The apparent power consumption of the device plugged into
+             the outlet.  A non-negative value indicates the apparent
+             power consumption in Volt-Amps.  A negative value indicates
+             that the apparent power consumption was not available."
+        ::= { outletEntry 15 }
+
+    outletPowerFactor OBJECT-TYPE
+        SYNTAX      INTEGER(-1..100)
+        UNITS       "hundredths"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The power factor of the device plugged into the outlet.  A
+             non-negative value indicates the power factor in hundredths.
+             A negative value indicates that the power factor was not able
+             to be measured."
+        ::= { outletEntry 16 }
+
+    outletCrestFactor OBJECT-TYPE
+        SYNTAX      INTEGER(-1..1000)
+        UNITS       "tenths"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The crest factor for the load of the device plugged into the
+             outlet.  A non-negative value indicates the crest factor in
+             tenths.  A negative value indicates that the crest factor
+             was not able to be measured."
+        ::= { outletEntry 17 }
+
+    outletEnergy OBJECT-TYPE
+        SYNTAX      INTEGER(-1..2147483647)
+        UNITS       "Watt-Hours"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The energy consumption of the device plugged into the outlet.
+             A non-negative value indicates the energy consumption in
+             Watt-Hours.  A negative value indicates that the energy
+             consumption was not available."
+        ::= { outletEntry 18 }
+
+    outletWakeupState OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        last(1),
+                        off(2),
+                        on(3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The wakeup state of the outlet."
+        ::= { outletEntry 19 }
+
+    outletPostOnDelay OBJECT-TYPE
+        SYNTAX      INTEGER(0..900)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The post-on delay of the outlet."
+        ::= { outletEntry 20 }
+
+    --
+    --  Environmental Monitor Table
+    --
+
+    envMonTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EnvMonEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table of environmental monitors."
+        ::= { systemTables 4 }
+
+    envMonEntry OBJECT-TYPE
+        SYNTAX      EnvMonEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Row definition for the environmental monitor table."
+        INDEX       { envMonIndex }
+        ::= { envMonTable 1 }
+
+    EnvMonEntry ::= SEQUENCE {
+        envMonIndex                INTEGER,
+        envMonID                   DisplayString,
+        envMonName                 DisplayString,
+        envMonStatus               INTEGER,
+        envMonWaterSensorName      DisplayString,
+        envMonWaterSensorStatus    INTEGER,
+        envMonADCName              DisplayString,
+        envMonADCStatus            INTEGER,
+        envMonADCCount             INTEGER,
+        envMonADCLowThresh         INTEGER,
+        envMonADCHighThresh        INTEGER,
+        envMonTempHumidSensorCount INTEGER,
+        envMonContactClosureCount  INTEGER
+    }
+
+    envMonIndex OBJECT-TYPE
+        SYNTAX      INTEGER(0..4)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Index for the environmental monitor table."
+        ::= { envMonEntry 1 }
+
+    envMonID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(1))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The ID of the environmental monitor."
+        ::= { envMonEntry 2 }
+
+    envMonName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..24))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The name of the environmental monitor."
+        ::= { envMonEntry 3 }
+
+    envMonStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        normal(0),
+                        noComm(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The operational status of the environmental monitor."
+        ::= { envMonEntry 4 }
+
+    envMonWaterSensorName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..24))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The name of the water sensor."
+        ::= { envMonEntry 5 }
+
+    envMonWaterSensorStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        normal(0),
+                        alarm(1),
+                        noComm(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the water sensor."
+        ::= { envMonEntry 6 }
+
+    envMonADCName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..24))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The name of the analog-to-digital converter."
+        ::= { envMonEntry 7 }
+
+    envMonADCStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        normal(0),
+                        reading(1),
+                        countLow(2),
+                        countHigh(3),
+                        readError(4),
+                        noComm(5)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the analog-to-digital converter."
+        ::= { envMonEntry 8 }
+
+    envMonADCCount OBJECT-TYPE
+        SYNTAX      INTEGER(-1..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The 8-bit count value from the analog-to-digital converter.
+             A non-negative value indicates the digital value retrieved
+             from the ADC.  A negative value indicates that a digital
+             value was not able to be retrieved."
+        ::= { envMonEntry 9 }
+
+    envMonADCLowThresh OBJECT-TYPE
+        SYNTAX      INTEGER(0..255)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The 8-bit count low threshold value of the analog-to-digital
+             converter."
+        ::= { envMonEntry 10 }
+
+    envMonADCHighThresh OBJECT-TYPE
+        SYNTAX      INTEGER(0..255)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The 8-bit count high threshold value of the analog-to-digital
+             converter."
+        ::= { envMonEntry 11 }
+
+    envMonTempHumidSensorCount OBJECT-TYPE
+        SYNTAX      INTEGER(0..2)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of temperature/humidity sensors on the
+             environmental monitor."
+        ::= { envMonEntry 12 }
+
+    envMonContactClosureCount OBJECT-TYPE
+        SYNTAX      INTEGER(0..4)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of contact closures on the environmental
+             monitor."
+        ::= { envMonEntry 13 }
+
+    --
+    --  Temperature/Humidity Sensor Table
+    --
+
+    tempHumidSensorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF TempHumidSensorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table of temperature/humidity sensors."
+        ::= { systemTables 5 }
+
+    tempHumidSensorEntry OBJECT-TYPE
+        SYNTAX      TempHumidSensorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Row definition for the temperature/humidity sensor table."
+        INDEX       { envMonIndex, tempHumidSensorIndex }
+        ::= { tempHumidSensorTable 1 }
+
+    TempHumidSensorEntry ::= SEQUENCE {
+        tempHumidSensorIndex           INTEGER,
+        tempHumidSensorID              DisplayString,
+        tempHumidSensorName            DisplayString,
+        tempHumidSensorStatus          INTEGER,
+        tempHumidSensorTempStatus      INTEGER,
+        tempHumidSensorTempValue       INTEGER,
+        tempHumidSensorTempLowThresh   INTEGER,
+        tempHumidSensorTempHighThresh  INTEGER,
+        tempHumidSensorHumidStatus     INTEGER,
+        tempHumidSensorHumidValue      INTEGER,
+        tempHumidSensorHumidLowThresh  INTEGER,
+        tempHumidSensorHumidHighThresh INTEGER,
+        tempHumidSensorTempScale       INTEGER,
+        tempHumidSensorTempRecDelta    INTEGER,
+        tempHumidSensorHumidRecDelta   INTEGER
+    }
+
+    tempHumidSensorIndex OBJECT-TYPE
+        SYNTAX      INTEGER(0..2)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Index for the temperature/humidity sensor table."
+        ::= { tempHumidSensorEntry 1 }
+
+    tempHumidSensorID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(2))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The ID of the temperature/humidity sensor."
+        ::= { tempHumidSensorEntry 2 }
+
+    tempHumidSensorName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..24))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The name of the temperature/humidity sensor."
+        ::= { tempHumidSensorEntry 3 }
+
+    tempHumidSensorStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        found(0),
+                        notFound(1),
+                        lost(2),
+                        noComm(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The operational status of the temperature/humidity sensor."
+        ::= { tempHumidSensorEntry 4 }
+
+    tempHumidSensorTempStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        normal(0),
+                        notFound(1),
+                        reading(2),
+                        tempLow(3),
+                        tempHigh(4),
+                        readError(5),
+                        lost(6),
+                        noComm(7)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the temperature sensor."
+        ::= { tempHumidSensorEntry 5 }
+
+    tempHumidSensorTempValue OBJECT-TYPE
+        SYNTAX      INTEGER(-1..2540)
+        UNITS       "tenth degrees"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The temperature measured by the sensor.  A non-negative value
+             indicates the measured temperature in tenths of degrees, using
+             the scale selected by tempHumidSensorTempScale.  If the agent
+             does not support the tempHumidSensorTempScale object, then the
+             temperature scale used is Celsius.  A negative value indicates
+             that a temperature value was not able to be measured."
+        ::= { tempHumidSensorEntry 6 }
+
+    tempHumidSensorTempLowThresh OBJECT-TYPE
+        SYNTAX      INTEGER(0..254)
+        UNITS       "degrees"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The temperature low threshold value of the sensor in degrees,
+             using the scale selected by tempHumidSensorTempScale.  If the
+             agent does not support the tempHumidSensorTempScale object,
+             then the temperature scale used is Celsius."
+        ::= { tempHumidSensorEntry 7 }
+
+    tempHumidSensorTempHighThresh OBJECT-TYPE
+        SYNTAX      INTEGER(0..254)
+        UNITS       "degrees"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The temperature high threshold value of the sensor in degrees,
+             using the scale selected by tempHumidSensorTempScale.  If the
+             agent does not support the tempHumidSensorTempScale object,
+             then the temperature scale used is Celsius."
+        ::= { tempHumidSensorEntry 8 }
+
+    tempHumidSensorHumidStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        normal(0),
+                        notFound(1),
+                        reading(2),
+                        humidLow(3),
+                        humidHigh(4),
+                        readError(5),
+                        lost(6),
+                        noComm(7)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the humidity sensor."
+        ::= { tempHumidSensorEntry 9 }
+
+    tempHumidSensorHumidValue OBJECT-TYPE
+        SYNTAX      INTEGER(-1..100)
+        UNITS       "percentage relative humidity"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The humidity measured by the sensor.  A non-negative value
+             indicates the measured humidity in percentage relative
+             humidity.  A negative value indicates that a humidity value
+             was not able to be measured."
+        ::= { tempHumidSensorEntry 10 }
+
+    tempHumidSensorHumidLowThresh OBJECT-TYPE
+        SYNTAX      INTEGER(0..100)
+        UNITS       "percentage relative humidity"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The humidity low threshold value of the sensor in percentage
+             relative humidity."
+        ::= { tempHumidSensorEntry 11 }
+
+    tempHumidSensorHumidHighThresh OBJECT-TYPE
+        SYNTAX      INTEGER(0..100)
+        UNITS       "percentage relative humidity"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The humidity low threshold value of the sensor in percentage
+             relative humidity."
+        ::= { tempHumidSensorEntry 12 }
+
+    tempHumidSensorTempScale OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        celsius(0),
+                        fahrenheit(1)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The scale used for temperature values.  This is a global
+             setting for all temperature values in the system.  If the
+             agent does not support this object, then the temperature
+             scale used is Celsius."
+        ::= { tempHumidSensorEntry 13 }
+
+    tempHumidSensorTempRecDelta OBJECT-TYPE
+        SYNTAX      INTEGER(0..54)
+        UNITS       "degrees"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The temperature recovery delta (hysteresis) value of the
+             sensor in degrees, using the scale selected by
+             tempHumidSensorTempScale."
+        ::= { tempHumidSensorEntry 14 }
+
+    tempHumidSensorHumidRecDelta OBJECT-TYPE
+        SYNTAX      INTEGER(0..20)
+        UNITS       "percentage relative humidity"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The humidity recovery delta (hysteresis) value of the
+             sensor in percentage relative humidity."
+        ::= { tempHumidSensorEntry 15 }
+
+    --
+    --  Contact Closure Table
+    --
+
+    contactClosureTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ContactClosureEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table of contact closures."
+        ::= { systemTables 6 }
+
+    contactClosureEntry OBJECT-TYPE
+        SYNTAX      ContactClosureEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Row definition for the contact closure table."
+        INDEX       { envMonIndex, contactClosureIndex }
+        ::= { contactClosureTable 1 }
+
+    ContactClosureEntry ::= SEQUENCE {
+        contactClosureIndex     INTEGER,
+        contactClosureID        DisplayString,
+        contactClosureName      DisplayString,
+        contactClosureStatus    INTEGER
+    }
+
+    contactClosureIndex OBJECT-TYPE
+        SYNTAX      INTEGER(0..4)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Index for the contact closure table."
+        ::= { contactClosureEntry 1 }
+
+    contactClosureID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(2))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The ID of the contact closure."
+        ::= { contactClosureEntry 2 }
+
+    contactClosureName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..24))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The name of the contact closure."
+        ::= { contactClosureEntry 3 }
+
+    contactClosureStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        normal(0),
+                        alarm(1),
+                        noComm(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the contact closure."
+        ::= { contactClosureEntry 4 }
+
+    --
+    --  Branch Table
+    --
+
+    branchTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF BranchEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table of branches."
+        ::= { systemTables 7 }
+
+    branchEntry OBJECT-TYPE
+        SYNTAX      BranchEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Row definition for the branch table."
+        INDEX       { towerIndex, infeedIndex, branchIndex }
+        ::= { branchTable 1 }
+
+    BranchEntry ::= SEQUENCE {
+        branchIndex          INTEGER,
+        branchID             DisplayString,
+        branchName           DisplayString,
+        branchCapabilities   BITS,
+        branchStatus         INTEGER,
+        branchLoadStatus     INTEGER,
+        branchLoadValue      INTEGER,
+        branchLoadHighThresh INTEGER,
+        branchCapacity       INTEGER
+    }
+
+    branchIndex OBJECT-TYPE
+        SYNTAX      INTEGER(0..4)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Index for the branch table."
+        ::= { branchEntry 1 }
+
+    branchID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(3))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The ID of the branch."
+        ::= { branchEntry 2 }
+
+    branchName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..24))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The name of the branch."
+        ::= { branchEntry 3 }
+
+    branchCapabilities OBJECT-TYPE
+        SYNTAX      BITS {
+                        onSense(0),
+                        loadSense(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The capabilities of the branch."
+        ::= { branchEntry 4 }
+
+    branchStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        off(0),
+                        on(1),
+                        offWait(2),
+                        onWait(3),
+                        offError(4),
+                        onError(5),
+                        noComm(6),
+                        reading(7),
+                        offFuse(8),
+                        onFuse(9)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the branch."
+        ::= { branchEntry 5 }
+
+    branchLoadStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        normal(0),
+                        notOn(1),
+                        reading(2),
+                        loadLow(3),
+                        loadHigh(4),
+                        overLoad(5),
+                        readError(6),
+                        noComm(7)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the load measured on the branch."
+        ::= { branchEntry 6 }
+
+    branchLoadValue OBJECT-TYPE
+        SYNTAX      INTEGER(-1..4000)
+        UNITS       "hundredth Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The load measured on the branch.  A non-negative
+             value indicates the measured load in hundredths of Amps.  A
+             negative value indicates that a load value was not able to
+             be measured."
+        ::= { branchEntry 7 }
+
+    branchLoadHighThresh OBJECT-TYPE
+        SYNTAX      INTEGER(0..40)
+        UNITS       "Amps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The load high threshold value of the branch in Amps."
+        ::= { branchEntry 8 }
+
+    branchCapacity OBJECT-TYPE
+        SYNTAX      INTEGER(-1..40)
+        UNITS       "Amps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The load capacity of the branch.  A non-negative value
+             indicates the maximum load in Amps.  A negative value
+             indicates that the capacity was not available."
+        ::= { branchEntry 9 }
+
+--
+--  Event Information Group
+--
+
+    eventInformationGroup OBJECT IDENTIFIER ::= { sentry3 99 }
+
+    eventStatusText OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The text representation of the enumerated integer value of
+             the status object included in a trap.  The value of this
+             object is set only when sent with a trap.  A get of this
+             object will return a NULL string."
+        ::= { eventInformationGroup 1 }
+
+    eventStatusCondition OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        nonError(0),
+                        error(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The condition of the enumerated integer value of the status
+             object included in a trap.  The value of this object is set
+             only when sent with a trap.  A get of this object will
+             return zero."
+        ::= { eventInformationGroup 2 }
+
+--
+--  Notifications
+--
+
+    sentry3Traps OBJECT IDENTIFIER ::= { sentry3 100 }
+
+    events OBJECT IDENTIFIER ::= { sentry3Traps 0 }
+    -- the 0 is for V1 compatibility
+
+    -- Tower Traps
+
+    towerStatusEvent NOTIFICATION-TYPE
+        OBJECTS {
+            systemLocation,
+            towerID,
+            towerName,
+            towerStatus,
+            eventStatusText,
+            eventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Tower status event.  If enabled, this trap is sent when the
+             towerStatus indicates an error state ('noComm', 'fanFail',
+             'overTemp', 'nvmFail', or 'outOfBalance').  This trap is
+             repeated periodically while the towerStatus remains in an
+             error state.  If the towerStatus returns to a non-error
+             state ('normal'), this trap is sent once more with the
+             non-error towerStatus, and then stops being repeated.
+
+             While the towerStatus indicates a 'noComm' error state, all
+             status and load traps are suppressed for input feeds and
+             outlets on the tower."
+        --#TYPE "Sentry: Tower Status Event."
+        --#SUMMARY "Status of Tower '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 4 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { events 1 }
+
+    -- Input Feed Traps
+
+    infeedStatusEvent NOTIFICATION-TYPE
+        OBJECTS {
+            systemLocation,
+            infeedID,
+            infeedName,
+            infeedStatus,
+            eventStatusText,
+            eventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Input feed status event.  If enabled, this trap is sent when
+             the infeedStatus indicates an error state ('offError',
+             'onError', 'noComm', 'offFuse', or 'onFuse').  This trap is
+             repeated periodically while the infeedStatus remains in an
+             error state.  If the infeedStatus returns to a non-error
+             state ('off' or 'on'), this trap is sent once more with the
+             non-error infeedStatus, and then stops being repeated.
+
+             While the infeedStatus indicates an error state, load
+             traps are suppressed for the input feed, and, if the
+             infeedCapabilities 'failSafe' bit is FALSE, all status and
+             load traps are suppressed for outlets on the input feed."
+        --#TYPE "Sentry: Input Feed Status Event."
+        --#SUMMARY "Status of Input Feed '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 4 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { events 2 }
+
+    infeedLoadEvent NOTIFICATION-TYPE
+        OBJECTS {
+            systemLocation,
+            infeedID,
+            infeedName,
+            infeedLoadStatus,
+            infeedLoadValue,
+            infeedLoadHighThresh,
+            eventStatusText,
+            eventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Input feed load event.  If enabled, this trap is sent when
+             the infeedLoadStatus indicates an error state ('loadLow',
+             'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+             trap is repeated periodically while the infeedLoadStatus
+             remains in an error state.  If the infeedLoadStatus returns
+             to a non-error state ('normal' or 'notOn'), this trap is
+             sent once more with the non-error infeedLoadStatus, and then
+             stops being repeated."
+        --#TYPE "Sentry: Input Feed Load Event."
+        --#SUMMARY "Load Status of Input Feed '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 6 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { events 3 }
+
+    -- Outlet Traps
+
+    outletStatusEvent NOTIFICATION-TYPE
+        OBJECTS {
+            systemLocation,
+            outletID,
+            outletName,
+            outletStatus,
+            eventStatusText,
+            eventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Outlet status event.  If enabled, this trap is sent when the
+             outletStatus indicates an error state ('offError', 'onError',
+             'noComm', 'offFuse', or 'onFuse').  This trap is repeated
+             periodically while the outletStatus remains in an error state.
+             If the outletStatus returns to a non-error state ('off' or
+             'on'), this trap is sent once more with the non-error
+             outletStatus, and then stops being repeated.
+
+             While the outletStatus indicates an error state, load traps
+             are suppressed for the outlet."
+        --#TYPE "Sentry: Outlet Status Event."
+        --#SUMMARY "Status of Outlet '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 4 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { events 4 }
+
+    outletLoadEvent NOTIFICATION-TYPE
+        OBJECTS {
+            systemLocation,
+            outletID,
+            outletName,
+            outletLoadStatus,
+            outletLoadValue,
+            outletLoadLowThresh,
+            outletLoadHighThresh,
+            eventStatusText,
+            eventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Outlet load event.  If enabled, this trap is sent when the
+             outletLoadStatus indicates an error state ('loadLow',
+             'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+             trap is repeated periodically while the outletLoadStatus
+             remains in an error state.  If the outletLoadStatus returns
+             to a non-error state ('normal' or 'notOn'), this trap is
+             sent once more with the non-error outletLoadStatus, and then
+             stops being repeated."
+        --#TYPE "Sentry: Outlet Load Event."
+        --#SUMMARY "Load Status of Outlet '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 7 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { events 5 }
+
+    outletChangeEvent NOTIFICATION-TYPE
+        OBJECTS {
+            systemLocation,
+            outletID,
+            outletName,
+            outletStatus,
+            outletControlState,
+            eventStatusText,
+            eventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Outlet on/off change event.  If enabled, this trap is sent
+             when the outletStatus changes from any 'on' state ('on',
+             'onWait', 'onError', or 'onFuse') to any 'off' state ('off',
+             'offWait', 'offError', or 'offFuse'), and vice-versa."
+        --#TYPE "Sentry: Outlet Change Event."
+        --#SUMMARY "Outlet '%s' (%s) has changed to '%s'."
+        --#ARGUMENTS { 2, 1, 5 }
+        --#SEVERITY INFORMATIONAL
+        --#GENERIC 6
+        --#CATEGORY "Status Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { events 6 }
+
+    -- Environmental Monitor Traps
+
+    envMonStatusEvent NOTIFICATION-TYPE
+        OBJECTS {
+            systemLocation,
+            envMonID,
+            envMonName,
+            envMonStatus,
+            eventStatusText,
+            eventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Environmental monitor status event.  If enabled, this trap
+             is sent when the envMonStatus indicates an error state
+             ('noComm').  This trap is repeated periodically while the
+             envMonStatus remains in an error state.  If the envMonStatus
+             returns to a non-error state ('normal'), this trap is sent
+             once more with the non-error envMonStatus, and then stops
+             being repeated.
+
+             While the envMonStatus indicates an error state, all status
+             traps are suppressed for the water sensor, ADC, temperature/
+             humidity sensors, and contact closures on the environmental
+             monitor."
+        --#TYPE "Sentry: Environmental Monitor Status Event."
+        --#SUMMARY "Status of Environmental Monitor '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 4 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { events 7 }
+
+    envMonWaterSensorEvent NOTIFICATION-TYPE
+        OBJECTS {
+            systemLocation,
+            envMonID,
+            envMonWaterSensorName,
+            envMonWaterSensorStatus,
+            eventStatusText,
+            eventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Environmental monitor water sensor event.  If enabled, this
+             trap is sent when the envMonWaterSensorStatus indicates an
+             error state ('alarm').  This trap is repeated periodically
+             while the envMonWaterSensorStatus remains in an error state.
+             If the envMonWaterSensorStatus returns to a non-error state
+             ('normal'), this trap is sent once more with the non-error
+             envMonWaterSensorStatus, and then stops being repeated."
+        --#TYPE "Sentry: Water Sensor Event."
+        --#SUMMARY "Status of Water Sensor '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 4 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { events 8 }
+
+    envMonADCEvent NOTIFICATION-TYPE
+        OBJECTS {
+            systemLocation,
+            envMonID,
+            envMonADCName,
+            envMonADCStatus,
+            envMonADCCount,
+            envMonADCLowThresh,
+            envMonADCHighThresh,
+            eventStatusText,
+            eventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Environmental monitor analog-to-digital converter event.
+             If enabled, this trap is sent when the envMonADCStatus
+             indicates an error state ('countLow' or 'countHigh').  This
+             trap is repeated periodically while the envMonADCStatus
+             remains in an error state.  If the envMonADCStatus returns
+             to a non-error state ('normal'), this trap is sent once more
+             with the non-error envMonADCStatus, and then stops being
+             repeated."
+        --#TYPE "Sentry: ADC Event."
+        --#SUMMARY "Status of ADC '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 7 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { events 9 }
+
+    tempHumidSensorStatusEvent NOTIFICATION-TYPE
+        OBJECTS {
+            systemLocation,
+            tempHumidSensorID,
+            tempHumidSensorName,
+            tempHumidSensorStatus,
+            eventStatusText,
+            eventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Temperature/humidity sensor status event.  If enabled, this
+             trap is sent when the tempHumidSensorStatus indicates an
+             error state ('lost').  This trap is repeated periodically
+             while the tempHumidSensorStatus remains in an error state.
+             If the tempHumidSensorStatus returns to a non-error state
+             ('found'), this trap is sent once more with the non-error
+             tempHumidSensorStatus, and then stops being repeated.
+
+             While the tempHumidSensorStatus indicates an error state, all
+             temperature and humidity status traps are suppressed for the
+             temperature/humidity sensor."
+        --#TYPE "Sentry: T/H Sensor Status Event."
+        --#SUMMARY "Status of T/H Sensor '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 4 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { events 10 }
+
+    tempHumidSensorTempEvent NOTIFICATION-TYPE
+        OBJECTS {
+            systemLocation,
+            tempHumidSensorID,
+            tempHumidSensorName,
+            tempHumidSensorTempStatus,
+            tempHumidSensorTempValue,
+            tempHumidSensorTempLowThresh,
+            tempHumidSensorTempHighThresh,
+            tempHumidSensorTempScale,
+            eventStatusText,
+            eventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Temperature/humidity sensor temperature event.  If enabled,
+             this trap is sent when the tempHumidSensorTempStatus
+             indicates an error state ('tempLow' or 'tempHigh').
+             This trap is repeated periodically while the
+             tempHumidSensorTempStatus remains in an error state.  If
+             the tempHumidSensorTempStatus returns to a non-error state
+             ('normal'), this trap is sent once more with the non-error
+             tempHumidSensorTempStatus, and then stops being repeated."
+        --#TYPE "Sentry: T/H Sensor Temperature Event."
+        --#SUMMARY "Temperature Status of T/H Sensor '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 8 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { events 11 }
+
+    tempHumidSensorHumidEvent NOTIFICATION-TYPE
+        OBJECTS {
+            systemLocation,
+            tempHumidSensorID,
+            tempHumidSensorName,
+            tempHumidSensorHumidStatus,
+            tempHumidSensorHumidValue,
+            tempHumidSensorHumidLowThresh,
+            tempHumidSensorHumidHighThresh,
+            eventStatusText,
+            eventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Temperature/humidity sensor humidity event.  If enabled,
+             this trap is sent when the tempHumidSensorHumidStatus
+             indicates an error state ('humidLow' or 'humidHigh').
+             This trap is repeated periodically while the
+             tempHumidSensorHumidStatus remains in an error state.  If
+             the tempHumidSensorHumidStatus returns to a non-error state
+             ('normal'), this trap is sent once more with the non-error
+             tempHumidSensorHumidStatus, and then stops being repeated."
+        --#TYPE "Sentry: T/H Sensor Humidity Event."
+        --#SUMMARY "Humidity Status of T/H Sensor '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 7 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { events 12 }
+
+    contactClosureEvent NOTIFICATION-TYPE
+        OBJECTS {
+            systemLocation,
+            contactClosureID,
+            contactClosureName,
+            contactClosureStatus,
+            eventStatusText,
+            eventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Contact closure event.  If enabled, this trap is sent when
+             the contactClosureStatus indicates an error state ('alarm').
+             This trap is repeated periodically while the
+             contactClosureStatus remains in an error state.  If the
+             contactClosureStatus returns to a non-error state ('normal'),
+             this trap is sent once more with the non-error
+             contactClosureStatus, and then stops being repeated."
+        --#TYPE "Sentry: Contact Closure Event."
+        --#SUMMARY "Status of Contact Closure '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 4 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { events 13 }
+
+    -- Branch Traps
+
+    branchStatusEvent NOTIFICATION-TYPE
+        OBJECTS {
+            systemLocation,
+            branchID,
+            branchName,
+            branchStatus,
+            eventStatusText,
+            eventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Branch status event.  If enabled, this trap is sent when
+             the branchStatus indicates an error state ('offError',
+             'onError', 'noComm', 'offFuse', or 'onFuse').  This trap
+             is repeated periodically while the branchStatus remains in
+             an error state.  If the branchStatus returns to a non-error
+             state ('off' or 'on'), this trap is sent once more with the
+             non-error branchStatus, and then stops being repeated.
+
+             While the branchStatus indicates an error state, load traps
+             are suppressed for the branch."
+        --#TYPE "Sentry: Branch Status Event."
+        --#SUMMARY "Status of Branch '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 4 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { events 14 }
+
+    branchLoadEvent NOTIFICATION-TYPE
+        OBJECTS {
+            systemLocation,
+            branchID,
+            branchName,
+            branchLoadStatus,
+            branchLoadValue,
+            branchLoadHighThresh,
+            eventStatusText,
+            eventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Branch load event.  If enabled, this trap is sent when
+             the branchLoadStatus indicates an error state ('loadLow',
+             'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+             trap is repeated periodically while the branchLoadStatus
+             remains in an error state.  If the branchLoadStatus returns
+             to a non-error state ('normal' or 'notOn'), this trap is
+             sent once more with the non-error branchLoadStatus, and then
+             stops being repeated."
+        --#TYPE "Sentry: Branch Load Event."
+        --#SUMMARY "Load Status of Branch '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 6 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { events 15 }
+
+END

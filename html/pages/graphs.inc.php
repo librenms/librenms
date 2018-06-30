@@ -39,58 +39,51 @@ if (!$auth) {
     require 'includes/error-no-perm.inc.php';
 } else {
     if (isset($config['graph_types'][$type][$subtype]['descr'])) {
-        $title .= " :: ".$config['graph_types'][$type][$subtype]['descr'];
+        $title .= " :: " . $config['graph_types'][$type][$subtype]['descr'];
     } elseif ($type == "device" && $subtype == "collectd") {
-        $title .= " :: ".ucfirst($subtype)." :: ". $vars['c_plugin'];
+        $title .= " :: " . ucfirst($subtype) . " :: " . $vars['c_plugin'];
         if (isset($vars['c_plugin_instance'])) {
-            $title .= " - ".$vars['c_plugin_instance'];
+            $title .= " - " . $vars['c_plugin_instance'];
         }
-        $title .= " - ".$vars['c_type'];
+        $title .= " - " . $vars['c_type'];
         if (isset($vars['c_type_instance'])) {
-            $title .= " - ".$vars['c_type_instance'];
+            $title .= " - " . $vars['c_type_instance'];
         }
     } else {
-        $title .= " :: ".ucfirst($subtype);
+        $title .= " :: " . ucfirst($subtype);
     }
 
     $graph_array = $vars;
     $graph_array['height'] = "60";
-    $graph_array['width']  = $thumb_width;
+    $graph_array['width'] = $thumb_width;
     $graph_array['legend'] = "no";
-    $graph_array['to']     = $config['time']['now'];
+    $graph_array['to'] = $config['time']['now'];
 
     print_optionbar_start();
-    echo($title);
+    echo $title;
 
-    echo('<div style="float: right;">');
-?>
-  <form action="">
-  <select name='type' id='type'
-    onchange="window.open(this.options[this.selectedIndex].value,'_top')" >
-<?php
+    // FIXME allow switching between types for sensor and wireless also restrict types to ones that have data
+    if ($type != 'sensor') {
+        echo '<div style="float: right;"><form action="">';
+        echo "<select name='type' id='type' onchange=\"window.open(this.options[this.selectedIndex].value,'_top')\" >";
 
-foreach (get_graph_subtypes($type, $device) as $avail_type) {
-    echo("<option value='".generate_url($vars, array('type' => $type."_".$avail_type, 'page' => "graphs"))."'");
-    if ($avail_type == $subtype) {
-        echo(" selected");
+        foreach (get_graph_subtypes($type, $device) as $avail_type) {
+            echo "<option value='" . generate_url($vars, array('type' => $type . "_" . $avail_type, 'page' => "graphs")) . "'";
+            if ($avail_type == $subtype) {
+                echo(" selected");
+            }
+            $display_type = is_mib_graph($type, $avail_type) ? $avail_type : nicecase($avail_type);
+            echo ">$display_type</option>";
+        }
+        echo '</select></form></div>';
     }
-    $display_type = is_mib_graph($type, $avail_type) ? $avail_type : nicecase($avail_type);
-    echo(">$display_type</option>");
-}
-?>
-    </select>
-  </form>
-<?php
-    echo('</div>');
 
     print_optionbar_end();
 
-    print_optionbar_start();
 
-    $thumb_array = array('sixhour' => '6 Hours', 'day' => '24 Hours', 'twoday' => '48 Hours', 'week' => 'One Week', 'twoweek' => 'Two Weeks',
-        'month' => 'One Month', 'twomonth' => 'Two Months','year' => 'One Year', 'twoyear' => 'Two Years');
+    $thumb_array = $config['graphs']['row']['normal'];
 
-     echo('<table width=100% class="thumbnail_graph_table"><tr>');
+    echo '<table width=100% class="thumbnail_graph_table"><tr>';
 
     foreach ($thumb_array as $period => $text) {
         $graph_array['from']   = $config['time'][$period];
@@ -162,8 +155,6 @@ foreach (get_graph_subtypes($type, $device) as $avail_type) {
     }
     echo('</center>');
 
-    print_optionbar_end();
-
     echo generate_graph_js_state($graph_array);
 
     echo('<div style="width: '.$graph_array['width'].'; margin: auto;"><center>');
@@ -174,7 +165,7 @@ foreach (get_graph_subtypes($type, $device) as $avail_type) {
         print_optionbar_start();
         echo('<div style="float: left; width: 30px;">
             <div style="margin: auto auto;">
-            <img valign=absmiddle src="images/16/information.png" />
+            <i class="fa fa-info-circle fa-lg icon-theme" aria-hidden="true"></i>
             </div>
             </div>');
         echo($config['graph_descr'][$vars['type']]);

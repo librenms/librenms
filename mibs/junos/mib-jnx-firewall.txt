@@ -18,7 +18,7 @@ IMPORTS
         FROM JUNIPER-SMI;
 
 jnxFirewalls MODULE-IDENTITY
-    LAST-UPDATED "200307182153Z" -- Fri Jul 18 21:53:50 2003 UTC
+    LAST-UPDATED "201601231553Z" -- Wed Jan 23 15:53:50 2016 UTC
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
             "        Juniper Technical Assistance Center
@@ -30,6 +30,9 @@ jnxFirewalls MODULE-IDENTITY
     DESCRIPTION
             "This is Juniper Networks' implementation of enterprise
 	     specific MIB for firewalls filters/policers."
+
+    REVISION "201601231553Z" -- Wed Jan 23 15:53:50 2016 UTC
+    DESCRIPTION "MIB support for firewall Hier policer stats."
     ::= { jnxMibs 5 }
 
 
@@ -81,10 +84,10 @@ jnxFirewalls MODULE-IDENTITY
 	MAX-ACCESS  read-only
 	STATUS      current
 	DESCRIPTION
-		"The name of the counter or policer.  This name is 
-		specific within the firewall filter.  Whether this 
-		object is associated with a counter or a policer 
-		is indicated by jnxFWType.
+		"The name of the counter, policer or Hier policer.  
+                This name is specific within the firewall filter.  
+                Whether this object is associated with a counter,
+                policer or a Hier policer is indicated by jnxFWType.
 		See DESCRIPTION of jnxFirewallsTable for details
 		on this assumption."
 	::= { jnxFirewallsEntry 2 }
@@ -93,13 +96,15 @@ jnxFirewalls MODULE-IDENTITY
 	SYNTAX      INTEGER {
 		other(1),
 		counter(2),
-		policer(3)
+                policer(3),
+                hpolagg(4),
+                hpolpre(5)
 	}		
 	MAX-ACCESS  read-only
 	STATUS      current
 	DESCRIPTION
 		"The type of the object jnxFWCounter.  What it is 
-		associated with - a counter or a policer."
+		associated with a counter, policer or Hier policer."
 	::= { jnxFirewallsEntry 3 }
 
     jnxFWPackets OBJECT-TYPE
@@ -169,23 +174,27 @@ jnxFirewalls MODULE-IDENTITY
 	MAX-ACCESS  not-accessible
 	STATUS      current
 	DESCRIPTION
-		"The name of the counter or policer.  Whether this 
-		object is associated with a counter or a policer 
-		is indicated by jnxFWCounterType."
+		"The name of the counter, policer or Hier policer.  
+                This name is specific within the firewall filter.  
+                Whether this object is associated with a counter,
+                policer or a Hier policer is indicated by 
+                jnxFWCounterType."
 	::= { jnxFirewallCounterEntry 2 }
 
     jnxFWCounterType OBJECT-TYPE
 	SYNTAX      INTEGER {
 		other(1),
 		counter(2),
-		policer(3)
+                policer(3),
+                hpolagg(4),
+                hpolpre(5)
 	}		
 	MAX-ACCESS  not-accessible
 	STATUS      current
 	DESCRIPTION
 		"The type of the object jnxFWCounterName identifies.  What it
-		is associated with - a counter or a policer.  It is possible
-		to have two counters of the same name and different type."
+		is associated with - a counter, policer or Hier policer.  It is 
+                possible to have two counters of the same name and different type."
 	::= { jnxFirewallCounterEntry 3 }
 
     jnxFWCounterPacketCount OBJECT-TYPE
@@ -221,23 +230,25 @@ jnxFirewalls MODULE-IDENTITY
 	MAX-ACCESS  read-only
 	STATUS      current
 	DESCRIPTION
-		"The name of the counter or policer.  Whether this 
-		object is associated with a counter or a policer 
-		is indicated by jnxFWCounterType."
+		"The name of the counter, policer or Hier policer.  Whether 
+                this object is associated with a counter, policer or Hier 
+                policer is indicated by jnxFWCounterType."
 	::= { jnxFirewallCounterEntry 7 }
 
     jnxFWCounterDisplayType OBJECT-TYPE
 	SYNTAX      INTEGER {
 		other(1),
 		counter(2),
-		policer(3)
+		policer(3),
+                hpolagg(4),
+                hpolpre(5)
 	}		
 	MAX-ACCESS  read-only
 	STATUS      current
 	DESCRIPTION
 		"The type of the object jnxFWCounterName identifies.  What it
-		is associated with - a counter or a policer.  It is possible
-		to have two counters of the same name and different type."
+		is associated with - a counter, policer or Hier policer.  It is 
+                possible to have two counters of the same name and different type."
 	::= { jnxFirewallCounterEntry 8 }
 
     jnxFWCntrXTable   OBJECT-TYPE

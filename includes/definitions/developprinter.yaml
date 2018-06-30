@@ -1,0 +1,14 @@
+os: developprinter
+group: printer
+text: 'Develop Printer'
+type: printer
+icon: develop
+over:
+    - { graph: device_toner, text: Toner }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.18334.1.2.1.2.1.50.2.2
+discovery_modules:
+    toner: true
+poller_modules:
+    toner: true

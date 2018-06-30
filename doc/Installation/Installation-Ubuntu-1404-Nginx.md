@@ -1,8 +1,7 @@
 source: Installation/Installation-Ubuntu-1404-Nginx.md
+> NOTE: These instructions assume you are the **root** user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
 
-> NOTE: These instructions have been tested on a fresh install of Ubuntu 12.04 and 14.04.
-
-> NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
+**Please note the minimum supported PHP version is 5.6.4**
 
 ### On the DB Server ###
 
@@ -29,11 +28,9 @@ Input the MySQL root password to enter the MySQL command-line interface.
 Create the database:
 
 ```sql
-CREATE DATABASE librenms;
-GRANT ALL PRIVILEGES ON librenms.*
-  TO 'librenms'@'<ip>'
-  IDENTIFIED BY '<password>'
-;
+CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+CREATE USER 'librenms'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'localhost';
 FLUSH PRIVILEGES;
 exit
 ```
@@ -123,6 +120,8 @@ server {
  index       index.php;
  access_log  /opt/librenms/logs/access_log;
  error_log   /opt/librenms/logs/error_log;
+ gzip on;
+ gzip_types text/css application/x-javascript text/richtext image/svg+xml text/plain    text/xsd text/xsl text/xml image/x-icon;
  location / {
   try_files $uri $uri/ @librenms;
  }
@@ -211,6 +210,12 @@ LibreNMS uses Job Snijders' [poller-wrapper.py][1].  By default, the cron job ru
 Create the cronjob
 
     cp librenms.nonroot.cron /etc/cron.d/librenms
+
+### Copy logrotate config ###
+
+LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large and be rotated out.  To rotate out the old logs you can use the provided logrotate config file:
+
+    cp misc/librenms.logrotate /etc/logrotate.d/librenms
 
 ### Daily Updates ###
 

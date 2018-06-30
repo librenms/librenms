@@ -32,12 +32,12 @@ if (rrdtool_check_rrd_exists($mysql_rrd)) {
 
 
     $rrd_list = array();
-    foreach ($array as $ds => $vars) {
+    foreach ($array as $ds => $var) {
         $rrd_list[] = array(
             'filename' => $rrd_filename,
-            'descr' => $vars['descr'],
+            'descr' => $var['descr'],
             'ds' => $ds,
-//                'colour' => $vars['colour']
+//                'colour' => $var['colour']
         );
     }
 } else {

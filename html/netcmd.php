@@ -10,6 +10,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use LibreNMS\Authentication\Auth;
+
 ini_set('allow_url_fopen', 0);
 ini_set('display_errors', 0);
 
@@ -20,22 +22,18 @@ if ($_GET[debug]) {
     ini_set('error_reporting', E_ALL);
 }
 
-require '../includes/defaults.inc.php';
-require '../config.php';
-require_once '../includes/definitions.inc.php';
-require 'includes/functions.inc.php';
-require '../includes/functions.php';
-require 'includes/authenticate.inc.php';
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-if (!$_SESSION['authenticated']) {
+if (!Auth::check()) {
     echo 'unauthenticated';
     exit;
 }
 
 $output = '';
 if ($_GET['query'] && $_GET['cmd']) {
-    $host = $_GET['query'];
-    if (Net_IPv6::checkIPv6($host) || Net_IPv4::validateip($host) || filter_var('http://'.$host, FILTER_VALIDATE_URL)) {
+    $host = clean($_GET['query']);
+    if (filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) || filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) || filter_var('http://'.$host, FILTER_VALIDATE_URL)) {
         switch ($_GET['cmd']) {
             case 'whois':
                 $cmd = $config['whois']." $host | grep -v \%";
@@ -50,7 +48,7 @@ if ($_GET['query'] && $_GET['cmd']) {
                 break;
 
             case 'nmap':
-                if ($_SESSION['userlevel'] != '10') {
+                if (!Auth::user()->isAdmin()) {
                     echo 'insufficient privileges';
                 } else {
                     $cmd = $config['nmap']." $host";

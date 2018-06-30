@@ -28,7 +28,7 @@ foreach ($components as $id => $array) {
     if ($array['otvtype'] == 'endpoint') {
         $rrd_filename = rrd_name($device['hostname'], array('cisco', 'otv', $array['endpoint'], 'mac'));
 
-        if (file_exists($rrd_filename)) {
+        if (rrdtool_check_rrd_exists($rrd_filename)) {
             // Stack the area on the second and subsequent DS's
             $stack = "";
             if ($count != 0) {

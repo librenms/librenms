@@ -1,5 +1,8 @@
 <?php
 
+use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\IP;
+
 echo '<div class="container-fluid">';
 echo "<div class='row'>
       <div class='col-md-12'>
@@ -7,13 +10,19 @@ echo "<div class='row'>
             <div class='panel-heading'>";
 
 if ($config['overview_show_sysDescr']) {
-    echo '<strong>'.$device['sysDescr'].'</strong>';
+    echo '<i class="fa fa-id-card fa-lg icon-theme" aria-hidden="true"></i> <strong>'.$device['sysDescr'].'</strong>';
 }
 
 echo '</div>
       <table class="table table-hover table-condensed table-striped">';
 
-$uptime = $device['uptime'];
+$uptime = formatUptime($device['uptime']);
+$uptime_text = 'Uptime';
+if ($device['status'] == 0) {
+    // Rewrite $uptime to be downtime if device is down
+    $uptime = formatUptime(time() - strtotime($device['last_polled']));
+    $uptime_text = 'Downtime';
+}
 
 if ($device['os'] == 'ios') {
     formatCiscoHardware($device);
@@ -31,10 +40,21 @@ echo '<tr>
       </tr>';
 
 if (!empty($device['ip'])) {
+     echo "<tr><td>Resolved IP</td><td>{$device['ip']}</td></tr>";
+} elseif ($config['force_ip_to_sysname'] === true) {
+    try {
+        $ip = IP::parse($device['hostname']);
+        echo "<tr><td>IP Address</td><td>$ip</td></tr>";
+    } catch (InvalidIpException $e) {
+        // don't add an ip line
+    }
+}
+
+if ($device['purpose']) {
     echo '<tr>
-             <td>Resolved IP</td>
-             <td>'.$device['ip'].'</td>
-         </tr>';
+        <td>Description</td>
+        <td>'.display($device['purpose']).'</td>
+      </tr>';
 }
 
 if ($device['hardware']) {
@@ -99,15 +119,15 @@ if (!is_array($loc)) {
 if (is_array($loc)) {
     echo '<tr>
         <td>Lat / Lng</td>
-        <td>['.$loc['lat'].','.$loc['lng'].']</td>
+        <td>['.$loc['lat'].','.$loc['lng'].'] <div class="pull-right"><a href="https://maps.google.com/?q='.$loc['lat'].'+'.$loc['lng'].'" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</button></div></a></td>
     </tr>';
 }
 
 if ($uptime) {
-    echo '<tr>
-        <td>Uptime</td>
-        <td>'.formatUptime($uptime).'</td>
-      </tr>';
+    echo "<tr>
+        <td>$uptime_text</td>
+        <td>".$uptime."</td>
+      </tr>";
 }
 
 echo '</table>

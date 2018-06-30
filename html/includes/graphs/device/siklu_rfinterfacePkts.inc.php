@@ -4,7 +4,7 @@ require 'includes/graphs/common.inc.php';
 
 $rrdfilename = rrd_name($device['hostname'], 'siklu-interface');
 
-if (file_exists($rrdfilename)) {
+if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'pps      Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:rfInPkts='.$rrdfilename.':rfInPkts:AVERAGE ';
     $rrd_options .= ' DEF:rfOutPkts='.$rrdfilename.':rfOutPkts:AVERAGE ';

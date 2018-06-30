@@ -18,6 +18,7 @@
 
 var grid = $("#mac-search").bootgrid({
     ajax: true,
+    rowCount: [50, 100, 250, -1],
     templates: {
         header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
                 "<div class=\"col-sm-9 actionBar\"><span class=\"pull-left\">"+
@@ -26,22 +27,25 @@ var grid = $("#mac-search").bootgrid({
                 "<select name=\"device_id\" id=\"device_id\" class=\"form-control input-sm\">"+
                 "<option value=\"\">All Devices</option>"+
 <?php
-$sql = 'SELECT `devices`.`device_id`,`hostname` FROM `devices`';
 
-if (is_admin() === false && is_read() === false) {
+use LibreNMS\Authentication\Auth;
+
+$sql = 'SELECT `devices`.`device_id`,`hostname`, `sysName` FROM `devices`';
+
+if (!Auth::user()->hasGlobalRead()) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
     $where  .= ' WHERE `DP`.`user_id`=?';
-    $param[] = $_SESSION['user_id'];
+    $param[] = Auth::id();
 }
 
-$sql .= " $where GROUP BY `hostname` ORDER BY `hostname`";
+$sql .= " $where ORDER BY `hostname`";
 foreach (dbFetchRows($sql, $param) as $data) {
     echo '"<option value=\"'.$data['device_id'].'\""+';
     if ($data['device_id'] == $_POST['device_id']) {
         echo '" selected "+';
     }
 
-    echo '">'.$data['hostname'].'</option>"+';
+    echo '">'.format_hostname($data).'</option>"+';
 }
 ?>
                "</select>"+

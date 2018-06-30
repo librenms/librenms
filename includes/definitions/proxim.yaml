@@ -1,0 +1,9 @@
+os: proxim
+text: Proxim
+type: network
+icon: proxim
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.11898.2.4.9

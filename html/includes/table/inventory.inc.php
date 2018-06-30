@@ -1,44 +1,46 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 $where = '1';
 $param = array();
 
 
 
-if ($_SESSION['userlevel'] >= '5') {
+if (Auth::user()->hasGlobalRead()) {
     $sql = " FROM entPhysical AS E, devices AS D WHERE $where AND D.device_id = E.device_id";
 } else {
     $sql     = " FROM entPhysical AS E, devices AS D, devices_perms AS P WHERE $where AND D.device_id = E.device_id AND P.device_id = D.device_id AND P.user_id = ?";
-    $param[] = $_SESSION['user_id'];
+    $param[] = Auth::id();
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
     $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `E`.`entPhysicalDescr` LIKE '%$searchPhrase%' OR `E`.`entPhysicalModelName` LIKE '%$searchPhrase%' OR `E`.`entPhysicalSerialNum` LIKE '%$searchPhrase%')";
 }
 
-if (isset($_POST['string']) && strlen($_POST['string'])) {
+if (isset($vars['string']) && strlen($vars['string'])) {
     $sql    .= ' AND E.entPhysicalDescr LIKE ?';
-    $param[] = '%'.$_POST['string'].'%';
+    $param[] = '%'.$vars['string'].'%';
 }
 
-if (isset($_POST['device_string']) && strlen($_POST['device_string'])) {
+if (isset($vars['device_string']) && strlen($vars['device_string'])) {
     $sql    .= ' AND D.hostname LIKE ?';
-    $param[] = '%'.$_POST['device_string'].'%';
+    $param[] = '%'.$vars['device_string'].'%';
 }
 
-if (isset($_POST['part']) && strlen($_POST['part'])) {
+if (isset($vars['part']) && strlen($vars['part'])) {
     $sql    .= ' AND E.entPhysicalModelName = ?';
-    $param[] = $_POST['part'];
+    $param[] = $vars['part'];
 }
 
-if (isset($_POST['serial']) && strlen($_POST['serial'])) {
+if (isset($vars['serial']) && strlen($vars['serial'])) {
     $sql    .= ' AND E.entPhysicalSerialNum LIKE ?';
-    $param[] = '%'.$_POST['serial'].'%';
+    $param[] = '%'.$vars['serial'].'%';
 }
 
-if (isset($_POST['device']) && is_numeric($_POST['device'])) {
+if (isset($vars['device']) && is_numeric($vars['device'])) {
     $sql    .= ' AND D.device_id = ?';
-    $param[] = $_POST['device'];
+    $param[] = $vars['device'];
 }
 
 $count_sql = "SELECT COUNT(`entPhysical_id`) $sql";

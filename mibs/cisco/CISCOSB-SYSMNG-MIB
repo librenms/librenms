@@ -1,0 +1,506 @@
+CISCOSB-SYSMNG-MIB DEFINITIONS ::= BEGIN
+
+-- Version:    7.50
+-- Date:       31 Oct 2010
+-- 31-Oct-2010 Added rlSysmngTcamAllocationsTable
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,Counter32,
+    Unsigned32                                  FROM SNMPv2-SMI
+    TruthValue, RowStatus, RowPointer,
+    TEXTUAL-CONVENTION,DisplayString            FROM SNMPv2-TC
+    Counter64, OBJECT-TYPE                      FROM SNMPv2-SMI
+    Percents,switch001                          FROM CISCOSB-MIB;
+
+
+rlSysmngMib MODULE-IDENTITY
+        LAST-UPDATED "201010310000z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+             "The private MIB module definition for System Manager pool."
+        REVISION "201010310000z"
+        DESCRIPTION
+             "Initial revision."
+        ::= { switch001 204 }
+
+SysmngResourceRouteType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Supported router resource types"
+    SYNTAX  INTEGER {
+        ipv4(1),
+        ipv6(2),
+        ipmv4(3),
+        ipmv6(4),
+        nonIp(5)
+
+}
+
+SysmngResourceRouteUsageType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Supported router resource usage types"
+    SYNTAX  INTEGER {
+        ipv4Neighbor(1),
+        ipv4Address(2),
+        ipv4Route(3),
+        ipv6Neighbor(4),
+        ipv6Address(5),
+        ipv6OnlinkPrefix(6),
+        ipv6Route(7),
+        ipmv4Route(8),
+        ipmv4RouteStarG(9),
+        ipmv6Route(10),
+        ipmv6RouteStarG(11)
+}
+
+SysmngPoolType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Supported TCAM pools."
+    SYNTAX  INTEGER {
+        router(1),
+        iscsi(2),
+        voip(3),
+        misc(4)           -- Miscellaneous pool - uses all TCAM entries that
+                          --                      previous pools (Router/ISCSI)
+                          --                      didn't reserved
+}
+
+-- System Manager Tcam Allocations Table
+
+    rlSysmngTcamAllocations OBJECT IDENTIFIER
+      ::= { rlSysmngMib 1 }
+
+    rlSysmngTcamAllocationsTable OBJECT-TYPE
+      SYNTAX         SEQUENCE OF RlSysmngTcamAllocationsEntry
+      MAX-ACCESS     not-accessible
+      STATUS         current
+      DESCRIPTION
+           "A table containing tcam allocations information.
+           Each row represents objects for a defined profile."
+      ::= { rlSysmngTcamAllocations 1 }
+
+    rlSysmngTcamAllocationsEntry OBJECT-TYPE
+      SYNTAX         RlSysmngTcamAllocationsEntry
+      MAX-ACCESS     not-accessible
+      STATUS         current
+      DESCRIPTION
+           "A Single entry containing tcam allocations information
+            per predefined profile and specific pool."
+      INDEX          { rlSysmngTcamAllocProfileName, rlSysmngTcamAllocPoolType }
+      ::= { rlSysmngTcamAllocationsTable 1 }
+
+    RlSysmngTcamAllocationsEntry ::= SEQUENCE {
+      rlSysmngTcamAllocProfileName                          DisplayString,
+      rlSysmngTcamAllocPoolType                             SysmngPoolType,
+
+      rlSysmngTcamAllocMinRequiredEntries                   Unsigned32,
+      rlSysmngTcamAllocStaticConfigEntries                  Unsigned32,
+      rlSysmngTcamAllocInUseEntries                         Unsigned32,
+      rlSysmngTcamAllocPoolSize                             Unsigned32
+    }
+
+     rlSysmngTcamAllocProfileName OBJECT-TYPE
+      SYNTAX         DisplayString
+      MAX-ACCESS     not-accessible
+      STATUS         current
+      DESCRIPTION
+           "The profile name for tcam allocation.
+            Must be unique per entry. This is an index into the table.
+            'tcam0' profile contains policy tcam counters
+            'tcam1' profile contains router tcam counters"
+      ::= { rlSysmngTcamAllocationsEntry 1 }
+
+    rlSysmngTcamAllocPoolType OBJECT-TYPE
+      SYNTAX         SysmngPoolType
+      MAX-ACCESS     not-accessible
+      STATUS         current
+      DESCRIPTION
+           "Pool type.
+            Must be unique per entry. This is an index into the table."
+      ::= { rlSysmngTcamAllocationsEntry 2 }
+
+
+   rlSysmngTcamAllocMinRequiredEntries OBJECT-TYPE
+      SYNTAX         Unsigned32
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+           "Number of minimal hardware entries, required by pool to operate."
+      DEFVAL { 0 }
+      ::= { rlSysmngTcamAllocationsEntry 3 }
+
+    rlSysmngTcamAllocStaticConfigEntries OBJECT-TYPE
+      SYNTAX         Unsigned32
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+           "Number of hardware entries, in use by static configuration of the pool."
+      DEFVAL { 0 }
+      ::= { rlSysmngTcamAllocationsEntry 4 }
+
+   rlSysmngTcamAllocInUseEntries OBJECT-TYPE
+      SYNTAX         Unsigned32
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+           "Total number of hardware entries, currently in use by the pool.
+            This number includes minimum, static and dynamic entries."
+      DEFVAL { 0 }
+      ::= { rlSysmngTcamAllocationsEntry 5 }
+
+   rlSysmngTcamAllocPoolSize OBJECT-TYPE
+      SYNTAX         Unsigned32
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+           "Total number of hardware entries reserved for the pool."
+      DEFVAL { 0 }
+      ::= { rlSysmngTcamAllocationsEntry 6 }
+
+-- System Manager Router Resource Table
+
+rlSysmngResource OBJECT IDENTIFIER
+    ::= { rlSysmngMib 2 }
+
+-- This is going to be deprecated and instead, rlSysmngResourcePerUnitTable
+-- should be used
+rlSysmngResourceTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF RlSysmngResourceEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "A read-only table for displaying router resources configuration,
+        properties, and usage per resource."
+    ::= { rlSysmngResource 1 }
+
+rlSysmngResourceEntry OBJECT-TYPE
+    SYNTAX         RlSysmngResourceEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "A Single entry containing specific router resource information."
+    INDEX          { rlSysmngResourceRouteType }
+    ::= { rlSysmngResourceTable 1 }
+
+RlSysmngResourceEntry ::= SEQUENCE {
+    rlSysmngResourceRouteType                       SysmngResourceRouteType,
+    rlSysmngResourceCurrentUse                      Unsigned32,
+    rlSysmngResourceCurrentUseHw                    Unsigned32,
+    rlSysmngResourceCurrentMax                      Unsigned32,
+    rlSysmngResourceCurrentMaxHw                    Unsigned32,
+    rlSysmngResourceTemporaryMax                    Unsigned32,
+    rlSysmngResourceTemporaryMaxHw                  Unsigned32,
+    rlSysmngResourceCurrentNexthopMax               Unsigned32,
+    rlSysmngResourceCurrentNexthopMaxHw             Unsigned32,
+    rlSysmngResourceCurrentNexthopUse               Unsigned32,
+    rlSysmngResourceCurrentNexthopUseHw             Unsigned32
+}
+
+rlSysmngResourceRouteType OBJECT-TYPE
+    SYNTAX         SysmngResourceRouteType
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+       "Router resource type."
+    ::= { rlSysmngResourceEntry 1 }
+
+rlSysmngResourceCurrentUse OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "Currently in used number of routes."
+    DEFVAL { 0 }
+    ::= { rlSysmngResourceEntry 2 }
+
+rlSysmngResourceCurrentUseHw OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "Currently in used number of HW FFT entries"
+    DEFVAL { 0 }
+    ::= { rlSysmngResourceEntry 3 }
+
+rlSysmngResourceCurrentMax OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "The running maximum supported number of routes."
+    DEFVAL { 0 }
+    ::= { rlSysmngResourceEntry 4 }
+
+rlSysmngResourceCurrentMaxHw OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "The running maximum supported number of HW FFT entries."
+    DEFVAL { 0 }
+    ::= { rlSysmngResourceEntry 5 }
+
+rlSysmngResourceTemporaryMax OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "The temporary maximum supported number of routes."
+    DEFVAL { 0 }
+    ::= { rlSysmngResourceEntry 6 }
+
+rlSysmngResourceTemporaryMaxHw OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "The temporary maximum supported number of HW FFT entries."
+    DEFVAL { 0 }
+    ::= { rlSysmngResourceEntry 7 }
+
+rlSysmngResourceCurrentNexthopMax OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "The maximum supported number of nexthop entries."
+    DEFVAL { 0 }
+    ::= { rlSysmngResourceEntry 8 }
+
+rlSysmngResourceCurrentNexthopMaxHw OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "The maximum supported number of HW nexthop entries."
+    DEFVAL { 0 }
+    ::= { rlSysmngResourceEntry 9 }
+
+rlSysmngResourceCurrentNexthopUse OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "The current number of nexthop entries."
+    DEFVAL { 0 }
+    ::= { rlSysmngResourceEntry 10 }
+
+rlSysmngResourceCurrentNexthopUseHw OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "The current number of HW nexthop entries."
+    DEFVAL { 0 }
+    ::= { rlSysmngResourceEntry 11 }
+
+-- System Manager Router Resource Action
+rlSysmngRouterResourceAction OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Router recource action."
+    ::=  { rlSysmngMib 3 }
+
+-- System Manager Router Resource Table
+
+rlSysmngResourceUsage OBJECT IDENTIFIER
+    ::= { rlSysmngMib 4 }
+
+rlSysmngResourceUsageTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF RlSysmngResourceUsageEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "A read-only table for displaying router resources configuration,
+        properties, and usage per resource."
+    ::= { rlSysmngResourceUsage 1 }
+
+rlSysmngResourceUsageEntry OBJECT-TYPE
+    SYNTAX         RlSysmngResourceUsageEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "A Single entry containing specific router resource information."
+    INDEX          { rlSysmngResourceUsageType }
+    ::= { rlSysmngResourceUsageTable 1 }
+
+RlSysmngResourceUsageEntry ::= SEQUENCE {
+    rlSysmngResourceUsageType                       SysmngResourceRouteUsageType,
+    rlSysmngResourceUsageNum                        Unsigned32
+}
+
+rlSysmngResourceUsageType OBJECT-TYPE
+    SYNTAX         SysmngResourceRouteUsageType
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+       "Router resource type."
+    ::= { rlSysmngResourceUsageEntry 1 }
+
+rlSysmngResourceUsageNum OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "Currently in used."
+    DEFVAL { 0 }
+    ::= { rlSysmngResourceUsageEntry 2 }
+
+rlSysmngResourcePerUnit OBJECT IDENTIFIER
+    ::= { rlSysmngMib 5 }
+
+-- This table should be used rlSysmngResourcePerUnitTable instead of
+-- rlSysmngResourceTable
+rlSysmngResourcePerUnitTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF RlSysmngResourcePerUnitEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "A read-only table for displaying router resources configuration,
+        properties, and usage per resource."
+    ::= { rlSysmngResourcePerUnit 1 }
+
+rlSysmngResourcePerUnitEntry OBJECT-TYPE
+    SYNTAX         RlSysmngResourcePerUnitEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "A Single entry containing specific router resource information."
+    INDEX          { rlSysmngResourcePerUnitRouteType,
+                     rlSysmngResourcePerUnitUnitId }
+    ::= { rlSysmngResourcePerUnitTable 1 }
+
+RlSysmngResourcePerUnitEntry ::= SEQUENCE {
+    rlSysmngResourcePerUnitRouteType                    SysmngResourceRouteType,
+    rlSysmngResourcePerUnitUnitId                       Unsigned32,
+    rlSysmngResourcePerUnitCurrentUse                   Unsigned32,
+    rlSysmngResourcePerUnitCurrentUseHw                 Unsigned32,
+    rlSysmngResourcePerUnitCurrentMax                   Unsigned32,
+    rlSysmngResourcePerUnitCurrentMaxHw                 Unsigned32,
+    rlSysmngResourcePerUnitTemporaryMax                 Unsigned32,
+    rlSysmngResourcePerUnitTemporaryMaxHw               Unsigned32,
+    rlSysmngResourcePerUnitCurrentNexthopMax            Unsigned32,
+    rlSysmngResourcePerUnitCurrentNexthopMaxHw          Unsigned32,
+    rlSysmngResourcePerUnitCurrentNexthopUse            Unsigned32,
+    rlSysmngResourcePerUnitCurrentNexthopUseHw          Unsigned32
+}
+
+rlSysmngResourcePerUnitRouteType OBJECT-TYPE
+    SYNTAX         SysmngResourceRouteType
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+       "Router resource type."
+    ::= { rlSysmngResourcePerUnitEntry 1 }
+
+rlSysmngResourcePerUnitUnitId OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+       "Unit id. Zero value means system totals."
+    ::= { rlSysmngResourcePerUnitEntry 2 }
+
+rlSysmngResourcePerUnitCurrentUse OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "Currently in used number of routes."
+    DEFVAL { 0 }
+    ::= { rlSysmngResourcePerUnitEntry 3 }
+
+rlSysmngResourcePerUnitCurrentUseHw OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "Currently in used number of HW FFT entries"
+    DEFVAL { 0 }
+    ::= { rlSysmngResourcePerUnitEntry 4 }
+
+rlSysmngResourcePerUnitCurrentMax OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "The running maximum supported number of routes."
+    DEFVAL { 0 }
+    ::= { rlSysmngResourcePerUnitEntry 5 }
+
+rlSysmngResourcePerUnitCurrentMaxHw OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "The running maximum supported number of HW FFT entries."
+    DEFVAL { 0 }
+    ::= { rlSysmngResourcePerUnitEntry 6 }
+
+rlSysmngResourcePerUnitTemporaryMax OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "The temporary maximum supported number of routes."
+    DEFVAL { 0 }
+    ::= { rlSysmngResourcePerUnitEntry 7 }
+
+rlSysmngResourcePerUnitTemporaryMaxHw OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "The temporary maximum supported number of HW FFT entries."
+    DEFVAL { 0 }
+    ::= { rlSysmngResourcePerUnitEntry 8 }
+
+rlSysmngResourcePerUnitCurrentNexthopMax OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "The maximum supported number of nexthop entries."
+    DEFVAL { 0 }
+    ::= { rlSysmngResourcePerUnitEntry 9 }
+
+rlSysmngResourcePerUnitCurrentNexthopMaxHw OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "The maximum supported number of HW nexthop entries."
+    DEFVAL { 0 }
+    ::= { rlSysmngResourcePerUnitEntry 10 }
+
+rlSysmngResourcePerUnitCurrentNexthopUse OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "The current number of nexthop entries."
+    DEFVAL { 0 }
+    ::= { rlSysmngResourcePerUnitEntry 11 }
+
+rlSysmngResourcePerUnitCurrentNexthopUseHw OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "The current number of HW nexthop entries."
+    DEFVAL { 0 }
+    ::= { rlSysmngResourcePerUnitEntry 12 }
+
+END

@@ -1,0 +1,20 @@
+os: quanta
+text: Quanta
+type: network
+icon: quanta
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+mib_dir:
+    - quanta
+discovery:
+    - sysObjectID:
+          - .1.3.6.1.4.1.7244
+    -
+      sysObjectID:
+          - .1.3.6.1.4.1.4413
+      sysDescr_regex:
+          - '/VxWorks/'
+          - '/quanta/i'
+          - '/FASTPATH (Switching|Routing)/'

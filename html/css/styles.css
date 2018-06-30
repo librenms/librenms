@@ -315,6 +315,7 @@ A.purple:visited, a.purple, .purple { color: #740074; }
 .bluebg  { background-color: #aaaaff; }
 .greenbg { background-color: #aaffaa; }
 .greybg  { background-color: #DEEFEF; }
+.blackbg { background-color: #000000; }
 
 .selector {
   width:275px;
@@ -357,7 +358,6 @@ A.purple:visited, a.purple, .purple { color: #740074; }
 
 .box-desc {
   font-size: 12px;
-  font-style: italic;
 }
 
 .interface-desc {
@@ -837,6 +837,13 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
   font-size: 12px;
   margin: 8px;
 }
+
+.infobox .rrd-pre {
+  background-color: #CCCCFF;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
 
 .infobox-down {
 
@@ -1552,7 +1559,7 @@ tr.search:nth-child(odd) {
 
 .scrollable-menu {
     height: auto;
-    max-height: 200px;
+    max-height: 600px;
     overflow-x: hidden;
 }
 
@@ -1579,8 +1586,19 @@ tr.search:nth-child(odd) {
 }
 
 .navbar-brand {
-  padding-left: 15px !important;
-  padding-top: 8px !important;
+  padding: 8px 15px 8px 15px !important;
+  line-height: 32px;
+}
+
+@media (min-width: 992px) and (max-width: 1280px) {
+  .navbar-brand {
+    display: none !important;
+  }
+}
+
+.navbar-brand img {
+  height: 100%;
+  max-width: 170px;
 }
 
 #visualization {
@@ -1646,8 +1664,12 @@ tr.search:nth-child(odd) {
 }
 
 .tt-suggestion:hover {
-	background-color: #0097CF;
-	color: #FFFFFF;
+  background-color: #0097CF;
+  color: #FFFFFF;
+}
+
+.tt-suggestion img {
+  width: 32px;
 }
 
 .gridster * {
@@ -1755,7 +1777,9 @@ tr.search:nth-child(odd) {
     height: 600px;
 }
 
-.edit-storage-input {
+.edit-storage-input,
+.edit-processor-input,
+.edit-mempool-input {
     width: 100px;
 }
 
@@ -1763,22 +1787,56 @@ label {
     font-weight: normal;
 }
 
-.nav>li>a.dropdown-toggle {
-    padding: 15px 6px;
-}
-
-.badge-navbar-user{
-   background:red;
+.badge-navbar-user {
    border-radius: 40%;
    font-size: 65%;
-   height: auto;
-   margin: 0;
-   padding:5px;
-   position:absolute;
-   right:-3px;
-   top:5px;
-   width: auto;
-  }
+   padding: 5px;
+   position: relative;
+   top: -10px;
+   left: -5px;
+}
+.badge-default {
+  background-color: #777;
+}
+.badge-default[href]:hover,
+.badge-default[href]:focus {
+  background-color: #5e5e5e;
+}
+.badge-primary {
+  background-color: #337ab7;
+}
+.badge-primary[href]:hover,
+.badge-primary[href]:focus {
+  background-color: #286090;
+}
+.badge-success {
+  background-color: #5cb85c;
+}
+.badge-success[href]:hover,
+.badge-success[href]:focus {
+  background-color: #449d44;
+}
+.badge-info {
+  background-color: #5bc0de;
+}
+.badge-info[href]:hover,
+.badge-info[href]:focus {
+  background-color: #31b0d5;
+}
+.badge-warning {
+  background-color: #f0ad4e;
+}
+.badge-warning[href]:hover,
+.badge-warning[href]:focus {
+  background-color: #ec971f;
+}
+.badge-danger {
+  background-color: #d9534f;
+}
+.badge-danger[href]:hover,
+.badge-danger[href]:focus {
+  background-color: #c9302c;
+}
 
 @media only screen and (max-width: 480px) {
     .thumbnail_graph_table b { font-size : 6px;}
@@ -1786,16 +1844,6 @@ label {
         max-width: 45px;
         max-height: 50px;
     }
-    .device-header-table .device_icon img {
-       max-width: 20px;
-       max-height: 20px;
-    }
-    .device-header-table img {
-       max-width: 115px;
-       max-height: 40px;
-    }
-    .device-header-table {font-size : 8px;}
-    .device-header-table a {font-size : 11px;}
 }
 
 @media only screen and (max-width: 768px) and (min-width: 481px) {
@@ -1804,12 +1852,6 @@ label {
         max-width: 60px;
         max-height: 55px;
     }
-    .device-header-table img {
-       max-width: 150px;
-       max-height: 50px;
-    }
-    .device-header-table {font-size : 10px;}
-    .device-header-table a {font-size : 17px;}
 }
 
 
@@ -1842,6 +1884,16 @@ label {
     color: white;
 }
 
+.blueCluster {
+    background-color: rgba(23,162,184, 0);
+    background-color: rgba(23,162,184,0.7);
+    text-align: center;
+    width: 25px !important;
+    height: 25px !important;
+    font-size: 14px;
+    color: white;
+}
+
 .greenCluster {
     background-color: rgba(0,255,0, 0);
     background-color: rgba(110, 204, 57, 0.6);
@@ -1866,13 +1918,12 @@ label {
 .widget_body {
     overflow-y: auto;
     width: 100%;
-    height: calc(100% - 35px);
+    height: calc(100% - 38px);
 }
 
 .device-availability, .service-availability {
   color:#000000;
   float:left;
-  width:163px;
   height:64px;
   margin:10px;
   padding:8px;
@@ -1893,7 +1944,16 @@ label {
   border:1px solid #FFB733;
 }
 
+.device-availability.ignored, .service-availability.ignored {
+  border:1px solid #36393D;
+}
+
+.device-availability.disabled, .service-availability.disabled {
+  border:1px solid #000000;
+}
+
 .availability-label {
+  border-radius: 0 .25em 0 .25em;
   float:right;
   margin:-8px;
 }
@@ -1916,13 +1976,13 @@ label {
 }
 
 .page-availability-title-left {
-  width:50%;
+  width:40%;
   float:left;
   height:40px;
 }
 
 .page-availability-title-right {
-  width:50%;
+  width:60%;
   float:left;
   text-align:right;
 }
@@ -1950,6 +2010,12 @@ label {
   float:left;
   margin:2px;
   curosr: pointer;
+}
+
+.widget-availability-fixed {
+  min-width: 2.4em;
+  min-height: 1.3em;
+  max-height: 1.6em;
 }
 
 .widget-availability-host {
@@ -1990,4 +2056,146 @@ label {
   width:12px;
   float:left;
   background-color: #D9534F;
+}
+
+.availability-map-widget-header {
+  line-height:34px;
+}
+
+.nav > li > a {
+  padding-left: 10px;
+  padding-right: 5px;
+}
+
+/* devices layout modifications */
+.devices-font-bold {
+    font-weight: bold;
+}
+
+.devices-float-right {
+    float: right;
+}
+
+.devices-graphs-select {
+    margin-right: 5px;
+}
+
+.devices-search-header {
+    margin: 5px;
+}
+
+.devices-input-small {
+    line-height: 14px;
+}
+
+.devices-status-box-detail {
+    line-height: 16px;
+    margin-left: 5px;
+    font-size: 14px;
+    width: 80px;
+    display: block;
+    height: 24px;
+    text-align: center;
+    vertical-align: middle;
+    margin-top: 8px;
+}
+
+.devices-status-box-basic {
+    margin-left: 5px;
+    width: 70px;
+    display: block;
+    text-align: center;
+}
+
+.devices-headers-table-menu {
+    padding: 0;
+    float: right;
+}
+
+.devices-overlib-box {
+    display: block;
+    padding: 1px;
+    margin: 2px;
+    min-height: 170px;
+    max-height: 170px;
+    text-align: center;
+    float: left;
+    background-color: #f5f5f5;
+}
+
+.device-table-metrics span {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.device-table-metrics>a {
+  color:#000;
+  text-decoration:none;
+}
+
+.device-table-header-actions {
+  min-width: 110px;
+  text-align: center;
+}
+
+.device-table-icon {
+  padding-left:7px;
+  display: inline-block;
+  width: 64px;
+  height: 32px;
+  line-height: 32px;
+}
+
+.device-table-icon img {
+    width: 32px;
+}
+
+.device-icon img {
+    max-height: 32px;
+    max-width: 40px;
+}
+
+.device-icon {
+  display: inline-block;
+  height: 32px;
+  width: 40px;
+}
+
+.device-icon-header {
+  height: 52px;
+  max-width: 250px;
+  margin-right: 15px;
+}
+
+.alert-status {
+  display: inline-block;
+  width: 7px;
+  min-height: 27px;
+}
+
+.device-services-page {
+  font-weight: bold;
+  margin-left: 20px;
+  vertical-align: middle;
+}
+
+.device-services-page-no-service {
+  font-weight: bold;
+  vertical-align: middle;
+  padding: 15px;
+}
+
+.validation:invalid {
+    border-color: red;
+}
+
+.eventlog-status {
+  display: inline-block;
+  margin-right: 8px;
+  float: left;
+}
+
+/* Workaround for https://github.com/select2/select2/issues/291 */
+.select2-selection--multiple .select2-search--inline .select2-search__field {
+  width: auto !important;
 }

@@ -1,0 +1,202 @@
+-- ****************************************************************************
+--  COLUBRIS-VSC-MIB definitions
+--
+--  Copyright (c) 2006, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Colubris Virtual Service Communities MIB file.
+--
+-- ****************************************************************************
+
+
+COLUBRIS-VSC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32
+        FROM    SNMPv2-SMI
+    DisplayString, TruthValue
+        FROM    SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM    SNMPv2-CONF
+    colubrisMgmtV2
+        FROM    COLUBRIS-SMI
+    ColubrisSSID
+        FROM    COLUBRIS-TC
+;
+
+
+colubrisVscMIB MODULE-IDENTITY
+    LAST-UPDATED    "200607050000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "Colubris Virtual Service Communities MIB."
+
+    ::= { colubrisMgmtV2 22 }
+
+
+-- colubrisVscMIB definition
+colubrisVscMIBObjects OBJECT IDENTIFIER ::= { colubrisVscMIB 1 }
+
+-- colubris Virtual Service Communities groups
+coVscConfigGroup OBJECT IDENTIFIER ::= { colubrisVscMIBObjects 1 }
+
+-- The MultiService Access Point Wireless Interface Status Group
+coVscConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoVscConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Virtual Service Communities configuration attributes."
+    ::= { coVscConfigGroup 1 }
+
+coVscConfigEntry OBJECT-TYPE
+    SYNTAX      CoVscConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the coVscConfigTable.
+                 coVscCfgIndex - Uniquely identify a Virtual Service
+                                 Community on the MultiService Access
+                                 Controller."
+    INDEX       { coVscCfgIndex }
+    ::= { coVscConfigTable 1 }
+
+CoVscConfigEntry ::= SEQUENCE
+{
+    coVscCfgIndex                  Integer32,
+    coVscCfgFriendlyVscName        DisplayString,
+    coVscCfgSSID                   ColubrisSSID,
+    coVscCfgAccessControlled       TruthValue,
+    coVscCfgSecurity               INTEGER,
+    coVscCfgEncryption             INTEGER,
+    coVscCfg8021xAuthentication    INTEGER,
+    coVscCfgMACAuthentication      TruthValue,
+    coVscCfgHTMLAuthentication     TruthValue
+}
+
+coVscCfgIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Specifies the index of a Virtual Service Community (VSC)
+                 in the MultiService Controller configuration file."
+    ::= { coVscConfigEntry 1 }
+
+coVscCfgFriendlyVscName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The friendly name associated with the VSC."
+    ::= { coVscConfigEntry 2 }
+
+coVscCfgSSID OBJECT-TYPE
+    SYNTAX      ColubrisSSID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Service Set ID assigned to the VSC."
+    ::= { coVscConfigEntry 3 }
+
+coVscCfgAccessControlled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates if the VSC is access controlled."
+    ::= { coVscConfigEntry 4 }
+
+coVscCfgSecurity OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    open(1),
+                    ieee802dot1x(2),
+                    wpa(3),
+                    wpa2(4),
+                    wpaAndWpa2(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the type of security used by the VSC."
+    ::= { coVscConfigEntry 5 }
+
+coVscCfgEncryption OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    none(1),
+                    wep(2),
+                    tkip(3),
+                    aes(4),
+                    tkipAndAes(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the encryption type supported by the VSC."
+    ::= { coVscConfigEntry 6 }
+
+coVscCfg8021xAuthentication OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    none(1),
+                    radius(2),
+                    psk(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the 802.1x authentication type supported by the VSC."
+    ::= { coVscConfigEntry 7 }
+
+coVscCfgMACAuthentication OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates if MAC authentication is enabled on the VSC."
+    ::= { coVscConfigEntry 8 }
+
+coVscCfgHTMLAuthentication OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates if HTML authentication is enabled on the
+                 VSC. Always false on a satellite."
+    ::= { coVscConfigEntry 9 }
+
+
+-- conformance information
+colubrisVscMIBConformance OBJECT IDENTIFIER ::= { colubrisVscMIB 2 }
+colubrisVscMIBCompliances OBJECT IDENTIFIER ::= { colubrisVscMIBConformance 1 }
+colubrisVscMIBGroups      OBJECT IDENTIFIER ::= { colubrisVscMIBConformance 2 }
+
+
+-- compliance statements
+colubrisVscMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for the Virtual Service
+                 Communities MIB."
+    MODULE      MANDATORY-GROUPS
+                    {
+                        colubrisVscMIBGroup
+                    }
+    ::= { colubrisVscMIBCompliances 1 }
+
+-- units of conformance
+colubrisVscMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                        coVscCfgFriendlyVscName,
+                        coVscCfgSSID,
+                        coVscCfgAccessControlled,
+                        coVscCfgSecurity,
+                        coVscCfgEncryption,
+                        coVscCfg8021xAuthentication,
+                        coVscCfgMACAuthentication,
+                        coVscCfgHTMLAuthentication
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for the wireless interface
+                 status."
+    ::= { colubrisVscMIBGroups 1 }
+
+END

@@ -20,7 +20,7 @@ JUNIPER-JS-POLICY-MIB DEFINITIONS ::= BEGIN
 
 
     jnxJsSecPolicyMIB MODULE-IDENTITY
-        LAST-UPDATED  "200705071840Z" -- May 07, 2007
+        LAST-UPDATED  "201307020000Z" -- July 02, 2013
         ORGANIZATION  "Juniper Networks, Inc."
         CONTACT-INFO
             "Juniper Technical Assistance Center
@@ -46,12 +46,17 @@ JUNIPER-JS-POLICY-MIB DEFINITIONS ::= BEGIN
              it passes through the firewall. "
         REVISION        "200612140000Z" -- Dec 14, 2006
         DESCRIPTION     "Creation Date"
+        REVISION        "201307020000Z" -- July 02, 2013
+        DESCRIPTION     "Add policy system wide counters for dropped and accepted ipv4 and ipv6 packets"
     ::= { jnxJsPolicies 1 }   
 
 
     jnxJsPolicyNotifications OBJECT IDENTIFIER ::= { jnxJsSecPolicyMIB 0 }
     jnxJsPolicyObjects       OBJECT IDENTIFIER ::= { jnxJsSecPolicyMIB 1 }
     jnxJsPolicyTrapVars      OBJECT IDENTIFIER ::= { jnxJsSecPolicyMIB 2 }
+    jnxJsPolicySystemStats   OBJECT IDENTIFIER ::= { jnxJsSecPolicyMIB 3 }
+    jnxJsPolicySystemStatsIPv4   OBJECT IDENTIFIER ::= { jnxJsPolicySystemStats 1 }
+    jnxJsPolicySystemStatsIPv6   OBJECT IDENTIFIER ::= { jnxJsPolicySystemStats 2 }
 
                 
     -- ***************************************************************
@@ -269,7 +274,23 @@ JUNIPER-JS-POLICY-MIB DEFINITIONS ::= BEGIN
         jnxJsPolicyStatsSessionRate            Gauge32,
         jnxJsPolicyStatsSessionDeleted         Counter32,
         jnxJsPolicyStatsLookups                Counter32,
-        jnxJsPolicyStatsCountAlarm             Counter32
+        jnxJsPolicyStatsCountAlarm             Counter32,
+        jnxJsPolicyStatsInBytesInit            Counter64,
+        jnxJsPolicyStatsInBytesRep             Counter64,
+        jnxJsPolicyStatsInByteRtInit           Gauge32,
+        jnxJsPolicyStatsInByteRtRep            Gauge32,
+        jnxJsPolicyStatsOutBytesInit           Counter64,
+        jnxJsPolicyStatsOutBytesRep            Counter64,
+        jnxJsPolicyStatsOutByteRtInit          Gauge32,
+        jnxJsPolicyStatsOutByteRtRep           Gauge32,
+        jnxJsPolicyStatsInPacketsInit          Counter32,
+        jnxJsPolicyStatsInPacketsRep           Counter32,
+        jnxJsPolicyStatsInPacketRtInit         Gauge32,
+        jnxJsPolicyStatsInPacketRtRep          Gauge32,
+        jnxJsPolicyStatsOutPacketsInit         Counter32,
+        jnxJsPolicyStatsOutPacketsRep          Counter32,
+        jnxJsPolicyStatsOutPacketRtInit        Gauge32,
+        jnxJsPolicyStatsOutPacketRtRep         Gauge32
     }
 
     jnxJsPolicyStatsCreationTime OBJECT-TYPE
@@ -387,13 +408,338 @@ JUNIPER-JS-POLICY-MIB DEFINITIONS ::= BEGIN
     jnxJsPolicyStatsCountAlarm OBJECT-TYPE
         SYNTAX          Counter32
         MAX-ACCESS      read-only
-        STATUS          current
+        STATUS          obsolete 
         DESCRIPTION
             "The number of alarm counted when the traffic exceeds 
-             certain threshold configuration."
+             certain threshold configuration. The node is obsoleted."
         ::= { jnxJsPolicyStatsEntry 14 }
 
+    jnxJsPolicyStatsInBytesInit OBJECT-TYPE
+        SYNTAX          Counter64 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of input bytes in the session initial direction enters 
+            the FW through this policy."
+        ::= { jnxJsPolicyStatsEntry 15 }
+		
+	jnxJsPolicyStatsInBytesRep OBJECT-TYPE
+        SYNTAX          Counter64 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of input bytes in the session reply direction enters 
+            the FW through this policy."
+        ::= { jnxJsPolicyStatsEntry 16 }		
 
+    jnxJsPolicyStatsInByteRtInit OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of input bytes in the session initial direction 
+            per second or the rate that enters the FW through this policy."
+        ::= { jnxJsPolicyStatsEntry 17 }
+
+    jnxJsPolicyStatsInByteRtRep OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of input bytes in the session reply direction 
+            per second or the rate that enters the FW through this policy."
+        ::= { jnxJsPolicyStatsEntry 18 }
+		
+    jnxJsPolicyStatsOutBytesInit OBJECT-TYPE
+        SYNTAX          Counter64 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of output bytes in the session initial direction 
+            associated with this policy."
+        ::= { jnxJsPolicyStatsEntry 19 }
+		
+    jnxJsPolicyStatsOutBytesRep OBJECT-TYPE
+        SYNTAX          Counter64 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of output bytes in the session reply direction 
+            associated with this policy."
+        ::= { jnxJsPolicyStatsEntry 20 }
+
+    jnxJsPolicyStatsOutByteRtInit OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of output bytes in the session initial direction 
+            per second or the rate associated with this policy."
+        ::= { jnxJsPolicyStatsEntry 21 }
+
+    jnxJsPolicyStatsOutByteRtRep OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of output bytes in the session reply direction per 
+            second or the rate associated with this policy."
+        ::= { jnxJsPolicyStatsEntry 22 }
+
+    jnxJsPolicyStatsInPacketsInit OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of input packets in the session initial direction 
+            enters the FW through this policy."
+        ::= { jnxJsPolicyStatsEntry 23 }
+
+    jnxJsPolicyStatsInPacketsRep OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of input packets in the session reply direction 
+            enters the FW through this policy."
+        ::= { jnxJsPolicyStatsEntry 24 }
+
+    jnxJsPolicyStatsInPacketRtInit OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of input packets in the session initial direction 
+            per second or the input packet rate of the FW through this policy."
+        ::= { jnxJsPolicyStatsEntry 25 }
+		
+    jnxJsPolicyStatsInPacketRtRep OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of input packets in the session reply direction 
+            per second or the input packet rate of the FW through this policy."
+        ::= { jnxJsPolicyStatsEntry 26 }
+
+    jnxJsPolicyStatsOutPacketsInit OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of output packets in the session initial direction 
+            associated with this policy."
+        ::= { jnxJsPolicyStatsEntry 27 }
+		
+    jnxJsPolicyStatsOutPacketsRep OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of output packets in the session reply direction 
+            associated with this policy."
+        ::= { jnxJsPolicyStatsEntry 28 }
+		
+    jnxJsPolicyStatsOutPacketRtInit OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of output packets in the session initial direction 
+            per second or the rate associated with this policy."
+        ::= { jnxJsPolicyStatsEntry 29 }
+	
+    jnxJsPolicyStatsOutPacketRtRep OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of output packets in the session reply direction 
+            per second or the rate associated with this policy."
+        ::= { jnxJsPolicyStatsEntry 30 }
+	
+
+    -- ***************************************************************
+    --  System Wide Policy Statistics related
+    -- ***************************************************************
+    jnxJsPolicySystemStatsEnabled  OBJECT-TYPE
+        SYNTAX            INTEGER {
+                              enabled     (1),
+                              disabled    (2)
+                          } 
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+            "The configured status of Policy System Wide Statistic Collection."
+        ::= { jnxJsPolicySystemStats 3 }
+                    
+    -- ***************************************************************
+    --  System Wide Policy Statistics IPv4
+    -- ***************************************************************
+  
+    jnxJsPolicySystemStatsTotalAllowIPv4Packets  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of IPv4 packets allowed by all policies."
+        ::= { jnxJsPolicySystemStatsIPv4 1 }
+        
+    jnxJsPolicySystemStatsTotalAllowIPv4Bytes  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of IPv4 bytes allowed by all policies."
+        ::= { jnxJsPolicySystemStatsIPv4 2 }
+        
+    jnxJsPolicySystemStatsTotalAllowIPv4PacketsRate  OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The rate of IPv4 packets allowed by all policies."
+        ::= { jnxJsPolicySystemStatsIPv4 3 }
+ 
+    jnxJsPolicySystemStatsTotalAllowIPv4BytesRate  OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The rate of IPv4 bytes allowed by all policies."
+        ::= { jnxJsPolicySystemStatsIPv4 4 }
+
+    jnxJsPolicySystemStatsTotalDropIPv4Packets  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of IPv4 packets dropped by all policies."
+        ::= { jnxJsPolicySystemStatsIPv4 5 }
+
+    jnxJsPolicySystemStatsTotalDropIPv4Bytes  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of IPv4 bytes dropped by all policies."
+        ::= { jnxJsPolicySystemStatsIPv4 6 }
+
+    jnxJsPolicySystemStatsTotalDropIPv4PacketsRate  OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The rate of IPv4 packets dropped by all policies."
+        ::= { jnxJsPolicySystemStatsIPv4 7 }
+        
+    jnxJsPolicySystemStatsTotalDropIPv4BytesRate  OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The rate of IPv4 bytes dropped by all policies."
+        ::= { jnxJsPolicySystemStatsIPv4 8 }
+
+    jnxJsPolicySystemStatsTotalAllowIPv4Flows  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of IPv4 flows allowed by all policies."
+        ::= { jnxJsPolicySystemStatsIPv4 9 }
+
+    jnxJsPolicySystemStatsTotalAllowIPv4FlowsRate  OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The rate of IPv4 flows allowed by all policies."
+        ::= { jnxJsPolicySystemStatsIPv4 10 }
+
+    -- ***************************************************************
+    --  System Wide Policy Statistics IPv6
+    -- ***************************************************************
+    
+    jnxJsPolicySystemStatsTotalAllowIPv6Packets  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of IPv6 packets allowed by all policies."
+        ::= { jnxJsPolicySystemStatsIPv6 1 }
+
+    jnxJsPolicySystemStatsTotalAllowIPv6Bytes  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of IPv6 bytes allowed by all policies."
+        ::= { jnxJsPolicySystemStatsIPv6 2 }
+
+    jnxJsPolicySystemStatsTotalAllowIPv6PacketsRate  OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The rate of IPv6 packets allowed by all policies."
+        ::= { jnxJsPolicySystemStatsIPv6 3 }
+        
+    jnxJsPolicySystemStatsTotalAllowIPv6BytesRate  OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The rate of IPv6 bytes allowed by all policies."
+        ::= { jnxJsPolicySystemStatsIPv6 4 }
+        
+    jnxJsPolicySystemStatsTotalDropIPv6Packets  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of IPv6 packets dropped by all policies."
+        ::= { jnxJsPolicySystemStatsIPv6 5 }
+
+    jnxJsPolicySystemStatsTotalDropIPv6Bytes  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of IPv6 bytes dropped by all policies."
+        ::= { jnxJsPolicySystemStatsIPv6 6 }
+
+    jnxJsPolicySystemStatsTotalDropIPv6PacketsRate  OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The rate of IPv6 packets dropped by all policies."
+        ::= { jnxJsPolicySystemStatsIPv6 7 }
+
+    jnxJsPolicySystemStatsTotalDropIPv6BytesRate  OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The rate of IPv6 bytes dropped by all policies."
+        ::= { jnxJsPolicySystemStatsIPv6 8 }
+
+    jnxJsPolicySystemStatsTotalAllowIPv6Flows  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of IPv6 flows allowed by all policies."
+        ::= { jnxJsPolicySystemStatsIPv6 9 }
+
+    jnxJsPolicySystemStatsTotalAllowIPv6FlowsRate  OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The rate of IPv6 flows allowed by all policies."
+        ::= { jnxJsPolicySystemStatsIPv6 10 }
 
     -- ***************************************************************
     -- definition of access authentication related traps.

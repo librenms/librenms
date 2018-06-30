@@ -10,15 +10,15 @@ $row = 0;
 foreach ($vlans as $vlan) {
     $row++;
     if (is_integer($row / 2)) {
-        $row_colour = $list_colour_a;
+        $row_colour = $config['list_colour']['even'];
     } else {
-        $row_colour = $list_colour_b;
+        $row_colour = $config['list_colour']['odd'];
     }
 
     echo '<tr bgcolor="'.$row_colour.'">';
 
     echo '<td width=100 class=list-large> Vlan '.$vlan['vlan'].'</td>';
-    echo '<td width=200 class=box-desc>'.$vlan['vlan_descr'].'</td>';
+    echo '<td width=200 class=box-desc>'.$vlan['vlan_name'].'</td>';
 
     if ($vlan['state'] == 'blocking') {
         $class = 'red';
@@ -30,15 +30,24 @@ foreach ($vlans as $vlan) {
 
     echo '<td>'.$vlan['cost'].'</td><td>'.$vlan['priority']."</td><td class=$class>".$vlan['state'].'</td>';
 
+    $traverse_ifvlan = true;
     $vlan_ports = array();
     $otherports = dbFetchRows('SELECT * FROM `ports_vlans` AS V, `ports` as P WHERE V.`device_id` = ? AND V.`vlan` = ? AND P.port_id = V.port_id', array($device['device_id'], $vlan['vlan']));
     foreach ($otherports as $otherport) {
+        if ($otherport['untagged']) {
+            $traverse_ifvlan = false;
+        }
         $vlan_ports[$otherport[ifIndex]] = $otherport;
     }
 
-    $otherports = dbFetchRows('SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?', array($device['device_id'], $vlan['vlan']));
-    foreach ($otherports as $otherport) {
-        $vlan_ports[$otherport[ifIndex]] = array_merge($otherport, array('untagged' => '1'));
+    if ($traverse_ifvlan) {
+        $otherports = dbFetchRows(
+            'SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?',
+            array($device['device_id'], $vlan['vlan'])
+        );
+        foreach ($otherports as $otherport) {
+            $vlan_ports[$otherport[ifIndex]] = array_merge($otherport, array('untagged' => '1'));
+        }
     }
 
     ksort($vlan_ports);
@@ -46,6 +55,7 @@ foreach ($vlans as $vlan) {
     echo '<td>';
     $vsep = '';
     foreach ($vlan_ports as $otherport) {
+        $otherport = cleanPort($otherport);
         echo $vsep.generate_port_link($otherport, makeshortif($otherport['ifDescr']));
         if ($otherport['untagged']) {
             echo '(U)';

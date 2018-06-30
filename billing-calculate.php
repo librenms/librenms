@@ -11,12 +11,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-chdir(dirname($argv[0]));
-
-require 'includes/defaults.inc.php';
-require 'config.php';
-require 'includes/definitions.inc.php';
-require 'includes/functions.php';
+$init_modules = array();
+require __DIR__ . '/includes/init.php';
 
 $options = getopt('r');
 
@@ -130,8 +126,6 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
                     'bill_used'        => $used,
                     'bill_overuse'     => $overuse,
                     'bill_percent'     => $percent,
-                    'bill_datefrom'    => $datefrom,
-                    'bill_dateto'      => $dateto,
                     'bill_id'          => $bill['bill_id'],
                 );
                 dbInsert($update, 'bill_history');

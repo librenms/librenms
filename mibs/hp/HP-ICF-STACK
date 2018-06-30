@@ -1,0 +1,218 @@
+       HP-ICF-STACK DEFINITIONS ::= BEGIN
+
+       IMPORTS
+           Integer32, OBJECT-TYPE, MODULE-IDENTITY
+               FROM SNMPv2-SMI
+           DisplayString, TruthValue
+               FROM SNMPv2-TC
+           MODULE-COMPLIANCE, OBJECT-GROUP
+               FROM SNMPv2-CONF
+           entPhysicalIndex
+               FROM ENTITY-MIB
+           hpicfObjectModules, hpicfCommon
+               FROM HP-ICF-OID;
+
+       hpicfStackMib MODULE-IDENTITY
+            LAST-UPDATED "200011032225Z"  -- November 3, 2000
+            ORGANIZATION "Hewlett Packard Company,
+                          Network Infrastructure Solutions"
+            CONTACT-INFO
+                    "Hewlett Packard Company
+                     8000 Foothills Blvd.
+                     Roseville, CA 95747"
+            DESCRIPTION
+                    "This MIB module contains object definitions for
+                    managing HP stackable devices."
+
+            REVISION     "200011032225Z"  -- November 3, 2000
+            DESCRIPTION  "Updated division name."
+
+            REVISION     "9609062228Z"  -- September 6, 1996
+            DESCRIPTION
+                    "Initial version of this MIB module."
+           ::= { hpicfObjectModules 6 }
+
+
+       hpicfStack   OBJECT IDENTIFIER ::= { hpicfCommon 5 }
+
+       hpicfStackBoxTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpicfStackBoxEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "This table contains a list of physical boxes
+                   currently in the stack."
+           ::= { hpicfStack 1 }
+
+       hpicfStackBoxEntry OBJECT-TYPE
+           SYNTAX     HpicfStackBoxEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An entry containing information about a physical
+                   box in the stack.  This table is indexed by
+                   the value of entPhysicalIndex that corresponds to
+                   the row in the entPhysicalTable for this box."
+           INDEX      { entPhysicalIndex }
+           ::= { hpicfStackBoxTable 1 }
+
+       HpicfStackBoxEntry ::=
+           SEQUENCE {
+               hpicfStackBoxId                 OCTET STRING,
+               hpicfStackBoxName               DisplayString
+           }
+
+       hpicfStackBoxId OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE(5))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The box identifier that uniquely identifies this
+                   physical box.  The value of this object is the serial
+                   number of the box."
+           ::= { hpicfStackBoxEntry 1 }
+
+       hpicfStackBoxName OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE(0..16))
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "A settable name for this box.  This name defaults
+                   to an ASCII representation of the base MAC address
+                   of the box, but may be set to a user-friendly
+                   display string by a management application."
+           ::= { hpicfStackBoxEntry 2 }
+
+
+       hpicfStackAgentTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpicfStackAgentEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "This table provides a list of SNMP agent cards in
+                   the stack that are capable of managing the stack.
+                   Note that this table is redundant, since this
+                   information is available in the Entity MIB, but is
+                   provided for the convenience of management
+                   applications, so that they are not required to scan
+                   the entire entPhysicalTable to determine what agent
+                   cards are present."
+           ::= { hpicfStack 2 }
+
+       hpicfStackAgentEntry OBJECT-TYPE
+           SYNTAX     HpicfStackAgentEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An entry in the hpicfStackAgentTable representing
+                   a single agent card.  This table is indexed by
+                   the value of entPhysicalIndex that corresponds to
+                   the row in the entPhysicalTable for this agent
+                   card."
+           INDEX      { entPhysicalIndex }
+           ::= { hpicfStackAgentTable 1 }
+
+       HpicfStackAgentEntry ::= 
+           SEQUENCE {
+               hpicfStackAgentBoxId            OCTET STRING
+           }
+
+       hpicfStackAgentBoxId OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE(5))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The value of hpicfStackBoxId for the box containing
+                   this agent card.  Note that this object is redundant
+                   since containment information is available in the
+                   Entity MIB, but is provided for the convenience of
+                   manament applications (and so that there would be at
+                   least one accessible column in this table)."
+           ::= { hpicfStackAgentEntry 1 }
+
+
+       hpicfStackActiveAgent OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "The value of entPhysicalIndex for the agent that is
+                   currently managing this stack.  A set to this value
+                   will also set hpicfStackAgentForced to 'true'.  Note
+                   that setting this object to a value different from
+                   the current value will cause this agent to reset.
+                   After reset, the current agent will no longer be
+                   active, because the new agent will take over."
+           ::= { hpicfStack 3 }
+
+       hpicfStackAgentForced OBJECT-TYPE
+           SYNTAX     TruthValue
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "A value of 'true' indicates that the current active
+                   agent card has been chosen by a management action as
+                   the active agent.  This management action may have
+                   been performed through a console user interface
+                   command, or by setting the hpicfStackActiveAgent
+                   object.  The reason for this is to allow the network
+                   administrator to prevent an added redundant agent
+                   from taking over when there is a configured agent
+                   card in the stack."
+           ::= { hpicfStack 4 }
+
+
+       -- conformance information
+
+       hpicfStackConformance
+           OBJECT IDENTIFIER ::= { hpicfStackMib 1 }
+
+       hpicfStackCompliances
+           OBJECT IDENTIFIER ::= { hpicfStackConformance 1 }
+       hpicfStackGroups
+           OBJECT IDENTIFIER ::= { hpicfStackConformance 2 }
+
+
+       -- compliance statements
+
+       hpicfStackCompliance MODULE-COMPLIANCE
+           STATUS     current
+           DESCRIPTION
+                   "The compliance statement for agents managing
+                   a stack of HP boxes."
+           MODULE
+               MANDATORY-GROUPS { hpicfStackBasicGroup }
+
+               GROUP      hpicfStackMultiAgentGroup
+               DESCRIPTION
+                       "This group is implemented by all agents for
+                       stackable devices that support redundant
+                       management cards."
+
+           ::= { hpicfStackCompliances 1 }
+
+
+       -- units of conformance
+
+       hpicfStackBasicGroup OBJECT-GROUP
+           OBJECTS    { hpicfStackBoxId,
+                        hpicfStackBoxName
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for managing boxes in a
+                   stack."
+           ::= { hpicfStackGroups 1 }
+
+       hpicfStackMultiAgentGroup OBJECT-GROUP
+           OBJECTS    { hpicfStackAgentBoxId,
+                        hpicfStackActiveAgent,
+                        hpicfStackAgentForced
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for managing redundant
+                   agents in a stack of HP boxes."
+           ::= { hpicfStackGroups 2 }
+
+       END

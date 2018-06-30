@@ -1,0 +1,258 @@
+-- ***********************************************
+-- PAN-PRODUCT-MIB.my
+--
+-- MIB for the platform specific MIB objects implemented by
+-- Palo Alto devices.
+-- ***********************************************
+
+PAN-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-IDENTITY,
+		OBJECT-TYPE, NOTIFICATION-TYPE,
+		Integer32
+			FROM SNMPv2-SMI
+--		MODULE-COMPLIANCE, OBJECT-GROUP
+--			FROM SNMPv2-CONF
+		DisplayString, TruthValue
+			FROM SNMPv2-TC
+		TcChassisType
+			FROM PAN-GLOBAL-TC
+		panModules, panProductsMibs
+			FROM PAN-GLOBAL-REG;
+
+	panProductsMibsModule MODULE-IDENTITY
+		LAST-UPDATED			"201304151650Z"
+		ORGANIZATION			"Palo Alto Networks"
+		CONTACT-INFO			"
+					Customer Support
+					Palo Alto Networks
+					4401 Great America Pkwy
+					Santa Clara, CA 95054-1211
+
+					+1 866-898-9087
+					support at paloaltonetworks dot com"
+
+		DESCRIPTION				"
+			A MIB module containing definitions of managed objects
+			implemented by specific Palo Alto Networks' products."
+
+		REVISION				"201304151650Z"
+		DESCRIPTION				"
+			Rev 2.0
+			Updated with PA-7000, GP-100 and WF-500 products."
+		REVISION				"201102091610Z"
+		DESCRIPTION				"
+			Rev 1.0
+			Initial version of MIB module PAN-PRODUCTS-MIB."
+
+		::= { panModules 4 }
+
+	panPA-4050 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-4050 specific objects."
+		::= { panProductsMibs 1 }
+
+	panPA-4020 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-4020 specific objects."
+		::= { panProductsMibs 2 }
+
+	panPA-2050 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-2050 specific objects."
+		::= { panProductsMibs 3 }
+
+	panPA-2020 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-2020 specific objects."
+		::= { panProductsMibs 4 }
+
+	panPA-4060 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-4060 specific objects."
+		::= { panProductsMibs 5 }
+
+	panPA-500 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-500 specific objects."
+		::= { panProductsMibs 6 }
+
+	panPanorama OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for Panorama specific objects."
+		::= { panProductsMibs 7 }
+
+	panPA-5060 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-5060 specific objects."
+		::= { panProductsMibs 8 }
+
+	panPA-5050 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-5050 specific objects."
+		::= { panProductsMibs 9 }
+
+	panPA-5020 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-5020 specific objects."
+		::= { panProductsMibs 11 }
+
+	panPA-200 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-200 specific objects."
+		::= { panProductsMibs 12 }
+
+	panPA-3050 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-3050 specific objects."
+		::= { panProductsMibs 17 }
+
+	panPA-3020 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-3020 specific objects."
+		::= { panProductsMibs 18 }
+
+	panPA-3060 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-3060 specific objects."
+		::= { panProductsMibs 19 }
+
+	panPA-5260 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-5260 specific objects."
+		::= { panProductsMibs 22 }
+
+	panPA-5250 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-5250 specific objects."
+		::= { panProductsMibs 23 }
+
+	panPA-5220 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-5220 specific objects."
+		::= { panProductsMibs 24 }
+
+
+	panPA-VM OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-VM specific objects."
+		::= { panProductsMibs 29 }
+
+	panM-100 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for M-100 specific objects."
+		::= { panProductsMibs 30 }
+	
+	panPA-7050 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-7050 specific objects."
+		::= { panProductsMibs 31 }
+
+	panGP-100 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for GP-100 specific objects."
+		::= { panProductsMibs 32 }
+
+	panWF-500 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for WF-500 specific objects."
+		::= { panProductsMibs 33 }
+
+	panPA-7080 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-7080 specific objects."
+		::= { panProductsMibs 34 }
+
+	panM-500 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for M-500 specific objects."
+		::= { panProductsMibs 35 }
+	
+	panPA-820 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-820 specific objects."
+		::= { panProductsMibs 36 }
+
+	panPA-850 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-850 specific objects."
+		::= { panProductsMibs 37 }
+
+	panPA-220 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-220 specific objects."
+		::= { panProductsMibs 38 }
+
+	panProcessingCards OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for Processing line card specific objects."
+		::= { panProductsMibs 100 }
+
+	panFans OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for Fan specific objects."
+		::= { panProductsMibs 101 }
+
+	panPowerSupplies OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for Power supply specific objects."
+		::= { panProductsMibs 102 }
+
+-- Processing line cards
+
+	panPA-7000-SMC OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			PA-7000 series Switch management card."
+		::= { panProcessingCards 1 }
+
+	panPA-7000-LPC OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			PA-7000 series Log Processing card."
+		::= { panProcessingCards 2 }
+
+	panPA-7000-20G-NPC OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			PA-7000 series 20G Network Processing card."
+		::= { panProcessingCards 3 }
+
+	panPA-7080-SMC OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			PA-7080 Switch management card."
+		::= { panProcessingCards 4 }
+
+END

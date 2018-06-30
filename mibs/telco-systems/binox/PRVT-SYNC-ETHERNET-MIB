@@ -1,0 +1,624 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-SYNC-ETHERNET-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-SYNC-ETHERNET-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ifIndex
+        FROM IF-MIB
+    switch
+        FROM PRVT-SWITCH-MIB
+    Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, 
+    Unsigned32
+        FROM SNMPv2-SMI
+    DateAndTime, RowStatus, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+prvtSyncEthernetMIB MODULE-IDENTITY
+    LAST-UPDATED "201011100000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "This is the MIB module to manage
+         synchronization over ethernet."
+    REVISION    "201011100000Z"
+    DESCRIPTION 
+        "Initial"
+    ::= { switch 170 }
+
+
+PrvtSyncEthernetQualityLevelType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Clock Quality Levels."
+    SYNTAX      INTEGER { prc(2), ssuA(4), ssuB(8), sec(11), dnu(15), 
+                    stu(16), prs(17), tnc(20), st2(23), st3(26), smc(28), 
+                    st3e(29), prov(30), dus(31), invalid(64), failed(65) }
+
+prvtSyncEthernetMIBNotifications OBJECT IDENTIFIER
+    ::= { prvtSyncEthernetMIB 0 }
+
+prvtSyncEthernetMIBObjects OBJECT IDENTIFIER
+    ::= { prvtSyncEthernetMIB 1 }
+
+syncEthernetHoldOffTime OBJECT-TYPE
+    SYNTAX      Integer32 (300..1800)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Timeout value, in millisseconds, for the hold-off timer."
+    ::= { prvtSyncEthernetMIBObjects 1 }
+
+syncEthernetWaitToRestoreTime OBJECT-TYPE
+    SYNTAX      Integer32 (0..12)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Timeout value, in minutes, for the wait-to-restore timer."
+    ::= { prvtSyncEthernetMIBObjects 2 }
+
+syncEthernetG781OptionMode OBJECT-TYPE
+    SYNTAX      INTEGER { option1(1), option2(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify which G.781 option mode to operate in."
+    ::= { prvtSyncEthernetMIBObjects 3 }
+
+syncEthernetClockSourceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SyncEthernetClockSourceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Source clock synchronization table."
+    ::= { prvtSyncEthernetMIBObjects 10 }
+
+syncEthernetClockSourceEntry OBJECT-TYPE
+    SYNTAX      SyncEthernetClockSourceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Source clock synchronization entry."
+    INDEX       { ifIndex }
+    ::= { syncEthernetClockSourceTable 1 }
+
+SyncEthernetClockSourceEntry ::= SEQUENCE {
+    syncEthernetClockSourceRowStatus                    RowStatus,
+    syncEthernetClockSourceAdminStatus                  INTEGER,
+    syncEthernetClockSourceEsmc                         TruthValue,
+    syncEthernetClockSourceFrequency                    Unsigned32,
+    syncEthernetClockSourceQuality                      PrvtSyncEthernetQualityLevelType,
+    syncEthernetClockSourceQualityChangeNotify          TruthValue,
+    syncEthernetClockSourceRecvQualityLevel             PrvtSyncEthernetQualityLevelType,
+    syncEthernetClockSourceLastRecvEsmcPduTime          DateAndTime,
+    syncEthernetClockSourceLastRecvEsmcErrorPduTime     DateAndTime,
+    syncEthernetClockSourceLastRecvEsmcPduType          Unsigned32,
+    syncEthernetClockSourceLastRecvLastError            Unsigned32,
+    syncEthernetClockSourceNumRecvEsmcPdu               Unsigned32,
+    syncEthernetClockSourceNumDiscEsmcPdu               Unsigned32,
+    syncEthernetClockSourceNumSignalFail                Unsigned32,
+    syncEthernetClockSourceQualityInvalidNotify         TruthValue,
+    syncEthernetClockSourceEsmcInvalidNotify            TruthValue
+}
+
+syncEthernetClockSourceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Clock source synchronization table rowstatus."
+    ::= { syncEthernetClockSourceEntry 2 }
+
+syncEthernetClockSourceAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER { up(1), down(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable clock source."
+    ::= { syncEthernetClockSourceEntry 3 }
+
+syncEthernetClockSourceEsmc OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable receiving ESMC messages (Synchronization Status Messages).
+         Only applicable for BITS clock sources."
+    ::= { syncEthernetClockSourceEntry 4 }
+
+syncEthernetClockSourceFrequency OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2431)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify input frequency - N*8kHz
+         Only applicable for BITS clock sources."
+    ::= { syncEthernetClockSourceEntry 5 }
+
+syncEthernetClockSourceQuality OBJECT-TYPE
+    SYNTAX      PrvtSyncEthernetQualityLevelType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify quality level
+         In G781-option I mode, valid values are prs, ssuA, ssuB, dnu.
+         In G781-option II mode, valid values are stu, prs, tnc, st2, st3, smc, st3e, dus, prov."
+    ::= { syncEthernetClockSourceEntry 6 }
+
+syncEthernetClockSourceQualityChangeNotify OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable quality level change notifications"
+    ::= { syncEthernetClockSourceEntry 7 }
+
+syncEthernetClockSourceRecvQualityLevel OBJECT-TYPE
+    SYNTAX      PrvtSyncEthernetQualityLevelType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The received quality level value."
+    ::= { syncEthernetClockSourceEntry 8 }
+
+syncEthernetClockSourceLastRecvEsmcPduTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Time elapsed since the last valid ESMC message received"
+    ::= { syncEthernetClockSourceEntry 9 }
+
+syncEthernetClockSourceLastRecvEsmcErrorPduTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Time elapsed since the last invalid ESMC message received"
+    ::= { syncEthernetClockSourceEntry 10 }
+
+syncEthernetClockSourceLastRecvEsmcPduType OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last received ESMC message type"
+    ::= { syncEthernetClockSourceEntry 11 }
+
+syncEthernetClockSourceLastRecvLastError OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last error code"
+    ::= { syncEthernetClockSourceEntry 12 }
+
+syncEthernetClockSourceNumRecvEsmcPdu OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total number of received ESMC messages"
+    ::= { syncEthernetClockSourceEntry 13 }
+
+syncEthernetClockSourceNumDiscEsmcPdu OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total number of discarded ESMC messages"
+    ::= { syncEthernetClockSourceEntry 14 }
+
+syncEthernetClockSourceNumSignalFail OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total number of generated signal failure events"
+    ::= { syncEthernetClockSourceEntry 15 }
+
+syncEthernetClockSourceQualityInvalidNotify OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable invalid quality notifications"
+    ::= { syncEthernetClockSourceEntry 16 }
+
+syncEthernetClockSourceEsmcInvalidNotify OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable invalid ESMC notifications"
+    ::= { syncEthernetClockSourceEntry 17 }
+
+syncEthernetClockOutputTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SyncEthernetClockOutputEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Output clock synchronization table."
+    ::= { prvtSyncEthernetMIBObjects 12 }
+
+syncEthernetClockOutputEntry OBJECT-TYPE
+    SYNTAX      SyncEthernetClockOutputEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Output clock synchronization entry."
+    INDEX       { ifIndex }
+    ::= { syncEthernetClockOutputTable 1 }
+
+SyncEthernetClockOutputEntry ::= SEQUENCE {
+    syncEthernetClockOutputRowStatus                    RowStatus,
+    syncEthernetClockOutputEsmc                         TruthValue,
+    syncEthernetClockOutputFrequency                    Unsigned32,
+    syncEthernetClockOutputDpll                         Integer32,
+    syncEthernetClockOutputQualityLevel                 PrvtSyncEthernetQualityLevelType,
+    syncEthernetClockOutputLastQualityLevelChange       DateAndTime,
+    syncEthernetClockOutputMsgEvent                     TruthValue,
+    syncEthernetClockOutputNumTransmittedEsmcPdu        Unsigned32,
+    syncEthernetClockOutputNumTransmittedEventEsmcPdu   Unsigned32
+}
+
+syncEthernetClockOutputRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "syncEthernetClockOutput table rowStatus"
+    ::= { syncEthernetClockOutputEntry 2 }
+
+syncEthernetClockOutputEsmc OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable sending ESMC messages
+         Only applicable for BITS clock outputs."
+    ::= { syncEthernetClockOutputEntry 3 }
+
+syncEthernetClockOutputFrequency OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2431)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify output frequency - N*8kHz
+         Only applicable for BITS clock outputs."
+    ::= { syncEthernetClockOutputEntry 4 }
+
+syncEthernetClockOutputDpll OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Assign output clock to DPLL
+         Only applicable for BITS clock outputs.
+         Must be set to the syncEthernetDpllModuleId value of an existing
+         row in syncEthernetDpllTable."
+    ::= { syncEthernetClockOutputEntry 5 }
+
+syncEthernetClockOutputQualityLevel OBJECT-TYPE
+    SYNTAX      PrvtSyncEthernetQualityLevelType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last quality level value sent"
+    ::= { syncEthernetClockOutputEntry 6 }
+
+syncEthernetClockOutputLastQualityLevelChange OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Time elapsed since the last quality level change"
+    ::= { syncEthernetClockOutputEntry 7 }
+
+syncEthernetClockOutputMsgEvent OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last ESMC message type sent"
+    ::= { syncEthernetClockOutputEntry 8 }
+
+syncEthernetClockOutputNumTransmittedEsmcPdu OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total number of ESMC messages sent"
+    ::= { syncEthernetClockOutputEntry 9 }
+
+syncEthernetClockOutputNumTransmittedEventEsmcPdu OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total number of ESMC messages sent"
+    ::= { syncEthernetClockOutputEntry 10 }
+
+syncEthernetDpllTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SyncEthernetDpllEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Synchronization DPLL table"
+    ::= { prvtSyncEthernetMIBObjects 14 }
+
+syncEthernetDpllEntry OBJECT-TYPE
+    SYNTAX      SyncEthernetDpllEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Synchronization DPLL entry"
+    INDEX       { syncEthernetDpllModuleId }
+    ::= { syncEthernetDpllTable 1 }
+
+SyncEthernetDpllEntry ::= SEQUENCE {
+    syncEthernetDpllModuleId                        Integer32,
+    syncEthernetDpllRowStatus                       RowStatus,
+    syncEthernetDpllAdminStatus                     INTEGER,
+    syncEthernetDpllReferenceSelection              INTEGER,
+    syncEthernetDpllEnableQualityLevel              TruthValue,
+    syncEthernetDpllStatusChangeNotify              TruthValue,
+    syncEthernetDpllReferenceChangeNotify           TruthValue,
+    syncEthernetDpllStatus                          INTEGER,
+    syncEthernetDpllStatusLastChange                DateAndTime,
+    syncEthernetDpllSystemQualityLevel              PrvtSyncEthernetQualityLevelType,
+    syncEthernetDpllSystemQualityLevelLastChange    DateAndTime,
+    syncEthernetDpllSelectedReferenceClock          OCTET STRING,
+    syncEthernetDpllSelectedReferenceClockChange    DateAndTime
+}
+
+syncEthernetDpllModuleId OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Synchronization DPLL module index"
+    ::= { syncEthernetDpllEntry 1 }
+
+syncEthernetDpllRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Synchronization DPLL rowstatus"
+    ::= { syncEthernetDpllEntry 2 }
+
+syncEthernetDpllAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER { up(1), down(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Administrative status of the DPLL"
+    ::= { syncEthernetDpllEntry 3 }
+
+syncEthernetDpllReferenceSelection OBJECT-TYPE
+    SYNTAX      INTEGER { freerun(1), static(2), g781(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify reference selection mode"
+    ::= { syncEthernetDpllEntry 4 }
+
+syncEthernetDpllEnableQualityLevel OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable reference selection based on quality level
+         Only applicable when syncEthernetDpllReferenceSelection equals g781."
+    ::= { syncEthernetDpllEntry 5 }
+
+syncEthernetDpllStatusChangeNotify OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable DPLL status change notifications"
+    ::= { syncEthernetDpllEntry 6 }
+
+syncEthernetDpllReferenceChangeNotify OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable reference clock change notifications"
+    ::= { syncEthernetDpllEntry 7 }
+
+syncEthernetDpllStatus OBJECT-TYPE
+    SYNTAX      INTEGER { freerun(0), locked(1), holdover(2), 
+                    refFailure(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "DPLL operational status"
+    ::= { syncEthernetDpllEntry 8 }
+
+syncEthernetDpllStatusLastChange OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Time since last DPLL status change"
+    ::= { syncEthernetDpllEntry 9 }
+
+syncEthernetDpllSystemQualityLevel OBJECT-TYPE
+    SYNTAX      PrvtSyncEthernetQualityLevelType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "System quality level"
+    ::= { syncEthernetDpllEntry 10 }
+
+syncEthernetDpllSystemQualityLevelLastChange OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Time since last system quality level change"
+    ::= { syncEthernetDpllEntry 11 }
+
+syncEthernetDpllSelectedReferenceClock OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The selected reference clock source"
+    ::= { syncEthernetDpllEntry 12 }
+
+syncEthernetDpllSelectedReferenceClockChange OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Time since last reference clock change"
+    ::= { syncEthernetDpllEntry 13 }
+
+syncEthernetDpllClkRefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SyncEthernetDpllClkRefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Synchronization DPLL clock reference table"
+    ::= { prvtSyncEthernetMIBObjects 16 }
+
+syncEthernetDpllClkRefEntry OBJECT-TYPE
+    SYNTAX      SyncEthernetDpllClkRefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Synchronization DPLL clock reference entry"
+    INDEX       { syncEthernetDpllModuleId, ifIndex }
+    ::= { syncEthernetDpllClkRefTable 1 }
+
+SyncEthernetDpllClkRefEntry ::= SEQUENCE {
+    syncEthernetDpllClkRefRowStatus     RowStatus,
+    syncEthernetDpllClkRefPriority      Unsigned32,
+    syncEthernetDpllClkRefLockOut       TruthValue,
+    syncEthernetDpllClkRefFailStatus    Integer32
+}
+
+syncEthernetDpllClkRefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Synchronization DPLL clock reference rowstatus"
+    ::= { syncEthernetDpllClkRefEntry 2 }
+
+syncEthernetDpllClkRefPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..256)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify reference clock priority"
+    ::= { syncEthernetDpllClkRefEntry 3 }
+
+syncEthernetDpllClkRefLockOut OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Lock reference clock"
+    ::= { syncEthernetDpllClkRefEntry 4 }
+
+syncEthernetDpllClkRefFailStatus OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "DPLL reference clock status"
+    ::= { syncEthernetDpllClkRefEntry 5 }
+
+syncEthernetInvalidESMC NOTIFICATION-TYPE
+    OBJECTS     { syncEthernetClockSourceLastRecvLastError }
+    STATUS      current
+    DESCRIPTION 
+        "Invalid ESMC has been received."
+    ::= { prvtSyncEthernetMIBNotifications 1 }
+
+syncEthernetQualityLevelChange NOTIFICATION-TYPE
+    OBJECTS     { syncEthernetClockSourceQuality }
+    STATUS      current
+    DESCRIPTION 
+        "Current value of syncEthernetClockSourceQuality has
+         been changed."
+    ::= { prvtSyncEthernetMIBNotifications 2 }
+
+syncEthernetInvalidQualityLevelReceived NOTIFICATION-TYPE
+    OBJECTS     { syncEthernetClockSourceRecvQualityLevel }
+    STATUS      current
+    DESCRIPTION 
+        "Invalid Quality level equals to QL-INVx has been received."
+    ::= { prvtSyncEthernetMIBNotifications 3 }
+
+syncEthernetDPLLReferenceChange NOTIFICATION-TYPE
+    OBJECTS     { syncEthernetDpllSelectedReferenceClockChange }
+    STATUS      current
+    DESCRIPTION 
+        "DPLL's reference clock changed."
+    ::= { prvtSyncEthernetMIBNotifications 4 }
+
+syncEthernetDPLLChanged NOTIFICATION-TYPE
+    OBJECTS     { syncEthernetDpllStatus }
+    STATUS      current
+    DESCRIPTION 
+        "Some of the DPLL's operational status changes."
+    ::= { prvtSyncEthernetMIBNotifications 5 }
+
+syncEthernetDPLLLockFailed NOTIFICATION-TYPE
+    OBJECTS     { syncEthernetDpllClkRefFailStatus }
+    STATUS      current
+    DESCRIPTION 
+        "If after new Reference selection the DPLL can't
+         lock onto it, this will affect the Clock Source
+         associated with that reference"
+    ::= { prvtSyncEthernetMIBNotifications 6 }
+
+END -- end of module PRVT-SYNC-ETHERNET-MIB.

@@ -1,0 +1,36 @@
+os: linux
+type: server
+group: unix
+text: Linux
+ifXmcbc: true
+ifname: true
+mib_dir:
+    - supermicro
+    - dell
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_ucd_memory, text: 'Memory Usage' }
+    - { graph: device_storage, text: 'Storage Usage' }
+poller_modules:
+    bgp-peers: false
+    ospf: false
+    stp: false
+discovery_modules:
+    applications: true
+    bgp-peers: false
+    stp: false
+    vmware-vminfo: true
+    libvirt-vminfo: true
+processor_stacked: true
+register_mibs:
+    rxCounter: GANDI-MIB
+    txCounter: GANDI-MIB
+    dropCounter: GANDI-MIB
+    acldropCounter: GANDI-MIB
+    ratedropCounter: GANDI-MIB
+    KNIrxCounter: GANDI-MIB
+    KNItxCounter: GANDI-MIB
+    KNIdropCounter: GANDI-MIB
+discovery:
+    - sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+    - sysDescr_regex: '/^Linux/'

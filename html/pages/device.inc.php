@@ -1,41 +1,49 @@
 <?php
 
-if ($vars['tab'] == 'port' && is_numeric($vars['device']) && port_permitted($vars['port'])) {
-    $check_device = get_device_id_by_port_id($vars['port']);
-    $permit_ports = 1;
-}
+use LibreNMS\Authentication\Auth;
 
 if (!is_numeric($vars['device'])) {
-    $vars['device'] = device_by_name($vars['device']);
+    $vars['device'] = getidbyname($vars['device']);
 }
 
-if (device_permitted($vars['device']) || $check_device == $vars['device']) {
-    $selected['iface'] = 'selected';
+$permitted_by_port = $vars['tab'] == 'port' && port_permitted($vars['port'], $vars['device']);
 
-    $tab = str_replace('.', '', mres($vars['tab']));
-
-    if (!$tab) {
+if (device_permitted($vars['device']) || $permitted_by_port) {
+    if (empty($vars['tab'])) {
         $tab = 'overview';
+    } else {
+        $tab = str_replace('.', '', $vars['tab']);
     }
+    $select = array($tab => 'class="active"');
 
-    $select[$tab] = 'active';
-
-    $device  = device_by_id_cache($vars['device']);
+    $device = device_by_id_cache($vars['device']);
     $attribs = get_dev_attribs($device['device_id']);
+    $device['attribs'] = $attribs;
+    load_os($device);
 
     $entity_state = get_dev_entity_state($device['device_id']);
 
     // print_r($entity_state);
-    $pagetitle[] = $device['hostname'];
+    $pagetitle[] = format_hostname($device, $device['hostname']);
 
-    if ($config['os'][$device['os']]['group']) {
-        $device['os_group'] = $config['os'][$device['os']]['group'];
+    $component = new LibreNMS\Component();
+    $component_count = $component->getComponentCount($device['device_id']);
+
+    $alert_class = '';
+    if ($device['disabled'] == '1') {
+        $alert_class = 'alert-info';
+    } else {
+        if ($device['status'] == '0') {
+            $alert_class = 'alert-danger';
+        } elseif ($device['ignore'] == '1') {
+            $alert_class = 'alert-warning';
+        }
     }
 
     echo '<div class="panel panel-default">';
-        echo '<table class="device-header-table" style="margin: 0px 7px 7px 7px;" cellspacing="0" class="devicetable" width="99%">';
+        echo '<div class="panel-body '.$alert_class.'">';
         require 'includes/device-header.inc.php';
-    echo '</table>';
+        echo '</div>';
     echo '</div>';
 
 
@@ -44,85 +52,93 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
 
         if ($config['show_overview_tab']) {
             echo '
-                <li class="'.$select['overview'].'">
+                <li role="presentation" '.$select['overview'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'overview')).'">
-                <img src="images/16/server_lightning.png" align="absmiddle" border="0"> Overview
+		<i class="fa fa-lightbulb-o fa-lg icon-theme" aria-hidden="true"></i> Overview
                 </a>
                 </li>';
         }
 
-        echo '<li class="'.$select['graphs'].'">
+        echo '<li role="presentation" '.$select['graphs'].'>
             <a href="'.generate_device_url($device, array('tab' => 'graphs')).'">
-            <img src="images/16/server_chart.png" align="absmiddle" border="0"> Graphs
+            <i class="fa fa-area-chart fa-lg icon-theme" aria-hidden="true"></i> Graphs
             </a>
             </li>';
 
-        $health =  dbFetchCell("SELECT COUNT(*) FROM storage WHERE device_id = '" . $device['device_id'] . "'") +
-                   dbFetchCell("SELECT COUNT(sensor_id) FROM sensors WHERE device_id = '" . $device['device_id'] . "'") +
-                   dbFetchCell("SELECT COUNT(*) FROM mempools WHERE device_id = '" . $device['device_id'] . "'") +
-                   dbFetchCell("SELECT COUNT(*) FROM processors WHERE device_id = '" . $device['device_id'] . "'") +
+        $health =  dbFetchCell("SELECT COUNT(*) FROM storage WHERE device_id = ?", array($device['device_id'])) +
+                   dbFetchCell("SELECT COUNT(*) FROM sensors WHERE device_id = ?", array($device['device_id'])) +
+                   dbFetchCell("SELECT COUNT(*) FROM mempools WHERE device_id = ?", array($device['device_id'])) +
+                   dbFetchCell("SELECT COUNT(*) FROM processors WHERE device_id = ?", array($device['device_id'])) +
                    count_mib_health($device);
 
         if ($health) {
-            echo '<li class="'.$select['health'].'">
+            echo '<li role="presentation" '.$select['health'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'health')).'">
-                <img src="images/icons/sensors.png" align="absmiddle" border="0" /> Health
+                <i class="fa fa-heartbeat fa-lg icon-theme" aria-hidden="true"></i> Health
                 </a>
                 </li>';
         }
 
-        if (@dbFetchCell("SELECT COUNT(app_id) FROM applications WHERE device_id = '".$device['device_id']."'") > '0') {
-            echo '<li class="'.$select['apps'].'">
+        if (dbFetchCell("SELECT 1 FROM applications WHERE device_id = ?", array($device['device_id']))) {
+            echo '<li role="presentation" '.$select['apps'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'apps')).'">
-                <img src="images/icons/apps.png" align="absmiddle" border="0" /> Apps
+                <i class="fa fa-cubes fa-lg icon-theme" aria-hidden="true"></i> Apps
                 </a>
                 </li>';
         }
 
-        if (@dbFetchCell("SELECT 1 FROM processes WHERE device_id = '".$device['device_id']."'") > '0') {
-            echo '<li class="'.$select['processes'].'">
+        if (dbFetchCell("SELECT 1 FROM processes WHERE device_id = ?", array($device['device_id']))) {
+            echo '<li role="presentation" '.$select['processes'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'processes')).'">
-                <img src="images/16/application_osx_terminal.png" align="absmiddle" border="0" /> Processes
+                <i class="fa fa-microchip fa-lg icon-theme" aria-hidden="true"></i> Processes
                 </a>
                 </li>';
         }
 
         if (isset($config['collectd_dir']) && is_dir($config['collectd_dir'].'/'.$device['hostname'].'/')) {
-            echo '<li class="'.$select['collectd'].'">
+            echo '<li role="presentation" '.$select['collectd'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'collectd')).'">
-                <img src="images/16/chart_line.png" align="absmiddle" border="0" /> CollectD
+                <i class="fa fa-pie-chart fa-lg icon-theme" aria-hidden="true"></i> CollectD
                 </a>
                 </li>';
         }
 
-        if (@dbFetchCell("SELECT COUNT(mplug_id) FROM munin_plugins WHERE device_id = '".$device['device_id']."'") > '0') {
-            echo '<li class="'.$select['munin'].'">
+        if (dbFetchCell("SELECT 1 FROM munin_plugins WHERE device_id = ?", array($device['device_id']))) {
+            echo '<li role="presentation" '.$select['munin'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'munin')).'">
-                <img src="images/16/chart_line.png" align="absmiddle" border="0" /> Munin
+                <i class="fa fa-pie-chart fa-lg icon-theme" aria-hidden="true"></i> Munin
                 </a>
                 </li>';
         }
 
-        if (@dbFetchCell("SELECT COUNT(port_id) FROM ports WHERE device_id = '".$device['device_id']."'") > '0') {
-            echo '<li class="'.$select['ports'].$select['port'].'">
+        if (dbFetchCell("SELECT 1 FROM ports WHERE device_id = ?", array($device['device_id']))) {
+            echo '<li role="presentation" '.$select['ports'].$select['port'].'">
                 <a href="'.generate_device_url($device, array('tab' => 'ports')).'">
-                <img src="images/16/connect.png" align="absmiddle" border="0" /> Ports
+                <i class="fa fa-link fa-lg icon-theme" aria-hidden="true"></i> Ports
                 </a>
                 </li>';
         }
 
-        if (@dbFetchCell("SELECT COUNT(sla_id) FROM slas WHERE device_id = '".$device['device_id']."'") > '0') {
-            echo '<li class="'.$select['slas'].$select['sla'].'">
+        if (dbFetchCell("SELECT 1 FROM slas WHERE device_id = ?", array($device['device_id']))) {
+            echo '<li role="presentation" '.$select['slas'].$select['sla'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'slas')).'">
-                <img src="images/16/chart_line.png" align="absmiddle" border="0" /> SLAs
+                <i class="fa fa-flag fa-lg icon-theme" aria-hidden="true"></i> SLAs
                 </a>
                 </li>';
         }
 
-        if (@dbFetchCell("SELECT COUNT(accesspoint_id) FROM access_points WHERE device_id = '".$device['device_id']."'") > '0') {
-            echo '<li class="'.$select['accesspoints'].'">
+        if (dbFetchCell('SELECT 1 FROM `wireless_sensors` WHERE `device_id`=?', array($device['device_id']))) {
+            echo '<li role="presentation" '.$select['wireless'].'>
+                <a href="'.generate_device_url($device, array('tab' => 'wireless')).'">
+                <i class="fa fa-wifi fa-lg icon-theme"  aria-hidden="true"></i> Wireless
+                </a>
+                </li>';
+        }
+
+        if (dbFetchCell("SELECT 1 FROM access_points WHERE device_id = ?", array($device['device_id']))) {
+            echo '<li role="presentation" '.$select['accesspoints'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'accesspoints')).'">
-                <img src="images/icons/wireless.png" align="absmiddle" border="0" /> Access Points
+                <i class="fa fa-wifi fa-lg icon-theme"  aria-hidden="true"></i> Access Points
                 </a>
                 </li>';
         }
@@ -130,27 +146,45 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
         $smokeping_files = get_smokeping_files($device);
 
         if (count($smokeping_files['in'][$device['hostname']]) || count($smokeping_files['out'][$device['hostname']])) {
-            echo '<li class="'.$select['latency'].'">
+            echo '<li role="presentation" '.$select['latency'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'latency')).'">
-                <img src="images/16/arrow_undo.png" align="absmiddle" border="0" /> Ping
+                <i class="fa fa-crosshairs fa-lg icon-theme"  aria-hidden="true"></i> Ping
                 </a>
                 </li>';
         }
 
-        if (@dbFetchCell("SELECT COUNT(vlan_id) FROM vlans WHERE device_id = '".$device['device_id']."'") > '0') {
-            echo '<li class="'.$select['vlans'].'">
+        if (dbFetchCell("SELECT 1 FROM vlans WHERE device_id = ?", array($device['device_id']))) {
+            echo '<li role="presentation" '.$select['vlans'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'vlans')).'">
-                <img src="images/16/vlans.png" align="absmiddle" border="0" /> VLANs
+                <i class="fa fa-tasks fa-lg icon-theme"  aria-hidden="true"></i> VLANs
                 </a>
                 </li>';
         }
 
-        if (@dbFetchCell("SELECT COUNT(id) FROM vminfo WHERE device_id = '".$device['device_id']."'") > '0') {
-            echo '<li class="'.$select['vm'].'">
+        if (dbFetchCell("SELECT 1 FROM vminfo WHERE device_id = ?", array($device['device_id']))) {
+            echo '<li role="presentation" '.$select['vm'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'vm')).'">
-                <img src="images/16/server_cog.png" align="absmiddle" border="0" /> Virtual Machines
+                <i class="fa fa-cog fa-lg icon-theme"  aria-hidden="true"></i> Virtual Machines
                 </a>
                 </li>';
+        }
+
+        if (dbFetchCell("SELECT 1 FROM mefinfo WHERE device_id = ?", array($device['device_id']))) {
+            echo '<li role="presentation" '.$select['mef'].'>
+                <a href="'.generate_device_url($device, array('tab' => 'mef')).'">
+                <i class="fa fa-link fa-lg icon-theme"  aria-hidden="true"></i> Metro Ethernet
+                </a>
+                </li>';
+        }
+
+        if ($device['os'] == 'coriant') {
+            if (dbFetchCell("SELECT 1 FROM tnmsneinfo WHERE device_id = ?", array($device['device_id']))) {
+                echo '<li class="'.$select['tnmsne'].'">
+                    <a href="'.generate_device_url($device, array('tab' => 'tnmsne')).'">
+                    <i class="fa fa-link fa-lg icon-theme"  aria-hidden="true"></i> Hardware
+                    </a>
+                    </li>';
+            }
         }
 
         // $loadbalancer_tabs is used in device/loadbalancer/ to build the submenu. we do it here to save queries
@@ -170,10 +204,28 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
             }
         }
 
+        // F5 LTM
+        if (isset($component_count['f5-ltm-vs'])) {
+            $device_loadbalancer_count['ltm_vs'] = $component_count['f5-ltm-vs'];
+            $loadbalancer_tabs[] = 'ltm_vs';
+        }
+        if (isset($component_count['f5-ltm-pool'])) {
+            $device_loadbalancer_count['ltm_pool'] = $component_count['f5-ltm-pool'];
+            $loadbalancer_tabs[] = 'ltm_pool';
+        }
+        if (isset($component_count['f5-gtm-wide'])) {
+            $device_loadbalancer_count['gtm_wide'] = $component_count['f5-gtm-wide'];
+            $loadbalancer_tabs[] = 'gtm_wide';
+        }
+        if (isset($component_count['f5-gtm-pool'])) {
+            $device_loadbalancer_count['gtm_pool'] = $component_count['f5-gtm-pool'];
+            $loadbalancer_tabs[] = 'gtm_pool';
+        }
+
         if (is_array($loadbalancer_tabs)) {
-            echo '<li class="'.$select['loadbalancer'].'">
+            echo '<li role="presentation" '.$select['loadbalancer'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'loadbalancer')).'">
-                <img src="images/icons/loadbalancer.png" align="absmiddle" border="0" /> Load Balancer
+                <i class="fa fa-balance-scale fa-lg icon-theme"  aria-hidden="true"></i> Load Balancer
                 </a>
                 </li>';
         }
@@ -209,109 +261,100 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
             $routing_tabs[] = 'vrf';
         }
 
-        $component = new LibreNMS\Component();
-        $options['type'] = 'Cisco-OTV';
-        $options['filter']['device_id'] = array('=',$device['device_id']);
-        $otv = $component->getComponents(null, $options);
-        $device_routing_count['cisco-otv'] = count($otv);
+        $device_routing_count['cisco-otv'] = $component_count['Cisco-OTV'];
         if ($device_routing_count['cisco-otv'] > 0) {
             $routing_tabs[] = 'cisco-otv';
         }
 
         if (is_array($routing_tabs)) {
-            echo '<li class="'.$select['routing'].'">
+            echo '<li role="presentation" '.$select['routing'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'routing')).'">
-                <img src="images/16/arrow_branch.png" align="absmiddle" border="0" /> Routing
+                <i class="fa fa-random fa-lg icon-theme"  aria-hidden="true"></i> Routing
                 </a>
                 </li>';
         }
 
-        $device_pw_count = @dbFetchCell('SELECT COUNT(*) FROM `pseudowires` WHERE `device_id` = ?', array($device['device_id']));
-        if ($device_pw_count) {
-            echo '<li class="'.$select['pseudowires'].'">
+        if (dbFetchCell('SELECT 1 FROM `pseudowires` WHERE `device_id` = ?', array($device['device_id']))) {
+            echo '<li role="presentation" '.$select['pseudowires'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'pseudowires')).'">
-                <img src="images/16/arrow_switch.png" align="absmiddle" border="0" /> Pseudowires
+                <i class="fa fa-arrows-alt fa-lg icon-theme"  aria-hidden="true"></i> Pseudowires
                 </a>
                 </li>';
         }
-
-        echo('<li class="' . $select['map'] . '">
-                <a href="'.generate_device_url($device, array('tab' => 'map')).'">
-                  <img src="images/16/chart_organisation.png" align="absmiddle" border="0" /> Map
-                </a>
-              </li>');
-
-        if (@dbFetchCell("SELECT 1 FROM stp WHERE device_id = '".$device['device_id']."'")) {
-            echo '<li class="'.$select['stp'].'">
+        if (dbFetchCell("SELECT 1 FROM `links` where `local_device_id`=?", array($device['device_id']))) {
+            echo '<li role="presentation" '.$select['neighbours'].'>
+                    <a href="'.generate_device_url($device, array('tab' => 'neighbours')).'">
+                      <i class="fa fa-sitemap fa-lg icon-theme"  aria-hidden="true"></i> Neighbours
+                    </a>
+                  </li>';
+        }
+        if (dbFetchCell("SELECT 1 FROM stp WHERE device_id = ?", array($device['device_id']))) {
+            echo '<li role="presentation" '.$select['stp'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'stp')).'">
-                <img src="images/16/chart_organisation.png" align="absmiddle" border="0" /> STP
+                <i class="fa fa-sitemap fa-lg icon-theme"  aria-hidden="true"></i> STP
                 </a>
                 </li>';
         }
 
-        if (@dbFetchCell("SELECT COUNT(*) FROM `packages` WHERE device_id = '".$device['device_id']."'") > '0') {
-            echo '<li class="'.$select['packages'].'">
+        if (dbFetchCell("SELECT 1 FROM `packages` WHERE device_id = ?", array($device['device_id']))) {
+            echo '<li role="presentation" '.$select['packages'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'packages')).'">
-                <img src="images/16/package.png" align="absmiddle" border="0" /> Pkgs
+                <i class="fa fa-folder fa-lg icon-theme"  aria-hidden="true"></i> Pkgs
                 </a>
                 </li>';
         }
 
-        if ($config['enable_inventory'] && @dbFetchCell("SELECT * FROM `entPhysical` WHERE device_id = '".$device['device_id']."'") > '0') {
-            echo '<li class="'.$select['entphysical'].'">
-                <a href="'.generate_device_url($device, array('tab' => 'entphysical')).'">
-                <img src="images/16/bricks.png" align="absmiddle" border="0" /> Inventory
-                </a>
-                </li>';
-        } elseif (device_permitted($device['device_id']) && $config['enable_inventory'] && @dbFetchCell("SELECT * FROM `hrDevice` WHERE device_id = '".$device['device_id']."'") > '0') {
-            echo '<li class="'.$select['hrdevice'].'">
-                <a href="'.generate_device_url($device, array('tab' => 'hrdevice')).'">
-                <img src="images/16/bricks.png" align="absmiddle" border="0" /> Inventory
-                </a>
-                </li>';
+        if ($config['enable_inventory']) {
+            if (dbFetchCell("SELECT 1 FROM `entPhysical` WHERE device_id = ?", array($device['device_id']))) {
+                echo '<li role="presentation" ' . $select['entphysical'] . '>
+                    <a href="' . generate_device_url($device, array('tab' => 'entphysical')) . '">
+                    <i class="fa fa-cube fa-lg icon-theme"  aria-hidden="true"></i> Inventory
+                    </a>
+                    </li>';
+            } elseif (@dbFetchCell("SELECT 1 FROM `hrDevice` WHERE device_id = ?", array($device['device_id']))) {
+                echo '<li role="presentation" ' . $select['hrdevice'] . '>
+                    <a href="' . generate_device_url($device, array('tab' => 'hrdevice')) . '">
+                    <i class="fa fa-cube fa-lg icon-theme"  aria-hidden="true"></i> Inventory
+                    </a>
+                    </li>';
+            }
         }
 
-        if (dbFetchCell("SELECT COUNT(service_id) FROM services WHERE device_id = '".$device['device_id']."'") > '0') {
-            echo '<li class="'.$select['services'].'">
+        if ($config['show_services']) {
+            echo '<li role="presentation" '.$select['services'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'services')).'">
-                <img src="images/icons/services.png" align="absmiddle" border="0" /> Services
+                <i class="fa fa-cogs fa-lg icon-theme"  aria-hidden="true"></i> Services
                 </a>
                 </li>';
         }
 
-        if (@dbFetchCell("SELECT COUNT(toner_id) FROM toner WHERE device_id = '".$device['device_id']."'") > '0') {
-            echo '<li class="'.$select['toner'].'">
+        if (dbFetchCell("SELECT 1 FROM toner WHERE device_id = ?", array($device['device_id']))) {
+            echo '<li role="presentation" '.$select['toner'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'toner')).'">
-                <img src="images/icons/toner.png" align="absmiddle" border="0" /> Toner
+                <i class="fa fa-print fa-lg icon-theme"  aria-hidden="true"></i> Toner
                 </a>
                 </li>';
         }
 
-        if (device_permitted($device['device_id'])) {
-            echo '<li class="'.$select['logs'].'">
-                <a href="'.generate_device_url($device, array('tab' => 'logs')).'">
-                <img src="images/16/report_magnify.png" align="absmiddle" border="0" /> Logs
-                </a>
-                </li>';
-        }
+        echo '<li role="presentation" '.$select['logs'].'>
+            <a href="'.generate_device_url($device, array('tab' => 'logs')).'">
+            <i class="fa fa-sticky-note fa-lg icon-theme"  aria-hidden="true"></i> Logs
+            </a>
+            </li>';
 
-        if (device_permitted($device['device_id'])) {
-            echo '<li class="'.$select['alerts'].'">
-                <a href="'.generate_device_url($device, array('tab' => 'alerts')).'">
-                <img src="images/16/bell.png" align="absmiddle" border="0" /> Alerts
-                </a>
-                </li>';
-        }
+        echo '<li role="presentation" '.$select['alerts'].'>
+            <a href="'.generate_device_url($device, array('tab' => 'alerts')).'">
+            <i class="fa fa-exclamation-circle fa-lg icon-theme"  aria-hidden="true"></i> Alerts
+            </a>
+            </li>';
 
-        if (device_permitted($device['device_id'])) {
-            echo '<li class="'.$select['alert-stats'].'">
-                <a href="'.generate_device_url($device, array('tab' => 'alert-stats')).'">
-                <img src="images/16/chart_bar.png" align="absmiddle" border="0" /> Alert Stats
-                </a>
-                </li>';
-        }
+        echo '<li role="presentation" '.$select['alert-stats'].'>
+            <a href="'.generate_device_url($device, array('tab' => 'alert-stats')).'">
+            <i class="fa fa-bar-chart fa-lg icon-theme"  aria-hidden="true"></i> Alert Stats
+            </a>
+            </li>';
 
-        if (is_admin()) {
+        if (Auth::user()->hasGlobalAdmin()) {
             if (!is_array($config['rancid_configs'])) {
                 $config['rancid_configs'] = array($config['rancid_configs']);
             }
@@ -334,16 +377,16 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
                 } // end if
             }
 
-            if ($config['oxidized']['enabled'] === true && isset($config['oxidized']['url'])) {
+            if ($config['oxidized']['enabled'] === true && !in_array($device['type'], $config['oxidized']['ignore_types']) && isset($config['oxidized']['url'])) {
                 $device_config_file = true;
             }
         }
 
         if ($device_config_file) {
-            if (dbFetchCell("SELECT COUNT(device_id) FROM devices_attribs WHERE device_id = ? AND attrib_type = 'override_Oxidized_disable' AND attrib_value='true'", array($device['device_id'])) == '0') {
+            if (!get_dev_attrib($device, 'override_Oxidized_disable', 'true')) {
                 echo '<li class="'.$select['showconfig'].'">
                     <a href="'.generate_device_url($device, array('tab' => 'showconfig')).'">
-                    <img src="images/16/page_white_text.png" align="absmiddle" border="0" /> Config
+                    <i class="fa fa-align-justify fa-lg icon-theme"  aria-hidden="true"></i> Config
                     </a>
                     </li>';
             }
@@ -364,7 +407,12 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
                     $nfsensuffix = $config['nfsen_suffix'];
                 }
 
-                $basefilename_underscored = preg_replace('/\./', $config['nfsen_split_char'], $device['hostname']);
+                if (isset($config['nfsen_split_char']) && !empty($config['nfsen_split_char'])) {
+                    $basefilename_underscored = preg_replace('/\./', $config['nfsen_split_char'], $device['hostname']);
+                } else {
+                    $basefilename_underscored = $device['hostname'];
+                }
+
                 $nfsen_filename           = preg_replace('/'.$nfsensuffix.'/', '', $basefilename_underscored);
                 if (is_file($nfsenrrds.$nfsen_filename.'.rrd')) {
                     $nfsen_rrd_file = $nfsenrrds.$nfsen_filename.'.rrd';
@@ -373,63 +421,73 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
         }//end if
 
         if ($nfsen_rrd_file) {
-            echo '<li class="'.$select['nfsen'].'">
+            echo '<li role="presentation" '.$select['nfsen'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'nfsen')).'">
-                <img src="images/16/rainbow.png" align="absmiddle" border="0" /> Netflow
+                <i class="fa fa-tint fa-lg icon-theme"  aria-hidden="true"></i> Netflow
                 </a>
                 </li>';
         }
 
         if (can_ping_device($attribs) === true) {
-            echo '<li class="'.$select['performance'].'">
+            echo '<li role="presentation" '.$select['performance'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'performance')).'">
-                <img src="images/16/chart_line.png" align="absmiddle" border="0" /> Performance
+                <i class="fa fa-line-chart fa-lg icon-theme"  aria-hidden="true"></i> Performance
                 </a>
                 </li>';
         }
 
-        echo '<li class="'.$select['notes'].'">
+        echo '<li role="presentation" '.$select['notes'].'>
             <a href="'.generate_device_url($device, array('tab' => 'notes')).'">
-            <img src="images/16/page_white_text.png" align="absmiddle" border="0" /> Notes
+            <i class="fa fa-file-text-o fa-lg icon-theme"  aria-hidden="true"></i> Notes
             </a>
             </li>';
 
-        if (device_permitted($device['device_id']) && is_mib_poller_enabled($device)) {
-            echo '<li class="'.$select['mib'].'">
+        if (is_mib_poller_enabled($device)) {
+            echo '<li role="presentation" '.$select['mib'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'mib')).'">
-                <i class="fa fa-file-text-o"></i> MIB
+                <i class="fa fa-file-text-o fa-lg icon-theme"  aria-hidden="true"></i> MIB
                 </a>
                 </li>';
         }
 
+            echo '<div class="dropdown pull-right">
+                  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-cog fa-lg icon-theme"  aria-hidden="true"></i>
+                  <span class="caret"></span></button>
+                  <ul class="dropdown-menu">
+                    <li><a href="https://'.$device['hostname'].'" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme"  aria-hidden="true"></i> Web</a></li>';
+        if (isset($config['gateone']['server'])) {
+            if ($config['gateone']['use_librenms_user'] == true) {
+                    echo '<li><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . Auth::user()->username . '@' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" aria-hidden="true"></i> SSH</a></li>';
+            } else {
+                    echo '<li><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" aria-hidden="true"></i> SSH</a></li>';
+            }
+        } else {
+            echo '<li><a href="ssh://'.$device['hostname'].'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme"  aria-hidden="true"></i> SSH</a></li>
+            ';
+        }
+            echo '<li><a href="telnet://'.$device['hostname'].'" target="_blank" rel="noopener"><i class="fa fa-terminal fa-lg icon-theme"  aria-hidden="true"></i> Telnet</a></li>';
 
-        echo '<div class="dropdown pull-right">
-              <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-cog"></i>
-              <span class="caret"></span></button>
-              <ul class="dropdown-menu">
-                <li><a href="https://'.$device['hostname'].'" target="_blank"><img src="images/16/http.png" alt="https" title="Launch browser to https://'.$device['hostname'].'" border="0" width="16" height="16" target="_blank"> Web</a></li>
-                <li><a href="ssh://'.$device['hostname'].'" target="_blank"><img src="images/16/ssh.png" alt="ssh" title="SSH to '.$device['hostname'].'" border="0" width="16" height="16"> SSH</a></li>
-                 <li><a href="telnet://'.$device['hostname'].'" target="_blank"><img src="images/16/telnet.png" alt="telnet" title="Telnet to '.$device['hostname'].'" border="0" width="16" height="16"> Telnet</a></li>';
-        if (is_admin()) {
+        if (Auth::user()->hasGlobalAdmin()) {
             echo '<li>
                 <a href="'.generate_device_url($device, array('tab' => 'edit')).'">
-                <img src="images/16/wrench.png" align="absmiddle" border="0" />
-                 Edit
-                </a>
+                <i class="fa fa-pencil fa-lg icon-theme"  aria-hidden="true"></i> Edit </a>
                 </li>';
+
+            echo '<li><a href="'.generate_device_url($device, array('tab' => 'capture')).'">
+                <i class="fa fa-bug fa-lg icon-theme"  aria-hidden="true"></i> Capture
+                </a></li>';
         }
               echo '</ul>
             </div>';
         echo '</ul>';
-    }//end if
+    }//end if device_permitted
 
-    if (device_permitted($device['device_id']) || $check_device == $vars['device']) {
-        echo '<div class="tabcontent">';
 
-        require 'pages/device/'.mres(basename($tab)).'.inc.php';
-
-        echo '</div>';
-    } else {
-        require 'includes/error-no-perm.inc.php';
-    }
-}//end if
+    // include the tabcontent
+    echo '<div class="tabcontent">';
+    require 'pages/device/'.filter_var(basename($tab), FILTER_SANITIZE_URL).'.inc.php';
+    echo '</div>';
+} else {
+    // no device permissions
+    require 'includes/error-no-perm.inc.php';
+}

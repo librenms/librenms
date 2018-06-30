@@ -1,0 +1,312 @@
+CISCO-DOCS-EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Integer32,
+        Counter32,
+        IpAddress,
+        Unsigned32,     -- imported from Cisco-SMI in official Cisco MIB
+        Gauge32
+                FROM SNMPv2-SMI
+        TruthValue,
+        DisplayString,
+        MacAddress,
+        TimeStamp, 
+        RowStatus,
+        TimeInterval,
+        TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+        OBJECT-GROUP,
+        MODULE-COMPLIANCE,
+        NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        ifIndex,
+        InterfaceIndex
+                FROM IF-MIB
+        docsIfCmtsServiceEntry,
+        docsIfCmtsCmStatusEntry, 
+        docsIfCmtsCmStatusIndex, 
+        docsIfCmtsMacEntry,
+        docsIfCmtsCmStatusMacAddress,
+        docsIfCmtsCmStatusIpAddress,
+        docsIfCmtsCmStatusDownChannelIfIndex,
+        docsIfCmtsCmStatusUpChannelIfIndex,
+        docsIfUpstreamChannelEntry,
+        TenthdBmV
+                FROM DOCS-IF-MIB;
+--        ciscoMgmt
+--                FROM CISCO-SMI;
+--        Unsigned32
+--                FROM CISCO-TC;
+
+cisco OBJECT IDENTIFIER
+    ::= { enterprises 9 }
+
+ciscoMgmt OBJECT IDENTIFIER
+        ::= { cisco 9 }
+
+ciscoDocsExtMIB MODULE-IDENTITY
+        LAST-UPDATED    "200410050000Z"  --10 May 2005 Arris
+        ORGANIZATION    "Cisco Systems, Inc."
+        CONTACT-INFO
+            "        Cisco Systems
+                     Customer Service
+
+             Postal: Cisco Systems
+                     170 West Tasman Drive
+                     San Jose, CA 95134
+                     U.S.A.
+             Phone:  +1 800 553-NETS 
+             E-mail: cs-ubr@cisco.com"
+
+        DESCRIPTION            "Arris: many of the Tables have been removed because of conflicts with Arris proprietary tables. "
+
+        REVISION        "200110070000Z"
+        DESCRIPTION            "This is the MIB module for the Cisco specific extension 
+             objects of Data Over Cable Service, Radio Frequency 
+             interface.  There is a standard MIB for Data-Over-Cable 
+             Service Interface Specifications (DOCSIS) and in Cisco,
+             it is called DOCS-IF-MIB. Besides the objects in 
+             DOCS-IF-MIB, this MIB module contains the extension 
+             objects to manage the Cable Modem Termination Systems (CMTS).
+
+             This MIB module includes objects for the scheduler 
+             that supports Quality of Service (QoS) of MCNS/DOCSIS 
+             compliant Radio Frequency (RF) interfaces in Cable Modem 
+             Termination Systems (CMTS). And the purpose is to let 
+             users configure attributes of the schedulers in 
+             order to ensure the Quality of Service and fairness for 
+             modem requests according to users' business needs. 
+             Also this MIB shows various states of the schedulers 
+             for users to monitor of the schedulers' current status. 
+            
+             This MIB module also includes connection status objects
+             for cable modems and Customer Premise Equipment (CPE) 
+             and the purpose is to let users easily get the connection 
+             status and manage access group information about cable 
+             modems and CPE.
+
+             This MIB module also includes objects for upstream 
+             configuration for automated spectrum management in 
+             order to mitigate upstream impairment.
+
+             This MIB module also includes objects to keep count of
+             the total # of modems,# of registered and # of active 
+             modems on the mac interface as well as each 
+             upstream. "
+
+        REVISION        "200110070000Z"
+        DESCRIPTION            "Added new objects cdxIfCmtsCmStatusOnlineTimesNum and
+             cdxIfCmtsCmStatusLastResetTime to 
+             cdxCmtsCmStatusExtTable. "
+
+        REVISION        "200108060000Z"
+        DESCRIPTION            "DOCSIS 1.1 Changes:
+             Added new objects cdxIfUpChannelAvgUtil, 
+             cdxIfUpChannelAvgContSlots, 
+             cdxIfUpChannelRangeSlots in 
+             cdxIfUpstreamChannelExtTable. 
+
+             NON-DOCSIS 1.1 Changes:
+             Added following objects in cdxIfUpstreamChannelExtTable 
+             for providing per upstream UGS statistics information:
+             cdxIfUpChannelNumActiveUGS,
+             cdxIfUpChannelMaxUGSLastOneHour, 
+             cdxIfUpChannelMinUGSLastOneHour,
+             cdxIfUpChannelAvgUGSLastOneHour, 
+             cdxIfUpChannelMaxUGSLastFiveMins,
+             cdxIfUpChannelMinUGSLastFiveMins, 
+             cdxIfUpChannelAvgUGSLastFiveMins. "
+
+        REVISION        "200104010000Z"
+        DESCRIPTION            "DOCSIS 1.1 Changes:
+             1.  Added  cdxUpInfoElemStatsTable to display the per 
+             Information Element (IE) statistics.
+                
+             2. Added the new queue types in cdxBWQueueNameCode to 
+             support the new priority queues of the MAC-Scheduler.
+
+             3. Added the new CM states in cdxCmtsCmStatusValue.
+
+             Non-DOCSIS 1.1 changes:
+             4. Added new status information for CM if the connection
+             is noisy or if the maximum power has been reached.
+
+             5. Changed the Description for cdxIfUpChannelWidth to
+             cater for non-awacs card.
+
+             6. Added new object cdxIfUpChannelInputPowerLevel for
+             Upstream Input Power Level. "
+
+        REVISION        "200007190000Z"
+        DESCRIPTION            "1.  Added  cdxCmtsCmTotal,cdxCmtsCmActive,
+             cdxCmtsCmRegistered to the cdxCmtsMacExtTable to report 
+             the number of active,registered,total cable 
+             modems on a cable mac interface since boot.
+             
+             2.  Added cdxIfUpChannelCmTotal, cdxIfUpChannelCmActive,
+             cdxIfUpChannelCmRegistered to the 
+             cdxIfUpstreamChannelExtTable to report the number of 
+             active,registered,total cable modems connected on an 
+             upstream."
+
+        REVISION        "200005170000Z"
+        DESCRIPTION            "1.  Added cdxCmCpeResetNow to reset CM or CPE.
+             2.  Added cdxCmtsCmCurrCpeNumber to report the current
+             number of CPE connecting to the CM."
+
+        REVISION        "9912280000Z"
+        DESCRIPTION            " 1. Added new objects cdxSpecMgmtObjects. 
+              2. Added new object cdxIfCmtsCmStatusDynSidCount. 
+              3. Enhanced cdxQosIfRateLimitTable for a new rate limit 
+                 algorithm.
+              4. Added more status for cdxCmtsCmStatusValue. "
+
+        REVISION        "9901210000Z"
+        DESCRIPTION            "Initial version of this MIB module."
+
+        ::= { ciscoMgmt 116 }
+
+
+ciscoDocsExtMIBObjects  OBJECT IDENTIFIER ::= { ciscoDocsExtMIB 1 }
+
+cdxCmtsCmCpeObjects OBJECT IDENTIFIER ::= { ciscoDocsExtMIBObjects 3 }
+
+
+--
+-- Cable modem (CM) or Customer Premises Equipments (CPE) Table
+--
+-- For the information of CM or CPE maintained in CMTS. 
+--
+
+cdxCmCpeTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF CdxCmCpeEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION           "This table contains information about cable modems (CM) or 
+            Customer Premises Equipments (CPE). "
+       ::= { cdxCmtsCmCpeObjects 1 }
+
+cdxCmCpeEntry OBJECT-TYPE
+        SYNTAX      CdxCmCpeEntry 
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION           "The list contains information for a cable modem (CM) or a
+            Customer Premises Equipment (CPE). An entry exist for 
+            each cable modem supported by CMTS and each Customer Premises 
+            Equipment connected to a cable modem supported by CMTS. "
+        REFERENCE
+            "Data-Over-Cable Service Interface Specifications (DOCSIS)
+             Radio Frequency Interface Specification (SP-RFI-I04-980724.)
+             docsIfCmtsCmStatusTable, docsIfCmtsServiceTable in 
+             DOCS-IF-MIB.my. "
+        INDEX { cdxCmCpeMacAddress }
+        ::= { cdxCmCpeTable 1 }
+
+CdxCmCpeEntry ::= SEQUENCE {
+            cdxCmCpeMacAddress           MacAddress,
+            cdxCmCpeType                 INTEGER,
+            cdxCmCpeIpAddress            IpAddress,
+            cdxCmCpeIfIndex              InterfaceIndex,
+            cdxCmCpeCmtsServiceId        Integer32, 
+            cdxCmCpeCmStatusIndex        Integer32,
+            cdxCmCpeAccessGroup          DisplayString,
+            cdxCmCpeResetNow             TruthValue
+        }
+
+cdxCmCpeMacAddress OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  not-accessible 
+        STATUS      current
+        DESCRIPTION            "The Mac address to identify a cable modem or a Customer 
+             Premises Equipment. "
+        ::= { cdxCmCpeEntry 1 }
+
+cdxCmCpeType OBJECT-TYPE
+        SYNTAX      INTEGER {
+            cm(1),  
+            cpe(2) 
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION            "Indicate this entry is for cable modem or Customer Premises 
+             Equipment.  The enumerations are: 
+              cm(1): cable modem
+              cpe(2): Customer Premises Equipment " 
+        ::= { cdxCmCpeEntry 2 }
+
+
+cdxCmCpeIpAddress  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+       DESCRIPTION            "Ip address of the cable modem or Customer Premises Equipment. "
+        ::= { cdxCmCpeEntry 3 }
+
+
+cdxCmCpeIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION            "The CMTS cable MAC interface index (ifType of 
+             docsCableMaclayer(127)) that cable modem or Customer Premises 
+             Equipment connects to.  
+
+             Use cdxCmCpeIfIndex and cdxCmCpeCmtsServiceId to indentify an 
+             entry in docsIfCmtsServiceTable.  " 
+        ::= { cdxCmCpeEntry 4 }
+
+cdxCmCpeCmtsServiceId  OBJECT-TYPE
+        SYNTAX      Integer32(1..16383) 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION            "The cable modem's primary Service ID if the type is cm. 
+             The primary Service ID for the CM which the CPE connects if the 
+             type is cpe.
+
+             Use cdxCmCpeIfIndex and cdxCmCpeCmtsServiceId to identify an 
+             entry in docsIfCmtsServiceTable.  " 
+        ::= { cdxCmCpeEntry 5 }
+
+
+cdxCmCpeCmStatusIndex OBJECT-TYPE 
+        SYNTAX      Integer32(1..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION            "Pointer to an entry in docsIfCmtsCmStatusTable identifying 
+             status of the CM (which the CPE connects to.) "
+        ::= { cdxCmCpeEntry 6 }
+
+cdxCmCpeAccessGroup OBJECT-TYPE    
+        SYNTAX      DisplayString 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION            "ASCII text to identify the Access Group for a CM or CPE. 
+             Access Group is to filter the upstream traffic for that
+             CM or CPE.  "
+        ::= { cdxCmCpeEntry 7 }
+
+cdxCmCpeResetNow OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION            "Setting this object to true(1) causes the device to 
+             reset.  Reading this object always returns false(2).
+ 
+             For cdxCmCpeType value cm(1),  CMTS removes the 
+             CM from the Station Maintenance List and would cause 
+             the CM to reset its interface.
+ 
+             For cdxCmCpeType value cpe(2), CMTS removes the 
+             CPE's MAC address from the internal address table.  
+             It then rediscovers and associates the CPE with the 
+             correct CM during the next DHCP lease cycle.  By resetting 
+             the CPE, the user can replace an existing CPE or change 
+             its network interface card (NIC).
+            "
+        ::= { cdxCmCpeEntry 8 }
+
+
+END

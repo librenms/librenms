@@ -1,0 +1,680 @@
+HP-ICF-PIM DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, IpAddress, 
+        Integer32, Unsigned32, TimeTicks
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        TruthValue, RowStatus
+            FROM SNMPv2-TC
+        pimCandidateRPEntry, pimInterfaceEntry, pimComponentEntry, 
+        pimRPSetComponent
+            FROM PIM-MIB
+        hpSwitch
+            FROM HP-ICF-OID;
+
+    hpicfPimMIB MODULE-IDENTITY
+        LAST-UPDATED "200508041619Z"  -- August 4, 2005
+        ORGANIZATION "Hewlett-Packard Company
+                      ProCurve Networking Business"
+        CONTACT-INFO "Hewlett-Packard Company
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+        DESCRIPTION  "This MIB module contains HP proprietary
+                     extensions to the standard PIM MIB (RFC 2934)."
+
+        REVISION     "200508041619Z"  -- August 4, 2005
+        DESCRIPTION  "Added PIM-SM objects."
+
+        REVISION     "200406300000Z"  -- June 30, 2004
+        DESCRIPTION  "Initial revision."
+        ::= { hpSwitch 20 }
+
+-- **********************************************************************
+-- The PIM MIB Groups
+-- **********************************************************************
+
+    hpicfPimObjects     OBJECT IDENTIFIER ::= { hpicfPimMIB 1 }
+    hpicfPimTraps       OBJECT IDENTIFIER ::= { hpicfPimObjects 0 }
+    hpicfPim            OBJECT IDENTIFIER ::= { hpicfPimObjects 1 }
+
+    hpicfPimConformance OBJECT IDENTIFIER ::= { hpicfPimMIB 2 }
+    hpicfPimGroups      OBJECT IDENTIFIER ::= { hpicfPimConformance 1 }
+    hpicfPimCompliances OBJECT IDENTIFIER ::= { hpicfPimConformance 2 }
+
+-- **********************************************************************
+-- Start of MIB objects
+-- **********************************************************************
+
+    hpicfPimAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The operational status of the PIM routing protocol
+                    on this router. Default is disabled."
+        DEFVAL      { disable }
+        ::= { hpicfPim 1 }
+
+    hpicfPimStateRefreshInterval OBJECT-TYPE
+        SYNTAX      Integer32 (10..300)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The interval between successive State Refresh
+                    messages originated by this router. 
+                    Default is 60 seconds."
+        DEFVAL { 60 } 
+        ::= { hpicfPim 2 } 
+
+    hpicfPimSPTThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Specifies a threshold for switching to the Shortest 
+                    Path Tree (SPT) on this router. If the object has 
+                    the special value of -1, the Shared Tree rooted to the
+                    Rendezvous Point (RP) will be used indefinitely on the 
+                    router. Default is -1."
+        DEFVAL { -1 }
+        ::= { hpicfPim 3 }
+
+    hpicfPimTrapControl OBJECT-TYPE
+        SYNTAX       BITS {
+                         neighborLoss(0),
+                         hardMrtFull(1),
+                         softMrtFull(2)
+                     }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION  "Indicates whether the PIM-enabled router will generate
+                     SNMP traps for PIM events. The set bit means 'enabled'.
+
+                     - neighborLoss(0)
+                       This bit controls whether the notification trap is
+                       allowed to be send when the neighbour timer expires
+                       and the router has no other neighbours on the same
+                       interface with a lower IP address than itself.
+
+                     - hardMrtFull(1)
+                       This bit controls whether the notification trap is
+                       allowed to be send when the MRT table is full and
+                       the error has been originated by hardware.
+
+                     - softMrtFull(2)
+                       This bit controls whether the notification trap is
+                       allowed to be send when the MRT table is full and
+                       the error has been originated by software."
+        ::= { hpicfPim 4 }
+
+-- **********************************************************************
+-- The PIM Static RP-Set Table
+-- **********************************************************************
+
+    hpicfPimStaticRPSetTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfPimStaticRPSetEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The (conceptual) table containing statically 
+                    configured Rendezvous Points (RPs) for IP multicast 
+                    group mappings. This information is being used 
+                    in the PIM Sparse mode only."
+        ::= { hpicfPim 5 }
+
+    hpicfPimStaticRPSetEntry OBJECT-TYPE
+        SYNTAX      HpicfPimStaticRPSetEntry 
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry (row) in the hpicfPimStaticRPSetTable. 
+                    NOTE: the pimRPSetComponent is an index that uniquely 
+                    identifies the component. Each protocol instance 
+                    connected to a separate domain should have a different 
+                    index value."
+        INDEX      { pimRPSetComponent,
+                     hpicfPimStaticRPSetGroupAddress, 
+                     hpicfPimStaticRPSetGroupMask,
+                     hpicfPimStaticRPSetAddress }
+        ::= { hpicfPimStaticRPSetTable 1 }
+
+    HpicfPimStaticRPSetEntry ::= 
+        SEQUENCE {
+            hpicfPimStaticRPSetGroupAddress      IpAddress,
+            hpicfPimStaticRPSetGroupMask         IpAddress,
+            hpicfPimStaticRPSetAddress           IpAddress,
+            hpicfPimStaticRPSetOverride          TruthValue,
+            hpicfPimStaticRPSetRowStatus         RowStatus
+    }
+
+    hpicfPimStaticRPSetGroupAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The IP multicast group address which, when combined
+                    with hpicfPimStaticRPSetGroupMask, gives the group 
+                    prefix for which this entry contains information 
+                    about the statically configured RP."
+        ::= { hpicfPimStaticRPSetEntry 1 }
+
+    hpicfPimStaticRPSetGroupMask OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The multicast group address mask which, when combined 
+                    with hpicfPimStaticRPSetGroupAddress, gives the group 
+                    prefix for which this entry contains information about 
+                    the statically configured RP."
+        ::= { hpicfPimStaticRPSetEntry 2 }
+
+    hpicfPimStaticRPSetAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The IP address of statically configured RP for the 
+                    given IP multicast group(s)."
+        ::= { hpicfPimStaticRPSetEntry 3 }
+
+    hpicfPimStaticRPSetOverride OBJECT-TYPE 
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "If true, indicates that the router should ignore the 
+                    information learned by a BSR if there is a conflict 
+                    between the information this static entry contains and 
+                    the information that is learned by the BSR. 
+                    Default is false."
+        DEFVAL { false }
+        ::= { hpicfPimStaticRPSetEntry 4 }
+
+    hpicfPimStaticRPSetRowStatus OBJECT-TYPE
+        SYNTAX     RowStatus
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION "The status of this row, by which new entries may be 
+                    created, or old entries deleted from this table."
+        ::= { hpicfPimStaticRPSetEntry 5 }
+
+-- **********************************************************************
+-- The Extensions to the PIM Interface Table (RFC 2934)
+-- **********************************************************************
+
+    hpicfPimIfTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfPimIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions to the pimInterfaceTable."
+        ::= { hpicfPim 6 }
+
+    hpicfPimIfEntry OBJECT-TYPE
+        SYNTAX      HpicfPimIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions for an entry in the pimInterfaceTable."
+        AUGMENTS    { pimInterfaceEntry }
+        ::= { hpicfPimIfTable 1 }
+
+    HpicfPimIfEntry ::=
+        SEQUENCE {
+            hpicfPimIfAddress            IpAddress,
+            hpicfPimIfTrigHelloInterval  Integer32,
+            hpicfPimIfHelloHoldtime      Integer32,
+            hpicfPimIfLanPruneDelay      TruthValue,
+            hpicfPimIfPropagationDelay   Integer32,
+            hpicfPimIfOverrideInterval   Integer32,
+            hpicfPimIfGenerationID       TruthValue,
+            hpicfPimIfJoinPruneHoldtime  Unsigned32,
+            hpicfPimIfGraftRetryInterval Integer32,
+            hpicfPimIfMaxGraftRetries    Integer32,
+            hpicfPimIfSRTTLThreshold     Unsigned32,
+            hpicfPimIfLanDelayEnabled    TruthValue,
+            hpicfPimIfSRCapable          TruthValue,
+            hpicfPimIfDRPriority         Unsigned32,
+            hpicfPimIfNBRTimeout         Integer32
+        }
+
+    hpicfPimIfAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This is copy of pimInterfaceAddress with read-create 
+                    access. PIM uses this source address to send its 
+                    protocol packets out on this interface. This address can 
+                    be set to one of IP addresses of the interface or 
+                    255.255.255.255 if the address is determined dynamically 
+                    based on the current IP configuration.
+                    The currently used source address is value of
+                    pimInterfaceAddress in the latter case."
+        ::= { hpicfPimIfEntry 1 }
+
+    hpicfPimIfTrigHelloInterval OBJECT-TYPE 
+        SYNTAX      Integer32 (0..5)
+        UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The maximum time before a triggered PIM Hello message 
+                    is transmitted on this interface. Default is 5 seconds."
+        DEFVAL { 5 } 
+        ::= { hpicfPimIfEntry 2 } 
+
+    hpicfPimIfHelloHoldtime OBJECT-TYPE 
+        SYNTAX      Integer32 (17..1050) 
+        UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The value set in the Holdtime field of Hello messages 
+                    transmitted on this interface.  This should be 3.5 
+                    times the value of pimInterfaceHelloInterval. 
+                    Default is 105 seconds."
+        DEFVAL { 105 } 
+        ::= { hpicfPimIfEntry 3 } 
+
+    hpicfPimIfLanPruneDelay OBJECT-TYPE 
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Turns the LAN Prune Delay Option off and on on this 
+                     interface. Default is true."
+        DEFVAL { true }
+        ::= { hpicfPimIfEntry 4 }
+
+    hpicfPimIfPropagationDelay OBJECT-TYPE 
+        SYNTAX      Integer32 (250..2000)
+        UNITS       "milliseconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The value inserted into the LAN Prune Delay field of a 
+                     LAN Prune Delay option on this interface. 
+                     Default is 500 milliseconds."
+        DEFVAL { 500 } 
+        ::= { hpicfPimIfEntry 5 }
+
+    hpicfPimIfOverrideInterval OBJECT-TYPE 
+        SYNTAX      Integer32 (500..6000)
+        UNITS       "milliseconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The value inserted into the Override Interval field of 
+                     a LAN Prune Delay option on this interface. 
+                     Default is 2500 milliseconds."
+        DEFVAL { 2500 } 
+        ::= { hpicfPimIfEntry 6 } 
+
+    hpicfPimIfGenerationID OBJECT-TYPE 
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Turns the Generation ID Option off and on on this 
+                    interface. Default is false."
+        DEFVAL { false } 
+        ::= { hpicfPimIfEntry 7 }
+
+    hpicfPimIfJoinPruneHoldtime OBJECT-TYPE
+        SYNTAX      Unsigned32
+        UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The value inserted into the Holdtime field of a Join/
+                    Prune message sent on this interface.  The value should
+                    be 3.5 times pimInterfaceJoinPruneInterval.
+                    Default is 210 seconds."
+        DEFVAL { 210 }
+        ::= { hpicfPimIfEntry 8 }
+
+    hpicfPimIfGraftRetryInterval OBJECT-TYPE 
+        SYNTAX      Integer32 (1..10)
+        UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The interval a PIM router waits for a Graft Ack before 
+                    re-sending a Graft on this interface. 
+                    Default is 3 seconds."
+        DEFVAL { 3 }
+        ::= { hpicfPimIfEntry 9 } 
+
+    hpicfPimIfMaxGraftRetries OBJECT-TYPE 
+        SYNTAX      Integer32 (1..10)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The maximum number of times this router will re-send a 
+                     Graft on this interface. Default is 2."
+        DEFVAL { 2 }
+        ::= { hpicfPimIfEntry 10 }
+
+    hpicfPimIfSRTTLThreshold OBJECT-TYPE 
+        SYNTAX      Unsigned32 
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The Time To Live in a PIM-DM State Refresh message at
+                    which it is not forwarded on this interface. Default is 0."
+        DEFVAL { 0 }
+        ::= { hpicfPimIfEntry 11 }
+
+    hpicfPimIfLanDelayEnabled OBJECT-TYPE 
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Evaluates to TRUE if all routers on this interface are
+                    using the LAN Prune Delay Option."
+        ::= { hpicfPimIfEntry 12 }
+
+    hpicfPimIfSRCapable OBJECT-TYPE 
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Evaluates to TRUE if all routers on this interface are
+                    using the State Refresh Capable Option."
+        ::= { hpicfPimIfEntry 13 }
+
+    hpicfPimIfDRPriority OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The Designated Router Priority inserted into the DR
+                    priority option on this interface. Default is 1."
+        DEFVAL { 1 }
+        ::= { hpicfPimIfEntry 14 }
+
+    hpicfPimIfNBRTimeout OBJECT-TYPE
+        SYNTAX      Integer32 (60..8000)
+        UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Time interval after which the router will consider a 
+                    neighbour to not be present, if no PIM Hello messages 
+                    arrived on the interface. Default is 180 seconds."
+        DEFVAL { 180 }
+        ::= { hpicfPimIfEntry 15 }
+
+-- **********************************************************************
+-- The Extensions to the PIM Component Table (RFC 2934)
+-- **********************************************************************
+
+    hpicfPimComponentTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfPimComponentEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions to the pimComponentTable - the 
+                    (conceptual) table containing objects specific to a
+                    PIM domain. One row exists for each domain to which 
+                    the router is connected. Typically, a PIM-SM router 
+                    will be a member of exactly one domain, however, the 
+                    table also supports routers which may form a border 
+                    between two PIM-SM domains and do not forward Bootstrap 
+                    messages between them."
+        ::= { hpicfPim 7 }
+
+    hpicfPimComponentEntry OBJECT-TYPE
+        SYNTAX      HpicfPimComponentEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions for an entry in the pimComponentTable."
+        AUGMENTS    { pimComponentEntry }
+        ::= { hpicfPimComponentTable 1 }
+
+    HpicfPimComponentEntry ::=
+        SEQUENCE {
+            -- ------------------
+            -- read-write objects
+            -- ------------------
+            hpicfPimComponentCBSRAdminStatus        INTEGER,
+            hpicfPimComponentCBSRAddress            IpAddress,
+            hpicfPimComponentCBSRPriority           Integer32,
+            hpicfPimComponentCBSRHashMaskLength     Integer32,
+            hpicfPimComponentCBSRMessageInterval    Integer32,
+            hpicfPimComponentCRPPriority            Integer32,
+            -- ------------------
+            -- read-only objects
+            -- ------------------
+            hpicfPimComponentCRPAdvInterval         Unsigned32, 
+            hpicfPimComponentBSRPriority            Unsigned32,
+            hpicfPimComponentBSRHashMaskLength      Unsigned32,
+            hpicfPimComponentBSRUpTime              TimeTicks,
+            hpicfPimComponentBSRNextMessage         TimeTicks
+        }
+
+    hpicfPimComponentCBSRAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This objects specifies whether or not the router 
+                    configured to be a Candidate BSR for the local 
+                    PIM region. Default is disabled."
+        DEFVAL      { disable }
+        ::= { hpicfPimComponentEntry 1 }
+
+    hpicfPimComponentCBSRAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The IP address the Candidate BSR router will advertise 
+                    for the local PIM region."
+        ::= { hpicfPimComponentEntry 2 }
+
+    hpicfPimComponentCBSRPriority OBJECT-TYPE 
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The priority for Candidate BSR router. In BSR election
+                    process the candidate BSR with the highest (numerically 
+                    bigger) priority becomes the BSR. If the priority values 
+                    are the same, the router with the larger IP address is 
+                    the BSR. Default is 0."
+        DEFVAL { 0 }
+        ::= { hpicfPimComponentEntry 3 }
+
+    hpicfPimComponentCBSRHashMaskLength OBJECT-TYPE 
+        SYNTAX      Integer32 (1..128)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Specifies the length (in bits) of a multicast group
+                    address to use when mapping a group to one of the 
+                    candidate RPs from the RP-Set whose group-prefix 
+                    includes the group. The recommended value for IPv4 
+                    is 30, for IPv6 is 126. Default is 30."
+        DEFVAL { 30 }
+        ::= { hpicfPimComponentEntry 4 }
+
+    hpicfPimComponentCBSRMessageInterval OBJECT-TYPE 
+        SYNTAX      Integer32 (5..65535)
+        UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "If this router is the elected BSR, then this is the 
+                    interval for sending (multicast out) periodic Bootstrap 
+                    (RP-Set) messages on all PIM SM interfaces.
+                    Default is 60 seconds."
+        DEFVAL { 60 }
+        ::= { hpicfPimComponentEntry 5 }
+
+    hpicfPimComponentCRPPriority OBJECT-TYPE 
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The priority for the Candidate RP for the local PIM 
+                    domain. Determines which Candidate RPs get selected by 
+                    the BSR to be in the RP Set. The smaller value means 
+                    the higher priority (a value of zero is the highest 
+                    possible priority). Default is 192."
+        DEFVAL { 192 }
+        ::= { hpicfPimComponentEntry 6 }
+
+    hpicfPimComponentCRPAdvInterval OBJECT-TYPE 
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The interval at which the Candidate RP transmits
+                    (unicast to the elected BSR) advertise messages in
+                    the local PIM domain."
+        ::= { hpicfPimComponentEntry 7 }
+
+    hpicfPimComponentBSRPriority OBJECT-TYPE 
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The priority of the Bootstrap Router (BSR) elected
+                    for the local PIM region."
+        ::= { hpicfPimComponentEntry 8 }
+
+    hpicfPimComponentBSRHashMaskLength OBJECT-TYPE 
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The hash mask length of the elected Bootstrap 
+                    Router (BSR)."
+        ::= { hpicfPimComponentEntry 9 }
+
+    hpicfPimComponentBSRUpTime OBJECT-TYPE 
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Length of time that the elected Bootstrap Router (BSR)
+                    has been up."
+        ::= { hpicfPimComponentEntry 10 }
+
+    hpicfPimComponentBSRNextMessage OBJECT-TYPE 
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Time in which the next bootstrap message is due from 
+                    the elected Bootstrap Router (BSR)."
+        ::= { hpicfPimComponentEntry 11 }
+
+-- **********************************************************************
+-- PIM Notifications Trap Definitions
+-- **********************************************************************
+
+    hpicfPimHardMRTFull NOTIFICATION-TYPE
+        STATUS      current
+        DESCRIPTION "This notification signifies that the MRT table is 
+                    full and the error has been originated by hardware. 
+                    This trap should be generated whenever a multicast 
+                    flow or MRT  entry cannot be added."
+        ::= { hpicfPimTraps 1 }
+
+    hpicfPimSoftMRTFull NOTIFICATION-TYPE
+        STATUS      current
+        DESCRIPTION "This notification signifies that the MRT table is 
+                    full and the error has been originated by software. 
+                    This trap should be generated whenever a multicast 
+                    flow or MRT entry cannot be added."
+        ::= { hpicfPimTraps 2 }
+
+-- **********************************************************************
+-- Conformance Information
+-- **********************************************************************
+
+    hpicfPimNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS
+                    { hpicfPimHardMRTFull,
+                      hpicfPimSoftMRTFull }
+        STATUS      current
+        DESCRIPTION "A collection of notifications that extends 
+                     notifications defined in RFC 2934 - used for signalling 
+                     important PIM events."
+        ::= { hpicfPimGroups 1 }
+
+    hpicfPimBaseGroup OBJECT-GROUP
+        OBJECTS     { hpicfPimAdminStatus,
+                      hpicfPimStateRefreshInterval,
+                      hpicfPimSPTThreshold,
+                      hpicfPimTrapControl }
+        STATUS      current
+        DESCRIPTION "A collection of objects to support basic PIM 
+                    configuration information on HP routers."
+        ::= { hpicfPimGroups 2 }
+
+    hpicfPimStaticRPSetMappingGroup OBJECT-GROUP
+        OBJECTS     { hpicfPimStaticRPSetOverride,
+                      hpicfPimStaticRPSetRowStatus }
+        STATUS      current
+        DESCRIPTION "A collection of objects to support management of
+                    static Rendezvous Point (RP) to IP multicast group 
+                    mappings."
+        ::= { hpicfPimGroups 3 }
+
+    hpicfPimSparseIfGroup OBJECT-GROUP
+        OBJECTS     { hpicfPimIfAddress,
+                      hpicfPimIfTrigHelloInterval,
+                      hpicfPimIfHelloHoldtime,
+                      hpicfPimIfLanPruneDelay,
+                      hpicfPimIfPropagationDelay,
+                      hpicfPimIfOverrideInterval,
+                      hpicfPimIfGenerationID,
+                      hpicfPimIfJoinPruneHoldtime,
+                      hpicfPimIfLanDelayEnabled,
+                      hpicfPimIfDRPriority,
+                      hpicfPimIfNBRTimeout }
+        STATUS      current
+        DESCRIPTION "A collection of objects that extends objects defined
+                    in pimInterfaceTable and used to support management of 
+                    interfaces operating in PIM Sparse Mode."
+        ::= { hpicfPimGroups 4 }
+
+    hpicfPimDenseIfGroup OBJECT-GROUP
+        OBJECTS     { hpicfPimIfAddress,
+                      hpicfPimIfTrigHelloInterval,
+                      hpicfPimIfHelloHoldtime,
+                      hpicfPimIfLanPruneDelay,
+                      hpicfPimIfPropagationDelay,
+                      hpicfPimIfOverrideInterval,
+                      hpicfPimIfGenerationID,
+                      hpicfPimIfJoinPruneHoldtime,
+                      hpicfPimIfGraftRetryInterval,
+                      hpicfPimIfMaxGraftRetries,
+                      hpicfPimIfSRTTLThreshold,
+                      hpicfPimIfLanDelayEnabled,
+                      hpicfPimIfSRCapable,
+                      hpicfPimIfDRPriority }
+        STATUS      current
+        DESCRIPTION "A collection of objects that extends objects defined
+                    in pimInterfaceTable and used to support management of 
+                    interfaces operating in PIM Dense Mode."
+        ::= { hpicfPimGroups 5 }
+
+    hpicfPimComponentGroup OBJECT-GROUP
+        OBJECTS     { hpicfPimComponentCBSRAdminStatus,
+                      hpicfPimComponentCBSRAddress,
+                      hpicfPimComponentCBSRPriority,
+                      hpicfPimComponentCBSRHashMaskLength,
+                      hpicfPimComponentCBSRMessageInterval,
+                      hpicfPimComponentCRPPriority,
+                      hpicfPimComponentCRPAdvInterval,
+                      hpicfPimComponentBSRPriority,
+                      hpicfPimComponentBSRHashMaskLength,
+                      hpicfPimComponentBSRUpTime,
+                      hpicfPimComponentBSRNextMessage }
+        STATUS      current
+        DESCRIPTION "A collection of objects that extends objects defined 
+                    in pimComponentTable (RFC 2934)."
+        ::= { hpicfPimGroups 6 }
+
+-- **********************************************************************
+-- Compliance statements
+-- **********************************************************************
+
+    hpicfPimSparseMIBCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP routers running
+                    PIM Sparse Mode and implementing the HP-ICF-PIM MIB."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfPimBaseGroup,
+                               hpicfPimStaticRPSetMappingGroup,
+                               hpicfPimSparseIfGroup,
+                               hpicfPimComponentGroup }
+        ::= { hpicfPimCompliances 1 }
+
+    hpicfPimDenseMIBCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP routers running
+                    PIM Dense Mode and implementing the HP-ICF-PIM MIB."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfPimBaseGroup,
+                               hpicfPimDenseIfGroup }
+        ::= { hpicfPimCompliances 2 }
+
+END

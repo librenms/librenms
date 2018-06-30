@@ -23,75 +23,91 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use LibreNMS\Authentication\Auth;
+
 $where = "`D`.`hostname` != '' ";
 $param = array();
 $sql = 'FROM `ports`';
 
-if (is_admin() === false && is_read() === false) {
-    $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `ports`.`device_id` = `DP`.`device_id`';
-    $sql    .= ' LEFT JOIN `ports_perms` AS `PP` ON `ports`.`port_id` = `PP`.`port_id`';
+if (!Auth::user()->hasGlobalRead()) {
+    $sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `ports`.`device_id` = `DP`.`device_id`';
+    $sql .= ' LEFT JOIN `ports_perms` AS `PP` ON `ports`.`port_id` = `PP`.`port_id`';
 
-    $where  .= ' AND (`DP`.`user_id`=? OR `PP`.`user_id`=?)';
-    $param[] = $_SESSION['user_id'];
-    $param[] = $_SESSION['user_id'];
+    $where .= ' AND (`DP`.`user_id`=? OR `PP`.`user_id`=?)';
+    $param[] = Auth::id();
+    $param[] = Auth::id();
 }
 
 $sql .= ' LEFT JOIN `devices` AS `D` ON `ports`.`device_id` = `D`.`device_id`';
 
-if (!empty($_POST['hostname'])) {
-    $where  .= ' AND `D`.`hostname` LIKE ?';
-    $param[] = '%' . $_POST['hostname'] . '%';
+if (!empty($vars['hostname'])) {
+    $where .= ' AND (D.hostname LIKE ? OR D.sysName LIKE ?)';
+    $param += array_fill(count($param), 2, '%' . $vars['hostname'] . '%');
 }
 
-if (!empty($_POST['location'])) {
-    $where  .= " AND `D`.`location` = ?";
-    $param[] = $_POST['location'];
+if (!empty($vars['location'])) {
+    $where .= " AND `D`.`location` = ?";
+    $param[] = $vars['location'];
 }
 
 $sql .= " WHERE $where ";
 
-if (!empty($_POST['errors'])) {
+if (!empty($vars['errors'])) {
     $sql .= " AND (`ports`.`ifInErrors_delta` > 0 OR `ports`.`ifOutErrors_delta` > 0)";
 }
 
-if (!empty($_POST['device_id'])) {
-    $sql    .= ' AND `ports`.`device_id`=?';
-    $param[] = $_POST['device_id'];
+if (!empty($vars['device_id'])) {
+    $sql .= ' AND `ports`.`device_id`=?';
+    $param[] = $vars['device_id'];
 }
 
-if (!empty($_POST['state'])) {
-    $sql .= ' AND `ports`.`ifOperStatus`=?';
-    $param[] = $_POST['state'];
+if (!empty($vars['state'])) {
+    switch ($vars['state']) {
+        case "down":
+            $sql .= " AND `ports`.`ifAdminStatus` = ? AND `ports`.`ifOperStatus` = ?";
+            $param[] = "up";
+            $param[] = "down";
+            break;
+        case "up":
+            $sql .= " AND `ports`.`ifAdminStatus` = ? AND `ports`.`ifOperStatus` = ?";
+            $param[] = "up";
+            $param[] = "up";
+            break;
+        case "admindown":
+            $sql .= " AND `ports`.`ifAdminStatus` = ? AND `D`.`ignore` = 0";
+            $param[] = "down";
+            break;
+    }
 }
 
-if (!empty($_POST['ifSpeed'])) {
+if (!empty($vars['ifSpeed'])) {
     $sql .= ' AND `ports`.`ifSpeed`=?';
-    $param[] = $_POST['ifSpeed'];
+    $param[] = $vars['ifSpeed'];
 }
 
-if (!empty($_POST['ifType'])) {
+if (!empty($vars['ifType'])) {
     $sql .= ' AND `ports`.`ifType`=?';
-    $param[] = $_POST['ifType'];
+    $param[] = $vars['ifType'];
 }
 
-if (!empty($_POST['port_descr_type'])) {
+if (!empty($vars['port_descr_type'])) {
     $sql .= ' AND `ports`.`port_descr_type`=?';
-    $param[] = $_POST['port_descr_type'];
+    $param[] = $vars['port_descr_type'];
 }
 
-if (!empty($_POST['ifAlias'])) {
+if (!empty($vars['ifAlias'])) {
     $sql .= ' AND `ports`.`ifAlias` LIKE ?';
-    $param[] = '%'.$_POST['ifAlias'].'%';
+    $param[] = '%' . $vars['ifAlias'] . '%';
 }
 
-$sql    .= ' AND `ports`.`disabled`=?';
-$param[] = (int)(isset($_POST['disabled']) && $_POST['disabled']);
+$sql .= ' AND `ports`.`disabled`=?';
+$param[] = (int)(isset($vars['disabled']) && $vars['disabled']);
 
-$sql    .= ' AND `ports`.`ignore`=?';
-$param[] = (int)(isset($_POST['ignore']) && $_POST['ignore']);
+$sql .= ' AND `ports`.`ignore`=?';
+$param[] = (int)(isset($vars['ignore']) && $vars['ignore']);
 
-$sql    .= ' AND `ports`.`deleted`=?';
-$param[] = (int)(isset($_POST['deleted']) && $_POST['deleted']);
+$sql .= ' AND `ports`.`deleted`=?';
+$param[] = (int)(isset($vars['deleted']) && $vars['deleted']);
 
 $count_sql = "SELECT COUNT(`ports`.`port_id`) $sql";
 $total = (int)dbFetchCell($count_sql, $param);
@@ -102,13 +118,15 @@ if (isset($sort) && !empty($sort)) {
         $sql .= " ORDER BY `D`.`hostname` $sort_order";
     } elseif ($sort_column == 'port') {
         $sql .= " ORDER BY `ifDescr` $sort_order";
+    } elseif ($sort_column == 'ifLastChange') {
+        $sql .= " ORDER BY `secondsIfLastChange` $sort_order";
     } else {
         $sql .= " ORDER BY `$sort_column` $sort_order";
     }
 }
 
 if (isset($current)) {
-    $limit_low  = (($current * $rowCount) - ($rowCount));
+    $limit_low = (($current * $rowCount) - ($rowCount));
     $limit_high = $rowCount;
 }
 
@@ -116,31 +134,64 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT DISTINCT(`ports`.`port_id`),`ports`.* $sql";
+$query = 'SELECT DISTINCT(`ports`.`port_id`),`ports`.*';
+// calculate ifLastChange as seconds ago
+$query .= ',`D`.`uptime` - `ports`.`ifLastChange` / 100 as secondsIfLastChange ';
+$query .= $sql;
 
-foreach (dbFetchRows($sql, $param) as $port) {
+foreach (dbFetchRows($query, $param) as $port) {
     $device = device_by_id_cache($port['device_id']);
+    $port = cleanPort($port, $device);
+
+    switch ($port['ifOperStatus']) {
+        case 'up':
+            $status = 'label-success';
+            break;
+        case 'down':
+            switch ($port['ifAdminStatus']) {
+                case 'up':
+                    $status = 'label-danger';
+                    break;
+                case 'down':
+                    $status = 'label-warning';
+                    break;
+            }
+            break;
+    }
 
     // FIXME what actions should we have?
     $actions = '<div class="container-fluid"><div class="row">';
-    $actions .= '<div class="col-xs-1"><a href="';
-    $actions .= generate_device_url($device, array('tab' => 'alerts'));
-    $actions .= '"><img src="images/16/bell.png" border="0" align="absmiddle" alt="View alerts" title="View alerts" /></a></div>';
 
-    if ($_SESSION['userlevel'] >= '7') {
+    if ($vars['deleted'] !== 'yes') {
         $actions .= '<div class="col-xs-1"><a href="';
-        $actions .= generate_device_url($device, array('tab' => 'edit', 'section' => 'ports'));
-        $actions .= '"><img src="images/16/wrench.png" border="0" align="absmiddle" alt="Edit ports" title="Edit ports" /></a></div>';
+        $actions .= generate_device_url($device, array('tab' => 'alerts'));
+        $actions .= '" title="View alerts"><i class="fa fa-exclamation-circle fa-lg icon-theme" aria-hidden="true"></i></a></div>';
+
+        if (Auth::user()->hasGlobalAdmin()) {
+            $actions .= '<div class="col-xs-1"><a href="';
+            $actions .= generate_device_url($device, array('tab' => 'edit', 'section' => 'ports'));
+            $actions .= '" title="Edit ports"><i class="fa fa-pencil fa-lg icon-theme" aria-hidden="true"></i></a></div>';
+        }
+    }
+
+    if ($vars['deleted'] === 'yes') {
+        if (port_permitted($port['port_id'], $device['device_id'])) {
+            $actions .= '<div class="col-xs-1"><a href="ports/deleted=yes/purge=' . $port['port_id'] . '" title="Delete port"><i class="fa fa-times fa-lg icon-theme"></i></a></div>';
+        }
     }
 
     $actions .= '</div></div>';
 
     $response[] = array(
+        'status' => $status,
         'device' => generate_device_link($device),
         'port' => generate_port_link($port),
+        'ifLastChange' => ceil($port['secondsIfLastChange']),
+        'ifConnectorPresent' => ($port['ifConnectorPresent'] == 'true') ? 'yes' : 'no',
         'ifSpeed' => $port['ifSpeed'],
-        'ifInOctets_rate' => $port['ifInOctets_rate'],
-        'ifOutOctets_rate' => $port['ifOutOctets_rate'],
+        'ifMtu' => $port['ifMtu'],
+        'ifInOctets_rate' => $port['ifInOctets_rate'] * 8,
+        'ifOutOctets_rate' => $port['ifOutOctets_rate'] * 8,
         'ifInUcastPkts_rate' => $port['ifInUcastPkts_rate'],
         'ifOutUcastPkts_rate' => $port['ifOutUcastPkts_rate'],
         'ifInErrors' => $port['ifInErrors'],
@@ -152,10 +203,10 @@ foreach (dbFetchRows($sql, $param) as $port) {
 }
 
 $output = array(
-    'current'  => $current,
+    'current' => $current,
     'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
+    'rows' => $response,
+    'total' => $total,
 );
 
 echo _json_encode($output);

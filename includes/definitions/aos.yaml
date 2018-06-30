@@ -1,0 +1,14 @@
+os: aos
+group: nokia
+text: 'Alcatel-Lucent OS'
+type: network
+ifXmcbc: true
+ifname: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+icon: alcatellucent
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.6486.801.
+        - .1.3.6.1.4.1.6486.800.1.1.2.1.
+        - .1.3.6.1.4.1.6486.800.1.1.2.2.4. #OmniStack LS

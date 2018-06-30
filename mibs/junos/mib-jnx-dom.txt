@@ -1,5 +1,5 @@
 --
--- Juniper Enterprise Specific MIB: XFP Digital Optical Monitor MIB
+-- Juniper Enterprise Specific MIB: SFF Digital Optical Monitor MIB
 -- 
 -- Copyright (c) 2010, Juniper Networks, Inc.
 -- All rights reserved.
@@ -14,7 +14,7 @@ IMPORTS
         FROM SNMPv2-SMI
     DateAndTime, TEXTUAL-CONVENTION
         FROM SNMPv2-TC
-    jnxDomMibRoot, jnxDomNotifications
+    jnxDomMibRoot, jnxDomNotifications, jnxDomLaneNotifications
         FROM JUNIPER-SMI
     ifIndex, ifDescr
         FROM IF-MIB;
@@ -22,7 +22,7 @@ IMPORTS
 -- DOM Alarm and Warning Type
 
 jnxDomMib MODULE-IDENTITY
-    LAST-UPDATED "200912230931Z" -- Wed Dec 23 09:30:00 2009 UTC
+    LAST-UPDATED "201403200000Z" -- Thu Mar 03 2009 UTC
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
             "        Juniper Technical Assistance Center
@@ -33,7 +33,11 @@ jnxDomMib MODULE-IDENTITY
 
     DESCRIPTION
             "This MIB module defines objects used for Digital Optical 
-             Monitor on XFP interface of Juniper products."
+             Monitor on  interface of Juniper products."
+    REVISION      "201403200000Z"
+    DESCRIPTION
+            "Change XFP references to generic SFF in descriptions.  Add
+             DOM lane table."
     REVISION      "200912230000Z" 
     DESCRIPTION
             "Initial revision."
@@ -63,7 +67,9 @@ JnxDomAlarmId ::= TEXTUAL-CONVENTION
         domModuleNotReadyAlarm(15),            -- Module MOD_NR
         domModulePowerDownAlarm(16),           -- Module P_DOWN
         domLinkDownAlarm(17),                  -- Wire Unplugged or Down
-        domModuleRemovedAlarm(18)              -- Module Unplugged or Down
+        domModuleRemovedAlarm(18),             -- Module Unplugged or Down
+        domModuleVoltageHighAlarm(19),         -- Module Voltage High
+        domModuleVoltageLowAlarm(20)           -- Module Voltage Low
     }
 
 JnxDomWarningId ::= TEXTUAL-CONVENTION
@@ -79,8 +85,42 @@ JnxDomWarningId ::= TEXTUAL-CONVENTION
         domTxLaserOutputPowerHighWarning(4),   -- Output laser power
         domTxLaserOutputPowerLowWarning(5),    -- Output laser power
         domModuleTemperatureHighWarning(6),    -- Module temperature
-        domModuleTemperatureLowWarning(7)      -- Module temperature
+        domModuleTemperatureLowWarning(7),     -- Module temperature
+        domModuleVoltageHighWarning(8),        -- Module voltage
+        domModuleVoltageLowWarning(9)          -- Module voltage
     }
+
+JnxDomLaneAlarmId ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION
+           "Identifies specific DOM alarms that may exist on
+            a Lane of a SFF interface"
+   SYNTAX      BITS {
+       domLaneRxLaserPowerHighAlarm(0),
+       domLaneRxLaserPowerLowAlarm(1),
+       domLaneTxLaserBiasCurrentHighAlarm(2),
+       domLaneTxLaserBiasCurrentLowAlarm(3),
+       domLaneTxLaserOutputPowerHighAlarm(4),
+       domLaneTxLaserOutputPowerLowAlarm(5),
+       domLaneLaserTemperatureHighAlarm(6),
+       domLaneLaserTemperatureLowAlarm(7)
+   }
+
+JnxDomLaneWarningId ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION
+           "Identifies specific DOM warnings that may exist on
+            a Lane of a SFF interface"
+   SYNTAX      BITS {
+       domLaneRxLaserPowerHighWarning(0),
+       domLaneRxLaserPowerLowWarning(1),
+       domLaneTxLaserBiasCurrentHighWarning(2),
+       domLaneTxLaserBiasCurrentLowWarning(3),
+       domLaneTxLaserOutputPowerHighWarning(4),
+       domLaneTxLaserOutputPowerLowWarning(5),
+       domLaneLaserTemperatureHighWarning(6),
+       domLaneLaserTemperatureLowWarning(7)
+   }
 
 -- 
 -- Current DOM Statistics
@@ -156,6 +196,18 @@ JnxDomCurrentEntry ::=
         jnxDomCurrentModuleTemperatureHighWarningThreshold
               Integer32,
         jnxDomCurrentModuleTemperatureLowWarningThreshold
+              Integer32,
+        jnxDomCurrentModuleVoltage
+              Integer32,
+        jnxDomCurrentModuleVoltageHighAlarmThreshold
+              Integer32,
+        jnxDomCurrentModuleVoltageLowAlarmThreshold
+              Integer32,
+        jnxDomCurrentModuleVoltageHighWarningThreshold
+              Integer32,
+        jnxDomCurrentModuleVoltageLowWarningThreshold
+              Integer32,
+        jnxDomCurrentModuleLaneCount
               Integer32
     }
 
@@ -165,7 +217,7 @@ JnxDomCurrentEntry ::=
         STATUS      current
         DESCRIPTION
                 "This object identifies all the active DOM alarms 
-                 on a XFP physical interface on this router."
+                 on a SFF physical interface on this router."
         ::= { jnxDomCurrentEntry 1 }
 
     jnxDomCurrentAlarmDate OBJECT-TYPE
@@ -192,7 +244,7 @@ JnxDomCurrentEntry ::=
         STATUS      current
         DESCRIPTION
                 "This object identifies all the active DOM warnings
-                 on a XFP physical interface on this router."
+                 on a SFF physical interface on this router."
         ::= { jnxDomCurrentEntry 4 }
 
     jnxDomCurrentRxLaserPower OBJECT-TYPE
@@ -210,7 +262,7 @@ JnxDomCurrentEntry ::=
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-                " Receiver laser bias current."
+                " Transmitter laser bias current."
         ::= { jnxDomCurrentEntry 6 }
 
 
@@ -376,6 +428,190 @@ JnxDomCurrentEntry ::=
                 " Module temperature low warning threshold."
         ::= { jnxDomCurrentEntry 24 }
 
+    jnxDomCurrentModuleVoltage OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.001 V"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Module voltage."
+        ::= { jnxDomCurrentEntry 25 }
+
+    jnxDomCurrentModuleVoltageHighAlarmThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.001 V"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Module voltage high alarm threshold."
+        ::= { jnxDomCurrentEntry 26 }
+        
+    jnxDomCurrentModuleVoltageLowAlarmThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.001 V"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Module voltage low alarm threshold."
+        ::= { jnxDomCurrentEntry 27 }
+        
+    jnxDomCurrentModuleVoltageHighWarningThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.001 V"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Module voltage high warning threshold."
+        ::= { jnxDomCurrentEntry 28 }
+        
+    jnxDomCurrentModuleVoltageLowWarningThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.001 V"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Module voltage low warning threshold."
+        ::= { jnxDomCurrentEntry 29 }
+
+    jnxDomCurrentModuleLaneCount OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " Number of Lanes (Lasers) in this module"
+        ::= { jnxDomCurrentEntry 30 }
+
+-- 
+-- Current DOM Lane Statistics
+-- 
+
+jnxDomDigitalLaneMonitoring OBJECT IDENTIFIER ::= { jnxDomMib 2 }
+
+jnxDomModuleLaneTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF JnxDomCurrentLaneEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Table of information for this lane (Laser) of this
+             SFF optical module."
+    ::= { jnxDomDigitalLaneMonitoring 1 }
+
+jnxDomCurrentLaneEntry OBJECT-TYPE
+    SYNTAX     JnxDomCurrentLaneEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Information about Digital Optical Monitoring for this
+             lane of this SFF optical Module"
+    INDEX { ifIndex, jnxDomLaneIndex }
+    ::= { jnxDomModuleLaneTable 1 }
+
+JnxDomCurrentLaneEntry ::=
+    SEQUENCE {
+            jnxDomLaneIndex
+                      Integer32,
+            jnxDomCurrentLaneAlarms
+                      JnxDomLaneAlarmId,
+            jnxDomCurrentLaneAlarmDate
+                      DateAndTime,
+            jnxDomLaneLastAlarms
+                      JnxDomLaneAlarmId,
+            jnxDomCurrentLaneWarnings
+                      JnxDomLaneWarningId,
+            jnxDomCurrentLaneRxLaserPower
+                      Integer32,
+            jnxDomCurrentLaneTxLaserBiasCurrent
+                      Integer32,
+            jnxDomCurrentLaneTxLaserOutputPower
+                      Integer32,
+            jnxDomCurrentLaneLaserTemperature
+                      Integer32
+    }
+
+    jnxDomLaneIndex OBJECT-TYPE
+        SYNTAX      Integer32 (0..1000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "A lane (Laser) on this SFF optical interface"
+        ::= {jnxDomCurrentLaneEntry 1}
+
+    jnxDomCurrentLaneAlarms OBJECT-TYPE
+        SYNTAX      JnxDomLaneAlarmId
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "This object identifies all the active DOM alarms
+                 on a particular Lane of a SFF physical interface."
+        ::= {jnxDomCurrentLaneEntry 2}
+
+    jnxDomCurrentLaneAlarmDate OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The system date and time when the management subsystem learned
+                 of the current lane alarm event."
+        ::= {jnxDomCurrentLaneEntry 3}
+
+    jnxDomLaneLastAlarms OBJECT-TYPE
+        SYNTAX      JnxDomLaneAlarmId
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "This object identifies a copy of jnxDomCurrentAlarms 
+                 before last set or clear."
+        ::= {jnxDomCurrentLaneEntry 4}
+
+    jnxDomCurrentLaneWarnings OBJECT-TYPE
+        SYNTAX      JnxDomLaneWarningId
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "This object identifies all the active DOM warnings
+                 on a particular Lane of a SFF physical interface."
+        ::= {jnxDomCurrentLaneEntry 5}
+
+    jnxDomCurrentLaneRxLaserPower OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.01 dbm"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Receiver laser power on a particular Lane of a SFF
+                 physcial interface."
+        ::= {jnxDomCurrentLaneEntry 6}
+
+    jnxDomCurrentLaneTxLaserBiasCurrent OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.001 mA"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Transmitter laser bias on a particular Lane of a SFF
+                 physcial interface."
+        ::= {jnxDomCurrentLaneEntry 7}
+
+    jnxDomCurrentLaneTxLaserOutputPower OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.01 dbm"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Transmitter laser power on a particular Lane of a SFF
+                 physcial interface."
+        ::= {jnxDomCurrentLaneEntry 8}
+
+    jnxDomCurrentLaneLaserTemperature OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS  "Celsius (degrees C)"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Temperature of laser on a particular Lane of a SFF
+                 physcial interface."
+        ::= {jnxDomCurrentLaneEntry 9}
+
 --
 -- Configuration Management Notifications
 --
@@ -401,6 +637,30 @@ jnxDomNotificationPrefix   OBJECT IDENTIFIER ::= { jnxDomNotifications 0 }
         DESCRIPTION
                 "Notification of a recently cleared Dom alarm."
         ::= { jnxDomNotificationPrefix 2 }
+
+jnxDomLaneNotificationPrefix   OBJECT IDENTIFIER ::= { jnxDomLaneNotifications 0 }
+
+    jnxDomLaneAlarmSet NOTIFICATION-TYPE
+        OBJECTS { ifDescr,
+                  jnxDomLaneIndex,
+                  jnxDomLaneLastAlarms,
+                  jnxDomCurrentLaneAlarms,
+                  jnxDomCurrentLaneAlarmDate }
+        STATUS  current
+        DESCRIPTION
+                "Notification of a recently set Dom Lane alarm."
+        ::= { jnxDomLaneNotificationPrefix 1 }
+
+    jnxDomLaneAlarmCleared NOTIFICATION-TYPE
+        OBJECTS { ifDescr,
+                  jnxDomLaneIndex,
+                  jnxDomLaneLastAlarms,
+                  jnxDomCurrentLaneAlarms,
+                  jnxDomCurrentLaneAlarmDate }
+        STATUS  current
+        DESCRIPTION
+                "Notification of a recently cleared Dom Lane alarm."
+        ::= { jnxDomLaneNotificationPrefix 2 }
 
 END
 

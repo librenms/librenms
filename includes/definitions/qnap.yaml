@@ -1,0 +1,19 @@
+os: qnap
+type: storage
+group: unix
+text: 'QNAP TurboNAS'
+ifXmcbc: true
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_storage, text: 'Storage Usage' }
+processor_stacked: true
+discovery:
+    - sysObjectID: .1.3.6.1.4.1.24681
+    -
+      sysDescr: Linux TS-
+      snmpget:
+          oid: entPhysicalMfgName.1
+          mib: ENTITY-MIB
+          op: starts
+          value: 'QNAP Systems'

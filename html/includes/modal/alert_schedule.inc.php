@@ -12,7 +12,9 @@
  * the source code distribution for details.
  */
 
-if (is_admin() !== false) {
+use LibreNMS\Authentication\Auth;
+
+if (Auth::user()->hasGlobalAdmin()) {
 ?>
 
 <div class="modal fade bs-example-modal-sm" id="schedule-maintenance" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
@@ -33,7 +35,7 @@ if (is_admin() !== false) {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="title" class="col-sm-4 control-label">Title: </label>
+                        <label for="title" class="col-sm-4 control-label">Title <exp>*</exp>: </label>
                         <div class="col-sm-8">
                             <input type="text" class="form-control" id="title" name="title" placeholder="Maintenance title">
                         </div>
@@ -45,24 +47,75 @@ if (is_admin() !== false) {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="start" class="col-sm-4 control-label">Start: </label>
-                        <div class="col-sm-8">
-                            <input type="text" class="form-control date" id="start" name="start" value="<?php echo date($config['dateformat']['byminute']); ?>" data-date-format="YYYY-MM-DD HH:mm">
+                        <label for="recurring" class="col-sm-4 control-label">Recurring <strong class="text-danger">*</strong>: </label>
+                        <div class="col-sm-8"> 
+                            <label class="radio-inline">
+                                <input type="radio" id="recurring0" name="recurring" value="0" checked="checked"/> No
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" id="recurring1" name="recurring" value="1"/> Yes
+                            </label>
+                        </div>
+                    </div>
+                    <div id="norecurringgroup">
+                        <div class="form-group">
+                            <label for="start" class="col-sm-4 control-label">Start <exp>*</exp>: </label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control date" id="start" name="start" value="<?php echo date($config['dateformat']['byminute']); ?>" data-date-format="YYYY-MM-DD HH:mm">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="end" class="col-sm-4 control-label">End <exp>*</exp>: </label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control date" id="end" name="end" value="<?php echo date($config['dateformat']['byminute'], strtotime('+1 hour')); ?>" data-date-format="YYYY-MM-DD HH:mm">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="recurringgroup" style="display:none;">
+                        <div class="form-group">
+                            <label for="start_recurring_dt" class="col-sm-4 control-label">Start date <exp>*</exp>: </label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control date" id="start_recurring_dt" name="start_recurring_dt" value="<?php echo date($config['dateformat']['start_recurring_dt']); ?>" data-date-format="YYYY-MM-DD">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="end_recurring_dt" class="col-sm-4 control-label">End date: </label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control date" id="end_recurring_dt" name="end_recurring_dt" value="<?php echo date($config['dateformat']['end_recurring_dt'], strtotime('+1 hour')); ?>" data-date-format="YYYY-MM-DD">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="start_recurring_hr" class="col-sm-4 control-label">Start hour <exp>*</exp>: </label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control date" id="start_recurring_hr" name="start_recurring_hr" value="<?php echo date($config['dateformat']['start_recurring_hr']); ?>" data-date-format="HH:mm">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="end_recurring_hr" class="col-sm-4 control-label">End hour <exp>*</exp>: </label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control date" id="end_recurring_hr" name="end_recurring_hr" value="<?php echo date($config['dateformat']['end_recurring_hr'], strtotime('+1 hour')); ?>" data-date-format="HH:mm">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="recurring_day" class="col-sm-4 control-label">Only on weekday: </label>
+                            <div class="col-sm-8">
+                                <div style="float: left;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="recurring_day" name="recurring_day[]" value="1" />Mo</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="recurring_day" name="recurring_day[]" value="2" />Tu</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="recurring_day" name="recurring_day[]" value="3" />We</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="recurring_day" name="recurring_day[]" value="4" />Th</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="recurring_day" name="recurring_day[]" value="5" />Fr</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="recurring_day" name="recurring_day[]" value="6" />Sa</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="recurring_day" name="recurring_day[]" value="0" />Su</label></div>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="end" class="col-sm-4 control-label">End: </label>
-                        <div class="col-sm-8">
-                            <input type="text" class="form-control date" id="end" name="end" value="<?php echo date($config['dateformat']['byminute'], strtotime('+1 hour')); ?>" data-date-format="YYYY-MM-DD HH:mm">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                         <label for='map-stub' class='col-sm-4 control-label'>Map To: </label>
+                         <label for='map-stub' class='col-sm-4 control-label'>Map To <exp>*</exp>: </label>
                         <div class="col-sm-5">
                             <input type='text' id='map-stub' name='map-stub' class='form-control'/>
                         </div>
                         <div class="col-sm-3">
-                            <button class="btn btn-primary btn-sm" type="button" name="add-map" id="add-map" value="Add">Add</button>
+                            <button class="btn btn-primary" type="button" name="add-map" id="add-map" value="Add">Add</button>
                         </div>
                     </div>
                     <div class="form-group">
@@ -86,8 +139,18 @@ $('#schedule-maintenance').on('hide.bs.modal', function (event) {
     $('#schedule_id').val('');
     $('#title').val('');
     $('#notes').val('');
+    $('#recurring').val('');
     $('#start').val('');
     $('#end').val('');
+    $('#start_recurring_dt').val('');
+    $('#end_recurring_dt').val('');
+    $('#start_recurring_hr').val('');
+    $('#end_recurring_hr').val('');
+    $("#recurring0").prop("checked", true);
+    $('#recurring_day').prop('checked', false);
+    $('#norecurringgroup').show();
+    $('#recurringgroup').hide();
+    $('#schedulemodal-alert').remove('');
 });
 
 $('#schedule-maintenance').on('show.bs.modal', function (event) {
@@ -112,12 +175,60 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
                 $('#map-tags').data('tagmanager').populate(arr);
                 $('#title').val(output['title']);
                 $('#notes').val(output['notes']);
-                $('#start').val(output['start']);
-                $('#end').val(output['end']);
+                if (output['recurring'] == 0){
+                    $('#start').val(output['start']);
+                    $('#end').val(output['end']);                    
+
+                    $('#norecurringgroup').show();
+                    $('#recurringgroup').hide();
+                    
+                    $('#start_recurring_dt').val('');
+                    $('#end_recurring_dt').val('');
+                    $('#start_recurring_hr').val('');
+                    $('#end_recurring_hr').val('');
+                    $("#recurring0").prop("checked", true);
+                    $('#recurring_day').prop('checked', false);
+                }else{
+                    
+                    $('#start_recurring_dt').val(output['start_recurring_dt']);
+                    $('#end_recurring_dt').val(output['end_recurring_dt']);
+                    $('#start_recurring_hr').val(output['start_recurring_hr']);
+                    $('#end_recurring_hr').val(output['end_recurring_hr']);
+                    $("#recurring1").prop("checked", true);
+                    
+                    var recdayupd = output['recurring_day'];
+                    if (recdayupd != ''){
+                        var arrayrecdayupd = recdayupd.split(',');
+                        $.each(arrayrecdayupd, function(indexcheckedday, checkedday){
+                            $("input[name='recurring_day[]'][value="+checkedday+"]").prop('checked', true);
+                        });
+                    }else{
+                        $('#recurring_day').prop('checked', false);                        
+                    }
+                    
+                    $('#norecurringgroup').hide();
+                    $('#recurringgroup').show();
+                    
+                    $('#start').val('');
+                    $('#end').val('');
+                }
+
             }
         });
     }
 });
+
+$('#sched-form input[name=recurring]').on('change', function() {
+    var isrecurring = $('input[name=recurring]:checked', '#sched-form').val(); 
+    if (isrecurring == 1){
+        $('#norecurringgroup').hide();
+        $('#recurringgroup').show();
+    }else{
+        $('#norecurringgroup').show();
+        $('#recurringgroup').hide();
+    }
+});
+
 
 $('#sched-submit').click('', function(e) {
     e.preventDefault();
@@ -128,15 +239,17 @@ $('#sched-submit').click('', function(e) {
         dataType: "json",
         success: function(data){
             if(data.status == 'ok') {
-                $("#message").html('<div class="alert alert-info">'+data.message+'</div>');
+                $("#message").html('<div id="schedulemsg" class="alert alert-info"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.message+'</div>');
+                window.setTimeout(function() { $('#schedulemsg').fadeOut().slideUp(); } , 5000);
                 $("#schedule-maintenance").modal('hide');
+                $("#schedulemodal-alert").remove();
                 $("#alert-schedule").bootgrid('reload');
             } else {
-                $("#response").html('<div class="alert alert-info">'+data.message+'</div>');
+                $("#response").html('<div id="schedulemodal-alert" class="alert alert-danger">'+data.message+'</div>');
             }
         },
         error: function(){
-            $("#response").html('<div class="alert alert-info">An error occurred.</div>');
+            $("#response").html('<div id="schedulemodal-alert" class="alert alert-danger">An error occurred.</div>');
         }
     });
 });
@@ -207,14 +320,102 @@ $('#map-stub').typeahead({
 
 $(function () {
     $("#start").datetimepicker({
-        minDate: '<?php echo date($config['dateformat']['byminute']); ?>'
+        minDate: '<?php echo date($config['dateformat']['byminute']); ?>',
+        icons: {
+            time: 'fa fa-clock-o',
+            date: 'fa fa-calendar',
+            up: 'fa fa-chevron-up',
+            down: 'fa fa-chevron-down',
+            previous: 'fa fa-chevron-left',
+            next: 'fa fa-chevron-right',
+            today: 'fa fa-calendar-check-o',
+            clear: 'fa fa-trash-o',
+            close: 'fa fa-close'
+        }
     });
-    $("#end").datetimepicker();
+    $("#end").datetimepicker({
+        icons: {
+            time: 'fa fa-clock-o',
+            date: 'fa fa-calendar',
+            up: 'fa fa-chevron-up',
+            down: 'fa fa-chevron-down',
+            previous: 'fa fa-chevron-left',
+            next: 'fa fa-chevron-right',
+            today: 'fa fa-calendar-check-o',
+            clear: 'fa fa-trash-o',
+            close: 'fa fa-close'
+        }
+    });
     $("#start").on("dp.change", function (e) {
         $("#end").data("DateTimePicker").minDate(e.date);
     });
     $("#end").on("dp.change", function (e) {
         $("#start").data("DateTimePicker").maxDate(e.date);
+    });
+    $("#start_recurring_dt").datetimepicker({
+        minDate: '<?php echo date($config['dateformat']['byminute']); ?>',
+        icons: {
+            time: 'fa fa-clock-o',
+            date: 'fa fa-calendar',
+            up: 'fa fa-chevron-up',
+            down: 'fa fa-chevron-down',
+            previous: 'fa fa-chevron-left',
+            next: 'fa fa-chevron-right',
+            today: 'fa fa-calendar-check-o',
+            clear: 'fa fa-trash-o',
+            close: 'fa fa-close'
+        }
+    });
+    $("#end_recurring_dt").datetimepicker({
+        icons: {
+            time: 'fa fa-clock-o',
+            date: 'fa fa-calendar',
+            up: 'fa fa-chevron-up',
+            down: 'fa fa-chevron-down',
+            previous: 'fa fa-chevron-left',
+            next: 'fa fa-chevron-right',
+            today: 'fa fa-calendar-check-o',
+            clear: 'fa fa-trash-o',
+            close: 'fa fa-close'
+        }
+    });
+    $("#start_recurring_dt").on("dp.change", function (e) {
+        $("#end_recurring_dt").data("DateTimePicker").minDate(e.date);
+    });
+    $("#end_recurring_dt").on("dp.change", function (e) {
+        $("#start_recurring_dt").data("DateTimePicker").maxDate(e.date);
+    });
+    $("#start_recurring_hr").datetimepicker({
+        icons: {
+            time: 'fa fa-clock-o',
+            date: 'fa fa-calendar',
+            up: 'fa fa-chevron-up',
+            down: 'fa fa-chevron-down',
+            previous: 'fa fa-chevron-left',
+            next: 'fa fa-chevron-right',
+            today: 'fa fa-calendar-check-o',
+            clear: 'fa fa-trash-o',
+            close: 'fa fa-close'
+        }
+    });
+    $("#end_recurring_hr").datetimepicker({
+        icons: {
+            time: 'fa fa-clock-o',
+            date: 'fa fa-calendar',
+            up: 'fa fa-chevron-up',
+            down: 'fa fa-chevron-down',
+            previous: 'fa fa-chevron-left',
+            next: 'fa fa-chevron-right',
+            today: 'fa fa-calendar-check-o',
+            clear: 'fa fa-trash-o',
+            close: 'fa fa-close'
+        }
+    });
+    $("#start_recurring_hr").on("dp.change", function (e) {
+        $("#end_recurring_hr").data("DateTimePicker").minDate(e.date);
+    });
+    $("#end_recurring_hr").on("dp.change", function (e) {
+        $("#start_recurring_hr").data("DateTimePicker").maxDate(e.date);
     });
 });
 

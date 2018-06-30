@@ -15,7 +15,7 @@ include "includes/graphs/common.inc.php";
 $rrd_options .= " -l 0 -E ";
 $rrd_filename = rrd_name($device['hostname'], 'cisco-iosxcode');
 
-if (file_exists($rrd_filename)) {
+if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_options .= " COMMENT:'                            Cur   Min  Max\\n'";
     $rrd_options .= " DEF:Total=" . $rrd_filename . ":total:AVERAGE ";
     $rrd_options .= " AREA:Total#c099ff ";

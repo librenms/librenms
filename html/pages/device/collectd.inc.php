@@ -16,8 +16,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02150-1301, USA.
  */
 
-error_reporting((E_ALL | E_NOTICE | E_WARNING));
-
 require 'includes/collectd/config.php';
 require 'includes/collectd/functions.php';
 require 'includes/collectd/definitions.php';
@@ -96,9 +94,9 @@ foreach ($pinsts as &$instance) {
         foreach ($typeinstances as &$tinst) {
             $i++;
             if (!is_integer($i / 2)) {
-                $row_colour = $list_colour_a;
+                $row_colour = $config['list_colour']['even'];
             } else {
-                $row_colour = $list_colour_b;
+                $row_colour = $config['list_colour']['odd'];
             }
 
             echo '<div style="background-color: '.$row_colour.';">';

@@ -1,0 +1,37 @@
+-- **********************************************
+-- ZyXEL Communications Corporation
+--
+-- Enterprise Solution MIB definitions
+-- RF MANAGEMENT MIBs
+--
+-- Copyright by ZyXEL Communications Corp.
+-- All rights reserved.
+-- **********************************************
+
+ZYXEL-ES-RF-MANAGEMENT DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	OBJECT-TYPE			FROM SNMPv2-SMI
+
+	OBJECT-GROUP,
+	MODULE-COMPLIANCE	FROM SNMPv2-CONF
+
+	esMgmt				FROM ZYXEL-ES-SMI;
+
+
+--
+-- Node: esRFMgmt
+--
+
+esRFMgmt MODULE-IDENTITY
+	LAST-UPDATED		"201009200000Z"
+	ORGANIZATION	"Enterprise Solution ZyXEL"
+	CONTACT-INFO		""
+	DESCRIPTION
+		"The sub tree for RF management information"
+	::= { esMgmt 6 }
+
+END

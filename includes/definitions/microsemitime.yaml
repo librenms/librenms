@@ -1,0 +1,6 @@
+os: microsemitime
+text: 'Microsemi Timing'
+type: timing
+icon: microsemi
+discovery:
+    - { sysObjectID: [.1.3.6.1.4.1.39165.1.6] }

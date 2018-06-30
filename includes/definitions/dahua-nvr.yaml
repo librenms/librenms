@@ -1,0 +1,10 @@
+os: dahua-nvr
+text: 'Dahua NVR'
+type: appliance
+icon: dahua
+group: dahua
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.1004849.3.2.

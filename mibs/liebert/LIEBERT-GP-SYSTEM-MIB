@@ -1,0 +1,494 @@
+-- =============================================================================
+LIEBERT-GP-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, 
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY, 
+    NOTIFICATION-TYPE,
+    Integer32, 
+    Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    lgpSystem, 
+    liebertSystemModuleReg
+        FROM LIEBERT-GP-REGISTRATION-MIB
+    sysUpTime
+        FROM RFC1213-MIB
+    lgpAgentConnectedDeviceCount,
+    lgpAgentDeviceIndex
+        FROM LIEBERT-GP-AGENT-MIB
+    ;
+
+-- =============================================================================
+-- Module Identification and Registration
+-- =============================================================================
+--
+liebertSystemModule MODULE-IDENTITY
+  LAST-UPDATED "200811170000Z"
+  ORGANIZATION "Liebert Corporation"
+  CONTACT-INFO
+      "Contact:   Technical Support
+
+      Postal:
+      Liebert Corporation
+      1050 Dearborn Drive
+      P.O. Box 29186
+      Columbus OH, 43229
+      US
+
+      Tel: +1 (800) 222-5877
+
+      E-mail: liebert.monitoring@emerson.com
+      Web:    www.liebert.com
+
+      Author:  Gregory M. Hoge"
+
+   DESCRIPTION
+      "The MIB module used to specify Liebert Controller OIDs
+
+      Copyright 2000-2008 Liebert Corporation. All rights reserved.
+      Reproduction of this document is authorized on the condition
+      that the forgoing copyright notice is included.
+
+      This Specification is supplied 'AS IS' and Liebert Corporation
+      makes no warranty, either express or implied, as to the use,
+      operation, condition, or performance of the Specification."
+
+   REVISION "200811170000Z"
+   DESCRIPTION
+    "Added support for NXL unit."
+
+   REVISION "200807020000Z"
+   DESCRIPTION
+    "Added missing items to the IMPORT statement"
+
+   REVISION "200801100000Z"
+   DESCRIPTION
+    "Add system notifications sub-tree and modified contact email address."
+
+   REVISION "200705290000Z"
+   DESCRIPTION
+    "Added support for XDF Unit."
+
+   REVISION "200602220000Z"
+   DESCRIPTION
+    "Added support for Liebert DS Unit."
+
+   ::= { liebertSystemModuleReg 1 }
+
+-- =============================================================================
+-- lgpSystem - Liebert System Groups
+-- =============================================================================
+lgpSysStatistics OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert System Statistics object
+        identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are
+        defined below in the sub-section titled Liebert System Statistics
+        Group."
+    ::= { lgpSystem 1 }
+
+lgpSysStatus OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert System Status object
+        identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are
+        defined below in the sub-section titled Liebert System Status
+        Group."
+    ::= { lgpSystem 2 }
+
+lgpSysSettings OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert System Settings object
+        identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are
+        defined below in the sub-section titled Liebert System Settings
+        Group."
+    ::= { lgpSystem 3 }
+
+lgpSysControl OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert System Control object
+        identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are
+        defined below in the sub-section titled Liebert System Control
+        Group."
+    ::= { lgpSystem 4 }
+
+lgpSysTime OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert System Time object
+        identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are
+        defined below in the sub-section titled Liebert System Time
+        Group."
+    ::= { lgpSystem 5 }
+
+lgpSysMaintenance OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert System Maintenance object
+        identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are
+        defined below in the sub-section titled Liebert System Maintenance
+        Group."
+    ::= { lgpSystem 6 }
+
+lgpSysEventDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An ASCII textual description for the event. This object is
+        primarily used in the varbind of some notifications to provide
+        a simple human-readable description."
+    ::= { lgpSystem 7 }
+
+lgpSysEventNotifications OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert System Notification object
+        identifiers."
+    ::= { lgpSystem 8 }
+
+-- -----------------------------------------------------------------------------
+-- Device Component Group
+-- -----------------------------------------------------------------------------
+lgpSysDeviceComponentGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This sub-tree registers well known device components."
+    REFERENCE
+        "These well known components are referenced in the
+        'lgpSysDeviceComponentDescr' column in the
+        'lgpSysDeviceComponentTable'."
+    ::= { lgpSystem 9 }
+
+-- -----------------------------------------------------------------------------
+-- Device Component Table
+-- -----------------------------------------------------------------------------
+    lgpSysDeviceComponentTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF LgpSysDeviceComponentEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of components of devices identified by their serial number and 
+            or model number.
+
+            This table contains zero, one, or many rows. The NMS cannot create or
+            delete rows from the table. The rows are created by the agent based upon
+            the capabilities of the managed device."
+        ::= { lgpSysDeviceComponentGroup 1 }
+
+        lgpSysDeviceComponentEntry OBJECT-TYPE
+            SYNTAX      LgpSysDeviceComponentEntry
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION
+                "This entry defines the contents of the columns for the table
+                'lgpSysDeviceComponentTable'."
+            INDEX       { lgpAgentDeviceIndex, lgpSysDeviceComponentIndex }
+            ::= { lgpSysDeviceComponentTable 1 }
+
+        LgpSysDeviceComponentEntry ::= SEQUENCE
+        {
+            lgpSysDeviceComponentIndex      Unsigned32,
+            lgpSysDeviceComponentDescr      OBJECT IDENTIFIER,
+            lgpSysDeviceComponentSerialNum  DisplayString (SIZE (255)),
+            lgpSysDeviceComponentModelNum   DisplayString (SIZE (255))
+        }
+
+        lgpSysDeviceComponentIndex OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION
+                "This is the index indicating the row in the table
+                 'lgpSysDeviceComponentTable' for a component entry."
+            ::= { lgpSysDeviceComponentEntry 1 }
+
+        lgpSysDeviceComponentDescr OBJECT-TYPE
+            SYNTAX      OBJECT IDENTIFIER
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "An OID representing a component of the device indicated by the
+                index lgpAgentDeviceIndex."
+            REFERENCE
+                "The object identifiers in this column can be found in the 
+                 sub-tree 'lgpSysDeviceComponentWellknown'."
+            ::= { lgpSysDeviceComponentEntry 2 }
+
+        lgpSysDeviceComponentSerialNum OBJECT-TYPE
+            SYNTAX      DisplayString (SIZE (255))
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "This is the serial number of the component described by the OID 
+                'lgpSysDeviceComponentDescr'. This data is intended for 
+                display / human consumption. Do not use this field for determining
+                programmatic behavior."
+            ::= { lgpSysDeviceComponentEntry 3 }
+
+        lgpSysDeviceComponentModelNum OBJECT-TYPE
+            SYNTAX      DisplayString (SIZE (255))
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "This is the model identifier of the component described by the OID 
+                'lgpSysDeviceComponentDescr'. This data is intended for 
+                display / human consumption. Do not use this field for determining
+                programmatic behavior."
+            ::= { lgpSysDeviceComponentEntry 4 }
+
+    lgpSysDeviceComponentWellknown OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This sub-tree registers well known Liebert System Components."
+        REFERENCE
+            "These well known measurement identifiers are referenced in the
+             'lgpSysDeviceComponentDescr' column in the
+             'lgpSysDeviceComponentTable'."
+            ::= { lgpSysDeviceComponentGroup 5  }
+
+        lgpSysDeviceBatCabinet OBJECT-IDENTITY
+                STATUS      current
+                DESCRIPTION
+                    "This sub-tree is used to register a battery cabinet component.
+                    To determine the cabinet being described in a
+                    multi-cabinet system, this point implements an additional
+                    two indexes. The first index describes the module the cabinet
+                    is located in. The second index describes the cabinet
+                    number. In an SMS (Single-Module System) the first index is
+                    always 1.
+
+                    Example: lgpSysDeviceComponentCabinet.2.4
+
+                        'lgpSysDeviceCabinet' = Point is a battery cabinet.
+                                     '.2' = Cabinet is in the second module.
+                                     '.4' = Cabinet number 4 in second module"
+                ::= { lgpSysDeviceComponentWellknown 5 }
+
+        lgpSysDeviceParallelCabinet OBJECT-IDENTITY
+                STATUS      current
+                DESCRIPTION
+                    "This sub-tree is used to register a parallel cabinet."
+                ::= { lgpSysDeviceComponentWellknown 6 }
+
+        lgpSysDeviceMaintBypass OBJECT-IDENTITY
+                STATUS      current
+                DESCRIPTION
+                    "This sub-tree is used to register the maintenance bypass."
+                ::= { lgpSysDeviceComponentWellknown 7 }
+
+-- =============================================================================
+-- lgpSysNotifications - Liebert System Notifications Group
+-- =============================================================================
+
+lgpSysNotification NOTIFICATION-TYPE
+    OBJECTS     { sysUpTime, lgpSysEventDescription }
+    STATUS      current
+    DESCRIPTION
+        "This notification is a generic notification intended for direct user
+        visibility.  The user event description identifies the system
+        condition that has occurred.  This text will be prefixed with either
+        'Active:', 'Cleared:', or 'Message:' depending on the state of the
+        event.  Note: That a prefix of 'Message:' identifies a stateless event
+        and as such there will be no corresponding 'Cleared:' trap sent."
+    ::= { lgpSysEventNotifications 1 }
+
+lgpSysNormal NOTIFICATION-TYPE
+    OBJECTS     { sysUpTime, lgpAgentConnectedDeviceCount }
+    STATUS      current
+    DESCRIPTION
+        "The system has returned to a normal operating state. This implies
+        prior to the generation of this event the system was operating in a
+        state where one or more alarm or warning conditions were present.
+        All of those alarms or conditions have now cleared.
+
+        NOTE: This notification may be generated after a short delay during a
+        cold boot of the system -- if no alarms or conditions are present in the
+        monitored device(s) at that time."
+
+    ::= { lgpSysEventNotifications 2 }
+
+-- =============================================================================
+-- lgpSysStatistics - Liebert System Statistics Group
+-- =============================================================================
+
+lgpSysStatisticsRunHrs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Accumulated run hours of the system."
+    ::= { lgpSysStatistics 1 }
+
+-- =============================================================================
+-- lgpSysStatus - Liebert System Status Group
+-- =============================================================================
+
+lgpSysSelfTestResult OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        unknown(1),
+        passed(2), 
+        failed(3), 
+        inProgress(4),
+        sysFailure(5), 
+        inhibited(6)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The outcome of the previous self-test."
+    ::= { lgpSysStatus 1 }
+
+lgpSysState OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        normalOperation(1), 
+        startUp(2), 
+        normalWithWarning(3), 
+        normalWithAlarm(4), 
+        abnormalOperation(5) 
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operating status for the system. The intent of this data
+        is to provide a high level status of the system.
+
+        The possible states are:
+
+            normalOperation(1)
+                The system is operating normally with no active warnings or 
+                alarms.
+            startUp(2)
+                The system is in a startup state (initializing). Monitoring 
+                operations and information may not be fully supported at this 
+                time. This state will clear automatically when the system is 
+                fully initialized and ready to accept monitoring commands.
+            normalWithWarning(3)
+                The system is operating normally with one or more active 
+                warnings. Appropriate personnel should investigate the 
+                warning(s) as soon as possible and take appropriate action. 
+            normalWithAlarm(4)
+                The system is operating normally with one or more active 
+                alarms. Appropriate personnel should investigate the alarm(s)
+                as soon as possible and take appropriate action. 
+            abnormalOperation(5)
+                They system is operating abnormally. There is a 
+                failure within the system that is unexpected under normal 
+                operating conditions. Appropriate personnel should investigate
+                the cause as soon as possible. The normal functioning of
+                the system is likely inhibited."
+    ::= { lgpSysStatus 2 }
+
+-- =============================================================================
+-- lgpSysSettings - Liebert System Settings Group
+-- =============================================================================
+
+lgpSysAudibleAlarm OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The state of the audible alarm of the device."
+    ::= { lgpSysSettings 1 }
+
+-- =============================================================================
+-- lgpSysControl - Liebert System Control Group
+-- =============================================================================
+
+lgpSysSelfTest OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Self-Test Command.  This command will initiate a system self-test of
+        the system.  If already initiated, this command will abort the
+        self-test.  This command should be sent with a parameter of 1.  This
+        variable doesn't return a value when read."
+    ::= { lgpSysControl 1 }
+
+lgpSysControlOperationOnOff OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows control of the system functionality.  This will not
+        affect the communications or control of the system, so that once turned
+        off, the system operation can be restored by setting this value to 
+        'on'."
+    ::= { lgpSysControl 2 }
+
+-- =============================================================================
+-- lgpSysTime - Liebert System Time Group
+-- =============================================================================
+
+lgpSysTimeEpoch OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The present time of the system.  This time is represented as the
+        number of seconds since the epoch of 1970-01-01 00:00:00 GMT."
+    ::= { lgpSysTime 1 }
+
+-- =============================================================================
+-- lgpSysMaintenance - Liebert System Maintenance Group
+-- =============================================================================
+
+lgpSysMaintenanceCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The relative percentage of time that has elapsed since the last
+        scheduled maintenance was performed.  When this value reaches 100%,
+        the device is due for another scheduled maintenance procedure."
+    ::= { lgpSysMaintenance 1 }
+
+lgpSysMaintenanceYear OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "year"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The year in which the next scheduled service is due"
+    ::= { lgpSysMaintenance 2 }
+
+lgpSysMaintenanceMonth OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "month"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The month in which the next scheduled service is due"
+    ::= { lgpSysMaintenance 3 }
+END

@@ -1,0 +1,9 @@
+os: panos
+text: PanOS
+type: firewall
+icon: panos
+mib_dir:
+    - paloaltonetworks
+discovery:
+    - sysDescr:
+        - 'Palo Alto Networks'

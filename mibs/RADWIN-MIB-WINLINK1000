@@ -1,0 +1,4271 @@
+--
+-- RADWIN Management Information Base (MIB)
+-- Generated 01/05/16 14:23:32 Version: 10.2.40_b9653
+--
+	RADWIN-MIB-WINLINK1000 DEFINITIONS ::= BEGIN
+
+	IMPORTS 
+		enterprises, IpAddress, Counter, Gauge, TimeTicks
+			FROM RFC1155-SMI
+		OBJECT-TYPE
+			FROM RFC-1212
+		DisplayString, ifIndex
+			FROM RFC1213-MIB
+		TRAP-TYPE
+		    FROM RFC-1215;
+	
+
+	radwin			OBJECT IDENTIFIER ::= { enterprises 4458 }
+	winlink1000		OBJECT IDENTIFIER ::= { radwin 1000 }
+
+	-- ###########################################################
+	--                      ODU
+	-- ###########################################################
+
+	winlink1000Odu OBJECT IDENTIFIER ::= { winlink1000 1 }
+
+	-- ###########################################################
+	--                      ODU Admin
+	-- ###########################################################
+
+	winlink1000OduAdmin OBJECT IDENTIFIER ::= { winlink1000Odu 1 }
+
+	winlink1000OduAdmProductType OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU configuration description."
+		::= { winlink1000OduAdmin 1 }
+
+	winlink1000OduAdmHwRev OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU Hardware Version."
+		::= { winlink1000OduAdmin 2 }
+
+	winlink1000OduAdmSwRev OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU Software Version."
+		::= { winlink1000OduAdmin 3 }
+
+	winlink1000OduAdmLinkName OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Link Name. A change is effective immediately."
+		::= { winlink1000OduAdmin 4 }
+
+	winlink1000OduAdmResetCmd OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Reset Command. 
+		A set command with a value of 3 will cause a device reset.
+		HBS only: A set command with a value of 4 will cause a device reset for the entire sector.
+		The read value is always 0."
+		::= { winlink1000OduAdmin 5 }
+
+	winlink1000OduAdmAddres OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU IP address. A change is effective after reset.
+		 The parameter is kept for backward compatibility.
+		 Using the alternative parameter: winlink1000OduAdmIpParamsCnfg is recommended."
+		::= { winlink1000OduAdmin 6 }
+
+	winlink1000OduAdmMask OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU Subnet Mask. A change is effective after reset.
+		 The parameter is kept for backward compatibility.
+		 Using the alternative parameter: winlink1000OduAdmIpParamsCnfg is recommended."
+		::= { winlink1000OduAdmin 7 }
+
+	winlink1000OduAdmGateway OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU default gateway. A change is effective after reset.
+		 The parameter is kept for backward compatibility.
+		 Using the alternative parameter: winlink1000OduAdmIpParamsCnfg is recommended."
+		::= { winlink1000OduAdmin 8 }	
+
+	winlink1000OduAdmBroadcast OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"This parameter is reserved for the Manager application provided with the product."
+		::= { winlink1000OduAdmin 10 }
+	
+	-- ###########################################################
+	--                      ODU Admin Hosts Table
+	-- ###########################################################
+
+	winlink1000OduAdmHostsTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Winlink1000OduAdmHostsEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"Trap destinations table. Each trap destination is defined by an IP address and a UDP port.
+		Up to 10 addresses can be configured."
+		::= { winlink1000OduAdmin 12 }
+
+	winlink1000OduAdmHostsEntry OBJECT-TYPE
+		SYNTAX  Winlink1000OduAdmHostsEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"Trap destinations table entry."
+		INDEX { winlink1000OduAdmHostsIndex }
+		::= { winlink1000OduAdmHostsTable 1 }
+
+	Winlink1000OduAdmHostsEntry ::= SEQUENCE {
+		winlink1000OduAdmHostsIndex
+			INTEGER,
+		winlink1000OduAdmHostsIp
+			IpAddress,
+		winlink1000OduAdmHostsPort
+			INTEGER,
+		winlink1000OduAdmHostsSecurityModel
+			INTEGER,
+		winlink1000OduAdmHostsUserName
+			DisplayString,
+		winlink1000OduAdmHostsPassword
+			DisplayString,
+		winlink1000OduAdmHostsIPv6
+			DisplayString
+		}
+
+	winlink1000OduAdmHostsIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Trap destinations table index."
+		::= { winlink1000OduAdmHostsEntry 1 }
+
+	winlink1000OduAdmHostsIp OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Trap destination IP address. A change is effective immediately."
+		::= { winlink1000OduAdmHostsEntry 2 }
+
+	winlink1000OduAdmHostsPort OBJECT-TYPE
+		SYNTAX  INTEGER (1..65535)
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"UDP port of the trap destination. A change is effective immediately."
+		::= { winlink1000OduAdmHostsEntry 3 }
+		
+	winlink1000OduAdmHostsSecurityModel OBJECT-TYPE
+		SYNTAX  INTEGER {
+			snmpv1(1),
+			snmpv3(3)		
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Security model used for this trap generation."
+		::= { winlink1000OduAdmHostsEntry 4 }
+		
+	winlink1000OduAdmHostsUserName OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"User name used to generate the snmpv3 trap."
+		::= { winlink1000OduAdmHostsEntry 5 }
+		
+	winlink1000OduAdmHostsPassword OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Password used to generate the snmpv3 trap."
+		::= { winlink1000OduAdmHostsEntry 6 }
+
+	winlink1000OduAdmHostsIPv6 OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Trap destination IPv6 address. A change is effective immediately."
+		::= { winlink1000OduAdmHostsEntry 7 }
+		
+	winlink1000OduBuzzerAdminState OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"This parameter controls the activation of the buzzer while the unit is in install mode.
+		A change is effective immediately. The valid values are: disabled (0), enabledAuto (1), enabledConstantly(2), advancedAuto (3)."
+		::= { winlink1000OduAdmin 13 }
+
+	winlink1000OduProductId OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"This parameter is reserved for the Manager application provided with the product."
+		::= { winlink1000OduAdmin 14 }
+
+	winlink1000OduReadCommunity OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Read Community String. This parameter always returns ***** when retrieving its value.
+		It is used by the Manager application to change the Read Community String.
+		The SNMP agent accepts only encrypted values."
+		::= { winlink1000OduAdmin 15 }
+
+	winlink1000OduReadWriteCommunity OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Read/Write Community String. This parameter always returns ***** when retrieving its value.
+		It is used by the Manager application to change the Read/Write Community String.
+		The SNMP agent accepts only encrypted values."
+		::= { winlink1000OduAdmin 16 }
+
+	winlink1000OduTrapCommunity OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Trap Community String. This parameter is used by the Manager application to change the Trap Community String.
+		The SNMP agent accepts only encrypted values."
+		::= { winlink1000OduAdmin 17 }
+
+	winlink1000OduAdmSnmpAgentVersion OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Major version of the SNMP agent."
+		::= { winlink1000OduAdmin 18 }
+
+	winlink1000OduAdmRemoteSiteName OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Remote site name. Returns the same value as sysLocation parameter of the remote site."
+		::= { winlink1000OduAdmin 19 }
+
+	winlink1000OduAdmSnmpAgentMinorVersion OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Minor version of the SNMP agent."
+		::= { winlink1000OduAdmin 20 }
+
+	winlink1000OduAdmLinkPassword OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Link Password. This parameter always returns ***** when retrieving its value.
+		It is used by the Manager application to change the Link Password.
+		The SNMP agent accepts only encrypted values."
+		::= { winlink1000OduAdmin 21 }
+
+	winlink1000OduAdmSiteLinkPassword OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Site Link Password. This parameter always returns ***** when retrieving its value.
+		It is used by the Manager application to change the Link Password of the site.
+		The SNMP agent accepts only encrypted values."
+		::= { winlink1000OduAdmin 22 }
+
+	winlink1000OduAdmDefaultPassword OBJECT-TYPE
+		SYNTAX  INTEGER {
+			default(1),
+			nonDefault(2)
+			}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"This parameter indicates if the current Link Password is the default password."
+		::= { winlink1000OduAdmin 23 }
+
+	winlink1000OduAdmConnectionType OBJECT-TYPE
+		SYNTAX  INTEGER {
+			directConnection(1),
+			indirectConnection(2),
+			unknown(3)
+			}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"This parameter indicates if the Manager application is connected to the local ODU
+		or to the remote ODU over the air. A value of 'unknown' indicates community string mismatch."
+		::= { winlink1000OduAdmin 24 }
+
+	winlink1000OduAdmBackToFactorySettingsCmd OBJECT-TYPE
+		SYNTAX  INTEGER {
+			withIP(1),
+			withoutIP(2)
+			}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Back to factory settings Command. A change is effective after reset. 
+		The read value is always 0."
+		::= { winlink1000OduAdmin 25 }
+		
+	winlink1000OduAdmIpParamsCnfg OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU IP address Configuration. The format is: |||"
+		::= { winlink1000OduAdmin 26 }
+
+	winlink1000OduAdmVlanID OBJECT-TYPE
+		SYNTAX INTEGER (0..4094)
+		ACCESS  read-write
+		STATUS mandatory
+		DESCRIPTION
+		"VLAN ID. Valid values are 1 to 4094.
+		Initial value is 0 meaning VLAN unaware."
+		::= { winlink1000OduAdmin 27 }  
+
+	winlink1000OduAdmVlanPriority OBJECT-TYPE
+		SYNTAX INTEGER (0..7)
+		ACCESS  read-write
+		STATUS mandatory
+		DESCRIPTION
+		"VLAN Priority. 0 is lowest priority, 7 is highest priority."
+		::= { winlink1000OduAdmin 28 }  
+		
+	winlink1000OduAdmSN OBJECT-TYPE
+        SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+        DESCRIPTION
+        "ODU Serial Number"
+        ::= { winlink1000OduAdmin 29 }
+
+	winlink1000OduAdmProductName OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS  read-only
+		STATUS mandatory
+		DESCRIPTION
+		"This is the product name as it exists at EC"
+		::= { winlink1000OduAdmin 30 }
+		
+	winlink1000OduAdmActivationKey OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Activates a general key."
+		::= { winlink1000OduAdmin 31 }
+		
+	winlink1000OduAdmRmtPermittedOduType OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Mobile Application: permitted partner OduType."
+		::= { winlink1000OduAdmin 32 }
+		
+	winlink1000OduAdmCpuID OBJECT-TYPE
+		SYNTAX  INTEGER (0..64)
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"CPU ID"
+		::= { winlink1000OduAdmin 33 }
+		
+	winlink1000OduAdmOvrdCmd OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Ability to perform special command in the ODU."
+		::= { winlink1000OduAdmin 34 }
+				
+	winlink1000OduAdmLinkMode OBJECT-TYPE
+		SYNTAX  INTEGER {
+			pmpHbs (1),
+			pmpHsu (2),
+			pmpHsuHyb (3),
+			pmpHbsHyb (4)
+			}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Unit PMP operation mode."
+		::= { winlink1000OduAdmin 35 }
+		
+	winlink1000OduAdmActualConnectMode OBJECT-TYPE
+		SYNTAX  INTEGER {
+			none (1),
+			ptp (2),
+			ptmp (3)
+			}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Unit connected as part to ptp or ptmp."
+		::= { winlink1000OduAdmin 36 }
+		
+	winlink1000OduAdmAES256Support OBJECT-TYPE
+		SYNTAX  INTEGER {
+			notSupported (1),
+			supported (2)
+			}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"AES-256 security support indication."
+		::= { winlink1000OduAdmin 37 }
+		
+	winlink1000OduAdmAES256State OBJECT-TYPE
+		SYNTAX  INTEGER {
+			disabled (1),
+			enabled (2)
+			}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Enable/Disable AES-256 security mode over the air link."
+		::= { winlink1000OduAdmin 38 }
+		
+	winlink1000OduAdmAES256Status OBJECT-TYPE
+		SYNTAX  INTEGER {
+			notOperating (1),
+			partiallyOperating (2),
+			operating (3)
+			}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"AES256 operating status"
+		::= { winlink1000OduAdmin 39 }
+
+	winlink1000OduAdmBatterySavingShutdownTime OBJECT-TYPE
+		SYNTAX  INTEGER (0..1000)
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Battery Saving Shutdown Time in minutes, 0 till battery run out, -1 if not supported."
+		::= { winlink1000OduAdmin 40 }
+
+	winlink1000OduAdmWiFiPowerMode OBJECT-TYPE
+		SYNTAX  INTEGER {
+			undefined (1),
+			powerON (2),
+			powerOFF (3),
+			alwaysON (4)
+			}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"WIFI unit power mode."
+		::= { winlink1000OduAdmin 41 }
+	
+	winlink1000OduAdmShutdownTimer OBJECT-TYPE
+		SYNTAX  INTEGER (0..2147483647)
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Shutdown Timer in seconds."
+		::= { winlink1000OduAdmin 42 }
+	
+	winlink1000OduAdmGPSState OBJECT-TYPE
+		SYNTAX  INTEGER {
+			undefined (1),
+			notSynchronized (2),
+			fixed (3),
+			shortCircuit (4),
+			faulty (5),
+			synchronized (6),
+			synchronizedGlonass (7)
+			}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"GPS state"
+		::= { winlink1000OduAdmin 43 }
+		
+	winlink1000OduAdmTemperatureC OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"The temperature (Celsius) inside the Board."
+		::= { winlink1000OduAdmin 44 }	
+	
+	winlink1000OduAdmIPStackMode OBJECT-TYPE
+		SYNTAX  INTEGER {
+			v4 (1),
+			v6 (2),
+			v4andv6 (3)
+			}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"The IP stack mode."
+		::= { winlink1000OduAdmin 45 }	
+		
+	winlink1000OduAdmIPv6ParamsCnfg OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU IPv6 address Configuration. The format is: |||"
+		::= { winlink1000OduAdmin 46 }
+
+	winlink1000OduAdmIPv6Address OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU IPv6 address."
+		::= { winlink1000OduAdmin 47 }
+
+	winlink1000OduAdmIPv6Prefix OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU IPv6 subnet mask."
+		::= { winlink1000OduAdmin 48 }	
+
+	winlink1000OduAdmIPv6DefaultGateWay OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU IPv6 default gateway."
+		::= { winlink1000OduAdmin 49 }
+					
+	winlink1000OduAdmPowerConsumption OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Power Consumption (mWatt)"
+		::= { winlink1000OduAdmin 50 }	
+	
+	-- ###########################################################
+	--                      ODU Wifi
+	-- ###########################################################
+	
+	winlink1000OduAdmWifi OBJECT IDENTIFIER ::= { winlink1000OduAdmin 51 }
+	
+	winlink1000OduAdmWifiChannel OBJECT-TYPE
+		SYNTAX  INTEGER (1..11)
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Wifi Channel"
+		::= { winlink1000OduAdmWifi 1 }	
+
+	winlink1000OduAdmWifiTxPower OBJECT-TYPE
+		SYNTAX  INTEGER (11..15)
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Wifi TX Power"
+		::= { winlink1000OduAdmWifi 2 }				
+
+	winlink1000OduAdmWifiSSID OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Wifi SSID"
+		::= { winlink1000OduAdmWifi 3 }		
+
+	winlink1000OduAdmWifiSecurityType OBJECT-TYPE
+		SYNTAX  INTEGER {
+			open (1),
+			wep (2),
+			wpa2 (3)
+			}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Wifi Security type"
+		::= { winlink1000OduAdmWifi 4 }			
+
+	winlink1000OduAdmWifiPassword OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Wifi Password"
+		::= { winlink1000OduAdmWifi 5 }		
+		
+	winlink1000OduAdmWifiNetwork OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Wifi Network"
+		::= { winlink1000OduAdmWifi 6 }	
+
+	winlink1000OduAdmWifiRssi OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Wifi RSSI"
+		::= { winlink1000OduAdmWifi 7 }	
+
+	winlink1000OduAdmWifiStationMAC OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Wifi Station MAC"
+		::= { winlink1000OduAdmWifi 8 }		
+
+	winlink1000OduAdmWifiRestart OBJECT-TYPE
+		SYNTAX  INTEGER (1)
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"A set command with a value of 1 will cause a Wifi restart.
+		The read value is always 0."
+		::= { winlink1000OduAdmWifi 9 }		
+
+	winlink1000OduAdmWifiApStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+			off (1),
+			on (2),
+			connected (3)
+			}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Wifi AP Status"
+		::= { winlink1000OduAdmWifi 10 }
+
+	winlink1000OduAdmBsaOperationMode OBJECT-TYPE
+		SYNTAX  INTEGER {
+			inactive (1),
+			hbsTracking (2),
+			hsuAlignment (3)
+			}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"BSA Operation Mode"
+		::= { winlink1000OduAdmin 52 }
+		
+	winlink1000OduAdmMngConnection OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Management Connection"
+		::= { winlink1000OduAdmin 53 }
+		
+	winlink1000OduAdm1588TCSupport OBJECT-TYPE
+		SYNTAX  INTEGER {
+			notSupported (1),
+			supported (2)
+			}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Indicates that 1588TC license activated"
+		::= { winlink1000OduAdmin 54 }
+
+	winlink1000OduAdmSyncESupport OBJECT-TYPE
+		SYNTAX  INTEGER {
+			notSupported (1),
+			supported (2)
+			}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"ndicates that SyncE license activated"
+		::= { winlink1000OduAdmin 55 }
+
+	winlink1000OduAdmRadioRev OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Radio Revision"
+		::= { winlink1000OduAdmin 56 }
+		
+	winlink1000OduAdmProductRev OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Product Revision"
+		::= { winlink1000OduAdmin 57 }		
+		
+	winlink1000OduAdmPMPSUSupport OBJECT-TYPE
+		SYNTAX  INTEGER {
+			notSupported (1),
+			supported (2)
+			}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Indicates that PMP SU license is activated"
+		::= { winlink1000OduAdmin 58 }	
+		
+	winlink1000OduAdmManagerDownloadURL OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"This is the URL from which management tool can be downloaded"
+		::= { winlink1000OduAdmin 59 }
+		
+	winlink1000OduAdmAntennaDescription OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"The is a description of the antenna connected to the ODU"
+		::= { winlink1000OduAdmin 60 }
+		
+	winlink1000OduAdmSwCapabilities OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"This is used to describe which Software Capabilities the current ODU supports"
+		::= { winlink1000OduAdmin 61 }
+		
+	-- ###########################################################
+	--                      ODU Service
+	-- ###########################################################
+
+	winlink1000OduService OBJECT IDENTIFIER ::= { winlink1000Odu 2 }
+
+	winlink1000OduSrvMode OBJECT-TYPE
+		SYNTAX  INTEGER {
+			installMode (1),
+			normalMode (2),
+			slaveMode (3),
+			tempInstallMode (4),
+			inactiveMode (5)
+			}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"System mode. The only values that can be set are installMode and slaveMode;
+		normalMode reserved to the Manager application provided with the product.
+		A change is effective after link re-synchronization."
+		::= { winlink1000OduService 1 }
+
+	winlink1000OduSrvBridging OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Bridging Mode. Valid values are: disabled (0), enabled (1)."
+		::= { winlink1000OduService 3 }
+		
+	-- ###########################################################
+	--                      ODU Ring Topology
+	-- ###########################################################
+	
+	winlink1000OduServiceRingTopology OBJECT IDENTIFIER ::= { winlink1000OduService 4 }
+	
+	winlink1000OduSrvRingLinkMode OBJECT-TYPE
+		SYNTAX  INTEGER {
+			independentLink (1),				
+			nonRpl (2),
+			rpl (3)	
+			}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Mode of the link regarding ring topology."
+		::= { winlink1000OduServiceRingTopology 1 }		
+
+	winlink1000OduSrvRingTopologySupported OBJECT-TYPE
+		SYNTAX  INTEGER {
+			notSupported (1),
+			supported (2)			
+			}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Ring Topology, options are: supported, not supported"
+		::= { winlink1000OduServiceRingTopology 2 }
+		
+	winlink1000OduSrvRingVlanIdTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Winlink1000OduSrvRingVlanIdEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"Ring VLAN IDs table."
+		::= { winlink1000OduServiceRingTopology 3 }
+
+	winlink1000OduSrvRingVlanIdEntry OBJECT-TYPE
+		SYNTAX  Winlink1000OduSrvRingVlanIdEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"VLAN ID of the internal ring messages. Valid values are 1 to 4094.
+		Initial value is 0 meaning VLAN unaware."
+		INDEX { winlink1000OduSrvRingVlanIdIndex }
+		::= { winlink1000OduSrvRingVlanIdTable 1 }
+
+	Winlink1000OduSrvRingVlanIdEntry ::= SEQUENCE {
+		winlink1000OduSrvRingVlanIdIndex
+			INTEGER,
+		winlink1000OduSrvRingVlanId
+			INTEGER
+		}
+
+	winlink1000OduSrvRingVlanIdIndex OBJECT-TYPE
+		SYNTAX  INTEGER (0..3)
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Index of VLAN ID of the internal ring messages."			
+		::= { winlink1000OduSrvRingVlanIdEntry 1 }
+
+	winlink1000OduSrvRingVlanId OBJECT-TYPE
+		SYNTAX  INTEGER (0..4094)
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"VLAN ID of the internal ring messages. Valid values are 1 to 4094.
+		Initial value is 0 meaning VLAN unaware."
+		::= { winlink1000OduSrvRingVlanIdEntry 2 }
+		
+		
+	winlink1000OduSrvRingEthStatus OBJECT-TYPE
+		SYNTAX  INTEGER {				
+			unblocked(1),				
+			blocked(2),
+			notApplicable(3)
+			}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Represents the Ethernet service blocking state of a Rings link"
+		::= { winlink1000OduServiceRingTopology 4 } 			
+			
+	winlink1000OduSrvRingMaxAllowedTimeFromLastRpm OBJECT-TYPE
+		SYNTAX  INTEGER 
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Defines the minimal time (in ms) required for determination of ring failure."
+		::= { winlink1000OduServiceRingTopology 5 }			
+			
+	winlink1000OduSrvRingWTR OBJECT-TYPE
+		SYNTAX  INTEGER 
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Defines the minimal time (in ms) required for ring recovery."
+		::= { winlink1000OduServiceRingTopology 6 }			
+		-- ###########################################################
+		--                      ODU QoS
+		-- ###########################################################
+		
+		winlink1000OduServiceQoS OBJECT IDENTIFIER ::= { winlink1000OduService 5 }
+		
+		winlink1000OduSrvQoSMode OBJECT-TYPE
+			SYNTAX  INTEGER {
+				notSupported (1),				
+				notActive (2),
+				classVlan (3),
+				classDiffserv (4)
+				}
+			ACCESS  read-write
+			STATUS  mandatory
+			DESCRIPTION
+			"Mode of QoS feature."
+			::= { winlink1000OduServiceQoS 1 }
+			
+		winlink1000OduSrvQoSConfTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF Winlink1000OduSrvQoSConfEntry
+			ACCESS  not-accessible
+			STATUS  mandatory
+			DESCRIPTION
+			"QoS configuration table."
+			::= { winlink1000OduServiceQoS 2 }
+			
+		winlink1000OduSrvQoSConfEntry OBJECT-TYPE
+			SYNTAX  Winlink1000OduSrvQoSConfEntry
+			ACCESS  not-accessible
+			STATUS  mandatory
+			DESCRIPTION
+			"QoS configuration table."
+			INDEX { winlink1000OduSrvQoSConfIndex }
+			::= { winlink1000OduSrvQoSConfTable 1 }
+			
+		Winlink1000OduSrvQoSConfEntry ::= SEQUENCE {
+			winlink1000OduSrvQoSConfIndex
+				INTEGER,
+			winlink1000OduSrvConfVlanQGroups
+				INTEGER,
+			winlink1000OduSrvConfDiffservQGroups
+				INTEGER,
+			winlink1000OduSrvConfQueMir
+				INTEGER,
+			winlink1000OduSrvConfQueWeight
+				INTEGER
+			}
+			
+		winlink1000OduSrvQoSConfIndex OBJECT-TYPE
+			SYNTAX  INTEGER (0..3)
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+			"Index of QoS Configuration."			
+			::= { winlink1000OduSrvQoSConfEntry 1 }
+			
+		winlink1000OduSrvConfVlanQGroups OBJECT-TYPE
+			SYNTAX  INTEGER (0..7)
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+			"Frames classification according to VLAN Priority IDs."			
+			::= { winlink1000OduSrvQoSConfEntry 2 }
+			
+		winlink1000OduSrvConfDiffservQGroups OBJECT-TYPE
+			SYNTAX  INTEGER (0..48)
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+			"Frames classification according to Diffserv."			
+			::= { winlink1000OduSrvQoSConfEntry 3 }
+			
+		winlink1000OduSrvConfQueMir OBJECT-TYPE
+			SYNTAX  INTEGER 
+			ACCESS  read-write
+			STATUS  mandatory
+			DESCRIPTION
+			"Desired Private MIR."			
+			::= { winlink1000OduSrvQoSConfEntry 4 }
+			
+		winlink1000OduSrvConfQueWeight OBJECT-TYPE
+			SYNTAX  INTEGER (0..100)
+			ACCESS  read-write
+			STATUS  mandatory
+			DESCRIPTION
+			"QoS queueu's weights in percent."			
+			::= { winlink1000OduSrvQoSConfEntry 5 }		
+			
+		winlink1000OduSrvQoSVlanQGroupsSetStr OBJECT-TYPE
+			SYNTAX  DisplayString
+			ACCESS  read-write
+			STATUS  mandatory
+			DESCRIPTION
+			"Frames classification according to VLAN IDs string for set."
+			::= { winlink1000OduServiceQoS 3 }
+			
+		winlink1000OduSrvQoSDiffservQGroupsSetStr OBJECT-TYPE
+			SYNTAX  DisplayString
+			ACCESS  read-write
+			STATUS  mandatory
+			DESCRIPTION
+			"Frames classification according to Diffserv IDs string for set."
+			::= { winlink1000OduServiceQoS 4 }
+			
+		winlink1000OduSrvQoSMaxRTQuePercent OBJECT-TYPE
+			SYNTAX  INTEGER (0..100)				
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+			"Maximal percent for RT & NRT queues."
+			::= { winlink1000OduServiceQoS 5 }
+		
+		-- ###########################################################
+		--                      ODU VLAN Configuration
+		-- ###########################################################
+		
+		winlink1000OduServiceVlan OBJECT IDENTIFIER ::= { winlink1000OduService 6 }
+		
+		winlink1000OduSrvVlanSupport OBJECT-TYPE
+			SYNTAX  INTEGER {
+				notSupported (1),				
+				supported(2),
+				available(3)
+				}
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+			"ODU Ethernet port VLAN support and configuration availability indication.
+			1 - ODU VLAN Functionality Not Supported
+			2 - ODU VLAN Functionality Supported
+			3 - ODU VLAN Functionality Supported and Available"
+			::= { winlink1000OduServiceVlan 1 }
+			
+		winlink1000OduSrvVlanIngressMode OBJECT-TYPE
+			SYNTAX  INTEGER {
+				transparent (1),				
+				untagAll    (2),
+				filter      (3)
+				}
+			ACCESS  read-write
+			STATUS  mandatory
+			DESCRIPTION
+			"ODU Ethernet port ingress VLAN mode."
+			::= { winlink1000OduServiceVlan 2 }
+			
+		winlink1000OduSrvVlanEgressMode OBJECT-TYPE
+			SYNTAX  INTEGER {
+				transparent (1),				
+				tag (2),
+				provider (3)
+				}
+			ACCESS  read-write
+			STATUS  mandatory
+			DESCRIPTION
+			"ODU Ethernet port egress VLAN mode."
+			::= { winlink1000OduServiceVlan 3 }
+			
+		winlink1000OduSrvEgressTag OBJECT-TYPE
+			SYNTAX  INTEGER (0..40947)
+			ACCESS  read-write
+			STATUS  mandatory
+			DESCRIPTION
+			"ODU ethernet port egress VLAN tag.
+			Right most digit is Vlan priority (0-7), 
+			other digits compose Vlan Id (2-4094)"
+			::= { winlink1000OduServiceVlan 4 }
+			
+		winlink1000OduSrvEgressProviderTag OBJECT-TYPE
+			SYNTAX  INTEGER (0..40947)
+			ACCESS  read-write
+			STATUS  mandatory
+			DESCRIPTION
+			"ODU ethernet port egress Provider VLAN tag.
+			Right most digit is Vlan priority (0-7), 
+			other digits compose Vlan Id (2-4094)"
+			::= { winlink1000OduServiceVlan 5 }
+			
+		winlink1000OduSrvVlanIngressAllowedVIDs OBJECT-TYPE
+			SYNTAX  DisplayString
+			ACCESS  read-write
+			STATUS  mandatory
+			DESCRIPTION
+			"ODU ethernet port VLAN IDs that will not be filtered on ingress.
+			w|w|w|w|w|w|w|w| ( where w = {0-4094} and w != 1 )"
+			::= { winlink1000OduServiceVlan 6 }
+			
+		winlink1000OduSrvVlanDisable OBJECT-TYPE
+			SYNTAX  INTEGER
+			ACCESS  read-write
+			STATUS  mandatory
+			DESCRIPTION
+			"Disable VLAN functionality. The following values can be set:
+			3 - Disable ODU & IDU VLAN Configurations."
+			::= { winlink1000OduServiceVlan 7 }	
+			
+		winlink1000OduServiceVlanProviderListTPIDstr OBJECT-TYPE
+			SYNTAX  DisplayString
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+			"Holds the possible Provider TPIDs."
+			::= { winlink1000OduServiceVlan 8 }
+			
+	-- ###########################################################
+	--                      ODU Ethernet
+	-- ###########################################################
+
+	winlink1000OduEthernet OBJECT IDENTIFIER ::= { winlink1000Odu 3 }
+
+	winlink1000OduEthernetRemainingRate OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Current Ethernet bandwidth in bps."
+		::= { winlink1000OduEthernet 1 }	
+
+	-- ###########################################################
+	--                      ODU Ethernet Interface Table
+	-- ###########################################################
+
+	winlink1000OduEthernetIfTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Winlink1000OduEthernetIfEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU Ethernet Interface table."
+		::= { winlink1000OduEthernet 2 }
+
+	winlink1000OduEthernetIfEntry OBJECT-TYPE
+		SYNTAX  Winlink1000OduEthernetIfEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU Ethernet Interface table entry."
+		INDEX { winlink1000OduEthernetIfIndex }
+		::= { winlink1000OduEthernetIfTable 1 }
+
+	Winlink1000OduEthernetIfEntry ::= SEQUENCE {
+		winlink1000OduEthernetIfIndex
+			INTEGER,
+		winlink1000OduEthernetIfAddress
+			DisplayString,
+		winlink1000OduEthernetIfAdminStatus
+			INTEGER,
+		winlink1000OduEthernetIfOperStatus
+			INTEGER,
+		winlink1000OduEthernetIfFailAction
+			INTEGER,
+		winlink1000OduEthernetIf1588v2PTPEventRXRate
+			INTEGER,
+		winlink1000OduEthernetIf1588v2PTPEventTXRate
+			INTEGER
+		}
+
+	winlink1000OduEthernetIfIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU Ethernet Interface Index." 
+		::= { winlink1000OduEthernetIfEntry 1 }	
+
+	winlink1000OduEthernetIfAddress OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU MAC address."
+		::= { winlink1000OduEthernetIfEntry 5 }
+
+	winlink1000OduEthernetIfAdminStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+			portAutoSense(1),
+			portAutoSense100Mbps(5),			
+			forceHalfDuplex10Mbps(10),			
+			forceFullDuplex10Mbps(11),
+			forceHalfDuplex100Mbps(15),
+			forceFullDuplex100Mbps(16),
+			forceFullDuplex1000Mbps(21),
+			disablePoePort(254),			
+			disablePort(255)
+			}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Required state of the interface."
+		::= { winlink1000OduEthernetIfEntry 6 }	
+
+	winlink1000OduEthernetIfOperStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+			notConnected(1),
+			connectedHalfDuplex10Mbps(10),
+			connectedFullDuplex10Mbps(11),
+			connectedHalfDuplex100Mbps(15),
+			connectedFullDuplex100Mbps(16),
+			connectedHalfDuplex1000Mbps(20),
+			connectedFullDuplex1000Mbps(21),
+			unknown(65535)
+			}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Current operational state of the interface."
+		::= { winlink1000OduEthernetIfEntry 7 }
+		
+	winlink1000OduEthernetIfFailAction OBJECT-TYPE
+		SYNTAX  INTEGER {
+			faNoAction(1),
+			faForceHalfDuplex10Mbps(10),			
+			faForceFullDuplex10Mbps(11),
+			faDisablePort(255)
+			}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Failure action of the interface."
+		::= { winlink1000OduEthernetIfEntry 8 }			
+		
+	winlink1000OduEthernetIf1588v2PTPEventRXRate OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"For debug use"
+		::= { winlink1000OduEthernetIfEntry 9 }
+		
+	winlink1000OduEthernetIf1588v2PTPEventTXRate OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"For debug use"
+		::= { winlink1000OduEthernetIfEntry 10 }		
+
+	winlink1000OduEthernetNumOfPorts OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Number of ODU network interfaces."
+		::= { winlink1000OduEthernet 3 }
+		
+	
+	winlink1000OduEthernetGbeSupported OBJECT-TYPE
+		SYNTAX  INTEGER {notSupported(1), supported(2)}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Supported Giga bit Ethernet in ODU."
+		::= { winlink1000OduEthernet 4 }
+
+	winlink1000OduEthernetSfpProperties OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Sfp port properties."
+		::= { winlink1000OduEthernet 5 }			
+
+	-- ###########################################################
+	--                      ODU Bridge
+	-- ###########################################################
+
+	winlink1000OduBridge OBJECT IDENTIFIER ::= { winlink1000Odu 4 }
+
+	-- ###########################################################
+	--                      ODU Bridge Base
+	-- ###########################################################
+
+	winlink1000OduBridgeBase OBJECT IDENTIFIER ::= { winlink1000OduBridge 1 }
+
+	-- ###########################################################
+	--                      ODU Bridge Ports Table
+	-- ###########################################################
+
+	winlink1000OduBridgeBasePortTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Winlink1000OduBridgeBasePortEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU Bridge Ports table."
+		::= { winlink1000OduBridgeBase 4 }
+
+	winlink1000OduBridgeBasePortEntry OBJECT-TYPE
+		SYNTAX  Winlink1000OduBridgeBasePortEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU Bridge Ports table entry."
+		INDEX { winlink1000OduBridgeBasePortIndex }
+		::= { winlink1000OduBridgeBasePortTable 1 }
+
+	Winlink1000OduBridgeBasePortEntry ::= SEQUENCE {
+		winlink1000OduBridgeBasePortIndex
+			INTEGER,
+		winlink1000OduBridgeBaseIfIndex
+			INTEGER
+		}
+
+	winlink1000OduBridgeBasePortIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU Bridge Port Number."
+		::= { winlink1000OduBridgeBasePortEntry 1 }
+
+	winlink1000OduBridgeBaseIfIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"IfIndex corresponding to ODU Bridge port."
+		::= { winlink1000OduBridgeBasePortEntry 2 }
+
+	-- ###########################################################
+	--                      ODU Bridge Tp
+	-- ###########################################################
+
+	winlink1000OduBridgeTp OBJECT IDENTIFIER ::= { winlink1000OduBridge 4 }
+
+	winlink1000OduBridgeTpMode OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU bridge mode. 
+		A change is effective after reset. Valid values: hubMode (0), bridgeMode (1)."
+		::= { winlink1000OduBridgeTp 101 }
+
+	-- ###########################################################
+	--                      ODU Transparent Bridge Ports Table
+	-- ###########################################################
+
+	winlink1000OduBridgeTpPortTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Winlink1000OduBridgeTpPortEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU Transparent Bridge Ports table."
+		::= { winlink1000OduBridgeTp 3 }
+
+	winlink1000OduBridgeTpPortEntry OBJECT-TYPE
+		SYNTAX  Winlink1000OduBridgeTpPortEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU Transparent Bridge Ports table entry."
+		INDEX { winlink1000OduBridgeTpPortIndex }
+		::= { winlink1000OduBridgeTpPortTable 1 }
+
+	Winlink1000OduBridgeTpPortEntry ::= SEQUENCE {
+		winlink1000OduBridgeTpPortIndex
+			INTEGER,
+		winlink1000OduBridgeTpPortInFrames
+			Counter,
+		winlink1000OduBridgeTpPortOutFrames
+			Counter,
+		winlink1000OduBridgeTpPortInBytes
+			Counter,
+		winlink1000OduBridgeTpPortOutBytes
+			Counter
+		}
+
+	winlink1000OduBridgeTpPortIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU Transparent Bridge Port Number."
+		::= { winlink1000OduBridgeTpPortEntry 1 }
+
+	winlink1000OduBridgeTpPortInFrames OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Number of frames received by this port."
+		::= { winlink1000OduBridgeTpPortEntry 3 }
+
+	winlink1000OduBridgeTpPortOutFrames OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Number of frames transmitted by this port."
+		::= { winlink1000OduBridgeTpPortEntry 4 }
+
+	winlink1000OduBridgeTpPortInBytes OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Number of bytes received by this port."
+		::= { winlink1000OduBridgeTpPortEntry 101 }
+
+	winlink1000OduBridgeTpPortOutBytes OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Number of bytes transmitted by this port."
+		::= { winlink1000OduBridgeTpPortEntry 102 }
+		
+	winlink1000OduBridgeConfigMode OBJECT-TYPE
+		SYNTAX  INTEGER{
+			enable (1),
+			disable (2)
+			}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU bridge configuration mode"
+		::= { winlink1000OduBridgeTp 102 }
+
+	-- ###########################################################
+	--                      ODU Air
+	-- ###########################################################
+
+	winlink1000OduAir OBJECT IDENTIFIER ::= { winlink1000Odu 5 }
+
+	winlink1000OduAirFreq OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Installation Center Frequency. Valid values are product dependent. A change is effective after link re-synchronization."
+		::= { winlink1000OduAir 1 }
+
+	winlink1000OduAirDesiredRate OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  deprecated
+		DESCRIPTION
+		"Deprecated parameter, actual behavior is read-only. 
+		Required Air Rate. For Channel Bandwidth of 20, 10, 5 MHz divide the value by 1, 2, 4 respectively."
+		::= { winlink1000OduAir 2 }
+
+	winlink1000OduAirSSID OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Reserved for the Manager application provided with the product.
+		 The Sector ID in Point-To-Multi-Point systems."
+		::= { winlink1000OduAir 3 }
+
+	winlink1000OduAirTxPower OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Required Transmit power in dBm . This is a nominal value while the actual transmit power includes additional attenuation.
+		The min and max values are product specific. A change is effective immediately."
+		::= { winlink1000OduAir 4 }
+
+	winlink1000OduAirSesState OBJECT-TYPE
+		SYNTAX  INTEGER {
+			sessionDown (1),
+			basicRate (2),
+			active (3),
+			installation (4),
+			scanning (5),
+			probing (6),
+			transmitting (7),
+			activeWithDefaultEncryptionKey (8),
+			installationWithDefaultEncryptionKey (9),
+			bitFailed (10),
+			activeWithVersionsMismatch (11),
+			installationWithVersionsMismatch (12),
+			inactive (13),
+			iduIncompatible (14),
+			spectrumAnalysis (15)
+			}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Current Link State. The value is active (3) during normal operation." 
+		::= { winlink1000OduAir 5 }
+
+	winlink1000OduAirMstrSlv OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"This parameter indicates if the device was automatically selected into the radio link master or slave. 
+		The value is undefined if there is no link.
+		The value is relevant only for point to point systems."
+		::= { winlink1000OduAir 6 }	
+
+	winlink1000OduAirResync OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Setting this parameter to 1 will cause the link to restart the synchronization process."
+		::= { winlink1000OduAir 8 }
+
+	-- ###########################################################
+	--                      ODU Air Perf
+	-- ###########################################################
+
+	winlink1000OduAirPerf OBJECT IDENTIFIER ::= { winlink1000OduAir 9 }
+
+	winlink1000OduAirRxPower OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Received Signal Strength in dBm. Relevant only for point to point systems."
+		::= { winlink1000OduAirPerf 1 }
+
+	winlink1000OduAirTotalFrames OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Total number of radio frames."
+		::= { winlink1000OduAirPerf 2 }
+
+	winlink1000OduAirBadFrames OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Total number of received radio frames with CRC error. The value is relevant only for point to point systems ."
+		::= { winlink1000OduAirPerf 3 }
+
+	winlink1000OduAirCurrentRate OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  deprecated
+		DESCRIPTION
+		"Deprecated parameter. Actual rate of the air interface in Mbps. 
+		For Channel Bandwidth of 20, 10, 5 MHz divide the value by 1, 2, 4 respectively."
+		::= { winlink1000OduAirPerf 4 }
+
+	winlink1000OduAirCurrentRateIdx OBJECT-TYPE
+		SYNTAX  INTEGER 
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Index of current air rate."
+		::= { winlink1000OduAirPerf 5 }
+		
+	winlink1000OduAirChainsRxPower OBJECT-TYPE
+		SYNTAX  OCTET STRING
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Received Signal Strength of Cpe chains in dBm.
+		Chain 1 RSS: (1 Byte)
+		Chain 2 RSS: (1 Byte)
+		Chain 3 RSS: (1 Byte)"
+		::= { winlink1000OduAirPerf 6 }
+
+	winlink1000OduAirCurrentRateCBW OBJECT-TYPE
+		SYNTAX  INTEGER 
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"CBW of current air rate."
+		::= { winlink1000OduAirPerf 7 }
+		
+	winlink1000OduAirCurrentRateGI OBJECT-TYPE
+		SYNTAX  INTEGER 
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"GI of current air rate."
+		::= { winlink1000OduAirPerf 8 }
+		
+	winlink1000OduAirTxPower36 OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  deprecated
+		DESCRIPTION
+		"Deprecated parameter. Actual behavior is read-only."
+		::= { winlink1000OduAir 10 }
+
+	winlink1000OduAirTxPower48 OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  deprecated
+		DESCRIPTION
+		"Deprecated parameter. Actual behavior is read-only."
+		::= { winlink1000OduAir 11 }
+
+	winlink1000OduAirCurrentTxPower OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Current Transmit Power in dBm. This is a nominal value while the actual transmit power includes additional attenuation."
+		::= { winlink1000OduAir 12 }
+
+	winlink1000OduAirMinFrequency OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Minimum center frequency in MHz."
+		::= { winlink1000OduAir 13 }
+
+	winlink1000OduAirMaxFrequency OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Maximum center frequency in MHz."
+		::= { winlink1000OduAir 14 }
+
+	winlink1000OduAirFreqResolution OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Center Frequency resolution. 
+		Measured in MHz if value < 100, otherwise in KHz."
+		::= { winlink1000OduAir 15 }
+
+	winlink1000OduAirCurrentFreq OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Current Center Frequency.
+		Measured in MHz if center frequency resolution value < 100, otherwise in KHz."
+		::= { winlink1000OduAir 16 }
+
+	winlink1000OduAirNumberOfChannels OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Number of channels that can be used."
+		::= { winlink1000OduAir 17 }
+
+	-- ###########################################################
+	--                      Channels Table
+	-- ###########################################################
+
+	winlink1000OduAirChannelsTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Winlink1000OduAirChannelsEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"Table of channels used by automatic channels selection (ACS)."
+		::= { winlink1000OduAir 18 }
+
+	winlink1000OduAirChannelsEntry OBJECT-TYPE
+		SYNTAX  Winlink1000OduAirChannelsEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"ACS channels table entry."
+		INDEX { winlink1000OduAirChannelsIndex }
+		::= { winlink1000OduAirChannelsTable 1 }
+
+	Winlink1000OduAirChannelsEntry ::= SEQUENCE {
+		winlink1000OduAirChannelsIndex
+			INTEGER,
+		winlink1000OduAirChannelsFrequency
+			INTEGER,
+		winlink1000OduAirChannelsOperState
+			INTEGER,
+		winlink1000OduAirChannelsAvail
+			INTEGER,
+		winlink1000OduAirChannelsDefaultFreq
+			INTEGER
+		}
+
+	winlink1000OduAirChannelsIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Channel Index."
+		::= { winlink1000OduAirChannelsEntry 1 }
+
+	winlink1000OduAirChannelsFrequency OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Channel frequency in MHz."
+		::= { winlink1000OduAirChannelsEntry 2 }
+
+	winlink1000OduAirChannelsOperState OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Channel state. Can be set by the user. 
+		 Automatic Channel Selection uses channels that are AirChannelsOperState enabled and AirChannelsAvail enabled. 
+		 A change is effective after link re-synchronization. Valid values: disabled (0), enabled (1).
+		 Rewriteable only in Point-To-Point products."
+		::= { winlink1000OduAirChannelsEntry 3 }
+
+	winlink1000OduAirChannelsAvail OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Channel state. Product specific and cannot be changed by the user. 
+		Automatic Channel Selection uses channels that are AirChannelsOperState enabled and AirChannelsAvail enabled. 
+		Valid values: disabled (0), enabled (1)."
+		::= { winlink1000OduAirChannelsEntry 4 }
+
+	winlink1000OduAirChannelsDefaultFreq OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Default channel's availability for all CBWs.
+		The valid values are: forbidden (0), available (1)."
+		::= { winlink1000OduAirChannelsEntry 5 }
+
+	winlink1000OduAirDfsState OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Radar detection state. Valid values: disabled (0), enabled (1)."
+		::= { winlink1000OduAir 19 }
+
+	winlink1000OduAirAutoChannelSelectionState OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  deprecated
+		DESCRIPTION
+		"Deprecated parameter. Indicating Automatic Channel Selection availability at current channel bandwidth. 
+		Valid values: disabled (0), enabled (1)."
+		::= { winlink1000OduAir 20 }
+
+	winlink1000OduAirEnableTxPower OBJECT-TYPE
+		SYNTAX  INTEGER {
+			enabled (1),
+			disabled (2)
+			}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Indicating Transmit power configuration enabled or disabled."
+		::= { winlink1000OduAir 21 }
+
+	winlink1000OduAirMinTxPower OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Minimum Transmit power in dBm."
+		::= { winlink1000OduAir 22 }
+
+	-- ###########################################################
+	--                      Max Tx Power Table
+	-- ###########################################################
+
+	winlink1000OduAirMaxTxPowerTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Winlink1000OduAirMaxTxPowerEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"Table of Maximum transmit power per air rate, in dBm."
+		::= { winlink1000OduAir 23 }
+
+	winlink1000OduAirMaxTxPowerEntry OBJECT-TYPE
+		SYNTAX  Winlink1000OduAirMaxTxPowerEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"Maximum Transmit power table entry."
+		INDEX { winlink1000OduAirMaxTxPowerIndex }
+		::= { winlink1000OduAirMaxTxPowerTable 1 }
+
+	Winlink1000OduAirMaxTxPowerEntry ::= SEQUENCE {
+		winlink1000OduAirMaxTxPowerIndex
+			INTEGER,
+		winlink1000OduAirMaxTxPower
+			INTEGER
+		}
+
+	winlink1000OduAirMaxTxPowerIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Air interface rate index."
+		::= { winlink1000OduAirMaxTxPowerEntry 1 }
+
+	winlink1000OduAirMaxTxPower OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Maximum Transmit power in dBm."
+		::= { winlink1000OduAirMaxTxPowerEntry 2 }
+
+	winlink1000OduAirChannelBandwidth OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Channel bandwidth in KHz. A change is effective after reset."
+		::= { winlink1000OduAir 24 }
+
+	-- ###########################################################
+	--                      Channel BW Table
+	-- ###########################################################
+
+	winlink1000OduAirChannelBWTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Winlink1000OduAirChannelBWEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"Channel Bandwidths table."
+		::= { winlink1000OduAir 25 }
+
+	winlink1000OduAirChannelBWEntry OBJECT-TYPE
+		SYNTAX  Winlink1000OduAirChannelBWEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"Channel Bandwidth table entry."
+		INDEX { winlink1000OduAirChannelBWIndex }
+		::= { winlink1000OduAirChannelBWTable 1 }
+
+	Winlink1000OduAirChannelBWEntry ::= SEQUENCE {
+		winlink1000OduAirChannelBWIndex
+			INTEGER,
+		winlink1000OduAirChannelBWAvail
+			INTEGER,
+		winlink1000OduAirChannelsAdminState
+			DisplayString,
+		winlink1000OduAirChannelBWHSSATDDConflictPerCBW
+			INTEGER,
+		winlink1000OduAirChannelBWMinRatioForSupporting
+			INTEGER,
+		winlink1000OduAirChannelBWMaxRatioForSupporting
+			INTEGER	
+		}
+
+	winlink1000OduAirChannelBWIndex OBJECT-TYPE
+		SYNTAX  INTEGER {
+				channelBW5MHz(1),
+				channelBW10MHz(2),
+				channelBW20MHz(3),
+				channelBW40MHz(4),
+				channelBW80MHz(5),
+				channelBW7MHz(6),
+				channelBW14MHz(7)				
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Channel Bandwidth index."
+		::= { winlink1000OduAirChannelBWEntry 1 }
+
+	winlink1000OduAirChannelBWAvail OBJECT-TYPE
+		SYNTAX  INTEGER {
+			notSupported(1),
+			supportedManual(2),
+			supportedWithACS(3)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Channel Bandwidth availability, product specific.
+		Options are: Not supported, supported with manual channel selection, supported with Automatic Channel Selection."
+		::= { winlink1000OduAirChannelBWEntry 2 }
+
+	winlink1000OduAirChannelsAdminState OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Channels' availability per CBW."
+		::= { winlink1000OduAirChannelBWEntry 3 }
+
+	winlink1000OduAirChannelBWHSSATDDConflictPerCBW OBJECT-TYPE
+		SYNTAX  INTEGER {
+			noConflict(1),
+			conflictSingle(2),
+			conflictDual(3)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Indication for possible Link drop per CBW due to conflict between HSS and ATDD."
+		::= { winlink1000OduAirChannelBWEntry 4 }
+
+	winlink1000OduAirChannelBWMinRatioForSupporting OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Minimal TX ratio that may be used by the HSM and still enable proper operation of the aforementioned CBW."
+		::= { winlink1000OduAirChannelBWEntry 5 }
+
+	winlink1000OduAirChannelBWMaxRatioForSupporting OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Maximal TX ratio that may be used by the HSM and still enable proper operation of the aforementioned CBW."
+		::= { winlink1000OduAirChannelBWEntry 6 }
+
+	winlink1000OduAirRFD OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Current radio frame duration in microseconds."
+		::= { winlink1000OduAir 26 }
+
+	-- ###########################################################
+	--                      Available Rates Table
+	-- ###########################################################
+
+	winlink1000OduAirRatesTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Winlink1000OduAirRatesEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"Air Rate indexes table for current channel bandwidth."
+		::= { winlink1000OduAir 27 }
+
+	winlink1000OduAirRatesEntry OBJECT-TYPE
+		SYNTAX  Winlink1000OduAirRatesEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"Air Rate indexes table entry."
+		INDEX { winlink1000OduAirRatesIndex }
+		::= { winlink1000OduAirRatesTable 1 }
+
+	Winlink1000OduAirRatesEntry ::= SEQUENCE {
+		winlink1000OduAirRatesIndex
+			INTEGER,
+		winlink1000OduAirRatesAvail
+			INTEGER
+		}
+
+	winlink1000OduAirRatesIndex OBJECT-TYPE
+		SYNTAX  INTEGER 
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Air Rate index."
+		::= { winlink1000OduAirRatesEntry 1 }
+
+	winlink1000OduAirRatesAvail OBJECT-TYPE
+		SYNTAX  INTEGER {
+			rateNotAvailable(1),
+			rateAvailable(2)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Air Rate availability, depending on air interface conditions."
+		::= { winlink1000OduAirRatesEntry 2 }
+
+	winlink1000OduAirDesiredRateIdx OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Required Air Rate index. 0 reserved for Adaptive Rate.
+		A change is effective immediately after Set operation to the master side
+		while the link is up."
+		::= { winlink1000OduAir 28 }
+
+	winlink1000OduAirLinkDistance OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Link distance in meters. 
+		A value of -1 indicates an illegal value and is also used when a link is not established."
+		::= { winlink1000OduAir 29 }
+
+	winlink1000OduAirLinkWorkingMode OBJECT-TYPE
+		SYNTAX  INTEGER {
+			unknown(1),
+			normal(2),
+			fullCompatibilityRemoteUpgradeAvailable(3),
+			fullCompatibilityLocalUpgradeAvailable(4),
+			restrictedCompatibilityRemoteUpgradeRecomended(5),
+			restrictedCompatibilityLocalUpgradeRecomended(6),
+			softwareUpgradeRemoteUpgradeRequired(7),
+			softwareUpgradeLocalUpgradeRequired(8),
+			versionsIncompatibilityRemoteUpgradeRequired(9),
+			versionsIncompatibilityLocalUpgradeRequired(10)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Link working mode as a result of comparing versions of both sides of the link. 
+		Possible modes are: Unknown - no link, Normal - versions on both sides are identical with full compatibility, 
+		with restricted compatibility, or versions on both sides are different with software upgrade or versions incompatibility."
+		::= { winlink1000OduAir 30 }
+
+	winlink1000OduAirMajorLinkIfVersion OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Major link interface version"
+		::= { winlink1000OduAir 31 }
+
+	winlink1000OduAirMinorLinkIfVersion OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Minor link interface version"
+		::= { winlink1000OduAir 32 }
+
+	winlink1000OduAirHss OBJECT IDENTIFIER ::= { winlink1000OduAir 40 }
+
+	winlink1000OduAirHssDesiredOpState OBJECT-TYPE
+		SYNTAX  INTEGER {
+			notSupported(1),
+			independentUnit(2),
+			hubSyncMaster(3),
+			hubSyncClientContinueTx(4),
+			hubSyncClientDisableTx(5),
+			gpsSync(6),
+			independentSyncUnit-ISU(7)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Required Hub Site Synchronization operating state.
+		For HssSyncUnits : 	For hssISU :[2,7] ,For hssGSU :[2,6]
+		For HBS:			[2,3,4,5]"		
+		::= { winlink1000OduAirHss 1 }
+
+	winlink1000OduAirHssCurrentOpState OBJECT-TYPE
+		SYNTAX  INTEGER {
+			notSupported(1),
+			independentUnit(2),
+			hubSyncMaster(3),
+			hubSyncClientContinueTx(4),
+			hubSyncClientDisableTx(5),
+			gpsSync(6),
+			independentSyncUnit-ISU(7)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Current Hub Site Synchronization operating state."		
+		::= { winlink1000OduAirHss 2 }
+
+	winlink1000OduAirHssSyncStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+			notApplicable(1),
+			notSynchronized(2),
+			synchronized(3)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Hub Site Synchronization sync status."		
+		::= { winlink1000OduAirHss 3 }
+
+	winlink1000OduAirHssExtPulseStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+			notDetected(1),
+			generating(2),
+			generatingAndDetected(3),
+			generatingAndImproperDetected(4),
+			detected(5),
+			improperDetected(6),
+			multipleSourcesDetected(7)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Hub Site Synchronization external pulse detection status.
+		In GSS mode: 
+		if generating then 1PSP is auto generated by the GSS Unit.
+		if generatingAndDetecting then 1PSP is generated by GPS satellites signal."		
+		::= { winlink1000OduAirHss 4 }
+
+	winlink1000OduAirHssExtPulseType OBJECT-TYPE
+		SYNTAX  INTEGER {
+			notApplicable(1),
+			typeA(2),
+			typeB(3),
+			typeC(4),
+			typeD(5),
+			typeE(6),
+			typeF(7)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Hub Site Synchronization external pulse type."		
+		::= { winlink1000OduAirHss 5 }
+		
+	winlink1000OduAirHssDesiredExtPulseType OBJECT-TYPE
+		SYNTAX  INTEGER {
+			notApplicable(1),
+			typeA(2),
+			typeB(3),
+			typeC(4),
+			typeD(5),
+			typeE(6),
+			typeF(7)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Hub Site Synchronization required external pulse type. Valid values for read write:
+		 {typeA(2),typeB(3),typeC(4),typeD(5),typeE(6),typeF(7)}. Valid value for read only:
+		 {notApplicable(1)}."		
+		::= { winlink1000OduAirHss 6 }
+		
+	-- ###########################################################
+	--                      HSS Radio Frame Pattern Table
+	-- ###########################################################
+	winlink1000OduAirHssRfpTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Winlink1000OduAirHssRfpEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU Radio Frame Patterns (RFP) Table."
+		::= { winlink1000OduAirHss 7 }
+
+	winlink1000OduAirHssRfpEntry OBJECT-TYPE
+		SYNTAX  Winlink1000OduAirHssRfpEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU RFP Table entry."
+		INDEX { winlink1000OduAirHssRfpIndex }
+		::= { winlink1000OduAirHssRfpTable 1 }
+
+	Winlink1000OduAirHssRfpEntry ::= SEQUENCE {
+		winlink1000OduAirHssRfpIndex
+			INTEGER,
+		winlink1000OduAirHssRfpEthChannelBW5MHz
+			INTEGER,
+		winlink1000OduAirHssRfpTdmChannelBW5MHz
+			INTEGER,
+		winlink1000OduAirHssRfpEthChannelBW10MHz
+			INTEGER,
+		winlink1000OduAirHssRfpTdmChannelBW10MHz
+			INTEGER,
+		winlink1000OduAirHssRfpEthChannelBW20MHz
+			INTEGER,
+		winlink1000OduAirHssRfpTdmChannelBW20MHz
+			INTEGER,
+		winlink1000OduAirHssRfpEthChannelBW40MHz
+			INTEGER,
+		winlink1000OduAirHssRfpTdmChannelBW40MHz
+			INTEGER,
+		winlink1000OduAirHssRfpEthChannelBW80MHz
+			INTEGER,
+		winlink1000OduAirHssRfpEthChannelBW7MHz
+			INTEGER,
+		winlink1000OduAirHssRfpEthChannelBW14MHz
+			INTEGER
+		}
+		
+	winlink1000OduAirHssRfpIndex OBJECT-TYPE
+		SYNTAX  INTEGER (2..7)
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU RFP Table index. The index represent the Radio Frame Pattern:
+		 typeA(2), typeB(3), typeC(4), typeD(5),typeE(6),typeF(7)."
+		::= { winlink1000OduAirHssRfpEntry 1 }
+		
+	winlink1000OduAirHssRfpEthChannelBW5MHz OBJECT-TYPE
+		SYNTAX  INTEGER {
+			bestFit(1),
+			nonOptimal(2),
+			notAvailable(3)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Represents the compatibility of Ethernet service under Channel BW of 5MHz 
+		 in the specific Radio Frame Pattern."
+		::= { winlink1000OduAirHssRfpEntry 2 }
+		
+	winlink1000OduAirHssRfpTdmChannelBW5MHz OBJECT-TYPE
+		SYNTAX  INTEGER {
+			bestFit(1),
+			nonOptimal(2),
+			notAvailable(3)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Represents the compatibility of TDM service under Channel BW of 5MHz 
+		 in the specific Radio Frame Pattern."
+		::= { winlink1000OduAirHssRfpEntry 3 }
+		
+		winlink1000OduAirHssRfpEthChannelBW10MHz OBJECT-TYPE
+		SYNTAX  INTEGER {
+			bestFit(1),
+			nonOptimal(2),
+			notAvailable(3)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Represents the compatibility of Ethernet service under Channel BW of 10MHz 
+		 in the specific Radio Frame Pattern."
+		::= { winlink1000OduAirHssRfpEntry 4 }
+		
+	winlink1000OduAirHssRfpTdmChannelBW10MHz OBJECT-TYPE
+		SYNTAX  INTEGER {
+			bestFit(1),
+			nonOptimal(2),
+			notAvailable(3)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Represents the compatibility of TDM service under Channel BW of 10MHz 
+		 in the specific Radio Frame Pattern."
+		::= { winlink1000OduAirHssRfpEntry 5 }
+		
+	winlink1000OduAirHssRfpEthChannelBW20MHz OBJECT-TYPE
+		SYNTAX  INTEGER {
+			bestFit(1),
+			nonOptimal(2),
+			notAvailable(3)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Represents the compatibility of Ethernet service under Channel BW of 20MHz 
+		 in the specific Radio Frame Pattern."
+		::= { winlink1000OduAirHssRfpEntry 6 }
+		
+	winlink1000OduAirHssRfpTdmChannelBW20MHz OBJECT-TYPE
+		SYNTAX  INTEGER {
+			bestFit(1),
+			nonOptimal(2),
+			notAvailable(3)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Represents the compatibility of TDM service under Channel BW of 20MHz 
+		 in the specific Radio Frame Pattern."
+		::= { winlink1000OduAirHssRfpEntry 7 }
+		
+	winlink1000OduAirHssRfpEthChannelBW40MHz OBJECT-TYPE
+		SYNTAX  INTEGER {
+			bestFit(1),
+			nonOptimal(2),
+			notAvailable(3)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Represents the compatibility of Ethernet service under Channel BW of 40MHz 
+		 in the specific Radio Frame Pattern."
+		::= { winlink1000OduAirHssRfpEntry 8 }
+		
+	winlink1000OduAirHssRfpTdmChannelBW40MHz OBJECT-TYPE
+		SYNTAX  INTEGER {
+			bestFit(1),
+			nonOptimal(2),
+			notAvailable(3)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Represents the compatibility of TDM service under Channel BW of 40MHz 
+		 in the specific Radio Frame Pattern."
+		::= { winlink1000OduAirHssRfpEntry 9 }
+	
+	winlink1000OduAirHssRfpEthChannelBW80MHz OBJECT-TYPE
+		SYNTAX  INTEGER {
+			bestFit(1),
+			nonOptimal(2),
+			notAvailable(3)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Represents the compatibility of Ethernet service under Channel BW of 80MHz 
+		 in the specific Radio Frame Pattern."
+		::= { winlink1000OduAirHssRfpEntry 10 }
+		
+	winlink1000OduAirHssRfpEthChannelBW7MHz OBJECT-TYPE
+		SYNTAX  INTEGER {
+			bestFit(1),
+			nonOptimal(2),
+			notAvailable(3)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Represents the compatibility of Ethernet service under Channel BW of 7MHz 
+		 in the specific Radio Frame Pattern."
+		::= { winlink1000OduAirHssRfpEntry 11 }
+	
+	winlink1000OduAirHssRfpEthChannelBW14MHz OBJECT-TYPE
+		SYNTAX  INTEGER {
+			bestFit(1),
+			nonOptimal(2),
+			notAvailable(3)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Represents the compatibility of Ethernet service under Channel BW of 14MHz 
+		 in the specific Radio Frame Pattern."
+		::= { winlink1000OduAirHssRfpEntry 12 }
+	
+	winlink1000OduAirHssRfpStr OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Hub Site Synchronization supported patterns"
+		::= { winlink1000OduAirHss 8 }
+		
+	winlink1000OduAirHssHsmID OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"A  unique ID which is common to the HSM and all its collocated ODUs"
+		::= { winlink1000OduAirHss 9 }
+		
+	winlink1000OduAirHssTime OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Hub Site Synchronization GPS time"
+		::= { winlink1000OduAirHss 10 }
+		
+	winlink1000OduAirHssLatitude OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Hub Site Synchronization GPS Latitude"
+		::= { winlink1000OduAirHss 11 }
+		
+	winlink1000OduAirHssNSIndicator OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Hub Site Synchronization GPS N/S Indicator"
+		::= { winlink1000OduAirHss 12 }
+		
+	winlink1000OduAirHssLongitude OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Hub Site Synchronization GPS Longitude"
+		::= { winlink1000OduAirHss 13 }
+		
+	winlink1000OduAirHssEWIndicator OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Hub Site Synchronization GPS E/W Indicator"
+		::= { winlink1000OduAirHss 14 }
+		
+	winlink1000OduAirHssNumSatellites OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Hub Site Synchronization GPS Number of satellites"
+		::= { winlink1000OduAirHss 15 }
+		
+	winlink1000OduAirHssAltitude OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Hub Site Synchronization GPS Altitude"
+		::= { winlink1000OduAirHss 16 }
+		
+	winlink1000OduAirHssRfpPhase OBJECT-TYPE
+		SYNTAX  INTEGER {
+			rfpNormalPhase(1),
+			rfpShiftedPhase(2)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Hub Site Synchronization GPS RFP phase"
+		::= { winlink1000OduAirHss 17 }
+		
+	winlink1000OduAirHssInterSiteSynchronizationMode OBJECT-TYPE
+		SYNTAX  INTEGER {
+			independent(1),
+			synchronized(2)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Inter-Site Synchronization Mode - independent / synchronized"
+		::= { winlink1000OduAirHss 18 }
+		
+	winlink1000OduAirHssInterSiteSynchronizationAvailability OBJECT-TYPE
+		SYNTAX  INTEGER {
+			notAvailable(1),
+			available(2)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Inter-Site Synchronization Availability"
+		::= { winlink1000OduAirHss 19 }
+		
+	winlink1000OduAirHssSatellitesSatSyncRequired OBJECT-TYPE
+		SYNTAX  INTEGER {
+			notRequired(1),
+			required(2)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Satellites Synchronization Is Required"
+		::= { winlink1000OduAirHss 20 }
+		
+	winlink1000OduAirHssDomainID OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"EHSS domain. Indentify set of CUs with same HSS synchronization"
+		::= { winlink1000OduAirHss 21 }
+		
+	winlink1000OduAirHssSupportedSynchronizationProtocol OBJECT-TYPE
+		SYNTAX  INTEGER {
+			serialOnly(1),
+			ethOnly(2),
+			both(3),
+			ghssAndEth(4),
+			ghssEthSerial(5)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Supported Synchronization Protocols"
+		::= { winlink1000OduAirHss 22 }
+		
+	winlink1000OduAirHssDesiredSynchronizationProtocol OBJECT-TYPE
+		SYNTAX  INTEGER {
+			serialOnly(1),
+			ethOnly(2),
+			both(3),
+			ghssOnly(4)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Desired Synchronization Protocols"
+		::= { winlink1000OduAirHss 23 }
+		
+	winlink1000OduAirHssDiscover OBJECT-TYPE
+		SYNTAX  INTEGER {
+			startAll(1),
+			startAllMstr(2),
+			startMyDmn(3),
+			startMyMstr(4)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Initiate Discovery process of ODUs on the network."
+		::= { winlink1000OduAirHss 24 }
+		
+	winlink1000OduAirHssNumberOfDiscoveredODUs OBJECT-TYPE
+		SYNTAX  INTEGER (0..1000)
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Number OF Discovered ODUs in network."
+		::= { winlink1000OduAirHss 25 }
+		
+	-- ###########################################################
+	--                      HSS Discover Table
+	-- ###########################################################
+	
+	winlink1000OduAirHssDiscoverTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Winlink1000OduAirHssDiscoverEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"HSS Discover Table."
+		::= { winlink1000OduAirHss 26 }
+
+	winlink1000OduAirHssDiscoverEntry OBJECT-TYPE
+		SYNTAX  Winlink1000OduAirHssDiscoverEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"ODU Discover Table entry."
+		INDEX { winlink1000OduAirHssDiscoverIndex }
+		::= { winlink1000OduAirHssDiscoverTable 1 }
+
+	Winlink1000OduAirHssDiscoverEntry ::= SEQUENCE {
+		winlink1000OduAirHssDiscoverIndex
+			INTEGER,
+		winlink1000OduAirHssDiscoverODUDescription
+			DisplayString
+		}
+		
+	winlink1000OduAirHssDiscoverIndex OBJECT-TYPE
+		SYNTAX  INTEGER (1..256)
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"HSS Discover Table Index."
+		::= { winlink1000OduAirHssDiscoverEntry 1 }
+		
+	winlink1000OduAirHssDiscoverODUDescription OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Hold ODU HSS status in compress format:
+		Domain,IP,HSS Role,Hss support,
+		Enabled HSS protocol,Sync Status,
+		Location, IPv6."
+		::= { winlink1000OduAirHssDiscoverEntry 2 }
+		
+	-- ###################### End of Discover Table ###################
+	
+	winlink1000OduAirHssMasterSlaveCompatibility OBJECT-TYPE
+		SYNTAX  INTEGER {
+			compatible(1),
+			notCompatible(2)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"EHSM version compatibility. Relevant to Ethernet HSS Clients only."
+		::= { winlink1000OduAirHss 27 }
+		
+	winlink1000OduAirHssNumberOfAssociatedCU OBJECT-TYPE
+		SYNTAX  INTEGER (0..256)
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Number of associated Ethernet HSS Clients. Relevant to Ethernet HSS Masters only"
+		::= { winlink1000OduAirHss 28 }
+		
+	-- ###########################################################
+	--                      HSS Associated CU Table
+	-- ###########################################################
+		
+	winlink1000OduAirHssAssociatedCUTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Winlink1000OduAirHssAssociatedCUTableEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"Associated Ethernet HSS Clients Table. Releant for Ethernet HSS Masters only."
+		::= { winlink1000OduAirHss 29 }
+
+	winlink1000OduAirHssAssociatedCUTableEntry OBJECT-TYPE
+		SYNTAX  Winlink1000OduAirHssAssociatedCUTableEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+		"Associated Ethernet HSS Clients Table Entry. Releant for Ethernet HSS Masters only."
+		INDEX { winlink1000OduAirHssAssociatedCUIndex }
+		::= { winlink1000OduAirHssAssociatedCUTable 1 }
+
+	Winlink1000OduAirHssAssociatedCUTableEntry ::= SEQUENCE {
+		winlink1000OduAirHssAssociatedCUIndex
+			INTEGER,
+		winlink1000OduAirHssAssociatedCUDescription
+			DisplayString
+		}
+		
+	winlink1000OduAirHssAssociatedCUIndex OBJECT-TYPE
+		SYNTAX  INTEGER (1..256)
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Associated Ethernet HSS Clients Table Index. Releant for Ethernet HSS Masters only."
+		::= { winlink1000OduAirHssAssociatedCUTableEntry 1 }
+		
+	winlink1000OduAirHssAssociatedCUDescription OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Holds Associated Ethernet HSS Clients Description in compress format:
+		IP,Delay,Compatibility,Ethernet Speed, Ethernet Rx rate, IPv6"
+		::= { winlink1000OduAirHssAssociatedCUTableEntry 2 }
+		
+	-- ###################### End of Associated CU Table ###################
+		
+	winlink1000OduAirHssSyncStatusEth OBJECT-TYPE
+		SYNTAX  INTEGER {
+			notApplicable(1),
+			notSynchronized(2),
+			goodSynchronizationLevel(3),
+			mediumSynchronizationLevel(4),
+			badSynchronizationLevel(5),
+			startSynchronization(6)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Ethernet HSS Client Synchronization Level"
+		::= { winlink1000OduAirHss 30 }
+		
+	winlink1000OduAirHssEthVLANTag OBJECT-TYPE
+		SYNTAX  INTEGER (1..40947)
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Ethernet HSS VLan Tag: 
+		The least significate decimal digit is the VLan Priority(0-6) 
+		and the rest of the digits represents VLan ID (2-4094)"
+		::= { winlink1000OduAirHss 31 }
+	
+	winlink1000OduAirHssHSMIPAddress OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"HSMs IP address. Relevant for HSC synchronized over Ethernet."
+		::= { winlink1000OduAirHss 32 }
+
+	winlink1000OduAirHssDelayToHSM OBJECT-TYPE
+		SYNTAX  INTEGER (0..1000000)
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"Delay in microseconds to HSM. Relevant for HSC synchronized over Ethernet."
+		::= { winlink1000OduAirHss 33 }
+
+	winlink1000OduAirHssSyncAcquisitionSeconds OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Accumulated quantity of seconds in clock acquisition while connected to current HSM"
+		::= { winlink1000OduAirHss 34 }
+		
+	winlink1000OduAirHssHSMIPv6Address OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+		"HSMs IPv6 address. Relevant for HSC synchronized over Ethernet."
+		::= { winlink1000OduAirHss 35 }
+		
+	-- ###################### End of HSS Section ###################
+	
+	winlink1000OduAirLockRemote OBJECT-TYPE
+		SYNTAX  INTEGER {
+			unlock(1),
+			lock(2)
+			}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"This parameter enables locking the link with a specific ODU.
+		 The following values can be set:
+		 Unlock (default) - The ODU is not locked on a specific remote ODU. Unlock can only be performed when the link is not connected.
+		 Lock - The ODU is locked on a specific remote ODU. Lock can only be performed when the link is active."
+		::= { winlink1000OduAir 41 }
+
+	winlink1000OduAirAntennaGain OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+		"Current Antenna Gain in 0.1 dBi resolution. User defined value for 
+		external antenna.
+		Legal range: MinAntennaGain - Alarm.
+		"
+		::= { winlink1000OduAir 42 }
+
+	externalAlarmInPort1Alarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		The trap is sent every time an alarm occurs in the External Alarm Input of port #1.
+		Contains a single parameter, which is its description:
+		1 - Description: External Alarm 1 -  - Alarm.
+		"
+		::= 105
+
+	externalAlarmInPort2Alarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		The trap is sent every time an alarm occurs in the External Alarm Input of port #2.
+		Contains a single parameter, which is its description:
+		1 - Description: External Alarm 2 -  - Alarm.
+		"
+		::= 106
+
+	bitFailedAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { critical }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		The trap is sent if there is no way to recover from the situation.		
+		Contains two parameters:
+		1 - Description: ODU power up built in test failed. Error code is: %n
+		2 - %n number
+		"
+		::= 107
+
+	wrongConfigurationLoadedAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		The trap is sent if there is a way to recover from the situation.		
+		Contains two parameters:
+		1 - Description: Wrong configuration loaded. Error code is: %n
+		2 - %n number
+		"
+		::= 108
+
+	lanPort1DisconnectedAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		Indicates the LAN port 1 status changed to disconnected.		
+		Contains a single parameter, which is its description:
+		1 - Description: LAN port 1 status changed to disconnected.
+		"
+		::= 109
+
+	lanPort2DisconnectedAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		Indicates the LAN port 2 status changed to disconnected.		
+		Contains a single parameter, which is its description:
+		1 - Description: LAN port 2 status changed to disconnected.
+		"
+		::= 110
+
+	mngPortDisconnectedAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		Indicates the LAN1 port status changed to disconnected.		
+		Contains a single parameter, which is its description:
+		1 - Description: LAN1 port status changed to disconnected.
+		"
+		::= 111
+
+	externalAlarmInPort3Alarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		The trap is sent every time an alarm occurs in the External Alarm Input of port #3.
+		Contains a single parameter, which is its description:
+		1 - Description: External Alarm 3 -  - Alarm.
+		"
+		::= 112
+
+	externalAlarmInPort4Alarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		The trap is sent every time an alarm occurs in the External Alarm Input of port #4.
+		Contains a single parameter, which is its description:
+		1 - Description: External Alarm 4 -  - Alarm.
+		"
+		::= 113
+
+	swVersionsMismatchFullCompatibilityAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { warning }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		The trap is sent if SW versions mismatch with full link functionality.
+		Contains a single parameter, which is its description:
+		1 - Description: Software versions mismatch - full link functionality
+		"
+		::= 114
+
+	swVersionsMismatchRestrictedCompatibilityAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { minor }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		The trap is sent if SW versions mismatch with restricted link functionality.
+		Contains a single parameter, which is its description:
+		1 - Description: Software versions mismatch - restricted link functionality
+		"
+		::= 115
+
+	swVersionsMismatchSoftwareUpgradeRequired TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		The trap is sent if SW versions mismatch and SW upgrade is required.
+		Contains a single parameter, which is its description:
+		1 - Description: Software versions mismatch - Software upgrade required
+		"
+		::= 116
+
+	swVersionsIncompatible TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { critical }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		The trap is sent if SW versions are incompatible.
+		Contains a single parameter, which is its description:
+		1 - Description: SW Versions incompatible
+		"
+		::= 117
+
+	hssMultipleSourcesDetectedAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		Indicates that multiple sync pulse sources were detected.
+		Contains a single parameter, which is its description:
+		1 - Description: HSS multiple sync sources were detected.
+		"
+		::= 118
+
+	hssSyncToProperSourceStoppedAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		Indicates that synchronization to a proper sync pulse source was stopped.
+		Contains a single parameter, which is its description:
+		1 - Description: HSS sync pulse - Down. The reason is: %s.
+		%s - Is the reason for the sync down.
+		"
+		::= 119
+
+	hssSyncPulseDetectedAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that HSS additional sync pulse was detected.
+		Contains a single parameter, which is its description:
+		1 - Description: HSS additional sync pulse was detected.		
+		"
+		::= 120
+
+	tdmBackupAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that the TDM backup link was activated.
+		Contains a single parameter, which is its description:
+		1 - Description: TDM backup alarm - backup link was activated.
+		"
+		::= 121
+		
+	linkLockUnauthorizedRemoteODU TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that the remote ODU is unauthorized. 
+		Contains a single parameter, which is its description:
+		1 - Description: Unauthorized remote ODU connection rejected.
+		"
+		::= 122
+		
+	linkLockUnauthorizedODU TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that the ODU is unauthorized. 
+		Contains a single parameter, which is its description:
+		1 - Description: Unauthorized ODU connection rejected.
+		"
+		::= 123
+		
+	hotStandbyAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that the hot standby secondary link was activated.
+		Contains a single parameter, which is its description:
+		1 - Description: Secondary Link Is Active.
+		"
+		::= 124
+
+	sfpInsertion TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that a device was inserted to SFP Port
+		"
+		::= 126
+
+	sfpPort1DisconnectedAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		Indicates the SFP port 1 status changed to disconnected.		
+		Contains a single parameter which is its description:
+		1 - Description: SFP port 1 status changed to disconnected.
+		"
+		::= 127
+		
+	ringRplStateActiveAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		RPL state changed to Active.
+		"
+		::= 128
+			
+
+	desiredRatioCanNotBeAppliedAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { minor }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		Indicates Desired UL/DL RAtio Can Not Be Applied.
+		"
+		::= 129
+		
+	cbwMismatch TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		Indicates that a Channel Bandwidth mismatch was detected.		
+		Contains two parameters:
+		1 - Description: Channel Bandwidth Mismatch: one side is %n0 MHz and the other is %n1 MHz.
+		%n0 is the local Channel Bandwidth value in MHz.
+		%n1 is the remoet Channel Bandwidth value in MHz."
+		::= 130
+
+	gpsNotSynchronized TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that the GPS is not synchronized with satellites.
+		Pulses are self generated.
+		"
+		::= 131
+		
+	pdTooHighDueCbwLimitations TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that link cannot be established because 
+		link range is too large for channel bandwidth.
+		"
+		::= 132
+		
+	hbsEncryptionAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		Indicates an encryption key mismatch.
+		Contains a single parameter, which is its description, including the HSU's name
+		"
+		::= 133
+		
+	hbsEhServiceClosedToHsu TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		Indicates an encryption key mismatch.
+		Contains a single parameter, which is its description, including the HSU's name
+		"
+		::= 134
+
+	hbsUnsynchronizedHsuAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { critical }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		Indicates a registered HSU lost synchronization.
+		"
+		::= 135
+		
+	hbsInactiveHbsAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		Indicates HBS is InActive.
+		"
+		::= 136
+		
+	incompatibleHsu TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { critical }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		Indicates that the HSU is not compatible to HBS.
+		Contains a single parameter, which is its description:
+		1 - Description: Incompatible ODUs.
+		"
+		::= 137
+		
+	hsuUnsupportedBeacon TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { warning }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		Indicates an unsupported beacon has arrived at HSU
+		"
+		::= 138
+		
+	lanPortDisconnectedAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		Indicates the LAN port status changed to disconnected.		
+		Contains a single parameter, which is its description:
+		1 - Description: LAN port status changed to disconnected.
+		"
+		::= 139
+		
+	poePortDisconnectedAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		Indicates the LAN2 port status changed to disconnected.		
+		Contains a single parameter, which is its description:
+		1 - Description: LAN2 port status changed to disconnected.
+		"
+		::= 140
+		
+	poePowerConsumptionAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		Indicates the POE Power Consumption is above allowed maximum.		
+		Contains a single parameter, which is its description:
+		1 - Description: POE consumption above allowed maximum. port closed.
+		"
+		::= 141
+		
+	hobupFaultyStateAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		This Alarm will indicate that the Hot Backup module is in faulty state.
+		1 - Description: Hot Backup fault detected: %s unit.
+		%s - Primary Or Secondary Unit
+		"
+		::= 149
+
+	gpsOverCurrentAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		Indicates the GPS Antenna current consumption is above allowed maximum.		
+		Contains a single parameter, which is its description:
+		1 - Description: GPS Antenna current consumption above allowed maximum. GPS closed.
+		"
+		::= 150
+		
+	gpsCommunicationFailiureAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		Indicates the GPS data isn't received.		
+		Contains a single parameter, which is its description:
+		1 - Description: GPS Communication failiure.
+		"
+		::= 151
+	
+	temperatureThresholdAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		Indicates the board temperature is above allowed maximum.		
+		Contains a single parameter, which is its description:
+		1 - Description: GPS Antenna current consumption above allowed maximum. GPS closed.
+		"
+		::= 152
+		
+	localRouterDiscoveryStatus TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		This Alarm will indicate that we have no connection with local train router.
+		1 - Description: MacLearningUpdate detected disconnection with local train router %s
+		%s - local train IP
+		"
+		::= 153
+	
+	trackRouterDiscoveryStatus TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		This Alarm will indicate that we have no connection with Track side router.
+		1 - Description: MacLearningUpdate detected disconnection with Track side router %s
+		%s - Default gateway IP
+		"
+		::= 154
+		
+	lastUserSnmpAccessOverHourAgo TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		This trap will indicate that the last access of the accessing user was more than an hour ago.
+		1 - Description: User %s performed SNMP access after more than an hour.
+		%s - user name
+		"
+		::= 155
+		
+	btsTargetUnreachable TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		This Alarm will indicate that we have no connection with Bts desired target.
+		1 - Description: TNC detected disconnection with the BTS target %s
+		%s - Default gateway IP
+		"
+		::= 156
+		
+	tdmServiceClear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 100 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that TDM Service fault is cleared.
+		Contains a single parameter, which is its description:
+		1 - Description: TDM Service - Normal.
+		"
+		::= 200
+
+	ethServiceOpened TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 101 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that Ethernet Service has been opened.
+		Contains a single parameter, which is its description:
+		1 - Description: Ethernet Service has been opened.
+		"
+		::= 201
+
+	encryptionClear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 103 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that encryption is OK.
+		Contains a single parameter, which is its description:
+		1 - Description: Encryption Status - Normal.
+		"
+		::= 203
+
+	changeLinkPasswordClear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 104 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that the Link Password was changed successfully.
+		Contains a single parameter, which is its description:
+		1 - Description: Link Password has been changed at/on: %s.
+		%s - Is the Local Site name or Remote Site name or both sides of the Link.
+		"
+		::= 204
+
+	externalAlarmInPort1Clear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 105 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		This Trap is sent every time an External Alarm Input fault of port # 1 is cleared.
+		Contains a single parameter, which is its description:
+		1 - Description: External Alarm 1 -  - Alarm Cleared.
+		"
+		::= 205	
+
+	externalAlarmInPort2Clear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 106 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		This Trap is sent every time an External Alarm Input fault of port # 2 is cleared.
+		Contains a single parameter, which is its description:
+		1 - Description: External Alarm 2 -  - Alarm Cleared.
+		"
+		::= 206
+		
+	lanPort1Clear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 109 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates the LAN port 1 status changed to connected.
+		Contains two parameters:
+		1 - Description: LAN port 1 status changed to connected - %s
+		2 - %s Is the Eth. mode (speed & duplex)
+		"
+		::= 209
+		
+	lanPort2Clear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 110 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates the LAN port 2 status changed to connected.
+		Contains two parameters:
+		1 - Description: LAN port 2 status changed to connected - %s.
+		2 - %s Is the Eth. mode (speed & duplex).
+		"
+		::= 210
+		
+	mngPortClear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 111 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates the LAN1 port status changed to connected.
+		Contains two parameters:
+		1 - Description: LAN1 port status changed to connected - %s
+		2 - %s Is the Eth. mode (speed & duplex)
+		"
+		::= 211
+
+	externalAlarmInPort3Clear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 112 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		This Trap is sent every time an External Alarm Input fault of port # 3 is cleared.
+		Contains a single parameter, which is its description:
+		1 - Description: External Alarm 3 -  - Alarm Cleared.
+		"
+		::= 212	
+
+	externalAlarmInPort4Clear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 113 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		This Trap is sent every time an External Alarm Input fault of port # 4 is cleared.
+		Contains a single parameter, which is its description:
+		1 - Description: External Alarm 4 -  - Alarm Cleared.
+		"
+		::= 213
+	
+	swVersionsMatchFullCompatibilityClear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 114 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		The trap is sent if SW versions match.
+		Contains a single parameter, which is its description:
+		1 - Description: Software Versions compatible
+		"
+		::= 214
+
+	swVersionsMatchRestrictedCompatibilityClear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 115 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		The trap is sent if SW versions match and link functionality is not restricted.
+		Contains a single parameter, which is its description:
+		1 - Description: Software Versions compatible
+		"
+		::= 215
+
+	swVersionsMatchSoftwareUpgradeRequiredClear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 116 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		The trap is sent if SW versions match and SW upgrade is successful.
+		Contains a single parameter, which is its description:
+		1 - Description: Software Versions compatible
+		"
+		::= 216
+
+	swVersionsCompatibleClear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 117 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		The trap is sent if SW versions compatible
+		Contains a single parameter, which is its description:
+		1 - Description: Software Versions compatible
+		"
+		::= 217
+
+	hssMultipleSourcesDisappearedClear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 118 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that multiple sync pulse sources disappeared.
+		Contains a single parameter, which is its description:
+		1 - Description: HSS multiple sync pulse sources disappeared.
+		"
+		::= 218
+
+	hssSyncToProperSourceAchievedClear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 119 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that synchronization to a proper Sync source was achieved.
+		Contains a single parameter, which is its description:
+		1 - Description: HSS sync pulse - Up.
+		"
+		::= 219
+
+	hssSyncPulseDisappearedClear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 120 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that HSS additional sync pulse disappeared.
+		Contains a single parameter, which is its description:
+		1 - Description: HSS additional sync pulse was disappeared.		
+		"
+		::= 220
+
+	tdmBackupClear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 121 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that the TDM main link was activated.
+		Contains a single parameter, which is its description:
+		1 - Description: TDM main link was activated.
+		"
+		::= 221
+		
+	linkLockAuthorizedRemoteODU TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 122 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that the remote ODU is authorized.
+		Contains a single parameter, which is its description:
+		1 - Description: Authorized remote ODU connection accepted.
+		"
+		::= 222
+
+	linkLockAuthorizedODU TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 123 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that the ODU is authorized.
+		Contains a single parameter, which is its description:
+		1 - Description: Authorized ODU connection permitted.
+		"
+		::= 223		
+
+	linkAuthenticationDisabled TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 122 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that the Link Lock is disabled.
+		Contains a single parameter, which is its description:
+		1 - Description: Link Authentication has been disabled.
+		"
+		::= 224	
+
+	hotStandbyClear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 124 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that the Primary Link Was Activated.
+		Contains a single parameter, which is its description:
+		1 - Description: Primary Link Is Active.
+		"
+		::= 225
+		
+	sfpExtraction TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that a device was extracted from SFP Port
+		"
+		::= 226
+
+	sfpPort1Clear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 127 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates the SFP port 1 status changed to connected.
+		Contains two parameters:
+		1 - Description: SFP port 1 status changed to connected - %s
+		2 - %s Is the Eth. mode (speed & duplex)
+		"
+		::= 227
+
+	compatibleIdus TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 10 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that the ODU has identified compatible Idus on both sides of the link.
+		"
+		::= 228	
+
+	desiredRatioCanNotBeAppliedClear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 129 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates Current UL/DL Ratio Is Equal To Desired Ratio.
+		"
+		::= 229
+		
+	cbwMatch TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 130 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that a Channel Bandwidth match was detected.
+		Contains a single parameter, which is its description:
+		1 - Channel Bandwidth value in MHz.
+		"
+		::= 230
+		
+	switchCbwAndChannel TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that the system is switching Channel Bandwidth and channel frequency.
+		Contains two parameters:
+		1 - Switching to Channel Bandwith %n0 MHz and to channel %n1 GHz.
+		"
+		::= 231			
+		
+	ringRplStateIdle TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 128 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		RPL state changed to Idle.
+		"
+		::= 232
+		
+	ringEthServiceStatus TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }		
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates Ethernet service's state - blocked \ unblocked.
+		Contains a single parameter:
+		1 - Description: Ethernet's state (blocked \ unblocked)
+		"
+		::= 233
+		
+	ringFirstRpmReceived TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }		
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Ring application: in non-RPL link indicates first from a specific RPL was received.
+		Contains a single parameter:
+		1 - Description: RPM's VLAN ID
+		"
+		::= 234
+		
+	ringEthernetSrviceUnblockedTO TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }		
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Ring application: in non-RPL link Ethernet service is unblocked due to RPM timeout.		
+		"
+		::= 235
+		
+	gpsSynchronized TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 131 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that the GPS is synchronized with satellites.
+		"
+		::= 236
+
+	hbsEncryptionClear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 133 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that encryption is OK.
+		Contains a single parameter, which is its description, including the HSU's name
+		"
+		::= 237
+		
+	hbsEhServiceOpenedToHsu TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 134 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates that encryption is OK.
+		Contains a single parameter, which is its description, including the HSU's name
+		"
+		::= 238
+
+	hbsSynchronizedHsuAlarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 135 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates a registered HSU is synchronized.
+		"
+		::= 239
+		
+	hbsActiveHbs TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 136 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates when HBS has been activated.
+		"
+		::= 240
+		
+	switchCBW TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Switching Channel Bandwidth.
+		"
+		::= 241		
+
+	changeRatio TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		HBS Tx ratio has changed.
+		"
+		::= 242			
+
+	lanPortClear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 139 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates the LAN port status changed to connected.
+		Contains two parameters:
+		1 - Description: LAN port status changed to connected - %s
+		2 - %s Is the Eth. mode (speed & duplex)
+		"
+		::= 243
+
+	poePortClear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 140 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates the LAN2 port status changed to connected.
+		Contains two parameters:
+		1 - Description: LAN2 port status changed to connected - %s
+		2 - %s Is the Eth. mode (speed & duplex)
+		"
+		::= 244	
+		
+	poePowerConsumptionClear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 141 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates the POE power consumption is valid.
+		Contains two parameters:
+		1 - Description: POE consumption within limits. port is opened.
+		2 - %s Is the Eth. mode (speed & duplex)
+		"
+		::= 245
+
+	incompatibleHbsHsu TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Incompatible HBS/HSU software versions - no service.
+		"
+		::= 246
+
+	mobilityLinkOff TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Mobility - Link cannot be established due to:
+		1 - The HBS does not support Mobility
+		2 - Lack of resources in the HBS for HSU level
+		"
+		::= 247
+
+	enterLocalConnection TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Entering Local Connection (Broadcast) Mode.
+		"
+		::= 248	
+	
+	hobupActiveStateFaultyClear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 149 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		this clear alarm will indicate that the Hot Backup unit is in active state.
+		Contains a single parameter, which is its description:
+		1 - Description: Hot Backup %s unit activated.
+		%s - Primary Or Secondary Unit
+		"	
+		::= 249	
+		
+	hobupStandbyState TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		This info fault will indicate that the Hot backup module has entered standby/peer_detection state
+		Contains a single parameter, which is its description:
+		1 - Description: Hot Backup in Standby state: %s unit.
+		%s - Primary Or Secondary Unit
+		"	
+		::= 250		
+
+	gpsOverCurrentClear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 150 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates the GPS Antenna current consumption is valid.
+		"
+		::= 251
+		
+	temperatureThresholdClear TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 152 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicates the board temperature is valid.
+		"
+		::= 252		
+		
+	localRouterDiscoverySucceed TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 153 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicated the we succeeded to discover train router in ip %s MAC address %s
+		%s Train IP
+		%s Train MAC Address
+		"
+		::= 253	
+	
+	trackRouterDiscoverySucceed TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 154 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicated the we succeeded to discover track router in ip %s MAC address %s
+		%s Train IP
+		%s Train MAC Address
+		"
+		::= 254	
+		
+	qosVersion2StrictMismatch TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		CPE  doesn't support strict QOS configuration.
+		"	
+		::= 255
+		
+	qosVersion2TtlMismatch TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		CPE doesn't support TTL configuration.
+		"	
+		::= 256
+		
+	btsTargetIsReachable TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 156 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicated the we succeeded to establish connection with the Bts desired target (%s)
+		%s Target IP
+		"
+		::= 257
+		
+	tcNotSupportedByHSU TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		CPE doesn't support TC functionality.
+		"	
+		::= 258
+		
+	syncEPortHOStateChange TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Enter/leave HO state of SyncE port.
+		"	
+		::= 259
+		
+	syncEPortFailureStateChange TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Enter/leave Failure state of SyncE port.
+		"	
+		::= 260
+		
+	btsCpeUpdateServiceFailed TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Update service Failed
+		"	
+		::= 261
+		
+	btsCpeUpdateServiceSucceed TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Update service Succeed
+		"	
+		::= 262
+	radiusServerNoREsponse TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		No response from radius server
+		"	
+		::= 263	
+	noRadiusServerRespond TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Alarm indicates that no Radius server is connected
+		"	
+		::= 264	
+	radiusServerRespondedSuccessfully TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&CLEARS   { 264 }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		indicates that Radius server responded seccessfully.
+		"	
+		::= 265	
+
+	bsaAlignmentStarted TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicate the beginning of Alignment Process
+		"
+		::= 266
+		
+	bsaAlignmentFinished TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicate the completion of Alignment Process
+		"
+		::= 267
+		
+	bsaAlignmentTriggered TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES   { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { normal }
+		--&MESG     "$'1"
+		DESCRIPTION
+		"
+		Indicate the triggering of Alignment Process due to exceeding thresholds
+		"
+		::= 268
+
+	-- ###########################################################
+	--                 Products Section
+	-- ###########################################################
+
+
+	radwinProducts			OBJECT IDENTIFIER ::= { radwin 20 }
+	winlink1000Family		OBJECT IDENTIFIER ::= { radwinProducts 2 } 
+	radwin2000Family		OBJECT IDENTIFIER ::= { radwinProducts 3 }
+	gpsSynchronizerFamily	OBJECT IDENTIFIER ::= { radwinProducts 4 }
+	radwin5000HBSFamily		OBJECT IDENTIFIER ::= { radwinProducts 5 }
+	radwin5000HSUFamily		OBJECT IDENTIFIER ::= { radwinProducts 6 }
+	radwin6000Family		OBJECT IDENTIFIER ::= { radwinProducts 10 }
+	radwinWiFiAPFamily		OBJECT IDENTIFIER ::= { radwinProducts 20 }
+
+
+	--
+	-- the following identifiers are assigned to ODU Products
+	--        
+
+	odu	       					OBJECT IDENTIFIER ::= { winlink1000Family 1 }
+
+	oduIntegratedAntenna        OBJECT IDENTIFIER ::= { odu 1 }
+	oduExternalAntenna          OBJECT IDENTIFIER ::= { odu 2 }
+
+	--
+	-- Suffix 3,4,5,6,7,8,9,10,11,12,13,14,15,16 in the products section
+	-- are reserved for backward compatibility.
+	--
+
+	odu2000    					OBJECT IDENTIFIER ::= { radwin2000Family 1 }
+
+	odu2KIntegratedAntenna        OBJECT IDENTIFIER ::= { odu2000 1 }
+	odu2KExternalAntenna          OBJECT IDENTIFIER ::= { odu2000 2 }
+
+	oduGSU						OBJECT IDENTIFIER ::= { gpsSynchronizerFamily 1 }
+	
+	oduGSUExternalAntenna		OBJECT IDENTIFIER ::= { oduGSU 2 }
+
+	hssSyncUnits				OBJECT IDENTIFIER ::= { gpsSynchronizerFamily 2 }
+	
+	hssISU						OBJECT IDENTIFIER ::= { hssSyncUnits 1 }
+	hssGSU						OBJECT IDENTIFIER ::= { hssSyncUnits 2 }
+
+	oduHBS    					OBJECT IDENTIFIER ::= { radwin5000HBSFamily 1 }
+
+	oduHBSIntegratedAntenna		OBJECT IDENTIFIER ::= { oduHBS 1 }
+	oduHBSExternalAntenna		OBJECT IDENTIFIER ::= { oduHBS 2 }
+	
+	oduHSU    					OBJECT IDENTIFIER ::= { radwin5000HSUFamily 1 }
+
+	oduHSUIntegratedAntenna		OBJECT IDENTIFIER ::= { oduHSU 1 }
+	oduHSUExternalAntenna		OBJECT IDENTIFIER ::= { oduHSU 2 }	
+
+	odu6000    					OBJECT IDENTIFIER ::= { radwin6000Family 1 }
+
+	odu6K						OBJECT IDENTIFIER ::= { odu6000 1 }
+	
+	gateway6000    				OBJECT IDENTIFIER ::= { radwin6000Family 2 }
+
+	gateway6K						OBJECT IDENTIFIER ::= { gateway6000 1 }
+	
+	odu600    					OBJECT IDENTIFIER ::= { radwinWiFiAPFamily 1 }
+
+	oduWiFiAP					OBJECT IDENTIFIER ::= { odu600 1 }
+	
+	END
+

@@ -1,0 +1,3643 @@
+--
+-- Accedian Enterprise Specific MIB
+--
+-- Copyright (c) 2005-2008, Accedian Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+ACD-CFM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64, Gauge32
+        FROM SNMPv2-SMI
+    TruthValue, DateAndTime, RowStatus, DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+    acdMibs
+        FROM ACCEDIAN-SMI;
+
+acdCfm MODULE-IDENTITY
+
+    LAST-UPDATED "201112210100Z"
+    ORGANIZATION "Accedian Networks, Inc."
+    CONTACT-INFO
+            "Accedian Technical Assistance Center
+             Accedian Networks, Inc.
+             4878 Levy, suite 202
+             Saint-Laurent, Quebec Canada H4R 2P1
+             E-mail: support@accedian.com"
+    DESCRIPTION
+            "This MIB is complementary to the IEEE P802.1ag(TM) CFM MIB. It
+             covers the delay measurment and the packet loss configuration
+             and results."
+
+    REVISION "201112210100Z"        -- 21 Dec 2011
+    DESCRIPTION
+            "Add support for ETH-SLM Tx/Rx PDU counters."
+
+
+    REVISION "201112200100Z"        -- 20 Dec 2011
+    DESCRIPTION
+            "Add support for ETH-CSF Tx/Rx PDU counters."
+
+
+    REVISION "201109210100Z"        -- 21 Sept 2011
+    DESCRIPTION
+            "Add support for CFM Stack Table."
+
+    REVISION "201103300100Z"        -- 30 Mars 2011
+    DESCRIPTION
+            "Add support for Instantaneous values."
+
+    REVISION "200911010100Z"        -- 1 Nov 2009
+    DESCRIPTION
+            "Add support for extended packet loss ratio."
+
+    REVISION "200902230100Z"        -- 23 Feb 2009
+    DESCRIPTION
+            "Add support for extended packet loss ratio."
+
+    REVISION "200805010100Z"        -- 1 May 2008
+    DESCRIPTION
+            "Initial version of MIB module ACD-CFM-MIB."
+
+    ::= { acdMibs 7 }
+
+acdCfmNotifications     OBJECT IDENTIFIER ::= { acdCfm 0 }
+acdCfmMIBObjects        OBJECT IDENTIFIER ::= { acdCfm 1 }
+acdCfmConformance       OBJECT IDENTIFIER ::= { acdCfm 2 }
+
+acdCfmDelayMeasurement  OBJECT IDENTIFIER ::= { acdCfmMIBObjects 1 }
+acdCfmPacketLoss        OBJECT IDENTIFIER ::= { acdCfmMIBObjects 2 }
+acdCfmMep               OBJECT IDENTIFIER ::= { acdCfmMIBObjects 3 }
+acdCfmStack             OBJECT IDENTIFIER ::= { acdCfmMIBObjects 4 }
+acdCfmSlm		    OBJECT IDENTIFIER ::= { acdCfmMIBObjects 5 }
+
+---------------------------------------------------------------------------
+ -- The Delay Measurement configuration table
+ -- This table contains all Delay Measurement entry configurations.
+---------------------------------------------------------------------------
+
+acdCfmDmCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdCfmDmCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configuration table of all DM entries."
+    ::= { acdCfmDelayMeasurement 1 }
+
+acdCfmDmCfgEntry OBJECT-TYPE
+    SYNTAX      AcdCfmDmCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all settings to manage a DM instance."
+    INDEX   { acdCfmDmCfgID }
+    ::=  { acdCfmDmCfgTable 1 }
+
+AcdCfmDmCfgEntry ::= SEQUENCE {
+    acdCfmDmCfgID                       Unsigned32,
+    acdCfmDmCfgRowStatus                RowStatus,
+    acdCfmDmCfgMepIdx                   Unsigned32,
+    acdCfmDmCfgRemoteMepId              Unsigned32,
+    acdCfmDmCfgPriority                 Unsigned32,
+    acdCfmDmCfgEnable                   TruthValue,
+    acdCfmDmCfgInterval                 Unsigned32,
+    acdCfmDmCfgRefPeriod                Unsigned32,
+    acdCfmDmCfgOneWayDelayEnable        TruthValue,
+    acdCfmDmCfgOneWayDelayMax           Unsigned32,
+    acdCfmDmCfgOneWayDelayThresh        Unsigned32,
+    acdCfmDmCfgOneWayAvgDelayThresh     Unsigned32,
+    acdCfmDmCfgOneWayDvEnable           TruthValue,
+    acdCfmDmCfgOneWayDvMax              Unsigned32,
+    acdCfmDmCfgOneWayDvThresh           Unsigned32,
+    acdCfmDmCfgOneWayAvgDvThresh        Unsigned32,
+    acdCfmDmCfgTwoWayDelayEnable        TruthValue,
+    acdCfmDmCfgTwoWayDelayMax           Unsigned32,
+    acdCfmDmCfgTwoWayDelayThresh        Unsigned32,
+    acdCfmDmCfgTwoWayAvgDelayThresh     Unsigned32,
+    acdCfmDmCfgTwoWayDvEnable           TruthValue,
+    acdCfmDmCfgTwoWayDvMax              Unsigned32,
+    acdCfmDmCfgTwoWayDvThresh           Unsigned32,
+    acdCfmDmCfgTwoWayAvgDvThresh        Unsigned32
+}
+
+acdCfmDmCfgID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each Delay Measurement instance. This value follows
+        the ordering of the results table."
+    ::= { acdCfmDmCfgEntry 1 }
+
+acdCfmDmCfgRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "All columns must have a valid value before a row can be activated."
+    ::= { acdCfmDmCfgEntry 2 }
+
+acdCfmDmCfgMepIdx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Maintenance association End Point Identifier."
+    ::= { acdCfmDmCfgEntry 3 }
+
+acdCfmDmCfgRemoteMepId  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8191)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Remote Maintenance association End Point Identifier used for this
+         delay measurement configuration."
+    ::= { acdCfmDmCfgEntry 4 }
+
+acdCfmDmCfgPriority  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The VLAN priority. Its value ranges from 0 to 7."
+    DEFVAL      { 0 }
+    ::= { acdCfmDmCfgEntry 5 }
+
+acdCfmDmCfgEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable CFM to issues DMM measurement packets."
+    DEFVAL      { false }
+    ::= { acdCfmDmCfgEntry 6 }
+
+acdCfmDmCfgInterval  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Interval in milliseconds at which CFM issues DMM measurement packets."
+    DEFVAL      { 10000 }
+    ::= { acdCfmDmCfgEntry 7 }
+
+acdCfmDmCfgRefPeriod  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1440)
+    UNITS       "minutes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Reference period in minutes for Delay Measurement."
+    DEFVAL      { 15 }
+    ::= { acdCfmDmCfgEntry 8 }
+
+acdCfmDmCfgOneWayDelayEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable CFM to compute one-way delay measurements."
+    DEFVAL      { true }
+    ::= { acdCfmDmCfgEntry 9 }
+
+acdCfmDmCfgOneWayDelayMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum allowed instantaneous delay in milliseconds."
+     DEFVAL      { 50 }
+    ::= { acdCfmDmCfgEntry 10 }
+
+acdCfmDmCfgOneWayDelayThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of consecutive delay greater than the maximum allowed value
+        before alert."
+     DEFVAL      { 4 }
+   ::= { acdCfmDmCfgEntry 11 }
+
+acdCfmDmCfgOneWayAvgDelayThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "One-way average delay threshold in milliseconds."
+     DEFVAL      { 50 }
+    ::= { acdCfmDmCfgEntry 12 }
+
+acdCfmDmCfgOneWayDvEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable CFM to compute one-way delay variation measurements."
+    DEFVAL      { true }
+    ::= { acdCfmDmCfgEntry 13 }
+
+acdCfmDmCfgOneWayDvMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum allowed instantaneous delay variation in milliseconds."
+     DEFVAL      { 50 }
+    ::= { acdCfmDmCfgEntry 14 }
+
+acdCfmDmCfgOneWayDvThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of consecutive delay variation greater than the maximum
+        allowed value before alert."
+     DEFVAL      { 10 }
+    ::= { acdCfmDmCfgEntry 15 }
+
+acdCfmDmCfgOneWayAvgDvThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "One-way average delay variation threshold in milliseconds."
+     DEFVAL      { 4 }
+    ::= { acdCfmDmCfgEntry 16 }
+
+acdCfmDmCfgTwoWayDelayEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable CFM to compute Two-way delay measurements."
+    DEFVAL      { true }
+    ::= { acdCfmDmCfgEntry 17 }
+
+acdCfmDmCfgTwoWayDelayMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum allowed instantaneous delay in milliseconds."
+      DEFVAL      { 100 }
+   ::= { acdCfmDmCfgEntry 18 }
+
+acdCfmDmCfgTwoWayDelayThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of consecutive delay greater than the maximum allowed value
+        before alert."
+     DEFVAL      { 40 }
+    ::= { acdCfmDmCfgEntry 19 }
+
+acdCfmDmCfgTwoWayAvgDelayThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Two-way average delay threshold in milliseconds."
+     DEFVAL      { 100 }
+    ::= { acdCfmDmCfgEntry 20 }
+
+acdCfmDmCfgTwoWayDvEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable CFM to compute Two-way delay variation measurements."
+    DEFVAL      { true }
+    ::= { acdCfmDmCfgEntry 21 }
+
+acdCfmDmCfgTwoWayDvMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum allowed instantaneous delay variation in milliseconds."
+     DEFVAL      { 10 }
+    ::= { acdCfmDmCfgEntry 22 }
+
+acdCfmDmCfgTwoWayDvThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of consecutive delay variation greater than the maximum
+        allowed value before alert."
+     DEFVAL      { 4 }
+    ::= { acdCfmDmCfgEntry 23 }
+
+acdCfmDmCfgTwoWayAvgDvThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Two-way average delay variation threshold in milliseconds."
+     DEFVAL      { 10 }
+    ::= { acdCfmDmCfgEntry 24 }
+
+---------------------------------------------------------------------------
+ -- The CFM DMM One Way delay Results table
+ -- This table contains all CFM DMM One Way delay entry results.
+---------------------------------------------------------------------------
+
+acdCfmResultOneWayDelayTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdCfmResultOneWayDelayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "One way delay result table of all DM entries."
+    ::= { acdCfmDelayMeasurement 2 }
+
+acdCfmResultOneWayDelayEntry OBJECT-TYPE
+    SYNTAX      AcdCfmResultOneWayDelayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of One Way Delay results for a DM entry."
+    INDEX   { acdCfmResultOneWayDelayID }
+    ::=  { acdCfmResultOneWayDelayTable 1 }
+
+AcdCfmResultOneWayDelayEntry ::= SEQUENCE {
+    acdCfmResultOneWayDelayID               Unsigned32,
+    acdCfmResultOneWayDelayPeriodIndex      Unsigned32,
+    acdCfmResultOneWayDelayIntervalStart    DateAndTime,
+    acdCfmResultOneWayDelayValid            TruthValue,
+    acdCfmResultOneWayDelayAlert            TruthValue,
+    acdCfmResultOneWayDelayAvgAlert         TruthValue,
+    acdCfmResultOneWayDelaySamples          Unsigned32,
+    acdCfmResultOneWayDelayMinValue         Integer32,
+    acdCfmResultOneWayDelayMaxValue         Integer32,
+    acdCfmResultOneWayDelayAvgValue         Integer32,
+    acdCfmResultOneWayDelayThreshExc        Unsigned32,
+    acdCfmResultOneWayDelayInstValue        Integer32
+}
+
+acdCfmResultOneWayDelayID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each Delay Measurement instance. This value follows
+        the ordering of the Dm table."
+    ::= { acdCfmResultOneWayDelayEntry 1 }
+
+acdCfmResultOneWayDelayPeriodIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that uniquely identifies the particular sample this entry
+         represents among all samples associated with the same DM instance.
+         This index starts at 1 and increases by one as each new period."
+    ::= { acdCfmResultOneWayDelayEntry 2 }
+
+acdCfmResultOneWayDelayIntervalStart  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the time of the start of the period."
+    ::= { acdCfmResultOneWayDelayEntry 3 }
+
+acdCfmResultOneWayDelayValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the One-way delay results during this
+        sampling interval."
+    ::= { acdCfmResultOneWayDelayEntry 4 }
+
+acdCfmResultOneWayDelayAlert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the presence of the One Way Delay alert."
+    ::= { acdCfmResultOneWayDelayEntry 5 }
+
+acdCfmResultOneWayDelayAvgAlert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the presence of the One Way Average Delay alert."
+    ::= { acdCfmResultOneWayDelayEntry 6 }
+
+acdCfmResultOneWayDelaySamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered during the sampling
+         interval to calculate One-way delay results."
+    ::= { acdCfmResultOneWayDelayEntry 7 }
+
+acdCfmResultOneWayDelayMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the One-way delay minimum value. The value is expressed in
+        micro-seconds."
+    ::= { acdCfmResultOneWayDelayEntry 8 }
+
+acdCfmResultOneWayDelayMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the One-way delay maximum value. The value is expressed in
+        micro-seconds."
+    ::= { acdCfmResultOneWayDelayEntry 9 }
+
+acdCfmResultOneWayDelayAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the One-way delay average value. The value is expressed in
+        micro-seconds."
+    ::= { acdCfmResultOneWayDelayEntry 10}
+
+acdCfmResultOneWayDelayThreshExc  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples exceeding the limit."
+    ::= { acdCfmResultOneWayDelayEntry 11 }
+
+acdCfmResultOneWayDelayInstValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the One-way delay Instantaneous value. The value is expressed in
+        micro-seconds."
+    ::= { acdCfmResultOneWayDelayEntry 12 }
+
+---------------------------------------------------------------------------
+ -- The CFM DMM One Way delay variation Results table
+ -- This table contains all CFM DMM One Way delay variation entry results.
+---------------------------------------------------------------------------
+
+acdCfmResultOneWayDvTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdCfmResultOneWayDvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "One way delay variation result table of all DM entries."
+    ::= { acdCfmDelayMeasurement 3 }
+
+acdCfmResultOneWayDvEntry OBJECT-TYPE
+    SYNTAX      AcdCfmResultOneWayDvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of One Way Delay variation results for a DM entry."
+    INDEX   { acdCfmResultOneWayDvID }
+    ::=  { acdCfmResultOneWayDvTable 1 }
+
+AcdCfmResultOneWayDvEntry ::= SEQUENCE {
+    acdCfmResultOneWayDvID              Unsigned32,
+    acdCfmResultOneWayDvPeriodIndex     Unsigned32,
+    acdCfmResultOneWayDvIntervalStart   DateAndTime,
+    acdCfmResultOneWayDvValid           TruthValue,
+    acdCfmResultOneWayDvAlert           TruthValue,
+    acdCfmResultOneWayDvAvgAlert        TruthValue,
+    acdCfmResultOneWayDvSamples         Unsigned32,
+    acdCfmResultOneWayDvMinValue        Integer32,
+    acdCfmResultOneWayDvMaxValue        Integer32,
+    acdCfmResultOneWayDvAvgValue        Integer32,
+    acdCfmResultOneWayDvThreshExc       Unsigned32,
+    acdCfmResultOneWayDvInstValue       Integer32
+}
+
+acdCfmResultOneWayDvID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each Delay variation Measurement instance. This value follows
+        the ordering of the DM table."
+    ::= { acdCfmResultOneWayDvEntry 1 }
+
+acdCfmResultOneWayDvPeriodIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that uniquely identifies the particular sample this entry
+         represents among all samples associated with the same DM instance.
+         This index starts at 1 and increases by one as each new period."
+    ::= { acdCfmResultOneWayDvEntry 2 }
+
+acdCfmResultOneWayDvIntervalStart  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the time of the start of the period."
+    ::= { acdCfmResultOneWayDvEntry 3 }
+
+acdCfmResultOneWayDvValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the One-way delay variation results during this
+        sampling interval."
+    ::= { acdCfmResultOneWayDvEntry 4 }
+
+acdCfmResultOneWayDvAlert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the presence of the One Way Delay variation alert."
+    ::= { acdCfmResultOneWayDvEntry 5 }
+
+acdCfmResultOneWayDvAvgAlert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the presence of the One Way Average Delay variation alert."
+    ::= { acdCfmResultOneWayDvEntry 6 }
+
+acdCfmResultOneWayDvSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered during the sampling
+         interval to calculate One-way delay variation results."
+    ::= { acdCfmResultOneWayDvEntry 7 }
+
+acdCfmResultOneWayDvMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the One-way delay variation minimum value. The value is
+        expressed in micro-seconds."
+    ::= { acdCfmResultOneWayDvEntry 8 }
+
+acdCfmResultOneWayDvMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the One-way delay variationmaximum value. The value is
+        expressed in micro-seconds."
+    ::= { acdCfmResultOneWayDvEntry 9 }
+
+acdCfmResultOneWayDvAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the One-way delay variation average value. The value is
+        expressed in micro-seconds."
+    ::= { acdCfmResultOneWayDvEntry 10}
+
+acdCfmResultOneWayDvThreshExc  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples exceeding the limit."
+    ::= { acdCfmResultOneWayDvEntry 11 }
+
+acdCfmResultOneWayDvInstValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the One-way delay variation Instantaneous value. The value is
+        expressed in micro-seconds."
+    ::= { acdCfmResultOneWayDvEntry 12 }
+
+---------------------------------------------------------------------------
+ -- The CFM DMM Two Way delay Results table
+ -- This table contains all CFM DMM Two Way delay entry results.
+---------------------------------------------------------------------------
+
+acdCfmResultTwoWayDelayTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdCfmResultTwoWayDelayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Two way delay result table of all DM entries."
+    ::= { acdCfmDelayMeasurement 4 }
+
+acdCfmResultTwoWayDelayEntry OBJECT-TYPE
+    SYNTAX      AcdCfmResultTwoWayDelayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of Two Way Delay results for a DM entry."
+    INDEX   { acdCfmResultTwoWayDelayID }
+    ::=  { acdCfmResultTwoWayDelayTable 1 }
+
+AcdCfmResultTwoWayDelayEntry ::= SEQUENCE {
+    acdCfmResultTwoWayDelayID               Unsigned32,
+    acdCfmResultTwoWayDelayPeriodIndex      Unsigned32,
+    acdCfmResultTwoWayDelayIntervalStart    DateAndTime,
+    acdCfmResultTwoWayDelayValid            TruthValue,
+    acdCfmResultTwoWayDelayAlert            TruthValue,
+    acdCfmResultTwoWayDelayAvgAlert         TruthValue,
+    acdCfmResultTwoWayDelaySamples          Unsigned32,
+    acdCfmResultTwoWayDelayMinValue         Integer32,
+    acdCfmResultTwoWayDelayMaxValue         Integer32,
+    acdCfmResultTwoWayDelayAvgValue         Integer32,
+    acdCfmResultTwoWayDelayThreshExc        Unsigned32,
+    acdCfmResultTwoWayDelayInstValue        Integer32
+}
+
+acdCfmResultTwoWayDelayID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each Delay Measurement instance. This value follows
+        the ordering of the Dm table."
+    ::= { acdCfmResultTwoWayDelayEntry 1 }
+
+acdCfmResultTwoWayDelayPeriodIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that uniquely identifies the particular sample this entry
+         represents among all samples associated with the same DM instance.
+         This index starts at 1 and increases by one as each new period."
+    ::= { acdCfmResultTwoWayDelayEntry 2 }
+
+acdCfmResultTwoWayDelayIntervalStart  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the time of the start of the period."
+    ::= { acdCfmResultTwoWayDelayEntry 3 }
+
+acdCfmResultTwoWayDelayValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the Two way delay results during this
+        sampling interval."
+    ::= { acdCfmResultTwoWayDelayEntry 4 }
+
+acdCfmResultTwoWayDelayAlert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the presence of the Two Way Delay alert."
+    ::= { acdCfmResultTwoWayDelayEntry 5 }
+
+acdCfmResultTwoWayDelayAvgAlert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the presence of the Two Way Average Delay alert."
+    ::= { acdCfmResultTwoWayDelayEntry 6 }
+
+acdCfmResultTwoWayDelaySamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered during the sampling
+         interval to calculate Two-way delay results."
+    ::= { acdCfmResultTwoWayDelayEntry 7 }
+
+acdCfmResultTwoWayDelayMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Two-way delay minimum value. The value is expressed in
+        micro-seconds."
+    ::= { acdCfmResultTwoWayDelayEntry 8 }
+
+acdCfmResultTwoWayDelayMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Two-way delay maximum value. The value is expressed in
+        micro-seconds."
+    ::= { acdCfmResultTwoWayDelayEntry 9 }
+
+acdCfmResultTwoWayDelayAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Two-way delay average value. The value is expressed in
+        micro-seconds."
+    ::= { acdCfmResultTwoWayDelayEntry 10}
+
+acdCfmResultTwoWayDelayThreshExc  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples exceeding the limit."
+    ::= { acdCfmResultTwoWayDelayEntry 11 }
+
+acdCfmResultTwoWayDelayInstValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Two-way delay Instantaneous value. The value is expressed in
+        micro-seconds."
+    ::= { acdCfmResultTwoWayDelayEntry 12 }
+
+---------------------------------------------------------------------------
+ -- The CFM DMM Two Way delay variation Results table
+ -- This table contains all CFM DMM Two Way delay variation entry results.
+---------------------------------------------------------------------------
+
+acdCfmResultTwoWayDvTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdCfmResultTwoWayDvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Two way delay variation result table of all DM entries."
+    ::= { acdCfmDelayMeasurement 5 }
+
+acdCfmResultTwoWayDvEntry OBJECT-TYPE
+    SYNTAX      AcdCfmResultTwoWayDvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of One Way Delay variation results for a DM entry."
+    INDEX   { acdCfmResultTwoWayDvID }
+    ::=  { acdCfmResultTwoWayDvTable 1 }
+
+AcdCfmResultTwoWayDvEntry ::= SEQUENCE {
+    acdCfmResultTwoWayDvID               Unsigned32,
+    acdCfmResultTwoWayDvPeriodIndex      Unsigned32,
+    acdCfmResultTwoWayDvIntervalStart    DateAndTime,
+    acdCfmResultTwoWayDvValid            TruthValue,
+    acdCfmResultTwoWayDvAlert            TruthValue,
+    acdCfmResultTwoWayDvAvgAlert         TruthValue,
+    acdCfmResultTwoWayDvSamples          Unsigned32,
+    acdCfmResultTwoWayDvMinValue         Integer32,
+    acdCfmResultTwoWayDvMaxValue         Integer32,
+    acdCfmResultTwoWayDvAvgValue         Integer32,
+    acdCfmResultTwoWayDvThreshExc        Unsigned32,
+    acdCfmResultTwoWayDvInstValue        Integer32 
+}
+
+acdCfmResultTwoWayDvID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each Delay variation Measurement instance. This
+        value follows the ordering of the Dm table."
+    ::= { acdCfmResultTwoWayDvEntry 1 }
+
+acdCfmResultTwoWayDvPeriodIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that uniquely identifies the particular sample this entry
+         represents among all samples associated with the same DM instance.
+         This index starts at 1 and increases by one as each new period."
+    ::= { acdCfmResultTwoWayDvEntry 2 }
+
+acdCfmResultTwoWayDvIntervalStart  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the time of the start of the period."
+    ::= { acdCfmResultTwoWayDvEntry 3 }
+
+acdCfmResultTwoWayDvValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the two-way delay variation results during this
+        sampling interval."
+    ::= { acdCfmResultTwoWayDvEntry 4 }
+
+acdCfmResultTwoWayDvAlert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the presence of the Two Way Delay variation alert."
+    ::= { acdCfmResultTwoWayDvEntry 5 }
+
+acdCfmResultTwoWayDvAvgAlert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the presence of the Two Way Average Delay variation alert."
+    ::= { acdCfmResultTwoWayDvEntry 6 }
+
+acdCfmResultTwoWayDvSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered during the sampling
+         interval to calculate Two-way delay variation results."
+    ::= { acdCfmResultTwoWayDvEntry 7 }
+
+acdCfmResultTwoWayDvMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the two-way delay variation minimum value. The value is expressed in
+        micro-seconds."
+    ::= { acdCfmResultTwoWayDvEntry 8 }
+
+acdCfmResultTwoWayDvMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the two-way delay variation maximum value. The value is expressed in
+        micro-seconds."
+    ::= { acdCfmResultTwoWayDvEntry 9 }
+
+acdCfmResultTwoWayDvAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the two-way delay variation average value. The value is expressed in
+        micro-seconds."
+    ::= { acdCfmResultTwoWayDvEntry 10}
+
+acdCfmResultTwoWayDvThreshExc  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples exceeding the limit."
+    ::= { acdCfmResultTwoWayDvEntry 11 }
+
+acdCfmResultTwoWayDvInstValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the two-way delay variation Instantaneous value. The value is
+        expressed in micro-seconds."
+    ::= { acdCfmResultTwoWayDvEntry 12 }
+
+---------------------------------------------------------------------------
+ -- The CFM DMM One Way delay History Results table
+ -- This table contains all CFM DMM One Way delay entry History results.
+---------------------------------------------------------------------------
+
+acdCfmHistResultOneWayDelayTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdCfmHistResultOneWayDelayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "One way delay result table of all DM entries."
+    ::= { acdCfmDelayMeasurement 6 }
+
+acdCfmHistResultOneWayDelayEntry OBJECT-TYPE
+    SYNTAX      AcdCfmHistResultOneWayDelayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of One Way Delay results for a DM entry."
+    INDEX   { acdCfmHistResultOneWayDelayID,
+              acdCfmHistResultOneWayDelaySampleIndex }
+    ::=  { acdCfmHistResultOneWayDelayTable 1 }
+
+AcdCfmHistResultOneWayDelayEntry ::= SEQUENCE {
+    acdCfmHistResultOneWayDelayID               Unsigned32,
+    acdCfmHistResultOneWayDelaySampleIndex      Unsigned32,
+    acdCfmHistResultOneWayDelayStatus           INTEGER,
+    acdCfmHistResultOneWayDelayDuration         Unsigned32,
+    acdCfmHistResultOneWayDelayIntervalEnd      DateAndTime,
+    acdCfmHistResultOneWayDelaySamples          Unsigned32,
+    acdCfmHistResultOneWayDelayMinValue         Integer32,
+    acdCfmHistResultOneWayDelayMaxValue         Integer32,
+    acdCfmHistResultOneWayDelayAvgValue         Integer32,
+    acdCfmHistResultOneWayDelayThreshExc        Unsigned32
+}
+
+acdCfmHistResultOneWayDelayID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each Delay Measurement instance. This value follows
+        the ordering of the Dm table."
+    ::= { acdCfmHistResultOneWayDelayEntry 1 }
+
+acdCfmHistResultOneWayDelaySampleIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index that uniquely identifies the particular sample this entry
+         represents among all samples associated with the same DM instance.
+         This index starts at 1 and increases by one as each new period."
+    ::= { acdCfmHistResultOneWayDelayEntry 2 }
+
+acdCfmHistResultOneWayDelayStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    valid(1),
+                    invalid(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the One-way delay results during this
+        sampling interval."
+    ::= { acdCfmHistResultOneWayDelayEntry 3 }
+
+acdCfmHistResultOneWayDelayDuration  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each Delay Measurement instance. This value follows
+        the ordering of the Dm table."
+    ::= { acdCfmHistResultOneWayDelayEntry 4 }
+
+acdCfmHistResultOneWayDelayIntervalEnd  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the time of the end of the period."
+    ::= { acdCfmHistResultOneWayDelayEntry 5 }
+
+
+acdCfmHistResultOneWayDelaySamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered during the sampling
+         interval to calculate One-way delay results."
+    ::= { acdCfmHistResultOneWayDelayEntry 6 }
+
+acdCfmHistResultOneWayDelayMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the One-way delay minimum value. The value is expressed in
+        micro-seconds."
+    ::= { acdCfmHistResultOneWayDelayEntry 7 }
+
+acdCfmHistResultOneWayDelayMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the One-way delay maximum value. The value is expressed in
+        micro-seconds."
+    ::= { acdCfmHistResultOneWayDelayEntry 8 }
+
+acdCfmHistResultOneWayDelayAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the One-way delay average value. The value is expressed in
+        micro-seconds."
+    ::= { acdCfmHistResultOneWayDelayEntry 9}
+
+acdCfmHistResultOneWayDelayThreshExc  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples exceeding the limit."
+    ::= { acdCfmHistResultOneWayDelayEntry 10 }
+
+---------------------------------------------------------------------------
+ -- The CFM DMM One Way delay variation History Results table
+ -- This table contains all CFM DMM One Way delay variation entry History results.
+---------------------------------------------------------------------------
+
+acdCfmHistResultOneWayDvTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdCfmHistResultOneWayDvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "One way delay variation result table of all DM entries."
+    ::= { acdCfmDelayMeasurement 7 }
+
+acdCfmHistResultOneWayDvEntry OBJECT-TYPE
+    SYNTAX      AcdCfmHistResultOneWayDvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of One Way Delay variation results for a DM entry."
+    INDEX   { acdCfmHistResultOneWayDvID,
+              acdCfmHistResultOneWayDvSampleIndex }
+    ::=  { acdCfmHistResultOneWayDvTable 1 }
+
+AcdCfmHistResultOneWayDvEntry ::= SEQUENCE {
+    acdCfmHistResultOneWayDvID              Unsigned32,
+    acdCfmHistResultOneWayDvSampleIndex     Unsigned32,
+    acdCfmHistResultOneWayDvStatus          INTEGER,
+    acdCfmHistResultOneWayDvDuration        Unsigned32,
+    acdCfmHistResultOneWayDvIntervalEnd     DateAndTime,
+    acdCfmHistResultOneWayDvSamples         Unsigned32,
+    acdCfmHistResultOneWayDvMinValue        Integer32,
+    acdCfmHistResultOneWayDvMaxValue        Integer32,
+    acdCfmHistResultOneWayDvAvgValue        Integer32,
+    acdCfmHistResultOneWayDvThreshExc       Unsigned32
+}
+
+acdCfmHistResultOneWayDvID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each Delay variation Measurement instance. This value follows
+        the ordering of the DM table."
+    ::= { acdCfmHistResultOneWayDvEntry 1 }
+
+acdCfmHistResultOneWayDvSampleIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index that uniquely identifies the particular sample this entry
+         represents among all samples associated with the same DM instance.
+         This index starts at 1 and increases by one as each new period."
+    ::= { acdCfmHistResultOneWayDvEntry 2 }
+
+acdCfmHistResultOneWayDvStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    valid(1),
+                    invalid(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the One-way delay variation results during this
+        sampling interval."
+    ::= { acdCfmHistResultOneWayDvEntry 3 }
+
+acdCfmHistResultOneWayDvDuration  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interval in seconds over which the data is sampled for this entry."
+    ::= { acdCfmHistResultOneWayDvEntry 4 }
+
+acdCfmHistResultOneWayDvIntervalEnd  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the time of the end of the period."
+    ::= { acdCfmHistResultOneWayDvEntry 5 }
+
+acdCfmHistResultOneWayDvSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered during the sampling
+         interval to calculate One-way delay variation results."
+    ::= { acdCfmHistResultOneWayDvEntry 6 }
+
+acdCfmHistResultOneWayDvMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the One-way delay variation minimum value. The value is
+        expressed in micro-seconds."
+    ::= { acdCfmHistResultOneWayDvEntry 7 }
+
+acdCfmHistResultOneWayDvMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the One-way delay variationmaximum value. The value is
+        expressed in micro-seconds."
+    ::= { acdCfmHistResultOneWayDvEntry 8 }
+
+acdCfmHistResultOneWayDvAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the One-way delay variation average value. The value is
+        expressed in micro-seconds."
+    ::= { acdCfmHistResultOneWayDvEntry 9 }
+
+acdCfmHistResultOneWayDvThreshExc  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples exceeding the limit."
+    ::= { acdCfmHistResultOneWayDvEntry 10 }
+
+
+---------------------------------------------------------------------------
+ -- The CFM DMM Two Way delay History Results table
+ -- This table contains all CFM DMM Two Way delay entry History results.
+---------------------------------------------------------------------------
+
+acdCfmHistResultTwoWayDelayTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdCfmHistResultTwoWayDelayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Two way delay result table of all DM entries."
+    ::= { acdCfmDelayMeasurement 8 }
+
+acdCfmHistResultTwoWayDelayEntry OBJECT-TYPE
+    SYNTAX      AcdCfmHistResultTwoWayDelayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of Two Way Delay results for a DM entry."
+    INDEX   { acdCfmHistResultTwoWayDelayID,
+              acdCfmHistResultTwoWayDelaySampleIndex }
+    ::=  { acdCfmHistResultTwoWayDelayTable 1 }
+
+AcdCfmHistResultTwoWayDelayEntry ::= SEQUENCE {
+    acdCfmHistResultTwoWayDelayID               Unsigned32,
+    acdCfmHistResultTwoWayDelaySampleIndex      Unsigned32,
+    acdCfmHistResultTwoWayDelayStatus           INTEGER,
+    acdCfmHistResultTwoWayDelayDuration         Unsigned32,
+    acdCfmHistResultTwoWayDelayIntervalEnd      DateAndTime,
+    acdCfmHistResultTwoWayDelaySamples          Unsigned32,
+    acdCfmHistResultTwoWayDelayMinValue         Integer32,
+    acdCfmHistResultTwoWayDelayMaxValue         Integer32,
+    acdCfmHistResultTwoWayDelayAvgValue         Integer32,
+    acdCfmHistResultTwoWayDelayThreshExc        Unsigned32
+}
+
+acdCfmHistResultTwoWayDelayID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each Delay Measurement instance. This value follows
+        the ordering of the Dm table."
+    ::= { acdCfmHistResultTwoWayDelayEntry 1 }
+
+acdCfmHistResultTwoWayDelaySampleIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index that uniquely identifies the particular sample this entry
+         represents among all samples associated with the same DM instance.
+         This index starts at 1 and increases by one as each new period."
+    ::= { acdCfmHistResultTwoWayDelayEntry 2 }
+
+acdCfmHistResultTwoWayDelayStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    valid(1),
+                    invalid(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the Two way delay results during this
+        sampling interval."
+    ::= { acdCfmHistResultTwoWayDelayEntry 3 }
+
+acdCfmHistResultTwoWayDelayDuration  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interval in seconds over which the data is sampled for this entry."
+    ::= { acdCfmHistResultTwoWayDelayEntry 4 }
+
+acdCfmHistResultTwoWayDelayIntervalEnd  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the time of the end of the period."
+    ::= { acdCfmHistResultTwoWayDelayEntry 5 }
+
+acdCfmHistResultTwoWayDelaySamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered during the sampling
+         interval to calculate Two-way delay results."
+    ::= { acdCfmHistResultTwoWayDelayEntry 6 }
+
+acdCfmHistResultTwoWayDelayMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Two-way delay minimum value. The value is expressed in
+        micro-seconds."
+    ::= { acdCfmHistResultTwoWayDelayEntry 7 }
+
+acdCfmHistResultTwoWayDelayMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Two-way delay maximum value. The value is expressed in
+        micro-seconds."
+    ::= { acdCfmHistResultTwoWayDelayEntry 8 }
+
+acdCfmHistResultTwoWayDelayAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Two-way delay average value. The value is expressed in
+        micro-seconds."
+    ::= { acdCfmHistResultTwoWayDelayEntry 9 }
+
+acdCfmHistResultTwoWayDelayThreshExc  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples exceeding the limit."
+    ::= { acdCfmHistResultTwoWayDelayEntry 10 }
+
+
+---------------------------------------------------------------------------
+ -- The CFM DMM Two Way delay variation History Results table
+ -- This table contains all CFM DMM Two Way delay variation entry History results.
+---------------------------------------------------------------------------
+
+acdCfmHistResultTwoWayDvTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdCfmHistResultTwoWayDvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Two way delay variation result table of all DM entries."
+    ::= { acdCfmDelayMeasurement 9 }
+
+acdCfmHistResultTwoWayDvEntry OBJECT-TYPE
+    SYNTAX      AcdCfmHistResultTwoWayDvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of two Way Delay variation results for a DM entry."
+    INDEX   { acdCfmHistResultTwoWayDvID,
+              acdCfmHistResultTwoWayDvSampleIndex }
+    ::=  { acdCfmHistResultTwoWayDvTable 1 }
+
+AcdCfmHistResultTwoWayDvEntry ::= SEQUENCE {
+    acdCfmHistResultTwoWayDvID               Unsigned32,
+    acdCfmHistResultTwoWayDvSampleIndex      Unsigned32,
+    acdCfmHistResultTwoWayDvStatus           INTEGER,
+    acdCfmHistResultTwoWayDvDuration         Unsigned32,
+    acdCfmHistResultTwoWayDvIntervalEnd      DateAndTime,
+    acdCfmHistResultTwoWayDvSamples          Unsigned32,
+    acdCfmHistResultTwoWayDvMinValue         Integer32,
+    acdCfmHistResultTwoWayDvMaxValue         Integer32,
+    acdCfmHistResultTwoWayDvAvgValue         Integer32,
+    acdCfmHistResultTwoWayDvThreshExc        Unsigned32
+}
+
+acdCfmHistResultTwoWayDvID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each Delay variation Measurement instance. This
+        value follows the ordering of the Dm table."
+    ::= { acdCfmHistResultTwoWayDvEntry 1 }
+
+acdCfmHistResultTwoWayDvSampleIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index that uniquely identifies the particular sample this entry
+         represents among all samples associated with the same DM instance.
+         This index starts at 1 and increases by one as each new period."
+    ::= { acdCfmHistResultTwoWayDvEntry 2 }
+
+acdCfmHistResultTwoWayDvStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    valid(1),
+                    invalid(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the two-way delay variation results during this
+        sampling interval."
+    ::= { acdCfmHistResultTwoWayDvEntry 3 }
+
+acdCfmHistResultTwoWayDvDuration  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interval in seconds over which the data is sampled for this entry."
+    ::= { acdCfmHistResultTwoWayDvEntry 4 }
+
+acdCfmHistResultTwoWayDvIntervalEnd  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the time of the end of the period."
+    ::= { acdCfmHistResultTwoWayDvEntry 5 }
+
+acdCfmHistResultTwoWayDvSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered during the sampling
+         interval to calculate Two-way delay variation results."
+    ::= { acdCfmHistResultTwoWayDvEntry 6 }
+
+acdCfmHistResultTwoWayDvMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the two-way delay variation minimum value. The value is expressed in
+        micro-seconds."
+    ::= { acdCfmHistResultTwoWayDvEntry 7 }
+
+acdCfmHistResultTwoWayDvMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the two-way delay variation maximum value. The value is expressed in
+        micro-seconds."
+    ::= { acdCfmHistResultTwoWayDvEntry 8 }
+
+acdCfmHistResultTwoWayDvAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the two-way delay variation average value. The value is expressed in
+        micro-seconds."
+    ::= { acdCfmHistResultTwoWayDvEntry 9 }
+
+acdCfmHistResultTwoWayDvThreshExc  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples exceeding the limit."
+    ::= { acdCfmHistResultTwoWayDvEntry 10 }
+
+
+---------------------------------------------------------------------------
+ -- The Packet Loss configuration table
+ -- This table contains all Packet Loss entry configurations.
+---------------------------------------------------------------------------
+
+acdCfmPktLossCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdCfmPktLossCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configuration table of all Packet Loss entries."
+    ::= { acdCfmPacketLoss 1 }
+
+acdCfmPktLossCfgEntry OBJECT-TYPE
+    SYNTAX      AcdCfmPktLossCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all settings to manage a Packet loss instance."
+    INDEX   { acdCfmPktLossCfgID }
+    ::=  { acdCfmPktLossCfgTable 1 }
+
+
+AcdCfmPktLossCfgEntry ::= SEQUENCE {
+    acdCfmPktLossCfgID              Unsigned32,
+    acdCfmPktLossCfgRowStatus       RowStatus,
+    acdCfmPktLossCfgMepIdx          Unsigned32,
+    acdCfmPktLossCfgRemoteMepId     Unsigned32,
+    acdCfmPktLossCfgPriority        Unsigned32,
+    acdCfmPktLossCfgEnable          TruthValue,
+    acdCfmPktLossCfgInterval        Unsigned32,
+    acdCfmPktLossCfgRefPeriod       Unsigned32,
+    acdCfmPktLossCfgThresh          Unsigned32,
+    acdCfmPktLossCfgRatioThresh     Unsigned32
+}
+
+acdCfmPktLossCfgID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each Packet Loss instance. This value follows the
+         ordering the results table."
+    ::= { acdCfmPktLossCfgEntry 1 }
+
+acdCfmPktLossCfgRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The writable columns in a row can not be changed if the row is active.
+       All columns must have a valid value before a row can be activated."
+    ::= { acdCfmPktLossCfgEntry 2 }
+
+acdCfmPktLossCfgMepIdx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Maintenance association End Point Identifier."
+    ::= { acdCfmPktLossCfgEntry 3 }
+
+acdCfmPktLossCfgRemoteMepId  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8191)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Remote Maintenance association End Point Identifier."
+    ::= { acdCfmPktLossCfgEntry 4 }
+
+acdCfmPktLossCfgPriority  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The VLAN priority. Its value ranges from 0 to 7. Same has CCM
+         priority for packet loss based on CCM."
+     DEFVAL      { 0 }
+    ::= { acdCfmPktLossCfgEntry 5 }
+
+acdCfmPktLossCfgEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable CFM to perform Packet Loss measurement."
+     DEFVAL      { false }
+    ::= { acdCfmPktLossCfgEntry 6 }
+
+acdCfmPktLossCfgInterval  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Interval in milliseconds at which CFM issues Packet Loss measurement
+        packets. Same has CCM interval for packet loss based on CCM."
+     DEFVAL      { 10000 }
+    ::= { acdCfmPktLossCfgEntry 7 }
+
+acdCfmPktLossCfgRefPeriod  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1440)
+    UNITS       "minutes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Reference period in minutes for Packet Loss Measurement."
+     DEFVAL      { 15 }
+    ::= { acdCfmPktLossCfgEntry 8 }
+
+acdCfmPktLossCfgThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of packet loss allowed without issuing an alarm."
+     DEFVAL      { 1 }
+    ::= { acdCfmPktLossCfgEntry 9 }
+
+acdCfmPktLossCfgRatioThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Packet loss ratio threshold allowed without issuing an alarm
+         expressed in millionth of percent (1,000,000 is 1%)."
+     DEFVAL      { 0 }
+    ::= { acdCfmPktLossCfgEntry 10 }
+
+---------------------------------------------------------------------------
+ -- The CFM Packet Loss Results table
+ -- This table contains all CFM DMM Packet Loss results.
+---------------------------------------------------------------------------
+
+acdCfmResultPktLossTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdCfmResultPktLossEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Packet loss result table of a MEP and remote MEP pair."
+    ::= { acdCfmPacketLoss 2 }
+
+acdCfmResultPktLossEntry OBJECT-TYPE
+    SYNTAX      AcdCfmResultPktLossEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of packet loss result for a specific MEP and
+        remote MEP pair."
+    INDEX   { acdCfmResultPktLossID }
+    ::=  { acdCfmResultPktLossTable 1 }
+
+AcdCfmResultPktLossEntry ::= SEQUENCE {
+    acdCfmResultPktLossID                   Unsigned32,
+    acdCfmResultPktLossPeriodIndex          Unsigned32,
+    acdCfmResultPktLossIntervalStart        DateAndTime,
+    acdCfmResultPktLossValid                TruthValue,
+    acdCfmResultPktLossAlert                TruthValue,
+    acdCfmResultPktLossSamples              Counter32,
+    acdCfmResultPktLossOverflowSamples      Counter32,
+    acdCfmResultPktLossHCSamples            Counter64,
+    acdCfmResultPktLossNbrLoss              Counter32,
+    acdCfmResultPktLossOverflowNbrLoss      Counter32,
+    acdCfmResultPktLossHCNbrLoss            Counter64,
+    acdCfmResultPktLossNbrGaps              Counter32,
+    acdCfmResultPktLossOverflowNbrGaps      Counter32,
+    acdCfmResultPktLossHCNbrGaps            Counter64,
+    acdCfmResultPktLossLargestGap           Counter32,
+    acdCfmResultPktLossOverflowLargestGap   Counter32,
+    acdCfmResultPktLossHCLargestGap         Counter64,
+    acdCfmResultPktLossRatio                Unsigned32
+}
+
+acdCfmResultPktLossID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each Delay variation Measurement instance. This
+        value follows the ordering of the Dm table."
+    ::= { acdCfmResultPktLossEntry 1 }
+
+acdCfmResultPktLossPeriodIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that uniquely identifies the particular sample this entry
+         represents among all samples associated with the same PL instance.
+         This index starts at 1 and increases by one as each new period."
+    ::= { acdCfmResultPktLossEntry 2 }
+
+acdCfmResultPktLossIntervalStart  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the time of the start of the period."
+    ::= { acdCfmResultPktLossEntry 3 }
+
+acdCfmResultPktLossValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the packet loss results during this
+        sampling interval."
+    ::= { acdCfmResultPktLossEntry 4 }
+
+acdCfmResultPktLossAlert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the presence of the Packet Loss alert."
+    ::= { acdCfmResultPktLossEntry 5 }
+
+acdCfmResultPktLossSamples  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered during the sampling
+         interval to calculate packet loss results."
+    ::= { acdCfmResultPktLossEntry 6 }
+
+acdCfmResultPktLossOverflowSamples  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdCfmResultPktLossSamples counter
+         has overflowed during this sampling interval. This is a 32 bits counter.
+         Combined with acdCfmResultPktLossSamples, it provides the equivalent of
+         the 64 bits counter acdCfmResultPktLossHCSamples."
+    ::= { acdCfmResultPktLossEntry 7 }
+
+acdCfmResultPktLossHCSamples  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered during the sampling
+         interval to calculate packet loss results."
+    ::= { acdCfmResultPktLossEntry 8 }
+
+acdCfmResultPktLossNbrLoss  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the number of packet loss."
+    ::= { acdCfmResultPktLossEntry 9 }
+
+acdCfmResultPktLossOverflowNbrLoss  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdCfmResultPktLossNbrLoss counter
+         has overflowed during this sampling interval. This is a 32 bits counter.
+         Combined with acdCfmResultPktLossNbrLoss, it provides the equivalent of
+         the 64 bits counter acdCfmResultPktLossHCNbrLoss."
+    ::= { acdCfmResultPktLossEntry 10 }
+
+acdCfmResultPktLossHCNbrLoss  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the number of packet loss."
+    ::= { acdCfmResultPktLossEntry 11 }
+
+acdCfmResultPktLossNbrGaps  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the number of gap."
+    ::= { acdCfmResultPktLossEntry 12 }
+
+acdCfmResultPktLossOverflowNbrGaps  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdCfmResultPktLossNbrGaps counter
+         has overflowed during this sampling interval. This is a 32 bits counter.
+         Combined with acdCfmResultPktLossNbrGaps, it provides the equivalent of
+         the 64 bits counter acdCfmResultPktLossHCNbrGaps."
+    ::= { acdCfmResultPktLossEntry 13 }
+
+acdCfmResultPktLossHCNbrGaps  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the number of gap."
+    ::= { acdCfmResultPktLossEntry 14 }
+
+acdCfmResultPktLossLargestGap  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the largest gap size in packets."
+    ::= { acdCfmResultPktLossEntry 15 }
+
+acdCfmResultPktLossOverflowLargestGap  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdCfmResultPktLossLargestGap counter
+         has overflowed during this sampling interval. This is a 32 bits counter.
+         Combined with acdCfmResultPktLossLargestGap, it provides the equivalent
+         of the 64 bits counter acdCfmResultPktLossHCLargestGap."
+    ::= { acdCfmResultPktLossEntry 16 }
+
+acdCfmResultPktLossHCLargestGap  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the largest gap size in packets."
+    ::= { acdCfmResultPktLossEntry 17 }
+
+acdCfmResultPktLossRatio  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the packet loss ratio. The packet loss ratio is the percent
+         of packets transmitted but not received in millionth of a percent
+         (1,000,000 is 1%)."
+    ::= { acdCfmResultPktLossEntry 18 }
+
+---------------------------------------------------------------------------
+ -- The CFM Packet Loss History Results table
+ -- This table contains all CFM Packet Loss History results.
+---------------------------------------------------------------------------
+
+acdCfmHistResultPktLossTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdCfmHistResultPktLossEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Packet loss history result table of a MEP and remote MEP pair."
+    ::= { acdCfmPacketLoss 3 }
+
+acdCfmHistResultPktLossEntry OBJECT-TYPE
+    SYNTAX      AcdCfmHistResultPktLossEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of Packet loss history result for a specific
+        MEP and remote MEP pair."
+    INDEX   { acdCfmHistResultPktLossID,
+              acdCfmHistResultPktLossSampleIndex }
+    ::=  { acdCfmHistResultPktLossTable 1 }
+
+AcdCfmHistResultPktLossEntry ::= SEQUENCE {
+    acdCfmHistResultPktLossID                   Unsigned32,
+    acdCfmHistResultPktLossSampleIndex          Unsigned32,
+    acdCfmHistResultPktLossStatus               INTEGER,
+    acdCfmHistResultPktLossDuration             Unsigned32,
+    acdCfmHistResultPktLossIntervalEnd          DateAndTime,
+    acdCfmHistResultPktLossSamples              Counter32,
+    acdCfmHistResultPktLossOverflowSamples      Counter32,
+    acdCfmHistResultPktLossHCSamples            Counter64,
+    acdCfmHistResultPktLossNbrLoss              Counter32,
+    acdCfmHistResultPktLossOverflowNbrLoss      Counter32,
+    acdCfmHistResultPktLossHCNbrLoss            Counter64,
+    acdCfmHistResultPktLossNbrGaps              Counter32,
+    acdCfmHistResultPktLossOverflowNbrGaps      Counter32,
+    acdCfmHistResultPktLossHCNbrGaps            Counter64,
+    acdCfmHistResultPktLossLargestGap           Counter32,
+    acdCfmHistResultPktLossOverflowLargestGap   Counter32,
+    acdCfmHistResultPktLossHCLargestGap         Counter64,
+    acdCfmHistResultPktLossRatio                Unsigned32
+}
+
+acdCfmHistResultPktLossID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each Delay variation Measurement instance. This
+        value follows the ordering of the Dm table."
+    ::= { acdCfmHistResultPktLossEntry 1 }
+
+acdCfmHistResultPktLossSampleIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index that uniquely identifies the particular sample this entry
+         represents among all samples associated with the same PL instance.
+         This index starts at 1 and increases by one as each new period."
+    ::= { acdCfmHistResultPktLossEntry 2 }
+
+acdCfmHistResultPktLossStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    valid(1),
+                    invalid(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the packet loss results during this
+        sampling interval."
+    ::= { acdCfmHistResultPktLossEntry 3 }
+
+acdCfmHistResultPktLossDuration  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interval in seconds over which the data is sampled for this entry."
+    ::= { acdCfmHistResultPktLossEntry 4 }
+
+
+acdCfmHistResultPktLossIntervalEnd  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the time of the end of this entry."
+    ::= { acdCfmHistResultPktLossEntry 5 }
+
+acdCfmHistResultPktLossSamples  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered during the sampling
+         interval to calculate packet loss results.  This is a 32 bits counter.
+         Combined with the overflow counter it provides the equivalent of the
+         64 bits counter acdCfmHistResultPktLossHCSamples."
+    ::= { acdCfmHistResultPktLossEntry 6 }
+
+acdCfmHistResultPktLossOverflowSamples  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdCfmHistResultPktLossSamples
+         counter has overflowed during this sampling interval. This is a
+         32 bits counter. Combined with acdCfmHistResultPktLossSamples, it
+         provides the equivalent of the 64 bits counter
+         acdCfmHistResultPktLossHCSamples."
+    ::= { acdCfmHistResultPktLossEntry 7 }
+
+acdCfmHistResultPktLossHCSamples  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered during the sampling
+         interval to calculate packet loss results."
+    ::= { acdCfmHistResultPktLossEntry 8 }
+
+acdCfmHistResultPktLossNbrLoss  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets loss during this sampling interval. This is
+         a 32 bits counter. Combined with the overflow counter it provides the
+         equivalent of the 64 bits counter acdCfmHistResultPktLossHCNbrLoss."
+    ::= { acdCfmHistResultPktLossEntry 9 }
+
+acdCfmHistResultPktLossOverflowNbrLoss  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdCfmHistResultPktLossNbrLoss counter
+         has overflowed during this sampling interval. This is a 32 bits counter.
+         Combined with acdCfmHistResultPktLossNbrLoss, it provides the equivalent of
+         the 64 bits counter acdCfmHistResultPktLossHCNbrLoss."
+    ::= { acdCfmHistResultPktLossEntry 10 }
+
+acdCfmHistResultPktLossHCNbrLoss  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets loss during this sampling interval."
+    ::= { acdCfmHistResultPktLossEntry 11 }
+
+acdCfmHistResultPktLossNbrGaps  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of gap during this sampling interval. This is a
+         32 bits counter. Combined with the overflow counter it provides the
+         equivalent of the 64 bits counter acdCfmHistResultPktLossHCNbrGaps."
+    ::= { acdCfmHistResultPktLossEntry 12 }
+
+acdCfmHistResultPktLossOverflowNbrGaps  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdCfmHistResultPktLossNbrGaps counter
+         has overflowed during this sampling interval. This is a 32 bits counter.
+         Combined with acdCfmHistResultPktLossNbrGaps, it provides the equivalent of
+         the 64 bits counter acdCfmHistResultPktLossHCNbrGaps."
+    ::= { acdCfmHistResultPktLossEntry 13 }
+
+acdCfmHistResultPktLossHCNbrGaps  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of gap during this sampling interval."
+    ::= { acdCfmHistResultPktLossEntry 14 }
+
+acdCfmHistResultPktLossLargestGap  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the largest gap size in packets during this sampling interval. This is
+         a 32 bits counter. Combined with the overflow counter it provides the
+         equivalent of the 64 bits counter acdCfmHistResultPktLossHCNbrGaps."
+    ::= { acdCfmHistResultPktLossEntry 15 }
+
+acdCfmHistResultPktLossOverflowLargestGap  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdCfmHistResultPktLossLargestGap
+         counter has overflowed during this sampling interval. This is a
+         32 bits counter. Combined with acdCfmHistResultPktLossLargestGap, it
+         provides the equivalent of the 64 bits counter
+         acdCfmHistResultPktLossHCLargestGap."
+    ::= { acdCfmHistResultPktLossEntry 16 }
+
+acdCfmHistResultPktLossHCLargestGap  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the largest gap size in packets during this sampling interval."
+    ::= { acdCfmHistResultPktLossEntry 17 }
+
+acdCfmHistResultPktLossRatio  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the packet loss ratio. The packet loss ratio is the percent
+         of packets transmitted but not received in millionth of a percent
+         (1,000,000 is 1%)."
+    ::= { acdCfmHistResultPktLossEntry 18 }
+
+---------------------------------------------------------------------------
+ -- The SLM configuration table
+ -- This table contains all SLM entry configurations.
+---------------------------------------------------------------------------
+
+acdCfmSlmCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdCfmSlmCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configuration table of all SLM entries."
+    ::= { acdCfmSlm 1 }
+
+acdCfmSlmCfgEntry OBJECT-TYPE
+    SYNTAX      AcdCfmSlmCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all settings to manage a SLM instance."
+    INDEX   { acdCfmSlmCfgID }
+    ::=  { acdCfmSlmCfgTable 1 }
+
+
+AcdCfmSlmCfgEntry ::= SEQUENCE {
+    acdCfmSlmCfgID              Unsigned32,
+    acdCfmSlmCfgRowStatus       RowStatus,
+    acdCfmSlmCfgMepIdx          Unsigned32,
+    acdCfmSlmCfgRemoteMepId     Unsigned32,
+    acdCfmSlmCfgPriority        Unsigned32,
+    acdCfmSlmCfgState           TruthValue,
+    acdCfmSlmCfgInterval        Unsigned32,
+    acdCfmSlmCfgRefPeriod       Unsigned32,
+    acdCfmSlmCfgNearEndThresh   Unsigned32,
+    acdCfmSlmCfgFarEndThresh    Unsigned32,
+    acdCfmSlmCfgName            DisplayString
+}
+
+acdCfmSlmCfgID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each SLM instance. This value follows the
+         ordering the results table."
+    ::= { acdCfmSlmCfgEntry 1 }
+
+acdCfmSlmCfgRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The writable columns in a row can not be changed if the row is active.
+       All columns must have a valid value before a row can be activated."
+    ::= { acdCfmSlmCfgEntry 2 }
+
+acdCfmSlmCfgMepIdx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maintenance association End Point Identifier."
+    ::= { acdCfmSlmCfgEntry 3 }
+
+acdCfmSlmCfgRemoteMepId  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8191)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote Maintenance association End Point Identifier."
+    ::= { acdCfmSlmCfgEntry 4 }
+
+acdCfmSlmCfgPriority  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The VLAN priority. Its value ranges from 0 to 7."
+     DEFVAL      { 0 }
+    ::= { acdCfmSlmCfgEntry 5 }
+
+acdCfmSlmCfgState  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "State of the SLM instance"
+     DEFVAL      { false }
+    ::= { acdCfmSlmCfgEntry 6 }
+
+acdCfmSlmCfgInterval  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Interval in milliseconds at which CFM issues Synthetic Loss Measurement
+        packets."
+     DEFVAL      { 1000 }
+    ::= { acdCfmSlmCfgEntry 7 }
+
+acdCfmSlmCfgRefPeriod  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1440)
+    UNITS       "minutes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reference period in minutes for Synthetic Loss Measurement."
+     DEFVAL      { 15 }
+    ::= { acdCfmSlmCfgEntry 8 }
+
+acdCfmSlmCfgNearEndThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Near end packet loss ratio threshold allowed without issuing an alarm
+         expressed in millionth of percent (1,000,000 is 1%)."
+     DEFVAL      { 1 }
+    ::= { acdCfmSlmCfgEntry 9 }
+
+acdCfmSlmCfgFarEndThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Far end packet loss ratio threshold allowed without issuing an alarm
+         expressed in millionth of percent (1,000,000 is 1%)."
+     DEFVAL      { 0 }
+    ::= { acdCfmSlmCfgEntry 10 }
+
+acdCfmSlmCfgName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the instance"
+     DEFVAL      { "new" }
+    ::= { acdCfmSlmCfgEntry 11 }
+
+---------------------------------------------------------------------------
+ -- The SLM Results table
+ -- This table contains all SLM results.
+---------------------------------------------------------------------------
+
+acdCfmSlmResultTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdCfmSlmResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "SLM result table of a MEP and remote MEP pair."
+    ::= { acdCfmSlm 2 }
+
+acdCfmSlmResultEntry OBJECT-TYPE
+    SYNTAX      AcdCfmSlmResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of SLM result for a specific MEP and
+        remote MEP pair."
+    INDEX   { acdCfmSlmResultID }
+    ::=  { acdCfmSlmResultTable 1 }
+
+AcdCfmSlmResultEntry ::= SEQUENCE {
+    acdCfmSlmResultID                   Unsigned32,
+    acdCfmSlmResultPeriodIndex          Unsigned32,
+    acdCfmSlmResultIntervalStart        DateAndTime,
+    acdCfmSlmResultValid                TruthValue,
+    acdCfmSlmResultNearEndAlert         TruthValue,
+    acdCfmSlmResultFarEndAlert          TruthValue,
+    acdCfmSlmResultTxSlm                Counter32,
+    acdCfmSlmResultRxSlr                Counter32,
+    acdCfmSlmResultRemoteRxSlm          Counter32,
+    acdCfmSlmResultNearEndNbrLoss       Counter32,
+    acdCfmSlmResultFarEndNbrLoss        Counter32,
+    acdCfmSlmResultNearEndRatio           Gauge32,
+    acdCfmSlmResultFarEndRatio            Gauge32,
+    acdCfmSlmResultNbrGaps              Counter32,
+    acdCfmSlmResultLargestGap           Counter32
+}
+
+acdCfmSlmResultID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each SLM instance. This
+        value follows the ordering of the SLM table."
+    ::= { acdCfmSlmResultEntry 1 }
+
+acdCfmSlmResultPeriodIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that uniquely identifies the particular sample this entry
+         represents among all samples associated with the same PL instance.
+         This index starts at 1 and increases by one as each new period."
+    ::= { acdCfmSlmResultEntry 2 }
+
+acdCfmSlmResultIntervalStart  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the time of the start of the period."
+    ::= { acdCfmSlmResultEntry 3 }
+
+acdCfmSlmResultValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reserved for future use."
+    ::= { acdCfmSlmResultEntry 4 }
+
+acdCfmSlmResultNearEndAlert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the presence of the SLM near end alert."
+    ::= { acdCfmSlmResultEntry 5 }
+
+acdCfmSlmResultFarEndAlert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the presence of the SLM far end alert."
+    ::= { acdCfmSlmResultEntry 6 }
+
+acdCfmSlmResultTxSlm  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of SLM frames sent."
+    ::= { acdCfmSlmResultEntry 7 }
+
+acdCfmSlmResultRxSlr  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of SLR frames received."
+    ::= { acdCfmSlmResultEntry 8 }
+
+acdCfmSlmResultRemoteRxSlm  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of SLM frames received at the far end."
+    ::= { acdCfmSlmResultEntry 9 }
+
+acdCfmSlmResultNearEndNbrLoss  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the number of packets lost at the near end."
+    ::= { acdCfmSlmResultEntry 10 }
+
+acdCfmSlmResultFarEndNbrLoss  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the number of packets lost at the far end."
+    ::= { acdCfmSlmResultEntry 11 }
+
+acdCfmSlmResultNearEndRatio  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the packet loss ratio at the near end."
+    ::= { acdCfmSlmResultEntry 12 }
+
+acdCfmSlmResultFarEndRatio  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the packet loss ratio at the far end."
+    ::= { acdCfmSlmResultEntry 13 }
+
+acdCfmSlmResultNbrGaps  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the number of gap."
+    ::= { acdCfmSlmResultEntry 14 }
+
+acdCfmSlmResultLargestGap  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the largest gap."
+    ::= { acdCfmSlmResultEntry 15 }
+
+
+---------------------------------------------------------------------------
+ -- The SLM History Results table
+ -- This table contains all CFM Packet Loss History results.
+---------------------------------------------------------------------------
+
+acdCfmSlmHistResultTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdCfmSlmHistResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "SLM history result table of a MEP and remote MEP pair."
+    ::= { acdCfmSlm 3 }
+
+acdCfmSlmHistResultEntry OBJECT-TYPE
+    SYNTAX      AcdCfmSlmHistResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of SLM  history result for a specific
+        MEP and remote MEP pair."
+    INDEX   { acdCfmSlmHistResultInstanceIndex, acdCfmSlmHistResultID }
+    ::=  { acdCfmSlmHistResultTable 1 }
+
+AcdCfmSlmHistResultEntry ::= SEQUENCE {
+    acdCfmSlmHistResultID                   Unsigned32,
+    acdCfmSlmHistResultPeriodIndex          Unsigned32,
+    acdCfmSlmHistResultIntervalEnd          DateAndTime,
+    acdCfmSlmHistResultTxSlm                Counter32,
+    acdCfmSlmHistResultRxSlr                Counter32,
+    acdCfmSlmHistResultRemoteRxSlm          Counter32,
+    acdCfmSlmHistResultNearEndRatio           Gauge32,
+    acdCfmSlmHistResultFarEndRatio            Gauge32,
+    acdCfmSlmHistResultNbrGaps              Counter32,
+    acdCfmSlmHistResultLargestGap           Counter32,
+    acdCfmSlmHistResultInstanceIndex        Unsigned32
+
+}
+
+acdCfmSlmHistResultID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each SLM instance. This
+        value follows the ordering of the SLM table."
+    ::= { acdCfmSlmHistResultEntry 1 }
+
+
+acdCfmSlmHistResultPeriodIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that uniquely identifies the particular sample this entry
+         represents among all samples associated with the same PL instance.
+         This index starts at 1 and increases by one as each new period."
+    ::= { acdCfmSlmHistResultEntry 2 }
+
+acdCfmSlmHistResultIntervalEnd  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the time of the end of the period."
+    ::= { acdCfmSlmHistResultEntry 3 }
+
+acdCfmSlmHistResultTxSlm  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of SLM frames sent."
+    ::= { acdCfmSlmHistResultEntry 4 }
+
+acdCfmSlmHistResultRxSlr  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of SLR frames received."
+    ::= { acdCfmSlmHistResultEntry 5 }
+
+acdCfmSlmHistResultRemoteRxSlm  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of SLM frames received at the far end."
+    ::= { acdCfmSlmHistResultEntry 6 }
+
+acdCfmSlmHistResultNearEndRatio  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the packet loss ratio at the near end."
+    ::= { acdCfmSlmHistResultEntry 7 }
+
+acdCfmSlmHistResultFarEndRatio  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the packet loss ratio at the far end."
+    ::= { acdCfmSlmHistResultEntry 8 }
+
+acdCfmSlmHistResultNbrGaps  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the number of gap."
+    ::= { acdCfmSlmHistResultEntry 9 }
+
+acdCfmSlmHistResultLargestGap  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the largest gap."
+    ::= { acdCfmSlmHistResultEntry 10 }
+
+acdCfmSlmHistResultInstanceIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The instance index."
+    ::= { acdCfmSlmHistResultEntry 11 }
+
+---------------------------------------------------------------------------
+ -- The MEP Transmit Statistics table
+ -- This table contains all transmit statistics related to all MEP entries.
+---------------------------------------------------------------------------
+
+acdCfmMepStatsTxTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdCfmMepStatsTxEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Transmit Statictics table of all MEP entries."
+    ::= { acdCfmMep 2 }
+
+acdCfmMepStatsTxEntry OBJECT-TYPE
+    SYNTAX      AcdCfmMepStatsTxEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all transmit statistics related to a MEP entry."
+    INDEX   { acdCfmMepStatsTxID }
+    ::=  { acdCfmMepStatsTxTable 1 }
+
+AcdCfmMepStatsTxEntry ::= SEQUENCE {
+    acdCfmMepStatsTxID                      Unsigned32,
+    acdCfmMepStatsTxCcmPdu                  Counter64,
+    acdCfmMepStatsTxLbmPdu                  Counter64,
+    acdCfmMepStatsTxLbrPdu                  Counter64,
+    acdCfmMepStatsTxLtmPdu                  Counter64,
+    acdCfmMepStatsTxLtrPdu                  Counter64,
+    acdCfmMepStatsTxAisPdu                  Counter64,
+    acdCfmMepStatsTxLckPdu                  Counter64,
+    acdCfmMepStatsTxTstPdu                  Counter64,
+    acdCfmMepStatsTxLinearApsPdu            Counter64,
+    acdCfmMepStatsTxRingApsPdu              Counter64,
+    acdCfmMepStatsTxMccPdu                  Counter64,
+    acdCfmMepStatsTxLmmPdu                  Counter64,
+    acdCfmMepStatsTxLmrPdu                  Counter64,
+    acdCfmMepStatsTx1dmPdu                  Counter64,
+    acdCfmMepStatsTxDmmPdu                  Counter64,
+    acdCfmMepStatsTxDmrPdu                  Counter64,
+    acdCfmMepStatsTxExmPdu                  Counter64,
+    acdCfmMepStatsTxExrPdu                  Counter64,
+    acdCfmMepStatsTxVsmPdu                  Counter64,
+    acdCfmMepStatsTxVsrPdu                  Counter64,
+    acdCfmMepStatsTxCsfPdu                  Counter64,
+    acdCfmMepStatsTxSlmPdu                  Counter64,
+    acdCfmMepStatsTxSlrPdu                  Counter64
+}
+
+acdCfmMepStatsTxID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Unique value for each MEP instance. This value follows the ordering
+        of the MEP table."
+    ::= { acdCfmMepStatsTxEntry 1 }
+
+acdCfmMepStatsTxCcmPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Continuity Check Message (CCM)
+         PDU transmitted by the MEP (OpCode 1)."
+    ::= { acdCfmMepStatsTxEntry 2 }
+
+acdCfmMepStatsTxLbmPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of LoopBack Message (LBM)
+         PDU transmitted by the MEP (OpCode 3)."
+    ::= { acdCfmMepStatsTxEntry 3 }
+
+acdCfmMepStatsTxLbrPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of LoopBack Reply (LBR)
+         PDU transmitted by the MEP (OpCode 2)."
+    ::= { acdCfmMepStatsTxEntry 4 }
+
+acdCfmMepStatsTxLtmPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Link Trace Message (LTM)
+         PDU transmitted by the MEP (OpCode 5)."
+    ::= { acdCfmMepStatsTxEntry 5 }
+
+acdCfmMepStatsTxLtrPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Link Trace Reply (LTR)
+         PDU transmitted by the MEP (OpCode 4)."
+    ::= { acdCfmMepStatsTxEntry 6 }
+
+acdCfmMepStatsTxAisPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Alarm Indication Signal (AIS)
+         PDU transmitted by the MEP (OpCode 33)."
+    ::= { acdCfmMepStatsTxEntry 7 }
+
+acdCfmMepStatsTxLckPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Locked (LCK) PDU transmitted
+         by the MEP  (OpCode 35)."
+    ::= { acdCfmMepStatsTxEntry 8 }
+
+acdCfmMepStatsTxTstPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Test (TST) PDU transmitted by
+         the MEP (OpCode 37)."
+    ::= { acdCfmMepStatsTxEntry 9 }
+
+acdCfmMepStatsTxLinearApsPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of linear Automatic Protection Switching
+         (APS) PDU transmitted by the MEP  (OpCode 39)."
+    ::= { acdCfmMepStatsTxEntry 10 }
+
+acdCfmMepStatsTxRingApsPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of ring Automatic Protection Switching
+         (APS) PDU transmitted by the MEP (OpCode 40)."
+    ::= { acdCfmMepStatsTxEntry 11 }
+
+acdCfmMepStatsTxMccPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Maintenance Communication
+         Channel  (MCC) PDU transmitted by the MEP (OpCode 41)."
+    ::= { acdCfmMepStatsTxEntry 12 }
+
+acdCfmMepStatsTxLmmPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Loss Measurement Message (LMM)
+         PDU transmitted by the MEP (OpCode 43)."
+    ::= { acdCfmMepStatsTxEntry 13 }
+
+acdCfmMepStatsTxLmrPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Loss Measurement Reply (LMR)
+         PDU transmitted by the MEP (OpCode 42)."
+    ::= { acdCfmMepStatsTxEntry 14 }
+
+acdCfmMepStatsTx1dmPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of One-way Delay Measurement (1DM)
+         PDU transmitted by the MEP (OpCode 45)."
+    ::= { acdCfmMepStatsTxEntry 15 }
+
+acdCfmMepStatsTxDmmPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Delay Measurement Message (DMM)
+         PDU transmitted by the MEP (OpCode 47)."
+    ::= { acdCfmMepStatsTxEntry 16 }
+
+acdCfmMepStatsTxDmrPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Delay Measurement Reply (DMR)
+         PDU transmitted by the MEP (OpCode 46)."
+    ::= { acdCfmMepStatsTxEntry 17 }
+
+acdCfmMepStatsTxExmPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of EXperimental Message (EXM)
+         PDU transmitted by the MEP (OpCode 49)."
+    ::= { acdCfmMepStatsTxEntry 18 }
+
+acdCfmMepStatsTxExrPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of EXperimental Reply (EXR)
+         PDU transmitted by the MEP (OpCode 48)."
+    ::= { acdCfmMepStatsTxEntry 19 }
+
+acdCfmMepStatsTxVsmPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Vendor Specific Message (VSM)
+         PDU transmitted by the MEP  (OpCode 51)."
+    ::= { acdCfmMepStatsTxEntry 20 }
+
+acdCfmMepStatsTxVsrPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Vendor Specific Reply (VSR)
+         PDU transmitted by the MEP (OpCode 50)."
+    ::= { acdCfmMepStatsTxEntry 21 }
+
+acdCfmMepStatsTxCsfPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Client Signal Fail (CSF)
+         PDU transmitted by the MEP (OpCode 52)."
+    ::= { acdCfmMepStatsTxEntry 22 }
+
+acdCfmMepStatsTxSlmPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Synthetic Loss Message (SLM)
+         PDU transmitted by the MEP (OpCode 55)."
+    ::= { acdCfmMepStatsTxEntry 23 }
+
+acdCfmMepStatsTxSlrPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Synthetic Loss Reply (SLR)
+         PDU transmitted by the MEP (OpCode 54)."
+    ::= { acdCfmMepStatsTxEntry 24 }
+
+
+
+---------------------------------------------------------------------------
+ -- The MEP Receive Statistics table
+ -- This table contains all receive statistics related to all MEP entries.
+---------------------------------------------------------------------------
+
+acdCfmMepStatsRxTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdCfmMepStatsRxEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Receive Statictics table of all MEP entries."
+    ::= { acdCfmMep 3 }
+
+acdCfmMepStatsRxEntry OBJECT-TYPE
+    SYNTAX      AcdCfmMepStatsRxEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all receive statistics related to a MEP entry."
+    INDEX   { acdCfmMepStatsRxID }
+    ::=  { acdCfmMepStatsRxTable 1 }
+
+AcdCfmMepStatsRxEntry ::= SEQUENCE {
+    acdCfmMepStatsRxID                      Unsigned32,
+    acdCfmMepStatsRxCcmPdu                  Counter64,
+    acdCfmMepStatsRxLbmPdu                  Counter64,
+    acdCfmMepStatsRxLbrPdu                  Counter64,
+    acdCfmMepStatsRxLtmPdu                  Counter64,
+    acdCfmMepStatsRxLtrPdu                  Counter64,
+    acdCfmMepStatsRxAisPdu                  Counter64,
+    acdCfmMepStatsRxLckPdu                  Counter64,
+    acdCfmMepStatsRxTstPdu                  Counter64,
+    acdCfmMepStatsRxLinearApsPdu            Counter64,
+    acdCfmMepStatsRxRingApsPdu              Counter64,
+    acdCfmMepStatsRxMccPdu                  Counter64,
+    acdCfmMepStatsRxLmmPdu                  Counter64,
+    acdCfmMepStatsRxLmrPdu                  Counter64,
+    acdCfmMepStatsRx1dmPdu                  Counter64,
+    acdCfmMepStatsRxDmmPdu                  Counter64,
+    acdCfmMepStatsRxDmrPdu                  Counter64,
+    acdCfmMepStatsRxExmPdu                  Counter64,
+    acdCfmMepStatsRxExrPdu                  Counter64,
+    acdCfmMepStatsRxVsmPdu                  Counter64,
+    acdCfmMepStatsRxVsrPdu                  Counter64,
+
+    acdCfmMepStatsRxCcmSeqErrors            Counter64,
+    acdCfmMepStatsRxLtrUnexpectedPdu        Counter64,
+    acdCfmMepStatsRxLtrMacErrors            Counter64,
+    acdCfmMepStatsRxLbrOooErrors            Counter64,
+    acdCfmMepStatsRxLbrUnexpectedPdu        Counter64,
+    acdCfmMepStatsRxLbrDataErrors           Counter64,
+    acdCfmMepStatsRxCsfPdu                  Counter64,
+    acdCfmMepStatsRxSlmPdu                  Counter64,
+    acdCfmMepStatsRxSlrPdu                  Counter64
+}
+
+acdCfmMepStatsRxID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "."
+    ::= { acdCfmMepStatsRxEntry 1 }
+
+acdCfmMepStatsRxCcmPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Continuity Check Message (CCM)
+         PDU received by the MEP  (OpCode 1)."
+    ::= { acdCfmMepStatsRxEntry 2 }
+
+acdCfmMepStatsRxLbmPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of LoopBack Message (LBM)
+         PDU received by the MEP  (OpCode 3)."
+    ::= { acdCfmMepStatsRxEntry 3 }
+
+acdCfmMepStatsRxLbrPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of LoopBack Reply (LBR)
+         PDU received by the MEP  (OpCode 2)."
+    ::= { acdCfmMepStatsRxEntry 4 }
+
+acdCfmMepStatsRxLtmPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Link Trace Message (LTM)
+         PDU received by the MEP  (OpCode 5)."
+    ::= { acdCfmMepStatsRxEntry 5 }
+
+acdCfmMepStatsRxLtrPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Link Trace Reply (LTR)
+         PDU received by the MEP  (OpCode 4)."
+    ::= { acdCfmMepStatsRxEntry 6 }
+
+acdCfmMepStatsRxAisPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Alarm Indication Signal (AIS)
+         PDU received by the MEP  (OpCode 33)."
+    ::= { acdCfmMepStatsRxEntry 7 }
+
+acdCfmMepStatsRxLckPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Locked (LCK) PDU received
+         by the MEP  (OpCode 35)."
+    ::= { acdCfmMepStatsRxEntry 8 }
+
+acdCfmMepStatsRxTstPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Test (TST) PDU received by
+         the MEP  (OpCode 37)."
+    ::= { acdCfmMepStatsRxEntry 9 }
+
+acdCfmMepStatsRxLinearApsPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of linear Automatic Protection Switching
+         (APS) PDU received by the MEP (OpCode 39)."
+    ::= { acdCfmMepStatsRxEntry 10 }
+
+acdCfmMepStatsRxRingApsPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of ring Automatic Protection Switching
+         (APS) PDU received by the MEP (OpCode 40)."
+    ::= { acdCfmMepStatsRxEntry 11 }
+
+acdCfmMepStatsRxMccPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Maintenance Communication
+         Channel (MCC) PDU received by the MEP (OpCode 41)."
+    ::= { acdCfmMepStatsRxEntry 12 }
+
+acdCfmMepStatsRxLmmPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Loss Measurement Message (LMM)
+         PDU received by the MEP (OpCode 43)."
+    ::= { acdCfmMepStatsRxEntry 13 }
+
+acdCfmMepStatsRxLmrPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Loss Measurement Reply (LMR)
+         PDU received by the MEP  (OpCode 42)."
+    ::= { acdCfmMepStatsRxEntry 14 }
+
+acdCfmMepStatsRx1dmPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of One-way Delay Measurement (1DM)
+         PDU received by the MEP (OpCode 45)."
+    ::= { acdCfmMepStatsRxEntry 15 }
+
+acdCfmMepStatsRxDmmPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Delay Measurement Message (DMM)
+         PDU received by the MEP (OpCode 47)."
+    ::= { acdCfmMepStatsRxEntry 16 }
+
+acdCfmMepStatsRxDmrPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Delay Measurement Reply (DMR)
+         PDU received by the MEP (OpCode 46)."
+    ::= { acdCfmMepStatsRxEntry 17 }
+
+acdCfmMepStatsRxExmPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of EXperimental Message (EXM)
+         PDU received by the MEP (OpCode 49)."
+    ::= { acdCfmMepStatsRxEntry 18 }
+
+acdCfmMepStatsRxExrPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of EXperimental Reply (EXR)
+         PDU received by the MEP (OpCode 48)."
+    ::= { acdCfmMepStatsRxEntry 19 }
+
+acdCfmMepStatsRxVsmPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Vendor Specific Message (VSM)
+         PDU received by the MEP (OpCode 51)."
+    ::= { acdCfmMepStatsRxEntry 20 }
+
+acdCfmMepStatsRxVsrPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Vendor Specific Reply (VSR)
+         PDU received by the MEP (OpCode 50)."
+    ::= { acdCfmMepStatsRxEntry 21 }
+
+    acdCfmMepStatsRxCcmSeqErrors  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of out-of-sequence CCMs received from all remote
+         MEPs."
+    ::= { acdCfmMepStatsRxEntry 22 }
+
+    acdCfmMepStatsRxLtrUnexpectedPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of LTRs received when no linktrace request is active
+         for that MEP."
+    ::= { acdCfmMepStatsRxEntry 23 }
+
+    acdCfmMepStatsRxLtrMacErrors  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Link Trace Replies dropped because of bad MAC
+         address."
+    ::= { acdCfmMepStatsRxEntry 24 }
+
+    acdCfmMepStatsRxLbrOooErrors  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of valid, out-of-order Loopback Replies received."
+    ::= { acdCfmMepStatsRxEntry 25 }
+
+    acdCfmMepStatsRxLbrUnexpectedPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of LBRs received when no loopback request is active
+         for that MEP."
+    ::= { acdCfmMepStatsRxEntry 26 }
+
+    acdCfmMepStatsRxLbrDataErrors  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of LBRs received whose MACService Data Unit did not
+          match (except for the OpCode) that of the corresponding LBM."
+    ::= { acdCfmMepStatsRxEntry 27 }
+
+acdCfmMepStatsRxCsfPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Client Signal Fail (CSF)
+         PDU received by the MEP (OpCode 52)."
+    ::= { acdCfmMepStatsRxEntry 28 }
+
+acdCfmMepStatsRxSlmPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Synthetic Loss Message (SLM)
+         PDU received by the MEP (OpCode 55)."
+    ::= { acdCfmMepStatsRxEntry 29 }
+
+acdCfmMepStatsRxSlrPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Synthetic Loss Reply (SLR)
+         PDU received by the MEP (OpCode 54)."
+    ::= { acdCfmMepStatsRxEntry 30 }
+
+
+---------------------------------------------------------------------------
+ -- The DMM/DMR Statistics table
+ -- This table contains all DMM/DMR statistics related to a MEP entry.
+---------------------------------------------------------------------------
+
+acdCfmMepDmStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdCfmMepDmStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Transmit DMM/DMR statictics per priority table for a MEP entry."
+    ::= { acdCfmMep 4 }
+
+acdCfmMepDmStatsEntry OBJECT-TYPE
+    SYNTAX      AcdCfmMepDmStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all DMM/DMR statistics related to a MEP entry."
+    INDEX   { acdCfmMepDmStatsID, acdCfmMepDmStatsPriority }
+    ::=  { acdCfmMepDmStatsTable 1 }
+
+AcdCfmMepDmStatsEntry ::= SEQUENCE {
+    acdCfmMepDmStatsID                      Unsigned32,
+    acdCfmMepDmStatsPriority                Unsigned32,
+    acdCfmMepDmStatsTxDmmPdu                Counter64,
+    acdCfmMepDmStatsRxDmmPdu                Counter64,
+    acdCfmMepDmStatsTxDmrPdu                Counter64,
+    acdCfmMepDmStatsRxDmrPdu                Counter64
+}
+
+acdCfmMepDmStatsID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Unique value for each MEP instance. This value follows the ordering
+        of the MEP table. Same as acdCfmMepStatsTxID and acdCfmMepStatsRxID."
+    ::= { acdCfmMepDmStatsEntry 1 }
+
+acdCfmMepDmStatsPriority  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Unique value for each priority level."
+    ::= { acdCfmMepDmStatsEntry 2 }
+
+acdCfmMepDmStatsTxDmmPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Delay Measurement Message (DMM)
+         (OpCode 47) PDU transmitted by the MEP for this specific priority level."
+    ::= { acdCfmMepDmStatsEntry 3 }
+
+acdCfmMepDmStatsRxDmmPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Delay Measurement Message (DMM)
+         (OpCode 47) PDU received by the MEP for this specific priority level."
+    ::= { acdCfmMepDmStatsEntry 4 }
+
+acdCfmMepDmStatsTxDmrPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Delay Measurement Reply (DMR)
+         (OpCode 46) PDU transmitted by the MEP for this specific priority level."
+    ::= { acdCfmMepDmStatsEntry 5 }
+
+acdCfmMepDmStatsRxDmrPdu  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of Delay Measurement Reply (DMR)
+         (OpCode 46) PDU received by the MEP for this specific priority level."
+    ::= { acdCfmMepDmStatsEntry 6 }
+
+---------------------------------------------------------------------------
+ -- The Configuration manager Stack Table...
+ -- This table ties some information together
+---------------------------------------------------------------------------
+
+acdCfmStackTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdCfmStackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configuration table of stack entries."
+    ::= { acdCfmStack 1 }
+
+acdCfmStackEntry OBJECT-TYPE
+    SYNTAX      AcdCfmStackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all informations to tie together."
+    INDEX   { acdCfmMdIdx, acdCfmMaIdx, acdCfmMepID}
+    ::=  { acdCfmStackTable 1 }
+
+AcdCfmStackEntry ::= SEQUENCE {
+    acdCfmMdIdx                            Unsigned32,
+    acdCfmMaIdx                            Unsigned32,
+    acdCfmMepID                            Unsigned32,
+    acdCfmMepIdx                           Unsigned32
+  }
+
+acdCfmMdIdx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Maintenance Domain(MD) index from table dot1agCfmMepTable in IEEE8021-CFM-MIB."
+    ::= { acdCfmStackEntry 1 }
+
+acdCfmMaIdx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Maintenance Association(MA) index from table dot1agCfmMepTable in IEEE8021-CFM-MIB."
+    ::= { acdCfmStackEntry 2 }
+
+acdCfmMepID OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8191)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Maintenance End Point(Mep) index from table dot1agCfmMepTable in IEEE8021-CFM-MIB."
+    ::= { acdCfmStackEntry 3 }
+
+acdCfmMepIdx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maintenance End Point(Mep) index from table acdCfmDmCfgTable in ACD-CFM-MIB."
+    ::= { acdCfmStackEntry 4 }
+
+
+--------------------------------------------------------------------------
+ -- ACD-CFM-MIB Module - Conformance Information
+---------------------------------------------------------------------------
+
+acdCfmCompliances   OBJECT IDENTIFIER ::= { acdCfmConformance 1 }
+acdCfmGroups        OBJECT IDENTIFIER ::= { acdCfmConformance 2 }
+
+---------------------------------------------------------------------------
+ -- Units of conformance
+---------------------------------------------------------------------------
+
+acdCfmDmCfgGroup OBJECT-GROUP
+    OBJECTS {
+        acdCfmDmCfgRowStatus,
+        acdCfmDmCfgMepIdx,
+        acdCfmDmCfgRemoteMepId,
+        acdCfmDmCfgPriority,
+        acdCfmDmCfgEnable,
+        acdCfmDmCfgInterval,
+        acdCfmDmCfgRefPeriod,
+        acdCfmDmCfgOneWayDelayEnable,
+        acdCfmDmCfgOneWayDelayMax,
+        acdCfmDmCfgOneWayDelayThresh,
+        acdCfmDmCfgOneWayAvgDelayThresh,
+        acdCfmDmCfgOneWayDvEnable,
+        acdCfmDmCfgOneWayDvMax,
+        acdCfmDmCfgOneWayDvThresh,
+        acdCfmDmCfgOneWayAvgDvThresh,
+        acdCfmDmCfgTwoWayDelayEnable,
+        acdCfmDmCfgTwoWayDelayMax,
+        acdCfmDmCfgTwoWayDelayThresh,
+        acdCfmDmCfgTwoWayAvgDelayThresh,
+        acdCfmDmCfgTwoWayDvEnable,
+        acdCfmDmCfgTwoWayDvMax,
+        acdCfmDmCfgTwoWayDvThresh,
+        acdCfmDmCfgTwoWayAvgDvThresh
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Delay Measurement configuration Group."
+    ::= { acdCfmGroups 1 }
+
+acdCfmResultOneWayDelayGroup OBJECT-GROUP
+    OBJECTS {
+        acdCfmResultOneWayDelayPeriodIndex,
+        acdCfmResultOneWayDelayIntervalStart,
+        acdCfmResultOneWayDelayValid,
+        acdCfmResultOneWayDelayAlert,
+        acdCfmResultOneWayDelayAvgAlert,
+        acdCfmResultOneWayDelaySamples,
+        acdCfmResultOneWayDelayMinValue,
+        acdCfmResultOneWayDelayMaxValue,
+        acdCfmResultOneWayDelayAvgValue,
+        acdCfmResultOneWayDelayThreshExc,
+        acdCfmResultOneWayDelayInstValue
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the One Way Delay result Group."
+    ::= { acdCfmGroups 2 }
+
+acdCfmResultOneWayDvGroup OBJECT-GROUP
+    OBJECTS {
+        acdCfmResultOneWayDvPeriodIndex,
+        acdCfmResultOneWayDvIntervalStart,
+        acdCfmResultOneWayDvValid,
+        acdCfmResultOneWayDvAlert,
+        acdCfmResultOneWayDvAvgAlert,
+        acdCfmResultOneWayDvSamples,
+        acdCfmResultOneWayDvMinValue,
+        acdCfmResultOneWayDvMaxValue,
+        acdCfmResultOneWayDvAvgValue,
+        acdCfmResultOneWayDvThreshExc,
+        acdCfmResultOneWayDvInstValue
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the One Way Delay variation result Group."
+    ::= { acdCfmGroups 3 }
+
+acdCfmResultTwoWayDelayGroup OBJECT-GROUP
+    OBJECTS {
+        acdCfmResultTwoWayDelayPeriodIndex,
+        acdCfmResultTwoWayDelayIntervalStart,
+        acdCfmResultTwoWayDelayValid,
+        acdCfmResultTwoWayDelayAlert,
+        acdCfmResultTwoWayDelayAvgAlert,
+        acdCfmResultTwoWayDelaySamples,
+        acdCfmResultTwoWayDelayMinValue,
+        acdCfmResultTwoWayDelayMaxValue,
+        acdCfmResultTwoWayDelayAvgValue,
+        acdCfmResultTwoWayDelayThreshExc,
+        acdCfmResultTwoWayDelayInstValue
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Two Way Delay result Group."
+    ::= { acdCfmGroups 4 }
+
+acdCfmResultTwoWayDvGroup OBJECT-GROUP
+    OBJECTS {
+        acdCfmResultTwoWayDvPeriodIndex,
+        acdCfmResultTwoWayDvIntervalStart,
+        acdCfmResultTwoWayDvValid,
+        acdCfmResultTwoWayDvAlert,
+        acdCfmResultTwoWayDvAvgAlert,
+        acdCfmResultTwoWayDvSamples,
+        acdCfmResultTwoWayDvMinValue,
+        acdCfmResultTwoWayDvMaxValue,
+        acdCfmResultTwoWayDvAvgValue,
+        acdCfmResultTwoWayDvThreshExc,
+        acdCfmResultTwoWayDvInstValue
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Two Way Delay varition result Group."
+    ::= { acdCfmGroups 5 }
+
+acdCfmHistResultOneWayDelayGroup OBJECT-GROUP
+    OBJECTS {
+        acdCfmHistResultOneWayDelayStatus,
+        acdCfmHistResultOneWayDelayDuration,
+        acdCfmHistResultOneWayDelayIntervalEnd,
+        acdCfmHistResultOneWayDelaySamples,
+        acdCfmHistResultOneWayDelayMinValue,
+        acdCfmHistResultOneWayDelayMaxValue,
+        acdCfmHistResultOneWayDelayAvgValue,
+        acdCfmHistResultOneWayDelayThreshExc
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the One Way Delay history result Group."
+    ::= { acdCfmGroups 6 }
+
+acdCfmHistResultOneWayDvGroup OBJECT-GROUP
+    OBJECTS {
+        acdCfmHistResultOneWayDvStatus,
+        acdCfmHistResultOneWayDvDuration,
+        acdCfmHistResultOneWayDvIntervalEnd,
+        acdCfmHistResultOneWayDvSamples,
+        acdCfmHistResultOneWayDvMinValue,
+        acdCfmHistResultOneWayDvMaxValue,
+        acdCfmHistResultOneWayDvAvgValue,
+        acdCfmHistResultOneWayDvThreshExc
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the One Way Delay variation history result Group."
+    ::= { acdCfmGroups 7 }
+
+acdCfmHistResultTwoWayDelayGroup OBJECT-GROUP
+    OBJECTS {
+        acdCfmHistResultTwoWayDelayStatus,
+        acdCfmHistResultTwoWayDelayDuration,
+        acdCfmHistResultTwoWayDelayIntervalEnd,
+        acdCfmHistResultTwoWayDelaySamples,
+        acdCfmHistResultTwoWayDelayMinValue,
+        acdCfmHistResultTwoWayDelayMaxValue,
+        acdCfmHistResultTwoWayDelayAvgValue,
+        acdCfmHistResultTwoWayDelayThreshExc
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Two Way Delay history result Group."
+    ::= { acdCfmGroups 8 }
+
+acdCfmHistResultTwoWayDvGroup OBJECT-GROUP
+    OBJECTS {
+        acdCfmHistResultTwoWayDvStatus,
+        acdCfmHistResultTwoWayDvDuration,
+        acdCfmHistResultTwoWayDvIntervalEnd,
+        acdCfmHistResultTwoWayDvSamples,
+        acdCfmHistResultTwoWayDvMinValue,
+        acdCfmHistResultTwoWayDvMaxValue,
+        acdCfmHistResultTwoWayDvAvgValue,
+        acdCfmHistResultTwoWayDvThreshExc
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Two Way Delay variation history result Group."
+    ::= { acdCfmGroups 9 }
+
+
+acdCfmPktLossCfgGroup OBJECT-GROUP
+    OBJECTS {
+        acdCfmPktLossCfgRowStatus,
+        acdCfmPktLossCfgMepIdx,
+        acdCfmPktLossCfgRemoteMepId,
+        acdCfmPktLossCfgPriority,
+        acdCfmPktLossCfgEnable,
+        acdCfmPktLossCfgInterval,
+        acdCfmPktLossCfgRefPeriod,
+        acdCfmPktLossCfgThresh,
+        acdCfmPktLossCfgRatioThresh
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for Packet loss configuration Group."
+    ::= { acdCfmGroups 10 }
+
+acdCfmResultPktLossGroup OBJECT-GROUP
+    OBJECTS {
+        acdCfmResultPktLossPeriodIndex,
+        acdCfmResultPktLossIntervalStart,
+        acdCfmResultPktLossValid,
+        acdCfmResultPktLossAlert,
+        acdCfmResultPktLossSamples,
+        acdCfmResultPktLossOverflowSamples,
+        acdCfmResultPktLossHCSamples,
+        acdCfmResultPktLossNbrLoss,
+        acdCfmResultPktLossOverflowNbrLoss,
+        acdCfmResultPktLossHCNbrLoss,
+        acdCfmResultPktLossNbrGaps,
+        acdCfmResultPktLossOverflowNbrGaps,
+        acdCfmResultPktLossHCNbrGaps,
+        acdCfmResultPktLossLargestGap,
+        acdCfmResultPktLossOverflowLargestGap,
+        acdCfmResultPktLossHCLargestGap,
+        acdCfmResultPktLossRatio
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for Packet loss result Group."
+    ::= { acdCfmGroups 11 }
+
+acdCfmHistResultPktLossGroup OBJECT-GROUP
+    OBJECTS {
+        acdCfmHistResultPktLossStatus,
+        acdCfmHistResultPktLossDuration,
+        acdCfmHistResultPktLossIntervalEnd,
+        acdCfmHistResultPktLossSamples,
+        acdCfmHistResultPktLossOverflowSamples,
+        acdCfmHistResultPktLossHCSamples,
+        acdCfmHistResultPktLossNbrLoss,
+        acdCfmHistResultPktLossOverflowNbrLoss,
+        acdCfmHistResultPktLossHCNbrLoss,
+        acdCfmHistResultPktLossNbrGaps,
+        acdCfmHistResultPktLossOverflowNbrGaps,
+        acdCfmHistResultPktLossHCNbrGaps,
+        acdCfmHistResultPktLossLargestGap,
+        acdCfmHistResultPktLossOverflowLargestGap,
+        acdCfmHistResultPktLossHCLargestGap,
+        acdCfmHistResultPktLossRatio
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for Packet loss history result Group."
+    ::= { acdCfmGroups 12 }
+
+acdCfmMepStatsTxGroup OBJECT-GROUP
+    OBJECTS {
+        acdCfmMepStatsTxCcmPdu,
+        acdCfmMepStatsTxLbmPdu,
+        acdCfmMepStatsTxLbrPdu,
+        acdCfmMepStatsTxLtmPdu,
+        acdCfmMepStatsTxLtrPdu,
+        acdCfmMepStatsTxAisPdu,
+        acdCfmMepStatsTxLckPdu,
+        acdCfmMepStatsTxTstPdu,
+        acdCfmMepStatsTxLinearApsPdu,
+        acdCfmMepStatsTxRingApsPdu,
+        acdCfmMepStatsTxMccPdu,
+        acdCfmMepStatsTxLmmPdu,
+        acdCfmMepStatsTxLmrPdu,
+        acdCfmMepStatsTx1dmPdu,
+        acdCfmMepStatsTxDmmPdu,
+        acdCfmMepStatsTxDmrPdu,
+        acdCfmMepStatsTxExmPdu,
+        acdCfmMepStatsTxExrPdu,
+        acdCfmMepStatsTxVsmPdu,
+        acdCfmMepStatsTxVsrPdu,
+        acdCfmMepStatsTxCsfPdu,
+        acdCfmMepStatsTxSlmPdu,
+        acdCfmMepStatsTxSlrPdu
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for MEP transmit statistics Group."
+    ::= { acdCfmGroups 13 }
+
+acdCfmMepStatsRxGroup OBJECT-GROUP
+    OBJECTS {
+        acdCfmMepStatsRxCcmPdu,
+        acdCfmMepStatsRxLbmPdu,
+        acdCfmMepStatsRxLbrPdu,
+        acdCfmMepStatsRxLtmPdu,
+        acdCfmMepStatsRxLtrPdu,
+        acdCfmMepStatsRxAisPdu,
+        acdCfmMepStatsRxLckPdu,
+        acdCfmMepStatsRxTstPdu,
+        acdCfmMepStatsRxLinearApsPdu,
+        acdCfmMepStatsRxRingApsPdu,
+        acdCfmMepStatsRxMccPdu,
+        acdCfmMepStatsRxLmmPdu,
+        acdCfmMepStatsRxLmrPdu,
+        acdCfmMepStatsRx1dmPdu,
+        acdCfmMepStatsRxDmmPdu,
+        acdCfmMepStatsRxDmrPdu,
+        acdCfmMepStatsRxExmPdu,
+        acdCfmMepStatsRxExrPdu,
+        acdCfmMepStatsRxVsmPdu,
+        acdCfmMepStatsRxVsrPdu,
+        acdCfmMepStatsRxCcmSeqErrors,
+        acdCfmMepStatsRxLtrUnexpectedPdu,
+        acdCfmMepStatsRxLtrMacErrors,
+        acdCfmMepStatsRxLbrOooErrors,
+        acdCfmMepStatsRxLbrUnexpectedPdu,
+        acdCfmMepStatsRxLbrDataErrors,
+        acdCfmMepStatsRxCsfPdu,
+        acdCfmMepStatsRxSlrPdu
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for MEP receive statistics Group."
+    ::= { acdCfmGroups 14 }
+
+acdCfmMepDmStatsGroup OBJECT-GROUP
+    OBJECTS {
+        acdCfmMepDmStatsTxDmmPdu,
+        acdCfmMepDmStatsRxDmmPdu,
+        acdCfmMepDmStatsTxDmrPdu,
+        acdCfmMepDmStatsRxDmrPdu
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for DMM/DMR MEP statistics Group."
+    ::= { acdCfmGroups 15 }
+
+acdCfmMepStackGroup OBJECT-GROUP
+    OBJECTS {
+        acdCfmMepIdx
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for cfm Stack Group."
+    ::= { acdCfmGroups 16 }
+
+acdCfmMepSlmStatsGroup OBJECT-GROUP
+    OBJECTS {
+        acdCfmMepStatsTxSlmPdu,
+        acdCfmMepStatsRxSlmPdu,
+        acdCfmMepStatsTxSlrPdu,
+        acdCfmMepStatsRxSlrPdu
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for SLM/SLR MEP statistics Group."
+    ::= { acdCfmGroups 17 }
+
+acdCfmSlmCfgGroup OBJECT-GROUP
+    OBJECTS {
+        acdCfmSlmCfgRowStatus,
+        acdCfmSlmCfgMepIdx,
+        acdCfmSlmCfgRemoteMepId,
+        acdCfmSlmCfgPriority,
+        acdCfmSlmCfgState,
+        acdCfmSlmCfgInterval,
+        acdCfmSlmCfgRefPeriod,
+        acdCfmSlmCfgNearEndThresh,
+        acdCfmSlmCfgFarEndThresh,
+	acdCfmSlmCfgName
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for SLM configuration Group."
+    ::= { acdCfmGroups 18 }
+
+acdCfmSlmResultGroup OBJECT-GROUP
+    OBJECTS {
+        acdCfmSlmResultPeriodIndex,
+        acdCfmSlmResultIntervalStart,
+        acdCfmSlmResultValid,
+        acdCfmSlmResultNearEndAlert,
+        acdCfmSlmResultFarEndAlert,
+        acdCfmSlmResultTxSlm,
+        acdCfmSlmResultRxSlr,
+        acdCfmSlmResultRemoteRxSlm,
+        acdCfmSlmResultNearEndNbrLoss,
+        acdCfmSlmResultFarEndNbrLoss,
+        acdCfmSlmResultNearEndRatio,
+        acdCfmSlmResultFarEndRatio,
+        acdCfmSlmResultNbrGaps,
+        acdCfmSlmResultLargestGap
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for SLM result Group."
+    ::= { acdCfmGroups 19 }
+
+acdCfmSlmHistResultGroup OBJECT-GROUP
+    OBJECTS {
+	acdCfmSlmHistResultPeriodIndex,
+	acdCfmSlmHistResultIntervalEnd,
+	acdCfmSlmHistResultTxSlm,
+	acdCfmSlmHistResultRxSlr,
+	acdCfmSlmHistResultRemoteRxSlm,
+	acdCfmSlmHistResultNearEndRatio,
+	acdCfmSlmHistResultFarEndRatio,
+	acdCfmSlmHistResultNbrGaps,
+	acdCfmSlmHistResultLargestGap
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for SLM history result Group."
+    ::= { acdCfmGroups 20 }
+
+acdCfmCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+       "The compliance statement for support of the ACD-CFM-MIB module."
+    MODULE
+        MANDATORY-GROUPS {
+            acdCfmDmCfgGroup,
+            acdCfmResultOneWayDelayGroup,
+            acdCfmResultOneWayDvGroup,
+            acdCfmResultTwoWayDelayGroup,
+            acdCfmResultTwoWayDvGroup,
+            acdCfmHistResultOneWayDelayGroup,
+            acdCfmHistResultOneWayDvGroup,
+            acdCfmHistResultTwoWayDelayGroup,
+            acdCfmHistResultTwoWayDvGroup,
+            acdCfmPktLossCfgGroup,
+            acdCfmResultPktLossGroup,
+            acdCfmHistResultPktLossGroup,
+            acdCfmMepStatsTxGroup,
+            acdCfmMepStatsRxGroup,
+            acdCfmMepDmStatsGroup,
+            acdCfmMepStackGroup,
+	  acdCfmMepSlmStatsGroup,
+	  acdCfmSlmCfgGroup,
+	  acdCfmSlmResultGroup,
+	  acdCfmSlmHistResultGroup
+         }
+
+    OBJECT  acdCfmDmCfgRowStatus
+      SYNTAX       RowStatus { active(1) }
+      WRITE-SYNTAX RowStatus { createAndGo(4), destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    OBJECT  acdCfmPktLossCfgRowStatus
+      SYNTAX       RowStatus { active(1) }
+      WRITE-SYNTAX RowStatus { createAndGo(4), destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    OBJECT  acdCfmSlmCfgRowStatus
+      SYNTAX       RowStatus { active(1) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    ::= { acdCfmCompliances 1 }
+END
+

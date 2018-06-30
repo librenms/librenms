@@ -1,0 +1,10 @@
+os: poweralert
+text: 'Tripp Lite PowerAlert'
+type: power
+over:
+    - { graph: device_current, text: Current }
+icon: tripplite
+rfc1628_compat: true
+discovery:
+    - sysDescr_regex:
+        - '/POWERALERT/i'

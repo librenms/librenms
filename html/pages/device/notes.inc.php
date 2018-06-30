@@ -9,10 +9,18 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
- 
+
+use LibreNMS\Authentication\Auth;
+
 $data = dbFetchRow("SELECT `notes` FROM `devices` WHERE device_id = ?", array(
     $device['device_id']
 ));
+
+$disabled = '';
+if (!Auth::user()->hasGlobalAdmin()) {
+    $disabled = 'disabled';
+}
+
 ?>
 
 <form class="form-horizontal" action="" method="post">
@@ -20,14 +28,14 @@ $data = dbFetchRow("SELECT `notes` FROM `devices` WHERE device_id = ?", array(
     <hr>
     <div class="form-group">
         <div class="col-sm-12">
-            <textarea class="form-control" rows="6" name="notes" id="device-notes"><?php echo htmlentities($data['notes']); ?></textarea>
+            <textarea class="form-control" rows="6" name="notes" id="device-notes" <?php echo $disabled; ?>><?php echo htmlentities(urldecode($data['notes'])); ?></textarea>
         </div>
     </div>
     <div class="row">
         <div class="col-md-1 col-md-offset-5">
             <?php
             echo '
-                <button type="submit" name="btn-update-notes" id="btn-update-notes" class="btn btn-default" data-device_id="' . $device['device_id'] . '"><i class="fa fa-check"></i> Save</button>
+                <button type="submit" name="btn-update-notes" id="btn-update-notes" class="btn btn-default ' . $disabled . '" data-device_id="' . $device['device_id'] . '"><i class="fa fa-check"></i> Save</button>
             ';
             ?>
         </div>
@@ -43,9 +51,13 @@ $("[name='btn-update-notes']").on('click', function(event) {
         type: 'POST',
         url: 'ajax_form.php',
         data: { type: "update-notes", notes: notes, device_id: device_id},
-        dataType: "html",
+        dataType: "json",
         success: function(data){
-            toastr.success('Saved');
+            if (data.status == "error") {
+                toastr.error(data.message);
+            } else {
+                toastr.success('Saved');
+            }
         },
         error:function(){
             toastr.error('Error');
@@ -53,3 +65,7 @@ $("[name='btn-update-notes']").on('click', function(event) {
     });
 });
 </script>
+
+<?php
+unset($disabled);
+?>

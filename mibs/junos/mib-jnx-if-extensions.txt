@@ -54,6 +54,10 @@ ifJnx MODULE-IDENTITY
              ifHCOut1SecRate added" 
     REVISION     "200103150000Z"         -- 15 March, 2001 
     DESCRIPTION
+            "New objects ifHCIn1SecOctets and 
+             ifHCOut1SecOctets added" 
+    REVISION     "201510150000Z"         -- 14 Oct, 2015
+    DESCRIPTION
             "Initial Version"
             
             
@@ -122,7 +126,9 @@ ifJnx MODULE-IDENTITY
         ifJnxOutHslFifoUnderFlows Counter64,
         ifJnxOutHslCrcErrors   Counter32,
         ifJnxCrcErrors         Counter64,
-        ifJnxFcsErrors         Counter64
+        ifJnxFcsErrors         Counter64,
+	    ifHCIn1SecOctets	   CounterBasedGauge64,
+	    ifHCOut1SecOctets	   CounterBasedGauge64
 	}
 
     ifIn1SecRate OBJECT-TYPE
@@ -428,7 +434,25 @@ ifJnx MODULE-IDENTITY
                 "FCS Errors: The number of FCS errors" 
     ::= { ifJnxEntry 33 }
     
+    ifHCIn1SecOctets OBJECT-TYPE
+	SYNTAX      CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of bytes per second (Bps), delivered by 
+		this (sub-)layer to its next higher (sub-)layer.
+		This object is a 64 bit version of ifIn1SecOctets."
+	::= { ifJnxEntry 34 }
 
+    ifHCOut1SecOctets OBJECT-TYPE
+	SYNTAX      CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of bytes per second (Bps), delivered by
+		this (sub-)layer to its next lower (sub-)layer.
+		This object is a 64 bit version of ifOut1SecOctets."
+	::= { ifJnxEntry 35 }
 
 
 --

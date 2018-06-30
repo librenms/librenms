@@ -62,13 +62,15 @@ git pull upstream master
 git push origin master
 ```
 
+At this stage it's worth pointing out that we have some standard checks that are performed when you submit a 
+pull request, you can run these checks [yourself](Validating-Code.md) to be sure no issues are present in your 
+pull request.
+
 Now, create a new branch to do you work on. It's important that you do this as you are then able to work on more than
 one feature at a time and submit them as pull requests individually. If you did all your work in the master branch then
 it gets a bit messy!
 
-Ideally you want to create your new branch name based of the issue number. So firstly create an issue on
-[GitHub](https://github.com/librenms/librenms/issues) so that others are aware of the work going on. If the issue number
-you created is 123 then use issue-123 as the branch name.
+You need to give your branch a name. If an issue is open (or closed on GitHub) then you can use that, in this example if the issue number is 123 then we will use issue-123. If a post exists on the community forum then you can use the post id like community-123. You're also welcome to use any arbitrary name for your branch but try and make it relevant to what the branch is.
 
 ```bash
 git checkout -b issue-123
@@ -101,8 +103,28 @@ repo. Now select the branch you have just been working on (issue-123) from the d
 
 Thanks for your first pull request :)
 
-Ok, that should get you started on the contributing path. If you have any other questions then stop by our IRC Channel
-on Freenode ##librenms.
+Ok, that should get you started on the contributing path. If you have any other questions then stop by our [Discord Server](https://t.libren.ms/discord)
+
+### Hints and tips
+
+Undo last commit
+
+`git reset --soft 'HEAD^'`
+
+Remove specific commit
+
+`git revert <HASH>`
+
+Restore deleted file
+
+`git checkout $(git rev-list -n 1 HEAD -- "$file")^ -- "$file"`
+
+Merge last two commits
+
+`git rebase --interactive HEAD~2`
+In the text file that opens, change the last commit to squash from pick then save an exit.
+
+For more tips take a look at [Oh shit, git!](http://ohshitgit.com/)
 
 [1]: http://gitready.com
 [2]: http://git-scm.com/book

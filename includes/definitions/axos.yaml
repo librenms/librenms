@@ -1,0 +1,11 @@
+os: axos
+text: Calix
+type: network
+ifname: true
+empty_ifdescr: true
+icon: calix
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.6321.1.2.4

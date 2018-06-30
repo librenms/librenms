@@ -1,4 +1,4 @@
-[![Build Status](https://scrutinizer-ci.com/g/librenms/librenms/badges/build.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/build-status/master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/librenms/librenms/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/?branch=master) [![Build Status](https://travis-ci.org/librenms/librenms.svg?branch=master)](https://travis-ci.org/librenms/librenms)
+[![Scrutinizer Status](https://scrutinizer-ci.com/g/librenms/librenms/badges/build.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/build-status/master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/librenms/librenms/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/?branch=master) [![Travis Status](https://travis-ci.org/librenms/librenms.svg?branch=master)](https://travis-ci.org/librenms/librenms)
 
 Introduction
 ------------
@@ -6,7 +6,7 @@ Introduction
 LibreNMS is an autodiscovering PHP/MySQL/SNMP based network monitoring
 which includes support for a wide range of network hardware and operating
 systems including Cisco, Linux, FreeBSD, Juniper, Brocade, Foundry, HP and
-many more.  LibreNMS is a community-based fork of [Observium][9].
+many more.
 
 We intend LibreNMS to be a viable project and community that:
 - encourages contribution,
@@ -31,8 +31,8 @@ Participating
 -------------
 
 You can participate in the project by:
-- Talking to us on IRC ([##librenms on Freenode][4]) or [Twitter][3].
-- Joining the [librenms-project][1] mailing list.
+- Talking to us on [Discord](https://t.libren.ms/discord) or [Twitter][3].
+- Joining the [LibreNMS Community](https://community.librenms.org)
 - Improving the [documentation][5].
 - Cloning the [repo][2] and filing [bug reports][18] and [pull requests][19] on github.
   See [CONTRIBUTING][15] for more details.
@@ -44,35 +44,15 @@ VM image
 You can try LibreNMS by downloading a VM image.  Currently, a Ubuntu-based
 image is supplied and has been tested with [VirtualBox][8].
 
-Download the [VirtualBox / VMWare image][11] and open it then log in with credentials provided. 
-Enter the following command:
-
-    ./daily.sh
-
-You'll then need to find out the IP of your VM (`ifconfig | grep add`) and
-create a DNS entry for `librenms.example.com` to point to that IP.  You can
-also edit your `/etc/hosts` file with the following line:
-
-    $ip librenms.example.com
-
-where `$ip` is the IP of your VM.
-
-Add a new user by entering:
-
-    ./adduser.php <username> <password> 10 <email>
-
-replace <username>, <password> and <email> with a username, password and your email address.
-
-From there, just point your web browser
-to `http://librenms.example.com/` and login with your new username and password.
-
+Download one of the [VirtualBox images][11] we have available, documentation is provided which details 
+login credentials and setup details.
 
 License
 -------
 
 Copyright (C) 2006-2012 Adam Armstrong <adama@memetic.org>
 
-Copyright (C) 2013-2016 by individual LibreNMS contributors
+Copyright (C) 2013-2017 by individual LibreNMS contributors
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -103,15 +83,14 @@ exception):
 [1]: https://groups.google.com/forum/#!forum/librenms-project "LibreNMS"
 [2]: https://github.com/librenms/librenms "Main LibreNMS GitHub repo"
 [3]: https://twitter.com/librenms "@LibreNMS on Twitter"
-[4]: irc://irc.freenode.net/##librenms "LibreNMS IRC channel"
+[4]: https://t.libren.ms/discord "Discord LibreNMS Server"
 [5]: https://github.com/librenms/librenms/tree/master/doc/
-[6]: http://freenode.net/channel_guidelines.shtml "Freenode channel guidelines"
-[7]: http://freenode.net/catalysts.shtml "Freenode community catalysts"
+[6]: http://freenode.net/changuide "Freenode channel guidelines"
+[7]: http://freenode.net/catalysts "Freenode community catalysts"
 [8]: https://www.virtualbox.org/ "VirtualBox"
-[9]: http://observium.org/ "Observium web site"
 [10]: http://www.debian.org/social_contract "Debian project social contract"
 [11]: http://www.librenms.org/#downloads
-[12]: https://github.com/librenms/librenms/tree/master/doc/Observium_Welcome.md
+[12]: http://docs.librenms.org/General/Welcome-to-Observium-users/
 [13]: http://freenode.net/philosophy.shtml "Freenode philosophy"
 [14]: https://github.com/librenms/librenms/tree/master/LICENSE.txt
 [15]: http://docs.librenms.org/General/Contributing/
@@ -119,3 +98,57 @@ exception):
 [17]: http://docs.librenms.org/General/Acknowledgement/
 [18]: https://github.com/librenms/librenms/issues
 [19]: https://github.com/librenms/librenms/pulls
+
+
+## Backers
+
+Support us with a monthly donation and help us continue our activities. [[Become a backer](https://opencollective.com/librenms#backer)]
+
+<a href="https://opencollective.com/librenms/backer/0/website" target="_blank"><img src="https://opencollective.com/librenms/backer/0/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/1/website" target="_blank"><img src="https://opencollective.com/librenms/backer/1/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/2/website" target="_blank"><img src="https://opencollective.com/librenms/backer/2/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/3/website" target="_blank"><img src="https://opencollective.com/librenms/backer/3/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/4/website" target="_blank"><img src="https://opencollective.com/librenms/backer/4/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/5/website" target="_blank"><img src="https://opencollective.com/librenms/backer/5/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/6/website" target="_blank"><img src="https://opencollective.com/librenms/backer/6/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/7/website" target="_blank"><img src="https://opencollective.com/librenms/backer/7/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/8/website" target="_blank"><img src="https://opencollective.com/librenms/backer/8/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/9/website" target="_blank"><img src="https://opencollective.com/librenms/backer/9/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/10/website" target="_blank"><img src="https://opencollective.com/librenms/backer/10/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/11/website" target="_blank"><img src="https://opencollective.com/librenms/backer/11/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/12/website" target="_blank"><img src="https://opencollective.com/librenms/backer/12/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/13/website" target="_blank"><img src="https://opencollective.com/librenms/backer/13/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/14/website" target="_blank"><img src="https://opencollective.com/librenms/backer/14/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/15/website" target="_blank"><img src="https://opencollective.com/librenms/backer/15/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/16/website" target="_blank"><img src="https://opencollective.com/librenms/backer/16/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/17/website" target="_blank"><img src="https://opencollective.com/librenms/backer/17/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/18/website" target="_blank"><img src="https://opencollective.com/librenms/backer/18/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/19/website" target="_blank"><img src="https://opencollective.com/librenms/backer/19/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/20/website" target="_blank"><img src="https://opencollective.com/librenms/backer/20/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/21/website" target="_blank"><img src="https://opencollective.com/librenms/backer/21/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/22/website" target="_blank"><img src="https://opencollective.com/librenms/backer/22/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/23/website" target="_blank"><img src="https://opencollective.com/librenms/backer/23/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/24/website" target="_blank"><img src="https://opencollective.com/librenms/backer/24/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/25/website" target="_blank"><img src="https://opencollective.com/librenms/backer/25/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/26/website" target="_blank"><img src="https://opencollective.com/librenms/backer/26/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/27/website" target="_blank"><img src="https://opencollective.com/librenms/backer/27/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/28/website" target="_blank"><img src="https://opencollective.com/librenms/backer/28/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/29/website" target="_blank"><img src="https://opencollective.com/librenms/backer/29/avatar.svg"></a>
+
+
+## Sponsors
+
+Become a sponsor and get your logo on our README on Github with a link to your site. [[Become a sponsor](https://opencollective.com/librenms#sponsor)]
+
+<a href="https://opencollective.com/librenms/sponsor/0/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/sponsor/1/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/sponsor/2/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/sponsor/3/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/sponsor/4/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/sponsor/5/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/sponsor/6/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/sponsor/7/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/sponsor/8/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/sponsor/9/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/9/avatar.svg"></a>
+
+

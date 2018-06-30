@@ -1,10 +1,9 @@
-
 -- *****************************************************************
 -- CISCO-RTTMON-TC-MIB.my:  IP SLA Textual Conventions MIB file
 --   
 -- August 2005, Katherine Yang
 --   
--- Copyright (c) 2005-2006 by cisco Systems, Inc.
+-- Copyright (c) 2005-2014 by Cisco Systems Inc.
 -- All rights reserved.
 --   
 -- *****************************************************************
@@ -13,7 +12,6 @@ CISCO-RTTMON-TC-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY,
-    Integer32,
     Unsigned32
         FROM SNMPv2-SMI
     TEXTUAL-CONVENTION
@@ -23,7 +21,7 @@ IMPORTS
 
 
 ciscoRttMonTCMIB MODULE-IDENTITY
-    LAST-UPDATED    "200608280000Z"
+    LAST-UPDATED    "201403190000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Cisco Systems, Inc.
@@ -51,6 +49,47 @@ ciscoRttMonTCMIB MODULE-IDENTITY
           SAA: Service Assurance Agent
           VPN: Virtual Private Network
           CFM: Connection Fault Management"
+    REVISION        "201403190000Z"
+    DESCRIPTION
+        "Added new fabricPathEcho type to RttMonRttType and
+        fabricPathEchoAppl type to RttMonProtocol"
+    REVISION        "201311260000Z"
+    DESCRIPTION
+        "Added new RttMonReactVar type named 'protocolSpecificError'"
+    REVISION        "201211020000Z"
+    DESCRIPTION
+        "Added RttMonScheduleStartType TC.
+
+        Added  enumeration y1731dmmv1 to RttMonProtocol.
+
+        Added the following to RttMonReactVar:
+          lpdGroup, lpdTreeTrace, lpdAll,
+          unavailSD, unavailDS, pktLossPctSD,
+          pktLossPctDS, rttPct, maxOfLatencySDPct,
+          maxOfLatencyDSPct, latencySDAvgPct, latencyDSAvgPct,
+          jitterSDAvgPct, jitterDSAvgPct, jitterAvgPct,
+          overThreshold."
+    REVISION        "201205250000Z"
+    DESCRIPTION
+        "Added enumeration y1731slm to RttMonProtocol
+
+        Added the following to RttResopnseSense.
+         statsRetrieveOk, statsRetrieveNoConnect,  
+         statsRetrieveVersionFail, statsRetrieveInternalError,
+         statsRetrieveAbort, statsRetrieveFail,
+         statsRetrieveAuthFail, statsRetrieveFormatError,
+         statsRetrievePortInUse.
+
+        For enumeration from controlOk to controlPortInUse, changed the
+        prefix from control to enable."
+    REVISION        "201109150000Z"
+    DESCRIPTION
+        "Updated following textual conventions to include Y1731
+        and Multicast extensions.
+        -RttMonRttType, RttMonProtocol."
+    REVISION        "201004260000Z"
+    DESCRIPTION
+        "Added enumeration 'video' to RttMonRttType TC."
     REVISION        "200608110000Z"
     DESCRIPTION
         "Added RttMonIdLst and RttMonCtrlIndex textual conventions."
@@ -61,14 +100,38 @@ ciscoRttMonTCMIB MODULE-IDENTITY
     DESCRIPTION
         "Added ethernetPing and ethernetJitter in RttMonRttType.
         Added ethernetPingAppl and ethernetJitterAppl 
-        in RttMonProtocol "
+        in RttMonProtocol"
     REVISION        "200508090000Z"
     DESCRIPTION
         "Initial version of this MIB module."
-          ::= { ciscoMgmt 485 }
+    ::= { ciscoMgmt 485 }
+
 
 
 -- Textual Conventions
+
+RttMonScheduleStartType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "These are defined values for scheduling the start time of a
+        probe
+
+        pending(1)    - Pending state
+        now(2)        - Schedule the start time of probe to current time
+                        and probe is immediately started
+        random(3)     - Schedule the start time of probe at a random 
+                        time over a range.
+        after(4)      - Schedule the start time of probe after a certain
+                        amount of time from now.
+        specific(5)   - Schedule the start time of probe at a specific
+                        given time interval"
+    SYNTAX          INTEGER  {
+                        pending(1),
+                        now(2),
+                        random(3),
+                        after(4),
+                        specific(5)
+                    }
 
 RttReset ::= TEXTUAL-CONVENTION
     STATUS          current
@@ -108,6 +171,7 @@ RttMonOperation ::= TEXTUAL-CONVENTION
                         voipDTAlertRinging(6),
                         voipDTConnectOK(7)
                     }
+
 -- Operation completion sense code textual convention
 
 RttResponseSense ::= TEXTUAL-CONVENTION
@@ -174,7 +238,46 @@ RttResponseSense ::= TEXTUAL-CONVENTION
                            out by the reply router.
         mplsLspReachButNotFEC(20)
                          - MPLS echo request processed by the downstream
-                           router but not the target."
+                           router but not the target.
+        enableOk(21) 
+                         - Control enable request OK
+        enableNoConnect(22)
+                         - Control enable request fail due to no connection to
+                           the target.
+        enableVersionFail(23)
+                         - Control enable request version fail.
+        enableInternalError(24)
+                         - Control enable request internal error.
+        enableAbort(25)
+                         - Control enable request abort.
+        enableFail(26)
+                         - Control enable request fail.
+        enableAuthFail(27)
+                         - Control enable request fail due to authentication
+                           fail.
+        enableFormatError(28)
+                         - Control enable request fail due to format error.
+        enablePortInUse(29)
+                         - Control enable request fail due to port in use.
+        statsRetrieveOk(30)
+                         - Stats retrieve request OK
+        statsRetrieveNoConnect(31)
+                         - Stats retrieve request fail due to no connection 
+                           to the target.
+        statsRetrieveVersionFail(32)
+                         - Stats retrieve request version fail.
+        statsRetrieveInternalError(33)
+                         - Stats retrieve request internal error.
+        statsRetrieveAbort(34)
+                         - Stats retrieve request abort.
+        statsRetrieveFail(35)
+                         - Stats retrieve request fail.
+        statsRetrieveAuthFail(36)
+                         - Stats retrieve request fail due to authentication fail.
+        statsRetrieveFormatError(37)
+                         - Stats retrieve request fail due to format error.
+        statsRetrievePortInUse(38)
+                         - Stats retrieve request fail due to port in use."
     SYNTAX          INTEGER  {
                         other(0),
                         ok(1),
@@ -196,8 +299,27 @@ RttResponseSense ::= TEXTUAL-CONVENTION
                         mplsLspEchoTxError(17),
                         mplsLspUnreachable(18),
                         mplsLspMalformedReq(19),
-                        mplsLspReachButNotFEC(20)
+                        mplsLspReachButNotFEC(20),
+                        enableOk(21),
+                        enableNoConnect(22),
+                        enableVersionFail(23),
+                        enableInternalError(24),
+                        enableAbort(25),
+                        enableFail(26),
+                        enableAuthFail(27),
+                        enableFormatError(28),
+                        enablePortInUse(29),
+                        statsRetrieveOk(30),
+                        statsRetrieveNoConnect(31),
+                        statsRetrieveVersionFail(32),
+                        statsRetrieveInternalError(33),
+                        statsRetrieveAbort(34),
+                        statsRetrieveFail(35),
+                        statsRetrieveAuthFail(36),
+                        statsRetrieveFormatError(37),
+                        statsRetrievePortInUse(38)
                     }
+
 -- Operation type textual convention
 
 RttMonRttType ::= TEXTUAL-CONVENTION
@@ -276,13 +398,29 @@ RttMonRttType ::= TEXTUAL-CONVENTION
         perform trace over LSP path.
 
         The value of 'ethernetPing' will cause the RTT application to
-        perform delay variance analysis using regular 802.1ag loopback frame.
+        perform delay variance analysis using regular 802.1ag loopback
+        frame.
 
         The value of 'ethernetJitter' will cause the RTT application to
         perform delay variance analysis using CFM frame.
 
-        The value of 'lspPingPseudowire' will cause the RTT application to
-        perform LSP Ping over Pseudowire and measure response time."
+        The value of 'lspPingPseudowire' will cause the RTT application
+        to
+        perform LSP Ping over Pseudowire and measure response time.
+
+        The value 'video' will cause the the RTT application to perform
+        a video stream analysis directed at the 'RttMonTargetAddress
+        The value 'y1731Delay' will cause the RTT application to perform
+        a ITU-T standard Y.1731 delay variance analysis
+        The value 'y1731Loss' will cause the RTT application to perform
+        a ITU-T standard Y.1731 loss measure analysis
+        The value 'mcastJitter' will cause the RTT application to
+        perform 
+        udp jitter stream analysis on a multicast network.
+
+        The value 'fabricPathEcho' will cause the RTT application to
+        perform delay performance measurment and verify connectivity in
+        a Fabric Path Network."
     SYNTAX          INTEGER  {
                         echo(1),
                         pathEcho(2),
@@ -304,8 +442,14 @@ RttMonRttType ::= TEXTUAL-CONVENTION
                         lspTrace(18),
                         ethernetPing(19),
                         ethernetJitter(20),
-                        lspPingPseudowire(21)
+                        lspPingPseudowire(21),
+                        video(22),
+                        y1731Delay(23),
+                        y1731Loss(24),
+                        mcastJitter(25),
+                        fabricPathEcho(26)
                     }
+
 -- Operation type for Auto SAA L3 MPLS VPN textual convention
 
 RttMplsVpnMonRttType ::= TEXTUAL-CONVENTION
@@ -327,6 +471,7 @@ RttMplsVpnMonRttType ::= TEXTUAL-CONVENTION
                         echo(2),
                         pathEcho(3)
                     }
+
 -- --
 -- Auto SAA L3 MPLS VPN LSP Path Discovery
 -- Failure Cause textual convention
@@ -375,6 +520,7 @@ RttMplsVpnMonLpdFailureSense ::= TEXTUAL-CONVENTION
                         timeout(6),
                         error(7)
                     }
+
 -- textual convention
 
 RttMplsVpnMonLpdGrpStatus ::= TEXTUAL-CONVENTION
@@ -478,7 +624,19 @@ RttMonProtocol ::= TEXTUAL-CONVENTION
         icmpJitterAppl    - uses ICMP Timestamp for packet transfer 
                             to measure jitter.
         ethernetPingAppl    - uses regular 802.1ag loopback frame
-        ethernetJitterAppl  - uses CFM frames ."
+        ethernetJitterAppl  - uses CFM frames .
+        videoAppl           - uses synthetic traffic depending on video 
+                               profile
+        y1731dmm            - used to measure Y1731 delay
+        y17311dm            - used to measure Y1731 1DM
+        y1731lmm            - used to measure Y1731 Loss measurement
+        mcastJitterAppl     - uses udp jitter to measure multicast
+                               network performance
+        y1731slm            - used to measure Y1731 Synthetic Loss
+                               measurement
+        y1731dmmv1          - used to measure Y1731 DMMv1 measurement
+
+        fabricPathEchoAppl  - uses Fabric Path connect mechanism"
     SYNTAX          INTEGER  {
                         notApplicable(1),
                         ipIcmpEcho(2),
@@ -515,7 +673,15 @@ RttMonProtocol ::= TEXTUAL-CONVENTION
                         rtpAppl(33),
                         icmpJitterAppl(34),
                         ethernetPingAppl(35),
-                        ethernetJitterAppl(36)
+                        ethernetJitterAppl(36),
+                        videoAppl(37),
+                        y1731dmm(38),
+                        y17311dm(39),
+                        y1731lmm(40),
+                        mcastJitterAppl(41),
+                        y1731slm(42),
+                        y1731dmmv1(43),
+                        fabricPathEchoAppl(44)
                     }
 
 RttMonCodecType ::= TEXTUAL-CONVENTION
@@ -676,7 +842,38 @@ RttMonReactVar ::= TEXTUAL-CONVENTION
                                    Source to Destination
          mosCQSD(31)             - Conversational quality MOS at 
                                    Destination
-         rFactorSD(32)           - R-Factor value at Destination."
+         rFactorSD(32)           - R-Factor value at Destination.
+         lpdGroup(33)            - Label Path Discovery (LPD) group
+         lpdTreeTrace(34)        - LPD Tree Trace
+         lpdAll(35)              - LPD All
+         unavailSD(36)           - Unavailability threshold crossing
+                                   crossing - Source to Destination
+         unavailDS(37)           - Unavailability threshold crossing
+                                   crossing - Destination to source
+         pktLossPctSD(38)        - Loss ratio threshold crossing
+                                   based on percent - Source to
+                                   Destination
+         pktLossPctDS(39)        - Loss ratio threshold crossing
+                                   based on percent - Destination to
+                                   Source
+         rttPct(40)              - Percentile Round Trip Time
+         maxOfLatencySDPct(41)   - Percentile Maximum Latency from
+                                   Source to Destination
+         maxOfLatencyDSPct(42)   - Percentile Maximum Latency from
+                                   Destination to Source
+         latencySDAvgPct(43)     - Percentile Latency Average from
+                                   Source to Destination
+         latencyDSAvgPct(44)     - Percentile Latency Average from
+                                   Destination to Source
+         jitterSDAvgPct(45)      - Percentile Jitter Average from
+                                   Source to Destination
+         jitterDSAvgPct(46)      - Percentile Jitter Average from
+                                   Destination to Source
+         jitterAvgPct(47)        - Percentile Jitter Average in
+                                   both directions
+         overThreshold(48)       - Percent of Round Trip Times
+                                   over threshold.
+         protocolSpecificError(49)-Any protocol specific error."
     SYNTAX          INTEGER  {
                         rtt(1),
                         jitterSDAvg(2),
@@ -709,7 +906,24 @@ RttMonReactVar ::= TEXTUAL-CONVENTION
                         packetLoss(29),
                         iaJitterSD(30),
                         mosCQSD(31),
-                        rFactorSD(32)
+                        rFactorSD(32),
+                        lpdGroup(33),
+                        lpdTreeTrace(34),
+                        lpdAll(35),
+                        unavailSD(36),
+                        unavailDS(37),
+                        pktLossPctSD(38),
+                        pktLossPctDS(39),
+                        rttPct(40),
+                        maxOfLatencySDPct(41),
+                        maxOfLatencyDSPct(42),
+                        latencySDAvgPct(43),
+                        latencyDSAvgPct(44),
+                        jitterSDAvgPct(45),
+                        jitterDSAvgPct(46),
+                        jitterAvgPct(47),
+                        overThreshold(48),
+                        protocolSpecificError(49)
                     }
 
 RttMonIdLst ::= TEXTUAL-CONVENTION
@@ -731,6 +945,18 @@ RttMonCtrlIndex ::= TEXTUAL-CONVENTION
         "The value of this object identifies the row in the
         ipslaEthernetGrpCtrlTable and ipslaEthernetGrpReactTable.
         It can be used for other IP SLA control tables."
-    SYNTAX          Unsigned32 (1..2147483647 )
+    SYNTAX          Unsigned32 (1..2147483647)
 
 END
+
+
+-- %DNP%  MLC -Submitted MLC
+
+-- %DNP%  MRS -with reviewer MRS
+
+-- %DNP%  MRC - ciscoRttMonTCMIB~2~ - 2014031805:01 PST - vivsreev -11.0 -ACK
+-- %DNP%  - Can we allign the description of mcastJitterAppl into one line or two 
+-- %DNP%lines for better readability? in Line: 633
+-- %DNP%
+-- %DNP% -0 MRC 
+

@@ -8,8 +8,8 @@ if (!is_array($mempool_cache['vrp'])) {
     d_echo('caching');
 
     $mempool_cache['vrp'] = array();
-    $mempool_cache['vrp'] = snmpwalk_cache_multi_oid($device, 'hwEntityMemSize', $mempool_cache['vrp'], 'HUAWEI-ENTITY-EXTENT-MIB', $config['mib_dir'].':'.$config['mib_dir'].'/huawei');
-    $mempool_cache['vrp'] = snmpwalk_cache_multi_oid($device, 'hwEntityMemUsage', $mempool_cache['vrp'], 'HUAWEI-ENTITY-EXTENT-MIB', $config['mib_dir'].':'.$config['mib_dir'].'/huawei');
+    $mempool_cache['vrp'] = snmpwalk_cache_multi_oid($device, 'hwEntityMemSize', $mempool_cache['vrp'], 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
+    $mempool_cache['vrp'] = snmpwalk_cache_multi_oid($device, 'hwEntityMemUsage', $mempool_cache['vrp'], 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
     d_echo($mempool_cache);
 }
 

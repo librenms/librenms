@@ -1,0 +1,11 @@
+os: ibmnos
+text: 'IBM Networking Operating System'
+type: network
+icon: ibmos
+over:
+    - { graph: device_bits, text: Traffic }
+discovery:
+    - sysDescr:
+        - 'Networking Operating System'
+        - 'Flex System Fabric'
+        - 'IBM Networking OS'

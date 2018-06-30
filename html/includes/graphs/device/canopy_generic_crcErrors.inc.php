@@ -12,7 +12,7 @@
 require 'includes/graphs/common.inc.php';
 
 $rrdfilename = rrd_name($device['hostname'], 'canopy-generic-crcErrors');
-if (file_exists($rrdfilename)) {
+if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dBm                Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:crcErrors='.$rrdfilename.':crcErrors:AVERAGE ';
     $rrd_options .= " LINE2:crcErrors#FF0000:'CRC Errors        ' ";

@@ -1,0 +1,640 @@
+--     =================================================================
+-- Copyright (C) 2008 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description:  The HUAWEI-MC-TRUNK-MIB.mib provides information about MC-TRUNK
+-- Reference:
+-- Version:     V1.0
+-- History:
+--              zhenghebin,2008.11.25,publish 
+-- =================================================================
+
+    HUAWEI-MC-TRUNK-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            huaweiMgmt 
+                FROM HUAWEI-MIB 
+            IpAddress,Integer32, Unsigned32, Counter32, Counter64, 
+            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE 
+                FROM SNMPv2-SMI 
+            PhysAddress,DisplayString,TruthValue,TimeStamp,RowStatus,TEXTUAL-CONVENTION 
+                FROM SNMPv2-TC;
+
+
+        hwMcTrunkMIB MODULE-IDENTITY 
+            LAST-UPDATED "200810211010Z" -- June 10, 2005 at 19:36 GMT
+            ORGANIZATION 
+                "Organization."
+            CONTACT-INFO 
+                "Contact-info."
+            DESCRIPTION 
+                "Description."
+            ::= { hwDatacomm 178 }
+
+--
+-- Node definitions
+--
+
+        hwDatacomm OBJECT IDENTIFIER ::= { huaweiMgmt 25 }
+
+
+        hwMcTrunkObjects OBJECT IDENTIFIER ::= { hwMcTrunkMIB 1 }
+           
+           
+           
+-- McTrunk
+        hwMcTrunkTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMcTrunkEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The MC-Trunk table."
+            ::= { hwMcTrunkObjects 1 }
+
+
+        hwMcTrunkEntry OBJECT-TYPE
+            SYNTAX HwMcTrunkEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "MC-Trunk entry."
+            INDEX { hwMcTrunkId }
+            ::= { hwMcTrunkTable 1 }
+
+
+        HwMcTrunkEntry ::=
+            SEQUENCE {  
+                hwMcTrunkId
+                    Integer32,
+                hwMcTrunkSystemId
+                    PhysAddress, 
+                                  
+                hwMcTrunkPri
+                    Integer32,  
+          
+                hwMcTrunkStatus
+                    INTEGER, 
+                                         
+                hwMcTrunkStatusReason
+                    INTEGER,
+          
+                hwMcTrunkPeerIpAddr
+                    IpAddress,
+         
+                hwMcTrunkSourceIpAddr
+                    IpAddress,
+       
+                hwMcTrunkReceiveFailTimeMultiple
+                    Integer32,
+                                        
+                hwMcTrunkSendPeriod
+                    Integer32,
+                                       
+                hwMcTrunkPacketReceive
+                    Counter64,
+                               
+                hwMcTrunkPacketSend
+                    Counter64,
+                                       
+                hwMcTrunkPacketRecDrop
+                    Counter64,
+         
+                hwMcTrunkPacketSndDrop
+                    Counter64,
+                                 
+                hwMcTrunkPeerSystemId           
+                    PhysAddress,  
+      
+                hwMcTrunkPeerPri
+                    Integer32, 
+    
+                hwMcTrunkPeerReceiveFailTime
+                    Integer32, 
+           
+                hwMcTrunkSecurityKeyType 
+                    INTEGER,   
+                                 
+                hwMcTrunkSecurityKey
+                    OCTET STRING,
+                                  
+                hwMcTrunkBfdSessId
+                    Integer32, 
+                    
+                hwMcTrunkResetCounter
+                    Integer32,
+                    
+                hwMcTrunkRevertTime
+                    Integer32,
+                                 
+                hwMcTrunkRowStatus
+                    RowStatus
+
+        }
+
+
+        hwMcTrunkId OBJECT-TYPE
+            SYNTAX Integer32 (1..16)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of the MC-Trunk."
+            ::= { hwMcTrunkEntry 1 }
+
+
+        hwMcTrunkSystemId OBJECT-TYPE
+            SYNTAX PhysAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The system ID of the MC-Trunk. It is a physical address."
+            ::= { hwMcTrunkEntry 2 }
+
+
+        hwMcTrunkPri OBJECT-TYPE
+            SYNTAX Integer32 (1..254)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The priority of the MC-Trunk. The default value is 100."
+            ::= { hwMcTrunkEntry 3 }
+
+
+
+        hwMcTrunkStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    initialize(1),
+                    backup(2),
+                    master(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of the MC-Trunk. 
+                 1:initialize. 
+                 2:backup. 
+                 3:master. "
+            ::= { hwMcTrunkEntry 4 }   
+
+
+        hwMcTrunkStatusReason OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    pri(1),
+                    timeout(2),
+                    bfdDown(3),
+                    peerTimeout(4),
+                    peerBfdDown(5),
+                    allMemberDown(6),
+                    init(7)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The reason for the MC-Trunk being in the current status. 
+                 pri(1):Priority calculation.  
+                 timeout(2):The receiving timer timed out. 
+                 bfdDown(3):BFD detected the control link between the PE and peer down. 
+                 peerTimeout(4):The receiving timer of the peer timed out. 
+                 peerBfdDown(5):BFD of the peer detected the control link between the PE and peer down. 
+                 allMemberDown(6):All members of the MC-Trunk were down. 
+                 init(7):Initiated the MC-Trunk.  
+                "
+            ::= { hwMcTrunkEntry 5 }
+
+
+        hwMcTrunkPeerIpAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The peer IP address of the MC-Trunk."
+            ::= { hwMcTrunkEntry 6 }
+
+
+        hwMcTrunkSourceIpAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The source IP address of the MC-Trunk."
+            ::= { hwMcTrunkEntry 7 }
+
+        hwMcTrunkReceiveFailTimeMultiple OBJECT-TYPE
+            SYNTAX Integer32 (3..50)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The detection time multiplier for failure detection. It is the multiple of the sending period."
+            ::= { hwMcTrunkEntry 8 }
+
+
+        hwMcTrunkSendPeriod OBJECT-TYPE
+            SYNTAX Integer32 (5..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The period for sending packets of the MC-Trunk. The unit is 100ms. "
+            ::= { hwMcTrunkEntry 9 }
+
+
+
+        hwMcTrunkPacketReceive OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of received packets."
+            ::= { hwMcTrunkEntry 10 }
+
+
+        hwMcTrunkPacketSend OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of sent packets."
+            ::= { hwMcTrunkEntry 11 }
+
+
+        hwMcTrunkPacketRecDrop OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of the dropped packets when the packets are received."
+            ::= { hwMcTrunkEntry 12 }
+
+
+        hwMcTrunkPacketSndDrop OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of the dropped packets when the packets are sent."
+            ::= { hwMcTrunkEntry 13 }
+
+
+        hwMcTrunkPeerSystemId OBJECT-TYPE
+            SYNTAX PhysAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The system ID of the peer MC-Trunk. It is a physical address."
+            ::= { hwMcTrunkEntry 14 }
+
+
+        hwMcTrunkPeerPri OBJECT-TYPE
+            SYNTAX Integer32 (1..254)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The priority of the peer MC-Trunk."
+            ::= { hwMcTrunkEntry 15 }
+
+
+        hwMcTrunkPeerReceiveFailTime OBJECT-TYPE
+            SYNTAX Integer32 (15..5000)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The failure time for the peer MC-Trunk to receive packets. The unit is 100ms. "
+            ::= { hwMcTrunkEntry 16 }
+
+
+
+        hwMcTrunkSecurityKeyType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    simple(1),
+                    cipher(2)
+                }
+
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The type of the security key. 
+                 1:The simple encrypt type.  
+                 2:The cipher encrypt type. "
+            ::= { hwMcTrunkEntry 17 }
+
+
+        hwMcTrunkSecurityKey OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..24))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This is the security key. It can be set to a string of 1 to 16 bytes.  
+                 If hwMcTrunkSecurityKeyType is simple, you can get the key.
+                 If hwMcTrunkSecurityKeyType is cipher, the system returns a random string of 24 bytes."
+            ::= { hwMcTrunkEntry 18 }
+
+
+        hwMcTrunkBfdSessId OBJECT-TYPE
+            SYNTAX Integer32 (0..8191)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The ID of a BFD session which is bound to the MC-Trunk. When the status of the BFD session is changed, BFD will notify the MC-Trunk."
+            ::= { hwMcTrunkEntry 19}   
+  
+        hwMcTrunkResetCounter OBJECT-TYPE
+            SYNTAX Integer32 (0..0)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Reset hwMcTrunkPacketReceive,hwMcTrunkPacketSend,hwMcTrunkPacketRecDrop,hwMcTrunkPacketSndDrop."
+            ::= { hwMcTrunkEntry 20 }
+            
+        hwMcTrunkRevertTime OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The delay time to revert. The unit is second. The default is 120. "
+            ::= { hwMcTrunkEntry 21 }
+
+
+        hwMcTrunkRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Current operation status of the row. It is used to manage the creation and deletion of conceptual rows."
+            ::= { hwMcTrunkEntry 50}
+
+
+
+
+
+--Memeber 
+        hwMcTrunkMemberTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMcTrunkMemberEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The member table of the MC-Trunk."
+            ::= { hwMcTrunkObjects 2 }
+
+
+
+        hwMcTrunkMemberEntry OBJECT-TYPE
+            SYNTAX HwMcTrunkMemberEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Member Entry."
+            INDEX { hwMcTrunkMemberParentId,hwMcTrunkMemberType, hwMcTrunkMemberId}
+            ::= { hwMcTrunkMemberTable 1 } 
+
+
+
+
+        HwMcTrunkMemberEntry ::=
+            SEQUENCE {  
+                hwMcTrunkMemberParentId
+                    Integer32,
+         
+
+                hwMcTrunkMemberType
+                    Integer32,
+                              
+
+                hwMcTrunkMemberId
+                    Unsigned32,
+
+
+                hwMcTrunkMemberStatus
+                    INTEGER,  
+
+
+                hwMcTrunkMemberStatusReason
+                    INTEGER,
+
+
+                hwMcTrunkMemberWorkMode
+                    INTEGER,
+
+
+                hwMcTrunkMemberPhyStatus
+                    INTEGER,     
+    
+
+                hwMcTrunkMemberRowStatus
+                    RowStatus
+
+        }  
+  
+
+        hwMcTrunkMemberParentId OBJECT-TYPE
+            SYNTAX Integer32 (1..16)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The ID of the MC-Trunk to which the member belongs."
+            ::= { hwMcTrunkMemberEntry 1 }
+
+
+
+        hwMcTrunkMemberType OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The type of the member. Now it is Eth-Trunk only.
+                 1:EthTrunk"
+            ::= { hwMcTrunkMemberEntry 2 } 
+  
+
+        hwMcTrunkMemberId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The ID of the member."
+            ::= { hwMcTrunkMemberEntry 3 }
+
+
+
+        hwMcTrunkMemberStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    backup(1),
+                    master(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The member status.  
+                 1:backup. 
+                 2:master. "
+            ::= { hwMcTrunkMemberEntry 4 } 
+
+
+        hwMcTrunkMemberStatusReason OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    forceBackup(1),
+                    forceMaster(2),
+                    mctrunkInit(3),
+                    mctrunkBackup(4),
+                    mctrunkMaster(5),
+                    peerMemberDown(6),
+                    peerMemberUp(7)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The reason for the member being in the current status.   
+                 forceBackup(1):The work mode of the member is force-backup. 
+                 forceMaster(2):The work mode of the member is force-master. 
+                 mctrunkInit(3):The work mode of the member is auto. The status of MC-Trunk is initialize. 
+                 mctrunkBackup(4):The work mode of the member is auto. The status of MC-Trunk is backup. 
+                 mctrunkMaster(5):The work mode of the member is auto. The status of MC-Trunk is master. 
+                 peerMemberDown(6):The status of the member belonging to the peer MC-Trunk is down.  
+                 peerMemberUp(7):The status of the member belonging to the peer MC-Trunk is up. "
+            ::= { hwMcTrunkMemberEntry 5 }
+
+   
+
+        hwMcTrunkMemberWorkMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    auto(1),
+                    forceBackup(2),
+                    forceMaster(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The work mode of the member. 
+                 1:auto. 
+                 2:forceBackup. 
+                 3:forceMaster. "
+            ::= { hwMcTrunkMemberEntry 6 }   
+
+        hwMcTrunkMemberPhyStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    up(1),
+                    down(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The physical status of the member. 
+                 1:up. 
+                 2:down. "
+            ::= { hwMcTrunkMemberEntry 7 } 
+
+        hwMcTrunkMemberRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Current operation status of the row. It is used to manage the creation and deletion of conceptual rows."
+            ::= { hwMcTrunkMemberEntry 50 }
+
+
+
+
+
+
+
+-- Traps.
+
+        hwMcTrunkTraps            OBJECT IDENTIFIER ::= { hwMcTrunkMIB 2 } 
+        
+        hwMcTrunkStatusChange NOTIFICATION-TYPE
+            OBJECTS { 
+                hwMcTrunkStatus, 
+                hwMcTrunkStatusReason}
+            STATUS  current
+            DESCRIPTION
+                "The trap is generated when the status of the MC-Trunk is changed or the status reason of the MC-Trunk is changed."
+            ::= { hwMcTrunkTraps 1 }
+        
+
+        hwMcTrunkMemberStatusChange NOTIFICATION-TYPE
+            OBJECTS {
+                hwMcTrunkMemberStatus,
+                hwMcTrunkMemberStatusReason}
+            STATUS  current
+            DESCRIPTION
+                "The trap is generated when the status of the memeber is changed or the status reason of the memeber is changed."
+            ::= { hwMcTrunkTraps 2 }   
+        
+                   
+        hwMcTrunkConformance OBJECT IDENTIFIER ::= { hwMcTrunkMIB 3 }
+
+        
+        hwMcTrunkCompliances OBJECT IDENTIFIER ::= { hwMcTrunkConformance 1 }
+
+        
+        --  this module
+        hwMcTrunkFullCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwMcTrunkGroup, hwMcTrunkMemberGroup, hwMcTrunkNotificationGroup }
+            ::= { hwMcTrunkCompliances 1 }
+
+        
+        hwMcTrunkGroups OBJECT IDENTIFIER ::= { hwMcTrunkConformance 2 }
+
+        
+        hwMcTrunkGroup OBJECT-GROUP
+            OBJECTS {
+                hwMcTrunkSystemId,
+                hwMcTrunkPri,
+                hwMcTrunkStatus,
+                hwMcTrunkStatusReason,
+                hwMcTrunkPeerIpAddr,
+                hwMcTrunkSourceIpAddr,
+                hwMcTrunkReceiveFailTimeMultiple,
+                hwMcTrunkSendPeriod,
+                hwMcTrunkPacketReceive,
+                hwMcTrunkPacketSend,
+                hwMcTrunkPacketRecDrop,
+                hwMcTrunkPacketSndDrop,
+                hwMcTrunkPeerSystemId,
+                hwMcTrunkPeerPri,
+                hwMcTrunkPeerReceiveFailTime,
+                hwMcTrunkSecurityKeyType,
+                hwMcTrunkSecurityKey,
+                hwMcTrunkBfdSessId,
+                hwMcTrunkResetCounter,
+                hwMcTrunkRevertTime,
+                hwMcTrunkRowStatus        
+            }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwMcTrunkGroups 1 }
+
+        
+        hwMcTrunkMemberGroup OBJECT-GROUP
+            OBJECTS {
+                hwMcTrunkMemberStatus,
+                hwMcTrunkMemberStatusReason,
+                hwMcTrunkMemberWorkMode,
+                hwMcTrunkMemberPhyStatus, 
+                hwMcTrunkMemberRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwMcTrunkGroups 2 }
+
+
+        hwMcTrunkNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwMcTrunkStatusChange, hwMcTrunkMemberStatusChange }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwMcTrunkGroups 3 }
+           
+END
+
+--
+-- HUAWEI-MC-TRUNK-MIB.mib
+--

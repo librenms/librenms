@@ -1,0 +1,11 @@
+os: heliosip
+text: 'Helios IP'
+type: appliance
+icon: 2n
+over:
+    - { graph: device_uptime, text: 'Device Uptime' }
+mib_dir:
+    - 2n
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.6530

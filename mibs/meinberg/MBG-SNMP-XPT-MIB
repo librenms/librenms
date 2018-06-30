@@ -1,0 +1,602 @@
+MBG-SNMP-XPT-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Top-level infrastructure of the MBG -SNMP project enterprise MIB tree
+--
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP FROM SNMPv2-CONF
+    DisplayString                           FROM SNMPv2-TC
+
+   mbgSnmpRoot FROM MBG-SNMP-ROOT-MIB;
+
+mbgXPT MODULE-IDENTITY
+    LAST-UPDATED "201201250000Z"
+    ORGANIZATION "www.meinberg.de"
+    CONTACT-INFO
+	 "postal:   Meinberg Funkuhren
+                    Auf der Landwehr 22
+                    31812 Bad Pyrmont
+	            Germany
+
+          email:    info@meinberg.de"
+    DESCRIPTION
+	"Top-level infrastructure of the MBG-SNMP project enterprise MIB tree"
+    REVISION     "201201250000Z"
+    DESCRIPTION
+       "Update to new format referencing MBG-SNMP-ROOT-MIB"
+    REVISION     "200601200000Z"
+    DESCRIPTION
+       "Covering LAN-XPT and SCU-XPT modules from Meinberg"
+    ::= { mbgSnmpRoot 10 }
+
+
+--
+--  MBG-SNMP enterprise-specific management objects
+--
+-- 
+-- Copy everything from here into your MBG-SNMP-MIB.txt file, if you are using several different SNMP-supporting Meinberg systems 
+--
+
+mbgGPSRefclock1		OBJECT IDENTIFIER ::= {mbgXPT 2}
+mbgGPSRefclock2		OBJECT IDENTIFIER ::= {mbgXPT 3}
+mbgSCU			OBJECT IDENTIFIER ::= {mbgXPT 4}
+mbgXPTTraps              OBJECT IDENTIFIER ::= {mbgXPT 5}
+
+
+--
+-- GPS Refclock states 
+--  (For SCUXPT systems this is Refclock 1)
+--
+
+mbgGPSRefclock1Type OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type of clock"
+    ::= { mbgGPSRefclock1 1 }
+
+mbgGPSRefclock1TypeVal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type of refclock as value"
+    --- " 0: not available"
+    --- " 1: GPS167 1HE"
+    --- " 2: GPS167 BGT/TGP"
+    --- " 3: PZF509 1HE"
+    --- " 4: PZF509 BGT/TGP"
+    --- " 5: SHS 1HE"
+    --- " 6: SHS BGT"
+    --- " 7: SHS-FRC 1HE"
+    --- " 8: SHS-FRC BGT"
+    --- " 9: TCR509 1HE"
+    --- "10: TCR509 BGT/TGP"
+    --- "11: RD 1HE"
+    --- "12: RD BGT/TGP"
+    --- "13: EDT 1HE"
+    --- "14: EDT BGT/TGP"
+    --- "15: AHS"
+    --- "16: DHS"
+    DEFVAL { 0 }
+    ::= { mbgGPSRefclock1 2 }
+
+mbgGPSRefclock1Mode OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current Mode of refclock"
+    ::= { mbgGPSRefclock1 3 }
+
+mbgGPSRefclock1ModeVal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current Mode of refclock as value"
+    --- " 0: not available"
+    --- " 1: Normal Operation"
+    --- " 2: Tracking/Searching"
+    --- " 3: Antenna Faulty"
+    --- " 4: Warm Boot"
+    --- " 5: Cold Boot"
+    DEFVAL { 0 }
+    ::= { mbgGPSRefclock1 4 }
+
+mbgGPSRef1GpsState OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current State of GPS refclock "
+    ::= { mbgGPSRefclock1 5 }
+
+mbgGPSRef1GpsStateVal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current State of GPS refclock as value"
+    --- " 0: not available"
+    --- " 1: synchronized"
+    --- " 2: not synchronized"
+    DEFVAL { 0 }
+    ::= { mbgGPSRefclock1 6 }
+
+mbgGPSRef1GpsPosition OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current Position of GPS refclock "
+    ::= { mbgGPSRefclock1 7 }
+
+mbgGPSRef1GpsSatellites OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current Satellites in view and good of GPS refclock "
+    ::= { mbgGPSRefclock1 8 }
+
+mbgGPSRef1GpsSatellitesGood OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current good Satellites of GPS refclock as value"
+    ::= { mbgGPSRefclock1 9 }
+
+mbgGPSRef1GpsSatellitesInView OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current satellites in view of GPS refclock as value"
+    ::= { mbgGPSRefclock1 10 }
+
+
+--
+-- GPS Refclock states 
+-- (for SCUXPT 2nd refclock)
+
+mbgGPSRefclock2Type OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type of clock"
+    ::= { mbgGPSRefclock2 1 }
+
+mbgGPSRefclock2TypeVal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type of refclock as value"
+    --- " 0: not available"
+    --- " 1: GPS167 1HE"
+    --- " 2: GPS167 BGT/TGP"
+    --- " 3: PZF509 1HE"
+    --- " 4: PZF509 BGT/TGP"
+    --- " 5: SHS 1HE"
+    --- " 6: SHS BGT"
+    --- " 7: SHS-FRC 1HE"
+    --- " 8: SHS-FRC BGT"
+    --- " 9: TCR509 1HE"
+    --- "10: TCR509 BGT/TGP"
+    --- "11: RD 1HE"
+    --- "12: RD BGT/TGP"
+    --- "13: EDT 1HE"
+    --- "14: EDT BGT/TGP"
+    --- "15: AHS"
+    --- "16: DHS"
+    DEFVAL { 0 }
+    ::= { mbgGPSRefclock2 2 }
+
+mbgGPSRefclock2Mode OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current Mode of refclock"
+    ::= { mbgGPSRefclock2 3 }
+
+mbgGPSRefclock2ModeVal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current Mode of refclock as value"
+    --- " 0: not available"
+    --- " 1: Normal Operation"
+    --- " 2: Tracking/Searching"
+    --- " 3: Antenna Faulty"
+    --- " 4: Warm Boot"
+    --- " 5: Cold Boot"
+    DEFVAL { 0 }
+    ::= { mbgGPSRefclock2 4 }
+
+mbgGPSRef2GpsState OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current State of GPS refclock "
+    ::= { mbgGPSRefclock2 5 }
+
+mbgGPSRef2GpsStateVal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current State of GPS refclock as value"
+    --- " 0: not available"
+    --- " 1: synchronized"
+    --- " 2: not synchronized"
+    DEFVAL { 0 }
+    ::= { mbgGPSRefclock2 6 }
+
+mbgGPSRef2GpsPosition OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current Position of GPS refclock "
+    ::= { mbgGPSRefclock2 7 }
+
+mbgGPSRef2GpsSatellites OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current Satellites in view and good of GPS refclock "
+    ::= { mbgGPSRefclock2 8 }
+
+mbgGPSRef2GpsSatellitesGood OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current good Satellites of GPS refclock as value"
+    ::= { mbgGPSRefclock2 9 }
+
+mbgGPSRef2GpsSatellitesInView OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current satellites in view of GPS refclock as value"
+    ::= { mbgGPSRefclock2 10 }
+
+
+
+--
+-- GPS Switchcard states
+-- (for SCUXPT)
+
+mbgSCUType OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type of clock"
+    ::= { mbgSCU 1 }
+
+mbgSCUTypeVal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type of Switchcard as value"
+    DEFVAL { 0 }
+    ::= { mbgSCU 2 }
+
+mbgSCUMaster OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current selected masterclock of switchcard"
+    ::= { mbgSCU 3 }
+
+mbgSCUMasterVal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current selected masterclock of switchcard as value"
+    --- " 0: no master selected (outputs disabled)"
+    --- " 1: GPS clock 1 is master"
+    --- " 2: GPS clock 2 is master"
+    DEFVAL { 0 }
+    ::= { mbgSCU 4 }
+
+mbgSCUMasterselect OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current masterselect mode of GPS Switchcard "
+    ::= { mbgSCU 5 }
+
+mbgSCUMasterselectVal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current masterselect mode of GPS switchcard as value"
+    --- " 0: local masterselect"
+    --- " 1: remote masterselect"
+    DEFVAL { 0 }
+    ::= { mbgSCU 6 }
+
+mbgSCUTimeSync1 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current time sync status of clock 1"
+    ::= { mbgSCU 7 }
+
+mbgSCUTimeSync2 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current time sync status of clock 2"
+    ::= { mbgSCU 8 }
+
+mbgSCUTimelimitError OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current state of time limit alarm (not used)"
+    ::= { mbgSCU 9 }
+
+mbgSCUDisableOutputs OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current state of outputs (0=outputs disabled, 1=outputs enabled)"
+    ::= { mbgSCU 10 }
+
+mbgSCUSelectedInput OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current selected clock for status queries as a string"
+    ::= { mbgSCU 11 }
+
+mbgSCUSelectedInputVal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current selected clock for status queries as an integer"
+    --- " 0: no clock selected"
+    --- " 1: GPS clock 1 is selected"
+    --- " 2: GPS clock 2 is selected"
+    ::= { mbgSCU 12 }
+
+mbgSCUACOMode OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current state of ACO (access control override)"
+    --- " 0: ACO mode off (no firmware updates, password protection and encryption on)"
+    --- " 1: ACO mode on (firmware updates possible, password set to empty string (=just press enter)"
+    ::= { mbgSCU 13 }
+
+mbgSCUPSUStatus OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current status of power supply units as a string"
+    ::= { mbgSCU 14 }
+
+mbgSCUPSU1Status OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current status of power supply unit 1"
+    --- " 0: failure / not available"
+    --- " 1: OK / in operation"
+    ::= { mbgSCU 15 }
+
+mbgSCUPSU2Status OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current status of power supply unit 2"
+    --- " 0: failure / not available"
+    --- " 1: OK / in operation"
+    ::= { mbgSCU 16 }
+
+
+
+
+--
+-- SNMP trap definitions
+--
+
+mbgGPSTrapColdBoot NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when Refclock is in Cold Boot mode"
+    ::= { mbgXPTTraps 1 }
+
+mbgGPSTrapWarmBoot NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when Refclock is in Warm Boot mode"
+    ::= { mbgXPTTraps 2 }
+
+mbgGPSNavSolved NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when Refclock calculated its actual position"
+    ::= { mbgXPTTraps 3 }
+
+mbgGPSTrapReceiverNotResponding NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when GPS receiver is not responding "
+    ::= { mbgXPTTraps 4 }
+
+mbgGPSTrapReceiverNotSync NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when GPS receiver is not synchronised "
+    ::= { mbgXPTTraps 5 }
+
+mbgGPSTrapAntennaFaulty NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when connection to antenna is broken "
+    ::= { mbgXPTTraps 6 }
+
+mbgGPSTrapAntennaReconnect NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when antenna has been reconnected "
+    ::= { mbgXPTTraps 7 }
+
+mbgGPSTrapLANXPTBoot NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when LANXPT has been rebooted"
+    ::= { mbgXPTTraps 8 }
+
+mbgGPSTrapLeapSecondAnnounced NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when a leap second has been announced "
+    ::= { mbgXPTTraps 9 }
+
+mbgGPSTrapMasterclockSwitchover NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when masterclock changes "
+    ::= { mbgXPTTraps 10 }
+
+mbgGPSTrapPowerSupplyFailure NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when a power supply unit fails"
+    ::= { mbgXPTTraps 11 }
+
+mbgGPSTrapPowerSupplyOK NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when a power supply unit restores operation"
+    ::= { mbgXPTTraps 12 }
+
+mbgGPSTrapTestNotification NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when a test notification has been requested "
+    ::= { mbgXPTTraps 99 }
+
+
+--
+-- Conformance Statements
+--
+
+
+mbgXPTConformance		OBJECT IDENTIFIER ::= { mbgXPT 90 }
+mbgXPTCompliances		OBJECT IDENTIFIER ::= { mbgXPTConformance 1 }
+mbgXPTGroups			OBJECT IDENTIFIER ::= { mbgXPTConformance 2 }
+
+mbgXPTCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+	"The compliance statement for SNMP entities which implement version 2
+        of the XPT MIB"
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+                mbgXPTObjectsGroup,
+                mbgXPTTrapsGroup
+        }
+    ::= { mbgXPTCompliances 1 }
+
+
+mbgXPTObjectsGroup	OBJECT-GROUP
+    OBJECTS {
+	mbgGPSRefclock1Type,
+	mbgGPSRefclock1TypeVal,
+	mbgGPSRefclock1Mode,
+	mbgGPSRefclock1ModeVal,
+	mbgGPSRef1GpsState,
+	mbgGPSRef1GpsStateVal,
+	mbgGPSRef1GpsPosition,
+	mbgGPSRef1GpsSatellites,
+	mbgGPSRef1GpsSatellitesGood,
+	mbgGPSRef1GpsSatellitesInView,
+	mbgGPSRefclock2Type,
+	mbgGPSRefclock2TypeVal,
+	mbgGPSRefclock2Mode,
+	mbgGPSRefclock2ModeVal,
+	mbgGPSRef2GpsState,
+	mbgGPSRef2GpsStateVal,
+	mbgGPSRef2GpsPosition,
+	mbgGPSRef2GpsSatellites,
+	mbgGPSRef2GpsSatellitesGood,
+	mbgGPSRef2GpsSatellitesInView,
+	mbgSCUType,
+	mbgSCUTypeVal,
+	mbgSCUMaster,
+	mbgSCUMasterVal,
+	mbgSCUMasterselect,
+	mbgSCUMasterselectVal,
+	mbgSCUTimeSync1,
+	mbgSCUTimeSync2,
+	mbgSCUTimelimitError,
+	mbgSCUDisableOutputs,
+	mbgSCUSelectedInput,
+	mbgSCUSelectedInputVal,
+	mbgSCUACOMode,
+	mbgSCUPSUStatus,
+	mbgSCUPSU1Status,
+	mbgSCUPSU2Status
+    }			
+    STATUS	current
+    DESCRIPTION
+	"The collection of objects for the MBG XPT MIB"
+	
+    ::= { mbgXPTGroups 1 }
+    
+mbgXPTTrapsGroup 	NOTIFICATION-GROUP
+    NOTIFICATIONS {
+	mbgGPSTrapColdBoot,
+	mbgGPSTrapWarmBoot,
+	mbgGPSNavSolved,
+	mbgGPSTrapReceiverNotResponding,
+	mbgGPSTrapReceiverNotSync,
+	mbgGPSTrapAntennaFaulty,
+	mbgGPSTrapAntennaReconnect,
+	mbgGPSTrapLANXPTBoot,
+	mbgGPSTrapLeapSecondAnnounced,
+	mbgGPSTrapMasterclockSwitchover,
+	mbgGPSTrapPowerSupplyFailure,
+	mbgGPSTrapPowerSupplyOK,
+	mbgGPSTrapTestNotification
+    }																
+    STATUS	current
+    DESCRIPTION
+	"The collection of traps for the MBG XPT MIB"
+	
+    ::= { mbgXPTGroups 2 }
+
+END

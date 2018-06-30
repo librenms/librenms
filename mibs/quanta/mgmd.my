@@ -1,0 +1,1202 @@
+MGMD-STD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, mib-2, Counter32, Gauge32,
+    Unsigned32, TimeTicks            FROM SNMPv2-SMI
+    InetAddress, InetAddressType     FROM INET-ADDRESS-MIB
+    RowStatus                        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP  FROM SNMPv2-CONF
+    InterfaceIndexOrZero,
+    InterfaceIndex                   FROM IF-MIB;
+
+mgmdStdMIB MODULE-IDENTITY
+    LAST-UPDATED "200505170000Z" -- May 17, 2005
+    ORGANIZATION "Netgear Inc"
+    CONTACT-INFO ""
+    DESCRIPTION
+            "The MIB module for MGMD Management.
+	    A New version of MGMD combining RFC 2933 and RFC 3019.
+            Includes IGMPv3 and MLDv2 source filtering changes.
+            this follows the draft : draft-ietf-magma-mgmd-mib-05.txt"
+    ::= { mib-2 82 }
+
+
+mgmdMIBObjects     OBJECT IDENTIFIER ::= { mgmdStdMIB 1 }
+
+--
+--  The MGMD Host Interface Table
+--
+
+mgmdHostInterfaceTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF MgmdHostInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the interfaces on which
+             IGMP or MLD is enabled."
+    ::= { mgmdMIBObjects 3 }
+
+mgmdHostInterfaceEntry OBJECT-TYPE
+    SYNTAX     MgmdHostInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) representing an interface on
+            which IGMP or MLD is enabled."
+    INDEX      { mgmdHostInterfaceIfIndex, mgmdHostInterfaceQuerierType}
+    ::= { mgmdHostInterfaceTable 1 }
+
+MgmdHostInterfaceEntry ::= SEQUENCE {
+    mgmdHostInterfaceIfIndex               InterfaceIndex,
+    mgmdHostInterfaceQuerierType           InetAddressType,
+    mgmdHostInterfaceQuerier               InetAddress,
+    mgmdHostInterfaceStatus                RowStatus,
+    mgmdHostInterfaceVersion               Unsigned32,
+    mgmdHostInterfaceVersion1QuerierTimer  TimeTicks,
+    mgmdHostInterfaceVersion2QuerierTimer  TimeTicks
+}
+
+
+mgmdHostInterfaceIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of the interface for which IGMP or MLD
+            is enabled. The table is indexed by the ifIndex value and
+            the InetAddressType to allow for interfaces which may be
+            configured in both IPv4 and IPv6 modes."
+    ::= { mgmdHostInterfaceEntry 1 }
+
+mgmdHostInterfaceQuerierType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The address type of this interface. This entry along with
+             the ifIndex value acts as an index to the mgmdHostInterface
+             table. A physical interface may be configured in multiple
+             modes concurrently, e.g. in IPv4 and IPv6 modes connected
+             to the same interface, however the traffic is considered to
+             be logically separate."
+    ::= { mgmdHostInterfaceEntry 2 }
+
+mgmdHostInterfaceQuerier OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address of the IGMP or MLD Querier on the IP subnet to
+            which this interface is attached. The InetAddressType, e.g.
+            IPv4 or IPv6, is identified by the 
+	    mgmdHostInterfaceQuerierType variable in the 
+	    mgmdHostInterface table."
+    ::= { mgmdHostInterfaceEntry 3 }
+
+mgmdHostInterfaceStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The activation of a row enables the host side of IGMP or 
+	    MLD on the interface.  The destruction of a row disables the
+	    host side of IGMP or MLD  on the interface."
+    ::= { mgmdHostInterfaceEntry 4 }
+
+mgmdHostInterfaceVersion OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..3)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+
+            "The maximum version of MGMD which the host can run on this 
+	    interface. A value of 1 is only applicable for IPv4, and 
+	    indicates that the host only supports IGMPv1 on the 
+	    interface. A value of 2 indicates that the host also 
+	    supports IGMPv2 (for IPv4) or MLDv1 (for IPv6). A value of 3
+	    indicates that the host also supports IGMPv3 (for IPv4) or 
+	    MLDv2 (for IPv6)."
+    DEFVAL     { 3 }
+    ::= { mgmdHostInterfaceEntry 5 }
+
+mgmdHostInterfaceVersion1QuerierTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time remaining until the host assumes that there are
+            no MGMDv1 routers present on the interface.  While this is
+            non-zero, the host will reply to all queries with version 1
+            membership reports. This variable applies to MGMDv2 or 3 
+	    hosts that are forced to run in v1 for compatibility with v1
+	    hosts or routers present on the interface. This object may 
+	    only be present  when the corresponding value of 
+	    mgmdHostCacheAddressType is IPv4."
+    DEFVAL     { 0 }
+    ::= { mgmdHostInterfaceEntry 6 }
+
+mgmdHostInterfaceVersion2QuerierTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time remaining until the host assumes that there are
+            no MGMDv2 routers present on the interface.  While this is
+            non-zero, the host will reply to all queries with version 1
+            or 2 membership reports. This variable applies to MGMDv3 
+	    hosts that are forced to run in v2 for compatibility with v2
+	    hosts or routers present on the interface."
+    DEFVAL     { 0 }
+    ::= { mgmdHostInterfaceEntry 7 }
+
+
+--
+--  The MGMD Router Interface Table
+--
+
+mgmdRouterInterfaceTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF MgmdRouterInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the interfaces on which
+             IGMP or MLD is enabled."
+    ::= { mgmdMIBObjects 4 }
+
+mgmdRouterInterfaceEntry OBJECT-TYPE
+    SYNTAX     MgmdRouterInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) representing an interface on
+            which IGMP or MLD is enabled."
+    INDEX      { mgmdRouterInterfaceIfIndex, 
+                 mgmdRouterInterfaceQuerierType }
+    ::= { mgmdRouterInterfaceTable 1 }
+
+MgmdRouterInterfaceEntry ::= SEQUENCE {
+    mgmdRouterInterfaceIfIndex               InterfaceIndex,
+    mgmdRouterInterfaceQuerierType           InetAddressType,
+    mgmdRouterInterfaceQuerier               InetAddress,
+    mgmdRouterInterfaceQueryInterval         Unsigned32,
+    mgmdRouterInterfaceStatus                RowStatus,
+    mgmdRouterInterfaceVersion               Unsigned32,
+    mgmdRouterInterfaceQueryMaxResponseTime  Unsigned32,
+    mgmdRouterInterfaceQuerierUpTime         TimeTicks,
+    mgmdRouterInterfaceQuerierExpiryTime     TimeTicks,
+    mgmdRouterInterfaceWrongVersionQueries   Counter32,
+    mgmdRouterInterfaceJoins                 Counter32,
+    mgmdRouterInterfaceProxyIfIndex          InterfaceIndexOrZero,
+    mgmdRouterInterfaceGroups                Gauge32,
+    mgmdRouterInterfaceRobustness            Unsigned32,
+    mgmdRouterInterfaceLastMembQueryIntvl    Unsigned32
+}
+
+
+mgmdRouterInterfaceIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of the interface for which IGMP or MLD
+            is enabled. The table is indexed by the ifIndex value and
+            the InetAddressType to allow for interfaces which may be
+            configured in both IPv4 and IPv6 modes."
+    ::= { mgmdRouterInterfaceEntry 1 }
+
+
+mgmdRouterInterfaceQuerierType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The address type of this interface. This entry along with
+             the ifIndex value acts as the index to the 
+	     mgmdRouterInterface table. A physical interface may be 
+	     configured in multiple modes concurrently, e.g. in IPv4 
+	     and IPv6 modes connected to the same interface, however 
+	     the traffic is considered to be logically separate."
+    ::= { mgmdRouterInterfaceEntry 2 }
+
+mgmdRouterInterfaceQuerier OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address of the IGMP or MLD Querier on the IP subnet to
+            which this interface is attached. The InetAddressType, e.g.
+            IPv4 or IPv6, is identified by the 
+	    mgmdRouterInterfaceQuerierType variable in the 
+	    mgmdRouterInterface table."
+    ::= { mgmdRouterInterfaceEntry 3 }
+
+mgmdRouterInterfaceQueryInterval OBJECT-TYPE
+    SYNTAX     Unsigned32
+    UNITS      "seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The frequency at which IGMP or MLD Host-Query packets are
+            transmitted on this interface."
+    DEFVAL     { 125 }
+    ::= { mgmdRouterInterfaceEntry 4 }
+
+mgmdRouterInterfaceStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The activation of a row enables the router side of IGMP or
+	    MLD on the interface.  The destruction of a row disables the
+	    router side of IGMP or MLD on the interface."
+    ::= { mgmdRouterInterfaceEntry 5 }
+
+mgmdRouterInterfaceVersion OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..3)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The version of MGMD which is running on this interface.
+            Value 1 applies to IGMPv1 routers only. Value 2 applies
+            To IGMPv2 and MLDv1 routers, and value 3 applies to IGMPv3
+            and MLDv2 routers.
+            This object can be used to configure a router capable of
+            running either version.  For IGMP and MLD to function
+            correctly, all routers on a LAN must be configured to run
+            the same version on that LAN."
+    DEFVAL     { 3 }
+    ::= { mgmdRouterInterfaceEntry 6 }
+
+mgmdRouterInterfaceQueryMaxResponseTime OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "tenths of seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The maximum query response time advertised in MGMDv2 or v3
+            queries on this interface."
+    DEFVAL     { 100 }
+    ::= { mgmdRouterInterfaceEntry 7 }
+
+mgmdRouterInterfaceQuerierUpTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time since mgmdRouterInterfaceQuerier was last 
+	    changed."
+    ::= { mgmdRouterInterfaceEntry 8 }
+
+
+
+mgmdRouterInterfaceQuerierExpiryTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The amount of time remaining before the Other Querier
+            Present Timer expires.  If the local system is the querier,
+            the value of this object is zero."
+    ::= { mgmdRouterInterfaceEntry 9 }
+
+mgmdRouterInterfaceWrongVersionQueries OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+             "The number of general queries received whose IGMP or MLD
+	    version does not match the equivalent 
+	    mgmdRouterInterfaceVersion, over the lifetime of the row 
+	    entry.  Both IGMP and MLD require that all
+            routers on a LAN be configured to run the same version.
+            Thus, if any general queries are received with the wrong 
+	    version, this indicates a configuration error."
+    ::= { mgmdRouterInterfaceEntry 10 }
+
+mgmdRouterInterfaceJoins OBJECT-TYPE
+    SYNTAX     Counter32
+
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of times a group membership has been added on
+            this interface; that is, the number of times an entry for
+            this interface has been added to the Cache Table.  This
+            object gives an indication of the amount of IGMP or MLD
+            activity over the lifetime of the row entry."
+    ::= { mgmdRouterInterfaceEntry 11 }
+
+mgmdRouterInterfaceProxyIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndexOrZero
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Some devices implement a form of IGMP or MLD proxying
+            whereby memberships learned on the interface represented by
+            this row, cause Host Membership Reports to be sent on the
+            interface whose ifIndex value is given by this object.
+            Such a device would implement the mgmdV2RouterBaseMIBGroup
+	    only on its router interfaces (those interfaces with 
+	    non-zero mgmdRouterInterfaceProxyIfIndex).  Typically, the 
+	    value of this object is 0, indicating that no proxying is 
+	    being done."
+    DEFVAL     { 0 }
+    ::= { mgmdRouterInterfaceEntry 12 }
+
+
+
+mgmdRouterInterfaceGroups OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The current number of entries for this interface in the
+            RouterCache Table."
+    ::= { mgmdRouterInterfaceEntry 13 }
+
+mgmdRouterInterfaceRobustness OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..255)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The Robustness Variable allows tuning for the expected
+            packet loss on a subnet.  If a subnet is expected to be
+            lossy, the Robustness Variable may be increased.  IGMP and
+            MLD is robust to (Robustness Variable-1) packet losses."
+    DEFVAL     { 2 }
+    ::= { mgmdRouterInterfaceEntry 14 }
+
+mgmdRouterInterfaceLastMembQueryIntvl OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "tenths of seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The Last Member Query Interval is the Max Response Time
+            inserted into Group-Specific Queries sent in response to
+            Leave Group messages, and is also the amount of time
+            Between Group-Specific Query messages.  This value may be
+            tuned to modify the leave latency of the network.  A
+            reduced value results in reduced time to detect the loss of
+            the last member of a group.  The value of this object is
+            irrelevant if mgmdRouterInterfaceVersion is 1."
+    DEFVAL     { 10 }
+    ::= { mgmdRouterInterfaceEntry 15 }
+
+
+--
+--  The MGMD Host Cache Table
+--
+
+mgmdHostCacheTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF MgmdHostCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the IP multicast groups for
+             which the host is a member on a particular interface."
+
+
+    ::= { mgmdMIBObjects 5 }
+
+mgmdHostCacheEntry OBJECT-TYPE
+    SYNTAX     MgmdHostCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the mgmdHostCacheTable."
+    INDEX      { mgmdHostCacheAddressType, mgmdHostCacheAddress,
+                 mgmdHostCacheIfIndex }
+    ::= { mgmdHostCacheTable 1 }
+
+MgmdHostCacheEntry ::= SEQUENCE {
+    mgmdHostCacheAddressType        InetAddressType,
+    mgmdHostCacheAddress            InetAddress ,
+    mgmdHostCacheIfIndex            InterfaceIndex,
+    mgmdHostCacheUpTime             TimeTicks,
+    mgmdHostCacheLastReporter       InetAddress,
+    mgmdHostCacheSourceFilterMode   INTEGER
+}
+
+mgmdHostCacheAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The address type of the mgmdHostCacheTable entry. This 
+	    value applies to both the mgmdHostCacheAddress and the
+            mgmdHostCacheLastReporter entries."
+    ::= { mgmdHostCacheEntry 1 }
+
+
+mgmdHostCacheAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The IP multicast group address for which this entry
+            contains information. The InetAddressType, e.g.
+            IPv4 or IPv6, is identified by the mgmdHostCacheAddressType
+            variable in the mgmdHostCache table."
+    ::= { mgmdHostCacheEntry 2 }
+
+mgmdHostCacheIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The interface for which this entry contains information
+            for an IP multicast group address."
+    ::= { mgmdHostCacheEntry 3 }
+
+
+
+mgmdHostCacheUpTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time elapsed since this entry was created."
+    ::= { mgmdHostCacheEntry 4 }
+
+mgmdHostCacheLastReporter OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The IP address of the source of the last membership report
+            received for this IP Multicast group address on this
+            interface.  If no membership report has been received, this
+            object has the value 0::0. The InetAddressType, e.g.
+            IPv4 or IPv6, is identified by the mgmdHostCacheAddressType
+            variable in the mgmdHostCache table."
+    ::= { mgmdHostCacheEntry 5 }
+
+mgmdHostCacheSourceFilterMode OBJECT-TYPE
+    SYNTAX     INTEGER {include (1),
+                        exclude (2) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The state in which the interface is currently set. The
+            value indicates the relevance of the corresponding source
+            list entries in the HostSrcList Table for MGMDv3 
+	    interfaces."
+    ::= { mgmdHostCacheEntry 6 }
+
+--
+--  The MGMD Router Cache Table
+--
+
+
+mgmdRouterCacheTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF MgmdRouterCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the IP multicast groups for
+              which there are members on a particular router interface."
+    ::= { mgmdMIBObjects 6 }
+
+mgmdRouterCacheEntry OBJECT-TYPE
+    SYNTAX     MgmdRouterCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the mgmdRouterCacheTable."
+
+    INDEX      { mgmdRouterCacheAddressType, mgmdRouterCacheAddress,
+                 mgmdRouterCacheIfIndex }
+    ::= { mgmdRouterCacheTable 1 }
+
+
+MgmdRouterCacheEntry ::= SEQUENCE {
+    mgmdRouterCacheAddressType        InetAddressType,
+    mgmdRouterCacheAddress            InetAddress,
+    mgmdRouterCacheIfIndex            InterfaceIndex,
+    mgmdRouterCacheLastReporter       InetAddress,
+    mgmdRouterCacheUpTime             TimeTicks,
+    mgmdRouterCacheExpiryTime         TimeTicks,
+    mgmdRouterCacheVersion1HostTimer  TimeTicks,
+    mgmdRouterCacheVersion2HostTimer  TimeTicks,
+    mgmdRouterCacheSourceFilterMode   INTEGER
+}
+
+mgmdRouterCacheAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The address type of the mgmdRouterCacheTable entry. This 
+	    value applies to both the mgmdRouterCacheAddress and the
+            mgmdRouterCacheLastReporter entries."
+	::= { mgmdRouterCacheEntry 1 }
+
+mgmdRouterCacheAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The IP multicast group address for which this entry
+            contains information. The InetAddressType, e.g.
+            IPv4 or IPv6, is identified by the 
+	    mgmdRouterCacheAddressType variable in the mgmdRouterCache 
+	    table."
+    ::= { mgmdRouterCacheEntry 2 }
+
+mgmdRouterCacheIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The interface for which this entry contains information
+            for an IP multicast group address."
+    ::= { mgmdRouterCacheEntry 3 }
+
+mgmdRouterCacheLastReporter OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The IP address of the source of the last membership report
+            received for this IP Multicast group address on this
+            interface.  If no membership report has been received, this
+            object has the value 0::0. The InetAddressType, e.g.
+            IPv4 or IPv6, is identified by the 
+	    mgmdRouterCacheAddressType variable in the mgmdRouterCache 
+	    table."
+    ::= { mgmdRouterCacheEntry 4 }
+
+mgmdRouterCacheUpTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time elapsed since this entry was created."
+    ::= { mgmdRouterCacheEntry 5 }
+
+mgmdRouterCacheExpiryTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The minimum amount of time remaining before this entry
+            will be aged out.  The value must always be greater than 0."
+    ::= { mgmdRouterCacheEntry 6 }
+
+mgmdRouterCacheVersion1HostTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time remaining until the local router will assume that
+            there are no longer any MGMD version 1 members on the IP
+            subnet attached to this interface.  This entry only applies
+            to IGMPv1 hosts, and is not implemented for MLD. Upon
+            hearing any MGMDv1 Membership Report (IGMPv1 only), this
+            value is reset to the group membership timer.  While this
+            time remaining is non-zero, the local router ignores any
+            MGMDv2 Leave messages (IGMPv2 only) for this group that it
+            receives on this interface."
+    ::= { mgmdRouterCacheEntry 7 }
+
+mgmdRouterCacheVersion2HostTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time remaining until the local router will assume that
+            there are no longer any MGMD version 2 members on the IP
+            subnet attached to this interface.  This entry applies to
+            both IGMP and MLD hosts. Upon hearing any MGMDv2
+            Membership Report, this value is reset to the group
+            membership timer.  Assuming no MGMDv1 hosts have been
+            detected, the local router does not ignore any MGMDv2 Leave
+
+
+            messages for this group that it receives on this
+            interface."
+    ::= { mgmdRouterCacheEntry 8 }
+
+mgmdRouterCacheSourceFilterMode OBJECT-TYPE
+    SYNTAX     INTEGER {include (1),
+                        exclude (2) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The state in which the interface is currently set. The
+            value indicates the relevance of the corresponding source
+            list entries in the RouterSrcList Table for MGMDv3 
+	    interfaces."
+    ::= { mgmdRouterCacheEntry 9 }
+
+--
+--  The MGMD Reverse Host interface/cache lookup Table
+--
+
+mgmdInverseHostCacheTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF MgmdInverseHostCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the interfaces which
+            are members of a particular group. This is a reverse
+             lookup table for entries in the mgmdHostCacheTable."
+    ::= { mgmdMIBObjects 7 }
+
+mgmdInverseHostCacheEntry OBJECT-TYPE
+    SYNTAX     MgmdInverseHostCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the 
+	    mgmdInverseHostCacheTable."
+    INDEX      { mgmdInverseHostCacheIfIndex, 
+                 mgmdInverseHostCacheAddressType,
+                 mgmdInverseHostCacheAddress}
+    ::= { mgmdInverseHostCacheTable 1 }
+
+
+MgmdInverseHostCacheEntry ::= SEQUENCE {
+    mgmdInverseHostCacheIfIndex            InterfaceIndex,
+    mgmdInverseHostCacheAddressType        InetAddressType,
+    mgmdInverseHostCacheAddress            InetAddress
+}
+
+mgmdInverseHostCacheIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The interface for which this entry contains information."
+    ::= { mgmdInverseHostCacheEntry 1 }
+
+
+mgmdInverseHostCacheAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The address type of the mgmdInverseHostCacheTable entry."
+    ::= { mgmdInverseHostCacheEntry 2 }
+
+mgmdInverseHostCacheAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The IP multicast group address for which this entry
+            contains information about an interface. The 
+	    InetAddressType, e.g. IPv4 or IPv6, is identified by the 
+	    mgmdInverseHostCacheAddressType
+            variable in the mgmdInverseHostCache table."
+    ::= { mgmdInverseHostCacheEntry 3 }
+
+
+--
+--  The MGMD Reverse Router interface/cache lookup Table
+--
+
+mgmdInverseRouterCacheTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF MgmdInverseRouterCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the interfaces which
+              are members of a particular group. This is a reverse
+            lookup table for entries in the mgmdRouterCacheTable."
+    ::= { mgmdMIBObjects 8 }
+
+mgmdInverseRouterCacheEntry OBJECT-TYPE
+    SYNTAX     MgmdInverseRouterCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the 
+	    mgmdInverseRouterCacheTable."
+    INDEX      { mgmdInverseRouterCacheIfIndex, 
+                 mgmdInverseRouterCacheAddressType,
+                 mgmdInverseRouterCacheAddress}
+    ::= { mgmdInverseRouterCacheTable 1 }
+
+
+MgmdInverseRouterCacheEntry ::= SEQUENCE {
+    mgmdInverseRouterCacheIfIndex            InterfaceIndex,
+    mgmdInverseRouterCacheAddressType        InetAddressType,
+    mgmdInverseRouterCacheAddress            InetAddress
+}
+
+mgmdInverseRouterCacheIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The interface for which this entry contains information."
+    ::= { mgmdInverseRouterCacheEntry 1 }
+
+mgmdInverseRouterCacheAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The address type of the mgmdInverseRouterCacheTable entry."
+    ::= { mgmdInverseRouterCacheEntry 2 }
+
+mgmdInverseRouterCacheAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The IP multicast group address for which this entry
+            contains information about an interface. The 
+	    InetAddressType, e.g.IPv4 or IPv6, is identified by the 
+	    mgmdInverseRouterCacheAddressType variable in the 
+            mgmdInverseRouterCache table."
+    ::= { mgmdInverseRouterCacheEntry 3 }
+
+
+--
+--  The MGMD Host Source list Table
+--
+
+mgmdHostSrcListTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF MgmdHostSrcListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the Source List entries
+             corresponding to each interface and multicast group pair on
+	     a host."
+    ::= { mgmdMIBObjects 9 }
+
+mgmdHostSrcListEntry OBJECT-TYPE
+    SYNTAX     MgmdHostSrcListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the mgmdHostSrcListTable."
+    INDEX      { mgmdHostSrcListAddressType, mgmdHostSrcListAddress,
+                 mgmdHostSrcListIfIndex, mgmdHostSrcListHostAddress }
+    ::= { mgmdHostSrcListTable 1 }
+
+
+MgmdHostSrcListEntry ::= SEQUENCE {
+    mgmdHostSrcListAddressType      InetAddressType,
+    mgmdHostSrcListAddress          InetAddress,
+    mgmdHostSrcListIfIndex          InterfaceIndex,
+    mgmdHostSrcListHostAddress      InetAddress
+}
+
+mgmdHostSrcListAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The address type of the InetAddress variables in this
+            table. This value applies to the mgmdHostSrcListHostAddress
+	    and mgmdHostSrcListAddress entries."
+    ::= { mgmdHostSrcListEntry 1 }
+
+mgmdHostSrcListAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The IP multicast group address for which this entry
+            contains information."
+    ::= { mgmdHostSrcListEntry 2 }
+
+mgmdHostSrcListIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The interface for which this entry contains information
+            for an IP multicast group address."
+    ::= { mgmdHostSrcListEntry 3 }
+
+mgmdHostSrcListHostAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The host address to which this entry
+            corresponds. The mgmdHostCacheSourceFilterMode value for 
+	    this Group address and interface indicates whether this 
+	    Host address is included or excluded."
+    ::= { mgmdHostSrcListEntry 4 }
+
+
+
+
+--
+--  The MGMD Router Source list Table
+--
+
+mgmdRouterSrcListTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF MgmdRouterSrcListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the Source List entries
+             corresponding to each interface and multicast group pair on
+	     a Router."
+    ::= { mgmdMIBObjects 10 }
+
+mgmdRouterSrcListEntry OBJECT-TYPE
+    SYNTAX     MgmdRouterSrcListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the mgmdRouterSrcListTable."
+    INDEX      { mgmdRouterSrcListAddressType, mgmdRouterSrcListAddress,
+mgmdRouterSrcListIfIndex, mgmdRouterSrcListHostAddress }
+    ::= { mgmdRouterSrcListTable 1 }
+
+
+
+MgmdRouterSrcListEntry ::= SEQUENCE {
+    mgmdRouterSrcListAddressType      InetAddressType,
+    mgmdRouterSrcListAddress          InetAddress,
+    mgmdRouterSrcListIfIndex          InterfaceIndex,
+    mgmdRouterSrcListHostAddress      InetAddress
+}
+
+mgmdRouterSrcListAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The address type of the InetAddress variables in this
+            table. This value applies to the 
+	    mgmdRouterSrcListHostAddress and mgmdRouterSrcListAddress 
+	    entries."
+    ::= { mgmdRouterSrcListEntry 1 }
+
+mgmdRouterSrcListAddress OBJECT-TYPE
+
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The IP multicast group address for which this entry
+            contains information."
+    ::= { mgmdRouterSrcListEntry 2 }
+
+mgmdRouterSrcListIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The interface for which this entry contains information
+            for an IP multicast group address."
+    ::= { mgmdRouterSrcListEntry 3 }
+
+mgmdRouterSrcListHostAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The host address to which this entry
+            corresponds. The mgmdRouterCacheSourceFilterMode value for 
+	    this Group address and interface indicates whether this 
+	    Host address is included or excluded."
+    ::= { mgmdRouterSrcListEntry 4 }
+
+
+
+
+
+-- conformance information
+
+mgmdMIBConformance
+                 OBJECT IDENTIFIER ::= { mgmdStdMIB 2 }
+mgmdMIBCompliance  OBJECT IDENTIFIER ::= { mgmdMIBConformance 3 }
+mgmdMIBGroups    OBJECT IDENTIFIER ::= { mgmdMIBConformance 4 }
+
+
+-- Protocol Version Conformance
+
+mgmdIgmpV1HostMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The version statement for hosts running IGMPv1, RFC 1112 
+	    [5], and implementing the MGMD MIB. MGMDv1 applies to hosts 
+	    and routers running IGMPv1 only. IGMPv1 hosts must support 
+	    the IPv4 address type."
+    MODULE  -- this module
+    MANDATORY-GROUPS { mgmdHostBaseMIBGroup }
+    --GROUPS { mgmdHostOptMIBGroup }
+    OBJECT     mgmdHostInterfaceStatus
+    MIN-ACCESS read-only
+    DESCRIPTION
+             "Write access is not required."			 
+    ::= { mgmdMIBCompliance 1 }
+
+mgmdIgmpV1RouterMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION 
+            "The version statement for routers running IGMPv1, RFC 1112 
+	    [5], and implementing the MGMD MIB. MGMDv1 applies to hosts 
+	    and routers running IGMPv1 only. IGMPv1 routers must support 
+	    the IPv4 address type "
+    MODULE  -- this module
+    MANDATORY-GROUPS { mgmdRouterBaseMIBGroup }
+    OBJECT     mgmdRouterInterfaceStatus
+    MIN-ACCESS read-only
+    DESCRIPTION
+             "Write access is not required."			 
+    ::= { mgmdMIBCompliance 2 }
+
+mgmdIgmpV2HostMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The version statement for hosts running IGMPv2, RFC 2236 
+	    [6], and implementing the MGMD MIB. MGMDv2 applies to hosts
+	    and routers running IGMPv2 or MLDv1. IGMPv2 hosts must 
+	    support the IPv4 address type"
+    MODULE  -- this module
+    MANDATORY-GROUPS { mgmdHostBaseMIBGroup , mgmdV2IgmpHostMIBGroup }	
+    --GROUPS { mgmdV2HostOptMIBGroup }
+    ::= { mgmdMIBCompliance 3 }
+
+mgmdIgmpV2RouterMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The version statement for routers running IGMPv2, RFC 2236 
+	    [6], and implementing the MGMD MIB. MGMDv2 applies to hosts 
+	    and routers running IGMPv2 or MLDv1. IGMPv2 routers must 
+	    support the IPv4 address type "
+    MODULE  -- this module
+    MANDATORY-GROUPS { mgmdRouterBaseMIBGroup,
+	               mgmdV2RouterBaseMIBGroup,
+                       mgmdV2IgmpRouterMIBGroup
+                     }
+    --GROUPS { mgmdV2RouterOptMIBGroup, mgmdV2ProxyMIBGroup }
+    OBJECT     mgmdRouterInterfaceStatus
+    MIN-ACCESS read-only
+    DESCRIPTION
+             "Write access is not required."
+    ::= { mgmdMIBCompliance 4 }
+
+mgmdMldV1HostMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+
+    DESCRIPTION
+            "The version statement for hosts running MLDv1, RFC 2710 
+	    [8], and implementing the MGMD MIB. MGMDv2 applies to hosts 
+	    and routers running IGMPv2 or MLDv1. MLDv1 hosts must 
+	    support the IPv6 address type."
+    MODULE  -- this module
+    MANDATORY-GROUPS { mgmdHostBaseMIBGroup }
+    --GROUPS { mgmdV2HostOptMIBGroup }
+    ::= { mgmdMIBCompliance 5 }
+
+mgmdMldV1RouterMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The version statement for routers running MLDv1, RFC 2710 
+	    [8], and implementing the MGMD MIB. MGMDv2 applies to hosts 
+	    and routers running IGMPv2 or MLDv1. MLDv1 routers must 
+	    support the IPv6 address type."
+    MODULE  -- this module
+    MANDATORY-GROUPS { mgmdRouterBaseMIBGroup,
+                       mgmdV2RouterBaseMIBGroup
+                     }
+    --GROUPS { mgmdV2RouterOptMIBGroup, mgmdV2ProxyMIBGroup }
+    OBJECT     mgmdRouterInterfaceStatus
+	MIN-ACCESS read-only
+    DESCRIPTION
+             "Write access is not required."
+    ::= { mgmdMIBCompliance 6 }
+
+mgmdIgmpV3HostMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The version statement for hosts running IGMPv3, RFC 3376 
+	    [7], and implementing the MGMD MIB. MGMDv3 applies to hosts
+	    and routers running IGMPv3 or MLDv2. IGMPv3 hosts must 
+	    support the IPv4 address type."
+    MODULE  -- this module
+    MANDATORY-GROUPS { mgmdHostBaseMIBGroup,
+                       mgmdV2IgmpHostMIBGroup,
+                       mgmdV3HostMIBGroup
+                     }
+    OBJECT     mgmdHostInterfaceStatus
+	MIN-ACCESS read-only
+    DESCRIPTION
+             "Write access is not required."
+    ::= { mgmdMIBCompliance 7 }
+
+mgmdIgmpV3RouterMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The version statement for routers running IGMPv3, RFC 3376 
+	    [7], and implementing the MGMD MIB. MGMDv3 applies to hosts 
+	    and routers running IGMPv3 or MLDv2. IGMPv3 routers must 
+	    support the IPv4 address type."
+    MODULE  -- this module
+    MANDATORY-GROUPS { mgmdRouterBaseMIBGroup,
+                       mgmdV2RouterBaseMIBGroup,
+                       mgmdV2IgmpRouterMIBGroup,
+                       mgmdV3RouterMIBGroup
+                     }
+    OBJECT     mgmdRouterInterfaceStatus
+	MIN-ACCESS read-only
+    DESCRIPTION
+             "Write access is not required."
+    ::= { mgmdMIBCompliance 8 }
+
+mgmdMldV2HostMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The version statement for hosts running MLDv2 [9] and
+             implementing the MGMD MIB. MGMDv3 applies to hosts and 
+	     routers running IGMPv3 or MLDv2. MLDv2 hosts must support 
+	     the IPv6 address type."
+    MODULE  -- this module
+    MANDATORY-GROUPS { mgmdHostBaseMIBGroup,
+                       mgmdV3HostMIBGroup
+                     }
+    OBJECT     mgmdHostInterfaceStatus
+    MIN-ACCESS read-only
+    DESCRIPTION
+             "Write access is not required."
+    ::= { mgmdMIBCompliance 9 }
+
+mgmdMldV2RouterMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The version statement for routers running MLDv2 [9] and
+            implementing the MGMD MIB. MGMDv3 applies to hosts and 
+	     routers running IGMPv3 or MLDv2. MLDv2 routers must 
+	     support the IPv6 address type."
+    MODULE  -- this module
+    MANDATORY-GROUPS { mgmdRouterBaseMIBGroup,
+                       mgmdV2RouterBaseMIBGroup,
+                       mgmdV3RouterMIBGroup
+                     }
+    OBJECT     mgmdRouterInterfaceStatus
+    MIN-ACCESS read-only
+    DESCRIPTION
+             "Write access is not required."
+    ::= { mgmdMIBCompliance 10 }
+
+
+
+-- units of conformance
+
+mgmdHostBaseMIBGroup OBJECT-GROUP
+    OBJECTS { mgmdHostInterfaceStatus }
+    STATUS  current
+    DESCRIPTION
+            "The basic collection of objects providing management of
+            MGMD version 1, 2 or 3 for Hosts."
+    ::= { mgmdMIBGroups 1 }
+
+mgmdRouterBaseMIBGroup OBJECT-GROUP
+    OBJECTS { mgmdRouterInterfaceStatus,
+              mgmdRouterCacheUpTime, mgmdRouterCacheExpiryTime,
+              mgmdRouterInterfaceJoins, mgmdRouterInterfaceGroups,
+              mgmdRouterCacheLastReporter,
+	      mgmdRouterInterfaceQuerierUpTime,
+              mgmdRouterInterfaceQuerierExpiryTime,
+              mgmdRouterInterfaceQueryInterval
+            }
+    STATUS  current
+    DESCRIPTION
+            "The basic collection of objects providing management of
+            MGMD version 1, 2 or 3 for Routers."
+    ::= { mgmdMIBGroups 2 }
+
+mgmdV2IgmpHostMIBGroup OBJECT-GROUP
+    OBJECTS { mgmdHostInterfaceVersion,
+              mgmdHostInterfaceVersion1QuerierTimer
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of additional objects for management of IGMP
+            version 2 in hosts for MGMD version 2 compliance."
+    ::= { mgmdMIBGroups 3 }
+
+mgmdHostOptMIBGroup OBJECT-GROUP
+    OBJECTS { mgmdHostCacheLastReporter, mgmdHostCacheUpTime,
+             mgmdHostInterfaceQuerier }
+    STATUS  current
+    DESCRIPTION
+            "A collection of optional objects for MGMD hosts.
+            Supporting this group can be especially useful in an
+            environment with a router which does not support the MGMD
+            MIB."
+    ::= { mgmdMIBGroups 4 }
+
+mgmdV2HostOptMIBGroup OBJECT-GROUP
+    OBJECTS { mgmdInverseHostCacheAddress }
+    STATUS  current
+    DESCRIPTION
+            "An additional optional object for management of MGMD
+            version 2 in hosts."
+    ::= { mgmdMIBGroups 5 }
+
+mgmdV2RouterBaseMIBGroup OBJECT-GROUP
+    OBJECTS { mgmdRouterInterfaceVersion, mgmdRouterInterfaceQuerier,
+              mgmdRouterInterfaceQueryMaxResponseTime,
+              mgmdRouterInterfaceRobustness,
+              mgmdRouterInterfaceWrongVersionQueries,
+              mgmdRouterInterfaceLastMembQueryIntvl
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of additional objects for management of MGMD
+            version 2 in routers."
+    ::= { mgmdMIBGroups 6 }
+
+mgmdV2IgmpRouterMIBGroup OBJECT-GROUP
+    OBJECTS { mgmdRouterCacheVersion1HostTimer }
+    STATUS  current
+    DESCRIPTION
+            "A collection of further objects required by IGMPv2 routers
+			for MGMD version 2 compliance. "
+    ::= { mgmdMIBGroups 7 }
+
+mgmdV2ProxyMIBGroup OBJECT-GROUP
+    OBJECTS { mgmdRouterInterfaceProxyIfIndex }
+    STATUS  current
+    DESCRIPTION
+            "A collection of additional objects for management of MGMD
+            proxy devices."
+    ::= { mgmdMIBGroups 8 }
+
+mgmdV2RouterOptMIBGroup OBJECT-GROUP
+    OBJECTS { mgmdInverseRouterCacheAddress }
+    STATUS  current
+    DESCRIPTION
+            "An additional optional object for management of MGMD
+            version 2 in routers."
+    ::= { mgmdMIBGroups 9 }
+
+
+   	
+mgmdV3HostMIBGroup OBJECT-GROUP
+    OBJECTS { mgmdHostInterfaceVersion2QuerierTimer,
+              mgmdHostCacheSourceFilterMode,
+              mgmdHostSrcListHostAddress
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of additional objects for management of MGMD
+            version 3 in hosts."
+    ::= { mgmdMIBGroups 10 }
+
+mgmdV3RouterMIBGroup OBJECT-GROUP
+    OBJECTS { mgmdRouterCacheSourceFilterMode,
+              mgmdRouterCacheVersion2HostTimer,
+              mgmdRouterSrcListHostAddress
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of additional objects for management of MGMD
+            version 3 in routers."
+    ::= { mgmdMIBGroups 11 }
+
+END

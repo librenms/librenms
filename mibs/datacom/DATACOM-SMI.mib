@@ -1,0 +1,113 @@
+--
+-- DATACOM Telematica
+-- Copyright 1999-2006 by Datacom Telematica (Teracom Telematica Ltda). All Rights Reserved.
+-- This DATACOM SNMP MIB Specification is Datacom proprietary intellectual property.
+-- 
+-- This module will be extend, as required. The specification and other information 
+-- contained in this document can be modified without prior notice. The user should 
+-- consult Datacom to determine whether any such changes have been done.
+--
+
+DATACOM-SMI        DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+	enterprises
+		FROM RFC1155-SMI;
+
+datacom OBJECT IDENTIFIER ::={ enterprises 3709 }
+-- MODULE-IDENTITY
+--	ORGANIZATION	"DATACOM"
+--	CONTACT-INFO
+--		        "DATACOM
+--
+--		         Postal: DATACOM
+--			         Rua America, 1000
+--			         Eldorado do Sul, RS
+--			         CEP 92990-000
+--     		                 BRAZIL
+--
+--	 	         Tel:+55(51)3933 3000
+--			     Fax:+55(51)3933 3003
+--
+--			     E-mail: datacom@datacom.ind.br "
+--	DESCRIPTION
+--		" The Structure of Management Information for 
+--      Datacom Telematica enterprise. "
+--
+
+datacomRegistrations	OBJECT IDENTIFIER ::={ datacom 1 }
+ 
+
+datacomGenericMIBs	OBJECT IDENTIFIER ::={ datacom 2 }
+
+
+datacomProductsMIBs	OBJECT IDENTIFIER ::={ datacom 3 }
+
+	
+datacomExperimental	OBJECT IDENTIFIER ::={ datacom 4 }
+
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- 
+-- datacomRegistration
+-- Register the modules identification of MIBs
+datacomModules		OBJECT IDENTIFIER ::={ datacomRegistrations 1 }
+
+--
+-- Products registration
+-- Register the management cards
+datacomManagementCards 	OBJECT IDENTIFIER ::={ datacomRegistrations 2 }
+
+-- Register the modems
+datacomModems		      OBJECT IDENTIFIER ::={ datacomRegistrations 3 }
+	
+	
+-- Register the data converters.
+datacomAccessDevices		OBJECT IDENTIFIER ::={ datacomRegistrations 5 }
+
+
+-- Register the devices.
+datacomDevices				OBJECT IDENTIFIER ::={ datacomRegistrations 6 }
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- --
+--
+-- datacomProductsMIBs
+
+-- Modem MIBs
+datacomModemsMIBs		OBJECT IDENTIFIER ::={ datacomProductsMIBs 3 }
+	
+-- Access Devices MIBs 
+datacomAccessDevicesMIBs	OBJECT IDENTIFIER ::={ datacomProductsMIBs 5 }
+
+-- Devices MIBs 
+datacomDevicesMIBs	OBJECT IDENTIFIER ::={ datacomProductsMIBs 6 }
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- --
+--
+-- datacomExperimental
+
+datacomExpGenericMIBs	OBJECT IDENTIFIER ::={ datacomExperimental 2 }
+
+datacomExpProductsMIBs	OBJECT IDENTIFIER ::={ datacomExperimental 3 }
+
+
+--
+-- datacomExpProductsMIBs
+datacomExpModemsMIBs		        OBJECT IDENTIFIER ::={ datacomExpProductsMIBs 3 }
+
+-- Access Devices MIBs
+datacomExpAccessDevicesMIBs	  OBJECT IDENTIFIER ::={ datacomExpProductsMIBs 5 }
+
+
+END
+
+
+
+

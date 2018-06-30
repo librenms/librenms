@@ -1,3 +1,3 @@
 <?php
 
-$hardware = $poll_device['sysDescr'];
+$hardware = $device['sysDescr'];

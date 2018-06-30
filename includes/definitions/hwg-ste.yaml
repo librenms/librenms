@@ -1,0 +1,40 @@
+os: hwg-ste
+text: 'HWg STE'
+type: environment
+icon: hwg
+over:
+    - { graph: device_temperature, text: Temperature }
+mib_dir:
+    - hwg
+nobulk: true
+poller_modules:
+    applications: false
+    bgp-peers: false
+    ipmi: false
+    ospf: false
+    stp: false
+    netstats: false
+discovery_modules:
+    applications: false
+    arp-table: false
+    bgp-peers: false
+    cisco-vrf-lite: false
+    discovery-protocols: false
+    fdb-table: false
+    hr-device: false
+    ipv4-addresses: false
+    ipv6-addresses: false
+    mempools: false
+    ntp: false
+    ports: false
+    ports-stack: false
+    processors: false
+    services: false
+    storage: false
+    stp: false
+    ucd-diskio: false
+    vlans: false
+    wireless: false
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.21796.4.1

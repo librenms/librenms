@@ -1,0 +1,12 @@
+os: bintec-smart
+text: 'Bintec Smart Router'
+type: network
+icon: bintec
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_fortigate_cpu, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.272.4.201.82.78.79.48
+        - .1.3.6.1.4.1.272.4.201.83.82.49.48

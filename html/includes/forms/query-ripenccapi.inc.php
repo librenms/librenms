@@ -23,10 +23,10 @@ if (isset($data_param) && isset($query_param)) {
     $status  = 'error';
     $message = 'ERROR: Could not query';
 }
-die(json_encode(array(
+die(display(json_encode(array(
      'status'       => $status,
      'message'      => $message,
      'data_param'    => $data_param,
      'query_param'    => $query_param,
-     'output'       => $output
-)));
+     'output'       => $output,
+))));

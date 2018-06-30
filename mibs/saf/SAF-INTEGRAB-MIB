@@ -1,0 +1,2765 @@
+SAF-INTEGRAB-MIB DEFINITIONS ::= BEGIN
+
+-- Definitions for include by other SAF Tehnika mib modules
+
+IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32, Counter64,
+      TimeTicks
+          FROM SNMPv2-SMI                -- [RFC2578]
+      pointToPoint
+          FROM SAF-ENTERPRISE
+      safIntegra
+          FROM SAF-INTEGRA-MIB
+      DisplayString, DateAndTime, PhysAddress
+          FROM SNMPv2-TC
+      OBJECT-GROUP, MODULE-COMPLIANCE
+          FROM SNMPv2-CONF               -- [RFC2580]
+      IpAddress
+          FROM SNMPv2-SMI                -- [RFC2578]
+      IANAifType
+          FROM IANAifType-MIB;
+ 
+-- saf            OBJECT IDENTIFIER ::= { enterprises 7571 }
+-- microwaveRadio   OBJECT IDENTIFIER ::= { tehnika 1 }
+-- pointToPoint     OBJECT IDENTIFIER ::= { microwaveRadio 1 }
+-- safIntegra       OBJECT IDENTIFIER ::= { pointToPoint 7 }
+
+integraB MODULE-IDENTITY
+       LAST-UPDATED "201509170000Z" --  17 sep 2015
+       ORGANIZATION "SAF Tehnika"
+       CONTACT-INFO
+               "SAF Tehnika technical support
+                <techsupport>"
+       DESCRIPTION
+               "SAF Integra-B device management base"
+-- Revision history
+       REVISION   "201509170000Z" --  17 sep 2015
+       DESCRIPTION
+               "Conformance updated"
+       REVISION   "201509150000Z" --  15 sep 2015
+       DESCRIPTION
+               "Local/remote IP address, mask, gateway OIDs added"
+       REVISION   "201508120000Z" --  12 aug 2015
+       DESCRIPTION
+               "Syntax error fixes"
+       REVISION   "201507200000Z" --  20 jul 2015
+       DESCRIPTION
+               "Public Release 1.22.
+                integraBifIngressBPS, integraBifIngressPPS,
+                integraBifEgressBPS, integraBifEgressPPS value types changed"
+       REVISION   "201505200000Z" --  20 may 2015
+       DESCRIPTION
+               "Public Release 1.21.
+                Radio PLL status, free physical memory, CPU idle objects added"
+       REVISION   "201504140000Z" --  14 apr 2015
+       DESCRIPTION
+               "Descriptions updated"
+       REVISION   "201503240000Z" --  24 mar 2015
+       DESCRIPTION
+               "Public Release 1.20.
+                Removed integraBifLinkUpDownTrapEnable OID"
+       REVISION   "201502100000Z" --  10 feb 2015
+       DESCRIPTION
+               "Public Release 1.19.
+                Ethernet QoS statistics table reworked"
+       REVISION   "201502040000Z" --  04 feb 2015
+       DESCRIPTION
+               "Public Release 1.18.
+                Modem RMSE value type changed"
+       REVISION   "201501120000Z" --  12 jan 2015
+       DESCRIPTION
+               "Small syntax fix"
+       REVISION   "201501080000Z" --  08 jan 2015
+       DESCRIPTION
+               "Syntax fix"
+       REVISION   "201501060000Z" --  06 jan 2015
+       DESCRIPTION
+               "Public Release 1.17.
+                Module name change (Integra->IntegraB)"
+       REVISION   "201412180000Z" --  18 dec 2014
+       DESCRIPTION
+               "Public Release 1.16.
+                Ethernet port flow control OID added"
+       REVISION   "201412120000Z" --  12 dec 2014
+       DESCRIPTION
+               "Public Release 1.15.
+                Ethernet statistics table updated"
+       REVISION   "201412100000Z" --  10 dec 2014
+       DESCRIPTION
+               "Public Release 1.14.
+                System configuration executing & storing OIDs added"
+       REVISION   "201412090000Z" --  09 dec 2014
+       DESCRIPTION
+               "Public Release 1.13.
+                Duplex shift and Tx mute OIDs are read-only.
+                Read-write Tx mute duration OID added.
+                Radio ranges table created"
+       REVISION   "201411220000Z" --  22 nov 2014
+       DESCRIPTION
+               "Public Release 1.12.
+                Radio side OID is read-only. Grammar typos fixed"
+       REVISION   "201410290000Z" --  29 oct 2014
+       DESCRIPTION
+               "Licence expiration OID fix"
+       REVISION   "201409040000Z" --  04 sep 2014
+       DESCRIPTION
+               "Public Release 1.11. Modem carrier offset OID added"
+
+       REVISION   "201408010000Z" --  01 aug 2014
+       DESCRIPTION
+               "Public Release 1.10 module name changed"
+       REVISION   "201406110000Z" --  11 jun 2014
+       DESCRIPTION
+               "Public Release 1.09. ifPortType syntax 
+        declared by IANAifType"
+       REVISION   "201404160000Z" --  16 apr 2014
+       DESCRIPTION
+               "Public Release 1.08"
+       REVISION   "201402120000Z" --  12 feb 2014
+       DESCRIPTION
+               "Public Release 1.07 - small fixes"
+       REVISION   "201402110000Z" --  11 feb 2014
+       DESCRIPTION
+               "Public Release 1.07"
+       REVISION   "201401300000Z" --  30 jan 2014
+       DESCRIPTION
+               "Public Release 1.06
+                temperature units *10 only in description"
+       REVISION   "201401290000Z" --  29 jan 2014
+       DESCRIPTION
+               "Public Release 1.05"
+       REVISION   "201312180000Z" --  18 dec 2013
+       DESCRIPTION
+               "Public Release 1.04"
+       REVISION   "201312090000Z" --  09 dec 2013
+       DESCRIPTION
+               "Public Release 1.03"
+       REVISION   "201312050000Z" --  05 dec 2013
+       DESCRIPTION
+               "Public Release 1.02"
+       REVISION   "201309270000Z" --  27 sep 2013
+       DESCRIPTION
+               "Public Release 1.01"
+       REVISION   "201309190000Z" --  19 sep 2013
+       DESCRIPTION
+               "Public Release 1.0"
+        ::= { safIntegra 1 }
+
+integraBtimestamp OBJECT-TYPE
+   SYNTAX      DateAndTime
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "Last data update time"
+   ::= { integraB 1 }
+
+integraBradio  OBJECT IDENTIFIER ::=   { integraB 2 }
+
+integraBradioTxPower OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "dBm"
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION "Output power of radio transmitter"
+              ::= { integraBradio 1 }
+
+integraBradioTxFrequency OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "kHz"
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION "Frequency of radio transmitter"
+              ::= { integraBradio 2 }
+
+integraBradioRxLevel OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "dBm"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Level of the received signal"
+              ::= { integraBradio 3 }
+
+integraBradioSide     OBJECT-TYPE
+              SYNTAX  INTEGER {
+                high(1),
+                low(2),
+                error(3)
+                }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Radio side: Low/High"
+              ::= { integraBradio 4 }
+
+integraBradioTxMute   OBJECT-TYPE
+              SYNTAX  INTEGER {
+                 on(1),
+                 off(2),
+                 error(3)
+                 }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Status of 'Tx mute'
+       1 - Tx is muted,
+       2 - Tx is not muted.
+                      3 - Status information unavailable"
+              ::= { integraBradio 5 }
+
+integraBradioDuplexShift OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "kHz"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                    "Utilized duplex shift in kHz"
+              ::= { integraBradio 6 }
+
+integraBradioRxFrequency OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "kHz"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Frequency of radio receiver"
+              ::= { integraBradio 7 }
+
+integraBradioTemperature OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "C"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Radio module temperature *10 Celsius"
+              ::= { integraBradio 8 }
+
+integraBradioTxMuteDuration OBJECT-TYPE
+              SYNTAX  Integer32(0..214748364)
+              UNITS   "s"
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION
+                    "Time remaning for Tx to be muted in seconds.
+                    To turn mute on send number of seconds between 10 and MAX.
+                    To turn mute off send 0.
+                    GET will retrieve remaining duration for mute or 
+                    0 if Tx mute is turned off."
+              ::= { integraBradio 9 }
+
+--Settable radio parameter range values
+
+integraBradioRangesTable OBJECT-TYPE
+              SYNTAX SEQUENCE OF IntegraBradioRangeEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                      "Network interface port status data."
+              ::= { integraBradio 10 }
+
+integraBradioRangeEntry OBJECT-TYPE
+              SYNTAX IntegraBradioRangeEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                      "An entry containing network physical port status info."
+              INDEX { integraBradioRangeEntryIndex }
+              ::= { integraBradioRangesTable 1 }
+
+IntegraBradioRangeEntry   ::=
+              SEQUENCE {
+                    integraBradioRangeEntryIndex
+                        Integer32,
+                    integraBradioRangeDescr
+                        DisplayString,
+                    integraBradioRangeTxPower
+                        Integer32,
+                    integraBradioRangeTxFrequency
+                        Integer32
+              }
+
+integraBradioRangeEntryIndex OBJECT-TYPE
+              SYNTAX Integer32 (1..2)
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "A unique value, greater than zero, for each range 
+                      entry. Starts with 1 and is equal to a number of all range 
+                      parameters."
+              ::= { integraBradioRangeEntry 1 }
+
+integraBradioRangeDescr OBJECT-TYPE
+              SYNTAX DisplayString (SIZE (0..255))
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "'Minimal' and 'maximal' labels"
+              ::= { integraBradioRangeEntry 2 }
+
+integraBradioRangeTxPower OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "dBm"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Output power ranges for radio transmitter"
+              ::= { integraBradioRangeEntry 3 }
+
+integraBradioRangeTxFrequency OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "kHz"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Frequency ranges for radio transmitter"
+              ::= { integraBradioRangeEntry 4 }
+
+integraBradioPLL OBJECT-TYPE
+              SYNTAX  INTEGER {
+                error(1),
+          ok(2)
+              }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "PLL state of local-oscillator generator"
+              ::= { integraBradio 11 }
+
+            
+integraBmodem  OBJECT IDENTIFIER ::=   { integraB 3 }
+
+integraBmodemAcquireStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                 acquireInProgress(1),
+                 acquireLocked(2),
+                 acquireFailed(3)
+              }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "This is the current status of modem data acquire
+                           when queried modem status.
+                           For detailed info use modemAcquireLastStatusDetails."
+              ::= { integraBmodem 1 }
+
+integraBmodemRadialMse OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "dB"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Current radial MSE value (floating point value multiplied by 10)"
+              ::= { integraBmodem 2 }
+
+-- ldpcDecoderStress OBJECT-TYPE
+integraBmodemFECload OBJECT-TYPE
+              SYNTAX  DisplayString
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Decoder stress or FEC load value (floating point in textual representation)"
+              ::= { integraBmodem 3 }
+
+integraBmodemAcquireLastStatusDetails OBJECT-TYPE
+              SYNTAX INTEGER {
+                 acquireLocked(1),
+                 acquireSweep(4),
+                 acquireMSEerror(5),
+                 acquireBITerror(6),
+                 acquireStopped(12),
+                 acquireSMerror(13)
+              }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "This is the last status of successfull or unsuccessful modem data acquire"
+              ::= { integraBmodem 4 }
+
+integraBmodemTemperature OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "C"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Modem DSP temperature *10 Celsius"
+              ::= { integraBmodem 5 }
+
+integraBmodemBandwidth OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "kHz"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Signal bandwidth"
+              ::= { integraBmodem 6 }
+
+integraBmodemModulation    OBJECT-TYPE
+              SYNTAX  DisplayString
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Modulation (preferred)"
+              ::= { integraBmodem 7 }
+
+integraBmodemRxModulation    OBJECT-TYPE
+              SYNTAX  DisplayString
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Current (actual) Rx Modulation"
+              ::= { integraBmodem 8 }
+
+integraBmodemTxModulation    OBJECT-TYPE
+              SYNTAX  DisplayString
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Current (actual) Tx Modulation"
+              ::= { integraBmodem 9 }
+
+integraBmodemRxCapacity OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "kb/s"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Rx ethernet capacity in kilobits per second"
+              ::= { integraBmodem 10 }
+
+integraBmodemTxCapacity OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "kb/s"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Tx ethernet capacity in kilobits per second"
+              ::= { integraBmodem 11 }
+
+integraBmodemACMengine OBJECT-TYPE
+              SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2),
+                 error(3)
+              }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "ACM engine status"
+              ::= { integraBmodem 12 }
+
+integraBmodemCarrierOffset OBJECT-TYPE
+              SYNTAX Integer32
+              UNITS "Hz"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem carrier offset"
+              ::= { integraBmodem 13 }
+
+
+integraBsystem  OBJECT IDENTIFIER ::=   { integraB 4 }
+
+integraBsysCPUtemperature OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "C"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "System CPU temperature *10 Celsius"
+              ::= { integraBsystem 2 }
+
+integraBsysLicenseExpire OBJECT-TYPE
+              SYNTAX  Gauge32
+              UNITS   "s"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "License expires after number of seconds. 
+                           In the case of -1, check licenseGenStatus status"
+              ::= { integraBsystem 3 }
+integraBsysLicenseGenStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                ok(1),
+                expired(2),
+                unknown(3),
+                unlimitedTime(4)
+                }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "License General status."
+              ::= { integraBsystem 4 }
+
+integraBsysPSUvoltage    OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "mV"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Power voltage in mV"
+              ::= { integraBsystem 5 }
+
+integraBsysPSUcurrent    OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "mA"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Power current in mA"
+              ::= { integraBsystem 6 }
+integraBsysPSUpower    OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "mW"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Power consumption in mW"
+              ::= { integraBsystem 7 }
+integraBsysBoardTemperature OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "C"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "System temperature *10 Celsius"
+              ::= { integraBsystem 8 }
+integraBsysFreeMemory OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "%"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "System free memory *10 %"
+              ::= { integraBsystem 9 }
+integraBsysCPUidle OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "%"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "System CPU idle *10 %"
+              ::= { integraBsystem 10 }
+
+
+-- Ethernet
+integraBethernet      OBJECT IDENTIFIER ::=   { integraB 5 }
+   -- Port status
+integraBifStatusTable OBJECT-TYPE
+              SYNTAX SEQUENCE OF IntegraBifPortEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                      "Network interface port status data."
+              ::= { integraBethernet 1 }
+
+integraBifPortEntry  OBJECT-TYPE
+              SYNTAX IntegraBifPortEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                      "An entry containing network physical port status info."
+              INDEX  { integraBifPortStatIndex }
+              ::= { integraBifStatusTable 1 }
+
+IntegraBifPortEntry   ::=
+              SEQUENCE {
+                    integraBifPortStatIndex
+                        Integer32,
+                    integraBifPortStatDescr
+                        DisplayString,
+                    integraBifPortType
+                        IANAifType,
+                    integraBifPortMtu
+                        Integer32,
+                    integraBifPortSpeed
+                        Gauge32,
+                    integraBifPortPhysAddress
+                        PhysAddress,
+                    integraBifPortAdminStatus
+                        INTEGER,
+                    integraBifPortOperStatus
+                        INTEGER,
+                    integraBifPortLastChange
+                        TimeTicks,
+                    integraBifPortAutoneg
+                        INTEGER,
+                    integraBifPortDuplex
+                        INTEGER,
+                    integraBifPortSyncEthActive
+                        INTEGER,
+                    integraBifPortSyncEthPrio
+                        Integer32,
+      integraBifPortFlowControl
+   INTEGER
+              }
+
+integraBifPortStatIndex OBJECT-TYPE
+              SYNTAX Integer32 (1..4)
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "A unique value, greater than zero, for each physical
+                      network interface. It is recommended that
+                      values are assigned contiguously starting from 1."
+              ::= { integraBifPortEntry 1 }
+
+integraBifPortStatDescr OBJECT-TYPE
+              SYNTAX DisplayString (SIZE (0..255))
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Physical network interface description.
+                      LAN1 is electrical, LAN2 and LAN3 are SFP
+                      and WAN is radio port."
+              ::= { integraBifPortEntry 2 }
+
+integraBifPortType OBJECT-TYPE
+              SYNTAX IANAifType
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "The type of interface, distinguished according to
+                      the physical/link protocol(s) immediately `below'
+                      the network layer in the protocol stack."
+              ::= { integraBifPortEntry 3 }
+
+integraBifPortMtu OBJECT-TYPE
+              SYNTAX Integer32
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Maximum transmission unit value in bytes."
+              ::= { integraBifPortEntry 4 }
+
+integraBifPortSpeed OBJECT-TYPE
+              SYNTAX Gauge32
+              UNITS "bps"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Link speed in bits per second."
+              ::= { integraBifPortEntry 5 }
+
+integraBifPortPhysAddress OBJECT-TYPE
+              SYNTAX PhysAddress
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "The interface's address at the protocol layer
+                      immediately `below' the network layer in the
+                      protocol stack.  For interfaces which do not have
+                      such an address (e.g., a serial line), this object
+                      should contain an octet string of zero length."
+              ::= { integraBifPortEntry 6 }
+
+integraBifPortAdminStatus OBJECT-TYPE
+              SYNTAX INTEGER {
+                         enabled(1),
+                         disabled(2),
+                         unknown(3)
+                     }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Desired state of network interfaces. Interfaces
+                      can be enabled(1), disabled(2), unknown(3) (no info received)."
+              ::= { integraBifPortEntry 7 }
+
+integraBifPortOperStatus OBJECT-TYPE
+              SYNTAX INTEGER {
+                         up(1),
+                         down(2),
+                         unknown(3)
+                     }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Actual state of interfaces. Link can be up(1),
+                      down(2) or in unknown(3) state."
+              ::= { integraBifPortEntry 8 }
+
+integraBifPortLastChange OBJECT-TYPE
+              SYNTAX TimeTicks
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "This parameter value is always 0 at the moment."
+              ::= { integraBifPortEntry 9 }
+
+integraBifPortAutoneg OBJECT-TYPE
+              SYNTAX INTEGER {
+                         enabled(1),
+                         disabled(2),
+                         unknown(3)
+                     }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Auto-negotiation status. Unknown means no info was received."
+              ::= { integraBifPortEntry 10 }
+
+integraBifPortDuplex  OBJECT-TYPE
+              SYNTAX INTEGER {
+                         full(1),
+                         half(2),
+                         unknown(3)
+                     }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Duplex status for the interface."
+              ::= { integraBifPortEntry 11 }
+
+integraBifPortSyncEthActive OBJECT-TYPE
+              SYNTAX INTEGER {
+                         off(0),
+                         on(1)
+                     }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Synchronous Ethernet status.
+                      Can be active(1) or inactive(0)."
+              ::= { integraBifPortEntry 12 }
+
+integraBifPortSyncEthPrio OBJECT-TYPE
+              SYNTAX Integer32
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Synchronous Ethernet priority."
+              ::= { integraBifPortEntry 13 }
+
+integraBifPortFlowControl OBJECT-TYPE
+              SYNTAX INTEGER {
+                         enabled(1),
+                         disabled(2),
+                         unknown(3)
+                     }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Flow control status."
+              ::= { integraBifPortEntry 14 }
+
+
+   -- Port statistics
+integraBifStatisticsTable OBJECT-TYPE
+              SYNTAX SEQUENCE OF IntegraBifPortStcEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                      "Network interface port statistics data."
+              ::= { integraBethernet 2 }
+
+integraBifPortStcEntry OBJECT-TYPE
+              SYNTAX IntegraBifPortStcEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                      "An entry containing network physical port statistics counter data."
+              INDEX  { integraBifPortStcIndex }
+              ::= { integraBifStatisticsTable 1 }
+
+IntegraBifPortStcEntry    ::=
+              SEQUENCE {
+                    integraBifPortStcIndex
+                        Integer32,
+                    integraBifPortStcDescr
+                        DisplayString,
+                    integraBifTimePassed
+                        TimeTicks,
+                    integraBifIngressPackets
+                        Counter64,
+                    integraBifIngressBytes
+                        Counter64,
+                    integraBifEgressPackets
+                        Counter64,
+                    integraBifEgressBytes
+                        Counter64,
+                    integraBifEtherStatsMulticastPkts
+                        Counter64,
+                    integraBifEtherStatsBroadcastPkts
+                        Counter64,
+                    integraBifEtherStatsPkts64Octets
+                        Counter64,
+                    integraBifEtherStatsPkts65to127Octets
+                        Counter64,
+                    integraBifEtherStatsPkts128to255Octets
+                        Counter64,
+                    integraBifEtherStatsPkts256to511Octets
+                        Counter64,
+                    integraBifEtherStatsPkts512to1023Octets
+                        Counter64,
+                    integraBifEtherStatsPkts1024to1518Octets
+                        Counter64,
+                    integraBifEtherStatsOversizePkts
+                        Counter64,
+                    integraBifEtherRxOversizePkts
+                        Counter64,
+                    integraBifEtherTxOversizePkts
+                        Counter64,
+                    integraBifEtherStatsOctets
+                        Counter64,
+                    integraBifEtherStatsPkts
+                        Counter64,
+                    integraBifEtherStatsTXNoErrors
+                        Counter64,
+                    integraBifEtherStatsRXNoErrors
+                        Counter64,
+                    integraBifEtherStatsPkts1519to1522Octets
+                        Counter64,
+                    integraBifIfInOctets
+                        Counter64,
+                    integraBifIfOutOctets
+                        Counter64,
+                    integraBifDot1dTpPortInFrames
+                        Counter64,
+                    integraBifDot1dTpPortOutFrames
+                        Counter64,
+                    integraBifReceivedPkts64Octets
+                        Counter64,
+                    integraBifTransmittedPkts64Octets
+                        Counter64,
+                    integraBifReceivedPkts65to127Octets
+                        Counter64,
+                    integraBifTransmittedPkts65to127Octets
+                        Counter64,
+                    integraBifReceivedPkts128to255Octets
+                        Counter64,
+                    integraBifTransmittedPkts128to255Octets
+                        Counter64,
+                    integraBifReceivedPkts256to511Octets
+                        Counter64,
+                    integraBifTransmittedPkts256to511Octets
+                        Counter64,
+                    integraBifReceivedPkts512to1023Octets
+                        Counter64,
+                    integraBifTransmittedPkts512to1023Octets
+                        Counter64,
+                    integraBifReceivedPkts1024to1518Octets
+                        Counter64,
+                    integraBifTransmittedPkts1024to1518Octets
+                        Counter64,
+                    integraBifIfInBroadcastPkts
+                        Counter64,
+                    integraBifIfOutBroadcastPkts
+                        Counter64,
+                    integraBifIfInMulticastPkts
+                        Counter64,
+                    integraBifIfOutMulticastPkts
+                        Counter64,
+                    integraBifDot3InPauseFrames
+                        Counter64,
+                    integraBifDot3OutPauseFrames
+                        Counter64,
+                    integraBifEtherStatsUndersizePkts
+                        Counter64,
+                    integraBifEtherStatsFragments
+                        Counter64,
+                    integraBifEtherStatsCRCAlignErrors
+                        Counter64,
+                    integraBifEtherStatsJabbers
+                        Counter64,
+                    integraBifIngressBPS
+                        Integer32,
+                    integraBifIngressPPS
+                        Integer32,
+                    integraBifEgressBPS
+                        Integer32,
+                    integraBifEgressPPS
+                        Integer32,
+                    integraBifMAClearnLimitDropIngressPackets
+                        Counter64,
+                    integraBifL2cacheDropIngressPackets
+                        Counter64,
+                    integraBifEFMdropIngressPackets
+                        Counter64,
+                    integraBifEFMdropEgressPackets
+                        Counter64,
+                    integraBifSTPdropIngressPackets
+                        Counter64,
+                    integraBifSTPdropEgressPackets
+                        Counter64,
+                    integraBifMRUdropIngressPackets
+                        Counter64,
+                    integraBifMRUdropEgressPackets
+                        Counter64,
+                    integraBifFilterDropIngressPackets
+                        Counter64,
+                    integraBifFlowClassifierDropIngressPackets
+                        Counter64,
+                    integraBifFlowClassifierDropEgressPackets
+                        Counter64,
+                    integraBifIllegalSAdropIngressPackets
+                        Counter64,
+                    integraBifPortRateLimitDropIngressPackets
+                        Counter64,
+                    integraBifPortRateLimitDropIngressBytes
+                        Counter64,
+                    integraBifPausePFCframesGeneratedIngressPackets
+                        Counter64,
+                    integraBifPausePFCframesGeneratedEgressPackets
+                        Counter64,
+                    integraBifRateLimitDropForUnknownUnicastIngressPackets
+                        Counter64,
+                    integraBifRateLimitDropForUnknownUnicastIngressBytes
+                        Counter64,
+                    integraBifRateLimitDropForBroadcastIngressPackets
+                        Counter64,
+                    integraBifRateLimitDropForBroadcastIngressBytes
+                        Counter64,
+                    integraBifRateLimitDropForKnownMulticastIngressPackets
+                        Counter64,
+                    integraBifRateLimitDropForKnownMulticastIngressBytes
+                        Counter64,
+                    integraBifRateLimitDropForUnknownMulticastIngressPackets
+                        Counter64,
+                    integraBifRateLimitDropForUnknownMulticastIngressBytes
+                        Counter64,
+                    integraBifAllCoSQoutPackets
+                        Counter64,
+                    integraBifAllCoSQoutBytes
+                        Counter64,
+                    integraBifAllCoSQdroppedPackets
+                        Counter64,
+                    integraBifAllCoSQdroppedBytes
+                        Counter64,
+                    integraBifProcessedRxPackets
+                        Counter64,
+                    integraBifProcessedRxBytes
+                        Counter64
+              }
+
+integraBifPortStcIndex OBJECT-TYPE
+              SYNTAX Integer32 (1..5)
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "A unique value, greater than zero, for each physical
+                      network interface. It is recommended that
+                      values are assigned contiguously starting from 1."
+              ::= { integraBifPortStcEntry 1 }
+
+integraBifPortStcDescr OBJECT-TYPE
+              SYNTAX DisplayString (SIZE (0..255))
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Physical network interface description.
+                      LAN1 is electrical, LAN2 and LAN3 are SFP,
+                      WAN is radio port and MNG is internal management interface."
+              ::= { integraBifPortStcEntry 2 }
+
+integraBifTimePassed  OBJECT-TYPE
+              SYNTAX TimeTicks
+              UNITS "s/100"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Statistics collection time."
+              ::= { integraBifPortStcEntry 3 }
+
+integraBifIngressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Packets that ingress on the port."
+              ::= { integraBifPortStcEntry 4 }
+
+integraBifIngressBytes OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Bytes that ingress on the port."
+              ::= { integraBifPortStcEntry 5 }
+
+integraBifEgressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Packets that egress on the port."
+              ::= { integraBifPortStcEntry 6 }
+
+integraBifEgressBytes OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Bytes that egress on the port."
+              ::= { integraBifPortStcEntry 7 }
+
+integraBifEtherStatsMulticastPkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The total number of good packets (both received and 
+                     transmitted) that were directed to a multicast address.  
+                     Note that this number does not include packets directed 
+                     to the broadcast address."
+              ::= { integraBifPortStcEntry 8 }
+
+integraBifEtherStatsBroadcastPkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The total number of good packets (both received and 
+                     transmitted) that were directed to the broadcast address.
+                     Note that this does not include multicast packets."
+              ::= { integraBifPortStcEntry 9 }
+
+integraBifEtherStatsPkts64Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The total number of packets (including bad
+                     packets) (both received and transmitted)
+                     that were 64 octets in length
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraBifPortStcEntry 10 }
+
+integraBifEtherStatsPkts65to127Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The total number of packets (including bad
+                     packets) (both received and transmitted)
+                     that were between 65 and 127 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraBifPortStcEntry 11 }
+
+integraBifEtherStatsPkts128to255Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The total number of packets (including bad
+                     packets) (both received and transmitted) that were
+                     between 128 and 255 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraBifPortStcEntry 12 }
+
+integraBifEtherStatsPkts256to511Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "The total number of packets (including bad
+                    packets) (both received and transmitted) that were
+                    between 256 and 511 octets in length inclusive
+                    (excluding framing bits but including FCS octets)."
+              ::= { integraBifPortStcEntry 13 }
+
+integraBifEtherStatsPkts512to1023Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "The total number of packets (including bad
+                    packets) (both received and transmitted) that were
+                    between 512 and 1023 octets in length inclusive
+                    (excluding framing bits but including FCS octets)."
+              ::= { integraBifPortStcEntry 14 }
+
+integraBifEtherStatsPkts1024to1518Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "The total number of packets (including bad
+                    packets) (both received and transmitted) that were
+                    between 1024 and 1518 octets in length inclusive
+                    (excluding framing bits but including FCS octets)."
+              ::= { integraBifPortStcEntry 15 }
+
+integraBifEtherStatsOversizePkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "The number of packets (both received and 
+                    transmitted) that were longer than 1518
+                    octets (excluding framing bits but including
+                    FCS octets) but were otherwise well formed."
+              ::= { integraBifPortStcEntry 16 }
+
+integraBifEtherRxOversizePkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "The number of packets received
+                    that were longer than 1518 octets
+                    (excluding framing bits but including
+                    FCS octets) but were otherwise well formed."
+              ::= { integraBifPortStcEntry 17 }
+
+integraBifEtherTxOversizePkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "The number of packets transmitted
+                    that were longer than 1518 octets
+                    (excluding framing bits but including
+                    FCS octets) but were otherwise well formed."
+              ::= { integraBifPortStcEntry 18 }
+
+integraBifEtherStatsOctets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "Total number of octets of data (including
+                    those in bad packets) both received and 
+                    transmitted."
+              ::= { integraBifPortStcEntry 19 }
+
+integraBifEtherStatsPkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "Total number of packets (including bad packets)
+                    both received and transmitted."
+              ::= { integraBifPortStcEntry 20 }
+
+integraBifEtherStatsTXNoErrors OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "Number of packets that were transmitted
+                    without errors."
+              ::= { integraBifPortStcEntry 21 }
+
+integraBifEtherStatsRXNoErrors OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "Number of packets that were received
+                    without errors."
+              ::= { integraBifPortStcEntry 22 }
+
+integraBifEtherStatsPkts1519to1522Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "The total number of packets (including bad
+                    packets) (both received and transmitted) that were
+                    between 1519 and 1522 octets in length inclusive
+                    (excluding framing bits but including FCS octets)."
+              ::= { integraBifPortStcEntry 23 }
+
+integraBifIfInOctets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "octet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "Total number of octets of data (including
+                    those in bad packets) that were received."
+              ::= { integraBifPortStcEntry 24 }
+
+integraBifIfOutOctets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "octet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "Total number of octets of data (including
+                    those in bad packets) that were transmitted."
+              ::= { integraBifPortStcEntry 25 }
+
+integraBifDot1dTpPortInFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The number of frames that have been received by
+                     this port from its segment."
+              ::= { integraBifPortStcEntry 26 }
+
+integraBifDot1dTpPortOutFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The number of frames that have been transmitted by
+                     this port to its segment."
+              ::= { integraBifPortStcEntry 27 }
+
+integraBifReceivedPkts64Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of received packets that were
+                     64 octets in length (excluding framing bits
+                     but including FCS octets)."
+              ::= { integraBifPortStcEntry 28 }
+
+integraBifTransmittedPkts64Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of transmitted packets that were
+                     64 octets in length (excluding framing bits
+                     but including FCS octets)."
+              ::= { integraBifPortStcEntry 29 }
+
+integraBifReceivedPkts65to127Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of received packets that were
+                     between 65 and 127 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraBifPortStcEntry 30 }
+
+integraBifTransmittedPkts65to127Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of transmitted packets that were
+                     between 65 and 127 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraBifPortStcEntry 31 }
+
+integraBifReceivedPkts128to255Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of received packets that were
+                     between 128 and 255 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraBifPortStcEntry 32 }
+
+integraBifTransmittedPkts128to255Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of transmitted packets that were
+                     between 128 and 255 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraBifPortStcEntry 33 }
+
+integraBifReceivedPkts256to511Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of received packets that were
+                     between 256 and 511 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraBifPortStcEntry 34 }
+
+integraBifTransmittedPkts256to511Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of transmitted packets that were
+                     between 256 and 511 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraBifPortStcEntry 35 }
+
+integraBifReceivedPkts512to1023Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of received packets that were
+                     between 512 and 1023 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraBifPortStcEntry 36 }
+
+integraBifTransmittedPkts512to1023Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of transmitted packets that were
+                     between 512 and 1023 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraBifPortStcEntry 37 }
+
+integraBifReceivedPkts1024to1518Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of received packets that were
+                     between 1024 and 1518 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraBifPortStcEntry 38 }
+
+integraBifTransmittedPkts1024to1518Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of transmitted packets that were
+                     between 1024 and 1518 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraBifPortStcEntry 39 }
+
+integraBifIfInBroadcastPkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The total number of received good packets
+                     that were directed to the broadcast address.
+                     Note that this does not include multicast packets."
+              ::= { integraBifPortStcEntry 40 }
+
+integraBifIfOutBroadcastPkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The total number of transmitted good packets
+                     that were directed to the broadcast address.
+                     Note that this does not include multicast packets."
+              ::= { integraBifPortStcEntry 41 }
+
+integraBifIfInMulticastPkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The total number of received good packets
+                     that were directed to a multicast address.  
+                     Note that this number does not include broadcast packets."
+              ::= { integraBifPortStcEntry 42 }
+
+integraBifIfOutMulticastPkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The total number of transmitted good packets
+                     that were directed to a multicast address.  
+                     Note that this number does not include broadcast packets."
+              ::= { integraBifPortStcEntry 43 }
+
+integraBifDot3InPauseFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "A count of MAC Control frames received on this
+                      interface with an opcode indicating the PAUSE
+                      operation.
+                      This counter does not increment when the
+                      interface is operating in half-duplex mode."
+              ::= { integraBifPortStcEntry 44 }
+
+integraBifDot3OutPauseFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "A count of MAC Control frames transmitted on
+                      this interface with an opcode indicating the
+                      PAUSE operation.
+                      This counter does not increment when the
+                      interface is operating in half-duplex mode."
+              ::= { integraBifPortStcEntry 45 }
+
+integraBifEtherStatsUndersizePkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "The total number of packets received that were
+                      less than 64 octets long (excluding framing bits,
+                      but including FCS octets) and were otherwise well
+                      formed."
+              ::= { integraBifPortStcEntry 46 }
+
+integraBifEtherStatsFragments OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "The total number of packets received that were less than
+                      64 octets in length (excluding framing bits but including
+                      FCS octets) and had either a bad Frame Check Sequence
+                      (FCS) with an integral number of octets (FCS Error) or a
+                      bad FCS with a non-integral number of octets (Alignment
+                      Error).
+                      Note that it is entirely normal for etherStatsFragments to
+                      increment.  This is because it counts both runts (which are
+                      normal occurrences due to collisions) and noise hits."
+              ::= { integraBifPortStcEntry 47 }
+
+integraBifEtherStatsCRCAlignErrors OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "The total number of packets received that
+                      had a length (excluding framing bits, but
+                      including FCS octets) of between 64 and 1518
+                      octets, inclusive, but had either a bad
+                      Frame Check Sequence (FCS) with an integral
+                      number of octets (FCS Error) or a bad FCS with
+                      a non-integral number of octets (Alignment Error)."
+              ::= { integraBifPortStcEntry 48 }
+
+integraBifEtherStatsJabbers OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "The total number of packets received that were
+                      longer than 1518 octets (excluding framing bits,
+                      but including FCS octets), and had either a bad
+                      Frame Check Sequence (FCS) with an integral number
+                      of octets (FCS Error) or a bad FCS with a non-integral
+                      number of octets (Alignment Error).
+                      Note that this definition of jabber is different
+                      than the definition in IEEE-802.3 section 8.2.1.5
+                      (10BASE5) and section 10.3.1.4 (10BASE2).  These
+                      documents define jabber as the condition where any
+                      packet exceeds 20 ms.  The allowed range to detect
+                      jabber is between 20 ms and 150 ms."
+              ::= { integraBifPortStcEntry 49 }
+
+integraBifIngressBPS OBJECT-TYPE
+              SYNTAX Integer32
+              UNITS "Bps"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Ingoing data transfer rate in bytes per second."
+              ::= { integraBifPortStcEntry 50 }
+
+integraBifIngressPPS OBJECT-TYPE
+              SYNTAX Integer32
+              UNITS "pps"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Ingoing data transfer rate in packets per second."
+              ::= { integraBifPortStcEntry 51 }
+
+integraBifEgressBPS OBJECT-TYPE
+              SYNTAX Integer32
+              UNITS "Bps"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Outgoing data transfer rate in bytes per second."
+              ::= { integraBifPortStcEntry 52 }
+
+integraBifEgressPPS OBJECT-TYPE
+              SYNTAX Integer32
+              UNITS "pps"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Outgoing data transfer rate in packets per second."
+              ::= { integraBifPortStcEntry 53 }
+
+integraBifMAClearnLimitDropIngressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "MAC learn limit drop (IngressPackets)."
+              ::= { integraBifPortStcEntry 54 }
+
+integraBifL2cacheDropIngressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "L2 cache drop (IngressPackets)."
+              ::= { integraBifPortStcEntry 55 }
+
+integraBifEFMdropIngressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "EFM drop (IngressPackets)."
+              ::= { integraBifPortStcEntry 56 }
+
+integraBifEFMdropEgressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "EFM drop (EgressPackets)."
+              ::= { integraBifPortStcEntry 57 }
+
+integraBifSTPdropIngressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "STP drop (IngressPackets)."
+              ::= { integraBifPortStcEntry 58 }
+
+integraBifSTPdropEgressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "STP drop (EgressPackets)."
+              ::= { integraBifPortStcEntry 59 }
+
+integraBifMRUdropIngressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "MRU drop (IngressPackets)."
+              ::= { integraBifPortStcEntry 60 }
+
+integraBifMRUdropEgressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "MRU drop (EgressPackets)."
+              ::= { integraBifPortStcEntry 61 }
+
+integraBifFilterDropIngressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Filter drop (IngressPackets)."
+              ::= { integraBifPortStcEntry 62 }
+
+integraBifFlowClassifierDropIngressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Flow classifier drop (IngressPackets)."
+              ::= { integraBifPortStcEntry 63 }
+
+integraBifFlowClassifierDropEgressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Flow classifier drop (EgressPackets)."
+              ::= { integraBifPortStcEntry 64 }
+
+integraBifIllegalSAdropIngressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Illegal SA drop (IngressPackets)."
+              ::= { integraBifPortStcEntry 65 }
+
+integraBifPortRateLimitDropIngressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Port rate limit drop (IngressPackets)."
+              ::= { integraBifPortStcEntry 66 }
+
+integraBifPortRateLimitDropIngressBytes OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Port rate limit drop (IngressBytes)."
+              ::= { integraBifPortStcEntry 67 }
+
+integraBifPausePFCframesGeneratedIngressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "PAUSE/PFC frames generated (IngressPackets)."
+              ::= { integraBifPortStcEntry 68 }
+
+integraBifPausePFCframesGeneratedEgressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "PAUSE/PFC frames generated (EgressPackets)."
+              ::= { integraBifPortStcEntry 69 }
+
+integraBifRateLimitDropForUnknownUnicastIngressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Rate limit drop for unknown unicast (IngressPackets)."
+              ::= { integraBifPortStcEntry 70 }
+
+integraBifRateLimitDropForUnknownUnicastIngressBytes OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Rate limit drop for unknown unicast (IngressBytes)."
+              ::= { integraBifPortStcEntry 71 }
+
+integraBifRateLimitDropForBroadcastIngressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Rate limit drop for broadcast (IngressPackets)."
+              ::= { integraBifPortStcEntry 72 }
+
+integraBifRateLimitDropForBroadcastIngressBytes OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Rate limit drop for broadcast (IngressBytes)."
+              ::= { integraBifPortStcEntry 73 }
+
+integraBifRateLimitDropForKnownMulticastIngressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Rate limit drop for known multicast (IngressPackets)."
+              ::= { integraBifPortStcEntry 74 }
+
+integraBifRateLimitDropForKnownMulticastIngressBytes OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Rate limit drop for known multicast (IngressBytes)."
+              ::= { integraBifPortStcEntry 75 }
+
+integraBifRateLimitDropForUnknownMulticastIngressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Rate limit drop for unknown multicast (IngressPackets)."
+              ::= { integraBifPortStcEntry 76 }
+
+integraBifRateLimitDropForUnknownMulticastIngressBytes OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Rate limit drop for unknown multicast (IngressBytes)."
+              ::= { integraBifPortStcEntry 77 }
+
+integraBifAllCoSQoutPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "All CoSQ outgoing packets."
+              ::= { integraBifPortStcEntry 78 }
+
+integraBifAllCoSQoutBytes OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "All CoSQ outgoing bytes."
+              ::= { integraBifPortStcEntry 79 }
+
+integraBifAllCoSQdroppedPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "All CoSQ dropped packets."
+              ::= { integraBifPortStcEntry 80 }
+
+integraBifAllCoSQdroppedBytes OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "All CoSQ dropped bytes."
+              ::= { integraBifPortStcEntry 81 }
+
+integraBifProcessedRxPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Processed received packets."
+              ::= { integraBifPortStcEntry 82 }
+
+integraBifProcessedRxBytes OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Processed received bytes."
+              ::= { integraBifPortStcEntry 83 }
+
+
+   -- QoS statistics
+integraBifQosStatisticsTable OBJECT-TYPE
+              SYNTAX SEQUENCE OF IntegraBifCosqEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                  "Network interface QoS statistics counters."
+              ::= { integraBethernet 3 }
+
+integraBifCosqEntry OBJECT-TYPE
+              SYNTAX IntegraBifCosqEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                   "An entry containing network physical port status info."
+              INDEX  { integraBifCosqIfaceIndex }
+              ::= { integraBifQosStatisticsTable 1 }
+
+IntegraBifCosqEntry ::=
+              SEQUENCE {
+                    integraBifCosqIfaceIndex
+                        Integer32,
+                    integraBifCosqIfaceDescr
+                        DisplayString,
+                    integraBifCosqStatDroppedPacketsCoSQ0
+                        Counter64, 
+                    integraBifCosqStatDroppedBytesCoSQ0
+                        Counter64,
+                    integraBifCosqStatGreenDiscardDroppedPacketsCoSQ0
+                        Counter64,
+                    integraBifCosqStatYellowDiscardDroppedPacketsCoSQ0
+                        Counter64,
+                    integraBifCosqStatOutPacketsCoSQ0
+                        Counter64,
+                    integraBifCosqStatOutBytesCoSQ0
+                        Counter64,
+                    integraBifCosqStatDroppedPacketsCoSQ1
+                        Counter64,
+                    integraBifCosqStatDroppedBytesCoSQ1
+                        Counter64,
+                    integraBifCosqStatGreenDiscardDroppedPacketsCoSQ1
+                        Counter64,
+                    integraBifCosqStatYellowDiscardDroppedPacketsCoSQ1
+                        Counter64,
+                    integraBifCosqStatOutPacketsCoSQ1
+                        Counter64,
+                    integraBifCosqStatOutBytesCoSQ1
+                        Counter64,
+                    integraBifCosqStatDroppedPacketsCoSQ2
+                        Counter64,
+                    integraBifCosqStatDroppedBytesCoSQ2
+                        Counter64,
+                    integraBifCosqStatGreenDiscardDroppedPacketsCoSQ2
+                        Counter64,
+                    integraBifCosqStatYellowDiscardDroppedPacketsCoSQ2
+                        Counter64,
+                    integraBifCosqStatOutPacketsCoSQ2
+                        Counter64,
+                    integraBifCosqStatOutBytesCoSQ2
+                        Counter64,
+                    integraBifCosqStatDroppedPacketsCoSQ3
+                        Counter64,
+                    integraBifCosqStatDroppedBytesCoSQ3
+                        Counter64,
+                    integraBifCosqStatGreenDiscardDroppedPacketsCoSQ3
+                        Counter64,
+                    integraBifCosqStatYellowDiscardDroppedPacketsCoSQ3
+                        Counter64,
+                    integraBifCosqStatOutPacketsCoSQ3
+                        Counter64,
+                    integraBifCosqStatOutBytesCoSQ3
+                        Counter64,
+                    integraBifCosqStatDroppedPacketsCoSQ4
+                        Counter64,
+                    integraBifCosqStatDroppedBytesCoSQ4
+                        Counter64,
+                    integraBifCosqStatGreenDiscardDroppedPacketsCoSQ4
+                        Counter64,
+                    integraBifCosqStatYellowDiscardDroppedPacketsCoSQ4
+                        Counter64,
+                    integraBifCosqStatOutPacketsCoSQ4
+                        Counter64,
+                    integraBifCosqStatOutBytesCoSQ4
+                        Counter64,
+                    integraBifCosqStatDroppedPacketsCoSQ5
+                        Counter64,
+                    integraBifCosqStatDroppedBytesCoSQ5
+                        Counter64,
+                    integraBifCosqStatGreenDiscardDroppedPacketsCoSQ5
+                        Counter64,
+                    integraBifCosqStatYellowDiscardDroppedPacketsCoSQ5
+                        Counter64,
+                    integraBifCosqStatOutPacketsCoSQ5
+                        Counter64,
+                    integraBifCosqStatOutBytesCoSQ5
+                        Counter64,
+                    integraBifCosqStatDroppedPacketsCoSQ6
+                        Counter64,
+                    integraBifCosqStatDroppedBytesCoSQ6
+                        Counter64,
+                    integraBifCosqStatGreenDiscardDroppedPacketsCoSQ6
+                        Counter64,
+                    integraBifCosqStatYellowDiscardDroppedPacketsCoSQ6
+                        Counter64,
+                    integraBifCosqStatOutPacketsCoSQ6
+                        Counter64,
+                    integraBifCosqStatOutBytesCoSQ6
+                        Counter64,
+                    integraBifCosqStatDroppedPacketsCoSQ7
+                        Counter64,
+                    integraBifCosqStatDroppedBytesCoSQ7
+                        Counter64,
+                    integraBifCosqStatGreenDiscardDroppedPacketsCoSQ7
+                        Counter64,
+                    integraBifCosqStatYellowDiscardDroppedPacketsCoSQ7
+                        Counter64,
+                    integraBifCosqStatOutPacketsCoSQ7
+                        Counter64,
+                    integraBifCosqStatOutBytesCoSQ7
+                        Counter64
+              }
+
+integraBifCosqIfaceIndex OBJECT-TYPE
+              SYNTAX Integer32 (1..5)
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "A unique value, greater than zero, for each physical
+                      network interface. It is recommended that
+                      values are assigned contiguously starting from 1."
+              ::= { integraBifCosqEntry 1 }
+
+integraBifCosqIfaceDescr OBJECT-TYPE
+              SYNTAX DisplayString (SIZE (0..255))
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Physical network interface description.
+                      LAN1 is electrical, LAN2 and LAN3 are SFP,
+                      WAN is radio port and MNG is internal management interface."
+              ::= { integraBifCosqEntry 2 }
+
+integraBifCosqStatDroppedPacketsCoSQ0 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Dropped packets (bcmCosqStatDroppedPackets) counter
+                for CoSQ 0 for current interface."
+              ::= { integraBifCosqEntry 3 }
+
+integraBifCosqStatDroppedBytesCoSQ0 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Dropped packets (bcmCosqStatDroppedPackets) counter
+                for CoSQ 0 for current interface."
+              ::= { integraBifCosqEntry 4 }
+
+integraBifCosqStatGreenDiscardDroppedPacketsCoSQ0 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Discarded green packets
+                (bcmCosqStatGreenDiscardDroppedPackets)
+                counter for CoSQ 0 for current interface."
+              ::= { integraBifCosqEntry 5 }
+
+integraBifCosqStatYellowDiscardDroppedPacketsCoSQ0 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Discarded yellow packets
+                (bcmCosqStatYellowDiscardDroppedPackets)
+                counter for CoSQ 0 for current interface."
+              ::= { integraBifCosqEntry 6 }
+
+integraBifCosqStatOutPacketsCoSQ0 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Egress packets (bcmCosqStatOutPackets) counter
+              for CoSQ 0 for current interface."
+              ::= { integraBifCosqEntry 7 }
+
+integraBifCosqStatOutBytesCoSQ0 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                 "Egress bytes (bcmCosqStatOutBytes) counter
+                 for CoSQ 0 for current interface."
+              ::= { integraBifCosqEntry 8 }
+
+integraBifCosqStatDroppedPacketsCoSQ1 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Dropped packets (bcmCosqStatDroppedPackets) counter
+                for CoSQ 1 for current interface."
+              ::= { integraBifCosqEntry 9 }
+
+integraBifCosqStatDroppedBytesCoSQ1 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Dropped packets (bcmCosqStatDroppedPackets) counter
+                for CoSQ 1 for current interface."
+              ::= { integraBifCosqEntry 10 }
+
+integraBifCosqStatGreenDiscardDroppedPacketsCoSQ1 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Discarded green packets
+                (bcmCosqStatGreenDiscardDroppedPackets)
+                counter for CoSQ 1 for current interface."
+              ::= { integraBifCosqEntry 11 }
+
+integraBifCosqStatYellowDiscardDroppedPacketsCoSQ1 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Discarded yellow packets
+                (bcmCosqStatYellowDiscardDroppedPackets)
+                counter for CoSQ 1 for current interface."
+              ::= { integraBifCosqEntry 12 }
+
+integraBifCosqStatOutPacketsCoSQ1 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Egress packets (bcmCosqStatOutPackets) counter
+              for CoSQ 1 for current interface."
+              ::= { integraBifCosqEntry 13 }
+
+integraBifCosqStatOutBytesCoSQ1 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                 "Egress bytes (bcmCosqStatOutBytes) counter
+                 for CoSQ 1 for current interface."
+              ::= { integraBifCosqEntry 14 }
+
+integraBifCosqStatDroppedPacketsCoSQ2 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Dropped packets (bcmCosqStatDroppedPackets) counter
+                for CoSQ 2 for current interface."
+              ::= { integraBifCosqEntry 15 }
+
+integraBifCosqStatDroppedBytesCoSQ2 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Dropped packets (bcmCosqStatDroppedPackets) counter
+                for CoSQ 2 for current interface."
+              ::= { integraBifCosqEntry 16 }
+
+integraBifCosqStatGreenDiscardDroppedPacketsCoSQ2 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Discarded green packets
+                (bcmCosqStatGreenDiscardDroppedPackets)
+                counter for CoSQ 2 for current interface."
+              ::= { integraBifCosqEntry 17 }
+
+integraBifCosqStatYellowDiscardDroppedPacketsCoSQ2 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Discarded yellow packets
+                (bcmCosqStatYellowDiscardDroppedPackets)
+                counter for CoSQ 2 for current interface."
+              ::= { integraBifCosqEntry 18 }
+
+integraBifCosqStatOutPacketsCoSQ2 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Egress packets (bcmCosqStatOutPackets) counter
+              for CoSQ 2 for current interface."
+              ::= { integraBifCosqEntry 19 }
+
+integraBifCosqStatOutBytesCoSQ2 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                 "Egress bytes (bcmCosqStatOutBytes) counter
+                 for CoSQ 2 for current interface."
+              ::= { integraBifCosqEntry 20 }
+
+integraBifCosqStatDroppedPacketsCoSQ3 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Dropped packets (bcmCosqStatDroppedPackets) counter
+                for CoSQ 3 for current interface."
+              ::= { integraBifCosqEntry 21 }
+
+integraBifCosqStatDroppedBytesCoSQ3 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Dropped packets (bcmCosqStatDroppedPackets) counter
+                for CoSQ 3 for current interface."
+              ::= { integraBifCosqEntry 22 }
+
+integraBifCosqStatGreenDiscardDroppedPacketsCoSQ3 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Discarded green packets
+                (bcmCosqStatGreenDiscardDroppedPackets)
+                counter for CoSQ 3 for current interface."
+              ::= { integraBifCosqEntry 23 }
+
+integraBifCosqStatYellowDiscardDroppedPacketsCoSQ3 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Discarded yellow packets
+                (bcmCosqStatYellowDiscardDroppedPackets)
+                counter for CoSQ 3 for current interface."
+              ::= { integraBifCosqEntry 24 }
+
+integraBifCosqStatOutPacketsCoSQ3 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Egress packets (bcmCosqStatOutPackets) counter
+              for CoSQ 3 for current interface."
+              ::= { integraBifCosqEntry 25 }
+
+integraBifCosqStatOutBytesCoSQ3 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                 "Egress bytes (bcmCosqStatOutBytes) counter
+                 for CoSQ 3 for current interface."
+              ::= { integraBifCosqEntry 26 }
+
+integraBifCosqStatDroppedPacketsCoSQ4 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Dropped packets (bcmCosqStatDroppedPackets) counter
+                for CoSQ 4 for current interface."
+              ::= { integraBifCosqEntry 27 }
+
+integraBifCosqStatDroppedBytesCoSQ4 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Dropped packets (bcmCosqStatDroppedPackets) counter
+                for CoSQ 4 for current interface."
+              ::= { integraBifCosqEntry 28 }
+
+integraBifCosqStatGreenDiscardDroppedPacketsCoSQ4 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Discarded green packets
+                (bcmCosqStatGreenDiscardDroppedPackets)
+                counter for CoSQ 4 for current interface."
+              ::= { integraBifCosqEntry 29 }
+
+integraBifCosqStatYellowDiscardDroppedPacketsCoSQ4 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Discarded yellow packets
+                (bcmCosqStatYellowDiscardDroppedPackets)
+                counter for CoSQ 4 for current interface."
+              ::= { integraBifCosqEntry 30 }
+
+integraBifCosqStatOutPacketsCoSQ4 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Egress packets (bcmCosqStatOutPackets) counter
+              for CoSQ 4 for current interface."
+              ::= { integraBifCosqEntry 31 }
+
+integraBifCosqStatOutBytesCoSQ4 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                 "Egress bytes (bcmCosqStatOutBytes) counter
+                 for CoSQ 4 for current interface."
+              ::= { integraBifCosqEntry 32 }
+
+integraBifCosqStatDroppedPacketsCoSQ5 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Dropped packets (bcmCosqStatDroppedPackets) counter
+                for CoSQ 5 for current interface."
+              ::= { integraBifCosqEntry 33 }
+
+integraBifCosqStatDroppedBytesCoSQ5 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Dropped packets (bcmCosqStatDroppedPackets) counter
+                for CoSQ 5 for current interface."
+              ::= { integraBifCosqEntry 34 }
+
+integraBifCosqStatGreenDiscardDroppedPacketsCoSQ5 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Discarded green packets
+                (bcmCosqStatGreenDiscardDroppedPackets)
+                counter for CoSQ 5 for current interface."
+              ::= { integraBifCosqEntry 35 }
+
+integraBifCosqStatYellowDiscardDroppedPacketsCoSQ5 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Discarded yellow packets
+                (bcmCosqStatYellowDiscardDroppedPackets)
+                counter for CoSQ 5 for current interface."
+              ::= { integraBifCosqEntry 36 }
+
+integraBifCosqStatOutPacketsCoSQ5 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Egress packets (bcmCosqStatOutPackets) counter
+              for CoSQ 5 for current interface."
+              ::= { integraBifCosqEntry 37 }
+
+integraBifCosqStatOutBytesCoSQ5 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                 "Egress bytes (bcmCosqStatOutBytes) counter
+                 for CoSQ 5 for current interface."
+              ::= { integraBifCosqEntry 38 }
+
+integraBifCosqStatDroppedPacketsCoSQ6 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Dropped packets (bcmCosqStatDroppedPackets) counter
+                for CoSQ 6 for current interface."
+              ::= { integraBifCosqEntry 39 }
+
+integraBifCosqStatDroppedBytesCoSQ6 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Dropped packets (bcmCosqStatDroppedPackets) counter
+                for CoSQ 6 for current interface."
+              ::= { integraBifCosqEntry 40 }
+
+integraBifCosqStatGreenDiscardDroppedPacketsCoSQ6 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Discarded green packets
+                (bcmCosqStatGreenDiscardDroppedPackets)
+                counter for CoSQ 6 for current interface."
+              ::= { integraBifCosqEntry 41 }
+
+integraBifCosqStatYellowDiscardDroppedPacketsCoSQ6 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Discarded yellow packets
+                (bcmCosqStatYellowDiscardDroppedPackets)
+                counter for CoSQ 6 for current interface."
+              ::= { integraBifCosqEntry 42 }
+
+integraBifCosqStatOutPacketsCoSQ6 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Egress packets (bcmCosqStatOutPackets) counter
+              for CoSQ 6 for current interface."
+              ::= { integraBifCosqEntry 43 }
+
+integraBifCosqStatOutBytesCoSQ6 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                 "Egress bytes (bcmCosqStatOutBytes) counter
+                 for CoSQ 6 for current interface."
+              ::= { integraBifCosqEntry 44 }
+
+integraBifCosqStatDroppedPacketsCoSQ7 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Dropped packets (bcmCosqStatDroppedPackets) counter
+                for CoSQ 7 for current interface."
+              ::= { integraBifCosqEntry 45 }
+
+integraBifCosqStatDroppedBytesCoSQ7 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Dropped packets (bcmCosqStatDroppedPackets) counter
+                for CoSQ 7 for current interface."
+              ::= { integraBifCosqEntry 46 }
+
+integraBifCosqStatGreenDiscardDroppedPacketsCoSQ7 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Discarded green packets
+                (bcmCosqStatGreenDiscardDroppedPackets)
+                counter for CoSQ 7 for current interface."
+              ::= { integraBifCosqEntry 47 }
+
+integraBifCosqStatYellowDiscardDroppedPacketsCoSQ7 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Discarded yellow packets
+                (bcmCosqStatYellowDiscardDroppedPackets)
+                counter for CoSQ 7 for current interface."
+              ::= { integraBifCosqEntry 48 }
+
+integraBifCosqStatOutPacketsCoSQ7 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                "Egress packets (bcmCosqStatOutPackets) counter
+              for CoSQ 7 for current interface."
+              ::= { integraBifCosqEntry 49 }
+
+integraBifCosqStatOutBytesCoSQ7 OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                 "Egress bytes (bcmCosqStatOutBytes) counter
+                 for CoSQ 7 for current interface."
+              ::= { integraBifCosqEntry 50 }
+
+
+
+-- Configuration applying/saving objects
+
+integraBexecuteConfig OBJECT-TYPE
+              SYNTAX INTEGER {
+                 execute(1)
+              }
+              MAX-ACCESS  read-write
+              STATUS current
+              DESCRIPTION "This object can only be set to 1.
+                           It initiates new running configuration 
+                           applying using values, that have been set before.
+                           Setting it when no new changes are available
+                           will do nothing and return an error.
+                           GET will return 0 if there were no errors,
+                           while executing configuration or will return
+                           a bitmask, that shows which SET requests have failed.
+                           Those failed requests will be shown bit wise
+                           from LSB as follows:
+                           BIT0 radioTxMuteDuration
+                           BIT1 radioTxFrequency
+                           BIT2 radioTxPower"
+              ::= { integraB 6 }
+
+integraBneedStore OBJECT-TYPE
+              SYNTAX INTEGER {
+                 no(0)
+              }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "This object shows if there is unsaved,
+                           but executed (running) configuration.
+                           Unsaved changes will be lost after
+                           device reboot. Unsaved entities are shown
+                           bit wise, starting from LSB as follows:
+                           BIT0 Aggregation
+                           BIT1 Event log
+                           BIT2 Modem
+                           BIT3 Network
+                           BIT4 Performance
+                           BIT5 Radio
+                           BIT6 SNMP
+                           BIT7 Synchronous Ethernet
+                           BIT8 System"
+              ::= { integraB 7 }
+
+integraBstoreConfig OBJECT-TYPE
+              SYNTAX INTEGER {
+                 store(1)
+              }
+              MAX-ACCESS  read-write
+              STATUS current
+              DESCRIPTION "This object can only be set to 1.
+                           It initiates saving of running configuration.
+                           It will only work if there are unsaved,
+                           but executed (running) changes (configuration).
+                           Setting it when no new running configuration
+                           is available will do nothing and return an error."
+              ::= { integraB 8 }
+
+
+-- IP settings
+
+integraBnetCfg OBJECT IDENTIFIER ::= { integraB 9 }
+
+integraBnetCfgIPaddress OBJECT-TYPE
+              SYNTAX IpAddress
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION "Local IP address"
+              ::= { integraBnetCfg 1 }
+
+integraBnetCfgIPmask OBJECT-TYPE
+              SYNTAX IpAddress
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION "Local IP mask"
+              ::= { integraBnetCfg 2 }
+
+integraBnetCfgIPgateway OBJECT-TYPE
+              SYNTAX IpAddress
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION "IP gateway
+                          Send '0' or '255.255.255.255' to clear."
+              ::= { integraBnetCfg 3 }
+
+integraBnetCfgRemoteIPaddress OBJECT-TYPE
+              SYNTAX IpAddress
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Remote IP address"
+              ::= { integraBnetCfg 4 }
+
+
+-- Conformance
+
+integraBConformance OBJECT IDENTIFIER ::= { integraB 10 }
+integraBCompliances OBJECT IDENTIFIER ::= { integraBConformance 1 }
+
+integraBCompliance MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION "The compliance statement for SNMP engine which
+                 implements the SAF Tehnika Integra-B device."
+    MODULE -- this module
+      MANDATORY-GROUPS { 
+                integraBMiscGroup,
+                integraBRadioGroup,
+                integraBModemGroup,
+                integraBSystemGroup,
+                integraBEthernetGeneralGroup,
+                integraBEthernetMiiPortGroup,
+                integraBEthernetQosQueueGroup }
+    ::= { integraBCompliances 1 }
+integraBGroups  OBJECT IDENTIFIER ::= { integraBConformance 2 }
+
+integraBMiscGroup OBJECT-GROUP
+   OBJECTS {
+          integraBtimestamp
+   }
+   STATUS   current
+   DESCRIPTION "misc data"
+   ::= { integraBGroups 1 }
+
+integraBRadioGroup OBJECT-GROUP
+   OBJECTS {
+          integraBradioTxPower,
+          integraBradioTxFrequency,
+          integraBradioRxLevel,
+          integraBradioSide,
+          integraBradioTxMute,
+          integraBradioDuplexShift,
+          integraBradioRxFrequency,
+          integraBradioTemperature,
+          integraBradioTxMuteDuration,
+          integraBradioRangeEntryIndex,
+          integraBradioRangeDescr,
+          integraBradioRangeTxPower,
+          integraBradioRangeTxFrequency,
+          integraBradioPLL
+   }
+   STATUS   current
+   DESCRIPTION "Radio group."
+   ::= { integraBGroups 2 }
+
+integraBModemGroup OBJECT-GROUP
+   OBJECTS {
+          integraBmodemAcquireStatus,
+          integraBmodemRadialMse,
+          integraBmodemFECload,
+          integraBmodemAcquireLastStatusDetails,
+          integraBmodemTemperature,
+          integraBmodemBandwidth,
+          integraBmodemModulation,
+          integraBmodemRxModulation,
+          integraBmodemTxModulation,
+          integraBmodemRxCapacity,
+          integraBmodemTxCapacity,
+          integraBmodemACMengine,
+          integraBmodemCarrierOffset
+   }
+   STATUS   current
+   DESCRIPTION "Modem group."
+   ::= { integraBGroups 3 }
+
+integraBSystemGroup OBJECT-GROUP
+   OBJECTS {
+          integraBsysCPUtemperature,
+          integraBsysLicenseExpire,
+          integraBsysLicenseGenStatus,
+          integraBsysPSUvoltage,
+          integraBsysPSUcurrent,
+          integraBsysPSUpower,
+          integraBsysBoardTemperature,
+          integraBsysFreeMemory,
+          integraBsysCPUidle,
+          integraBexecuteConfig,
+          integraBneedStore,
+          integraBstoreConfig
+   }
+   STATUS   current
+   DESCRIPTION "System group."
+   ::= { integraBGroups 4 }
+
+integraBEthernetGeneralGroup OBJECT-GROUP
+   OBJECTS {
+          integraBifPortStatIndex,
+          integraBifPortStatDescr,
+          integraBifPortType,
+          integraBifPortMtu,
+          integraBifPortSpeed,
+          integraBifPortPhysAddress,
+          integraBifPortAdminStatus,
+          integraBifPortOperStatus,
+          integraBifPortLastChange,
+          integraBifPortAutoneg,
+          integraBifPortDuplex,
+          integraBifPortSyncEthActive,
+          integraBifPortSyncEthPrio,
+          integraBifPortFlowControl,
+          integraBifPortStcIndex,
+          integraBifPortStcDescr,
+          integraBifTimePassed,
+          integraBifIngressPackets,
+          integraBifIngressBytes,
+          integraBifEgressPackets,
+          integraBifEgressBytes,
+          integraBifEtherRxOversizePkts,
+          integraBifEtherTxOversizePkts,
+          integraBifReceivedPkts64Octets,
+          integraBifTransmittedPkts64Octets,
+          integraBifReceivedPkts65to127Octets,
+          integraBifTransmittedPkts65to127Octets,
+          integraBifReceivedPkts128to255Octets,
+          integraBifTransmittedPkts128to255Octets,
+          integraBifReceivedPkts256to511Octets,
+          integraBifTransmittedPkts256to511Octets,
+          integraBifReceivedPkts512to1023Octets,
+          integraBifTransmittedPkts512to1023Octets,
+          integraBifReceivedPkts1024to1518Octets,
+          integraBifTransmittedPkts1024to1518Octets,
+          integraBifIfInBroadcastPkts,
+          integraBifIfOutBroadcastPkts,
+          integraBifIfInMulticastPkts,
+          integraBifIfOutMulticastPkts,
+          integraBifIngressBPS,
+          integraBifIngressPPS,
+          integraBifEgressBPS,
+          integraBifEgressPPS,
+          integraBifMAClearnLimitDropIngressPackets,
+          integraBifL2cacheDropIngressPackets,
+          integraBifEFMdropIngressPackets,
+          integraBifEFMdropEgressPackets,
+          integraBifSTPdropIngressPackets,
+          integraBifSTPdropEgressPackets,
+          integraBifMRUdropIngressPackets,
+          integraBifMRUdropEgressPackets,
+          integraBifFilterDropIngressPackets,
+          integraBifFlowClassifierDropIngressPackets,
+          integraBifFlowClassifierDropEgressPackets,
+          integraBifIllegalSAdropIngressPackets,
+          integraBifPortRateLimitDropIngressPackets,
+          integraBifPortRateLimitDropIngressBytes,
+          integraBifPausePFCframesGeneratedIngressPackets,
+          integraBifPausePFCframesGeneratedEgressPackets,
+          integraBifRateLimitDropForUnknownUnicastIngressPackets,
+          integraBifRateLimitDropForUnknownUnicastIngressBytes,
+          integraBifRateLimitDropForBroadcastIngressPackets,
+          integraBifRateLimitDropForBroadcastIngressBytes,
+          integraBifRateLimitDropForKnownMulticastIngressPackets,
+          integraBifRateLimitDropForKnownMulticastIngressBytes,
+          integraBifRateLimitDropForUnknownMulticastIngressPackets,
+          integraBifRateLimitDropForUnknownMulticastIngressBytes,
+          integraBifAllCoSQoutPackets,
+          integraBifAllCoSQoutBytes,
+          integraBifAllCoSQdroppedPackets,
+          integraBifAllCoSQdroppedBytes,
+          integraBifProcessedRxPackets,
+          integraBifProcessedRxBytes,
+          integraBnetCfgIPaddress,
+          integraBnetCfgIPmask,
+          integraBnetCfgIPgateway,
+          integraBnetCfgRemoteIPaddress
+   }
+   STATUS current
+   DESCRIPTION "A collection to objects, providing info applicable to
+               all network interfaces."
+   ::= { integraBGroups 5 }
+
+integraBEthernetMiiPortGroup OBJECT-GROUP
+   OBJECTS {
+          integraBifEtherStatsMulticastPkts,
+          integraBifEtherStatsBroadcastPkts,
+          integraBifEtherStatsPkts64Octets,
+          integraBifEtherStatsPkts65to127Octets,
+          integraBifEtherStatsPkts128to255Octets,
+          integraBifEtherStatsPkts256to511Octets,
+          integraBifEtherStatsPkts512to1023Octets,
+          integraBifEtherStatsPkts1024to1518Octets,
+          integraBifEtherStatsOversizePkts,
+          integraBifEtherStatsOctets,
+          integraBifEtherStatsPkts,
+          integraBifEtherStatsTXNoErrors,
+          integraBifEtherStatsRXNoErrors,
+          integraBifEtherStatsPkts1519to1522Octets,
+          integraBifIfInOctets,
+          integraBifIfOutOctets,
+          integraBifDot1dTpPortInFrames,
+          integraBifDot1dTpPortOutFrames,
+          integraBifDot3InPauseFrames,
+          integraBifDot3OutPauseFrames,
+          integraBifEtherStatsUndersizePkts,
+          integraBifEtherStatsFragments,
+          integraBifEtherStatsCRCAlignErrors,
+          integraBifEtherStatsJabbers
+   }
+   STATUS current
+   DESCRIPTION "A collection of objects, providing info applicable 
+               only to MII group interfaces."
+   ::= { integraBGroups 6 }
+
+integraBEthernetQosQueueGroup OBJECT-GROUP
+   OBJECTS {
+          integraBifCosqIfaceIndex,
+          integraBifCosqIfaceDescr,
+          integraBifCosqStatDroppedPacketsCoSQ0,
+          integraBifCosqStatDroppedBytesCoSQ0,
+          integraBifCosqStatGreenDiscardDroppedPacketsCoSQ0,
+          integraBifCosqStatYellowDiscardDroppedPacketsCoSQ0,
+          integraBifCosqStatOutPacketsCoSQ0,
+          integraBifCosqStatOutBytesCoSQ0,
+          integraBifCosqStatDroppedPacketsCoSQ1,
+          integraBifCosqStatDroppedBytesCoSQ1,
+          integraBifCosqStatGreenDiscardDroppedPacketsCoSQ1,
+          integraBifCosqStatYellowDiscardDroppedPacketsCoSQ1,
+          integraBifCosqStatOutPacketsCoSQ1,
+          integraBifCosqStatOutBytesCoSQ1,
+          integraBifCosqStatDroppedPacketsCoSQ2,
+          integraBifCosqStatDroppedBytesCoSQ2,
+          integraBifCosqStatGreenDiscardDroppedPacketsCoSQ2,
+          integraBifCosqStatYellowDiscardDroppedPacketsCoSQ2,
+          integraBifCosqStatOutPacketsCoSQ2,
+          integraBifCosqStatOutBytesCoSQ2,
+          integraBifCosqStatDroppedPacketsCoSQ3,
+          integraBifCosqStatDroppedBytesCoSQ3,
+          integraBifCosqStatGreenDiscardDroppedPacketsCoSQ3,
+          integraBifCosqStatYellowDiscardDroppedPacketsCoSQ3,
+          integraBifCosqStatOutPacketsCoSQ3,
+          integraBifCosqStatOutBytesCoSQ3,
+          integraBifCosqStatDroppedPacketsCoSQ4,
+          integraBifCosqStatDroppedBytesCoSQ4,
+          integraBifCosqStatGreenDiscardDroppedPacketsCoSQ4,
+          integraBifCosqStatYellowDiscardDroppedPacketsCoSQ4,
+          integraBifCosqStatOutPacketsCoSQ4,
+          integraBifCosqStatOutBytesCoSQ4,
+          integraBifCosqStatDroppedPacketsCoSQ5,
+          integraBifCosqStatDroppedBytesCoSQ5,
+          integraBifCosqStatGreenDiscardDroppedPacketsCoSQ5,
+          integraBifCosqStatYellowDiscardDroppedPacketsCoSQ5,
+          integraBifCosqStatOutPacketsCoSQ5,
+          integraBifCosqStatOutBytesCoSQ5,
+          integraBifCosqStatDroppedPacketsCoSQ6,
+          integraBifCosqStatDroppedBytesCoSQ6,
+          integraBifCosqStatGreenDiscardDroppedPacketsCoSQ6,
+          integraBifCosqStatYellowDiscardDroppedPacketsCoSQ6,
+          integraBifCosqStatOutPacketsCoSQ6,
+          integraBifCosqStatOutBytesCoSQ6,
+          integraBifCosqStatDroppedPacketsCoSQ7,
+          integraBifCosqStatDroppedBytesCoSQ7,
+          integraBifCosqStatGreenDiscardDroppedPacketsCoSQ7,
+          integraBifCosqStatYellowDiscardDroppedPacketsCoSQ7,
+          integraBifCosqStatOutPacketsCoSQ7,
+          integraBifCosqStatOutBytesCoSQ7
+   }
+   STATUS current
+   DESCRIPTION "A collection of objects, providing info applicable to
+               all network interface Quality of Service (QoS) queues."
+   ::= { integraBGroups 7 }
+
+END

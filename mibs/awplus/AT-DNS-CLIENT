@@ -1,0 +1,189 @@
+-- ============================================================================
+-- AT-DNS-CLIENT-MIB, Allied Telesis enterprise MIB: dns client
+--
+-- Copyright (c) 2008 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ===========================================================================
+
+    AT-DNS-CLIENT-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            modules
+                FROM AT-SMI-MIB
+            InetAddressType
+                FROM INET-ADDRESS-MIB
+            IpAddress, OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY
+                FROM SNMPv2-SMI
+            RowStatus
+                FROM SNMPv2-TC;
+
+
+        atDNSClient MODULE-IDENTITY
+            LAST-UPDATED "201006140445Z"
+            ORGANIZATION
+                "Allied Telesis, Inc"
+            CONTACT-INFO
+                "  http://www.alliedtelesis.com"
+            DESCRIPTION
+                "This MIB file contains definitions of managed objects
+                for the Allied Telesis DNS Client configuration."
+            REVISION "201006140445Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "200809181200Z"
+            DESCRIPTION
+                "Initial Revision"
+            ::= { atDns 1 }
+
+
+
+
+--
+-- Node definitions
+--
+
+        atDns OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "Description."
+            ::= { modules 501 }
+
+
+        atDNSServerIndexNext OBJECT-TYPE
+            SYNTAX INTEGER (0..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the next available value for
+                the object 'atDNSServerIndex'.
+                For creating an entry in the 'atDNSServerTable',
+                a management application should read this object,
+                get the value and use the same."
+            ::= { atDNSClient 1 }
+
+
+        atDNSServerTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtDNSServerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains information about the Domain Name
+                System (DNS) Server configurations in the system."
+            ::= { atDNSClient 2 }
+
+
+        atDNSServerEntry OBJECT-TYPE
+            SYNTAX AtDNSServerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An Entry representing the information about a
+                DNS Server configuration.
+                "
+            INDEX { atDNSServerIndex }
+            ::= { atDNSServerTable 1 }
+
+
+        AtDNSServerEntry ::=
+            SEQUENCE {
+                atDNSServerIndex
+                    INTEGER,
+                atDNSServerAddrType
+                    InetAddressType,
+                atDNSServerAddr
+                    IpAddress,
+                atDNSServerStatus
+                    RowStatus
+             }
+
+        atDNSServerIndex OBJECT-TYPE
+            SYNTAX INTEGER (1..65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object represents the index corresponding to the
+                particular DNS Server configuration in the system.
+                For creation of new entry, the value of this object
+                should be same as that of the value of
+                'atDNSServerIndexNext' object. If this is not
+                the case, then the entry creation will fail."
+            ::= { atDNSServerEntry 1 }
+
+
+        atDNSServerAddrType OBJECT-TYPE
+            SYNTAX InetAddressType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the Inet Address type of the
+                'atDNSServerAddr' object.
+                It's value should be of the values list below:
+                unknown(0),
+                ipv4(1),
+                ipv6(2),
+                ipv4z(3),
+                ipv6z(4),
+                dns(16)	"
+            DEFVAL { ipv4 }
+            ::= { atDNSServerEntry 2 }
+
+
+        atDNSServerAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object represents the address of the
+                DNS Server.
+
+                This object is a current object for row creation.
+
+                When a new row is created, this object is set with
+                a default value '0.0.0.0', and the management
+                application should change it to a desired value by
+                a SET operation."
+            DEFVAL { '00000000'h }
+            ::= { atDNSServerEntry 3 }
+
+
+        atDNSServerStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The Status of this row.
+                The reading of this object should have a value of
+                'active(1)', for an existing row.
+
+                For creation of new entry, a management application
+                should set this object with value 'createAndGo(4)',
+                and using the same value as that got from reading
+                object 'atDNSServerIndexNext', as the index for
+                the new entry.
+
+                When an entry is created, the object 'atDNSServerAddr'
+                in the entry is set with a default value '0.0.0.0'.
+                The management application should change it to
+                a desired value with a SET operation.
+
+                For deletion of entry, a management application
+                should set this object with value 'destroy(6)'.
+
+                Once an entry is deleted, other entries in the table
+                which have bigger index than the deleted one, will
+                be indexed again. Therefore a management
+                application can effectively delete multiple entries
+                by repeating the SET operation using the same index.
+
+                An attempt to SET this object with value other than
+                'createAndGo' or 'destroy' will fail."
+            DEFVAL { 1 }
+            ::= { atDNSServerEntry 4 }
+
+
+    END
+
+--
+-- at-dns.mib
+--

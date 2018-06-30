@@ -3,10 +3,10 @@
 --   
 -- May 1994, Jeffrey T. Johnson
 --   
--- Copyright (c) 1994-2007 by cisco Systems, Inc.
+-- Copyright (c) 1994-2015 and by Cisco Systems Inc.
 -- All rights reserved.
 --   
--- ****************************************************************
+-- ***************************************************************
 
 CISCO-TC DEFINITIONS ::= BEGIN
 
@@ -24,7 +24,7 @@ IMPORTS
 
 
 ciscoTextualConventions MODULE-IDENTITY
-    LAST-UPDATED    "200702150000Z"
+    LAST-UPDATED    "201506090000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Cisco Systems
@@ -40,6 +40,218 @@ ciscoTextualConventions MODULE-IDENTITY
     DESCRIPTION
         "This module defines textual conventions used throughout
         cisco enterprise mibs."
+    REVISION        "201506090000Z"
+    DESCRIPTION
+        "Added the following enumerations for IfOperStatusReason:
+        physicalPortHotStandBy,
+        wimaxModemUnattached,
+        wpanModemUnattached,
+        rbhModulo,
+        fpcMinLinkNotMet,
+        misCabling,
+        rcvSrpOnNonFcoeFex,
+        acessPortOnBd,
+        lacpMisConfig,
+        fortyGMemberPort,
+        goldLoopBackTest,
+        edpError,
+        vpcCompCheckFailed,
+        aclQosNoResource,
+        vpcShutdown,
+        notPcMember,
+        systemIntfShut,
+        speedGroupConfigMisMatch,
+        dot1qMisConfig,
+        mdMisMatch,
+        vpcPeerLinkShut,
+        notAvailable"
+    REVISION        "201407230000Z"
+    DESCRIPTION
+        "-Added the textual-convention CiscoAbsZeroBasedCounter64."
+    REVISION        "201208060000Z"
+    DESCRIPTION
+        "-Added the following enums for IfOperStatusReason:
+        ficonNoPortSwapLogicalPort,
+        ficonInvalidPortNum,
+        remotePortInL2vpnDown,
+        suspendedDueToNoLacpPdus,
+        fcotValidationFailedAtDriver,
+        unsupportedTransceiverMd5DigestNotSame,
+        unsupportedTransceiver,
+        adminStateConfigChange,
+        vlanAllowedList,
+        vlanAllowedListOverride,
+        vlanAllowedListAdd,
+        vlanAllowedRemove,
+        vlanCfgStateChange,
+        vlanCfgDelete,
+        pppPeerNotResponding,
+        pppAuthFailed,
+        xcvrAuthFailed,
+        badFramesRcvdFromLink"
+    REVISION        "201202010000Z"
+    DESCRIPTION
+        "Added CiscoVlanIndex TC."
+    REVISION        "201111110000Z"
+    DESCRIPTION
+        "Added CiscoEntityIndexList TC."
+    REVISION        "201106170000Z"
+    DESCRIPTION
+        "-Added the following enums for FcIfOperStatusReason:
+        fcRedirectIsolation,
+        portActLicenseNotAvailable,
+        sdmIsolation,
+        fcidAllocationFailed,
+        unavailableNPVUpstreamPort,
+        unavailableNPVPrefUpstreamPort,
+        sfpReadError,
+        stickyDownOnLinkFailure,
+        tooManyLinkFlapsErr,
+        unidirectionalUDLD,
+        txRxLoopUDLD,
+        neighborMismatchUDLD,
+        authzPending,
+        hotStdbyInBundle,
+        incompleteConfig,
+        incompleteTunnelCfg,
+        hwProgrammingFailed,
+        tunnelDstUnreachable,
+        suspendByMtu,
+        sfpInvalid,
+        sfpAbsent,
+        portCapabilitiesUnknown,
+        channelErrDisabled,
+        vrfMismatch,
+        vrfForwardReferencing,
+        dupTunnelConfigDetected,
+        primaryVLANDown,
+        vrfUnusable,
+        errDisableHandShkFailure,
+        errDisabledBPDUGuard,
+        dot1xSecViolationErrDisabled,
+        emptyEchoUDLD,
+        vfTaggingCapErr,
+        portDisabled,
+        tunnelModeNotConfigured,
+        tunnelSrcNotConfigured,
+        tunnelDstNotConfigured,
+        tunnelUnableToResolveSrcIP
+        tunnelUnableToResolveDstIP,
+        tunnelVrfDown,
+        sifAdminDown,
+        phyIntfDown,
+        ifSifLimitExceeded,
+        sifHoldDown,
+        noFcoe,
+        dcxCompatMismatch,
+        isolateBundleLimitExceeded,
+        sifNotBound,
+        errDisabledLacpMiscfg,
+        satFabricIfDown,
+        invalidSatFabricIf,
+        noRemoteChassis,
+        vicEnableNotReceived,
+        vicDisableReceived,
+        vlanVsanMappingNotEnabled,
+        stpNotFwdingInFcoeMappedVlan,
+        moduleOffline,
+        udldAggModeLinkFailure,
+        stpInconsVpcPeerDisabled,
+        setPortStateFailed,
+        suspendedByVpc,
+        vpcCfgInProgress,
+        vpcPeerLinkDown,
+        vpcNoRspFromPeer,
+        protoPortSuspend,
+        tunnelSrcDown,
+        cdpInfoUnavailable,
+        fexSfpInvalid,
+        errDisabledIpConflict,
+        fcotClkRateMismatch,
+        portGuardTrustSecViolation,
+        sdpTimeout,
+        satIncompatTopo,
+        waitForFlogi,
+        satNotConfigured,
+        npivNotEnabledInUpstream,
+        vsanMismatchWithUpstreamSwPort,
+        portGuardBitErrRate,
+        portGuardSigLoss,
+        portGuardSyncLoss,
+        portGuardLinkReset,
+        portGuardCreditLoss,
+        bitErrorRate,
+        signalLoss,
+        syncLoss,
+        linkReset,
+        creditLoss,
+        ipQosMgrPolicyAppFailure,
+        pauseRateLimitErrDisabled,
+        lstGrpUplinkDown,
+        stickyDnLinkFailure,
+        routerMacFailure,
+        dcxMultipleMsapIds,
+        dcxHundredPdusRcvdNoAck,
+        enmSatIncompatibleUplink,
+        enmLoopDetected,
+        nonStickyExternallyDisabled,
+        subGroupIdNotAssigned,
+        vemUnlicensed,
+        profileNotFound,
+        nonExistentVlan,
+        vlanInvalidType,
+        vlanDown,
+        vpcPeerUpgrade,
+        ipQosDcbxpCompatFailure,
+        nonCiscoHbaVfTag,
+        domainIdConfigMismatch,
+        sfpSpeedMismatch,
+        xcvrInitializing,
+        xcvrAbsent,
+        xcvrInvalid,
+        vfcBindingInvalid,
+        vlanNotFcoeEnabled,
+        pvlanNativeVlanErr,
+        ethL2VlanDown,
+        ethIntfInvalidBinding,
+        pmonFailure,
+        l3NotReady,
+        speedMismatch,
+        flowControlMismatch,
+        vdcMode,
+        suspendedDueToMinLinks,
+        enmPinFailLinkDown,
+        inactiveM1PortFpathActiveVlan,
+        parentPortDown,
+        moduleRemoved,
+        corePortMct,
+        nonCorePortMct,
+        ficonInorderNotActive,
+        invalidEncapsulation,
+        modemLineDeasserted,
+        ipSecHndshkInProgress,
+        sfpEthCompliantErr,
+        cellularModemUnattached,
+        outOfGlblRxBuffers,
+        sfpFcCompliantErr,
+        ethIntfNotLicensed,
+        domainIdsInvalid,
+        fabricNameInvalid."
+    REVISION        "201002240000Z"
+    DESCRIPTION
+        "Added CiscoURLStringOrEmpty textual convention."
+    REVISION        "200906180000Z"
+    DESCRIPTION
+        "Added the new textual convention CiscoVrfName"
+    REVISION        "200903100000Z"
+    DESCRIPTION
+        "Added the new textual convention CiscoInterfaceIndexList"
+    REVISION        "200902260000Z"
+    DESCRIPTION
+        "Added the new textual convention Cisco2KVlanList"
+    REVISION        "200804020000Z"
+    DESCRIPTION
+        "Added the new textual convention CiscoBridgeDomain."
     REVISION        "200702150000Z"
     DESCRIPTION
         "Added following textual conventions:
@@ -87,8 +299,8 @@ ciscoTextualConventions MODULE-IDENTITY
     REVISION        "200209220000Z"
     DESCRIPTION
         "Added ListIndex, ListIndexOrZero, TimeIntervalSec,
-        TimeintervalMin, MicroSeconds and MicroSeconds TC from Andiamo's
-        TC MIB ."
+        TimeintervalMin, MicroSeconds and MicroSeconds TC from 
+        Andiamo's TC MIB ."
     REVISION        "200209170000Z"
     DESCRIPTION
         "Added ConfigIterator & BulkConfigResult textual
@@ -150,7 +362,7 @@ Layer2Cos ::= TEXTUAL-CONVENTION
     REFERENCE
         "IEEE 802.1D, 2004 Edition, Annex G User priorities and traffic
             classes."
-    SYNTAX          Integer32 (0..7 )
+    SYNTAX          Integer32 (0..7)
 
 CiscoNetworkProtocol ::= TEXTUAL-CONVENTION
     STATUS          current
@@ -245,7 +457,7 @@ InterfaceIndexOrZero ::= TEXTUAL-CONVENTION
     DESCRIPTION
         "Either the value 0, or the ifIndex value of an
         interface in the ifTable."
-    SYNTAX          Integer32 (0..2147483647 )
+    SYNTAX          Integer32 (0..2147483647)
 
 SAPType ::= TEXTUAL-CONVENTION
     STATUS          current
@@ -253,7 +465,7 @@ SAPType ::= TEXTUAL-CONVENTION
         "Service Access Point - is a term that denotes the means
         by which a user entity in layer n+1 accesses a service
         of a provider entity in layer n."
-    SYNTAX          Integer32 (0..254 )
+    SYNTAX          Integer32 (0..254)
 
 CountryCode ::= TEXTUAL-CONVENTION
     STATUS          current
@@ -261,7 +473,7 @@ CountryCode ::= TEXTUAL-CONVENTION
         "Represents a case-insensitive 2-letter country code taken
         from ISO-3166. Unrecognized countries are represented as 
         empty string."
-    SYNTAX          OCTET STRING (SIZE (0  |  2))
+    SYNTAX          OCTET STRING (SIZE (0 | 2))
 
 CountryCodeITU ::= TEXTUAL-CONVENTION
     STATUS          current
@@ -270,7 +482,7 @@ CountryCodeITU ::= TEXTUAL-CONVENTION
         non-standard facilities in telematic services."
 
     REFERENCE       "ITU-T T.35 - Section 3.1 Country Code"
-    SYNTAX          Unsigned32 (0..255 )
+    SYNTAX          Unsigned32 (0..255)
 
 EntPhysicalIndexOrZero ::= TEXTUAL-CONVENTION
     STATUS          current
@@ -279,7 +491,7 @@ EntPhysicalIndexOrZero ::= TEXTUAL-CONVENTION
         If non-zero, the object is an entPhysicalIndex. If zero, no
         appropriate entPhysicalIndex exists. Any additional semantics
         are object specific."
-    SYNTAX          Integer32 (0..2147483647 )
+    SYNTAX          Integer32 (0..2147483647)
 
 CiscoRowOperStatus ::= TEXTUAL-CONVENTION
     STATUS          current
@@ -318,7 +530,7 @@ CiscoPort ::= TEXTUAL-CONVENTION
     REFERENCE
         "Transmission Control Protocol. J. Postel. RFC793,
             User Datagram Protocol. J. Postel. RFC768"
-    SYNTAX          Integer32 (0..65535 )
+    SYNTAX          Integer32 (0..65535)
 
 CiscoIpProtocol ::= TEXTUAL-CONVENTION
     STATUS          current
@@ -326,7 +538,7 @@ CiscoIpProtocol ::= TEXTUAL-CONVENTION
         "IP protocol number range."
 
     REFERENCE       "Internet Protocol. J. Postel. RFC791"
-    SYNTAX          Integer32 (0..255 )
+    SYNTAX          Integer32 (0..255)
 
 CiscoLocationClass ::= TEXTUAL-CONVENTION
     STATUS          current
@@ -442,7 +654,7 @@ CiscoInetAddressMask ::= TEXTUAL-CONVENTION
 
     REFERENCE
         "RFC2851, Textual Conventions for Internet Network Addresses."
-    SYNTAX          Unsigned32 (0..128 )
+    SYNTAX          Unsigned32 (0..128)
 
 CiscoAbsZeroBasedCounter32 ::= TEXTUAL-CONVENTION
     STATUS          current
@@ -727,7 +939,7 @@ ConfigIterator ::= TEXTUAL-CONVENTION
         the bulk configuration to the same table before the previous
         bulk operation has been completed. These two objects will 
         represent the last bulk operation in the table."
-    SYNTAX          Unsigned32 (1..4294967295 )
+    SYNTAX          Unsigned32 (1..4294967295)
 
 BulkConfigResult ::= TEXTUAL-CONVENTION
     STATUS          current
@@ -753,7 +965,7 @@ ListIndex ::= TEXTUAL-CONVENTION
         list that is defined. The object using this 
         convention should give all the object specific 
         details including the list type."
-    SYNTAX          Integer32 (1..2147483647 )
+    SYNTAX          Integer32 (1..2147483647)
 
 ListIndexOrZero ::= TEXTUAL-CONVENTION
     STATUS          current
@@ -765,7 +977,7 @@ ListIndexOrZero ::= TEXTUAL-CONVENTION
         should be given the description of that object. 
         In most cases, a value 0 means that the it does 
         not represent any lists."
-    SYNTAX          Integer32 (0..2147483647 )
+    SYNTAX          Integer32 (0..2147483647)
 
 TimeIntervalSec ::= TEXTUAL-CONVENTION
     STATUS          current
@@ -870,12 +1082,16 @@ IfOperStatusReason ::= TEXTUAL-CONVENTION
 
         GLOSSARY:
 
-        BB        - Buffer-to-Buffer.
+                BB        - Buffer-to-Buffer.
 
         BB_Credit - Buffer-to-Buffer credit, a link level flow
                     control mechanism.
 
         B_Port    - A Fibre Channel, Bridging port.
+
+        BPDU      - Bridge Protocol Data Unit.
+
+        CDP       - Cisco Discovery Protocol.
 
         Class F   - A connectionless service with notification on 
                     non-delivery between E_Ports, used for control, 
@@ -885,6 +1101,10 @@ IfOperStatusReason ::= TEXTUAL-CONVENTION
                     of frame delivery services) other than Class F.
 
         E_D_TOV   - Error Detect Timeout Value.
+
+        EDP       - Error Disabled Policy.
+
+        ENM       - Egress Non-Multicast.
 
         ELP       - Exchange Link Parameter.
 
@@ -900,9 +1120,15 @@ IfOperStatusReason ::= TEXTUAL-CONVENTION
         Fabric    - The set of physically connected fibre channel
                     switches.
 
+        FEX       - Fabric EXtender.
+
         FC-FS     - Fibre Channel Framing and Signaling.
 
         FCIP      - Fibre Channel over IP protocol.
+
+        FCID      - Fibre Channel Domain ID.
+
+        FCOE      - Fibre Channel Over Ethernet.
 
         FCOT      - Fibre channel optical transmitter.
 
@@ -919,6 +1145,8 @@ IfOperStatusReason ::= TEXTUAL-CONVENTION
         FLOGI     - Fabric Login, used by a node port to establish a
                     session with the fabric.
 
+        FPC       - Fabric Port Channel.
+
         GBIC      - Gigabit Interface Converter; a removable 
                     transceiver module permitting Fibre Channel and 
                     Gigabit Ethernet physical-layer transport.
@@ -927,15 +1155,27 @@ IfOperStatusReason ::= TEXTUAL-CONVENTION
                     E_Port or B_Port mode are generally referred to 
                     as Interconnect_Ports.
 
+        LACP      - Link Access Control Protocol.
+
         LIP       - Loop Initialization Primitive sequence.
 
         LR        - Link Reset, the FC-PH defined primitive sequence 
-                    used to initiate a link reset. 
+                    used to initiate a link reset.
+
+        MTU       - Maximun transmission unit. 
 
         NOS       - Not Operational Sequence, the FC-PH defined 
                     primitive sequence to indicate that the 
                     transmitting port has detected a link failure (or)
                     offline condition.
+
+        VIC       - Virtual Interface Card.
+
+        VPC       - Virtual Port Channel.
+
+        NPIV      - N Port Identifier Virtualization.
+
+        NPV       - NPort Virtualizer.
 
         Nx_Port   - A Fiber Channel Node Port. 
 
@@ -945,7 +1185,13 @@ IfOperStatusReason ::= TEXTUAL-CONVENTION
 
         OHMS      - Online Health Management System.
 
+        PMON      - Port Monitor.
+
+        QoS       - Quality of Service.
+
         R_A_TOV   - Resource Allocation Timeout Value.
+
+        RBH       - Resource Bundle Hash.
 
         RCF       - Reconfigure Fabric. 
 
@@ -956,11 +1202,35 @@ IfOperStatusReason ::= TEXTUAL-CONVENTION
                     devices to disk or tape arrays and other devices 
                     over Fibre Channel.
 
+        SIF       - Service Information Field.
+
+        SDM       - Security Device Manager.
+
+        SDP       - Secure Device Provisioning.
+
+        SFP       - Small Formfactor Pluggable.
+
+        SRP       - Spatial Reuse Protocol.
+
         TE_Port   - Trunking E_Port.
 
         TOV       - Time out value.
 
+        UDLD      - Uni Directional Link Detection.
+
+        VDC       - Virtual Device Context.
+
+        VEM       - Virtual Ethernet Module.
+
+        VFC       - Virtual Fibre Channel.
+
+        VRF       - VPN Routing and Forwarding.
+
         VSAN      - Virtual Storage Area Network.
+
+        WiMAX     - Worldwide Interoperability for Microwave Access.
+
+        WPAN      - Wireless Personal Area Network.
 
         WWN       - World Wide Name.
 
@@ -1224,7 +1494,7 @@ IfOperStatusReason ::= TEXTUAL-CONVENTION
            'linkFailNosRcvd (85)' - link failure due to non-operational 
                sequences received.
 
-           'linkFailOlsRcvd (86)' - link failure due to offline 
+           'linkFailOLSRcvd (86)' - link failure due to offline 
                sequences received.
 
            'linkFailDebounceTimeout (87)' - link failure due to 
@@ -1325,16 +1595,16 @@ IfOperStatusReason ::= TEXTUAL-CONVENTION
            'domainNotAllowedIsolated (120)' - port isolated due to
                domain not allowed.
 
-           'virtualIvrDomainOverlapIsolation (121)' - port isolated due to
-               virtual IVR domain overlap.
+           'virtualIvrDomainOverlapIsolation (121)' - port isolated
+                      due to virtual IVR domain overlap.
 
            'outOfService (122)' - port is in out of service state.
 
            'portAuthFailed (123)' - port has encountered an 802.1x 
             authentication failure.
 
-           'bundleStandby (124)' - port cannot be brought up in a bundle, 
-            since the bundle has max members.
+           'bundleStandby (124)' - port cannot be brought up in 
+                   a bundle, since the bundle has max members.
 
            'portConnectorTypeErr (125)' - Error in the port connector 
             type (SFP).
@@ -1343,8 +1613,8 @@ IfOperStatusReason ::= TEXTUAL-CONVENTION
             operational after trying to initialize the port multiple 
             times due to some erorrs.
 
-           'ficonDupPortNum (127)' - the ficon vsan has a duplicate port 
-            number.
+           'ficonDupPortNum (127)' - the ficon vsan has a duplicate 
+            port number.
 
            'localRcf (128)' - fcdomain applied a locally disruptive
             reconfiguration (the local domain became invalid; no 
@@ -1367,7 +1637,465 @@ IfOperStatusReason ::= TEXTUAL-CONVENTION
             failure due to peer WWN is received with all zeros.
 
             'preferredPathIsolation (133)' - port isolated due to
-             preferred path not able to program the routes."
+             preferred path not able to program the routes.
+
+            'fcRedirectIsolation (134)' - port isolated due to
+                    FC Redirect not being able to program routes.
+
+             'portActLicenseNotAvailable (135)' - port not brought up
+                due to lack of port activation licenses.
+
+             'sdmIsolation (136)' - port isolated due to SDM 
+                (Security Device Manager) not being
+                able to program routes.
+
+             'fcidAllocationFailed (137)' - port down due to failure
+                in FCID (Fibre Channel Domain ID) allocation.   
+
+             'externallyDisabled (138)' - port externally disabled.
+
+             'unavailableNPVUpstreamPort (139)' - NPV 
+                     (NPort Virtualizer) upstream port not available.
+
+             'unavailableNPVPrefUpstreamPort (140)' - NPV 
+                (NPort Virtualizer) preferred 
+                upstream port not available.
+
+             'sfpReadError (141)' - the port is not operational due to 
+                     SFP (Small Formfactor Pluggable) read error.
+
+             'stickyDownOnLinkFailure (142)' - the port is 
+                     not operational due to link failure 
+                     in the sticky down mode.
+
+             'tooManyLinkFlapsErr (143)' - too many link flaps 
+                     on the port in a short interval.
+
+             'unidirectionalUDLD (144)' - unidirectional UDLD 
+                (Uni Directional Link Detection) detected.
+
+             'txRxLoopUDLD (145)' - UDLD (Uni Directional 
+                     Link Detection) Tx Rx loop.
+
+             'neighborMismatchUDLD (146)' - UDLD 
+                (Uni Directional Link Detection) neighbor mismatch.
+
+             'authzPending (147)' - authorization pending.
+
+             'hotStdbyInBundle (148)' - hot standby in bundle.
+
+             'incompleteConfig (149)' - all parameters on the port 
+                              have not been configured.
+
+             'incompleteTunnelCfg (150)' - incomplete tunnel config.
+
+             'hwProgrammingFailed (151)' - hardware programming failed.
+
+             'tunnelDstUnreachable (152)' - no route to 
+                     tunnel destination address.
+
+             'suspendByMtu (153)' - MTU allocation failed.
+
+             'sfpInvalid (154)' - SFP (Small Formfactor Pluggable) 
+                is not Cisco certified.
+
+             'sfpAbsent (155)' - SFP (Small Formfactor 
+                     Pluggable) is absent.
+
+            'portCapabilitiesUnknown (156)' - the capabilities of the 
+                    port are unknown.
+
+             'channelErrDisabled (157)' - the port-channel to which 
+                     the port belongs is in error disabled state.
+
+             'vrfMismatch (158)' - Mismatch in source and transport VRF
+                        (VPN Routing and Forwarding).
+
+             'vrfForwardReferencing (159)' - Forward referencing 
+                     transport VRF (VPN Routing and Forwarding).
+
+             'dupTunnelConfigDetected (160)' - two tunnel interfaces 
+                     with same configuration is not allowed.
+
+             'primaryVLANDown (161)' - primary VLAN is in down state.
+
+             'vrfUnusable (162)' - VRF (VPN Routing and Forwarding) 
+                    is unusable.
+
+             'errDisableHandShkFailure (163)' - port is not operational 
+                             due to an internal handshake failure.
+
+             'errDisabledBPDUGuard (164)' - BPDUGuard 
+             (Bridge Protocol Data Unit) triggered 
+             error disable on the port.
+
+             'dot1xSecViolationErrDisabled (165)' - error disabled 
+                   due to dot1x security violation.
+
+             'emptyEchoUDLD (166)' - UDLD (Uni Directional 
+                     Link Detection) empty echo.
+
+             'vfTaggingCapErr (167)' - VF Tagging capability 
+                     mismatch error.
+
+             'portDisabled (168)' - Port disabled.
+
+             'tunnelModeNotConfigured (169)' - Tunnel Mode is not 
+                             configured.
+
+             'tunnelSrcNotConfigured (170)' - Tunnel Source is not 
+                             configured. 
+
+             'tunnelDstNotConfigured (171)' - Tunnel Destination 
+                             is not configured.
+
+             'tunnelUnableToResolveSrcIP (172)' - Unable to resolve 
+                             tunnel source IP address. 
+
+             'tunnelUnableToResolveDstIP (173)' - Unable to resolve 
+                             tunnel destination IP address.
+
+             'tunnelVrfDown (174)' - Tunnel VRF down.
+
+             'sifAdminDown (175)' - SIF (Service Information Field) 
+                is admin down.
+
+             'phyIntfDown (176)' - Physical interface is down.
+
+             'ifSifLimitExceeded (177)' - Interface SIF 
+             (Service Information Field)limit is exceeded.
+
+             'sifHoldDown (178)' - SIF (Service Information Field) 
+                     hold down.
+
+             'noFcoe (179)' - No FCOE (Fibre Channel Over Ethernet) 
+                configuration.
+
+             'dcxCompatMismatch (180)' - DCX Compatibility Mismatch.
+
+             'isolateBundleLimitExceeded (181)' - Isolation due to 
+                         bundle limit exceeded.
+
+             'sifNotBound (182)' - SIF (ervice Information Field) 
+                     is not bound.
+
+             'errDisabledLacpMiscfg (183)' - Error Disabled due to 
+                     LACP (Link Access Control Protocol) misconfig.
+
+             'satFabricIfDown (184)' - Satellite fabric interface down.
+
+             'invalidSatFabricIf (185)' - Invalid satellite fabric 
+                             interface.
+
+             'noRemoteChassis (186)' - No remote chassis.
+
+             'vicEnableNotReceived (187)' - VIC enable not received.
+
+             'vicDisableReceived (188)' - VIC disable received.
+
+             'vlanVsanMappingNotEnabled (189)' - VLAN VSAN mapping not 
+                             enabled.
+
+             'stpNotFwdingInFcoeMappedVlan (190)' - STP not forwarding 
+                             in FCOE Mapped Vlan.
+
+             'moduleOffline (191)' - Module Offline.
+
+             'udldAggModeLinkFailure (192)' - UDLD (Uni Directional Link
+                Detection) aggresive mode link failure.
+
+             'stpInconsVpcPeerDisabled (193)' - STP inconsistent 
+                     VPC (Virtual Port Channel) peer disabled. 
+
+             'setPortStateFailed (194)' - Set port state failed.
+
+             'suspendedByVpc (195)' - Suspended by VPC 
+                     (Virtual Port Channel).
+
+             'vpcCfgInProgress (196)' - VPC (Virtual Port Channel)
+                 configuration in progress.
+
+             'vpcPeerLinkDown (197)' - VPC (Virtual Port Channel)
+                 peer link down.
+
+             'vpcNoRspFromPeer (198)' - VPC (Virtual Port Channel) 
+                no response from peer.
+
+             'protoPortSuspend (199)' - Proto port suspend.
+
+             'tunnelSrcDown (200)' - Tunnel source down.
+
+             'cdpInfoUnavailable (201)' - CDP 
+             (Cisco Discovery Protocol) information unavailable.
+
+             'fexSfpInvalid (202)' - FEX (Fabric Extender) 
+             SFP (Small Formfactor Pluggable) invalid.
+
+             'errDisabledIpConflict (203)' - Error Disabled due to IP
+                              conflict.
+
+             'fcotClkRateMismatch (204)' - FCOT CLK rate mismatch.
+
+             'portGuardTrustSecViolation (205)' - Error disabled due 
+                 to port guard (Cisco Trusted Security Violation).
+
+             'sdpTimeout (206)' - SDP (Secure Device Provisioning)
+                      timeout.
+
+             'satIncompatTopo (207)' - Satellite incompatible topology.
+
+             'waitForFlogi (208)' - Wait for FLOGI.
+
+             'satNotConfigured (209)' - Satellite not configured.
+
+             'npivNotEnabledInUpstream (210)' - NPIV (N Port Identifier
+                Virtualization) not enabled in upstream.
+
+             'vsanMismatchWithUpstreamSwPort (211)' - VSAN 
+                     mismatch with upstream switch port.
+
+             'portGuardBitErrRate (212)' - Error disabled due to port 
+                             guard (Bit Error Rate).
+
+             'portGuardSigLoss (213)' - Error disabled due to 
+                     port guard (Signal Loss).
+
+             'portGuardSyncLoss (214)' - Error disabled due to port 
+                             guard (Sync Loss).
+
+             'portGuardLinkReset (215)' - Error disabled due to port
+                             guard (Link Reset).
+
+             'portGuardCreditLoss (216)' - Error disabled due to port
+                             guard (Credit Loss).
+
+             'ipQosMgrPolicyAppFailure (217)' - IP QOS Manager policy 
+                          application failure.
+
+             'pauseRateLimitErrDisabled (218)' - Port error disabled due
+                                        to pause rate limit condition.
+
+             'lstGrpUplinkDown (219)' - EthPM LSTGRP downstream link 
+                             down due to upstream link down.
+
+             'stickyDnLinkFailure (220)' - Port kept in error disabled
+                                         state due to Link Failure.
+
+             'routerMacFailure (221)' - Router MAC failure.
+
+             'dcxMultipleMsapIds (222)' - Port error disabled due to
+                                        multiple MSAP IDs (DCX).
+
+             'dcxHundredPdusRcvdNoAck (223)' - Hundred PDUs received 
+                             without ACK (DCX).
+
+             'enmSatIncompatibleUplink (224)' - Satellite Incompatible 
+                             Uplink.
+
+             'enmLoopDetected (225)' - Loop Detected (ENM).
+
+             'nonStickyExternallyDisabled (226)' - Disabled by VPD 
+                             Manager with shut/no shut allowed.
+
+             'nonStickyExternallyDisabled (227)' - Sub-group ID 
+                             not assigned.
+
+             'vemUnlicensed (228)' - VEM Unlicensed.
+
+             'profileNotFound (229)' - Profile not found.
+
+             'nonExistentVlan (230)' - VLAN does not exist.
+
+             'vlanInvalidType (231)' - Invalid VLAN type.
+
+             'vlanDown (232)' - VLAN down.
+
+             'vpcPeerUpgrade (233)' - VPC Peer Upgrade.
+
+             'ipQosDcbxpCompatFailure (234)' - IPQOS DCBXP compatibility
+                           failure.
+
+             'nonCiscoHbaVfTag (235)' - Error Disabled due to Non-Cisco 
+                             HBA VF Tag.
+
+             'domainIdConfigMismatch (236)' - Domain ID config mismatch.
+
+             'sfpSpeedMismatch (237)' - SFP (Small Formfactor Pluggable)
+                 speed mismatch.
+             'xcvrInitializing (238)' - Transceiver initializing.
+
+             'xcvrAbsent (239)' - Transceiver absent.
+
+             'xcvrInvalid (240)' - Transceiver invalid.
+
+             'vfcBindingInvalid (241)' - Invalid VFC Binding.
+
+             'vlanNotFcoeEnabled (242)' - VLAN down due to FCOE 
+                             disabled.
+
+             'pvlanNativeVlanErr (243)' - Private VLAN 
+                             Native VLAN error.
+
+             'ethL2VlanDown (244)' - Ethernet L2 VLAN down.
+
+             'ethIntfInvalidBinding (245)' - Invalid Binding 
+                     to Ethernet Interface.
+
+             'pmonFailure (246)' - PMON Failure.
+
+             'l3NotReady (247)' - L3 not ready.
+
+             'speedMismatch (248)' - Speed Mismatch.
+
+             'flowControlMismatch (249)' - Flow Control Mismatch.
+
+             'vdcMode (250)' - VDC mode 
+
+             'suspendedDueToMinLinks (251)' - Suspended due 
+                             to Min Links.
+
+             'enmPinFailLinkDown (252)' - ENM Pin Fail Link Down.
+
+             'inactiveM1PortFpathActiveVlan (253)' - Inactive M1 Port
+                                    F Path Active VLAN.
+
+             'parentPortDown (254)' - Parent Port Down.
+
+             'moduleRemoved (255)' - Module Removed.
+
+             'corePortMct (256)' - Core Port MCT.
+
+             'nonCorePortMct (257)' - Non Core port MCT.
+
+             'ficonInorderNotActive (258)'- FICON Inorder Not Active.
+
+             'invalidEncapsulation (259)' - Invalid Encapsulation.
+
+             'modemLineDeasserted (260)' - Modem line Deasserted.
+
+             'ipSecHndshkInProgress (261)' - IP Sec Handshake in 
+                                     progress.
+
+             'sfpEthCompliantErr (262)' - Sfp Ethernet compliant error.
+
+             'cellularModemUnattached (263)' - Cellular Modem 
+                             unattached.
+
+             'outOfGlblRxBuffers (264)' - Out of Global Rx Buffers.
+
+             'sfpFcCompliantErr (265)' - Sfp Fc compliant Error.
+
+             'ethIntfNotLicensed (266)' - Ethernet Interface Not 
+                                             Licensed.
+
+             'domainIdsInvalid (267)' - Domain IDs Invalid.
+
+             'fabricNameInvalid (268)' - Fabric Name Invalid.
+
+             'ficonNoPortSwapLogicalPort (269)' - Ficon No Port Swap Logical Port.
+
+             'ficonInvalidPortNum (270)' - Ficon Invalid Port Number.
+
+             'remotePortInL2vpnDown (271)' - Remote Port in L2VPN Down.
+
+             'suspendedDueToNoLacpPdus (272)' - Suspended due to no LACP PDUs.
+
+             'fcotValidationFailedAtDriver (273)' - Fcot validation failed at driver.
+
+             'unsupportedTransceiverMd5DigestNotSame (274)' - Unsupported transceiver MD5 digest not Same.
+
+             'unsupportedTransceiver (275)' - Unsupport transceiver.
+
+             'adminStateConfigChange (276)' - Admin state config change.
+
+             'vlanAllowedList (277)' - Allowed Vlan list configured on the port.
+
+             'vlanAllowedListOverride (278)' - Allowed Vlan list changed on the port.
+
+             'vlanAllowedListAdd (279)' - Vlan has been added to the allowed Vlan list on the port.
+
+             'vlanAllowedListRemove  (280)' - Vlan has been removed from the allowed Vlan list on the port.
+
+             'vlanCfgStateChange (281)' - Port affected due to Vlan state change.
+
+             'vlanCfgDelete (282)' - Port affected due to Vlan delete.
+
+             'pppPeerNotResponding (283)' - ppp peer not responding.
+
+             'pppAuthFailed (284)' - ppp authentication failed.
+
+             'xcvrAuthFailed (285)' - Transceiver authentication failed.
+
+             'badFramesRcvdFromLink (286)' - Excessive bad frames received from link.
+
+             'physicalPortHotStandBy (287)'
+                  - Physical Port in Hot-StandBy State.
+
+             'wimaxModemUnattached (288)'
+                  - Modem Disconnected from WiMAX network.
+
+             'wpanModemUnattached (289)'
+                  - Modem Disconnected from WPAN network.
+
+             'rbhModulo (290)'
+                  - Down due to RBH modulo load-balance feature toggle.
+
+             'fpcMinLinkNotMet (291)'
+                  - Suspended as the FPC min-link requirement has not
+                    been met.
+
+             'misCabling (292)'
+                  - Miscabling detected.
+
+             'rcvSrpOnNonFcoeFex (293)'
+                  - Down due to received SRP for a non-FCOE capable FEX 
+
+             'acessPortOnBd (294)'
+                  - Inactive due to access port is configured with a
+                    Bridge-Domain ID.
+
+             'lacpMisConfig (295)'
+                  - LACP port suspended due to misconfiguration.
+
+             'fortyGMemberPort (300)'
+                  - Port is a member of a 40G interface.
+
+             'goldLoopBackTest (301)'
+                  - Suspended due to Loopback diagnostics.
+
+             'edpError (302)'
+                  - Down due to EDP enforcement.
+
+             'vpcCompCheckFailed (303)'
+                  - VPC down because compatibility check failed.
+
+             'aclQosNoResource (304)'
+                  - Not enough free entries in TCAM bank for QoS.
+
+             'vpcShutdown (305)'
+                  - VPC shutdown.
+
+             'notPcMember (306)'
+                  - Port is not a member of a port channel.
+
+             'systemIntfShut (307)'
+                  - System interface shutdown.
+
+             'speedGroupConfigMisMatch (308)'
+                  - Speed-Group config does not match type of transceiver.
+
+             'dot1qMisConfig (310)'
+                  - Dot1q-tunnel misconfiguration.
+
+             'mdMisMatch (311)'
+                  - Mobility Domain Config Mismatch.
+
+             'vpcPeerLinkShut (312)'
+                  - Suspended because VPC peer link had been shut down.
+
+             'notAvailable (313)'
+                  - Port Operation Status is currently not available.
+             "
     SYNTAX          INTEGER  {
                         other(1),
                         none(2),
@@ -1454,7 +2182,7 @@ IfOperStatusReason ::= TEXTUAL-CONVENTION
                         linkFailLossOfSignal(83),
                         linkFailLossOfSync(84),
                         linkFailNosRcvd(85),
-                        linkFailOlsRcvd(86),
+                        linkFailOLSRcvd(86),
                         linkFailDebounceTimeout(87),
                         linkFailLrRcvd(88),
                         linkFailCreditLoss(89),
@@ -1501,7 +2229,182 @@ IfOperStatusReason ::= TEXTUAL-CONVENTION
                         invalidOtherSidePrincEFPReqRecd(130),
                         domainOther(131),
                         elpFailureAllZeroPeerWWNRcvd(132),
-                        preferredPathIsolation(133)
+                        preferredPathIsolation(133),
+                        fcRedirectIsolation(134),
+                        portActLicenseNotAvailable(135),
+                        sdmIsolation(136),
+                        fcidAllocationFailed(137),
+                        externallyDisabled(138),
+                        unavailableNPVUpstreamPort(139),
+                        unavailableNPVPrefUpstreamPort(140),
+                        sfpReadError(141),
+                        stickyDownOnLinkFailure(142),
+                        tooManyLinkFlapsErr(143),
+                        unidirectionalUDLD(144),
+                        txRxLoopUDLD(145),
+                        neighborMismatchUDLD(146),
+                        authzPending(147),
+                        hotStdbyInBundle(148),
+                        incompleteConfig(149),
+                        incompleteTunnelCfg(150),
+                        hwProgrammingFailed(151),
+                        tunnelDstUnreachable(152),
+                        suspendByMtu(153),
+                        sfpInvalid(154),
+                        sfpAbsent(155),
+                        portCapabilitiesUnknown(156),
+                        channelErrDisabled(157),
+                        vrfMismatch(158),
+                        vrfForwardReferencing(159),
+                        dupTunnelConfigDetected(160),
+                        primaryVLANDown(161),
+                        vrfUnusable(162),
+                        errDisableHandShkFailure(163),
+                        errDisabledBPDUGuard(164),
+                        dot1xSecViolationErrDisabled(165),
+                        emptyEchoUDLD(166),
+                        vfTaggingCapErr(167),
+                        portDisabled(168),
+                        tunnelModeNotConfigured(169),
+                        tunnelSrcNotConfigured(170),
+                        tunnelDstNotConfigured(171),
+                        tunnelUnableToResolveSrcIP(172),
+                        tunnelUnableToResolveDstIP(173),
+                        tunnelVrfDown(174),
+                        sifAdminDown(175),
+                        phyIntfDown(176),
+                        ifSifLimitExceeded(177),
+                        sifHoldDown(178),
+                        noFcoe(179),
+                        dcxCompatMismatch(180),
+                        isolateBundleLimitExceeded(181),
+                        sifNotBound(182),
+                        errDisabledLacpMiscfg(183),
+                        satFabricIfDown(184),
+                        invalidSatFabricIf(185),
+                        noRemoteChassis(186),
+                        vicEnableNotReceived(187),
+                        vicDisableReceived(188),
+                        vlanVsanMappingNotEnabled(189),
+                        stpNotFwdingInFcoeMappedVlan(190),
+                        moduleOffline(191),
+                        udldAggModeLinkFailure(192),
+                        stpInconsVpcPeerDisabled(193),
+                        setPortStateFailed(194),
+                        suspendedByVpc(195),
+                        vpcCfgInProgress(196),
+                        vpcPeerLinkDown(197),
+                        vpcNoRspFromPeer(198),
+                        protoPortSuspend(199),
+                        tunnelSrcDown(200),
+                        cdpInfoUnavailable(201),
+                        fexSfpInvalid(202),
+                        errDisabledIpConflict(203),
+                        fcotClkRateMismatch(204),
+                        portGuardTrustSecViolation(205),
+                        sdpTimeout(206),
+                        satIncompatTopo(207),
+                        waitForFlogi(208),
+                        satNotConfigured(209),
+                        npivNotEnabledInUpstream(210),
+                        vsanMismatchWithUpstreamSwPort(211),
+                        portGuardBitErrRate(212),
+                        portGuardSigLoss(213),
+                        portGuardSyncLoss(214),
+                        portGuardLinkReset(215),
+                        portGuardCreditLoss(216),
+                        ipQosMgrPolicyAppFailure(217),
+                        pauseRateLimitErrDisabled(218),
+                        lstGrpUplinkDown(219),
+                        stickyDnLinkFailure(220),
+                        routerMacFailure(221),
+                        dcxMultipleMsapIds(222),
+                        dcxHundredPdusRcvdNoAck(223),
+                        enmSatIncompatibleUplink(224),
+                        enmLoopDetected(225),
+                        nonStickyExternallyDisabled(226),
+                        subGroupIdNotAssigned(227),
+                        vemUnlicensed(228),
+                        profileNotFound(229),
+                        nonExistentVlan(230),
+                        vlanInvalidType(231),
+                        vlanDown(232),
+                        vpcPeerUpgrade(233),
+                        ipQosDcbxpCompatFailure(234),
+                        nonCiscoHbaVfTag(235),
+                        domainIdConfigMismatch(236),
+                        sfpSpeedMismatch(237),
+                        xcvrInitializing(238),
+                        xcvrAbsent(239),
+                        xcvrInvalid(240),
+                        vfcBindingInvalid(241),
+                        vlanNotFcoeEnabled(242),
+                        pvlanNativeVlanErr(243),
+                        ethL2VlanDown(244),
+                        ethIntfInvalidBinding(245),
+                        pmonFailure(246),
+                        l3NotReady(247),
+                        speedMismatch(248),
+                        flowControlMismatch(249),
+                        vdcMode(250),
+                        suspendedDueToMinLinks(251),
+                        enmPinFailLinkDown(252),
+                        inactiveM1PortFpathActiveVlan(253),
+                        parentPortDown(254),
+                        moduleRemoved(255),
+                        corePortMct(256),
+                        nonCorePortMct(257),
+                        ficonInorderNotActive(258),
+                        invalidEncapsulation(259),
+                        modemLineDeasserted(260),
+                        ipSecHndshkInProgress(261),
+                        sfpEthCompliantErr(262),
+                        cellularModemUnattached(263),
+                        outOfGlblRxBuffers(264),
+                        sfpFcCompliantErr(265),
+                        ethIntfNotLicensed(266),
+                        domainIdsInvalid(267),
+                        fabricNameInvalid(268),
+                        ficonNoPortSwapLogicalPort(269),
+                        ficonInvalidPortNum(270),
+                        remotePortInL2vpnDown(271),
+                        suspendedDueToNoLacpPdus(272),
+                        fcotValidationFailedAtDriver(273),
+                        unsupportedTransceiverMd5DigestNotSame(274),
+                        unsupportedTransceiver(275),
+                        adminStateConfigChange(276),
+                        vlanAllowedList(277),
+                        vlanAllowedListOverride(278),
+                        vlanAllowedListAdd(279),
+                        vlanAllowedRemove(280),
+                        vlanCfgStateChange(281),
+                        vlanCfgDelete(282),
+                        pppPeerNotResponding(283),
+                        pppAuthFailed(284),
+                        xcvrAuthFailed(285),
+                        badFramesRcvdFromLink(286),
+                        physicalPortHotStandBy(287),
+                        wimaxModemUnattached(288),
+                        wpanModemUnattached(289),
+                        rbhModulo(290),
+                        fpcMinLinkNotMet(291),
+                        misCabling(292),
+                        rcvSrpOnNonFcoeFex(293),
+                        acessPortOnBd(294),
+                        lacpMisConfig(295),
+                        fortyGMemberPort(300),
+                        goldLoopBackTest(301),
+                        edpError(302),
+                        vpcCompCheckFailed(303),
+                        aclQosNoResource(304),
+                        vpcShutdown(305),
+                        notPcMember(306),
+                        systemIntfShut(307),
+                        speedGroupConfigMisMatch(308),
+                        dot1qMisConfig(310),
+                        mdMisMatch(311),
+                        vpcPeerLinkShut(312),
+                        notAvailable(313)
                     }
 
 EntLogicalIndexOrZero ::= TEXTUAL-CONVENTION
@@ -1512,7 +2415,7 @@ EntLogicalIndexOrZero ::= TEXTUAL-CONVENTION
         If zero, no appropriate entLogicalIndex exists.  Any additional 
         semantics must be defined as part of the description of any 
         object which uses this syntax."
-    SYNTAX          Integer32 (0..2147483647 )
+    SYNTAX          Integer32 (0..2147483647)
 
 CiscoURLString ::= TEXTUAL-CONVENTION
     STATUS          current
@@ -1530,6 +2433,18 @@ CiscoURLString ::= TEXTUAL-CONVENTION
 
     REFERENCE       "Uniform Resource Locators. RFC 1738."
     SYNTAX          OCTET STRING (SIZE (1..255))
+
+CiscoURLStringOrEmpty ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This textual convention is an extension of CiscoURLString.
+        This extension permits the additional value of empty (zero
+        length) string.  The description of any object which uses this
+        syntax must specifically describe the meaning of empty string
+        value."
+
+    REFERENCE       "Uniform Resource Locators. RFC 1738."
+    SYNTAX          OCTET STRING (SIZE (0..255))
 
 CiscoHTTPResponseStatusCode ::= TEXTUAL-CONVENTION
     STATUS          current
@@ -1560,7 +2475,7 @@ CiscoHTTPResponseStatusCode ::= TEXTUAL-CONVENTION
 
     REFERENCE
         "RFC 2616 Section 6.1.1 Status Code and Reason Phrase."
-    SYNTAX          Unsigned32 (100..599 )
+    SYNTAX          Unsigned32 (100..599)
 
 CvE164Address ::= TEXTUAL-CONVENTION
     STATUS          current
@@ -1587,7 +2502,7 @@ CiscoVlanList ::= TEXTUAL-CONVENTION
         represents the first 8 VLANs of the range of VLANs
         specified by the object, the second octet represents
         the next 8 VLANs, etc. When a VLAN range is not
-        specified, a default port range of '0 - 1023' is assumed.
+        specified, a default VLAN range of '0 - 1023' is assumed.
 
         Within each octet, the most significant bit represents
         the lowest numbered VLAN, and the least significant bit
@@ -1627,6 +2542,128 @@ CiscoPbbServiceIdentifier ::= TEXTUAL-CONVENTION
         the Provider Backbone Bridge frame."
 
     REFERENCE       "IEEE P802.1ah/D3.3 chapter 9.8, December 2006"
-    SYNTAX          Unsigned32 (1..16777216 )
+    SYNTAX          Unsigned32 (1..16777216)
+
+CiscoBridgeDomain ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "An object with this syntax contains a bridge domain number
+        which is used to distinguish between multiple bridge domains. A
+        bridge domain represents a set of (logical) Ethernet segments
+        which are interconnected by 802.1D bridges. 802.1Q allows for a
+        maximum of 4095 VLANs within a bridge domain. Some devices can
+        be connected to multiple bridge domains, e.g., routers with
+        some of their interfaces in one bridge domain and other
+        interfaces in other bridge domain. In such devices, the
+        combination of bridge-domain-number and VLAN-id can be used to
+        uniquely identify any VLAN across all interfaces."
+    SYNTAX          Unsigned32 (1..65535)
+
+Cisco2KVlanList ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight VLANs.
+        The object defined by this textual convention can specify a VLAN
+        range of 2k VLANs in its description. Example: 0 - 2047, 2048 -
+        4095, etc. The first octet represents the first 8 VLANs of the
+        range of VLANs specified by the object, the second octet
+        represents the next 8 VLANs, etc.
+
+        Within each octet, the most significant bit represents the
+        lowest numbered VLAN, and the least significant bit represents
+        the highest numbered VLAN. Thus, each VLAN of the device is
+        represented by a single bit within the value of this object. If
+        that bit has a value of '1' then that VLAN is included in the
+        set of VLANs; the VLAN is not included if its bit has a value of
+        '0'.
+
+        Note that if the length of this string is less than 256 octets,
+        any 'missing' octets are assumed to contain the value zero. An
+        NMS may omit any zero-valued octets from the end of this string
+        in order to reduce SetPDU size, and the agent may also omit
+        zero-valued trailing octets, to reduce the size of GetResponse
+        PDUs."
+    SYNTAX          OCTET STRING (SIZE (0..256))
+
+CiscoInterfaceIndexList ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This textual convention contains a list of ifIndex values.
+
+        Each ifIndex value is represented by four octets.
+        Every set of four octets represents a value of an instance
+        of ifIndex object, defined in IF-MIB, corresponding to a
+        particular interface.
+
+        For example, the first octet to the fourth octet represent a 
+        value of the instance of ifIndex object for the first 
+        interface in the list.  The fifth octet to the eighth octet 
+        represent a value of the instance of ifIndex object for
+        the second interface in the list.
+
+        Up to 64 interfaces can be represented by this textual 
+        convention."
+    SYNTAX          OCTET STRING (SIZE (0..256))
+
+CiscoVrfName ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The name of the Virtual Private Network Routing and
+        Forwarding (VRF) domain.
+
+        Semantics of a zero length CiscoVrfName are object-specific
+        and must be defined as part of the description of any object
+        which uses this syntax."
+    SYNTAX          OCTET STRING (SIZE (0..32))
+
+CiscoEntityIndexList ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This text convention contains a list of entPhysicalIndex
+        values.
+
+        Each entPhysicalIndex value is represented by four
+        octets. Every set of four octets represents a value of an
+        instance of entPhysicalIndex object, defined in ENTITY-MIB,
+        corresponding to a particular physical entity.
+
+        For example, the first octet to the fourth octet
+        represents a value of the instance of entPhysicalIndex object
+        for the first physical entity in the list. The fifth octet to
+        the eighth octet represents a value of the instance of
+        entPhysicalIndex object for the second physical entity in the
+        list.
+
+        Up to 64 physical entities can be represented by this
+        textual convention."
+    SYNTAX          OCTET STRING (SIZE (0..256))
+
+CiscoVlanIndex ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The VLAN-id of a VLAN on ISL or 802.1q trunks.
+
+
+        For a new object which needs the vlan-id of a VLAN as 
+        its SYNTAX, it is suggested to import VlanIndex or VlanId 
+        from Q-BRIDGE-MIB instead of importing this TC. 
+
+
+        For a existing MIB which have the import of VlanIndex 
+        from CISCO-VTP-MIB, it is suggested to import this TC."
+    SYNTAX          Integer32 (0..4095)
+
+CiscoAbsZeroBasedCounter64 ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This TC describes an object which counts events with
+        the following semantics: objects of this type will be 
+        set to zero(0) on creation and will thereafter count 
+        appropriate events, it locks at the maximum value of 
+        2^64-1 (18446744073709551615 decimal) if the counter 
+        overflows. This TC may be used only in situations where
+        wrapping is not possible or extremely unlikely situation."
+    SYNTAX          Counter64
 
 END
+

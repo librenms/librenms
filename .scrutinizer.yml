@@ -5,4 +5,4 @@ imports:
 
 # FIXME: find a way to keep excluded_paths list sorted
 filter:
-    excluded_paths: [ html/js/*, includes/phpmailer/*, html/css/*, includes/console_colour.php, includes/console_table.php, html/lib/*, lib/* ]
+    excluded_paths: [ html/js/*, html/css/*, lib/*, vendor/* ]

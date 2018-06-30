@@ -1,0 +1,116 @@
+[
+    [
+        "",
+        {"condition":"OR","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"begins_with","value":"begin"}],"valid":true},
+        "devices.hostname LIKE 'begin%'",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname LIKE 'begin%'"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"not_begins_with","value":"notbegin"}],"valid":true},
+        "devices.hostname NOT LIKE 'notbegin%'",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname NOT LIKE 'notbegin%'"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"contains","value":"contains"}],"valid":true},
+        "devices.hostname LIKE '%contains%'",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname LIKE '%contains%'"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"not_contains","value":"notcontains"}],"valid":true},
+        "devices.hostname NOT LIKE '%notcontains%'",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname NOT LIKE '%notcontains%'"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"ends_with","value":"ends"}],"valid":true},
+        "devices.hostname LIKE '%ends'",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname LIKE '%ends'"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"not_ends_with","value":"notends"}],"valid":true},
+        "devices.hostname NOT LIKE '%notends'",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname NOT LIKE '%notends'"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"ports.ifDescr","field":"ports.ifDescr","type":"string","input":"text","operator":"is_null","value":""}],"valid":true},
+        "ports.ifDescr IS NULL",
+        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND ports.ifDescr IS NULL"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"ports.ifDescr","field":"ports.ifDescr","type":"string","input":"text","operator":"is_not_null","value":""}],"valid":true},
+        "ports.ifDescr IS NOT NULL",
+        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND ports.ifDescr IS NOT NULL"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.hardware","field":"devices.hardware","type":"string","input":"text","operator":"is_empty","value":null}],"valid":true},
+        "devices.hardware = ''",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hardware = ''"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.hardware","field":"devices.hardware","type":"string","input":"text","operator":"is_not_empty","value":null}],"valid":true},
+        "devices.hardware != ''",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hardware != ''"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.device_id","field":"devices.device_id","type":"integer","input":"number","operator":"between","value":["3","99"]}],"valid":true},
+        "devices.device_id BETWEEN 3 AND 99",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.device_id BETWEEN 3 AND 99"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.device_id","field":"devices.device_id","type":"integer","input":"number","operator":"not_between","value":["2","4"]}],"valid":true},
+        "devices.device_id NOT BETWEEN 2 AND 4",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.device_id NOT BETWEEN 2 AND 4"
+    ],
+    [
+        "%macros.device_up = 1",
+        {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
+        "macros.device_up = 1",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND (devices.status = 1 && (devices.disabled = 0 && devices.ignore = 0)) = 1"
+    ],
+    [
+        "%sensors.sensor_current > %sensors.sensor_limit",
+        {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"greater","value":"`sensors.sensor_limit`"}],"valid":true},
+        "sensors.sensor_current > sensors.sensor_limit",
+        "SELECT * FROM devices,sensors WHERE (devices.device_id = ? AND devices.device_id = sensors.device_id) AND sensors.sensor_current > sensors.sensor_limit"
+    ],
+    [
+        "%devices.hostname ~ \"@ocal@\" ",
+        {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"regex","value":".*ocal.*"}],"valid":true},
+        "devices.hostname REGEXP \".*ocal.*\"",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname REGEXP \".*ocal.*\""
+    ],
+    [
+        "%macros.state_sensor_critical",
+        {"condition":"AND","rules":[{"id":"macros.state_sensor_critical","field":"macros.state_sensor_critical","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
+        "macros.state_sensor_critical = 1",
+        "SELECT * FROM devices,sensors,sensors_to_state_indexes,state_indexes,state_translations WHERE (devices.device_id = ? AND devices.device_id = sensors.device_id AND sensors.sensor_id = sensors_to_state_indexes.sensor_id AND sensors_to_state_indexes.state_index_id = state_indexes.state_index_id AND state_indexes.state_index_id = state_translations.state_index_id) AND (sensors.sensor_current = state_translations.state_value && state_translations.state_generic_value = 2) = 1"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"macros.device","field":"macros.device","type":"integer","input":"radio","operator":"equal","value":"1"},{"condition":"OR","rules":[{"id":"ports.ifName","field":"ports.ifName","type":"string","input":"text","operator":"equal","value":"Ge12"},{"id":"ports.ifName","field":"ports.ifName","type":"string","input":"text","operator":"equal","value":"Ge13"}]},{"id":"ports.ifInOctets_delta","field":"ports.ifInOctets_delta","type":"integer","input":"number","operator":"greater","value":"42"}],"valid":true},
+        "macros.device = 1 AND (ports.ifName = \"Ge12\" OR ports.ifName = \"Ge13\") AND ports.ifInOctets_delta > 42",
+        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND (devices.disabled = 0 && devices.ignore = 0) = 1 AND (ports.ifName = \"Ge12\" OR ports.ifName = \"Ge13\") AND ports.ifInOctets_delta > 42"
+    ],
+    [
+        "%bills.bill_name = \"Neil's Bill\"",
+        {"condition":"AND","rules":[{"id":"bills.bill_name","field":"bills.bill_name","type":"string","input":"text","operator":"equal","value":"Neil's Bill"}],"valid":true},
+        "bills.bill_name = \"Neil's Bill\"",
+        "SELECT * FROM devices,ports,bill_ports,bills WHERE (devices.device_id = ? AND devices.device_id = ports.device_id AND ports.port_id = bill_ports.port_id AND bill_ports.bill_id = bills.bill_id) AND bills.bill_name = \"Neil's Bill\""
+    ],
+    [
+        "%ports.ifOutErrors_rate >= \"100\" || %ports.ifInErrors_rate >= \"100\"",
+        {"condition":"OR","rules":[{"id":"ports.ifOutErrors_rate","field":"ports.ifOutErrors_rate","type":"integer","input":"text","operator":"greater_or_equal","value":"100"},{"id":"ports.ifInErrors_rate","field":"ports.ifInErrors_rate","type":"integer","input":"text","operator":"greater_or_equal","value":"100"}],"valid":true},
+        "ports.ifOutErrors_rate >= 100 OR ports.ifInErrors_rate >= 100",
+        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND (ports.ifOutErrors_rate >= 100 OR ports.ifInErrors_rate >= 100)"
+    ]
+]

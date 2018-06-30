@@ -1,0 +1,19 @@
+os: pbn-cp
+text: 'PBN P2P CP100 Series Platform'
+type: network
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+icon: pbn
+discovery_modules:
+    ntp: false
+    ospf: false
+    services: false
+    storage: false
+poller_modules:
+    ntp: false
+    ospf: false
+    services: false
+    storage: false
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.11606.24

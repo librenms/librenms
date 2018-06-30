@@ -1,0 +1,628 @@
+--     =================================================================
+-- Copyright (C) 2008 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description:  The HUAWEI-SUPERLAG-MIB.mib provides information about SUPERLAG
+-- Reference:
+-- Version:     V1.0
+-- History:
+--              zhenghebin,2008.11.25,publish 
+-- =================================================================
+
+    HUAWEI-SUPERLAG-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            huaweiMgmt 
+                FROM HUAWEI-MIB 
+            IpAddress,Integer32, Unsigned32, Counter32, Counter64, 
+            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE 
+                FROM SNMPv2-SMI 
+            PhysAddress,DisplayString,TruthValue,TimeStamp,RowStatus,TEXTUAL-CONVENTION 
+                FROM SNMPv2-TC;
+
+
+        hwSuperLagMIB MODULE-IDENTITY 
+            LAST-UPDATED "200810211010Z" -- June 10, 2005 at 19:36 GMT
+            ORGANIZATION 
+                "Organization."
+            CONTACT-INFO 
+                "Contact-info."
+            DESCRIPTION 
+                "Description."
+            ::= { hwDatacomm 178 }
+
+--
+-- Node definitions
+--
+
+        hwDatacomm OBJECT IDENTIFIER ::= { huaweiMgmt 25 }
+
+
+        hwSuperLagObjects OBJECT IDENTIFIER ::= { hwSuperLagMIB 1 }
+           
+           
+           
+-- SuperLag
+        hwSuperLagTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwSuperLagEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The super LAG table."
+            ::= { hwSuperLagObjects 1 }
+
+
+        hwSuperLagEntry OBJECT-TYPE
+            SYNTAX HwSuperLagEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Super LAG entry."
+            INDEX { hwSuperLagId }
+            ::= { hwSuperLagTable 1 }
+
+
+        HwSuperLagEntry ::=
+            SEQUENCE {  
+                hwSuperLagId
+                    Integer32,
+                hwSuperLagSystemId
+                    PhysAddress, 
+                                  
+                hwSuperLagPri
+                    Integer32,  
+          
+                hwSuperLagStatus
+                    INTEGER, 
+                                         
+                hwSuperLagStatusReason
+                    INTEGER,
+          
+                hwSuperLagPeerIpAddr
+                    IpAddress,
+         
+                hwSuperLagSourceIpAddr
+                    IpAddress,
+       
+                hwSuperLagReceiveFailTimeMultiple
+                    Integer32,
+                                        
+                hwSuperLagSendPeriod
+                    Integer32,
+                                       
+                hwSuperLagPacketReceive
+                    Counter64,
+                               
+                hwSuperLagPacketSend
+                    Counter64,
+                                       
+                hwSuperLagPacketRecDrop
+                    Counter64,
+         
+                hwSuperLagPacketSndDrop
+                    Counter64,
+                                 
+                hwSuperLagPeerSystemId           
+                    PhysAddress,  
+      
+                hwSuperLagPeerPri
+                    Integer32, 
+    
+                hwSuperLagPeerReceiveFailTime
+                    Integer32, 
+           
+                hwSuperLagSecurityKeyType 
+                    INTEGER,   
+                                 
+                hwSuperLagSecurityKey
+                    OCTET STRING,
+                                  
+                hwSuperLagBfdSessId
+                    Integer32, 
+                    
+                hwSuperLagResetCounter
+                    Integer32,
+                                 
+                hwSuperLagRowStatus
+                    RowStatus
+
+        }
+
+
+        hwSuperLagId OBJECT-TYPE
+            SYNTAX Integer32 (1..16)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The ID of the super LAG, it is the index of the super LAG."
+            ::= { hwSuperLagEntry 1 }
+
+
+        hwSuperLagSystemId OBJECT-TYPE
+            SYNTAX PhysAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The system ID of the super LAG, it is a physical address."
+            ::= { hwSuperLagEntry 2 }
+
+
+        hwSuperLagPri OBJECT-TYPE
+            SYNTAX Integer32 (1..254)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The priority of the super LAG. The default is 100."
+            ::= { hwSuperLagEntry 3 }
+
+
+
+        hwSuperLagStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    initialize(1),
+                    backup(2),
+                    master(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of the super LAG. 
+                 1:initialize
+                 2:backup
+                 3:master"
+            ::= { hwSuperLagEntry 4 }   
+
+
+        hwSuperLagStatusReason OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    pri(1),
+                    timeout(2),
+                    bfdDown(3),
+                    peerTimeout(4),
+                    peerBfdDown(5),
+                    allMemberDown(6),
+                    init(7)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The reason for the super LAG is in the current status. 
+                 pri(1):Priority calculation 
+                 timeout(2):Receiving timer timeout
+                 bfdDown(3):BFD detected the control link between the PE and peer down
+                 peerTimeout(4):Receiving timer of the peer timeout
+                 peerBfdDown(5):BFD of the peer detected the control link between the PE and peer down
+                 allMemberDown(6):All SuperLagMembers of the superlag down
+                 init(7):The initial superlag.
+                "
+            ::= { hwSuperLagEntry 5 }
+
+
+        hwSuperLagPeerIpAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION    
+                "The IP address of the peer super LAG."
+            ::= { hwSuperLagEntry 6 }
+
+
+        hwSuperLagSourceIpAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The source IP address of the super LAG."
+            ::= { hwSuperLagEntry 7 }
+
+        hwSuperLagReceiveFailTimeMultiple OBJECT-TYPE
+            SYNTAX Integer32 (3..50)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The fail time of the super LAG for receiving packets. It is the multiple of sending period."
+            ::= { hwSuperLagEntry 8 }
+
+
+        hwSuperLagSendPeriod OBJECT-TYPE
+            SYNTAX Integer32 (5..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The period for sending packets of the super LAG. The unit is 100ms"
+            ::= { hwSuperLagEntry 9 }
+
+
+
+        hwSuperLagPacketReceive OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of the received packets."
+            ::= { hwSuperLagEntry 10 }
+
+
+        hwSuperLagPacketSend OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of the sending packets."
+            ::= { hwSuperLagEntry 11 }
+
+
+        hwSuperLagPacketRecDrop OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of the droped packets when the packets are received."
+            ::= { hwSuperLagEntry 12 }
+
+
+        hwSuperLagPacketSndDrop OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of the droped packets when the packets are send out."
+            ::= { hwSuperLagEntry 13 }
+
+
+        hwSuperLagPeerSystemId OBJECT-TYPE
+            SYNTAX PhysAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The system ID of peer super LAG,it is a physical address."
+            ::= { hwSuperLagEntry 14 }
+
+
+        hwSuperLagPeerPri OBJECT-TYPE
+            SYNTAX Integer32 (1..254)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The priority of the peer super LAG."
+            ::= { hwSuperLagEntry 15 }
+
+
+        hwSuperLagPeerReceiveFailTime OBJECT-TYPE
+            SYNTAX Integer32 (15..5000)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The fail time of the peer super LAG for receiving packets.The unit is 100ms"
+            ::= { hwSuperLagEntry 16 }
+
+
+
+        hwSuperLagSecurityKeyType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    simple(1),
+                    cipher(2)
+                }
+
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The mode of the security key. 
+                 1:The simple encrypt mode; 
+                 2:The cipher encrypt mode."
+            ::= { hwSuperLagEntry 17 }
+
+
+        hwSuperLagSecurityKey OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..24))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This is the security key. It is must be hex number and the most number is 16.
+                 If hwSuperLagSecurityKeyType is simple, you can get the key.
+                 If hwSuperLagSecurityKeyType is cipher, the system returns a random character string with 24 bytes."
+            ::= { hwSuperLagEntry 18 }
+
+
+        hwSuperLagBfdSessId OBJECT-TYPE
+            SYNTAX Integer32 (0..8191)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The ID of BFD session which is bind to a super LAG. When the status of the link is changed, BFD will notify super LAG."
+            ::= { hwSuperLagEntry 19}   
+  
+        hwSuperLagResetCounter OBJECT-TYPE
+            SYNTAX Integer32 (0..0)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Reset hwSuperLagPacketReceive,hwSuperLagPacketSend,hwSuperLagPacketRecDrop,hwSuperLagPacketSndDrop."
+            ::= { hwSuperLagEntry 20 }
+
+
+        hwSuperLagRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Current operation status of the row.Used to manage the creation and deletion of conceptual rows."
+            ::= { hwSuperLagEntry 50}
+
+
+
+
+
+--Memeber 
+        hwSuperLagMemberTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwSuperLagMemberEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The member table of a super LAG."
+            ::= { hwSuperLagObjects 2 }
+
+
+
+        hwSuperLagMemberEntry OBJECT-TYPE
+            SYNTAX HwSuperLagMemberEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Member Entry."
+            INDEX { hwSuperLagMemberParentSuperLagId,hwSuperLagMemberType, hwSuperLagMemberId}
+            ::= { hwSuperLagMemberTable 1 } 
+
+
+
+
+        HwSuperLagMemberEntry ::=
+            SEQUENCE {  
+                hwSuperLagMemberParentSuperLagId
+                    Integer32,
+         
+
+                hwSuperLagMemberType
+                    Integer32,
+                              
+
+                hwSuperLagMemberId
+                    Unsigned32,
+
+
+                hwSuperLagMemberStatus
+                    INTEGER,  
+
+
+                hwSuperLagMemberStatusReason
+                    INTEGER,
+
+
+                hwSuperLagMemberWorkMode
+                    INTEGER,
+
+
+                hwSuperLagMemberLocaPhylLinkStatus
+                    INTEGER,     
+    
+
+                hwSuperLagMemberRowStatus
+                    RowStatus
+
+        }  
+  
+
+        hwSuperLagMemberParentSuperLagId OBJECT-TYPE
+            SYNTAX Integer32 (1..16)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The ID of the super LAG which the member is belonged to."
+            ::= { hwSuperLagMemberEntry 1 }
+
+
+
+        hwSuperLagMemberType OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The type of the member. Now is EthTrunk only.
+                 1:EthTrunk"
+            ::= { hwSuperLagMemberEntry 2 } 
+  
+
+        hwSuperLagMemberId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The ID of the member."
+            ::= { hwSuperLagMemberEntry 3 }
+
+
+
+        hwSuperLagMemberStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    backup(1),
+                    master(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The member status.  
+                 1:backup
+                 2:master."
+            ::= { hwSuperLagMemberEntry 4 } 
+
+
+        hwSuperLagMemberStatusReason OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    forceBackup(1),
+                    forceMaster(2),
+                    suplagInit(3),
+                    suplagBackup(4),
+                    suplagMaster(5),
+                    peerMemberDown(6),
+                    peerMemberUp(7)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The reason for the member is in the current status.  
+                 forceBackup(1):The work mode of the member is force-backup
+                 forceMaster(2):The work mode of the member is force-master
+                 suplagInit(3):The work mode of the member is auto, the status of parent super LAG is INITIALIZE
+                 suplagBackup(4):The work mode of the member is auto, the status of parent super LAG is BACKUP
+                 suplagMaster(5):The work mode of the member is auto, the status of parent super LAG is MASTER
+                 peerMemberDown(6):The status of the members belonged to the peer super LAG is down
+                 peerMemberUp(7):The status of the members belonged to the peer super LAG is up"
+            ::= { hwSuperLagMemberEntry 5 }
+
+   
+
+        hwSuperLagMemberWorkMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    auto(1),
+                    forceBackup(2),
+                    forceMaster(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The work mode of the member. 
+                 1:auto
+                 2:forceBackup
+                 3:forceMaster"
+            ::= { hwSuperLagMemberEntry 6 }   
+
+        hwSuperLagMemberLocaPhylLinkStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    up(1),
+                    down(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The local physical link status of the member. 
+                 1:up
+                 2:down"
+            ::= { hwSuperLagMemberEntry 7 } 
+
+        hwSuperLagMemberRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Current operation status of the row.Used to manage the creation and deletion of conceptual rows."
+            ::= { hwSuperLagMemberEntry 50 }
+
+
+
+
+
+
+
+-- Traps.
+
+        hwSuperLagTraps            OBJECT IDENTIFIER ::= { hwSuperLagMIB 2 } 
+        
+        hwSuperLagStatusChange NOTIFICATION-TYPE
+            OBJECTS { 
+                hwSuperLagStatus, 
+                hwSuperLagStatusReason}
+            STATUS  current
+            DESCRIPTION
+                "The event is generated when the status of the super LAG is changed or the status reason of the super LAG is changed."
+            ::= { hwSuperLagTraps 1 }
+        
+
+        hwSuperLagMemberStatusChange NOTIFICATION-TYPE
+            OBJECTS {
+                hwSuperLagMemberStatus,
+                hwSuperLagMemberStatusReason}
+            STATUS  current
+            DESCRIPTION
+                "The event is generated when the status of the memeber is changed or the status reason of the memeber is changed."
+            ::= { hwSuperLagTraps 2 }   
+        
+                   
+        hwSuperLagConformance OBJECT IDENTIFIER ::= { hwSuperLagMIB 3 }
+
+        
+        hwSuperLagCompliances OBJECT IDENTIFIER ::= { hwSuperLagConformance 1 }
+
+        
+        --  this module
+        hwSuperLagFullCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwSuperLagGroup, hwSuperLagMemberGroup, hwSuperLagNotificationGroup }
+            ::= { hwSuperLagCompliances 1 }
+
+        
+        hwSuperLagGroups OBJECT IDENTIFIER ::= { hwSuperLagConformance 2 }
+
+        
+        hwSuperLagGroup OBJECT-GROUP
+            OBJECTS {
+                hwSuperLagSystemId,
+                hwSuperLagPri,
+                hwSuperLagStatus,
+                hwSuperLagStatusReason,
+                hwSuperLagPeerIpAddr,
+                hwSuperLagSourceIpAddr,
+                hwSuperLagReceiveFailTimeMultiple,
+                hwSuperLagSendPeriod,
+                hwSuperLagPacketReceive,
+                hwSuperLagPacketSend,
+                hwSuperLagPacketRecDrop,
+                hwSuperLagPacketSndDrop,
+                hwSuperLagPeerSystemId,
+                hwSuperLagPeerPri,
+                hwSuperLagPeerReceiveFailTime,
+                hwSuperLagSecurityKeyType,
+                hwSuperLagSecurityKey,
+                hwSuperLagBfdSessId,
+                hwSuperLagResetCounter,
+                hwSuperLagRowStatus        
+            }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwSuperLagGroups 1 }
+
+        
+        hwSuperLagMemberGroup OBJECT-GROUP
+            OBJECTS {
+                hwSuperLagMemberStatus,
+                hwSuperLagMemberStatusReason,
+                hwSuperLagMemberWorkMode,
+                hwSuperLagMemberLocaPhylLinkStatus, 
+                hwSuperLagMemberRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwSuperLagGroups 2 }
+
+
+        hwSuperLagNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwSuperLagStatusChange, hwSuperLagMemberStatusChange }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwSuperLagGroups 3 }
+           
+END
+
+--
+-- HUAWEI-SUPERLAG-MIB.mib
+--

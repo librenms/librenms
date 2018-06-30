@@ -1,0 +1,11 @@
+os: netmanplus
+text: 'NetMan Plus'
+group: ups
+nobulk: true
+type: power
+rfc1628_compat: true
+over:
+    - { graph: device_current, text: Current }
+discovery:
+    - sysObjectID: .1.3.6.1.4.1.5491.6
+    - sysDescr_regex: '/^NetMan.*plus/'

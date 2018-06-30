@@ -1,0 +1,164 @@
+ExaltComm-TRAPS-MIB DEFINITIONS ::= BEGIN
+        IMPORTS OBJECT-TYPE, NOTIFICATION-TYPE, Integer32 FROM SNMPv2-SMI
+        productsMIBNotifications, locLinkState,  modelName FROM ExaltComProducts;
+
+
+notifs OBJECT IDENTIFIER ::= { productsMIBNotifications 1 }
+notifObjects OBJECT IDENTIFIER ::= { productsMIBNotifications 2 }
+
+locRadioStat OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This integer object reports for possible values:
+	 0 for GREEN, 1 for YELLOW, 2 for RED, 3 for GRAY"
+::= { notifObjects 1 }
+
+remRadioStat OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This integer object reports for possible values:
+	 0 for GREEN, 1 for YELLOW, 2 for RED, 3 for GRAY"
+::= { notifObjects 2 }
+
+locRSLStat OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This integer object reports for possible values:
+	 1 for high, 2 for low, 3 for normal"
+::= { notifObjects 3 }
+
+locTempStat OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This integer object reports for possible values:
+	 1 for high, 2 for low, 3 for normal"
+::= { notifObjects 4 }
+
+locRSLStatVert OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This integer object reports for possible values:
+	 1 for high, 2 for low, 3 for normal"
+::= { notifObjects 5 }
+
+locEthWtmkHitDurationETH1 OBJECT-TYPE
+    SYNTAX      Integer32 (0..1440)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Reports number of minutes passed since previons notification of Ethernet Utilization above watermark (ETH1)"
+::= { notifObjects 6 }    
+
+locEthWtmkHitDurationETH2 OBJECT-TYPE
+    SYNTAX      Integer32 (0..1440)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Reports number of minutes passed since previons notification of Ethernet Utilization above watermark (ETH2)"
+::= { notifObjects 7 }
+
+locEthWtmkHitDurationETH3 OBJECT-TYPE
+    SYNTAX      Integer32 (0..1440)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Reports number of minutes passed since previons notification of Ethernet Utilization above watermark (ETH3)"
+::= { notifObjects 8 }
+
+locEthWtmkHitDurationETH4 OBJECT-TYPE
+    SYNTAX      Integer32 (0..1440)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Reports number of minutes passed since previons notification of Ethernet Utilization above watermark (ETH4)"
+::= { notifObjects 9 }
+
+locRSLStatHoriz OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This integer object reports for possible values: 1 for high, 2 for low, 3 for normal"
+::= { notifObjects 10 }
+
+cold-start-notif NOTIFICATION-TYPE
+      OBJECTS { modelName }
+	STATUS current
+	DESCRIPTION "cold start Trap"
+        ::= { notifs 1 }
+
+radio-syn-alm-notif NOTIFICATION-TYPE
+      OBJECTS { locLinkState }
+	STATUS current
+	DESCRIPTION "Local Link State Trap"
+        ::= { notifs 2 }
+
+loc-radio-stat-notif NOTIFICATION-TYPE
+      OBJECTS { locRadioStat }
+	STATUS current
+	DESCRIPTION "Local Radio Status Trap"
+        ::= { notifs 3 }
+
+rem-radio-stat-notif NOTIFICATION-TYPE
+      OBJECTS { remRadioStat }
+	STATUS current
+	DESCRIPTION "Remote Radio Status Trap"
+        ::= { notifs 4 }
+
+loc-rsl-stat-horiz-notif NOTIFICATION-TYPE
+      OBJECTS { locRSLStatHoriz }
+    STATUS current
+    DESCRIPTION "Local Horizontal RSL Event Trap"
+        ::= { notifs 5 }
+
+loc-temp-stat-notif NOTIFICATION-TYPE
+      OBJECTS { locTempStat }
+	STATUS current
+	DESCRIPTION "Local Temperature Event Trap"
+        ::= { notifs 6 }
+
+loc-rsl-stat-vert-notif NOTIFICATION-TYPE
+      OBJECTS { locRSLStatVert }
+	STATUS current
+	DESCRIPTION "Local Vertical RSL Event Trap"
+        ::= { notifs 7 }
+
+chan-syn-alm-v-notif NOTIFICATION-TYPE
+      OBJECTS { locLinkState }
+	STATUS current
+	DESCRIPTION "Local Vertical Link State Trap"
+        ::= { notifs 8 }
+
+chan-syn-alm-h-notif NOTIFICATION-TYPE
+      OBJECTS { locLinkState }
+	STATUS current
+	DESCRIPTION "Local Horizontal Link State Trap"
+        ::= { notifs 9 }
+
+loc-rsl-stat-notif NOTIFICATION-TYPE
+      OBJECTS { locRSLStat }
+	STATUS current
+	DESCRIPTION "Local RSL Event Trap"
+        ::= { notifs 10 }
+
+eth-watermark-hit-duration-notif NOTIFICATION-TYPE
+      OBJECTS { locEthWtmkHitDurationETH1, locEthWtmkHitDurationETH2, locEthWtmkHitDurationETH3 }
+    STATUS current
+    DESCRIPTION "Ethernet Utilization above watermark minutes Trap"
+        ::= { notifs 11 }
+
+END               
+
+
+
+

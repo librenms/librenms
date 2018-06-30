@@ -1,0 +1,13 @@
+os: clearpass
+text: 'Aruba Clearpass'
+type: appliance
+icon: aruba
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_storage, text: Storage }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.8072.3.2.10
+        sysDescr_regex:
+            - '/^ClearPass Policy Manager/'

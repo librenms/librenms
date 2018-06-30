@@ -1,0 +1,250 @@
+
+ETHERNET-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, Gauge32, Integer32
+        FROM SNMPv2-SMI
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    AlarmLevelT,EnableStatusT,EthernetMgmtTypeT
+        FROM ExaltComm
+    interface,locEthAlarms,remEthAlarms
+        FROM ExaltComProducts;
+
+    EthernetFunctionT ::= TEXTUAL-CONVENTION
+        STATUS              current
+        DESCRIPTION         "The  ethernet port function status "
+        SYNTAX              INTEGER {
+                                traffic( 0 ),
+                                mgmt( 1 ),
+                                trafficmgmt( 2 )
+                            }
+
+    EthernetModeT ::= TEXTUAL-CONVENTION
+        STATUS              current
+        DESCRIPTION         "The Ethernet port operation modes "
+        SYNTAX              INTEGER {
+                                full1000( 0 ),
+                                half1000( 1 ),
+                                full100( 2 ),
+                                half100( 3 ),
+                                full10( 4 ),
+                                half10( 5 ),
+                                auto( 6 )
+                            }
+    EthRateLimitTypeT ::= TEXTUAL-CONVENTION
+        STATUS              current
+        DESCRIPTION         "The ethernet rate limit type in KBPS (or) MBPS."
+        SYNTAX              INTEGER {
+                                kbps( 0 ),
+                                mbps( 1 )
+                            }
+
+     EthRateLimitValueT ::= TEXTUAL-CONVENTION
+        STATUS              current
+        DESCRIPTION         "The ethernet rate limit, if the rate limit is enabled,
+                             the value is applied on to the port.
+                             eg., rate in KBPS (64..1792, stepsize 64)
+                                  rate in MBPS (2..100, stepsize 1) and (104..1000, stepsize 8)"
+        SYNTAX              Integer32
+
+
+    ethernet OBJECT-IDENTITY
+        STATUS		current
+        DESCRIPTION     "Ethernet interfaces."
+        ::= { interface 1 }
+
+    ethernetNumChannels OBJECT-TYPE
+        SYNTAX              Gauge32
+        UNITS               "channels"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The maximum number of available ethernet channels. "
+        ::= { ethernet 3 }
+
+    ethernetInterfaces OBJECT-TYPE
+        SYNTAX              SEQUENCE OF EthernetPortEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Attributes for ethernet ports."
+        ::= { ethernet 4 }
+
+    ethernetInterface OBJECT-TYPE
+        SYNTAX              EthernetPortEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "An entry in the Ethernet table."
+        INDEX               {
+                                function, mode, alarm, mute, dhcp, rateConfig, rateType, rateLimit
+                            }
+        ::= { ethernetInterfaces 1 }
+
+    EthernetPortEntry ::= SEQUENCE {
+        function
+            EthernetFunctionT,
+        mode
+            EthernetModeT,
+        alarm
+            EnableStatusT,
+        mute
+            EnableStatusT,
+        dhcp
+            EnableStatusT,
+        rateConfig
+            EnableStatusT,
+        rateType
+            EthRateLimitTypeT,
+        rateLimit
+            EthRateLimitValueT
+    }
+
+    function OBJECT-TYPE
+        SYNTAX              EthernetFunctionT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Ethernet port function. "
+        ::= { ethernetInterface 1 }
+
+    mode OBJECT-TYPE
+        SYNTAX              EthernetModeT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Ethernet mode . "
+        ::= { ethernetInterface 2 }
+
+    alarm OBJECT-TYPE
+        SYNTAX              EnableStatusT 
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Ethernet port alarm. "
+        ::= { ethernetInterface 3 }
+
+    mute OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Ethernet can be muted, when there is a system/ethernet alarm.
+                             When MHS is enabled, the ethernet mute is termed as 'Auto', 
+                             setting a value as 2, when MHS disabled, the value is restored "
+        ::= { ethernetInterface 4 }
+
+
+    rateConfig OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Ethernet rate limit status, default is disabled "
+        ::= { ethernetInterface 5 }
+
+    rateType OBJECT-TYPE
+        SYNTAX              EthRateLimitTypeT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Ethernet rate limit type, default is KBPS "
+        ::= { ethernetInterface 6 }
+
+    rateLimit OBJECT-TYPE
+        SYNTAX              EthRateLimitValueT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Ethernet rate limit type default is 64KBPS"
+        ::= { ethernetInterface 7 }
+
+    dhcp OBJECT-TYPE
+        SYNTAX              EnableStatusT 
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "DHCP (Enable/Disable) on port. "
+        ::= { ethernetInterface 8 }
+
+    ethernetLearning OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Etherner Learning (Enable/Disable) on the switch "
+        ::= { ethernet 5 }
+
+    ethernetMgmt OBJECT-TYPE
+        SYNTAX              EthernetMgmtTypeT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Etherner Management Type (Inband/Out-of-Band/Port-to-Port/Legacy) for the switch "
+        ::= { ethernet 6 }
+
+    ethernetFlowControl OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Etherner Flow Control (Disable/Enable) on the switch "
+        ::= { ethernet 7 }
+
+    commitEthernetSettings OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(4..200))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The Commit ethernet command. "
+        ::= { ethernet 1000 }
+
+    locETHAlarms OBJECT-TYPE
+        SYNTAX              SEQUENCE OF LocalEthAlarmsEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "The Local Ethernet Interface Alarms."
+        ::= { locEthAlarms 1 }
+
+    locEthAlarmsEntry OBJECT-TYPE
+        SYNTAX              LocalEthAlarmsEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Ethernet Alarms table Entry."
+        INDEX               {
+                                locEthAlarm
+                            }
+        ::= { locETHAlarms 1 }
+
+    LocalEthAlarmsEntry ::= SEQUENCE {
+        locEthAlarm
+            AlarmLevelT
+    }
+
+    locEthAlarm OBJECT-TYPE
+        SYNTAX              AlarmLevelT
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Alarms state for the Local Ethernet Channel.
+                            "
+        ::= { locEthAlarmsEntry 1 }
+
+    remETHAlarms OBJECT-TYPE
+        SYNTAX              SEQUENCE OF RemoteEthAlarmsEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "The Local Ethernet Interface Alarms."
+        ::= { remEthAlarms 1 }
+
+    remEthAlarmsEntry OBJECT-TYPE
+        SYNTAX              RemoteEthAlarmsEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Ethernet Alarms table Entry."
+        INDEX               {
+                                remEthAlarm
+                            }
+        ::= { remETHAlarms 1 }
+
+    RemoteEthAlarmsEntry ::= SEQUENCE {
+        remEthAlarm
+            AlarmLevelT
+    }
+
+    remEthAlarm OBJECT-TYPE
+        SYNTAX              AlarmLevelT
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Alarms state for the Remote Ethernet Channel.
+                            "
+        ::= { remEthAlarmsEntry 1 }
+
+
+END

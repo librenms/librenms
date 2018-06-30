@@ -1,0 +1,12 @@
+os: openindiana
+type: server
+group: unix
+text: OpenIndiana
+processor_stacked: true
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_ucd_memory, text: 'Memory Usage' }
+discovery:
+    -
+      sysObjectID: .1.3.6.1.4.1.8072.3.2.3
+      sysDescr_regex: '/^SunOS oi_.* 5\.11/'

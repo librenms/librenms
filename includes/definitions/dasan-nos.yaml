@@ -1,0 +1,14 @@
+os: dasan-nos
+text: 'Dasan NOS'
+type: network
+icon: dasan
+mib_dir:
+    - dasan
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.6296.1.2
+        - .1.3.6.1.4.1.6296.1.21

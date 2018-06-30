@@ -1,0 +1,43 @@
+os: waas
+group: cisco
+text: 'Cisco WAAS'
+type: network
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+icon: cisco
+poller_modules:
+    applications: false
+    bgp-peers: false
+    cipsec-tunnels: false
+    cisco-cbqos: false
+    cisco-cef: false
+    cisco-ipsec-flow-monitor: false
+    cisco-mac-accounting: false
+    cisco-otv: false
+    cisco-remote-access-monitor: false
+    cisco-sla: false
+    cisco-voice: false
+    ipmi: false
+    ospf: false
+    toner: false
+    ucd-diskio: false
+    ucd-mib: false
+discovery_modules:
+    bgp-peers: false
+    cisco-cef: false
+    cisco-mac-accounting: false
+    cisco-otv: false
+    cisco-pw: false
+    cisco-sla: false
+    cisco-vrf-lite: false
+    vrf: false
+    libvirt-vminfo: false
+    ntp: false
+    stp: false
+    toner: false
+    ucd-diskio: false
+    vlans: false
+discovery:
+    - { sysDescr_regex: ['/^Cisco Wide Area Application Services/'] }

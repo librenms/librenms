@@ -1,0 +1,35 @@
+os: acsw
+group: cisco
+text: 'Cisco ACE'
+ifname: true
+type: loadbalancer
+icon: cisco
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+poller_modules:
+    cisco-ace-serverfarms: true
+    cisco-ace-loadbalancer: true
+    cisco-cbqos: true
+    cisco-cef: true
+    cisco-mac-accounting: true
+    cisco-voice: true
+    cisco-remote-access-monitor: true
+    cisco-sla: true
+    cisco-ipsec-flow-monitor: true
+    cipsec-tunnels: true
+    cisco-otv: true
+discovery_modules:
+    cisco-cef: true
+    cisco-sla: true
+    cisco-mac-accounting: true
+    cisco-otv: true
+    cisco-pw: true
+    vrf: true
+    cisco-vrf-lite: true
+discovery:
+    - sysObjectID: .1.3.6.1.4.1.9.1.1291
+    - sysDescr:
+        - 'Application Control Engine'
+        - 'Cisco Application Control Software'
