@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Validations;
 
+use LibreNMS\Config;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
@@ -97,7 +98,8 @@ class Poller extends BaseValidation
 
     private function checkDeviceLastPolled(Validator $validator)
     {
-        if (count($devices = dbFetchColumn("SELECT `hostname` FROM `devices` WHERE (`last_polled` < DATE_ADD(NOW(), INTERVAL - 5 MINUTE) OR `last_polled` IS NULL) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1")) > 0) {
+        $overdue = (int)(Config::get('rrd_step', 300) * 1.2);
+        if (count($devices = dbFetchColumn("SELECT `hostname` FROM `devices` WHERE (`last_polled` < DATE_ADD(NOW(), INTERVAL - $overdue SECOND) OR `last_polled` IS NULL) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1")) > 0) {
             $result = ValidationResult::warn("Some devices have not been polled in the last 5 minutes. You may have performance issues.")
                 ->setList('Devices', $devices);
 
@@ -115,7 +117,8 @@ class Poller extends BaseValidation
 
     private function checkDevicePollDuration(Validator $validator)
     {
-        if (count($devices = dbFetchColumn('SELECT `hostname` FROM `devices` WHERE last_polled_timetaken > 300 AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1')) > 0) {
+        $period = (int)Config::get('rrd_step', 300);
+        if (count($devices = dbFetchColumn("SELECT `hostname` FROM `devices` WHERE last_polled_timetaken > $period AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1")) > 0) {
             $result = ValidationResult::fail("Some devices have not completed their polling run in 5 minutes, this will create gaps in data.")
                 ->setList('Devices', $devices);
 
