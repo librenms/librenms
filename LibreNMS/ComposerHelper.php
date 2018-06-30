@@ -42,8 +42,9 @@ class ComposerHelper
     {
         if (!file_exists('.env')) {
             self::setPermissions();
-            self::populateEnv();
         }
+
+        self::populateEnv();
     }
 
     public static function preUpdate(Event $event)
@@ -80,34 +81,34 @@ class ComposerHelper
         if (!file_exists('.env')) {
             copy('.env.example', '.env');
             self::exec('php artisan key:generate');
-
-            $config = [
-                'db_host' => '',
-                'db_port' => '',
-                'db_name' => '',
-                'db_user' => '',
-                'db_pass' => '',
-                'db_socket' => '',
-                'base_url' => '',
-                'user' => '',
-                'group' => '',
-            ];
-
-            @include 'config.php';
-
-            self::setEnv([
-                'NODE_ID'        => uniqid(),
-                'DB_HOST'        => $config['db_host'],
-                'DB_PORT'        => $config['db_port'],
-                'DB_USERNAME'    => $config['db_user'],
-                'DB_PASSWORD'    => $config['db_pass'],
-                'DB_DATABASE'    => $config['db_name'],
-                'DB_SOCKET'      => $config['db_socket'],
-                'APP_URL'        => $config['base_url'],
-                'LIBRENMS_USER'  => $config['user'],
-                'LIBRENMS_GROUP' => $config['group'],
-            ]);
         }
+
+        $config = [
+            'db_host' => '',
+            'db_port' => '',
+            'db_name' => '',
+            'db_user' => '',
+            'db_pass' => '',
+            'db_socket' => '',
+            'base_url' => '',
+            'user' => '',
+            'group' => '',
+        ];
+
+        @include 'config.php';
+
+        self::setEnv([
+            'NODE_ID'        => uniqid(),
+            'DB_HOST'        => $config['db_host'],
+            'DB_PORT'        => $config['db_port'],
+            'DB_USERNAME'    => $config['db_user'],
+            'DB_PASSWORD'    => $config['db_pass'],
+            'DB_DATABASE'    => $config['db_name'],
+            'DB_SOCKET'      => $config['db_socket'],
+            'APP_URL'        => $config['base_url'],
+            'LIBRENMS_USER'  => $config['user'],
+            'LIBRENMS_GROUP' => $config['group'],
+        ]);
     }
 
     /**
@@ -118,8 +119,10 @@ class ComposerHelper
      */
     private static function setEnv($settings, $file = '.env')
     {
-        $content = file_get_contents($file);
-        if (substr($content, -1) !== "\n") {
+        $original_content = $content = file_get_contents($file);
+
+        // ensure trailing line return
+        if (substr($content, -1) !== PHP_EOL) {
             $content .= PHP_EOL;
         }
 
@@ -143,7 +146,10 @@ class ComposerHelper
             }
         }
 
-        file_put_contents($file, $content);
+        // only write if the content has changed
+        if ($content !== $original_content) {
+            file_put_contents($file, $content);
+        }
     }
 
     private static function setPermissions()
