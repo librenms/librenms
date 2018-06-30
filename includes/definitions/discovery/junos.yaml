@@ -123,7 +123,7 @@ modules:
                     high_limit: jnxJsSPUMonitoringMaxFlowSession
                     divisor: 1
                     multiplier: 1
-                    descr: 'FPC {{ $jnxJsSPUMonitoringFPCIndex }} SPU {{ $jnxJsSPUMonitoringSPUIndex }} Flow Count'
+                    descr: '{{ $jnxJsSPUMonitoringNodeDescr }} FPC {{ $jnxJsSPUMonitoringFPCIndex }} SPU {{ $jnxJsSPUMonitoringSPUIndex }} Flow Count'
                     index: '{{ $index }}'
                     skip_values:
                      - 0
