@@ -315,6 +315,18 @@ class Config
     }
 
     /**
+     * Serialise the whole configuration to json for use in external processes.
+     *
+     * @return string
+     */
+    public static function json_encode()
+    {
+        global $config;
+
+        return json_encode($config);
+    }
+
+    /**
      * merge the database config with the global config
      * Global config overrides db
      */

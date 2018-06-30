@@ -912,8 +912,8 @@ function ExtTransports($obj)
                 echo "ERROR: $tmp\r\n";
                 log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $tmp, $obj['device_id'], 'error', 5);
             }
+            echo '; ';
         }
-        echo '; ';
     }
 }//end ExtTransports()
 

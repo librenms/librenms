@@ -146,6 +146,7 @@ rrdtool_initialize();
 
 echo "Starting polling run:\n\n";
 $polled_devices = 0;
+$unreachable_devices = 0;
 if (!isset($query)) {
     $query = "SELECT * FROM `devices` WHERE `disabled` = 0 $where ORDER BY `device_id` ASC";
 }
@@ -156,7 +157,11 @@ foreach (dbFetch($query) as $device) {
     } else {
         $device['vrf_lite_cisco'] = '';
     }
-    poll_device($device, $options);
+
+    if (!poll_device($device, $options)) {
+        $unreachable_devices++;
+    }
+
     echo "#### Start Alerts ####\n";
     RunRules($device['device_id']);
     echo "#### End Alerts ####\r\n";
@@ -172,7 +177,14 @@ if ($graphite !== false) {
 }
 
 if ($polled_devices) {
-    dbInsert(array('type' => 'poll', 'doing' => $doing, 'start' => $poller_start, 'duration' => $poller_time, 'devices' => $polled_devices, 'poller' => $config['distributed_poller_name'] ), 'perf_times');
+    dbInsert(array(
+        'type' => 'poll',
+        'doing' => $doing,
+        'start' => $poller_start,
+        'duration' => $poller_time,
+        'devices' => $polled_devices,
+        'poller' => $config['distributed_poller_name']
+    ), 'perf_times');
 }
 
 $string = $argv[0]." $doing ".date($config['dateformat']['compact'])." - $polled_devices devices polled in $poller_time secs";
@@ -187,3 +199,9 @@ rrdtool_close();
 unset($config);
 // Remove this for testing
 // print_r(get_defined_vars());
+
+if ($polled_devices === $unreachable_devices) {
+    exit(6);
+}
+
+exit(0);

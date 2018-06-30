@@ -1,9 +1,9 @@
-[Unit] 
+[Unit]
 Description=LibreNMS SNMP Poller Service
-After=network.target 
+After=network.target
 
-[Service] 
-ExecStart=/opt/librenms/poller-service.py
+[Service]
+ExecStart=/usr/bin/scl enable rh-python36 -- /opt/librenms/librenms-service.py -v
 WorkingDirectory=/opt/librenms
 User=librenms
 Group=librenms
