@@ -31,6 +31,7 @@ class Sensor extends BaseModel
         'quality_factor' => 'arrows',
         'eer' => 'snowflake-o',
         'waterflow' => 'tint',
+        'sessions' => 'users',
     );
 
     // ---- Helper Functions ----

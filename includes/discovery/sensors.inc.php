@@ -57,6 +57,7 @@ $run_sensors = array(
     'ber',
     'eer',
     'waterflow',
+    'sessions',
 );
 sensors($run_sensors, $device, $valid, $pre_cache);
 unset(

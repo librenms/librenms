@@ -420,6 +420,7 @@ function sensor_low_limit($class, $current)
         case 'ber':
         case 'eer':
         case 'waterflow':
+        case 'sessions':
     }//end switch
 
     return $limit;
@@ -466,6 +467,7 @@ function sensor_limit($class, $current)
         case 'cooling':
             $limit = ($current * 1.05);
             break;
+        case 'sessions':
     }//end switch
 
     return $limit;

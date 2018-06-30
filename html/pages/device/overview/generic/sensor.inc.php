@@ -49,6 +49,9 @@ if (count($sensors)) {
         case "airflow":
             $sensor_fa_icon = "fa-superpowers";
             break;
+        case "sessions":
+            $sensor_fa_icon = "fa-users";
+            break;
         default:
             $sensor_fa_icon = "fa-delicious";
             break;

@@ -407,6 +407,7 @@ $icons = array(
     'quality_factor' => 'arrows',
     'eer' => 'snowflake-o',
     'waterflow' => 'tint',
+    'sessions' => 'users',
 
 );
 foreach (array('fanspeed','humidity','temperature','signal') as $item) {
