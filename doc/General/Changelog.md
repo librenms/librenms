@@ -1,3 +1,63 @@
+##1.41
+*(2018-06-30)*
+
+A big thank you to the following 17 contributors this last month:
+  - murrant (6)
+  - laf (5)
+  - vivia11 (3)
+  - InsaneSplash (3)
+  - asteen-nexcess (2)
+  - TheGreatDoc (1)
+  - xpatux (1)
+  - salt-lick (1)
+  - angryp (1)
+  - KlaasT (1)
+  - cron410 (1)
+  - mattie47 (1)
+  - isarandi (1)
+  - wiad (1)
+  - f0o (1)
+  - TomEvin (1)
+  - hanserasmus (1)
+
+#### Bug
+* Only list polling as overdue when it is 20% over the rrd_step value. ([#8848](https://github.com/librenms/librenms/pull/8848)) - [murrant](https://github.com/murrant)
+* Sanitize oxidized geshi html output ([#8847](https://github.com/librenms/librenms/pull/8847)) - [InsaneSplash](https://github.com/InsaneSplash)
+* Checking for 'none' as the only device relationship ([#8837](https://github.com/librenms/librenms/pull/8837)) - [salt-lick](https://github.com/salt-lick)
+* Fixed incorrect divisor for #8746 ([#8836](https://github.com/librenms/librenms/pull/8836)) - [angryp](https://github.com/angryp)
+* HPE ILO power fix ([#8822](https://github.com/librenms/librenms/pull/8822)) - [TomEvin](https://github.com/TomEvin)
+* Fix storing metrics for SMART ([#8807](https://github.com/librenms/librenms/pull/8807)) - [isarandi](https://github.com/isarandi)
+* Fixed missing var declaration for description search in FDB tables ([#8802](https://github.com/librenms/librenms/pull/8802)) - [wiad](https://github.com/wiad)
+* Change VRFs page to group together by RD and vrf_name ([#8799](https://github.com/librenms/librenms/pull/8799)) - [vivia11](https://github.com/vivia11)
+
+#### Webui
+* Sanitize oxidized geshi html output ([#8847](https://github.com/librenms/librenms/pull/8847)) - [InsaneSplash](https://github.com/InsaneSplash)
+* Change _POST to vars to get params by URL on FDB search. ([#8838](https://github.com/librenms/librenms/pull/8838)) - [xpatux](https://github.com/xpatux)
+* Disable autocomplete on SNMPv3 settings ([#8833](https://github.com/librenms/librenms/pull/8833)) - [KlaasT](https://github.com/KlaasT)
+* Allow the hostname to resolve to the sysName, ie Dynamic DNS ([#8810](https://github.com/librenms/librenms/pull/8810)) - [InsaneSplash](https://github.com/InsaneSplash)
+* Change VRFs page to group together by RD and vrf_name ([#8799](https://github.com/librenms/librenms/pull/8799)) - [vivia11](https://github.com/vivia11)
+
+#### Alerting
+* Revised Pushover title and severity level ([#8844](https://github.com/librenms/librenms/pull/8844)) - [InsaneSplash](https://github.com/InsaneSplash)
+
+#### Device
+* Added SNR Sensor to CMTS Arris ([#8840](https://github.com/librenms/librenms/pull/8840)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+* Added detection for Netscaler SD-WAN devices ([#8825](https://github.com/librenms/librenms/pull/8825)) - [laf](https://github.com/laf)
+* HPE ILO power fix ([#8822](https://github.com/librenms/librenms/pull/8822)) - [TomEvin](https://github.com/TomEvin)
+* Added Juniper SRX Branch Session Graphing ([#8815](https://github.com/librenms/librenms/pull/8815)) - [asteen-nexcess](https://github.com/asteen-nexcess)
+* Adding sensors to omnitron iconverter ([#8806](https://github.com/librenms/librenms/pull/8806)) - [vivia11](https://github.com/vivia11)
+
+#### Security
+* Disable autocomplete on SNMPv3 settings ([#8833](https://github.com/librenms/librenms/pull/8833)) - [KlaasT](https://github.com/KlaasT)
+
+#### Feature
+* Ability to enable debug output with wrappers ([#8830](https://github.com/librenms/librenms/pull/8830)) - [murrant](https://github.com/murrant)
+* Add option to ignore blockdevice regex ([#8797](https://github.com/librenms/librenms/pull/8797)) - [f0o](https://github.com/f0o)
+
+#### Documentation
+* Update Applications.md ([#8813](https://github.com/librenms/librenms/pull/8813)) - [mattie47](https://github.com/mattie47)
+
+
 ##1.40
 *(2018-05-30)*
 
