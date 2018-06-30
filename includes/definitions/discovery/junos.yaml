@@ -113,7 +113,6 @@ modules:
                     divisor: 1000
                     descr: '{{ $ifDescr }} Tx Bias'
                     index: 'jnxPMCurTxLaserBiasCurrent.{{ $index }}'
-
         sessions:
             data:
                 -
@@ -121,9 +120,16 @@ modules:
                     value: jnxJsSPUMonitoringCurrentFlowSession
                     num_oid: .1.3.6.1.4.1.2636.3.39.1.12.1.1.1.6.
                     high_limit: jnxJsSPUMonitoringMaxFlowSession
-                    divisor: 1
-                    multiplier: 1
-                    descr: '{{ $jnxJsSPUMonitoringNodeDescr }} FPC {{ $jnxJsSPUMonitoringFPCIndex }} SPU {{ $jnxJsSPUMonitoringSPUIndex }} Flow Count'
-                    index: '{{ $index }}'
+                    descr: 'Node {{ $jnxJsSPUMonitoringNodeIndex }} FPC {{ $jnxJsSPUMonitoringFPCIndex }} SPU {{ $jnxJsSPUMonitoringSPUIndex }} Flow Count'
+                    index: 'jnxJsSPUMonitoringCurrentFlowSession.{{ $index }}'
+                    skip_values:
+                     - 0
+                -
+                    oid: jnxJsSPUMonitoringObjectsTable
+                    value: jnxJsSPUMonitoringCurrentCPSession
+                    num_oid: .1.3.6.1.4.1.2636.3.39.1.12.1.1.1.8.
+                    high_limit: jnxJsSPUMonitoringMaxCPSession
+                    descr: 'Node {{ $jnxJsSPUMonitoringNodeIndex }} FPC {{ $jnxJsSPUMonitoringFPCIndex }} SPU {{ $jnxJsSPUMonitoringSPUIndex }} CP Flow Count'
+                    index: 'jnxJsSPUMonitoringCurrentCPSession.{{ $index }}'
                     skip_values:
                      - 0
