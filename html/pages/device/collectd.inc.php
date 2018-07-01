@@ -87,7 +87,6 @@ foreach ($pinsts as &$instance) {
         $typeinstances = collectd_list_tinsts($device['hostname'], $vars['plugin'], $instance, $type);
 
         if ($MetaGraphDefs[$type]) {
-            // $typeinstances = array($MetaGraphDefs[$type]);
             $typeinstances = array('');
         }
 
