@@ -11,7 +11,7 @@
                     "hardware": "",
                     "features": null,
                     "location": null,
-                    "os": "allied-wireless",
+                    "os": "allied-tq",
                     "type": "wireless",
                     "serial": null,
                     "icon": "alliedtelesis.svg"
@@ -29,7 +29,7 @@
                     "hardware": "AT-TQ4600",
                     "features": null,
                     "location": "<private>",
-                    "os": "allied-wireless",
+                    "os": "allied-tq",
                     "type": "wireless",
                     "serial": null,
                     "icon": "alliedtelesis.svg"
