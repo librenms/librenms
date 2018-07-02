@@ -1,8 +1,8 @@
 <?php
 /**
- * Pinger.php
+ * PingCheck.php
  *
- * Ping a large amount of devices quickly and update the db, ping-perf, and run alerts
+ * Device up/down icmp check job
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,34 +23,52 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS;
+namespace App\Jobs;
 
 use App\Models\Device;
 use Carbon\Carbon;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
+use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 use Symfony\Component\Process\Process;
 
-class Pinger
+class PingCheck implements ShouldQueue
 {
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
     private $process;
     private $rrd_tags;
 
     /** @var \Illuminate\Database\Eloquent\Collection $devices List of devices keyed by hostname */
     private $devices;
+    /** @var array $groups List of device group ids to check */
+    private $groups = [];
 
     // working data for loop
     /** @var Collection $tiered */
-    /** @var Collection $current */
     private $tiered;
+    /** @var Collection $current */
     private $current;
     private $current_tier;
+    /** @var Collection $deferred */
     private $deferred;
 
+    /**
+     * Create a new job instance.
+     *
+     * @param array $groups List of distributed poller groups to check
+     */
     public function __construct($groups = [])
     {
-        global $vdebug;
+        if (is_array($groups)) {
+            $this->groups = $groups;
+        }
 
         // define rrd tags
         $rrd_step = Config::get('ping_rrd_step', Config::get('rrd.step', 300));
@@ -66,43 +84,24 @@ class Pinger
         $wait = Config::get('rrd_step', 300) * 2;
 
         $this->process = new Process($cmd, null, null, null, $wait);
-
-        // fetch devices
-        /** @var Builder $query */
-        $query = Device::canPing()
-            ->select(['devices.device_id', 'hostname', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken', 'max_depth'])
-            ->orderBy('max_depth');
-
-        if ($groups) {
-            $query->whereIn('poller_group', $groups);
-        }
-
-        $this->devices = $query->get()->keyBy('hostname');
-
-        // working collections
-        $this->tiered = $this->devices->groupBy('max_depth', true);
-        $this->deferred = collect();
-
-        // start with tier 1 (the root nodes, 0 is standalone)
-        $this->current_tier = 1;
-        $this->current = $this->tiered->get($this->current_tier, collect());
-
-        if ($vdebug) {
-            $this->tiered->each(function (Collection $tier, $index) {
-                echo "Tier $index (" . $tier->count() . "): ";
-                echo $tier->implode('hostname', ', ');
-                echo PHP_EOL;
-            });
-        }
     }
 
-    public function start()
+    /**
+     * Execute the job.
+     *
+     * @return void
+     */
+    public function handle()
     {
+        $ping_start = microtime(true);
+
+        $this->fetchDevices();
+
         d_echo($this->process->getCommandLine() . PHP_EOL);
 
         // send hostnames to stdin to avoid overflowing cli length limits
-        $ordered_device_list = $this->tiered->get(1, collect())->keys() // root nodes before standalone nodes
-            ->merge($this->devices->keys())
+        $ordered_device_list = $this->tiered->get(1, collect())->keys()// root nodes before standalone nodes
+        ->merge($this->devices->keys())
             ->unique()
             ->implode(PHP_EOL);
 
@@ -139,6 +138,48 @@ class Pinger
             d_echo("Leftover devices, this shouldn't happen: " . $this->deferred->flatten(1)->implode('hostname', ', ') . PHP_EOL);
             d_echo("Devices left in tier: " . collect($this->current)->implode('hostname', ', ') . PHP_EOL);
         }
+
+        if (\App::runningInConsole()) {
+            printf("Pinged %s devices in %.2fs\n", $this->devices->count(), microtime(true) - $ping_start);
+        }
+    }
+
+    private function fetchDevices()
+    {
+        if (isset($this->devices)) {
+            return $this->devices;
+        }
+
+        global $vdebug;
+
+        /** @var Builder $query */
+        $query = Device::canPing()
+            ->select(['devices.device_id', 'hostname', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken', 'max_depth'])
+            ->orderBy('max_depth');
+
+        if ($this->groups) {
+            $query->whereIn('poller_group', $this->groups);
+        }
+
+        $this->devices = $query->get()->keyBy('hostname');
+
+        // working collections
+        $this->tiered = $this->devices->groupBy('max_depth', true);
+        $this->deferred = collect();
+
+        // start with tier 1 (the root nodes, 0 is standalone)
+        $this->current_tier = 1;
+        $this->current = $this->tiered->get($this->current_tier, collect());
+
+        if ($vdebug) {
+            $this->tiered->each(function (Collection $tier, $index) {
+                echo "Tier $index (" . $tier->count() . "): ";
+                echo $tier->implode('hostname', ', ');
+                echo PHP_EOL;
+            });
+        }
+
+        return $this->devices;
     }
 
     /**
@@ -262,10 +303,5 @@ class Pinger
         }
 
 
-    }
-
-    public function count()
-    {
-        return $this->devices->count();
     }
 }

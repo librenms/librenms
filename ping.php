@@ -1,16 +1,9 @@
 #!/usr/bin/env php
 <?php
 
-use App\Models\Device;
-use Carbon\Carbon;
-use Illuminate\Support\Collection;
-use LibreNMS\Config;
-use LibreNMS\RRD\RrdDefinition;
-use Symfony\Component\Process\Process;
+use App\Jobs\PingCheck;
 
-$ping_start = microtime(true);
-
-$init_modules = ['alerts', 'eloquent'];
+$init_modules = ['alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('hdvg:');
@@ -47,9 +40,6 @@ if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
 
 rrdtool_initialize();
 
-$pinger = new \LibreNMS\Pinger($groups);
-$pinger->start();
+PingCheck::dispatch(new PingCheck($groups));
 
 rrdtool_close();
-
-printf("Pinged %s devices in %.2fs\n", $pinger->count(), microtime(true) - $ping_start);
