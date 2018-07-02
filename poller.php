@@ -11,7 +11,7 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-$init_modules = array('polling', 'alerts');
+$init_modules = array('polling', 'alerts', 'laravel');
 require __DIR__ . '/includes/init.php';
 
 $poller_start = microtime(true);

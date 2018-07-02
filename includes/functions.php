@@ -26,12 +26,27 @@ use LibreNMS\Util\MemcacheLock;
 
 function set_debug($debug)
 {
-    if (isset($debug)) {
+    if ($debug) {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 0);
         ini_set('log_errors', 0);
         ini_set('allow_url_fopen', 0);
         ini_set('error_reporting', E_ALL);
+
+        if (class_exists('Log')) {
+            $logger = Log::getMonolog();
+
+            $handler = new \Monolog\Handler\StreamHandler(
+                'php://stdout',
+                \Monolog\Logger::DEBUG
+            );
+            $handler->setFormatter(new Monolog\Formatter\LineFormatter(
+                "%message%\n",
+                null,
+                true
+            ));
+            $logger->pushHandler($handler);
+        }
     }
 }//end set_debug()
 

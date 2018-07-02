@@ -38,6 +38,7 @@ class AppServiceProvider extends ServiceProvider
         Config::load();
 
         // direct log output to librenms.log
+        Log::getMonolog()->popHandler(); // remove existing errorlog logger
         Log::useFiles(Config::get('log_file', base_path('logs/librenms.log')));
 
 

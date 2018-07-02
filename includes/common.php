@@ -668,13 +668,18 @@ function is_valid_hostname($hostname)
 function d_echo($text, $no_debug_text = null)
 {
     global $debug, $php_debug;
-    if ($debug) {
+
+    if (class_exists('\Log')) {
+        \Log::debug(is_string($text) ? rtrim($text) : $text);
+    } elseif ($debug) {
         if (isset($php_debug)) {
             $php_debug[] = $text;
         } else {
             print_r($text);
         }
-    } elseif ($no_debug_text) {
+    }
+
+    if (!$debug && $no_debug_text) {
         echo "$no_debug_text";
     }
 } // d_echo
