@@ -25,6 +25,8 @@
 
 namespace LibreNMS\Tests;
 
+use LibreNMS\Config;
+
 class CommonFunctionsTest extends TestCase
 {
     public function testStrContains()
@@ -167,5 +169,57 @@ class CommonFunctionsTest extends TestCase
         if (getenv('DBTEST')) {
             dbRollbackTransaction();
         }
+    }
+
+    public function testFormatHostname()
+    {
+        $device_dns = [
+            'hostname' => 'test.librenms.org',
+            'sysName' => 'Testing DNS'
+        ];
+        $device_ip = [
+            'hostname' => '192.168.1.2',
+            'sysName' => 'Testing IP'
+        ];
+
+        // both false
+        Config::set('force_ip_to_sysname', false);
+        Config::set('force_hostname_to_sysname', false);
+        $this->assertEquals('test.librenms.org', format_hostname($device_dns));
+        $this->assertEquals('Not DNS', format_hostname($device_dns, 'Not DNS'));
+        $this->assertEquals('192.168.5.5', format_hostname($device_dns, '192.168.5.5'));
+        $this->assertEquals('192.168.1.2', format_hostname($device_ip));
+        $this->assertEquals('hostname.like', format_hostname($device_ip, 'hostname.like'));
+        $this->assertEquals('10.10.10.10', format_hostname($device_ip, '10.10.10.10'));
+
+        // ip to sysname
+        Config::set('force_ip_to_sysname', true);
+        Config::set('force_hostname_to_sysname', false);
+        $this->assertEquals('test.librenms.org', format_hostname($device_dns));
+        $this->assertEquals('Not DNS', format_hostname($device_dns, 'Not DNS'));
+        $this->assertEquals('Testing DNS', format_hostname($device_dns, '192.168.5.5'));
+        $this->assertEquals('Testing IP', format_hostname($device_ip));
+        $this->assertEquals('hostname.like', format_hostname($device_ip, 'hostname.like'));
+        $this->assertEquals('Testing IP', format_hostname($device_ip, '10.10.10.10'));
+
+        // dns to sysname
+        Config::set('force_ip_to_sysname', false);
+        Config::set('force_hostname_to_sysname', true);
+        $this->assertEquals('Testing DNS', format_hostname($device_dns));
+        $this->assertEquals('Not DNS', format_hostname($device_dns, 'Not DNS'));
+        $this->assertEquals('192.168.5.5', format_hostname($device_dns, '192.168.5.5'));
+        $this->assertEquals('192.168.1.2', format_hostname($device_ip));
+        $this->assertEquals('Testing IP', format_hostname($device_ip, 'hostname.like'));
+        $this->assertEquals('10.10.10.10', format_hostname($device_ip, '10.10.10.10'));
+
+        // both true
+        Config::set('force_ip_to_sysname', true);
+        Config::set('force_hostname_to_sysname', true);
+        $this->assertEquals('Testing DNS', format_hostname($device_dns));
+        $this->assertEquals('Not DNS', format_hostname($device_dns, 'Not DNS'));
+        $this->assertEquals('Testing DNS', format_hostname($device_dns, '192.168.5.5'));
+        $this->assertEquals('Testing IP', format_hostname($device_ip));
+        $this->assertEquals('Testing IP', format_hostname($device_ip, 'hostname.like'));
+        $this->assertEquals('Testing IP', format_hostname($device_ip, '10.10.10.10'));
     }
 }
