@@ -45,6 +45,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <option value="gitlab-form">Gitlab</option>
                                     <option value="jira-form">Jira</option>
                                     <option value="hue-form">Phillips Hue</option>
+                                    <option value="elasticsearch-form">Elasticsearch</option>
                                     <!--Insert more transport type options here has support is added. Value should be: [transport_name]-form -->
                                 </select>
                             </div>
@@ -60,30 +61,26 @@ if (Auth::user()->hasGlobalAdmin()) {
 
 // Fetch list of transport classes
 $transport_dir = Config::get('install_dir').'/LibreNMS/Alert/Transport';
-$transports = [];
-foreach (scandir($transport_dir) as $file) {
-    $file = strstr($file, '.', true);
-    if (empty($file)) {
+$switches = []; // store names of bootstrap switches
+
+foreach (scandir($transport_dir) as $transport) {
+    $transport = strstr($transport, '.', true);
+    if (empty($transport)) {
         continue;
     }
-    $transports[] = $file;
-}
-
-// Dynamically create transport forms
-foreach ($transports as $transport) {
     $class = 'LibreNMS\\Alert\\Transport\\'.$transport;
-    
+
     if (!method_exists($class, 'configTemplate')) {
-        // Skip to next transport since support has not been added
+        // Skip since support has not been added
         continue;
+    
     }
     
     echo '<form method="post" role="form" id="'.strtolower($transport).'-form" class="form-horizontal transport">';
     echo '<input type="hidden" name="transport-type" id="transport-type" value="'.strtolower($transport).'">';
    
     $tmp = call_user_func($class.'::configTemplate');
-    $switches = []; // store names of bootstrap switches
-
+    
     foreach ($tmp['config'] as $item) {
         echo '<div class="form-group" title="'.$item['descr'].'">';
         echo '<label for="'.$item['name'].'" class="col-sm-3 col-md-2 control-label">'.$item['title'].': </label>';
@@ -197,7 +194,6 @@ foreach ($transports as $transport) {
         });
 
         function loadTransport(transport) {
-            console.log(transport);
             $("#name").val(transport.name);
             $("#transport-choice").val(transport.type+"-form");
             $("#is_default").bootstrapSwitch('state', transport.is_default); 
@@ -207,8 +203,6 @@ foreach ($transports as $transport) {
             // Populate the field values
             transport.details.forEach(function(config) {
                 var $field = $("#" + config.name);
-                console.log($field.prop('type'));    
-                console.log(config); 
                 if ($field.prop('type') == 'checkbox') {
                     $field.bootstrapSwitch('state', config.value);
                 } else {
@@ -225,7 +219,6 @@ foreach ($transports as $transport) {
             data = $("form.transports-form").serializeArray();
             data = data.concat($("#" + $("#transport-choice").val()).serializeArray());
             
-            console.log(data);
             if (data !== null) {
                 //post data to ajax form
                 $.ajax({
