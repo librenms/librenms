@@ -104,16 +104,21 @@ class GitHub
      */
     public function getPullRequests($date, $page = 1)
     {
-        $prs = Requests::get($this->github . "/pulls?state=closed&page=$page", $this->getHeaders());
+        $prs = Requests::get($this->github . "/pulls?state=closed&sort=updated&direction=desc&page=$page", $this->getHeaders());
         $prs = json_decode($prs->body, true);
         foreach ($prs as $k => $pr) {
             if ($pr['merged_at']) {
+                $created    = new DateTime($pr['created_at']);
                 $merged     = new DateTime($pr['merged_at']);
+                $updated    = new DateTime($pr['updated_at']);
                 $end_date   = new DateTime($date);
                 if (isset($this->pr['merged_at']) && $merged > new DateTime($this->pr['merged_at'])) {
                     // If the date of this PR is newer than the final PR then skip over it
                     continue;
-                } elseif ($merged < $end_date) {
+                } elseif ($created < $end_date && $merged < $end_date && $updated >= $end_date) {
+                    // If this PR was created and merged before the last tag but has been updated since then skip over
+                    continue;
+                } elseif ($created < $end_date && $merged < $end_date && $updated < $end_date) {
                     // If the date of this PR is older than the last release we're done
                     return true;
                 } else {
