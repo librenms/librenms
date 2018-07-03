@@ -11,6 +11,7 @@
  *
  */
 
+use Illuminate\Database\Events\QueryExecuted;
 use LibreNMS\Authentication\Auth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostExistsException;
@@ -24,14 +25,28 @@ use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\MemcacheLock;
 
-function set_debug($debug)
+
+/**
+ * Set debugging output
+ *
+ * @param bool $state If debug is enabled or not
+ * @param bool $silence When not debugging, silence every php error
+ * @return bool
+ */
+function set_debug($state = true, $silence = false)
 {
+    global $debug;
+
+    $debug = $state; // set to global
+
+    $db = \LibreNMS\DB\Eloquent::DB();
+    restore_error_handler();
+
     if ($debug) {
         ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 0);
+        ini_set('display_startup_errors', 1);
         ini_set('log_errors', 0);
-        ini_set('allow_url_fopen', 0);
-        ini_set('error_reporting', E_ALL);
+        error_reporting(E_ALL & ~E_NOTICE);
 
         if (class_exists('Log')) {
             $logger = Log::getMonolog();
@@ -47,7 +62,32 @@ function set_debug($debug)
             ));
             $logger->pushHandler($handler);
         }
+
+        if ($db && !$db->getEventDispatcher()->hasListeners('Illuminate\Database\Events\QueryExecuted')) {
+            $db->listen(function (QueryExecuted $query) {
+                // collect bindings and make them a little more readable
+                $bindings = collect($query->bindings)->map(function ($item) {
+                    if ($item instanceof \Carbon\Carbon) {
+                        return $item->toDateTimeString();
+                    }
+
+                    return $item;
+                })->toJson();
+                c_echo("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n");
+            });
+        }
+    } else {
+        ini_set('display_errors', 0);
+        ini_set('display_startup_errors', 0);
+        ini_set('log_errors', 1);
+        error_reporting($silence ? 0 : E_ERROR);
+
+        if ($db) {
+            $db->getEventDispatcher()->flush('Illuminate\Database\Events\QueryExecuted');
+        }
     }
+
+    return $debug;
 }//end set_debug()
 
 function array_sort_by_column($array, $on, $order = SORT_ASC)
