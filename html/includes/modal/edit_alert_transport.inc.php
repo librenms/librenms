@@ -42,6 +42,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <option value="mail-form" selected>Mail</option>
                                     <option value="ciscospark-form">Cisco Spark</option>
                                     <option value="api-form">API</option>
+                                    <option value="gitlab-form">Gitlab</option>
+                                    <option value="jira-form">Jira</option>
                                     <!--Insert more transport type options here has support is added. Value should be: [transport_name]-form -->
                                 </select>
                             </div>

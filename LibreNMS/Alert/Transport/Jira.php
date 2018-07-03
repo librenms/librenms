@@ -29,6 +29,18 @@ class Jira implements Transport
 {
     public function deliverAlert($obj, $opts)
     {
+        if (!empty($this->config)) {
+            $opts['username'] = $this->config['jira-username'];
+            $opts['password'] = $this->config['jira-password'];
+            $opts['prjkey'] = $this->config['jira-key'];
+            $opts['issuetype'] = $this->config['jira-type'];
+            $opts['url'] = $this->config['jira-url'];
+        }
+        return sendCurl($obj, $opts);
+    }
+
+    public function sendCurl($obj, $opts)
+    {
         // Don't create tickets for resolutions
         if ($obj['severity'] == 'recovery' && $obj['msg'] != 'This is a test alert') {
             return true;
@@ -74,5 +86,74 @@ class Jira implements Transport
             d_echo("Jira connection error: " . serialize($ret));
             return false;
         }
+    }
+    
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'Project Key',
+                    'name' => 'jira-key',
+                    'descr' => 'Jira Project Key',
+                    'type' => 'text'
+                ],
+                [
+                    'title' => 'URL',
+                    'name' => 'jira-url',
+                    'descr' => 'Jira URL',
+                    'type' => 'text'
+                ],
+                [
+                    'title' => 'Issue Type',
+                    'name' => 'jira-tpye',
+                    'descr' => 'Jira Issue Type',
+                    'type' => 'text'
+                ],
+                [
+                    'title' => 'Jira Username',
+                    'name' => 'jira-username',
+                    'descr' => 'Jira Username',
+                    'type' => 'text'
+                ],
+                [
+                    'title' => 'Jira Passowrd',
+                    'name' => 'jira-password',
+                    'descr' => 'Jira Password',
+                    'type' => 'text'
+                ],
+            ],
+            'validation' => [
+                'jira-key' => 'required|string',
+                'jira-url' => 'required|string',
+                'jira-type' => 'required|string',
+                'jira-username' => 'required|string',
+                'jira-password' => 'required|string',
+            ]
+        ];
+    }
+
+    public static function configBuilder($vars)
+    {
+        $status = 'ok';
+        $message = '';
+        
+        $required = ['jira-key', 'jira-url', 'jira-type', 'jira-username', 'jira-password'];
+
+        if (count(array_diff($required, array_keys($vars))) == 0) {
+            $transport_config = [];
+            foreach ($required as $item) {
+                $transport_config[$item] = $vars[$item];
+            }
+        } else {
+            $status = 'error';
+            $message = 'Missing Jira information';
+        }
+
+        return [
+            'transport_config' => $transport_config,
+            'status' => $status,
+            'message' => $message
+        ];
     }
 }

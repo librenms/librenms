@@ -23,11 +23,21 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Gitlab implements Transport
+class Gitlab extends Transport
 {
     public function deliverAlert($obj, $opts)
+    {
+        if (!empty($this->config)) {
+            $opts['project-id'] = $this->config['gitlab-id'];
+            $opts['key'] = $this->config['gitlab-key'];
+            $opts['host'] = $this->config['gitlab-host'];
+        }
+        return sendCurl($obj, $opts);
+    }
+
+    public function sendCurl($obj, $opts)
     {
         // Don't create tickets for resolutions
         if ($obj['state'] == 0) {
@@ -72,5 +82,62 @@ class Gitlab implements Transport
                 return false;
             }
         }
+    }
+
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'Host',
+                    'name' => 'gitlab-host',
+                    'descr' => 'Gitlab Host',
+                    'type' => 'text',
+                    'required' => true
+                ],
+                [
+                    'title' => 'Project ID',
+                    'name' => 'gitlab-id',
+                    'descr' => 'Gitlab Prokect ID',
+                    'type'=> 'text',
+                    'required' => true
+                ],
+                [
+                    'title' => 'API Key',
+                    'name' => 'gitlab-key',
+                    'descr' => 'Gitlab API Key',
+                    'type' => 'text',
+                    'required' => true
+                ]
+            ],
+            'validation' => [
+                'gitlab-host' => 'required|string',
+                'gitlab-id' => 'required|string',
+                'gitlab-key' => 'required|string'
+            ]
+        ];
+    }
+
+    public static function configBuilder($vars)
+    {
+        $status = 'ok';
+        $message = '';
+
+        if ($vars['gitlab-host'] && $vars['gitlab-id'] && $vars['gitlab-key']) {
+            $transport_config = [
+                'gitlab-host' => $vars['gitlab-host'],
+                'gitlab-id' => $vars['gitlab-id'],
+                'gitlab-key' => $vars['gitlab-key']
+            ];
+        } else {
+            $status = 'error';
+            $message = 'Missing Gitlab information';
+        }
+    
+        return [
+            'transport_config' => $transport_config,
+            'status' => $status,
+            'message' => $message
+        ];
     }
 }
