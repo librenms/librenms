@@ -34,7 +34,7 @@ class Gitlab extends Transport
             $opts['key'] = $this->config['gitlab-key'];
             $opts['host'] = $this->config['gitlab-host'];
         }
-        return sendCurl($obj, $opts);
+        return $this->sendCurl($obj, $opts);
     }
 
     public function sendCurl($obj, $opts)

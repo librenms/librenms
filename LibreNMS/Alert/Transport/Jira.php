@@ -23,9 +23,9 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Jira implements Transport
+class Jira extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
@@ -36,7 +36,7 @@ class Jira implements Transport
             $opts['issuetype'] = $this->config['jira-type'];
             $opts['url'] = $this->config['jira-url'];
         }
-        return sendCurl($obj, $opts);
+        return $this->sendCurl($obj, $opts);
     }
 
     public function sendCurl($obj, $opts)

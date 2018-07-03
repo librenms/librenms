@@ -23,16 +23,27 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
 /**
  * The Hue API currently is fairly limited for alerts.
  * At it's current implementation we can send ['lselect' => "15 second flash", 'select' => "1 second flash"]
  * If a colour request is sent with it it will permenantly change the colour which is less than desired
  */
-class Hue implements Transport
+class Hue extends Transport
 {
     public function deliverAlert($obj, $opts)
+    {
+        if (!empty($this->config)) {
+            $opts['user'] = $this->config['hue-user'];
+            $opts['bridge'] = $this->config['hue-host'];
+            $opts['duration'] = $this->config['hue-duration'];
+        }
+
+        return $this->sendCurl($obj, $opts);
+    }
+
+    public function sendCurl($obj, $opts)
     {
         // Don't alert on resolve at this time
         if ($obj['state'] == 0) {
@@ -67,5 +78,64 @@ class Hue implements Transport
                 return false;
             }
         }
+    }
+
+    public static function configTemplate()
+    {
+        return [
+            'config'=>[
+                [
+                  'title'=> 'Host',
+                  'name' => 'hue-host',
+                  'descr' => 'Hue Host',
+                  'type' => 'text'
+                ],
+                [
+                  'title'=> 'Hue User',
+                  'name' => 'hue-user',
+                  'descr' => 'Phillips Hue Host',
+                  'type' => 'text'
+                ],
+                [
+                  'title'=> 'Duration',
+                  'name' => 'hue-duration',
+                  'descr' => 'Phillips Hue Duration',
+                  'type' => 'select',
+                  'options' => [
+                    '1 Second' => 'select',
+                    '15 Seconds' => 'lselect'
+                  ]
+                ]
+            ],
+            'validation' => [
+                'hue-host' => 'required|string',
+                'hue-user' => 'required|string',
+                'hue-duration' => 'required|string'
+            ]
+        ];
+    }
+
+    public static function configBuilder($vars)
+    {
+        $status = 'ok';
+        $message = '';
+
+        $required = ['hue-host', 'hue-user', 'hue-duration'];
+
+        if (count(array_diff($required, array_keys($vars))) == 0) {
+            $transport_config = [];
+            foreach ($required as $item) {
+                $transport_config[$item] = $vars[$item];
+            }
+        } else {
+            $status = 'error';
+            $message = "Missing Phillips Hue information";
+        }
+    
+        return [
+            'transport_config' => $transport_config,
+            'status' => $status,
+            'message' => $message
+        ];
     }
 }

@@ -44,6 +44,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <option value="api-form">API</option>
                                     <option value="gitlab-form">Gitlab</option>
                                     <option value="jira-form">Jira</option>
+                                    <option value="hue-form">Phillips Hue</option>
                                     <!--Insert more transport type options here has support is added. Value should be: [transport_name]-form -->
                                 </select>
                             </div>
