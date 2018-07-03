@@ -71,10 +71,10 @@ if (!isset($query)) {
 }
 
 foreach (dbFetch($query) as $device) {
-    $sql = 'SELECT * FROM `devices` AS D 
-INNER JOIN `services` AS S ON S.device_id = D.device_id AND D.device_id = '.$device['device_id'].' 
-LEFT JOIN `devices_attribs` as A ON D.device_id = A.device_id AND A.attrib_type = "override_icmp_disable" 
-ORDER by D.device_id DESC;';
+    $sql = 'SELECT * FROM `devices` AS D
+ INNER JOIN `services` AS S ON S.device_id = D.device_id AND D.device_id = '.$device['device_id'].'
+ LEFT JOIN `devices_attribs` as A ON D.device_id = A.device_id AND A.attrib_type = "override_icmp_disable"
+ ORDER by D.device_id DESC;';
 
     foreach (dbFetchRows($sql) as $service) {
     // Run the polling function if the associated device is up, "Disable ICMP Test" option is not enabled, 
@@ -82,18 +82,32 @@ ORDER by D.device_id DESC;';
         if ($service['status'] === "1" || ($service['status'] === '0' && $service['status_reason'] === 'snmp') ||
         $service['attrib_value'] === 'true' || ($service['service_ip'] !== $service['hostname'] &&
         $service['service_ip'] !== $service['ip'] )) {
+            // Mark service check as enabled if it was disabled previosly because device was down
+            if ($service['service_disabled'] === "1"){
+                dbUpdate(array('service_disabled' => '0'), 'services', '`service_id` = ?',
+                         array($service['service_id']));
+            }
             poll_service($service);
             $polled_services++;
         } else {
             d_echo("\nNagios Service - ".$service['service_id']."\nSkipping service check because device "
-        .$service['hostname']." is down due to icmp.\n");
+                   .$service['hostname']." is down due to icmp.\n");
+            // Mark service check as disabled while device is down and log to eventlog that service check is skipped,
+            // but only if it's not already marked as disabled
+            if ($service['service_disabled'] === "0"){
+                dbUpdate(array('service_disabled' => '1'), 'services', '`service_id` = ?',
+                         array($service['service_id']));
+                log_event("Nagios Service - {$service['service_desc']} ({$service['service_id']}) - 
+                          Skipping service check because device {$service['hostname']} is down due to icmp",
+                          $device, 'service', 4, $service['service_id']);
+            }
         }
-    } //end foreach
+    } //end service foreach
 
     echo "#### Start Alerts ####\n";
     RunRules($device['device_id']);
     echo "#### End Alerts ####\r\n";
-} //end foreach
+} //end device foreach
 
 $poller_end  = microtime(true);
 $poller_run  = ($poller_end - $poller_start);
