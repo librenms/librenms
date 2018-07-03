@@ -106,7 +106,7 @@ class Jira implements Transport
                 ],
                 [
                     'title' => 'Issue Type',
-                    'name' => 'jira-tpye',
+                    'name' => 'jira-type',
                     'descr' => 'Jira Issue Type',
                     'type' => 'text'
                 ],
@@ -117,7 +117,7 @@ class Jira implements Transport
                     'type' => 'text'
                 ],
                 [
-                    'title' => 'Jira Passowrd',
+                    'title' => 'Jira Password',
                     'name' => 'jira-password',
                     'descr' => 'Jira Password',
                     'type' => 'text'
