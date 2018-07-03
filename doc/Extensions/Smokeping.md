@@ -1,4 +1,4 @@
-+source: Extensions/Smokeping.md
+source: Extensions/Smokeping.md
 # Smokeping integration
 
 [SmokePing](https://oss.oetiker.ch/smokeping/) is a tool which lets us keep track of network latency, and visualise this through RRD graphs. 
@@ -161,7 +161,7 @@ The following will configure Nginx to respond to `http://yourlibrenms/smokeping`
         }
 ```
 
-After saving the config file, verify your Nginx config file syntax is OK with `sudo nginx -t`, then restart Nginx with `sudo systemctl nginx restart`
+After saving the config file, verify your Nginx config file syntax is OK with `sudo nginx -t`, then restart Nginx with `sudo systemctl restart nginx`
 
 You should be able to load the Smokeping web interface at `http://yourhost/smokeping`
 				
@@ -181,9 +181,9 @@ Verify: `sudo systemctl status smokeping`
 ## Verify in LibreNMS
 
 Within LibreNMS, you should now have a new device sub-tab called Ping.
-				
+		
+		
 --------------
-
 # Pre-Existing Smokeping Installation
 
 The following section covers the requirements for an existing SmokePing installation. The primary difference is this section does not cover using the LibreNMS Smokeping config script, and assumes an existing Smokeping server is set up and working correctly. 
