@@ -112,6 +112,26 @@ if ($options['f'] === 'device_perf') {
     exit($ret);
 }
 
+if ($options['f'] === 'ports_purge') {
+    try {
+        if (Config::get('distributed_poller')) {
+            MemcacheLock::lock('ports_purge', 0, 86000);
+        }
+        $ports_purge = Config::get('ports_purge');
+
+        if ($ports_purge) {
+            $interfaces = dbFetchRows('SELECT * from `ports` AS P, `devices` AS D WHERE `deleted` = 1 AND D.device_id = P.device_id');
+            foreach ($interfaces as $interface) {
+                delete_port($interface['port_id']);
+            }
+            echo "All deleted ports now purged\n";
+        }
+    } catch (LockException $e) {
+        echo $e->getMessage() . PHP_EOL;
+        exit(-1);
+    }
+}
+
 if ($options['f'] === 'handle_notifiable') {
     if ($options['t'] === 'update') {
         $title = 'Error: Daily update failed';
