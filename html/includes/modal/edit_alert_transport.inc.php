@@ -81,7 +81,7 @@ foreach ($transports as $transport) {
     $tmp = call_user_func($class.'::configTemplate');
     $switches = []; // store names of bootstrap switches
 
-    foreach ($tmp as $item) {
+    foreach ($tmp['config'] as $item) {
         echo '<div class="form-group" title="'.$item['descr'].'">';
         echo '<label for="'.$item['name'].'" class="col-sm-3 col-md-2 control-label">'.$item['title'].': </label>';
         if ($item['type'] == 'text') {

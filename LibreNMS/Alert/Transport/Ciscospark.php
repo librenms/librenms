@@ -59,21 +59,25 @@ class Ciscospark extends Transport
     public static function configTemplate()
     {
         return [
-            [
-                'title' => 'API Token',
-                'name' => 'api-token',
-                'descr' => 'CiscoSpark API Token',
-                'type' => 'text',
-                'required' => true,
-                'validation' => 'required|string'
+            'config' => [
+                [
+                    'title' => 'API Token',
+                    'name' => 'api-token',
+                    'descr' => 'CiscoSpark API Token',
+                    'type' => 'text',
+                    'required' => true
+                ],
+                [
+                    'title' => 'RoomID',
+                    'name' => 'room-id',
+                    'descr' => 'CiscoSpark Room ID',
+                    'type' => 'text',
+                    'required' => true,
+                ]
             ],
-            [
-                'title' => 'RoomID',
-                'name' => 'room-id',
-                'descr' => 'CiscoSpark Room ID',
-                'type' => 'text',
-                'required' => true,
-                'validation' => 'required|string'
+            'validation' => [
+                'api-token' => 'required|string',
+                'room-id' => 'required|string'
             ]
         ];
     }

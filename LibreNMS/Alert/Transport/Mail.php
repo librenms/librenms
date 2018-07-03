@@ -41,13 +41,17 @@ class Mail extends Transport
     public static function configTemplate()
     {
         return [
-            [
-                'title' => 'Email',
-                'name' => 'email',
-                'descr' => 'Email address of contact',
-                'type'  => 'text',
-                'required' => true,
-                'validation' => 'required|email'
+            'config' => [
+                [
+                    'title' => 'Email',
+                    'name' => 'email',
+                    'descr' => 'Email address of contact',
+                    'type'  => 'text',
+                    'required' => true
+                ]
+            ],
+            'validation' => [
+                'email' => 'required|email'
             ]
         ];
     }

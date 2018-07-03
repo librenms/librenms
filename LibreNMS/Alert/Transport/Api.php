@@ -78,21 +78,25 @@ class Api extends Transport
     public static function configTemplate()
     {
         return [
-            [
-                'title' => 'API Method',
-                'name' => 'api-method',
-                'descr' => 'API Method',
-                'type' => 'text',
-                'required' => true,
-                'pattern' => '[a-zA-Z]'
+            'config' => [
+                [
+                    'title' => 'API Method',
+                    'name' => 'api-method',
+                    'descr' => 'API Method',
+                    'type' => 'text',
+                    'required' => true
+                ],
+                [
+                    'title' => 'API URL',
+                    'name' => 'api-url',
+                    'descr' => 'API URL',
+                    'type' => 'text',
+                    'required' => true
+                ]
             ],
-            [
-                'title' => 'API URL',
-                'name' => 'api-url',
-                'descr' => 'API URL',
-                'type' => 'text',
-                'required' => true,
-                'validation' => 'required|url'
+            'validation' => [
+                'api-method' => 'in:GET,POST',
+                'api-url' => 'required|url'
             ]
         ];
     }
