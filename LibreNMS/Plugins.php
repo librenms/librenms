@@ -16,7 +16,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ *
+ * @package    LibreNMS
+ * @subpackage Plugins
+ * @author     LibreNMS Group
+ * @link       http://librenms.org
+ * @copyright  2016
  */
 
 namespace LibreNMS;
@@ -25,13 +31,13 @@ use App\Models\Plugin;
 
 /**
  * Handles loading of plugins
- * 
- * @package     LibreNMS
- * @subpackage  Plugins
- * @link        http://librenms.org
- * @copyright   2016
- * @author      LibreNMS Group
- * 
+ *
+ * @package    LibreNMS
+ * @subpackage Plugins
+ * @link       http://librenms.org
+ * @copyright  2016
+ * @author     LibreNMS Group
+ *
  * Supported hooks
  * <ul>
  *  <li>menu</li>
@@ -39,16 +45,18 @@ use App\Models\Plugin;
  *  <li>port_container</li>
  * </ul>
  */
-class Plugins {
+class Plugins
+{
 
     private static $plugins;
 
     /**
      * Start loading active plugins
-     * 
+     *
      * @return boolean
      */
-    public static function start() {
+    public static function start()
+    {
 
         if (!is_null(self::$plugins)) {
             return false;
@@ -62,9 +70,7 @@ class Plugins {
         }
 
         $plugin_files = Plugin::isActive()->get()->toArray();
-
         foreach ($plugin_files as $plugins) {
-
             $plugin_file = $plugin_dir . '/' . $plugins['plugin_name'] . '/' . $plugins['plugin_name'] . '.php';
             $plugin_info = pathinfo($plugin_file);
 
@@ -84,12 +90,13 @@ class Plugins {
 
     /**
      * Load plugin
-     * 
-     * @param string $file Full path and filename of plugin
-     * @param string $pluginName Plugin name without any namespace
+     *
+     * @param  string $file       Full path and filename of plugin
+     * @param  string $pluginName Plugin name without any namespace
      * @return object|null
      */
-    public static function load($file, $pluginName) {
+    public static function load($file, $pluginName)
+    {
 
         $plugin = false;
         $ns_prefix = 'LibreNMS\\Plugins\\';
@@ -107,7 +114,7 @@ class Plugins {
             $plugin = new $ns_plugin();
         }
 
-        // Include file because it's not psr4 
+        // Include file because it's not psr4
         if (!$plugin) {
             include $file;
         }
@@ -123,7 +130,6 @@ class Plugins {
 
         $hooks = get_class_methods($plugin);
         foreach ($hooks as $hookName) {
-
             if ($hookName{0} != '_') {
                 self::$plugins[$hookName][] = $pluginName;
             }
@@ -133,11 +139,12 @@ class Plugins {
 
     /**
      * Get all plugins implementing a specific hook.
-     * 
-     * @param string $hook Name of the hook to get count for
+     *
+     * @param  string $hook Name of the hook to get count for
      * @return boolean
      */
-    public static function countHooks($hook) {
+    public static function countHooks($hook)
+    {
         // count all plugins implementing a specific hook
         self::start();
         if (!empty(self::$plugins[$hook])) {
@@ -149,11 +156,12 @@ class Plugins {
 
     /**
      * Call hook for plugin.
-     * 
-     * @param string $hook Name of hook to call
-     * @param array $params Optional array of parameters for hook
+     *
+     * @param string $hook   Name of hook to call
+     * @param array  $params Optional array of parameters for hook
      */
-    public static function call($hook, $params = false) {
+    public static function call($hook, $params = false)
+    {
         self::start();
 
         if (!empty(self::$plugins[$hook])) {
@@ -169,12 +177,12 @@ class Plugins {
 
     /**
      * Get count of hooks.
-     * 
+     *
      * @return integer
      */
-    public static function count() {
+    public static function count()
+    {
         self::start();
         return count(self::$plugins);
     }
-
 }
