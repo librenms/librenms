@@ -1,5 +1,4 @@
 <?php
-
 define('LARAVEL_START', microtime(true));
 
 /*
@@ -14,14 +13,14 @@ define('LARAVEL_START', microtime(true));
   |
  */
 
-$plugin_dir = dirname(__DIR__) . "/html/plugins";
+$plugin_dir = dirname(__DIR__)."/html/plugins";
 
 /* @var $loader \Composer\Autoload\ClassLoader */
-$loader = include __DIR__ . '/../vendor/autoload.php';
+$loader = include __DIR__.'/../vendor/autoload.php';
 $loader->addPsr4('LibreNMS\\Plugins\\', $plugin_dir);
 
 if (!class_exists(\App\Checks::class)) {
-    require __DIR__ . '/../app/Checks.php';
+    require __DIR__.'/../app/Checks.php';
 }
 
 \App\Checks::postAutoload();

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Plugins.php
  *
@@ -34,9 +33,9 @@ use App\Models\Plugin;
  *
  * @package    LibreNMS
  * @subpackage Plugins
+ * @author     LibreNMS Group
  * @link       http://librenms.org
  * @copyright  2016
- * @author     LibreNMS Group
  *
  * Supported hooks
  * <ul>
@@ -47,7 +46,11 @@ use App\Models\Plugin;
  */
 class Plugins
 {
-
+    /**
+     * Array of plugin hooks
+     *
+     * @var array
+     */
     private static $plugins;
 
     /**
@@ -63,7 +66,7 @@ class Plugins
         }
 
         self::$plugins = [];
-        $plugin_dir = Config::get('plugin_dir');
+        $plugin_dir    = Config::get('plugin_dir');
 
         if (!file_exists($plugin_dir)) {
             return false;
@@ -71,7 +74,7 @@ class Plugins
 
         $plugin_files = Plugin::isActive()->get()->toArray();
         foreach ($plugin_files as $plugins) {
-            $plugin_file = $plugin_dir . '/' . $plugins['plugin_name'] . '/' . $plugins['plugin_name'] . '.php';
+            $plugin_file = $plugin_dir.'/'.$plugins['plugin_name'].'/'.$plugins['plugin_name'].'.php';
             $plugin_info = pathinfo($plugin_file);
 
             if ($plugin_info['extension'] !== 'php') {
@@ -98,20 +101,20 @@ class Plugins
     public static function load($file, $pluginName)
     {
 
-        $plugin = false;
+        $plugin    = false;
         $ns_prefix = 'LibreNMS\\Plugins\\';
-        $ns_psr4 = $ns_prefix . $pluginName . '\\' . $pluginName;
-        $ns_plugin = $ns_prefix . $pluginName;
+        $ns_psr4   = $ns_prefix.$pluginName.'\\'.$pluginName;
+        $ns_plugin = $ns_prefix.$pluginName;
         $ns_global = $pluginName;
 
-        if (class_exists($ns_psr4) & !$plugin) {
+        if (class_exists($ns_psr4) && !$plugin) {
             $pluginName = $ns_psr4;
-            $plugin = new $ns_psr4;
+            $plugin     = new $ns_psr4;
         }
 
-        if (class_exists($ns_plugin) & !$plugin) {
+        if (class_exists($ns_plugin) && !$plugin) {
             $pluginName = $ns_plugin;
-            $plugin = new $ns_plugin();
+            $plugin     = new $ns_plugin();
         }
 
         // Include file because it's not psr4
@@ -119,9 +122,9 @@ class Plugins
             include $file;
         }
 
-        if (class_exists($ns_global) & !$plugin) {
+        if (class_exists($ns_global) && !$plugin) {
             $pluginName = $ns_plugin;
-            $plugin = new $ns_plugin();
+            $plugin     = new $ns_plugin();
         }
 
         if (!$plugin) {
@@ -141,7 +144,7 @@ class Plugins
      * Get all plugins implementing a specific hook.
      *
      * @param  string $hook Name of the hook to get count for
-     * @return boolean
+     * @return integer|boolean
      */
     public static function countHooks($hook)
     {
@@ -164,13 +167,15 @@ class Plugins
     {
         self::start();
 
-        if (!empty(self::$plugins[$hook])) {
-            foreach (self::$plugins[$hook] as $name) {
-                if (!is_array($params)) {
-                    @call_user_func(array($name, $hook));
-                } else {
-                    @call_user_func_array(array($name, $hook), $params);
-                }
+        if (empty(self::$plugins[$hook])) {
+            return;
+        }
+
+        foreach (self::$plugins[$hook] as $name) {
+            if (!is_array($params)) {
+                @call_user_func(array($name, $hook));
+            } else {
+                @call_user_func_array(array($name, $hook), $params);
             }
         }
     }
