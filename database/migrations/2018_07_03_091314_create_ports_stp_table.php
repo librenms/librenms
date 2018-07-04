@@ -3,7 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreatePortsStpTable extends Migration {
+class CreatePortsStpTable extends Migration
+{
 
 	/**
 	 * Run the migrations.
@@ -12,8 +13,7 @@ class CreatePortsStpTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('ports_stp', function(Blueprint $table)
-		{
+		Schema::create('ports_stp', function (Blueprint $table) {
 			$table->integer('port_stp_id', true);
 			$table->integer('device_id');
 			$table->integer('port_id');
@@ -28,8 +28,10 @@ class CreatePortsStpTable extends Migration {
 			$table->integer('forwardTransitions')->unsigned();
 			$table->unique(['device_id','port_id'], 'device_id');
 		});
-	}
 
+		\DB::statement("ALTER TABLE `ports_stp` CHANGE `priority` `priority` tinyint(3) unsigned NOT NULL ;");
+		\DB::statement("ALTER TABLE `ports_stp` CHANGE `designatedPort` `designatedPort` mediumint(9) NOT NULL ;");
+	}
 
 	/**
 	 * Reverse the migrations.
@@ -40,5 +42,4 @@ class CreatePortsStpTable extends Migration {
 	{
 		Schema::drop('ports_stp');
 	}
-
 }

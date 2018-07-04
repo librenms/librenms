@@ -3,39 +3,37 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateSyslogTable extends Migration {
+class CreateSyslogTable extends Migration
+{
 
-	/**
-	 * Run the migrations.
-	 *
-	 * @return void
-	 */
-	public function up()
-	{
-		Schema::create('syslog', function(Blueprint $table)
-		{
-			$table->integer('device_id')->nullable()->index('device_id');
-			$table->string('facility', 10)->nullable();
-			$table->string('priority', 10)->nullable();
-			$table->string('level', 10)->nullable();
-			$table->string('tag', 10)->nullable();
-			$table->timestamp('timestamp')->default(DB::raw('CURRENT_TIMESTAMP'))->index('datetime');
-			$table->string('program', 32)->nullable()->index('program');
-			$table->text('msg', 65535)->nullable();
-			$table->bigInteger('seq', true)->unsigned();
-			$table->index(['priority','level'], 'priority_level');
-		});
-	}
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('syslog', function (Blueprint $table) {
+            $table->integer('device_id')->nullable()->index('device_id');
+            $table->string('facility', 10)->nullable();
+            $table->string('priority', 10)->nullable();
+            $table->string('level', 10)->nullable();
+            $table->string('tag', 10)->nullable();
+            $table->timestamp('timestamp')->default(DB::raw('CURRENT_TIMESTAMP'))->index('datetime');
+            $table->string('program', 32)->nullable()->index('program');
+            $table->text('msg', 65535)->nullable();
+            $table->bigInteger('seq', true)->unsigned();
+            $table->index(['priority','level'], 'priority_level');
+        });
+    }
 
-
-	/**
-	 * Reverse the migrations.
-	 *
-	 * @return void
-	 */
-	public function down()
-	{
-		Schema::drop('syslog');
-	}
-
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::drop('syslog');
+    }
 }

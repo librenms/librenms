@@ -3,33 +3,33 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateUcdDiskioTable extends Migration {
+class CreateUcdDiskioTable extends Migration
+{
 
-	/**
-	 * Run the migrations.
-	 *
-	 * @return void
-	 */
-	public function up()
-	{
-		Schema::create('ucd_diskio', function(Blueprint $table)
-		{
-			$table->integer('diskio_id', true);
-			$table->integer('device_id')->index('device_id_2');
-			$table->integer('diskio_index');
-			$table->string('diskio_descr', 32);
-		});
-	}
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('ucd_diskio', function (Blueprint $table) {
+            $table->integer('diskio_id', true);
+            $table->integer('device_id')->index('device_id_2');
+            $table->integer('diskio_index');
+            $table->string('diskio_descr', 32);
+        });
 
+        \DB::statement("ALTER TABLE `ucd_diskio` ADD INDEX `device_id` (`device_id`);");
+    }
 
-	/**
-	 * Reverse the migrations.
-	 *
-	 * @return void
-	 */
-	public function down()
-	{
-		Schema::drop('ucd_diskio');
-	}
-
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::drop('ucd_diskio');
+    }
 }

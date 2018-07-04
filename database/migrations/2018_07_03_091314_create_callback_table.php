@@ -3,32 +3,30 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateCallbackTable extends Migration {
+class CreateCallbackTable extends Migration
+{
 
-	/**
-	 * Run the migrations.
-	 *
-	 * @return void
-	 */
-	public function up()
-	{
-		Schema::create('callback', function(Blueprint $table)
-		{
-			$table->integer('callback_id', true);
-			$table->char('name', 64);
-			$table->char('value', 64);
-		});
-	}
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('callback', function (Blueprint $table) {
+            $table->integer('callback_id', true);
+            $table->char('name', 64);
+            $table->char('value', 64);
+        });
+    }
 
-
-	/**
-	 * Reverse the migrations.
-	 *
-	 * @return void
-	 */
-	public function down()
-	{
-		Schema::drop('callback');
-	}
-
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::drop('callback');
+    }
 }

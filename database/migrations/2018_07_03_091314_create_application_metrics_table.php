@@ -3,34 +3,32 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateApplicationMetricsTable extends Migration {
+class CreateApplicationMetricsTable extends Migration
+{
 
-	/**
-	 * Run the migrations.
-	 *
-	 * @return void
-	 */
-	public function up()
-	{
-		Schema::create('application_metrics', function(Blueprint $table)
-		{
-			$table->integer('app_id');
-			$table->string('metric', 32);
-			$table->integer('value')->nullable();
-			$table->integer('value_prev')->nullable();
-			$table->unique(['app_id','metric'], 'application_metrics_app_id_metric_uindex');
-		});
-	}
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('application_metrics', function (Blueprint $table) {
+            $table->integer('app_id');
+            $table->string('metric', 32);
+            $table->integer('value')->nullable();
+            $table->integer('value_prev')->nullable();
+            $table->unique(['app_id','metric'], 'application_metrics_app_id_metric_uindex');
+        });
+    }
 
-
-	/**
-	 * Reverse the migrations.
-	 *
-	 * @return void
-	 */
-	public function down()
-	{
-		Schema::drop('application_metrics');
-	}
-
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::drop('application_metrics');
+    }
 }
