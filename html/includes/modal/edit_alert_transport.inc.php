@@ -73,7 +73,6 @@ foreach (scandir($transport_dir) as $transport) {
     if (!method_exists($class, 'configTemplate')) {
         // Skip since support has not been added
         continue;
-    
     }
     
     echo '<form method="post" role="form" id="'.strtolower($transport).'-form" class="form-horizontal transport">';

@@ -22,7 +22,7 @@ class Elasticsearch extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        if (!empty($this->config)) { 
+        if (!empty($this->config)) {
             $opts['es_host'] = $this->config['es-host'];
             $opts['es_port'] = $this->config['es-port'];
             $opts['es_index'] = $this->config['es-pattern'];
@@ -30,8 +30,8 @@ class Elasticsearch extends Transport
         }
 
         return $this->sendCurl($obj, $opts);
-    
     }
+
     public function sendCurl($obj, $opts)
     {
         $es_host  = '127.0.0.1';
