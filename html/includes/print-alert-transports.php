@@ -49,18 +49,30 @@ foreach (dbFetchRows($query) as $transport) {
     }
     
     echo "<td class='col-sm-4'>";
-
-    //Iterate through alert transport config details
-    foreach (json_decode($transport['config']) as $key => $value) {
-        if (is_bool($value)) {
-            if ($value == true) {
-                $value = 'true';
+    
+    // Iterate through transport config template to display config details
+    $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($transport['type']);
+    if (!method_exists($class, 'configTemplate')) {
+        //skip
+        continue;
+    }
+    $tmp = call_user_func($class.'::configTemplate');
+    $transport_config = json_decode($transport['config'], true);
+    
+    foreach ($tmp['config'] as $item) {
+        $val = $transport_config[$item['name']];
+        // Reset value to string instead of displaying 1/0
+        if (is_bool($val)) {
+            if ($val == true) {
+                $val = 'true';
             } else {
-                $value = 'false';
+                $val = 'false';
             }
         }
-        echo "<i>".$key.": ".$value."<br /></i>";
+
+        echo "<i>".$item['title'].": ".$val."<br/></i>";
     }
+
     echo "</td>";
     echo "<td>";
 
