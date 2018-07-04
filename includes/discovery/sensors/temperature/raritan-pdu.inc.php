@@ -36,3 +36,17 @@ if (is_array($raritan_data) && !empty($raritan_data)) {
     $current = $raritan_data['unitCpuTemp.0'] / $divisor;
     discover_sensor($valid["sensor"], "temperature", $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
 }
+
+// Look for an external 1-wire sensor
+$external = snmp_get($device, '.1.3.6.1.4.1.13742.6.3.6.5.1.4.1.1', '-Ovq', 'PDU2-MIB');
+if ($external == "DPX-T1H1") {
+    $oid = '.1.3.6.1.4.1.13742.6.5.5.3.1.4.1.1';
+    $descr = 'External Sensor';
+    $low_limit = snmp_get($device, '.1.3.6.1.4.1.13742.6.3.6.3.1.31.1.1', '-Ovq', 'PDU2-MIB') / $divisor;
+    $low_warn_limit = snmp_get($device, '.1.3.6.1.4.1.13742.6.3.6.3.1.32.1.1', '-Ovq', 'PDU2-MIB') / $divisor;
+    $warn_limit = snmp_get($device, '.1.3.6.1.4.1.13742.6.3.6.3.1.34.1.1', '-Ovq', 'PDU2-MIB') / $divisor;
+    $high_limit = snmp_get($device, '.1.3.6.1.4.1.13742.6.3.6.3.1.33.1.1', '-Ovq', 'PDU2-MIB') / $divisor;
+    $current = snmp_get($device, '.1.3.6.1.4.1.13742.6.5.5.3.1.4.1.1', '-Ovq', 'PDU2-MIB') / $divisor;
+    discover_sensor($valid["sensor"], "temperature", $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
+}
+
