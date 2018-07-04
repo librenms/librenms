@@ -24,7 +24,6 @@ class CreatePollersTable extends Migration
         \DB::statement("ALTER TABLE `pollers` ADD UNIQUE `id` (`id`);");
         \DB::statement("ALTER TABLE `pollers` CHANGE `id` `id` int(11) NOT NULL auto_increment;");
         \DB::statement("ALTER TABLE `pollers` ADD PRIMARY KEY (`poller_name`);");
-
     }
 
     /**

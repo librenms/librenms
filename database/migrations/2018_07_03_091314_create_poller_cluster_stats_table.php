@@ -33,7 +33,6 @@ class CreatePollerClusterStatsTable extends Migration
         \DB::statement("ALTER TABLE `poller_cluster_stats` ADD UNIQUE `id` (`id`);");
         \DB::statement("ALTER TABLE `poller_cluster_stats` CHANGE `id` `id` int(11) NOT NULL auto_increment;");
         \DB::statement("ALTER TABLE `poller_cluster_stats` ADD PRIMARY KEY (`parent_poller`,`poller_type`);");
-
     }
 
     /**

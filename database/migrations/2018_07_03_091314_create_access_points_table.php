@@ -33,7 +33,6 @@ class CreateAccessPointsTable extends Migration
         });
 
         \DB::statement("ALTER TABLE `access_points` CHANGE `channel` `channel` tinyint(4) unsigned NOT NULL DEFAULT '0' ;");
-
     }
 
     /**
