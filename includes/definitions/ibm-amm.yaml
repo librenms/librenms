@@ -6,4 +6,4 @@ mib_dir:
     - ibm
 discovery:
     - sysDescr:
-        - BladeCenter Advanced Management Module
+        - 'BladeCenter Advanced Management Module'

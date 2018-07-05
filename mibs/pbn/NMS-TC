@@ -15,6 +15,7 @@ IMPORTS
     MODULE-IDENTITY,
     Gauge32,
     Integer32,
+    Unsigned32,
     Counter64
         FROM SNMPv2-SMI
     TEXTUAL-CONVENTION
@@ -121,7 +122,7 @@ NMSNetworkAddress ::= TEXTUAL-CONVENTION
         "
     SYNTAX    OCTET STRING
 
-SMI Unsigned32
+--SMI Unsigned32
 --Unsigned32 ::= TEXTUAL-CONVENTION
 --    STATUS    current
 --    DESCRIPTION
