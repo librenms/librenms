@@ -48,6 +48,6 @@ if ($external == "DPX-T1H1") {
     $warn_limit = snmp_get($device, '.1.3.6.1.4.1.13742.6.3.6.3.1.34.1.1', '-Ovq', 'PDU2-MIB') / $divisor;
     $high_limit = snmp_get($device, '.1.3.6.1.4.1.13742.6.3.6.3.1.33.1.1', '-Ovq', 'PDU2-MIB') / $divisor;
     $current = snmp_get($device, '.1.3.6.1.4.1.13742.6.5.5.3.1.4.1.1', '-Ovq', 'PDU2-MIB') / $divisor;
-    discover_sensor($valid["sensor"], "temperature", $device, $oid, $index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
+    discover_sensor($valid["sensor"], "temperature", $device, $oid.'.'.$index, $index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
 }
 
