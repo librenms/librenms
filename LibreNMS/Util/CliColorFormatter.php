@@ -29,10 +29,12 @@ namespace LibreNMS\Util;
 class CliColorFormatter extends \Monolog\Formatter\LineFormatter
 {
     private $console_color;
+    private $console;
 
     public function __construct()
     {
         $this->console_color = new \Console_Color2();
+        $this->console = \App::runningInConsole();
 
         parent::__construct(
             "%message%\n",
@@ -45,7 +47,7 @@ class CliColorFormatter extends \Monolog\Formatter\LineFormatter
     {
         // only format messages where color is enabled
         if (isset($record['context']['color']) && $record['context']['color']) {
-            if (\App::runningInConsole()) {
+            if ($this->console) {
                 $record['message'] = $this->console_color->convert($record['message']);
             } else {
                 $record['message'] = $this->console_color->strip($record['message']);

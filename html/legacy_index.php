@@ -35,23 +35,7 @@ if (!file_exists('../config.php') && $_SERVER['PATH_INFO'] != '/install.php') {
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-if (set_debug(strpos($_SERVER['REQUEST_URI'], "debug"))) {
-    // FIXME scrap this?
-    global $php_debug, $sql_debug;
-    set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-        global $php_debug;
-        $php_debug[] = ['errno' => $errno, 'errstr' => $errstr, 'errfile' => $errfile, 'errline' => $errline];
-    });
-    register_shutdown_function(function () {
-        $last_error = error_get_last();
-        if ($last_error['type'] == 1) {
-            $log_error = [$last_error['type'], $last_error['message'], $last_error['file'], $last_error['line']];
-            print_r($log_error);
-        }
-    });
-    $sql_debug = [];
-    $php_debug = [];
-}
+set_debug(str_contains($_SERVER['REQUEST_URI'], 'debug'));
 
 LibreNMS\Plugins::start();
 
@@ -330,10 +314,6 @@ if (is_array($msg_box)) {
         echo "toastr.".$message['type']."('".$message['message']."','".$message['title']."');\n";
     }
     echo("</script>");
-}
-
-if (is_array($sql_debug) && is_array($php_debug) && Auth::check()) {
-    require_once "includes/print-debug.php";
 }
 
 if ($no_refresh !== true && $config['page_refresh'] != 0) {

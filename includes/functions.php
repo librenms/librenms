@@ -54,7 +54,26 @@ function set_debug($state = true, $silence = false)
             $handlers = $logger->getHandlers();
 
             // only install if not existing
-            if (isset($handlers[0]) && $handlers[0]->getUrl() !== 'php://stdout') {
+            $install = true;
+            $logfile = Config::get('log_file', base_path('logs/librenms.log'));
+            foreach ($logger->getHandlers() as $handler) {
+                if ($handler instanceof \Monolog\Handler\StreamHandler) {
+                    if ($handler->getUrl() == 'php://stdout') {
+                        $install = false;
+                    } elseif ($handler->getUrl() == $logfile) {
+                        // send to librenms log file if not a cli app
+                        if (!App::runningInConsole()) {
+                            set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+                                Log::error("$errno $errfile:$errline $errstr");
+                            });
+                            $handler->setLevel(\Monolog\Logger::DEBUG);
+                        }
+                    }
+
+                }
+            }
+
+            if ($install) {
                 $handler = new \Monolog\Handler\StreamHandler(
                     'php://stdout',
                     \Monolog\Logger::DEBUG
