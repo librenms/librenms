@@ -7,9 +7,9 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_state, text: 'Power Status' }
 poller_modules:
-    processors: 0
+    processors: false
 discovery_modules:
-    processors: 0
+    processors: false
 discovery:
     -
         sysObjectID:
