@@ -40,7 +40,8 @@ function set_debug($state = true, $silence = false)
     $debug = $state; // set to global
 
     $db = \LibreNMS\DB\Eloquent::DB();
-    restore_error_handler();
+
+    restore_error_handler(); // disable Laravel error handler
 
     if ($debug) {
         ini_set('display_errors', 1);
@@ -50,17 +51,19 @@ function set_debug($state = true, $silence = false)
 
         if (class_exists('Log')) {
             $logger = Log::getMonolog();
+            $handlers = $logger->getHandlers();
 
-            $handler = new \Monolog\Handler\StreamHandler(
-                'php://stdout',
-                \Monolog\Logger::DEBUG
-            );
-            $handler->setFormatter(new Monolog\Formatter\LineFormatter(
-                "%message%\n",
-                null,
-                true
-            ));
-            $logger->pushHandler($handler);
+            // only install if not existing
+            if (isset($handlers[0]) && $handlers[0]->getUrl() !== 'php://stdout') {
+                $handler = new \Monolog\Handler\StreamHandler(
+                    'php://stdout',
+                    \Monolog\Logger::DEBUG
+                );
+
+                $handler->setFormatter(new LibreNMS\Util\CliColorFormatter());
+
+                $logger->pushHandler($handler);
+            }
         }
 
         if ($db && !$db->getEventDispatcher()->hasListeners('Illuminate\Database\Events\QueryExecuted')) {
@@ -73,7 +76,12 @@ function set_debug($state = true, $silence = false)
 
                     return $item;
                 })->toJson();
-                c_echo("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n");
+
+                if (class_exists('Log')) {
+                    Log::debug("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n", ['color' => true]);
+                } else {
+                    c_echo("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n");
+                }
             });
         }
     } else {
@@ -82,7 +90,15 @@ function set_debug($state = true, $silence = false)
         ini_set('log_errors', 1);
         error_reporting($silence ? 0 : E_ERROR);
 
+        if (class_exists('Log')) {
+            $handlers = Log::getMonolog()->getHandlers();
+            if (isset($handlers[0]) && $handlers[0]->getUrl() == 'php://stdout') {
+                Log::getMonolog()->popHandler();
+            }
+        }
+
         if ($db) {
+            // remove all query executed event handlers
             $db->getEventDispatcher()->flush('Illuminate\Database\Events\QueryExecuted');
         }
     }

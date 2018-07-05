@@ -11,7 +11,7 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-$init_modules = array('polling', 'alerts', 'laravel');
+$init_modules = array('polling', 'alerts');
 require __DIR__ . '/includes/init.php';
 
 $poller_start = microtime(true);
@@ -75,7 +75,7 @@ if (!$where) {
     exit;
 }
 
-if (isset($options['d']) || isset($options['v'])) {
+if (set_debug(isset($options['d'])) || isset($options['v'])) {
     $versions = version_info();
     echo <<<EOH
 ===================================
@@ -94,18 +94,7 @@ EOH;
     if (isset($options['v'])) {
         $vdebug = true;
     }
-    $debug = true;
     update_os_cache(true); // Force update of OS Cache
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    ini_set('log_errors', 1);
-    ini_set('error_reporting', 1);
-} else {
-    $debug = false;
-    // ini_set('display_errors', 0);
-    ini_set('display_startup_errors', 0);
-    ini_set('log_errors', 0);
-    // ini_set('error_reporting', 0);
 }
 
 if (isset($options['r'])) {
