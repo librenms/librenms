@@ -1,9 +1,9 @@
 source: Extensions/Poller-Service.md
-# Poller Service
+# LibreNMS Service
 
 > Status: BETA
 
-The new poller service (`librenms-service.py`) replaces the old poller service (`poller-service.py`), improving its reliability. It's mostly compatible with the old service, but testing is recommended before switching over.
+The new LibreNMS service (`librenms-service.py`) replaces the old poller service (`poller-service.py`), improving its reliability. It's mostly compatible with the old service, but testing is recommended before switching over.
 
 If you are currently using the old poller service, it's strongly recommended that you migrate away - it has a serious defect under certain versions of mysql/mariadb, and may be inadvertently DoS'ing your devices. The new service does not have this issue,
 
