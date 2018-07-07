@@ -40,6 +40,15 @@ if (!$auth) {
 } else {
     if (isset($config['graph_types'][$type][$subtype]['descr'])) {
         $title .= " :: " . $config['graph_types'][$type][$subtype]['descr'];
+    } elseif ($type == "device" && $subtype == "collectd") {
+        $title .= " :: " . ucfirst($subtype) . " :: " . $vars['c_plugin'];
+        if (isset($vars['c_plugin_instance'])) {
+            $title .= " - " . $vars['c_plugin_instance'];
+        }
+        $title .= " - " . $vars['c_type'];
+        if (isset($vars['c_type_instance'])) {
+            $title .= " - " . $vars['c_type_instance'];
+        }
     } else {
         $title .= " :: " . ucfirst($subtype);
     }
