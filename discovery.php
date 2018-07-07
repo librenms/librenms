@@ -125,7 +125,7 @@ if (!empty($config['distributed_poller_group'])) {
 
 global $device;
 foreach (dbFetch("SELECT * FROM `devices` WHERE disabled = 0 AND snmp_disable = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
-    discover_device($device, $options);
+    $discovered_devices += discover_device($device, $options);
 }
 
 $end      = microtime(true);
@@ -152,3 +152,8 @@ if (!isset($options['q'])) {
 }
 
 logfile($string);
+
+if ($discovered_devices == 0) {
+    # No discoverable devices, either down or disabled
+    exit(5);
+}

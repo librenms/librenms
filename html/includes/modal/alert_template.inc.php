@@ -210,7 +210,6 @@ $('#value').keypress(function (e) {
 });
 
 $('div').on('click', 'button#reset-default', function(e) {
-    console.log('zart');
     e.preventDefault();
     var template_id = $("#template_id").val();
     var template = '%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: {if %name}%name{else}%rule{/if}\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}';

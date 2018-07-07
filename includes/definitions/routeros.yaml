@@ -1,10 +1,10 @@
 os: routeros
 text: 'Mikrotik RouterOS'
+icon: mikrotik
 type: network
-nobulk: 1
 mib_dir:
     - mikrotik
-rfc1628_compat: 1
+rfc1628_compat: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

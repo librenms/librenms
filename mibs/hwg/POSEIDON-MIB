@@ -1,0 +1,635 @@
+--	POSEIDON-MIB 2.06
+--		History:
+--	2.07	7. 10.2009 Marek Koci    - sensorUnitString added, traps renamed
+--	2.06	10. 9.2009 Marek Koci    - universal 1-wire sensor supported
+--	2.05	11. 9.2008 Marek Koci    - new sensor units added
+--	2.04	14. 9.2007 Dusan Ferbas  - outMode added, node rename to reflect new behaviour for outputs
+--	2.03	20. 4.2007 Dusan Ferbas  - inpAlarmState added, also to inpChange trap
+--	2.02	 5. 9.2006 Rosta Hlebak  - unit type and sensor ID, temp -> sens, trap variable list changed
+--	2.01	18. 4.2005 Jiri Sindelar - enterprise changed from 17739 (Embedded Technologies s.r.o.) to 21796 (HW group s.r.o)
+--					 - output name & type added
+--	1.05	 5. 5.2004 Dusan Ferbas  - MIB name changed to Poseidon, input and output variables into tables, their names settable
+--	1.04	 2. 1.2004 Dusan Ferbas  - alarm table added
+--	1.03	21.11.2003 Dusan Ferbas  - Modified
+--	1.01	 5.11.2003 Dusan Ferbas  - Created
+--
+--
+--
+--  This is a MIB file for Poseidon product family - environment sensors & digital I/O over IP via XML, SNMP, Modbus/TCP 
+--  Availabe sensors: Temperature, Humidity, Voltage, Current, Power comsuption (110/230V) Industrial standards 
+--
+--  ---------------------  Poseidon Family ----------------------
+--
+--  Poseidon model 3262:     6 sensors
+--  Poseidon model 3265:     5 sensors,  GSM
+--  Poseidon model 3266:     3 sensors,  4 Inputs
+--  Poseidon model 3268:     4 sensors,  4 Inputs, 2 Outputs
+--  Poseidon model 1250:    42 sensors,  3 Inputs, 2 Outputs, GSM
+--  Poseidon model 2250:    42 sensors,  3 Inputs, 2 Outputs, GSM
+--  Poseidon model 2261:    42 sensors,  3 Inputs, 2 Outputs
+--  Poseidon model 3468:     4 sensors,  4 Inputs, 2 Outputs
+--  Poseidon model Sitemon: 12 sensors, 16 Inputs, 4 Outputs
+--  Poseidon model 4001:    16 sensors,  8 Inputs, 4 Outputs, GSM
+--  Poseidon model 4002:    16 sensors,  6 Inputs, 2 Outputs, GSM
+
+POSEIDON-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+	OBJECT-TYPE
+		FROM RFC-1212
+	Gauge, enterprises
+		FROM RFC1155-SMI
+	DisplayString, sysName
+		FROM RFC1213-MIB;
+
+
+--
+-- Type Definitions
+--
+
+PositiveInteger ::= INTEGER (1..2147483647)	-- 0x7FFF FFFF
+
+OnOff ::= INTEGER {
+		off (0),
+		on (1)
+	}
+
+OutputType ::= INTEGER {
+		onOff (0),
+		rts (1),
+		dtr (2)
+	}
+
+OutputMode ::= INTEGER {
+		manual (0),
+		autoAlarm (1),
+		autoTriggerEq (2),
+		autoTriggerHi (3),
+		autoTriggerLo (4)
+	}
+
+UnitType ::= INTEGER {
+		celsius (0),
+		fahrenheit (1),
+		kelvin (2),
+		percent(3),
+		volt (4),
+		miliAmper (5),
+		noUnit (6),
+		pulse (7),
+		switch (8),
+		dewPoint (9),
+		absoluteHumidity (10),
+		pressure (11),
+		universal (12)
+	}
+
+InputAlarmSetup ::= INTEGER {
+		inactive (0),
+		activeOff (1),
+		activeOn (2)
+	}
+
+InputAlarmState ::= INTEGER {
+		normal (0),
+		alarm (1)
+	}
+
+SensorState ::= INTEGER {
+		invalid (0),
+		normal (1),
+		alarmstate (2),
+		alarm (3)
+	}
+
+SensorID ::= INTEGER (0..65535)
+IOName ::= DisplayString (SIZE (0..20))
+SensorName ::= DisplayString (SIZE (0..15))
+
+SensorValue ::= INTEGER
+SensorString ::= DisplayString (SIZE (0..10))
+SensorUnitString ::= DisplayString (SIZE (0..4))
+
+SensorFlags ::= INTEGER	-- will hold info that this sensor has alarm (trap) enabled
+			-- and/or sets output pin (thermostat functionality)
+
+TimeStamp ::= TimeTicks
+
+
+--
+-- Node Definitions
+--
+
+hwgroup		OBJECT IDENTIFIER ::= { enterprises 21796 }
+
+charonII	OBJECT IDENTIFIER ::= { hwgroup 3 }
+poseidon	OBJECT IDENTIFIER ::= { charonII 3 }
+
+
+
+-- Application Nodes
+
+info	OBJECT IDENTIFIER ::= { poseidon 70 }
+setup	OBJECT IDENTIFIER ::= { poseidon 99 }
+
+inpTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF InpEntry
+	ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A list of binary input entries."
+	::= { poseidon 1 }
+
+inpEntry OBJECT-TYPE
+	SYNTAX	InpEntry
+	ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"An entry containing information applicable
+		to a particular binary input."
+	INDEX { inpIndex }
+	::= { inpTable 1 }
+
+InpEntry ::= SEQUENCE {
+	inpIndex	PositiveInteger,
+	inpValue	OnOff,
+	inpName		IOName,
+	inpAlarmSetup	InputAlarmSetup,
+	inpAlarmState	InputAlarmState
+}
+
+inpIndex OBJECT-TYPE
+	SYNTAX	PositiveInteger
+	ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"The binary input index."
+	::= { inpEntry 1 }
+
+inpValue OBJECT-TYPE
+	SYNTAX	OnOff
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The binary input value."
+	::= { inpEntry 2 }
+
+inpName OBJECT-TYPE
+	SYNTAX	IOName
+	ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The binary input name."
+	::= { inpEntry 3 }
+
+inpAlarmSetup OBJECT-TYPE
+	SYNTAX	InputAlarmSetup
+	ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"You can enable alarm for this binary input.
+		Alarm can be inactive or active for On/Off state."
+	::= { inpEntry 4 }
+
+inpAlarmState OBJECT-TYPE
+	SYNTAX	InputAlarmState
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The binary input alarm state."
+	::= { inpEntry 5 }
+
+--
+outTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF OutEntry
+	ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A list of binary output entries."
+	::= { poseidon 2 }
+
+outEntry OBJECT-TYPE
+	SYNTAX	OutEntry
+	ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"An entry containing information applicable
+		to a particular binary output."
+	INDEX { outIndex }
+	::= { outTable 1 }
+
+OutEntry ::= SEQUENCE {
+	outIndex	PositiveInteger,
+	outValue	OnOff,
+	outName		IOName,
+	outType		OutputType,
+	outMode		OutputMode
+}
+
+outIndex OBJECT-TYPE
+	SYNTAX	PositiveInteger
+	ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"The binary output index."
+	::= { outEntry 1 }
+
+outValue OBJECT-TYPE
+	SYNTAX	OnOff
+	ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The binary output value. 0 off(open), 1 on(close)"
+	::= { outEntry 2 }
+
+outName OBJECT-TYPE
+	SYNTAX	IOName
+	ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The binary output name."
+	::= { outEntry 3 }
+
+outType OBJECT-TYPE
+	SYNTAX	OutputType
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The binary output type. 0 relay (off, on), 1 rts (-10,+10V), 2 dtr (0,10V)"
+	::= { outEntry 4 }
+
+outMode OBJECT-TYPE
+	SYNTAX	OutputMode
+	ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The binary output mode. 0 manual, 1 autoAlarm,
+		2 autoTriggerEq, 3 autoTriggerHi, 4 autoTriggerLo"
+	::= { outEntry 5 }
+
+
+-- Table has to be last in a branch to satisfy snmp walk engine implementation
+sensTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SensEntry
+	ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A list of sensor table entries. The number
+		of entries corresponds with number of detected sensors."
+	::= { poseidon 3 }
+
+sensEntry OBJECT-TYPE
+	SYNTAX	SensEntry
+	ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"An entry containing information applicable to a
+		particular sensor."
+	INDEX { sensIndex }
+	::= { sensTable 1 }
+
+SensEntry ::= SEQUENCE {
+	sensIndex		PositiveInteger,
+	sensName		SensorName,
+	sensState		SensorState,
+	sensString		SensorString,
+	sensValue		SensorValue,
+	sensValueRaw		SensorValue,
+	sensID			SensorID,
+	sensUnit		UnitType,
+	sensUnitString		SensorUnitString
+}
+
+sensIndex OBJECT-TYPE
+	SYNTAX	PositiveInteger
+	ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"The sensor index."
+	::= { sensEntry 1 }
+
+sensName OBJECT-TYPE
+	SYNTAX	SensorName
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The sensor name."
+	::= { sensEntry 2 }
+
+sensState OBJECT-TYPE
+	SYNTAX	SensorState
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The sensor state."
+	::= { sensEntry 4 }
+
+sensString OBJECT-TYPE
+	SYNTAX	SensorString
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The string representation of sensor value."
+	::= { sensEntry 5 }
+
+sensValue OBJECT-TYPE
+	SYNTAX	SensorValue
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The integer (decimal * 10) representation
+		of sensor value."
+	::= { sensEntry 6 }
+
+sensValueRaw OBJECT-TYPE
+	SYNTAX	SensorValue
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The original raw value of sensor
+		(it differs for each sensor type, especially
+		 1-Wire sensors have different precisions)."
+	::= { sensEntry 7 }
+
+sensID OBJECT-TYPE
+	SYNTAX	SensorID
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The sensor ID."
+	::= { sensEntry 8 }
+
+sensUnit OBJECT-TYPE
+	SYNTAX	UnitType
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The sensor unit."
+	::= { sensEntry 9 }
+
+sensUnitString OBJECT-TYPE
+	SYNTAX	SensorUnitString
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The string representation of sensor unit."
+	::= { sensEntry 10 }
+
+
+-- The Alarm group.
+
+tsAlarm		OBJECT IDENTIFIER ::= { poseidon 50 }
+
+tsAlarmsPresent OBJECT-TYPE
+	SYNTAX	Gauge32
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The present number of active alarm conditions."
+	::= { tsAlarm 1 }
+
+tsAlarmTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF TsAlarmEntry
+	ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A list of alarm table entries.  The table contains
+		zero, one, or many rows at any moment, depending upon
+		the number of alarm conditions in effect.  The table
+		is initially empty at agent startup.  The agent
+		creates a row in the table each time a condition is
+		detected and deletes that row when that condition no
+		longer pertains.  The agent creates the first row with
+		tsAlarmId equal to 1, and increments the value of
+		tsAlarmId each time a new row is created, wrapping to
+		the first free value greater than or equal to 1 when
+		the maximum value of tsAlarmId would otherwise be
+		exceeded.  Consequently, after multiple operations,
+		the table may become sparse, e.g., containing entries
+		for rows 95, 100, 101, and 203 and the entries should
+		not be assumed to be in chronological order because
+		tsAlarmId might have wrapped.
+
+		The number of rows in the table at any given time is
+		reflected by the value of tsAlarmsPresent."
+	::= { tsAlarm 2 }
+
+tsAlarmEntry OBJECT-TYPE
+	SYNTAX	TsAlarmEntry
+	ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"An entry containing information applicable
+		to a particular alarm."
+	INDEX { tsAlarmIdx }
+	::= { tsAlarmTable 1 }
+
+TsAlarmEntry ::= SEQUENCE {
+	tsAlarmIdx	PositiveInteger,
+	tsAlarmId	PositiveInteger,
+	tsAlarmDescr	INTEGER,
+	tsAlarmSensName SensorName,
+	tsAlarmTime	TimeStamp
+}
+
+tsAlarmIdx OBJECT-TYPE
+	SYNTAX	PositiveInteger
+	ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"An index to alarm table."
+	::= { tsAlarmEntry 1 }
+
+tsAlarmId OBJECT-TYPE
+	SYNTAX	PositiveInteger
+	ACCESS	read-only	-- (used in trap variables)
+	STATUS	current
+	DESCRIPTION
+		"A unique identifier for an alarm condition.
+		This value must remain constant."
+	::= { tsAlarmEntry 2 }
+
+tsAlarmDescr OBJECT-TYPE
+	SYNTAX	 INTEGER {
+		inputStateAlarm(1),
+		temperatureOutOfRange(2)
+	}
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Description of the alarm condition."
+	::= { tsAlarmEntry 3 }
+
+-- inputStateAlarm(1)
+-- Binary input reached a state which meets its alarm setting.
+-- This means that no such alarm can happenn if alarm is set to no.
+
+-- temperatureOutOfRange(2)
+-- Sensor value is out of limits.
+
+
+tsAlarmSensName OBJECT-TYPE
+	SYNTAX	SensorName
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Name of sensor with alarm condition."
+	::= { tsAlarmEntry 4 }
+
+tsAlarmTime OBJECT-TYPE
+	SYNTAX	TimeStamp
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The value of sysUpTime when the alarm condition was
+		detected.  If the alarm condition was detected
+		at the time of agent startup and presumably existed
+		before agent startup, the value of tsAlarmTime shall equal 0."
+	::= { tsAlarmEntry 5 }
+
+
+-- Application Info
+
+infoAddressMAC OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE (0..17))
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"MAC address in text form.
+		It is here to distinguish devices in trap messages."
+	::= { info 1 }
+
+-- Application Setup
+
+sensSetup	OBJECT IDENTIFIER ::= { setup 1 }
+
+unitType OBJECT-TYPE
+	SYNTAX	UnitType
+	ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"Units for displayed values.
+		All setup values are fixed in Celsius"
+	::= { sensSetup 1 }
+
+sensSetupTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SensSetupEntry
+	ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A list of sensor table setup entries. The number
+		of entries corresponds with number of detected sensors."
+	::= { sensSetup 2 }
+
+sensSetupEntry OBJECT-TYPE
+	SYNTAX	SensSetupEntry
+	ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"An entry containing setup information
+		for a particular sensor."
+	INDEX { sensSetupIndex }
+	::= { sensSetupTable 1 }
+
+SensSetupEntry ::= SEQUENCE {
+	sensSetupIndex	PositiveInteger,
+	sensSetupName	SensorName,
+	sensFlags	SensorFlags,
+	sensLimitMin	SensorValue,
+	sensLimitMax	SensorValue,
+	sensHysteresis	SensorValue
+}
+
+sensSetupIndex OBJECT-TYPE
+	SYNTAX	PositiveInteger
+	ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"The sensor setup table index."
+	::= { sensSetupEntry 1 }
+
+sensSetupName OBJECT-TYPE
+	SYNTAX	SensorName
+	ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The sensor name."
+	::= { sensSetupEntry 2 }
+
+sensFlags OBJECT-TYPE
+	SYNTAX	SensorFlags
+	ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The behaviour of sensor
+		- 0x01: range or level detection
+		- 0x02: enable trap sending
+		-- 0x04: output set (thermostat)
+		- 0x08: sensor enabled
+		- 0x10: enable SMS sending
+		- 0x20: enable email sending."
+
+	::= { sensSetupEntry 5 }
+
+sensLimitMin OBJECT-TYPE
+	SYNTAX	SensorValue
+	ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The sensor low limit."
+	::= { sensSetupEntry 6 }
+
+sensLimitMax OBJECT-TYPE
+	SYNTAX	SensorValue
+	ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The sensor high limit."
+	::= { sensSetupEntry 7 }
+
+sensHysteresis OBJECT-TYPE
+	SYNTAX	SensorValue
+	ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The sensor hysteresis."
+	::= { sensSetupEntry 8 }
+
+-- Trap Definitions ------------------------------------------------------------
+
+inpAlarmStateChanged TRAP-TYPE
+	ENTERPRISE	poseidon
+	VARIABLES	{ sysName, infoAddressMAC, inpName, inpValue, inpAlarmState }
+	DESCRIPTION
+		"Input state entered/left alarm condition.
+		This trap always follows tsTrapAlarmStart/tsTrapAlarmEnd."
+	::= 1
+
+sensAlarmStateChanged TRAP-TYPE
+	ENTERPRISE	poseidon
+	VARIABLES	{ sysName, infoAddressMAC, sensName, sensID, sensState, sensValue, sensUnit }
+	DESCRIPTION
+		"Nth sensor state entered/left alarm condition.
+		This trap always follows tsTrapAlarmStart/tsTrapAlarmEnd."
+	::= 2
+
+tsTrapAlarmStart TRAP-TYPE
+	ENTERPRISE	poseidon
+	VARIABLES	{ sysName, infoAddressMAC, tsAlarmId, tsAlarmDescr }
+	DESCRIPTION
+		"This trap is sent each time an alarm is inserted
+		into to the alarm table.  It is sent on the insertion
+		of all alarms except for powerFailure."
+	::= 3
+
+tsTrapAlarmEnd TRAP-TYPE
+	ENTERPRISE	poseidon
+	VARIABLES	{ sysName, infoAddressMAC, tsAlarmId, tsAlarmDescr }
+	DESCRIPTION
+		"This trap is sent each time an alarm is removed
+		from the alarm table.  It is sent on the removal
+		of all alarms."
+	::= 4
+
+
+END
+

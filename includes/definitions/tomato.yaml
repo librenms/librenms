@@ -1,5 +1,5 @@
 os: tomato
-text: 'Tomato'
+text: Tomato
 type: network
 icon: tomato
 over:

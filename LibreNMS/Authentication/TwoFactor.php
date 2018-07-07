@@ -139,7 +139,7 @@ class TwoFactor
           <div class="panel panel-default">
             <div class="panel-heading">
               <h3 class="panel-title">
-                <img src="' . Config::get('title_image') . '">
+                <img class="img-responsive" src="' . Config::get('title_image') . '">
               </h3>
             </div>
             <div class="panel-body">

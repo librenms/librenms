@@ -1188,23 +1188,30 @@ function inet6_ntop($ip)
 
 /**
  * If hostname is an ip, use return sysName
- * @param array $device
+ * @param array $device (uses hostname and sysName fields)
  * @param string $hostname
  * @return string
-**/
-function format_hostname($device, $hostname = '')
+ */
+function format_hostname($device, $hostname = null)
 {
-    global $config;
     if (empty($hostname)) {
         $hostname = $device['hostname'];
     }
-    if ($config['force_ip_to_sysname'] === true && !empty($device['sysName'])) {
-        if (filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
-            $hostname = $device['sysName'];
+
+    if (Config::get('force_hostname_to_sysname') && !empty($device['sysName'])) {
+        if (is_valid_hostname($hostname) && !IP::isValid($hostname)) {
+            return $device['sysName'];
         }
     }
+
+    if (Config::get('force_ip_to_sysname') && !empty($device['sysName'])) {
+        if (IP::isValid($hostname)) {
+            return $device['sysName'];
+        }
+    }
+
     return $hostname;
-}//end format_hostname
+}
 
 /**
  * Return valid port association modes

@@ -245,11 +245,15 @@ if ($device['os'] == 'procera') {
     require_once 'ports/procera.inc.php';
 }
 
-if ($config['enable_ports_adsl']) {
-    $device['adsl_count'] = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `device_id` = ? AND `ifType` = 'adsl'", array($device['device_id']));
+if ($device['os'] == 'cmm') {
+    require_once 'ports/cmm.inc.php';
 }
 
-if ($device['adsl_count'] > '0') {
+if ($config['enable_ports_adsl']) {
+    $device['xdsl_count'] = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `device_id` = ? AND `ifType` in ('adsl','vdsl')", [$device['device_id']]);
+}
+
+if ($device['xdsl_count'] > '0') {
     echo 'ADSL ';
     $port_stats = snmpwalk_cache_oid($device, '.1.3.6.1.2.1.10.94.1.1.1.1', $port_stats, 'ADSL-LINE-MIB');
     $port_stats = snmpwalk_cache_oid($device, '.1.3.6.1.2.1.10.94.1.1.2.1', $port_stats, 'ADSL-LINE-MIB');
@@ -274,8 +278,39 @@ if ($device['adsl_count'] > '0') {
 }//end if
 
 if ($config['enable_ports_poe']) {
-    $port_stats = snmpwalk_cache_oid($device, 'pethPsePortEntry', $port_stats, 'POWER-ETHERNET-MIB');
-    $port_stats = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', $port_stats, 'CISCO-POWER-ETHERNET-EXT-MIB');
+    // Code by OS device
+
+    if ($device['os'] == 'ios') {
+        echo 'cpeExtPsePortEntry';
+        $port_stats_poe = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', array(), 'CISCO-POWER-ETHERNET-EXT-MIB');
+        $port_ent_to_if = snmpwalk_cache_oid($device, 'portIfIndex', array(), 'CISCO-STACK-MIB');
+
+        foreach ($port_stats_poe as $p_index => $p_stats) {
+            //We replace the ENTITY EntIndex by the IfIndex using the portIfIndex table (stored in $port_ent_to_if).
+            //Result is merged into $port_stats
+            if ($port_ent_to_if[$p_index] && $port_ent_to_if[$p_index]['portIfIndex'] && $port_stats[$port_ent_to_if[$p_index]['portIfIndex']]) {
+                $port_stats[$port_ent_to_if[$p_index]['portIfIndex']]=$port_stats[$port_ent_to_if[$p_index]['portIfIndex']]+$p_stats;
+            }
+        }
+    } elseif ($device['os'] == 'vrp') {
+        echo 'HwPoePortEntry' ;
+
+        $vrp_poe_oids = array(
+            'hwPoePortReferencePower',
+            'hwPoePortMaximumPower',
+            'hwPoePortConsumingPower',
+            'hwPoePortPeakPower',
+            'hwPoePortEnable',
+        );
+
+        foreach ($vrp_poe_oids as $oid) {
+            $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'HUAWEI-POE-MIB');
+        }
+    } else {
+        //Any other device, generic polling
+        $port_stats = snmpwalk_cache_oid($device, 'pethPsePortEntry', $port_stats, 'POWER-ETHERNET-MIB');
+        $port_stats = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', $port_stats, 'CISCO-POWER-ETHERNET-EXT-MIB');
+    }
 }
 
 if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {

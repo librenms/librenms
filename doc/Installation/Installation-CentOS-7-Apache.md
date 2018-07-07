@@ -9,7 +9,7 @@ source: Installation/Installation-CentOS-7-Apache.md
 
     rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
 
-    yum install composer cronie fping git httpd ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nmap php72w php72w-cli php72w-common php72w-curl php72w-gd php72w-mysql php72w-process php72w-snmp php72w-xml php72w-zip python-memcached rrdtool
+    yum install composer cronie fping git httpd ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nmap php72w php72w-cli php72w-common php72w-curl php72w-gd php72w-mbstring php72w-mysqlnd php72w-process php72w-snmp php72w-xml php72w-zip python-memcached rrdtool
 
 #### Add librenms user
 
@@ -99,10 +99,16 @@ Install the policy tool for SELinux:
     semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/rrd(/.*)?'
     semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/rrd(/.*)?'
     restorecon -RFvv /opt/librenms/rrd/
+    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/storage(/.*)?'
+    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/storage(/.*)?'
+    restorecon -RFvv /opt/librenms/storage/
+    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/bootstrap/cache(/.*)?'
+    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/bootstrap/cache(/.*)?'
+    restorecon -RFvv /opt/librenms/bootstrap/cache/
     setsebool -P httpd_can_sendmail=1
 
 ##### Allow fping
-Create the file http_fping.tt with the following contents:
+Create the file http_fping.tt with the following contents. You can create this file anywhere, as it is a throw-away file. The last step in this install procedure will install the module in the proper location.
 ```
 module http_fping 1.0;
 
@@ -132,6 +138,9 @@ Then run these commands
 
 #### Configure snmpd
 
+  
+Copy the example snmpd.conf from the LibreNMS install.
+
     cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
 
     vi /etc/snmp/snmpd.conf
@@ -156,14 +165,19 @@ LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large an
 ### Set permissions
 
     chown -R librenms:librenms /opt/librenms
-    setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs
-    setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs
+    setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
+    setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
 
 ## Web installer ##
 
 Now head to the web installer and follow the on-screen instructions.
 
     http://librenms.example.com/install.php
+
+The web installer might prompt you to create a `config.php` file in your librenms install location manually, copying the content displayed on-screen to the file. If you have to do this, please remember to set the permissions on config.php after you copied the on-screen contents to the file. Run:
+
+    chown librenms:librenms /opt/librenms/config.php
+
 
 ### Final steps
 

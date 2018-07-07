@@ -264,7 +264,8 @@ main () {
                                "purgeusers"
                                "bill_data"
                                "alert_log"
-                               "rrd_purge");
+                               "rrd_purge"
+                               "ports_purge");
                 call_daily_php "${options[@]}";
             ;;
             submodules)

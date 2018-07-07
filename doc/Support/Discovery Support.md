@@ -39,6 +39,8 @@ new will poll only those devices that have recently been added or have been sele
 
 We have a `discovery-wrapper.py` script which is based on `poller-wrapper.py` by [Job Snijders](https://github.com/job). This script is currently the default.
 
+If you need to debug the output of discovery-wrapper.py then you can add `-d` to the end of the command - it is NOT recommended to do this in cron.
+
 If you want to switch back to discovery.php then you can replace:
 
 `33  */6   * * *   librenms    /opt/librenms/discovery-wrapper.py 1 >> /dev/null 2>&1`
@@ -53,45 +55,45 @@ These are the default discovery config items. You can globally disable a module 
 disable it for one device then you can do this within the WebUI -> Device -> Settings -> Modules.
 
 ```php
-$config['discovery_modules']['os']                   = 1;
-$config['discovery_modules']['ports']                = 1;
-$config['discovery_modules']['ports-stack']          = 1;
-$config['discovery_modules']['entity-physical']      = 1;
-$config['discovery_modules']['entity-state']         = 0;
-$config['discovery_modules']['processors']           = 1;
-$config['discovery_modules']['mempools']             = 1;
-$config['discovery_modules']['cisco-vrf-lite']       = 1;
-$config['discovery_modules']['cisco-mac-accounting'] = 0;
-$config['discovery_modules']['cisco-pw']             = 0;
-$config['discovery_modules']['vrf']                  = 0;
-$config['discovery_modules']['cisco-cef']            = 0;
-$config['discovery_modules']['cisco-sla']            = 0;
-$config['discovery_modules']['cisco-cbqos']          = 0;
-$config['discovery_modules']['cisco-otv']            = 0;
-$config['discovery_modules']['ipv4-addresses']       = 1;
-$config['discovery_modules']['ipv6-addresses']       = 1;
-$config['discovery_modules']['route']                = 0;
-$config['discovery_modules']['sensors']              = 1;
-$config['discovery_modules']['storage']              = 1;
-$config['discovery_modules']['hr-device']            = 1;
-$config['discovery_modules']['discovery-protocols']  = 1;
-$config['discovery_modules']['arp-table']            = 1;
-$config['discovery_modules']['discovery-arp']        = 0;
-$config['discovery_modules']['junose-atm-vp']        = 0;
-$config['discovery_modules']['bgp-peers']            = 1;
-$config['discovery_modules']['vlans']                = 1;
-$config['discovery_modules']['vmware-vminfo']        = 0;
-$config['discovery_modules']['libvirt-vminfo']       = 0;
-$config['discovery_modules']['toner']                = 0;
-$config['discovery_modules']['ucd-diskio']           = 1;
-$config['discovery_modules']['applications']         = 0;
-$config['discovery_modules']['services']             = 1;
-$config['discovery_modules']['stp']                  = 1;
-$config['discovery_modules']['ntp']                  = 1;
-$config['discovery_modules']['loadbalancers']        = 0;
-$config['discovery_modules']['mef']                  = 0;
-$config['discovery_modules']['wireless']             = 1;
-$config['discovery_modules']['fdb-table']            = 1;
+$config['discovery_modules']['os']                   = true;
+$config['discovery_modules']['ports']                = true;
+$config['discovery_modules']['ports-stack']          = true;
+$config['discovery_modules']['entity-physical']      = true;
+$config['discovery_modules']['entity-state']         = false;
+$config['discovery_modules']['processors']           = true;
+$config['discovery_modules']['mempools']             = true;
+$config['discovery_modules']['cisco-vrf-lite']       = true;
+$config['discovery_modules']['cisco-mac-accounting'] = false;
+$config['discovery_modules']['cisco-pw']             = false;
+$config['discovery_modules']['vrf']                  = false;
+$config['discovery_modules']['cisco-cef']            = false;
+$config['discovery_modules']['cisco-sla']            = false;
+$config['discovery_modules']['cisco-cbqos']          = false;
+$config['discovery_modules']['cisco-otv']            = false;
+$config['discovery_modules']['ipv4-addresses']       = true;
+$config['discovery_modules']['ipv6-addresses']       = true;
+$config['discovery_modules']['route']                = false;
+$config['discovery_modules']['sensors']              = true;
+$config['discovery_modules']['storage']              = true;
+$config['discovery_modules']['hr-device']            = true;
+$config['discovery_modules']['discovery-protocols']  = true;
+$config['discovery_modules']['arp-table']            = true;
+$config['discovery_modules']['discovery-arp']        = false;
+$config['discovery_modules']['junose-atm-vp']        = false;
+$config['discovery_modules']['bgp-peers']            = true;
+$config['discovery_modules']['vlans']                = true;
+$config['discovery_modules']['vmware-vminfo']        = false;
+$config['discovery_modules']['libvirt-vminfo']       = false;
+$config['discovery_modules']['toner']                = false;
+$config['discovery_modules']['ucd-diskio']           = true;
+$config['discovery_modules']['applications']         = false;
+$config['discovery_modules']['services']             = true;
+$config['discovery_modules']['stp']                  = true;
+$config['discovery_modules']['ntp']                  = true;
+$config['discovery_modules']['loadbalancers']        = false;
+$config['discovery_modules']['mef']                  = false;
+$config['discovery_modules']['wireless']             = true;
+$config['discovery_modules']['fdb-table']            = true;
 ```
 
 #### OS based Discovery config
@@ -104,8 +106,8 @@ Discover performance improvement can be achieved by deactivating all modules tha
 E.g. to deactivate spanning tree but activate discovery-arp module for linux OS
 
 ```php
-$config['os']['linux']['discovery_modules']['stp'] = 0;
-$config['os']['linux']['discovery_modules']['discovery-arp'] = 1;
+$config['os']['linux']['discovery_modules']['stp'] = false;
+$config['os']['linux']['discovery_modules']['discovery-arp'] = true;
 ```
 
 #### Discovery modules

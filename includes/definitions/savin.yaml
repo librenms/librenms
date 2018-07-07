@@ -9,7 +9,6 @@ discovery:
     - sysDescr:
         - SAVIN
 discovery_modules:
-    toner: 1
+    toner: true
 poller_modules:
-    toner: 1
-
+    toner: true

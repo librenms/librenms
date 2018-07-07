@@ -825,6 +825,30 @@ function list_available_health_graphs()
                 'name' => 'device_'.$graph['sensor_class'],
             );
         }
+        $device = \App\Models\Device::find($device_id);
+
+        if ($device) {
+            if ($device->processors()->count() > 0) {
+                array_push($graphs, array(
+                    'desc' => 'Processors',
+                    'name' => 'device_processor'
+                ));
+            }
+    
+            if ($device->storage()->count() > 0) {
+                array_push($graphs, array(
+                    'desc' => 'Storage',
+                    'name' => 'device_storage'
+                ));
+            }
+    
+            if ($device->mempools()->count() > 0) {
+                array_push($graphs, array(
+                    'desc' => 'Memory Pools',
+                    'name' => 'device_mempool'
+                ));
+            }
+        }
     }
 
     return api_success($graphs, 'graphs');
@@ -1014,7 +1038,7 @@ function list_alerts()
     $sql = '';
     if (isset($router['id']) && $router['id'] > 0) {
         $alert_id = mres($router['id']);
-        $sql      = 'AND id=?';
+        $sql      = 'AND `A`.id=?';
         array_push($param, $alert_id);
     }
 
@@ -1213,42 +1237,41 @@ function list_oxidized()
         $params = array($hostname);
     }
 
-    foreach (dbFetchRows("SELECT hostname,sysname,os,location FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `disabled`='0' AND `ignore` = 0 AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os)) $sql", $params) as $device) {
-        if ($config['oxidized']['group_support'] == "true") {
-            foreach ($config['oxidized']['group']['hostname'] as $host_group) {
-                if (preg_match($host_group['regex'].'i', $device['hostname'])) {
-                    $device['group'] = $host_group['group'];
-                    break;
-                }
+    foreach (dbFetchRows("SELECT hostname,sysname,os,location,ip AS ip FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `disabled`='0' AND `ignore` = 0 AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os)) $sql", $params) as $device) {
+        // Convert from packed value to human value
+        $device['ip'] = inet6_ntop($device['ip']);
+
+        // Pre-populate the group with the default
+        if ($config['oxidized']['group_support'] === true && !empty($config['oxidized']['default_group'])) {
+            $device['group'] = $config['oxidized']['default_group'];
+        }
+        foreach ($config['oxidized']['maps'] as $maps_column => $maps) {
+            // Based on Oxidized group support we can apply groups by setting group_support to true
+            if ($maps_column == "group" && (!isset($config['oxidized']['group_support']) or $config['oxidized']['group_support'] !== true)) {
+                continue;
             }
-            if (empty($device['group'])) {
-                foreach ($config['oxidized']['group']['sysname'] as $host_group) {
-                    if (preg_match($host_group['regex'].'i', $device['sysname'])) {
-                        $device['group'] = $host_group['group'];
+            
+            foreach ($maps as $field_type => $fields) {
+                foreach ($fields as $field) {
+                    if (isset($field['regex']) && preg_match($field['regex'].'i', $device[$field_type])) {
+                        $device[$maps_column] = $field[$maps_column];
+                        break;
+                    } elseif (isset($field['match']) && $field['match'] == $device[$field_type]) {
+                        $device[$maps_column] = $field[$maps_column];
                         break;
                     }
                 }
-            }
-            if (empty($device['group'])) {
-                foreach ($config['oxidized']['group']['os'] as $host_group) {
-                    if ($host_group['match'] === $device['os']) {
-                        $device['group'] = $host_group['group'];
-                        break;
-                    }
-                }
-            }
-            if (empty($device['group'])) {
-                foreach ($config['oxidized']['group']['location'] as $host_group) {
-                    if (preg_match($host_group['regex'].'i', $device['location'])) {
-                        $device['group'] = $host_group['group'];
-                        break;
-                    }
-                }
-            }
-            if (empty($device['group']) && !empty($config['oxidized']['default_group'])) {
-                $device['group'] = $config['oxidized']['default_group'];
             }
         }
+
+        // We remap certain device OS' that have different names with Oxidized models
+        $models = [
+            'arista_eos' => 'eos',
+            'vyos'       => 'vyatta',
+        ];
+
+        $device['os'] = str_replace(array_keys($models), array_values($models), $device['os']);
+
         unset($device['location']);
         unset($device['sysname']);
         $devices[] = $device;
@@ -2135,4 +2158,15 @@ function add_service_for_host()
     } else {
         api_error(500, 'Failed to add the service');
     }
+}
+
+/**
+ * Display Librenms Instance Info
+ */
+function server_info()
+{
+    $versions = version_info();
+    api_success([
+        $versions
+    ], 'system');
 }

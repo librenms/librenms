@@ -915,7 +915,8 @@ function parse_email($emails)
                 $result[$out[2][0]] = $out[1][0];
             } else {
                 if (strpos($email, "@")) {
-                    $result[$email] = null;
+                    $from_name = Config::get('email_user');
+                    $result[$email] = $from_name;
                 }
             }
         }
@@ -934,9 +935,6 @@ function send_mail($emails, $subject, $message, $html = false)
         $mail->Hostname = php_uname('n');
 
         foreach (parse_email($config['email_from']) as $from => $from_name) {
-            if (empty($from_name)) {
-                $from_name = Config::get('email_user');
-            }
             $mail->setFrom($from, $from_name);
         }
         foreach ($emails as $email => $email_name) {
@@ -2418,29 +2416,6 @@ function return_num($entry)
 }
 
 /**
- * Locate the actual path of a binary
- *
- * @param $binary
- * @return mixed
- */
-function locate_binary($binary)
-{
-    if (!str_contains($binary, '/')) {
-        $output = `whereis -b $binary`;
-        $list = trim(substr($output, strpos($output, ':') + 1));
-        $targets = explode(' ', $list);
-
-        foreach ($targets as $target) {
-            if (is_executable($target)) {
-                return $target;
-            }
-        }
-    }
-
-    return $binary;
-}
-
-/**
  * If Distributed, create a lock, then purge the mysql table
  *
  * @param string $table
@@ -2468,4 +2443,39 @@ function lock_and_purge($table, $sql)
         echo $e->getMessage() . PHP_EOL;
         return -1;
     }
+}
+
+/**
+ * Convert space separated hex OID content to character
+ *
+ * @param string $hex_string
+ * @return string $chr_string
+ */
+
+function hexbin($hex_string)
+{
+    $chr_string = '';
+    foreach (explode(' ', $hex_string) as $a) {
+        $chr_string .= chr(hexdec($a));
+    }
+    return $chr_string;
+}
+
+/**
+ * Check if disk is valid to poll.
+ * Settings: bad_disk_regexp
+ *
+ * @param array $disk
+ * @param array $device
+ * @return bool
+ */
+function is_disk_valid($disk, $device)
+{
+    foreach (Config::getCombined($device['os'], 'bad_disk_regexp') as $bir) {
+        if (preg_match($bir ."i", $disk['diskIODevice'])) {
+            d_echo("Ignored Disk: {$disk['diskIODevice']} (matched: $bir)\n");
+            return false;
+        }
+    }
+    return true;
 }

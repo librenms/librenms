@@ -36,54 +36,60 @@ even. all will run poller against all devices.
 
 `-m` This enables you to specify the module you want to run for poller.
 
+#### Poller Wrapper
+
+We have a `poller-wrapper.py` script by [Job Snijders](https://github.com/job). This script is currently the default.
+
+If you need to debug the output of poller-wrapper.py then you can add `-d` to the end of the command - it is NOT recommended to do this in cron.
+
 #### Poller config
 
 These are the default poller config items. You can globally disable a module by setting it to 0. If you just want to
 disable it for one device then you can do this within the WebUI -> Settings -> Modules.
 
 ```php
-$config['poller_modules']['unix-agent']                  = 0;
-$config['poller_modules']['os']                          = 1;
-$config['poller_modules']['ipmi']                        = 1;
-$config['poller_modules']['sensors']                     = 1;
-$config['poller_modules']['processors']                  = 1;
-$config['poller_modules']['mempools']                    = 1;
-$config['poller_modules']['storage']                     = 1;
-$config['poller_modules']['netstats']                    = 1;
-$config['poller_modules']['hr-mib']                      = 1;
-$config['poller_modules']['ucd-mib']                     = 1;
-$config['poller_modules']['ipSystemStats']               = 1;
-$config['poller_modules']['ports']                       = 1;
-$config['poller_modules']['bgp-peers']                   = 1;
-$config['poller_modules']['junose-atm-vp']               = 0;
-$config['poller_modules']['toner']                       = 0;
-$config['poller_modules']['ucd-diskio']                  = 1;
-$config['poller_modules']['wireless']                    = 1;
-$config['poller_modules']['ospf']                        = 1;
-$config['poller_modules']['cisco-ipsec-flow-monitor']    = 0;
-$config['poller_modules']['cisco-remote-access-monitor'] = 0;
-$config['poller_modules']['cisco-cef']                   = 0;
-$config['poller_modules']['cisco-sla']                   = 0;
-$config['poller_modules']['cisco-mac-accounting']        = 0;
-$config['poller_modules']['cipsec-tunnels']              = 0;
-$config['poller_modules']['cisco-ace-loadbalancer']      = 0;
-$config['poller_modules']['cisco-ace-serverfarms']       = 0;
-$config['poller_modules']['cisco-asa-firewall']          = 0;
-$config['poller_modules']['cisco-voice']                 = 0;
-$config['poller_modules']['cisco-cbqos']                 = 0;
-$config['poller_modules']['cisco-otv']                   = 0;
-$config['poller_modules']['cisco-vpdn']                  = 0;
-$config['poller_modules']['netscaler-vsvr']              = 0;
-$config['poller_modules']['aruba-controller']            = 0;
-$config['poller_modules']['entity-physical']             = 1;
-$config['poller_modules']['entity-state']                = 0;
-$config['poller_modules']['applications']                = 1;
-$config['poller_modules']['mib']                         = 0;
-$config['poller_modules']['stp']                         = 1;
-$config['poller_modules']['ntp']                         = 1;
-$config['poller_modules']['services']                    = 1;
-$config['poller_modules']['loadbalancers']               = 0;
-$config['poller_modules']['mef']                         = 0;
+$config['poller_modules']['unix-agent']                  = false;
+$config['poller_modules']['os']                          = true;
+$config['poller_modules']['ipmi']                        = true;
+$config['poller_modules']['sensors']                     = true;
+$config['poller_modules']['processors']                  = true;
+$config['poller_modules']['mempools']                    = true;
+$config['poller_modules']['storage']                     = true;
+$config['poller_modules']['netstats']                    = true;
+$config['poller_modules']['hr-mib']                      = true;
+$config['poller_modules']['ucd-mib']                     = true;
+$config['poller_modules']['ipSystemStats']               = true;
+$config['poller_modules']['ports']                       = true;
+$config['poller_modules']['bgp-peers']                   = true;
+$config['poller_modules']['junose-atm-vp']               = false;
+$config['poller_modules']['toner']                       = false;
+$config['poller_modules']['ucd-diskio']                  = true;
+$config['poller_modules']['wireless']                    = true;
+$config['poller_modules']['ospf']                        = true;
+$config['poller_modules']['cisco-ipsec-flow-monitor']    = false;
+$config['poller_modules']['cisco-remote-access-monitor'] = false;
+$config['poller_modules']['cisco-cef']                   = false;
+$config['poller_modules']['cisco-sla']                   = false;
+$config['poller_modules']['cisco-mac-accounting']        = false;
+$config['poller_modules']['cipsec-tunnels']              = false;
+$config['poller_modules']['cisco-ace-loadbalancer']      = false;
+$config['poller_modules']['cisco-ace-serverfarms']       = false;
+$config['poller_modules']['cisco-asa-firewall']          = false;
+$config['poller_modules']['cisco-voice']                 = false;
+$config['poller_modules']['cisco-cbqos']                 = false;
+$config['poller_modules']['cisco-otv']                   = false;
+$config['poller_modules']['cisco-vpdn']                  = false;
+$config['poller_modules']['netscaler-vsvr']              = false;
+$config['poller_modules']['aruba-controller']            = false;
+$config['poller_modules']['entity-physical']             = true;
+$config['poller_modules']['entity-state']                = false;
+$config['poller_modules']['applications']                = true;
+$config['poller_modules']['mib']                         = false;
+$config['poller_modules']['stp']                         = true;
+$config['poller_modules']['ntp']                         = true;
+$config['poller_modules']['services']                    = true;
+$config['poller_modules']['loadbalancers']               = false;
+$config['poller_modules']['mef']                         = false;
 ```
 
 #### OS based Poller config
@@ -96,8 +102,8 @@ Poller performance improvement can be achieved by deactivating all modules that 
 E.g. to deactivate spanning tree but activate unix-agent module for linux OS
 
 ```php
-$config['os']['linux']['poller_modules']['stp']  = 0;
-$config['os']['linux']['poller_modules']['unix-agent'] = 1;
+$config['os']['linux']['poller_modules']['stp']  = false;
+$config['os']['linux']['poller_modules']['unix-agent'] = true;
 ```
 
 #### Poller modules

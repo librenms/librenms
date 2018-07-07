@@ -14,14 +14,16 @@ if ($options['r'] && $options['h']) {
         ini_set('log_errors', 1);
         ini_set('error_reporting', 1);
     }
-    $rule_id = $options['r'];
+    $rule_id = (int)$options['r'];
     $device_id = ctype_digit($options['h']) ? $options['h'] : getidbyname($options['h']);
-    $alert = dbFetchRow('SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($device_id, $rule_id));
-    if (empty($alert)) {
+    $where = "alerts.device_id = $device_id && alerts.rule_id = $rule_id";
+    $alerts = loadAlerts($where);
+    if (empty($alerts)) {
         echo "No active alert found, please check that you have the correct ids";
         exit(2);
     }
-    $alert['details'] = json_decode(gzuncompress($alert['details']), true);
+    $alert = $alerts[0];
+
     $alert['details']['delay'] = 0;
     IssueAlert($alert);
 } else {
