@@ -2,7 +2,6 @@ os: routeros
 text: 'Mikrotik RouterOS'
 icon: mikrotik
 type: network
-nobulk: true
 mib_dir:
     - mikrotik
 rfc1628_compat: true

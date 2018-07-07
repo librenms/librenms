@@ -7,7 +7,7 @@ if ($_POST['editing']) {
         $updated = 0;
 
         if (isset($_POST['parent_id'])) {
-            $parent_id = $_POST['parent_id'];
+            $parent_id = array_diff((array)$_POST['parent_id'], ['0']);
             $res = dbDelete('device_relationships', '`child_device_id` = ?', array($device['device_id']));
             if (!in_array('0', $pr)) {
                 foreach ($parent_id as $pr) {
