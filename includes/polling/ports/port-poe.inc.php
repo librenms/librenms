@@ -25,8 +25,8 @@ if (($device['os'] == 'vrp')) {
         data_update($device, 'poe', $tags, $fields);
         echo 'PoE(vrp) ';
     }
-} elseif (($device['os'] == 'ios')) {
-    // Code for Cisco IOS, tested on 2960X
+} elseif (($device['os'] == 'ios') || ($device['os'] == 'iosxe')) {
+    // Code for Cisco IOS and IOSXE, tested on 2960X
     if (isset($this_port['cpeExtPsePortPwrAllocated'])) {
         // if we have cpeExtPsePortPwrAllocated, we have the complete array so we can populate the RRD
         $upd = "$polled:".$port['cpeExtPsePortPwrAllocated'].':'.$port['cpeExtPsePortPwrAvailable'].':'.

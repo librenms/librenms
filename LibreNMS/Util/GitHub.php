@@ -78,7 +78,7 @@ class GitHub
      */
     public function getRelease($tag)
     {
-        $release = Requests::get($this->github . "/releases/tags/$tag", self::getHeaders());
+        $release = Requests::get($this->github . "/releases/tags/$tag", $this->getHeaders());
         return json_decode($release->body, true);
     }
 
@@ -90,7 +90,7 @@ class GitHub
      */
     public function getPullRequest()
     {
-        $pull_request = Requests::get($this->github . "/pulls/{$this->pr}", self::getHeaders());
+        $pull_request = Requests::get($this->github . "/pulls/{$this->pr}", $this->getHeaders());
         $this->pr = json_decode($pull_request->body, true);
     }
 
@@ -104,16 +104,21 @@ class GitHub
      */
     public function getPullRequests($date, $page = 1)
     {
-        $prs = Requests::get($this->github . "/pulls?state=closed&page=$page", self::getHeaders());
+        $prs = Requests::get($this->github . "/pulls?state=closed&sort=updated&direction=desc&page=$page", $this->getHeaders());
         $prs = json_decode($prs->body, true);
         foreach ($prs as $k => $pr) {
             if ($pr['merged_at']) {
+                $created    = new DateTime($pr['created_at']);
                 $merged     = new DateTime($pr['merged_at']);
+                $updated    = new DateTime($pr['updated_at']);
                 $end_date   = new DateTime($date);
                 if (isset($this->pr['merged_at']) && $merged > new DateTime($this->pr['merged_at'])) {
                     // If the date of this PR is newer than the final PR then skip over it
                     continue;
-                } elseif ($merged < $end_date) {
+                } elseif ($created < $end_date && $merged < $end_date && $updated >= $end_date) {
+                    // If this PR was created and merged before the last tag but has been updated since then skip over
+                    continue;
+                } elseif ($created < $end_date && $merged < $end_date && $updated < $end_date) {
                     // If the date of this PR is older than the last release we're done
                     return true;
                 } else {
@@ -139,7 +144,7 @@ class GitHub
                 $users[$pr['user']['login']] = 0;
             }
             if ($pr['merged_at']) {
-                foreach ($pr['labels'] as $k => $label) {
+                foreach ($pr['labels'] as $key => $label) {
                     $name = preg_replace('/ :[\S]+:/', '', strtolower($label['name']));
                     if (in_array($name, $this->labels)) {
                         $title = ucfirst(trim(preg_replace('/^[\S]+: /', '', $pr['title'])));
@@ -214,7 +219,7 @@ class GitHub
         //FIXME Come back to this
         return false;
         $sha = isset($this->pr['merge_commit_sha']) ? $this->pr['merge_commit_sha'] : 'master';
-        $release = Requests::post($this->github . "/releases", self::getHeaders(), [
+        $release = Requests::post($this->github . "/releases", $this->getHeaders(), [
             'tag_name' => $this->tag,
             'target_commitish' => $sha,
             'body' => $this->getMarkdown(),

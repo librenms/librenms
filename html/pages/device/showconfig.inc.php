@@ -259,7 +259,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         // $geshi->set_line_style('color: #999999');
         echo '<div class="config">';
         echo '<input id="linenumbers" class="btn btn-primary" type="submit" value="Hide line numbers"/>';
-        echo $geshi->parse_code();
+        echo htmlspecialchars_decode($geshi->parse_code());
         echo '</div>';
     }
 }//end if

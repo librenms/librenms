@@ -113,7 +113,7 @@ function load_discovery(&$device)
 function discover_device(&$device, $options = null)
 {
     if ($device['snmp_disable'] == '1') {
-        return;
+        return 0;
     }
 
     global $valid;
@@ -131,7 +131,7 @@ function discover_device(&$device, $options = null)
     $response = device_is_up($device, true);
 
     if ($response['status'] !== '1') {
-        return;
+        return 0;
     }
 
     if ($device['os'] == 'generic') {
@@ -207,10 +207,8 @@ function discover_device(&$device, $options = null)
 
     echo "Discovered in $device_time seconds\n";
 
-    global $discovered_devices;
-
-    echo "\n";
-    $discovered_devices++;
+    echo PHP_EOL;
+    return 1;
 }
 //end discover_device()
 
