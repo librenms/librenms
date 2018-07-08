@@ -26,3 +26,10 @@
 $hardware = trim(snmp_get($device, '.1.3.6.1.4.1.6339.100.25.1.1.1.0', '-OQv'), '"');
 $version = trim(snmp_get($device, '.1.3.6.1.4.1.6339.100.25.1.1.2.0', '-OQv'), '"');
 $serial = trim(snmp_get($device, '.1.3.6.1.2.1.47.1.1.1.1.11.1', '-OQv'), '"');
+
+if (empty($hardware) && empty($version)) {
+    $temp_data = snmp_get_multi_oid($device, 'sysHardwareVersion.0 sysSoftwareVersion.0', '-OUQs', 'DCN-MIB');
+    $hardware =  $temp_data['sysHardwareVersion.0'];
+    $version = $temp_data['sysSoftwareVersion.0'];
+    unset($temp_data);
+}
