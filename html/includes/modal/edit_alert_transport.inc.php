@@ -39,14 +39,15 @@ if (Auth::user()->hasGlobalAdmin()) {
                             <label for='transport-choice' class='col-sm-3 col-md-2 control-label'>Transport type: </label>
                             <div class="col-sm-3">
                                 <select name='transport-choice' id='transport-choice' class='form-control'>
-                                    <option value="mail-form" selected>Mail</option>
-                                    <option value="ciscospark-form">Cisco Spark</option>
                                     <option value="api-form">API</option>
+                                    <option value="ciscospark-form">Cisco Spark</option>
+                                    <option value="discord-form">Discord</option>
+                                    <option value="elasticsearch-form">Elasticsearch</option>
                                     <option value="gitlab-form">Gitlab</option>
                                     <option value="jira-form">Jira</option>
+                                    <option value="mail-form" selected>Mail</option>
                                     <option value="hue-form">Phillips Hue</option>
-                                    <option value="elasticsearch-form">Elasticsearch</option>
-                                    <!--Insert more transport type options here has support is added. Value should be: [transport_name]-form -->
+                                    <!--Insert more transport type options here as support is added. Value should be: [transport_name]-form -->
                                 </select>
                             </div>
                         </div>
@@ -104,6 +105,11 @@ foreach (scandir($transport_dir) as $transport) {
                 echo '<option value="'.$opt.'">'.$descr.'</option>';
             }
             echo '</select>';
+            echo '</div>';
+        } elseif ($item['type'] === 'textarea') {
+            echo '<div class="col-sm-3">';
+            echo '<textarea name="' . $item['name'] . '" id="' . $item['name'] . '" class="form-control">';
+            echo '</textarea>';
             echo '</div>';
         }
         echo '</div>';
@@ -200,6 +206,7 @@ foreach (scandir($transport_dir) as $transport) {
             $("#" + $("#transport-choice").val()).show().find("input:text").val("");
              
             // Populate the field values
+            console.log(transport.details);
             transport.details.forEach(function(config) {
                 var $field = $("#" + config.name);
                 if ($field.prop('type') == 'checkbox') {

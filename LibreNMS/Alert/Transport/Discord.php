@@ -33,32 +33,67 @@ class Discord implements Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        foreach ($opts as $tmp_api) {
-            $host          = $tmp_api['url'];
-            $curl          = curl_init();
-            $discord_msg   = strip_tags($obj['msg']);
-            $color         = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
-            $data          = array(
-                        'username'=>$tmp_api['username'],
-                        'content' => "". $obj['title'] ."\n" . $discord_msg
-                );
-            $alert_message = json_encode($data);
-            curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-            set_curl_proxy($curl);
-            curl_setopt($curl, CURLOPT_URL, $host);
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($curl, CURLOPT_POST, true);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $alert_message);
+        if (empty($this->config)) {
+            return $this->deliverAlertOld($obj, $opts);
+        }
+    }
 
-            $ret  = curl_exec($curl);
-            $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            if ($code != 204) {
-                var_dump("API '$host' returned Error"); //FIXME: propper debuging
-                var_dump("Params: " . $alert_message); //FIXME: propper debuging
-                var_dump("Return: " . $ret); //FIXME: propper debuging
-                return 'HTTP Status code ' . $code;
-            }
+    public function deliverAlertOld($obj, $opts)
+    {
+        foreach ($opts as $discord_opts) {
+            $this->contactDiscord($obj, $discord_opts);
         }
         return true;
+    }
+
+    public function contactDiscord($obj, $discord_opts)
+    {
+        $host          = $discord_opts['url'];
+        $curl          = curl_init();
+        $discord_msg   = strip_tags($obj['msg']);
+        $color         = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
+        $data          = array(
+            'username'=>$discord_opts['username'],
+            'content' => "". $obj['title'] ."\n" . $discord_msg
+        );
+        $alert_message = json_encode($data);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        set_curl_proxy($curl);
+        curl_setopt($curl, CURLOPT_URL, $host);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $alert_message);
+
+        $ret  = curl_exec($curl);
+        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        if ($code != 204) {
+            var_dump("API '$host' returned Error"); //FIXME: propper debuging
+            var_dump("Params: " . $alert_message); //FIXME: propper debuging
+            var_dump("Return: " . $ret); //FIXME: propper debuging
+            return 'HTTP Status code ' . $code;
+        }
+    }
+
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'Discord URL',
+                    'name' => 'url',
+                    'descr' => 'Discord URL',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Options',
+                    'name' => 'options',
+                    'descr' => 'Enter the config options (format: option=value separated by new lines)',
+                    'type' => 'textarea',
+                ]
+            ],
+            'validation' => [
+                'url' => 'required|url',
+            ]
+        ];
     }
 }

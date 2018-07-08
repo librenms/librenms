@@ -940,7 +940,7 @@ function ExtTransports($obj)
                 $msg        = FormatAlertTpl($obj);
                 $obj['msg'] = $msg;
                 echo $transport.' => ';
-                $instance = new $class;
+                $instance = new $class($item['transport_id']);
                 $tmp = $instance->deliverAlert($obj, $opts);
                 AlertLog($tmp, $obj, $transport);
             }
