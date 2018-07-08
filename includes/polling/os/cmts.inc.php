@@ -32,5 +32,7 @@ if ($id == "1") {
     $hardware = "C4";
 } elseif ($id == "2") {
     $hardware = "C4c";
+} elseif ($id == "3") {
+    $hardware = "C3";
 }
 unset($data);
