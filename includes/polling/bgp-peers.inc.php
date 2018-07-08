@@ -13,7 +13,7 @@ if ($config['enable_bgp']) {
         } elseif ($device['os_group'] === 'arista') {
             $peer_data_check = snmpwalk_cache_oid($device, 'aristaBgp4V2PeerRemoteAs', array(), 'ARISTA-BGP4V2-MIB');
         } elseif ($device['os_group'] === 'brocade') {
-             $peer_data_check = snmpwalk_cache_oid($device, 'bgp4V2PeerRemoteAs', array(), 'BGP4V2-MIB', "brocade", "-ObQ");
+            $peer_data_check = snmpwalk_cache_oid($device, 'bgp4V2PeerRemoteAs', array(), 'BGP4V2-MIB', "brocade", "-ObQ");
         } else {
             $peer_data_check = snmpwalk_cache_oid($device, 'cbgpPeer2RemoteAs', array(), 'CISCO-BGP4-MIB');
         }
@@ -244,7 +244,7 @@ if ($config['enable_bgp']) {
             }
 
             // --- Populate cbgp data ---
-            if ($device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os_group'] === 'arista' || $device['os_group'] === 'brocade11') {
+            if ($device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os_group'] === 'arista') {
                 // Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB or BGP4-V2-JUNIPER MIB)
                 $peer_afis = dbFetchRows('SELECT * FROM bgpPeers_cbgp WHERE `device_id` = ? AND bgpPeerIdentifier = ?', array($device['device_id'], $peer['bgpPeerIdentifier']));
                 foreach ($peer_afis as $peer_afi) {
