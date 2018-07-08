@@ -12,19 +12,21 @@ if ($config['enable_bgp']) {
             $peer_data_check = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerIndex', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.14', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
         } elseif ($device['os_group'] === 'arista') {
             $peer_data_check = snmpwalk_cache_oid($device, 'aristaBgp4V2PeerRemoteAs', array(), 'ARISTA-BGP4V2-MIB');
+        } elseif ($device['os_group'] === 'brocade') {
+             $peer_data_check = snmpwalk_cache_oid($device, 'bgp4V2PeerRemoteAs', array(), 'BGP4V2-MIB', "brocade", "-ObQ");
         } else {
             $peer_data_check = snmpwalk_cache_oid($device, 'cbgpPeer2RemoteAs', array(), 'CISCO-BGP4-MIB');
         }
-
+     
         foreach ($peers as $peer) {
             //add context if exist
             $device['context_name'] = $peer['context_name'];
-
+           
             try {
                 $peer_ip = IP::parse($peer['bgpPeerIdentifier']);
-
+           
                 echo "Checking BGP peer $peer_ip ";
-
+                
                 // --- Collect BGP data ---
                 if (count($peer_data_check) > 0) {
                     if ($device['os'] == 'junos') {
@@ -102,6 +104,27 @@ if ($config['enable_bgp']) {
                                 'aristaBgp4V2PeerInUpdatesElapsedTime' => 'bgpPeerInUpdateElapsedTime',
                                 'aristaBgp4V2PeerLocalAddr' => 'bgpLocalAddr',
                             );
+                        } elseif ($device['os_group'] === 'brocade') {
+                            if ($ip_type==2) {
+                                $ip_parts =  str_split(str_replace(":", "", $peer['bgpLocalAddr']), 2);
+                                array_walk($ip_parts, function (&$aPart) {
+                                    if ($aPart=="00") {
+                                        $aPart = "0";
+                                    }
+                                    $aPart = (int)$aPart;
+                                });
+                                $peer['bgpLocalAddr'] = implode(".", $ip_parts);
+                            }
+
+                            $peer_identifier = "1.".$ip_type . '.' . $ip_len . '.'. $peer['bgpLocalAddr'] ."." .$ip_type . '.' . $ip_len . '.' . $bgp_peer_ident;
+                            $mib = 'BGP4V2-MIB';
+                            $oid_map = array(
+                                'bgp4V2PeerState' => 'bgpPeerState',
+                                'bgp4V2PeerAdminStatus' => 'bgpPeerAdminStatus',
+                                'bgp4V2PeerFsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
+                                'bgp4V2PeerInUpdatesElapsedTime' => 'bgpPeerInUpdateElapsedTime',
+                                
+                            );
                         } else {
                             $peer_identifier = $ip_type . '.' . $ip_len . '.' . $bgp_peer_ident;
                             $mib = 'CISCO-BGP4-MIB';
@@ -143,12 +166,12 @@ if ($config['enable_bgp']) {
                     }, array_keys($oid_map));
                     $peer_data_raw = snmp_get_multi($device, $get_oids, '-OQUs', $mib);
                     $peer_data_raw = reset($peer_data_raw);  // get the first element of the array
-
+                    
                     $peer_data = array();
 
                     foreach ($oid_map as $source => $target) {
                         $v = isset($peer_data_raw[$source]) ? $peer_data_raw[$source] : '';
-
+                        
                         if (str_contains($source, 'LocalAddr')) {
                             try {
                                 $v = IP::fromHexString($v)->uncompressed();
@@ -160,7 +183,7 @@ if ($config['enable_bgp']) {
                         $peer_data[$target] = $v;
                     }
                 }
-
+           
                 d_echo($peer_data);
             } catch (InvalidIpException $e) {
                 // ignore
@@ -221,7 +244,7 @@ if ($config['enable_bgp']) {
             }
 
             // --- Populate cbgp data ---
-            if ($device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os_group'] === 'arista') {
+            if ($device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os_group'] === 'arista' || $device['os_group'] === 'brocade11') {
                 // Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB or BGP4-V2-JUNIPER MIB)
                 $peer_afis = dbFetchRows('SELECT * FROM bgpPeers_cbgp WHERE `device_id` = ? AND bgpPeerIdentifier = ?', array($device['device_id'], $peer['bgpPeerIdentifier']));
                 foreach ($peer_afis as $peer_afi) {

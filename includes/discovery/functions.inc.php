@@ -1159,13 +1159,18 @@ function build_bgp_peers($device, $data, $peer2)
         'CISCO-BGP4-MIB::cbgpPeer2RemoteAs.',
         'BGP4-MIB::bgpPeerRemoteAs.',
         '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.13.',
+        'BGP4V2-MIB::bgp4V2PeerRemoteAs.1.ipv4.',
+        'BGP4V2-MIB::bgp4V2PeerRemoteAs.1.ipv6.'
     );
     $peers = trim(str_replace($remove, '', $data));
 
     $peerlist = array();
     $ver = '';
     foreach (explode("\n", $peers) as $peer) {
+        $local_ip=null;
+        
         if ($peer2 === true) {
+            $peerFull = $peer;
             list($ver, $peer) = explode('.', $peer, 2);
         }
         list($peer_ip, $peer_as) = explode(' ', $peer);
@@ -1179,6 +1184,21 @@ function build_bgp_peers($device, $data, $peer2)
                 // ipv4
                 $peer_ip = implode('.', array_slice(explode('.', $peer_ip), -4));
             }
+        } elseif ($device['os_group'] === 'brocade') {
+            $rawIP = $peer_ip;
+            $ver = '';
+            $octets = count(explode(".", $rawIP));
+            if ($octets > 11) {
+                // ipv6
+                $peer_ip = (string)IP::parse(snmp2ipv6($rawIP), true);
+                $parts = explode(".2.16.", $peerFull);
+                $ip_parts =  str_split(str_replace(":", "", $parts[0]), 4);
+                $local_ip = implode(":", $ip_parts);
+            } else {
+                // ipv4
+                $peer_ip = implode('.', array_slice(explode('.', $rawIP), -4));
+                $local_ip = implode('.', array_slice(explode('.', $rawIP), 0, 4));
+            }
         } else {
             if (strstr($peer_ip, ':')) {
                 $peer_ip_snmp = preg_replace('/:/', ' ', $peer_ip);
@@ -1189,9 +1209,10 @@ function build_bgp_peers($device, $data, $peer2)
         if ($peer && $peer_ip != '0.0.0.0') {
             d_echo("Found peer $peer_ip (AS$peer_as)\n");
             $peerlist[] = array(
-                'ip'  => $peer_ip,
-                'as'  => $peer_as,
-                'ver' => $ver,
+                'ip'    => $peer_ip,
+                'localip' => $local_ip ?  $local_ip : "0.0.0.0",
+                'as'    => $peer_as,
+                'ver'   => $ver,
             );
         }
     }
@@ -1242,7 +1263,7 @@ function add_bgp_peer($device, $peer)
             'astext' => $peer['astext'],
             'bgpPeerState' => 'idle',
             'bgpPeerAdminStatus' => 'stop',
-            'bgpLocalAddr' => '0.0.0.0',
+            'bgpLocalAddr' => $peer['localip'] ?  $peer['localip']  : "0.0.0.0",
             'bgpPeerRemoteAddr' => '0.0.0.0',
             'bgpPeerInUpdates' => 0,
             'bgpPeerOutUpdates' => 0,
