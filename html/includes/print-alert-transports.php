@@ -70,6 +70,11 @@ foreach (dbFetchRows($query) as $transport) {
             }
         }
 
+        // Match value to key name for select inputs
+        if ($item['type'] == 'select') {
+            $val = array_search($val, $item['options']);
+        }
+
         echo "<i>".$item['title'].": ".$val."<br/></i>";
     }
 
