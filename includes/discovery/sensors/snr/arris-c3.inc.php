@@ -1,6 +1,6 @@
 <?php
 /**
- * arris_c3.inc.php
+ * arris-c3.inc.php
  *
  * LibreNMS snr discovery module for Arris CMTS
  *
@@ -24,14 +24,14 @@
  * Based on Neil Lathwood Cisco EPC files
  */
 
-foreach ($pre_cache['arris_c3_docsIfSignalQualityTable'] as $index => $data) {
+foreach ($pre_cache['ar-c3_docsIfSignalQualityTable'] as $index => $data) {
     if (is_numeric($data['docsIfSigQSignalNoise'])) {
-        $descr   = "Channel {$pre_cache['arris_c3_ifAlias'][$index]['ifAlias']} - {$pre_cache['arris_c3_ifName'][$index]['ifName']}";
+        $descr   = "Channel {$pre_cache['ar-c3_ifAlias'][$index]['ifAlias']} - {$pre_cache['ar-c3_ifName'][$index]['ifName']}";
         $oid     = '.1.3.6.1.2.1.10.127.1.1.4.1.5.' . $index;
         $divisor = 10;
         $value   = $data['docsIfSigQSignalNoise'];
-        if (preg_match("/.0$/", $pre_cache['arris_c3_ifName'][$index]['ifName'])) {
-            discover_sensor($valid['sensor'], 'snr', $device, $oid, 'docsIfSigQSignalNoise.'.$index, 'arris_c3', $descr, $divisor, '1', null, null, null, null, $value);
+        if (preg_match("/.0$/", $pre_cache['ar-c3_ifName'][$index]['ifName'])) {
+            discover_sensor($valid['sensor'], 'snr', $device, $oid, 'docsIfSigQSignalNoise.'.$index, 'arris-c3', $descr, $divisor, '1', null, null, null, null, $value);
         }
     }
 }
