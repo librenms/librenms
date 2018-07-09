@@ -100,11 +100,8 @@ if (empty($name)) {
             $status = 'error';
         } else {
             // Build config values
-            $result = call_user_func_array($class . '::configBuilder', array($vars));
-            $transport_config = $result['transport_config'];
-            $status = $result['status'];
-            $message = $result['message'];
-
+            $transport_config = call_user_func_array($class . '::configBuilder', array($vars, $result['config']));
+            
             //Update the json config field
             if ($transport_config) {
                 $transport_config = json_encode($transport_config);

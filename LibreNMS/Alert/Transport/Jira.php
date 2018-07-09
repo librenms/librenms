@@ -132,28 +132,4 @@ class Jira extends Transport
             ]
         ];
     }
-
-    public static function configBuilder($vars)
-    {
-        $status = 'ok';
-        $message = '';
-        
-        $required = ['jira-key', 'jira-url', 'jira-type', 'jira-username', 'jira-password'];
-
-        if (count(array_diff($required, array_keys($vars))) == 0) {
-            $transport_config = [];
-            foreach ($required as $item) {
-                $transport_config[$item] = $vars[$item];
-            }
-        } else {
-            $status = 'error';
-            $message = 'Missing Jira information';
-        }
-
-        return [
-            'transport_config' => $transport_config,
-            'status' => $status,
-            'message' => $message
-        ];
-    }
 }

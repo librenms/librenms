@@ -117,27 +117,4 @@ class Gitlab extends Transport
             ]
         ];
     }
-
-    public static function configBuilder($vars)
-    {
-        $status = 'ok';
-        $message = '';
-
-        if ($vars['gitlab-host'] && $vars['gitlab-id'] && $vars['gitlab-key']) {
-            $transport_config = [
-                'gitlab-host' => $vars['gitlab-host'],
-                'gitlab-id' => $vars['gitlab-id'],
-                'gitlab-key' => $vars['gitlab-key']
-            ];
-        } else {
-            $status = 'error';
-            $message = 'Missing Gitlab information';
-        }
-    
-        return [
-            'transport_config' => $transport_config,
-            'status' => $status,
-            'message' => $message
-        ];
-    }
 }

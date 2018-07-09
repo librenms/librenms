@@ -88,19 +88,22 @@ class Hue extends Transport
                   'title'=> 'Host',
                   'name' => 'hue-host',
                   'descr' => 'Hue Host',
-                  'type' => 'text'
+                  'type' => 'text',
+                  'required' => true
                 ],
                 [
                   'title'=> 'Hue User',
                   'name' => 'hue-user',
                   'descr' => 'Phillips Hue Host',
-                  'type' => 'text'
+                  'type' => 'text',
+                  'required' => true
                 ],
                 [
                   'title'=> 'Duration',
                   'name' => 'hue-duration',
                   'descr' => 'Phillips Hue Duration',
                   'type' => 'select',
+                  'required' => true,
                   'options' => [
                     '1 Second' => 'select',
                     '15 Seconds' => 'lselect'
@@ -112,30 +115,6 @@ class Hue extends Transport
                 'hue-user' => 'required|string',
                 'hue-duration' => 'required|string'
             ]
-        ];
-    }
-
-    public static function configBuilder($vars)
-    {
-        $status = 'ok';
-        $message = '';
-
-        $required = ['hue-host', 'hue-user', 'hue-duration'];
-
-        if (count(array_diff($required, array_keys($vars))) == 0) {
-            $transport_config = [];
-            foreach ($required as $item) {
-                $transport_config[$item] = $vars[$item];
-            }
-        } else {
-            $status = 'error';
-            $message = "Missing Phillips Hue information";
-        }
-    
-        return [
-            'transport_config' => $transport_config,
-            'status' => $status,
-            'message' => $message
         ];
     }
 }

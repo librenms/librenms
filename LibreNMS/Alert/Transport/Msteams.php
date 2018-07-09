@@ -11,9 +11,9 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Msteams implements Transport
+class Msteams extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
@@ -67,15 +67,6 @@ class Msteams implements Transport
             ],
             'validation' => [
                 'msteam-url' => 'required|url'
-            ]
-        ];
-    }
-    
-    public function configBuilder($vars)
-    {
-        return [
-            'transport_config' => [
-                'msteam-url' => $vars['msteam-url']
             ]
         ];
     }

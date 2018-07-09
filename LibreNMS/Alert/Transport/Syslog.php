@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Syslog implements Transport
+class Syslog extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
@@ -155,24 +155,6 @@ class Syslog implements Transport
                 'syslog-port' => 'required|numeric',
                 'syslog-facility' => 'required|string'
             ]
-        ];
-    }
-
-    public static function configBuilder($vars)
-    {
-        $status = 'ok';
-        $message = '';
-
-        $transport_config = [
-            'syslog-host' => $vars['syslog-host'],
-            'syslog-port' => $vars['syslog-port'],
-            'syslog-facility' => $vars['syslog-facility'],
-        ];
-
-        return [
-            'transport_config' => $transport_config,
-            'status' => $status,
-            'message' => $message
         ];
     }
 }
