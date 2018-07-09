@@ -3,7 +3,8 @@
 use LibreNMS\Config;
 
 if (Config::get('enable_vrfs')) {
-    if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os'] == 'ironware') {
+    if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || 
+        $device['os'] == 'junos' || $device['os'] == 'ironware') {
         unset($vrf_count);
 
         /*
