@@ -42,7 +42,7 @@ class Discord extends Transport
             list($k,$v) = explode('=', $option);
             $discord_opts['options'][$k] = $v;
         }
-        $this->contactDiscord($obj, $discord_opts);
+        return $this->contactDiscord($obj, $discord_opts);
     }
 
     public function deliverAlertOld($obj, $opts)
@@ -61,7 +61,9 @@ class Discord extends Transport
         $data          = [
             'content' => "". $obj['title'] ."\n" . $discord_msg
         ];
-        $data = array_merge($data, $discord_opts['options']);
+        if (!empty($discord_opts['options'])) {
+            $data = array_merge($data, $discord_opts['options']);
+        }
 
         $alert_message = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
@@ -79,6 +81,7 @@ class Discord extends Transport
             var_dump("Return: " . $ret); //FIXME: propper debuging
             return 'HTTP Status code ' . $code;
         }
+        return true;
     }
 
     public static function configTemplate()
