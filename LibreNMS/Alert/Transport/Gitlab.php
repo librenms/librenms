@@ -93,21 +93,18 @@ class Gitlab extends Transport
                     'name' => 'gitlab-host',
                     'descr' => 'Gitlab Host',
                     'type' => 'text',
-                    'required' => true
                 ],
                 [
                     'title' => 'Project ID',
                     'name' => 'gitlab-id',
                     'descr' => 'Gitlab Prokect ID',
                     'type'=> 'text',
-                    'required' => true
                 ],
                 [
                     'title' => 'API Key',
                     'name' => 'gitlab-key',
                     'descr' => 'Gitlab API Key',
                     'type' => 'text',
-                    'required' => true
                 ]
             ],
             'validation' => [

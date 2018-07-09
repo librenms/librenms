@@ -89,21 +89,18 @@ class Hue extends Transport
                   'name' => 'hue-host',
                   'descr' => 'Hue Host',
                   'type' => 'text',
-                  'required' => true
                 ],
                 [
                   'title'=> 'Hue User',
                   'name' => 'hue-user',
                   'descr' => 'Phillips Hue Host',
                   'type' => 'text',
-                  'required' => true
                 ],
                 [
                   'title'=> 'Duration',
                   'name' => 'hue-duration',
                   'descr' => 'Phillips Hue Duration',
                   'type' => 'select',
-                  'required' => true,
                   'options' => [
                     '1 Second' => 'select',
                     '15 Seconds' => 'lselect'

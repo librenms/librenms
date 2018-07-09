@@ -47,7 +47,6 @@ class Mail extends Transport
                     'name' => 'email',
                     'descr' => 'Email address of contact',
                     'type'  => 'text',
-                    'required' => true
                 ]
             ],
             'validation' => [

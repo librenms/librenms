@@ -35,20 +35,20 @@ class Api extends Transport
         }
         $url = $this->config['api-url'];
         $method = $this->config['api-method'];
-        $this->contactAPI($obj, $opts, $url, $method);
+        $this->contactAPI($obj, $url, $method);
     }
 
     private function deliverAlertOld($obj, $opts)
     {
         foreach ($opts as $method => $apis) {
             foreach ($apis as $api) {
-                $this->contactAPI($obj, $opts, $api, $method);
+                $this->contactAPI($obj, $api, $method);
             }
         }
         return true;
     }
 
-    private function contactAPI($obj, $opts, $api, $method)
+    private function contactAPI($obj, $api, $method)
     {
         $method = strtolower($method);
         list($host, $api) = explode("?", $api, 2);
@@ -84,14 +84,12 @@ class Api extends Transport
                     'name' => 'api-method',
                     'descr' => 'API Method',
                     'type' => 'text',
-                    'required' => true
                 ],
                 [
                     'title' => 'API URL',
                     'name' => 'api-url',
                     'descr' => 'API URL',
                     'type' => 'text',
-                    'required' => true
                 ]
             ],
             'validation' => [

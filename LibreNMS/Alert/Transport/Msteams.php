@@ -49,7 +49,6 @@ class Msteams extends Transport
             var_dump("Microsoft Teams returned Error, retry later");
             return false;
         }
-
         return true;
     }
 
@@ -62,7 +61,6 @@ class Msteams extends Transport
                     'name' => 'msteam-url',
                     'descr' => 'Microsoft Teams Webhook URL',
                     'type' => 'text',
-                    'required' => true
                 ]
             ],
             'validation' => [

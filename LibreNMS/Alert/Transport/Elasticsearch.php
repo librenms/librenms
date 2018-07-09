@@ -234,23 +234,4 @@ class Elasticsearch extends Transport
             ]
         ];
     }
-
-    public static function configBuilder($vars)
-    {
-        // Requires special handling for checkbox selection
-
-        $required = ['es-host', 'es-port', 'es-pattern'];
-    
-        if (count(array_diff($required, array_keys($vars))) == 0) {
-            foreach ($required as $item) {
-                $transport_config[$item] = $vars[$item];
-            }
-            if (empty($vars['es-proxy'])) {
-                $transport_config['es-proxy'] = false;
-            } else {
-                $transport_config['es-proxy'] = true;
-            }
-            return $transport_config;
-        }
-    }
 }
