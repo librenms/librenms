@@ -25,17 +25,24 @@
  * Thanks to F0o <f0o@devilcode.org> for creating the Slack transport which is the majority of this code.
  * Thanks to sdef2 for figuring out the differences needed to make Discord work.
  */
+
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Discord implements Transport
+class Discord extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
         if (empty($this->config)) {
             return $this->deliverAlertOld($obj, $opts);
         }
+        $discord_opts['url'] = $this->config['url'];
+        foreach(explode(PHP_EOL, $this->config['options']) as $option) {
+            list($k,$v) = explode('=', $option);
+            $discord_opts['options'][$k] = $v;
+        }
+        $this->contactDiscord($obj, $discord_opts);
     }
 
     public function deliverAlertOld($obj, $opts)
@@ -51,11 +58,11 @@ class Discord implements Transport
         $host          = $discord_opts['url'];
         $curl          = curl_init();
         $discord_msg   = strip_tags($obj['msg']);
-        $color         = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
-        $data          = array(
-            'username'=>$discord_opts['username'],
+        $data          = [
             'content' => "". $obj['title'] ."\n" . $discord_msg
-        );
+        ];
+        $data = array_merge($data, $discord_opts['options']);
+
         $alert_message = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
         set_curl_proxy($curl);
