@@ -80,11 +80,11 @@ foreach (dbFetchRows($sql) as $service) {
         // Mark service check as enabled if it was disabled previosly because device was down
         if ($service['service_disabled'] === "1") {
             dbUpdate(
-                    array('service_disabled' => '0'),
-                    'services',
-                    '`service_id` = ?',
-                    array($service['service_id'])
-                    );
+                array('service_disabled' => '0'),
+                'services',
+                '`service_id` = ?',
+                array($service['service_id'])
+            );
         }
         poll_service($service);
         $polled_services++;
@@ -95,18 +95,19 @@ foreach (dbFetchRows($sql) as $service) {
         // but only if it's not already marked as disabled
         if ($service['service_disabled'] === "0") {
             dbUpdate(
-                    array('service_disabled' => '1'),
-                    'services',
-                    '`service_id` = ?',
-                    array($service['service_id'])
-                    );
-            log_event("Nagios Service - {$service['service_desc']} ({$service['service_id']}) - 
-                      Skipping service check because device {$service['hostname']} is down due to icmp",
-                      $device,
-                      'service',
-                      4,
-                      $service['service_id']
-                     );
+                array('service_disabled' => '1'),
+                'services',
+                '`service_id` = ?',
+                array($service['service_id'])
+            );
+            log_event(
+                "Nagios Service - {$service['service_desc']} ({$service['service_id']}) - 
+                Skipping service check because device {$service['hostname']} is down due to icmp",
+                $device,
+                'service',
+                4,
+                $service['service_id']
+            );
         }
     }
 } //end service foreach
