@@ -864,6 +864,20 @@ $config['distributed_poller_group']          = 0;
 $config['distributed_poller_memcached_host'] = 'example.net';
 $config['distributed_poller_memcached_port'] = '11211';
 
+// Custom port aggregations
+// Interfaces are described as '<host>:port:port:port,<otherhost>:port:port'
+// Host has implicit % on the end, so short hostnames will work (careful though)
+// Port names support the * wildcard, which will be interpolated as % in SQL fetching
+// Example
+// $config['custom_aggregation'][] = ['Customer #1 Ports' => 'access1-1.sfo:ge-0/0/1:ge-0/0/2,access1-2.sfo:GigabitEthernet1/0/1];
+// $config['custom_aggregation'][] = ['Customer #2 Ports' => 'access2-1.sfo:ge-0/0/1:ge-0/0/2,access2-2.sfo:GigabitEthernet1/0/1];
+// An empty string will create a menu divider
+// $config['custom_aggregation'][] = '';
+
+// By specifying multiple aggregate keys instead of interface names, composite
+//  aggregates can be created from multiple other aggregates
+// $config['custom_aggregation'][] = ['SFO Customers' => ['Customer #1 Ports', 'Customer #2 Ports']];
+
 // Stats callback system
 $config['callback_post']  = 'https://stats.librenms.org/log.php';
 $config['callback_clear'] = 'https://stats.librenms.org/clear.php';
