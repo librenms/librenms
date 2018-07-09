@@ -11,11 +11,20 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Msteams implements Transport
+class Msteams extends Transport
 {
     public function deliverAlert($obj, $opts)
+    {
+        if (!empty($this->config)) {
+            $opts['url'] = $this->config['msteam-url'];
+        }
+        
+        return $this->sendCurl($obj, $opts);
+    }
+
+    public function sendCurl($obj, $opts)
     {
         $url   = $opts['url'];
         $color = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
@@ -42,5 +51,23 @@ class Msteams implements Transport
         }
 
         return true;
+    }
+
+    public function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'Webhook URL',
+                    'name' => 'msteam-url',
+                    'descr' => 'Microsoft Teams Webhook URL',
+                    'type' => 'text',
+                    'required' => true
+                ]
+            ],
+            'validation' => [
+                'msteam-url' => 'required|url'
+            ]
+        ];
     }
 }

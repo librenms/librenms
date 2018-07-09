@@ -55,25 +55,4 @@ class Mail extends Transport
             ]
         ];
     }
-
-    public static function configBuilder($vars)
-    {
-        $status = 'ok';
-        $message = '';
-
-        if ($vars['email']) {
-            $transport_config = [
-                'email' => $vars['email']
-            ];
-        } else {
-            $status = 'error';
-            $message = 'Missing email information';
-        }
-
-        return [
-            'transport_config' => $transport_config,
-            'status' => $status,
-            'meessage' => $message
-        ];
-    }
 }

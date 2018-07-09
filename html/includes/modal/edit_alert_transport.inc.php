@@ -46,8 +46,10 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <option value="gitlab-form">Gitlab</option>
                                     <option value="jira-form">Jira</option>
                                     <option value="mail-form" selected>Mail</option>
+                                    <option value="msteams-form">Microsoft Teams</option>
                                     <option value="hue-form">Phillips Hue</option>
-                                    <!--Insert more transport type options here as support is added. Value should be: [transport_name]-form -->
+                                    <option value="syslog-form">Syslog</option>
+                                    <!--Insert more transport type options here has support is added. Value should be: [transport_name]-form -->
                                 </select>
                             </div>
                         </div>

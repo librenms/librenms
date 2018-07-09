@@ -100,26 +100,4 @@ class Api extends Transport
             ]
         ];
     }
-
-    public static function configBuilder($vars)
-    {
-        $status = 'ok';
-        $message  = '';
-
-        if ($vars['api-method'] && $vars['api-url']) {
-            $transport_config = [
-                'api-method' => $vars['api-method'],
-                'api-url' => $vars['api-url']
-            ];
-        } else {
-            $status = 'error';
-            $message = 'Missing API Method or API URL';
-        }
-
-        return [
-            'transport_config' => $transport_config,
-            'status' => $status,
-            'message' => $message
-        ];
-    }
 }

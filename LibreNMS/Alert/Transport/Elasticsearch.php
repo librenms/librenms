@@ -230,16 +230,14 @@ class Elasticsearch extends Transport
             'validation' => [
                 'es-host' => 'required|string',
                 'es-port' => 'required|string',
-                'es-pattern' => 'required|string',
-                'es-proxy' => 'required|boolean'
+                'es-pattern' => 'required|string'
             ]
         ];
     }
 
     public static function configBuilder($vars)
     {
-        $status = 'ok';
-        $message = '';
+        // Requires special handling for checkbox selection
 
         $required = ['es-host', 'es-port', 'es-pattern'];
     
@@ -252,15 +250,7 @@ class Elasticsearch extends Transport
             } else {
                 $transport_config['es-proxy'] = true;
             }
-        } else {
-            $status = 'error';
-            $message = 'Missing Elasticsearch information';
+            return $transport_config;
         }
-    
-        return [
-            'transport_config' => $transport_config,
-            'status' => $status,
-            'message' => $message
-        ];
     }
 }
