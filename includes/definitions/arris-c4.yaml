@@ -1,4 +1,4 @@
-os: arris_c4
+os: arris-c4
 text: 'Arris CMTS'
 type: network
 icon: arris
