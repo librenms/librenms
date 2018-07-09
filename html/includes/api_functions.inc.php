@@ -352,7 +352,7 @@ function list_devices()
 
 
     if (!Auth::user()->hasGlobalRead()) {
-        $sql .= " AND `device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
+        $sql .= " AND `d`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
         $param[] = Auth::id();
     }
     $devices = array();
@@ -834,14 +834,14 @@ function list_available_health_graphs()
                     'name' => 'device_processor'
                 ));
             }
-    
+
             if ($device->storage()->count() > 0) {
                 array_push($graphs, array(
                     'desc' => 'Storage',
                     'name' => 'device_storage'
                 ));
             }
-    
+
             if ($device->mempools()->count() > 0) {
                 array_push($graphs, array(
                     'desc' => 'Memory Pools',
@@ -1250,7 +1250,7 @@ function list_oxidized()
             if ($maps_column == "group" && (!isset($config['oxidized']['group_support']) or $config['oxidized']['group_support'] !== true)) {
                 continue;
             }
-            
+
             foreach ($maps as $field_type => $fields) {
                 foreach ($fields as $field) {
                     if (isset($field['regex']) && preg_match($field['regex'].'i', $device[$field_type])) {
