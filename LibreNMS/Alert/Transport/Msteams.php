@@ -17,6 +17,15 @@ class Msteams implements Transport
 {
     public function deliverAlert($obj, $opts)
     {
+        if (!empty($this->config)) {
+            $opts['url'] = $this->config['msteam-url'];
+        }
+        
+        return $this->sendCurl($obj, $opts);
+    }
+
+    public function sendCurl($obj, $opts)
+    {
         $url   = $opts['url'];
         $color = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
         $data  = array(
@@ -42,5 +51,32 @@ class Msteams implements Transport
         }
 
         return true;
+    }
+
+    public function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'Webhook URL',
+                    'name' => 'msteam-url',
+                    'descr' => 'Microsoft Teams Webhook URL',
+                    'type' => 'text',
+                    'required' => true
+                ]
+            ],
+            'validation' => [
+                'msteam-url' => 'required|url'
+            ]
+        ];
+    }
+    
+    public function configBuilder($vars)
+    {
+        return [
+            'transport_config' => [
+                'msteam-url' => $vars['msteam-url']
+            ]
+        ];
     }
 }

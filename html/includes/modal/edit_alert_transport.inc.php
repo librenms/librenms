@@ -46,6 +46,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <option value="jira-form">Jira</option>
                                     <option value="hue-form">Phillips Hue</option>
                                     <option value="elasticsearch-form">Elasticsearch</option>
+                                    <option value="msteams-form">Microsoft Teams</option>
+                                    <option value="syslog-form">Syslog</option>
                                     <!--Insert more transport type options here has support is added. Value should be: [transport_name]-form -->
                                 </select>
                             </div>

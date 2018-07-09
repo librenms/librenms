@@ -22,6 +22,16 @@ class Syslog implements Transport
 {
     public function deliverAlert($obj, $opts)
     {
+        if (!empty($this->config)) {
+            $opts['syslog_host'] = $this->config['syslog-host'];
+            $opts['syslog_port'] = $this->config['syslog-port'];
+            $opts['syslog_facility'] = $this->config['syslog-facility'];
+        }
+        return $this->sendCurl($obj, $opts);
+    }
+
+    public function sendCurl($obj, $opts)
+    {
         $syslog_host = '127.0.0.1';
         $syslog_port = 514;
         $state       = "Unknown";
@@ -115,5 +125,54 @@ class Syslog implements Transport
             socket_close($socket);
         }
         return true;
+    }
+    
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'Host',
+                    'name' => 'syslog-host',
+                    'descr' => 'Syslog Host',
+                    'type' => 'text'
+                ],
+                [
+                    'title' => 'Port',
+                    'name' => 'syslog-port',
+                    'descr' => 'Syslog Port',
+                    'type' => 'text'
+                ],
+                [
+                    'title' => 'Facility',
+                    'name' => 'syslog-facility',
+                    'descr' => 'Syslog Facility',
+                    'type' => 'text'
+                ]
+            ],
+            'validation' => [
+                'syslog-host' => 'required|string',
+                'syslog-port' => 'required|numeric',
+                'syslog-facility' => 'required|string'
+            ]
+        ];
+    }
+
+    public static function configBuilder($vars)
+    {
+        $status = 'ok';
+        $message = '';
+
+        $transport_config = [
+            'syslog-host' => $vars['syslog-host'],
+            'syslog-port' => $vars['syslog-port'],
+            'syslog-facility' => $vars['syslog-facility'],
+        ];
+
+        return [
+            'transport_config' => $transport_config,
+            'status' => $status,
+            'message' => $message
+        ];
     }
 }
