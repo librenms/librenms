@@ -35,7 +35,9 @@ if (!Auth::user()->hasGlobalAdmin()) {
 $template_id = 0;
 
 $name = mres($vars['name']);
-if (!empty($name)) {
+if (isset($vars['template']) && empty(view(['template' => $vars['template']], [])->__toString())) {
+    $message = 'Template failed to be parsed, please check the syntax';
+} elseif (!empty($name)) {
     if ((isset($vars['template_id']) && is_numeric($vars['template_id'])) && (isset($vars['rule_id']) && $vars['rule_id'])) {
         //Update the template/rule mapping
 
@@ -55,7 +57,6 @@ if (!empty($name)) {
         }
     } elseif ($vars['template'] && is_numeric($vars['template_id'])) {
         //Update template-text
-
         if (dbUpdate(array('template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']), "alert_templates", "id = ?", array($vars['template_id'])) >= 0) {
             $status = 'ok';
             $message = "Alert template updated";

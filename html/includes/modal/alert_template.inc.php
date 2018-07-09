@@ -17,36 +17,6 @@ if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
-$placeholders = [
-    'device_id' => 'Device ID',
-    'hostname' => 'Hostname',
-    'sysName'  => 'sysName',
-    'sysDescr' => 'sysDescr',
-    'hardware' => 'Hardware',
-    'version'  => 'Version',
-    'location' => 'Location',
-    'uptime'   => 'Uptime (seconds)',
-    'uptime_short' => 'Short Uptime',
-    'uptime_long' => 'Full Uptime',
-    'description' => 'Description',
-    'notes'        => 'Device Notes',
-    'rule_id'      => 'Rule ID',
-    'alert_notes'  => 'Alert Notes',
-    'ping_timestamp' => 'Ping Timestamp',
-    'ping_loss'      => 'Ping Loss',
-    'ping_min'       => 'Ping Min',
-    'ping_max'       => 'Ping Max',
-    'ping_avg'       => 'Ping Avg',
-    'title'          => 'Alert Title',
-    'elapsed'        => 'Time Lapsed',
-    'uid'            => 'Unique Alert ID',
-    'alert_id'       => 'Alert ID',
-    'severity'       => 'Severify',
-    'rule'           => 'Rule',
-    'name'           => 'Rule Name',
-    'state'          => 'Alert State',
-];
-
 ?>
 
 <div class="modal fade bs-example-modal-lg" id="alert-template" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
@@ -105,7 +75,7 @@ $('#alert-template').on('show.bs.modal', function (event) {
                 $('#name').val(output['name']);
                 $('#title').val(output['title']);
                 $('#title_rec').val(output['title_rec']);
-                if (output['type'] == 'librenms') {
+                if(output['template'].indexOf("{/if}")>=0){
                     toastr.info('The old template syntax is no longer supported. Please see https://docs.librenms.org/Alerting/Old-Templates/');
                 }
             }
@@ -143,7 +113,8 @@ function alertTemplateAjaxOps(template, name, template_id, title, title_rec)
         url: "ajax_form.php",
         data: { type: "alert-templates", template: template, name: name, template_id: template_id, title: title, title_rec: title_rec},
         dataType: "json",
-        success: function(output){
+        success: function(output) {
+            console.log(output);
             if(output.status == 'ok') {
                 toastr.success(output.message);
                 $("#alert-template").modal('hide');
@@ -161,11 +132,11 @@ function alertTemplateAjaxOps(template, name, template_id, title, title_rec)
                     $('#templatetable').bootgrid("append", newrow);
                 }
             } else {
-                $("#error").html('<div class="alert alert-danger">'+msg+'</div>');
+                toastr.error(output.message);
             }
         },
         error: function(){
-            $("#error").html('<div class="alert alert-danger">An error occurred updating this alert template.</div>');
+            toastr.error('An error occurred updating this alert template.');
         }
     });
 
