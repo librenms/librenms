@@ -15,15 +15,22 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http>.
  *
  * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Vivia Nguyen-Tran
- * @author     Vivia Nguyen-Tran <vivia@ualberta.ca>
+ * @author     Vivia Nguyen-Tran <vivia>
  */
 
 use LibreNMS\Authentication\Auth;
+use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Container\Container;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Translation\FileLoader;
+use Illuminate\Translation\Translator;
+use Illuminate\Validation\DatabasePresenceVerifier;
+use Illuminate\Validation\Factory;
 
 header('Content-type: application/json');
 
@@ -39,7 +46,7 @@ $message = '';
 
 $transport_id        = $vars['transport_id'];
 $name                = $vars['name'];
-$is_default          = $vars['is_default'];
+$is_default          = isset($vars['is_default']) ? $vars['is_default'] : null;
 $transport_type      = $vars['transport-type'];
 
 if ($is_default == 'on') {
@@ -79,31 +86,47 @@ if (empty($name)) {
             ]));
         }
         
-        // Build config values
-        $result = call_user_func_array($class.'::configBuilder', array($vars));
-        $transport_config = $result['transport_config'];
-        $status = $result['status'];
-        $message = $result['message'];
-
-        //Update the json config field
-        if ($transport_config) {
-            $transport_config = json_encode($transport_config);
-            $detail = array(
-                'transport_type'   => $transport_type,
-                'transport_config' => $transport_config
-            );
-            $where = 'transport_id=?';
-
-            dbUpdate($detail, 'alert_transports', $where, [$transport_id]);
-            
-            $status = 'ok';
-            $message = 'Updated alert transports';
-        } else {
-            if ($newEntry) {
-                //If no config info provided, we will have to delete the new entry in the alert_transports tbl
-                $where = '`transport_id`=?';
-                dbDelete('alert_transports', $where, [$transport_id]);
+        // Validate config values in vars
+        $result = call_user_func($class.'::configTemplate');
+        $loader = new FileLoader(new Filesystem, "$install_dir/resources/lang");
+        $translator = new Translator($loader, 'en');
+        $validation = new Factory($translator, new Container);
+        $validator = $validation->make($vars, $result['validation']);
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            foreach ($errors->all() as $error) {
+                $message .= "$error<br>";
             }
+            $status = 'error';
+        } else {
+			// Build config values
+            $result = call_user_func_array($class . '::configBuilder', array($vars));
+            $transport_config = $result['transport_config'];
+            $status = $result['status'];
+            $message = $result['message'];
+
+            //Update the json config field
+            if ($transport_config) {
+                $transport_config = json_encode($transport_config);
+                $detail = array(
+                    'transport_type' => $transport_type,
+                    'transport_config' => $transport_config
+                );
+                $where = 'transport_id=?';
+
+                dbUpdate($detail, 'alert_transports', $where, [$transport_id]);
+
+                $status = 'ok';
+                $message = 'Updated alert transports';
+            } else {
+                $status = 'error';
+                $message = 'There was an issue with the transport config';
+            }
+        }
+        if ($status == 'error' && $newEntry) {
+            // If there was an error, we will have to delete the new entry in the alert_transports tbl
+            $where = '`transport_id`=?';
+            dbDelete('alert_transports', $where, [$transport_id]);
         }
     } else {
         $status = 'error';

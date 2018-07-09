@@ -230,8 +230,7 @@ class Elasticsearch extends Transport
             'validation' => [
                 'es-host' => 'required|string',
                 'es-port' => 'required|string',
-                'es-pattern' => 'required|string',
-                'es-proxy' => 'required|boolean'
+                'es-pattern' => 'required|string'
             ]
         ];
     }
