@@ -1,6 +1,6 @@
 <?php
 /**
- * cmts.inc.php
+ * arris_c4.inc.php
  *
  * LibreNMS os sensor pre-cache module for Arris CMTS
  *
@@ -25,10 +25,10 @@
  */
 
 echo 'ifName ';
-$pre_cache['cmts_ifName'] = snmpwalk_cache_oid($device, 'ifName', array(), 'DOCS-IF-MIB');
+$pre_cache['arris_c4_ifName'] = snmpwalk_cache_oid($device, 'ifName', array(), 'DOCS-IF-MIB');
 
 echo 'ifAlias ';
-$pre_cache['cmts_ifAlias'] = snmpwalk_cache_oid($device, 'ifAlias', array(), 'DOCS-IF-MIB');
+$pre_cache['arris_c4_ifAlias'] = snmpwalk_cache_oid($device, 'ifAlias', array(), 'DOCS-IF-MIB');
 
 echo 'docsIfSignalQualityTable ';
-$pre_cache['cmts_docsIfSignalQualityTable'] = snmpwalk_cache_oid($device, 'docsIfSignalQualityTable', array(), 'DOCS-IF-MIB');
+$pre_cache['arris_c4_docsIfSignalQualityTable'] = snmpwalk_cache_oid($device, 'docsIfSignalQualityTable', array(), 'DOCS-IF-MIB');
