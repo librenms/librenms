@@ -44,6 +44,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <option value="discord-form">Discord</option>
                                     <option value="elasticsearch-form">Elasticsearch</option>
                                     <option value="gitlab-form">Gitlab</option>
+                                    <option value="irc-form">IRC</option>
                                     <option value="jira-form">Jira</option>
                                     <option value="mail-form" selected>Mail</option>
                                     <option value="msteams-form">Microsoft Teams</option>

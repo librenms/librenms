@@ -42,4 +42,22 @@ class Irc implements Transport
             }
         }
     }
+
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'IRC',
+                    'name' => 'irc',
+                    'descr' => 'Enable IRC alerts',
+                    'type'  => 'checkbox',
+                    'default' => true,
+                ]
+            ],
+            'validation' => [
+                'irc' => 'required'
+            ]
+        ];
+    }
 }
