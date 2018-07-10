@@ -11,7 +11,7 @@ if (!Auth::user()->hasGlobalRead()) {
         'protocol' => 'vrf',
     );
 
-    print_optionbar_start('', '');
+    print_optionbar_start();
 
     echo "<span style='font-weight: bold;'>VRFs</span> &#187; ";
 
@@ -100,7 +100,10 @@ if (!Auth::user()->hasGlobalRead()) {
             }
 
             echo "<tr valign=top bgcolor='$bg_colour'>";
-            echo "<td width=240><a class=list-large href='routing/protocol=vrf/view=detail/vrf=".$vrf['vrf_name'].''."/'>".$vrf['vrf_name'].'</a><br /><span class=box-desc>'.$vrf['mplsVpnVrfDescription'].'</span></td>';
+            echo "<td width=240>";
+            echo "<a class=list-large href=".generate_url($vars, array('view' => 'detail', 'vrf' => $vrf['vrf_name'] )).">";
+            echo $vrf['vrf_name'].'</a><br />';
+            echo "<span class=box-desc>".$vrf['mplsVpnVrfDescription'].'</span></td>';
             echo '<td width=100 class=box-desc>'.$vrf['mplsVpnVrfRouteDistinguisher'].'</td>';
             echo '<td><table border=0 cellspacing=0 cellpadding=5 width=100%>';
             $x = 1;
@@ -119,7 +122,12 @@ if (!Auth::user()->hasGlobalRead()) {
                     }
                 }
 
-                echo "<tr bgcolor='$dev_colour'><td width=150><a href='/device/device=".$device['device_id']."/tab=routing/proto=vrf/view=basic/'>".$device['hostname']."</a> ";
+                echo "<tr bgcolor='$dev_colour'><td width=150><a href='";
+                echo generate_url(
+                     array('page' => 'device'),
+                     array('tab' => 'routing', 'view' => 'basic', 'proto' => 'vrf', 'device' => $device['device_id'])
+                     );
+                echo "'>".$device['hostname']."</a> ";
 
                 if ($device['vrf_name'] != $vrf['vrf_name']) {
                     echo "<a href='#' onmouseover=\" return overlib('Expected Name : ".$vrf['vrf_name'].'<br />Configured : '.$device['vrf_name']."', CAPTION, '<span class=list-large>VRF Inconsistency</span>' ,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\"> <i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i></a>";
