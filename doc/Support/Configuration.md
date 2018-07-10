@@ -221,11 +221,14 @@ $config['int_core']                = 1;  # Enable Core Port Types
 $config['int_l2tp']                = 0;  # Enable L2TP Port Types
 ```
 
-##### Custom Port-List Aggregates
+#### Custom Port-List Aggregates
 Configure the below options to create the **Ports -> Port Aggregates** sub-menu
-This sub-menu will contain any number of pages to aggregate arbitrary collections of ports
+This sub-menu will contain any number of items to aggregate arbitrary collections of ports
+
 *Interfaces are described as **<host>:port:port:port,<otherhost>:port:port***
+
 *Host has implicit % on the end, so short hostnames will work (careful though)*
+
 *Port names support the * wildcard, which will be interpolated as % in SQL fetching*
 
 ```php
@@ -243,6 +246,7 @@ aggregates can be created from multiple other aggregates
 $config['custom_aggregation'][] = ['SFO Customers' => ['Customer #1 Ports', 'Customer #2 Ports']];
 ```
 
+---
 
 Enable / disable certain menus from being shown in the WebUI.
 
