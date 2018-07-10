@@ -152,8 +152,3 @@ if (!isset($options['q'])) {
 }
 
 logfile($string);
-
-if ($discovered_devices == 0) {
-    # No discoverable devices, either down or disabled
-    exit(5);
-}
