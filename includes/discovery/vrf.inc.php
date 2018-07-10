@@ -98,8 +98,9 @@ if (Config::get('enable_vrfs')) {
                     //.1.3.6.1.2.1.10.166.11.1.2.2.1.4.5.116.101.115.116.49 36 35 33 30 31 3A 31 00
                     // regexp result => 5.116.101.115.116.49 -- 36 35 33 30 31 3A 31 -- 00
                     d_echo("  [DEBUG] VRP: RD HexString handling: $matches[2]");
-                    $hex_vrf_rd = str_replace(' ', '', $hex_vrf_rd);
+                    $hex_vrf_rd = str_replace(' ', '', $matches[2]);
                     $vrf_rd = hex2str($hex_vrf_rd);
+                    d_echo("\n  [DEBUG] VRP: RD : $hex_vrf_rd -> $vrf_rd");
                 }
 
                 // Brocade Ironware outputs VRF RD values as Hex-STRING rather than string. This has to be converted to decimal
