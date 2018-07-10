@@ -18,7 +18,13 @@ foreach ($device_groups as $string) {
     #array_push($device_data[$device], $interfaces_for_device)
     foreach ($interfaces_for_device as $interface_name) {
         $interface_name = preg_replace('/\*/', '%', $interface_name);
-        $ports = array_merge($ports, dbFetchRows("SELECT * FROM `ports` as I, `devices` as D WHERE (I.ifDescr LIKE \"$interface_name\" OR I.ifName LIKE \"$interface_name\") AND I.device_id = D.device_id AND D.hostname LIKE \"$device%\""));
+        $ports = array_merge($ports, dbFetchRows(
+            "SELECT * FROM `ports` as I, `devices` as D
+                WHERE (I.ifDescr LIKE \"$interface_name\"
+                OR I.ifName LIKE \"$interface_name\")
+                AND I.device_id = D.device_id
+                AND D.hostname LIKE \"$device%\""
+        ));
     }
 }
 
