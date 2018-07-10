@@ -61,15 +61,7 @@ foreach (dbFetchRows($query) as $transport) {
     
     foreach ($tmp['config'] as $item) {
         $val = $transport_config[$item['name']];
-        // Reset value to string instead of displaying 1/0
-        if (is_bool($val)) {
-            if ($val == true) {
-                $val = 'true';
-            } else {
-                $val = 'false';
-            }
-        }
-
+        
         // Match value to key name for select inputs
         if ($item['type'] == 'select') {
             $val = array_search($val, $item['options']);
