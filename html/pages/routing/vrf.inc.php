@@ -124,9 +124,9 @@ if (!Auth::user()->hasGlobalRead()) {
 
                 echo "<tr bgcolor='$dev_colour'><td width=150><a href='";
                 echo generate_url(
-                     array('page' => 'device'),
-                     array('tab' => 'routing', 'view' => 'basic', 'proto' => 'vrf', 'device' => $device['device_id'])
-                     );
+                    array('page' => 'device'),
+                    array('tab' => 'routing', 'view' => 'basic', 'proto' => 'vrf', 'device' => $device['device_id'])
+                );
                 echo "'>".$device['hostname']."</a> ";
 
                 if ($device['vrf_name'] != $vrf['vrf_name']) {
