@@ -23,11 +23,18 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Opsgenie implements Transport
+class Opsgenie extends Transport
 {
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert($obj, $opts) {
+        if (!empty($this->config)) {
+            $opts['url'] = $this->config['genie-url'];
+        }
+        return $this->sendCurl($obj, $opts);
+    }
+
+    public function sendCurl($obj, $opts)
     {
         $url = $opts['url'];
 
@@ -49,5 +56,22 @@ class Opsgenie implements Transport
         }
 
         return true;
+    }
+
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'Webhook URL',
+                    'name' => 'genie-url',
+                    'descr' => 'OpsGenie Webhook URL',
+                    'type' => 'text'
+                ]
+            ],
+            'validation' => [
+                'genie-url' => 'required|url'
+            ]
+        ];
     }
 }

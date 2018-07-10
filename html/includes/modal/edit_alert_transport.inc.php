@@ -40,6 +40,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                             <div class="col-sm-3">
                                 <select name='transport-choice' id='transport-choice' class='form-control'>
                                     <option value="api-form">API</option>
+                                    <option value="canopsis-form">Canopsis</option>
                                     <option value="ciscospark-form">Cisco Spark</option>
                                     <option value="discord-form">Discord</option>
                                     <option value="elasticsearch-form">Elasticsearch</option>
@@ -48,6 +49,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <option value="jira-form">Jira</option>
                                     <option value="mail-form" selected>Mail</option>
                                     <option value="msteams-form">Microsoft Teams</option>
+                                    <option value="opsgenie-form">OpsGenie</option>
                                     <option value="osticket-form">osTicket</option>
                                     <option value="hue-form">Phillips Hue</option>
                                     <option value="syslog-form">Syslog</option>
