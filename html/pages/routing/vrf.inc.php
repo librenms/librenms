@@ -16,7 +16,6 @@ if (!Auth::user()->hasGlobalRead()) {
     echo "<span style='font-weight: bold;'>VRFs</span> &#187; ";
 
     $menu_options = array('basic' => 'Basic',
-    // 'detail' => 'Detail',
                 );
 
     if (!$vars['view']) {
