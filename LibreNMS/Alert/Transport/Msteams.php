@@ -52,7 +52,7 @@ class Msteams extends Transport
         return true;
     }
 
-    public function configTemplate()
+    public static function configTemplate()
     {
         return [
             'config' => [
