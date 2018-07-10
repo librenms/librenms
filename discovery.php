@@ -152,3 +152,8 @@ if (!isset($options['q'])) {
 }
 
 logfile($string);
+
+if ($doing !== 'new' && $discovered_devices == 0) {
+    # No discoverable devices, either down or disabled
+    exit(5);
+}
