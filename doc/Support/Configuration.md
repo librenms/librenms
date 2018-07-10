@@ -221,15 +221,16 @@ $config['int_core']                = 1;  # Enable Core Port Types
 $config['int_l2tp']                = 0;  # Enable L2TP Port Types
 ```
 
+##### Custom Port-List Aggregates
 Configure the below options to create the **Ports -> Port Aggregates** sub-menu
 This sub-menu will contain any number of pages to aggregate arbitrary collections of ports
-**Interfaces are described as **<host>:port:port:port,<otherhost>:port:port**
-Host has implicit % on the end, so short hostnames will work (careful though)
-Port names support the * wildcard, which will be interpolated as % in SQL fetching**
+*Interfaces are described as **<host>:port:port:port,<otherhost>:port:port***
+*Host has implicit % on the end, so short hostnames will work (careful though)*
+*Port names support the * wildcard, which will be interpolated as % in SQL fetching*
 
 ```php
-$config['custom_aggregation'][] = ['Customer #1 Ports' => 'access1-1.sfo:ge-0/0/1:ge-0/0/2,access1-2.sfo:GigabitEthernet1/0/1];
-$config['custom_aggregation'][] = ['Customer #2 Ports' => 'access2-1.sfo:ge-0/0/1:ge-0/0/2,access2-2.sfo:GigabitEthernet1/0/1];
+$config['custom_aggregation'][] = ['Customer #1 Ports' => 'access1-1.sfo:ge-0/0/1:ge-0/0/2,access1-2.sfo:GigabitEthernet1/0/1'];
+$config['custom_aggregation'][] = ['Customer #2 Ports' => 'access2-1.sfo:ge-0/0/1:ge-0/0/2,access2-2.sfo:GigabitEthernet1/0/1'];
 ```
 An empty string will create a menu divider
 ```php
