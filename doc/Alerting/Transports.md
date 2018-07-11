@@ -436,13 +436,11 @@ $config['alert']['transports']['rocket'][] = array('url' => "https://rocket.url/
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
-The Slack transport will POST the alert message to your Slack Incoming WebHook using the [attachments](https://api.slack.com/docs/message-attachments) option, you are able to specify multiple webhooks along with the relevant options to go with it. Simple html tags are stripped from the message. All options are optional, the only required value is for url, without this then no call to Slack will be made. Below is an example of how to send alerts to two channels with different customised options: 
+The Slack transport will POST the alert message to your Slack Incoming WebHook using the [attachments](https://api.slack.com/docs/message-attachments) option, you are able to specify multiple webhooks along with the relevant options to go with it. Simple html tags are stripped from the message. All options are optional, the only required value is for url, without this then no call to Slack will be made.
 
-```php
-$config['alert']['transports']['slack'][] = array('url' => "https://hooks.slack.com/services/A12B34CDE/F56GH78JK/L901LmNopqrSTUVw2w3XYZAB4C", 'channel' => '#Alerting');
+We currently support the following attachment options:
 
-$config['alert']['transports']['slack'][] = array('url' => "https://hooks.slack.com/services/A12B34CDE/F56GH78JK/L901LmNopqrSTUVw2w3XYZAB4C", 'channel' => '@john', 'username' => 'LibreNMS', 'icon_emoji' => ':ghost:');
-```
+`author_name`
 
 ## SMSEagle
 

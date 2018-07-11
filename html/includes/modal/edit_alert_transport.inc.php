@@ -54,6 +54,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <option value="hue-form">Phillips Hue</option>
                                     <option value="pushbullet-form">Pushbullet</option>
                                     <option value="pushover-form">Pushover</option>
+                                    <option value="slack-form">Slack</option>
                                     <option value="syslog-form">Syslog</option>
                                     <option value="victorops-form">Victorops</option>
                                     <!--Insert more transport type options here has support is added. Value should be: [transport_name]-form -->
