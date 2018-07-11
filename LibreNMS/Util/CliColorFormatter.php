@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Util;
 
-
 class CliColorFormatter extends \Monolog\Formatter\LineFormatter
 {
     private $console_color;

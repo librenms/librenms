@@ -25,7 +25,6 @@ use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\MemcacheLock;
 
-
 /**
  * Set debugging output
  *
@@ -69,7 +68,6 @@ function set_debug($state = true, $silence = false)
                             $handler->setLevel(\Monolog\Logger::DEBUG);
                         }
                     }
-
                 }
             }
 
