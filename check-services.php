@@ -13,7 +13,7 @@
  * the source code distribution for details.
  */
 
-$init_modules = array('alerts');
+$init_modules = array();
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('d::h:f:;');
