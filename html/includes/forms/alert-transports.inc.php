@@ -116,12 +116,14 @@ if (empty($name)) {
                 $status = 'ok';
                 $message = 'Updated alert transports';
             } else {
-                if ($newEntry) {
-                    //If no config info provided, we will have to delete the new entry in the alert_transports tbl
-                    $where = '`transport_id`=?';
-                    dbDelete('alert_transports', $where, [$transport_id]);
-                }
+                $status = 'error';
+                $message = 'There was an issue with the transport config';
             }
+        }
+        if ($status == 'error' && $newEntry) {
+            //If error, we will have to delete the new entry in alert_transports tbl
+            $where = '`transport_id`=?';
+            dbDelete('alert_transports', $where, [$transport_id]);
         }
     } else {
         $status = 'error';
