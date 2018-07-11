@@ -50,7 +50,6 @@ function set_debug($state = true, $silence = false)
 
         if (class_exists('Log')) {
             $logger = Log::getMonolog();
-            $handlers = $logger->getHandlers();
 
             // only install if not existing
             $install = true;
