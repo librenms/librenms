@@ -24,10 +24,10 @@ class Ciscospark extends Transport
             $room_id = $this->config['room-id'];
             $token = $this->config['api-token'];
         }
-        return $this->sendCurl($obj, $room_id, $token);
+        return $this->contactCiscospark($obj, $room_id, $token);
     }
 
-    public function sendCurl($obj, $room_id, $token)
+    public function contactCiscospark($obj, $room_id, $token)
     {
         $text = strip_tags($obj['msg']);
         $data = array (

@@ -36,10 +36,10 @@ class Jira extends Transport
             $opts['issuetype'] = $this->config['jira-type'];
             $opts['url'] = $this->config['jira-url'];
         }
-        return $this->sendCurl($obj, $opts);
+        return $this->contactJira($obj, $opts);
     }
 
-    public function sendCurl($obj, $opts)
+    public function contactJira($obj, $opts)
     {
         // Don't create tickets for resolutions
         if ($obj['severity'] == 'recovery' && $obj['msg'] != 'This is a test alert') {

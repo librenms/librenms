@@ -14,10 +14,10 @@ class Canopsis extends Transport
             $opts['pass'] = $this->config['canopsis-pass'];
             $opts['vhost'] = $this->config['canopsis-vhost'];
         }
-        return $this->sendCurl($obj, $opts);
+        return $this->contactCanopsis($obj, $opts);
     }
 
-    public function sendCurl($obj, $opts)
+    public function contactCanopsis($obj, $opts)
     {
         // Configurations
         $host     = $opts["host"];

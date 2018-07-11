@@ -31,10 +31,10 @@ class Opsgenie extends Transport
         if (!empty($this->config)) {
             $opts['url'] = $this->config['genie-url'];
         }
-        return $this->sendCurl($obj, $opts);
+        return $this->contactOpsgenie($obj, $opts);
     }
 
-    public function sendCurl($obj, $opts)
+    public function contactOpsgenie($obj, $opts)
     {
         $url = $opts['url'];
 

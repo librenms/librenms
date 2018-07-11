@@ -40,10 +40,10 @@ class Hue extends Transport
             $opts['duration'] = $this->config['hue-duration'];
         }
 
-        return $this->sendCurl($obj, $opts);
+        return $this->contactHue($obj, $opts);
     }
 
-    public function sendCurl($obj, $opts)
+    public function contactHue($obj, $opts)
     {
         // Don't alert on resolve at this time
         if ($obj['state'] == 0) {

@@ -29,10 +29,10 @@ class Elasticsearch extends Transport
             $opts['es_proxy'] = $this-> config['es-proxy'];
         }
 
-        return $this->sendCurl($obj, $opts);
+        return $this->contactElasticsearch($obj, $opts);
     }
 
-    public function sendCurl($obj, $opts)
+    public function contactElasticsearch($obj, $opts)
     {
         $es_host  = '127.0.0.1';
         $es_port  = 9200;

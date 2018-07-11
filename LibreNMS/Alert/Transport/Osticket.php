@@ -21,10 +21,10 @@ class Osticket extends Transport
             $opts['url'] = $this->config['os-url'];
             $opts['token'] = $this->config['os-token'];
         }
-        return $this->sendCurl($obj, $opts);
+        return $this->contactOsticket($obj, $opts);
     }
 
-    public function sendCurl($obj, $opts)
+    public function contactOsticket($obj, $opts)
     {
         global $config;
 

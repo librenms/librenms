@@ -27,10 +27,10 @@ class Syslog extends Transport
             $opts['syslog_port'] = $this->config['syslog-port'];
             $opts['syslog_facility'] = $this->config['syslog-facility'];
         }
-        return $this->sendCurl($obj, $opts);
+        return $this->contactSyslog($obj, $opts);
     }
 
-    public function sendCurl($obj, $opts)
+    public function contactSyslog($obj, $opts)
     {
         $syslog_host = '127.0.0.1';
         $syslog_port = 514;

@@ -21,10 +21,10 @@ class Msteams extends Transport
             $opts['url'] = $this->config['msteam-url'];
         }
         
-        return $this->sendCurl($obj, $opts);
+        return $this->contactMsteams($obj, $opts);
     }
 
-    public function sendCurl($obj, $opts)
+    public function contactMsteams($obj, $opts)
     {
         $url   = $opts['url'];
         $color = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');

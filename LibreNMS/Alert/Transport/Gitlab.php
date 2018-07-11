@@ -34,10 +34,10 @@ class Gitlab extends Transport
             $opts['key'] = $this->config['gitlab-key'];
             $opts['host'] = $this->config['gitlab-host'];
         }
-        return $this->sendCurl($obj, $opts);
+        return $this->contactGitlab($obj, $opts);
     }
 
-    public function sendCurl($obj, $opts)
+    public function contactGitlab($obj, $opts)
     {
         // Don't create tickets for resolutions
         if ($obj['state'] == 0) {
