@@ -373,26 +373,28 @@ function dbDeleteOrphans($target_table, $parents)
 function dbFetchRows($sql, $parameters = array())
 {
     $time_start = microtime(true);
-    $result         = dbQuery($sql, $parameters);
+    $result = dbQuery($sql, $parameters);
 
-    if (mysqli_num_rows($result) > 0) {
-        $rows = array();
-        while ($row = mysqli_fetch_assoc($result)) {
-            $rows[] = $row;
+    if ($result !== false) {
+        if (mysqli_num_rows($result) > 0) {
+            $rows = [];
+            while ($row = mysqli_fetch_assoc($result)) {
+                $rows[] = $row;
+            }
+
+            mysqli_free_result($result);
+
+            recordDbStatistic('fetchrows', $time_start);
+            return $rows;
         }
 
         mysqli_free_result($result);
-
-        recordDbStatistic('fetchrows', $time_start);
-        return $rows;
     }
-
-    mysqli_free_result($result);
 
     // no records, thus return empty array
     // which should evaluate to false, and will prevent foreach notices/warnings
     recordDbStatistic('fetchrows', $time_start);
-    return array();
+    return [];
 }//end dbFetchRows()
 
 
@@ -653,7 +655,7 @@ function dbGenPlaceholders($count)
  */
 function recordDbStatistic($stat, $start_time)
 {
-    global $db_stats;
+    global $db_stats, $db_stats_last;
 
     if (!isset($db_stats)) {
         $db_stats = array(
@@ -676,6 +678,7 @@ function recordDbStatistic($stat, $start_time)
                 'fetchrows' => 0.0,
             ),
         );
+        $db_stats_last = $db_stats;
     }
 
     $runtime = microtime(true) - $start_time;

@@ -455,7 +455,7 @@ function del_device()
         $device = device_by_id_cache($device_id);
     }
 
-    if (!device) {
+    if (!$device) {
         api_error(404, "Device $hostname not found");
     }
 
@@ -834,14 +834,14 @@ function list_available_health_graphs()
                     'name' => 'device_processor'
                 ));
             }
-    
+
             if ($device->storage()->count() > 0) {
                 array_push($graphs, array(
                     'desc' => 'Storage',
                     'name' => 'device_storage'
                 ));
             }
-    
+
             if ($device->mempools()->count() > 0) {
                 array_push($graphs, array(
                     'desc' => 'Memory Pools',
@@ -1250,7 +1250,7 @@ function list_oxidized()
             if ($maps_column == "group" && (!isset($config['oxidized']['group_support']) or $config['oxidized']['group_support'] !== true)) {
                 continue;
             }
-            
+
             foreach ($maps as $field_type => $fields) {
                 foreach ($fields as $field) {
                     if (isset($field['regex']) && preg_match($field['regex'].'i', $device[$field_type])) {

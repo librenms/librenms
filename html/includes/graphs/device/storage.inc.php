@@ -29,13 +29,13 @@ foreach (dbFetchRows('SELECT * FROM storage where device_id = ?', array($device[
 
     $descr        = rrdtool_escape($storage['storage_descr'], 12);
     $rrd          = rrd_name($device['hostname'], array('storage', $storage['storage_mib'], $storage['storage_descr']));
-    $rrd_options .= " DEF:$storage[storage_id]used=$rrd:used:AVERAGE";
-    $rrd_options .= " DEF:$storage[storage_id]free=$rrd:free:AVERAGE";
-    $rrd_options .= " CDEF:$storage[storage_id]size=$storage[storage_id]used,$storage[storage_id]free,+";
-    $rrd_options .= " CDEF:$storage[storage_id]perc=$storage[storage_id]used,$storage[storage_id]size,/,100,*";
-    $rrd_options .= " LINE1.25:$storage[storage_id]perc#".$colour.":'$descr'";
-    $rrd_options .= " GPRINT:$storage[storage_id]size:LAST:%6.2lf%sB";
-    $rrd_options .= " GPRINT:$storage[storage_id]used:LAST:%6.2lf%sB";
-    $rrd_options .= " GPRINT:$storage[storage_id]perc:LAST:%5.2lf%%\\l";
+    $rrd_options .= " DEF:{$storage['storage_id']}used=$rrd:used:AVERAGE";
+    $rrd_options .= " DEF:{$storage['storage_id']}free=$rrd:free:AVERAGE";
+    $rrd_options .= " CDEF:{$storage['storage_id']}size={$storage['storage_id']}used,{$storage['storage_id']}free,+";
+    $rrd_options .= " CDEF:{$storage['storage_id']}perc={$storage['storage_id']}used,{$storage['storage_id']}size,/,100,*";
+    $rrd_options .= " LINE1.25:{$storage['storage_id']}perc#".$colour.":'$descr'";
+    $rrd_options .= " GPRINT:{$storage['storage_id']}size:LAST:%6.2lf%sB";
+    $rrd_options .= " GPRINT:{$storage['storage_id']}used:LAST:%6.2lf%sB";
+    $rrd_options .= " GPRINT:{$storage['storage_id']}perc:LAST:%5.2lf%%\\l";
     $iter++;
 }//end foreach

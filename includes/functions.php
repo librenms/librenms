@@ -738,12 +738,12 @@ function isSNMPable($device)
  * Check if the given host responds to ICMP echo requests ("pings").
  *
  * @param string $hostname The hostname or IP address to send ping requests to.
- * @param int $address_family The address family (AF_INET for IPv4 or AF_INET6 for IPv6) to use. Defaults to IPv4. Will *not* be autodetected for IP addresses, so it has to be set to AF_INET6 when pinging an IPv6 address or an IPv6-only host.
+ * @param int $address_family The address family ('ipv4' or 'ipv6') to use. Defaults to IPv4. Will *not* be autodetected for IP addresses, so it has to be set to 'ipv6' when pinging an IPv6 address or an IPv6-only host.
  * @param array $attribs The device attributes
  *
  * @return array  'result' => bool pingable, 'last_ping_timetaken' => int time for last ping, 'db' => fping results
  */
-function isPingable($hostname, $address_family = AF_INET, $attribs = array())
+function isPingable($hostname, $address_family = 'ipv4', $attribs = array())
 {
     global $config;
 
@@ -1493,7 +1493,7 @@ function ip_exists($ip)
     return false;
 }
 
-function fping($host, $params, $address_family = AF_INET)
+function fping($host, $params, $address_family = 'ipv4')
 {
 
     global $config;
@@ -1504,9 +1504,9 @@ function fping($host, $params, $address_family = AF_INET)
         2 => array("pipe", "w")
     );
 
-    // Default to AF_INET (IPv4)
+    // Default to ipv4
     $fping_path = $config['fping'];
-    if ($address_family == AF_INET6) {
+    if ($address_family == 'ipv6') {
         $fping_path = $config['fping6'];
     }
 
@@ -1582,23 +1582,19 @@ function force_influx_data($data)
  *                          "udp6", "tcp", or "tcp6". See `man snmpcmd`,
  *                          section "Agent Specification" for a full list.
  *
- * @return int The address family associated with the given transport
- *             specifier: AF_INET for IPv4 (or local connections not associated
- *             with an IP stack), AF_INET6 for IPv6.
+ * @return string The address family associated with the given transport
+ *             specifier: 'ipv4' (or local connections not associated
+ *             with an IP stack) or 'ipv6'.
  */
 function snmpTransportToAddressFamily($transport)
 {
-    if (!isset($transport)) {
-        $transport = 'udp';
-    }
-
-    $ipv6_snmp_transport_specifiers = array('udp6', 'udpv6', 'udpipv6', 'tcp6', 'tcpv6', 'tcpipv6');
+    $ipv6_snmp_transport_specifiers = ['udp6', 'udpv6', 'udpipv6', 'tcp6', 'tcpv6', 'tcpipv6'];
 
     if (in_array($transport, $ipv6_snmp_transport_specifiers)) {
-        return AF_INET6;
-    } else {
-        return AF_INET;
+        return 'ipv6';
     }
+
+    return 'ipv4';
 }
 
 /**
@@ -2082,6 +2078,7 @@ function get_toner_levels($device, $raw_value, $capacity)
 function initStats()
 {
     global $snmp_stats, $rrd_stats;
+    global $snmp_stats_last, $rrd_stats_last;
 
     if (!isset($snmp_stats, $rrd_stats)) {
         $snmp_stats = array(
@@ -2096,6 +2093,7 @@ function initStats()
                 'snmpwalk' => 0.0,
             )
         );
+        $snmp_stats_last = $snmp_stats;
 
         $rrd_stats = array(
             'ops' => array(
@@ -2109,6 +2107,7 @@ function initStats()
                 'other' => 0.0,
             ),
         );
+        $rrd_stats_last = $rrd_stats;
     }
 }
 
