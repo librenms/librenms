@@ -55,6 +55,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <option value="pushbullet-form">Pushbullet</option>
                                     <option value="pushover-form">Pushover</option>
                                     <option value="syslog-form">Syslog</option>
+                                    <option value="victorops-form">Victorops</option>
                                     <!--Insert more transport type options here has support is added. Value should be: [transport_name]-form -->
                                 </select>
                             </div>

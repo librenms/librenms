@@ -30,7 +30,7 @@ class Pushbullet extends Transport
     public function deliverAlert($obj, $opts)
     {
         if (!empty($this->config)) {
-            $opts = $this->config;
+            $opts = $this->config['pushbullet-token'];
         }
         return contactPushbullet($obj, $opts);
     }
