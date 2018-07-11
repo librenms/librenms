@@ -16,23 +16,4 @@ abstract class Transport implements TransportInterface
             $this->config = json_decode(dbFetchCell($sql, [$transport_id]), true);
         }
     }
-
-    // Build the config from vars and template
-    public static function configBuilder($vars, $tmp) {
-        $transport_config = [];
-
-        foreach ($tmp as $item) {
-            $name = $item['name'];
-            
-            if (!isset($vars[$name])) {
-                if ($item['required']) {
-                    return [];
-                } else {
-                    continue;
-                }
-            }
-            $transport_config[$name] = $vars[$name];
-        }
-        return $transport_config;
-    }
 }

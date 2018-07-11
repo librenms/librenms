@@ -48,7 +48,7 @@ class Pushover extends Transport
         }
         $pushover_opts = $this->config;
         unset($pushover_opts['options']);
-        foreach(explode(PHP_EOL, $this->config['options']) as $option) {
+        foreach (explode(PHP_EOL, $this->config['options']) as $option) {
             list($k,$v) = explode('=', $option);
             $pushover_opts['options'][$k] = $v;
         }
@@ -101,7 +101,7 @@ class Pushover extends Transport
         $curl            = curl_init();
         set_curl_proxy($curl);
         curl_setopt($curl, CURLOPT_URL, 'https://api.pushover.net/1/messages.json');
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_SAFE_UPLOAD, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
         $ret  = curl_exec($curl);

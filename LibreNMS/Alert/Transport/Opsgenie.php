@@ -27,7 +27,8 @@ use LibreNMS\Alert\Transport;
 
 class Opsgenie extends Transport
 {
-    public function deliverAlert($obj, $opts) {
+    public function deliverAlert($obj, $opts)
+    {
         if (!empty($this->config)) {
             $opts['url'] = $this->config['genie-url'];
         }
