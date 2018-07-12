@@ -147,8 +147,10 @@ if (defined('SHOW_SETTINGS')) {
     </div>
     <div class="col-sm-8">
       <select class="form-control" name="sort">';
-    $common_output[] = '<option value=""' . ($current_sorting == '' ? ' selected' : '') . '>timestamp, descending</option>';
-    $common_output[] = '<option value="severity"' . ($current_sorting == 'severity' ? ' selected' : ' ') . '>severity, descending</option>';
+    $common_output[] = '<option value=""' . ($current_sorting == '' ? ' selected' : '')
+                       . '>timestamp, descending</option>';
+    $common_output[] = '<option value="severity"' . ($current_sorting == 'severity' ? ' selected' : ' ')
+                       . '>severity, descending</option>';
 
     $common_output[] = '
       </select>
