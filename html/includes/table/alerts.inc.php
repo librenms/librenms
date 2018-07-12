@@ -124,12 +124,12 @@ $format = $vars['format'];
 foreach (dbFetchRows($sql, $param) as $alert) {
     $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', array($alert['rule_id'], $alert['device_id']));
     $fault_detail = alert_details($log);
-    
+
     $alert_to_ack = '<button type="button" class="btn btn-danger command-ack-alert fa fa-eye" aria-hidden="true" title="Mark as acknowledged" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" data-alert_state="' . $alert['state'] . '" name="ack-alert"></button>';
     $alert_to_nack = '<button type="button" class="btn btn-primary command-ack-alert fa fa-eye-slash" aria-hidden="true" title="Mark as not acknowledged" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" data-alert_state="' . $alert['state'] . '" name="ack-alert"></button>';
-    
+
     $ack_ico = $alert_to_ack;
-    
+
     if ((int)$alert['state'] === 0) {
         $ico = '';
         $msg = '';
@@ -144,16 +144,16 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         $ico = $alert_to_nack;
         $ack_ico = $alert_to_nack;
     }
-    
+
     $severity = $alert['severity'];
     if ($alert['state'] == 3) {
         $severity .= ' <strong>+</strong>';
     } elseif ($alert['state'] == 4) {
         $severity .= ' <strong>-</strong>';
     }
-    
+
     $hostname = '<div class="incident">' . generate_device_link($alert, shorthost($alert['hostname'])) . '<div id="incident' . ($rulei + 1) . '" class="collapse">' . $fault_detail . '</div></div>';
-    
+
     switch ($severity) {
         case 'critical':
             $severity_ico = '<span class="alert-status label-danger">&nbsp;</span>';
@@ -168,11 +168,11 @@ foreach (dbFetchRows($sql, $param) as $alert) {
             $severity_ico = '<span class="alert-status label-info">&nbsp;</span>';
             break;
     }
-    
+
     if ((int)$alert['state'] === 2) {
         $severity_ico = '<span class="alert-status label-primary">&nbsp;</span>';
     }
-    
+
     $proc = dbFetchCell('SELECT proc FROM alerts,alert_rules WHERE alert_rules.id = alerts.rule_id AND alerts.id = ?', array($alert['id']));
     if (($proc == "") || ($proc == "NULL")) {
         $has_proc = '';
@@ -183,13 +183,13 @@ foreach (dbFetchRows($sql, $param) as $alert) {
             $has_proc = '<a href="' . $proc . '" target="_blank"><button type="button" class="btn btn-info fa fa-external-link" aria-hidden="true"></button></a>';
         }
     }
-    
+
     if (empty($alert['note'])) {
         $note_class = 'default';
     } else {
         $note_class = 'warning';
     }
-    
+
     $response[] = array(
         'id' => $rulei++,
         'rule' => '<i title="' . htmlentities($alert['rule']) . '"><a href="' . generate_url(array('page' => 'alert-rules')) . '">' . htmlentities($alert['name']) . '</a></i>',
