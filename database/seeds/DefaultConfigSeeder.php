@@ -11,6 +11,10 @@ class DefaultConfigSeeder extends Seeder
      */
     public function run()
     {
+        \DB::table('dbSchema')->insert([
+            'version' => 253
+        ]);
+        
         \DB::table('config')->insert([
             [
                 "config_name" => "oxidized.enabled",
