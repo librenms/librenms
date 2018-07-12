@@ -3,10 +3,9 @@ use LibreNMS\Authentication\Auth;
 ?>
 
     <!-- PORTS -->
-        <li class="dropdown-submenu">
-          <a href="ports/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-link fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Port Aggregates</span></a>
-          <ul class="dropdown-menu scrollable-menu">
-
+            <li class="dropdown-submenu">
+              <a href="devices/"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i>Port Aggregates</a>
+              <ul class="dropdown-menu scrollable-menu">
 <?php
 
 if (Auth::user()->hasGlobalRead()) {
@@ -44,12 +43,12 @@ if (Auth::user()->hasGlobalRead()) {
     if ($config['custom_aggregation']) {
         foreach ($config['custom_aggregation'] as $index => $entry) {
             if ($entry == '') {
-                echo('            <li role="presentation" class="divider"></li>');
+                echo('                <li role="presentation" class="divider"></li>'."\n");
             } else {
                 foreach ($entry as $title => $interfaces) {
                     # In order to work around librenms default foreslash behavior, convert all / to &slsh;
                     $str = htmlentities(preg_replace('/\//', '&slsh;', $interfaces));
-                    echo('            <li><a href="aggregates/label=' . $title . '/iface=' . $str . '"><i class="fa fa-users fa-fw fa-lg" aria-hidden="true"></i>' . $title . '</a></li>');
+                    echo('                <li><a href="aggregates/label=' . $title . '/iface=' . $str . '"><i class="fa fa-users fa-fw fa-lg" aria-hidden="true"></i>' . $title . '</a></li>'."\n");
                 }
             }
         }
@@ -57,6 +56,6 @@ if (Auth::user()->hasGlobalRead()) {
 }
 
 ?>
+              </ul>
+            </li>
 
-          </ul>
-        </li>
