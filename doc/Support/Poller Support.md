@@ -20,7 +20,7 @@ Debugging and testing options:
 -f                                           Do not insert data into InfluxDB
 -d                                           Enable debugging output
 -v                                           Enable verbose debugging output
--m                                           Specify module(s) to be run
+-m                                           Specify module(s) to be run. Comma separate modules, submodules may be added with /
 ```
 
 `-h` Use this to specify a device via either id or hostname (including wildcard using *). You can also specify odd and
