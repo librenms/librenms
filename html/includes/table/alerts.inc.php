@@ -14,8 +14,11 @@
 */
 
 use LibreNMS\Authentication\Auth;
+
 require_once $config['install_dir'] . '/includes/device-groups.inc.php';
+
 $where = ' `devices`.`disabled` = 0';
+
 $alert_states = array(
     // divined from librenms/alerts.php
     'recovered' => 0,
@@ -36,6 +39,7 @@ $alert_severities = array(
 );
 
 $show_recovered = false;
+
 if (is_numeric($vars['device_id']) && $vars['device_id'] > 0) {
     $where .= ' AND `alerts`.`device_id`=' . $vars['device_id'];
 }
