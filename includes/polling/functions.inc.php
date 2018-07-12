@@ -219,11 +219,11 @@ function record_sensor_data($device, $all_sensors)
 }
 
 /**
- * @param $device
- * @param $options
+ * @param array $device The device to poll
+ * @param bool $force_module Ignore device module overrides
  * @return bool
  */
-function poll_device($device, $options)
+function poll_device($device, $force_module = false)
 {
     global $config, $device;
 
@@ -276,20 +276,9 @@ function poll_device($device, $options)
         $graphs    = array();
         $oldgraphs = array();
 
-        $force_module = false;
         if ($device['snmp_disable']) {
             $config['poller_modules'] = array();
         } else {
-            if ($options['m']) {
-                $config['poller_modules'] = array();
-                foreach (explode(',', $options['m']) as $module) {
-                    if (is_file('includes/polling/' . $module . '.inc.php')) {
-                        $config['poller_modules'][$module] = 1;
-                        $force_module = true;
-                    }
-                }
-            }
-
             // we always want the core module to be included, prepend it
             $config['poller_modules'] = array('core' => true) + $config['poller_modules'];
         }
