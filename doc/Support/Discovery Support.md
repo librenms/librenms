@@ -18,7 +18,7 @@ This document will explain how to use discovery.php to debug issues or manually 
 Debugging and testing options:
 -d                                           Enable debugging output
 -v                                           Enable verbose debugging output
--m                                           Specify single module to be run
+-m                                           Specify module(s) to be run. Comma separate modules, submodules may be added with /
 
 
 ```
