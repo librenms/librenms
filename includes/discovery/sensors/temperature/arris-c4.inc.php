@@ -12,6 +12,6 @@ foreach ($oids as $index => $entry) {
         $warnlimit = $entry['cardTemperatureHighWarn'];
         $limit = $entry['cardTemperatureHighError'];
 
-        discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $index, 'arris_c4', $descr, '1', '1', null, null, $warnlimit, $limit, $tempCurr);
+        discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $index, 'cmts', $descr, '1', '1', null, null, $warnlimit, $limit, $tempCurr);
     }
 }
