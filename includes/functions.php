@@ -79,6 +79,47 @@ function only_alphanumeric($string)
     return preg_replace('/[^a-zA-Z0-9]/', '', $string);
 }
 
+/**
+ * Parse cli discovery or poller modules and set config for this run
+ *
+ * @param string $type discovery or poller
+ * @param array $options get_opts array (only m key is checked)
+ * @return bool
+ */
+function parse_modules($type, $options)
+{
+    $override = false;
+
+    if ($options['m']) {
+        Config::set("{$type}_modules", []);
+        foreach (explode(',', $options['m']) as $module) {
+            // parse submodules (only supported by some modules)
+            if (str_contains($module, '/')) {
+                list($module, $submodule) = explode('/', $module, 2);
+                $existing_submodules = Config::get("{$type}_submodules.$module", []);
+                $existing_submodules[] = $submodule;
+                Config::set("{$type}_submodules.$module", $existing_submodules);
+            }
+
+            $dir = $type == 'poller' ? 'polling' : $type;
+            if (is_file("includes/$dir/$module.inc.php")) {
+                Config::set("{$type}_modules.$module", 1);
+                $override = true;
+            }
+        }
+
+        // display selected modules
+        $modules = array_map(function ($module) use ($type) {
+            $submodules = Config::get("{$type}_submodules.$module");
+            return $module . ($submodules ? '(' . implode(',', $submodules) . ')' : '');
+        }, array_keys(Config::get("{$type}_modules", [])));
+
+        d_echo("Override $type modules: " . implode(', ', $modules) . PHP_EOL);
+    }
+
+    return $override;
+}
+
 function logfile($string)
 {
     global $config;
