@@ -8,7 +8,7 @@ if (!is_array($storage_cache['hrstorage'])) {
     d_echo('Cached!');
 }
 
-$entry = $storage_cache['hrstorage'][$mempool[mempool_index]];
+$entry = $storage_cache['hrstorage'][$mempool['mempool_index']];
 
 $mempool['units'] = $entry['hrStorageAllocationUnits'];
 $mempool['used']  = ($entry['hrStorageUsed'] * $mempool['units']);

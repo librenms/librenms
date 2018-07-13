@@ -114,18 +114,17 @@ function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '',
 
 function dbQuery($sql, $parameters = array())
 {
-    global $fullSql, $debug, $sql_debug, $database_link, $config;
+    global $fullSql, $debug, $database_link, $config;
     $fullSql = dbMakeQuery($sql, $parameters);
     if ($debug) {
-        if (php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR'])) {
-            $fullSql = str_replace(PHP_EOL, '', $fullSql);
-            if (preg_match('/(INSERT INTO `alert_log`).*(details)/i', $fullSql)) {
-                echo "\nINSERT INTO `alert_log` entry masked due to binary data\n";
-            } else {
-                c_echo('SQL[%y'.$fullSql."%n] \n");
-            }
+        $fullSql = str_replace(PHP_EOL, '', $fullSql);
+
+        // hide binary field updates and inserts
+        $fullSql = preg_replace("/(.*alert_log.*details[` ]*= *')[^']*('.*)/i", '$1<binary data>$2', $fullSql);
+        if (class_exists('Log')) {
+            Log::info("SQL[%y$fullSql%n]", ['color' => true]);
         } else {
-            $sql_debug[] = $fullSql;
+            c_echo("SQL[%y$fullSql%n] \n");
         }
     }
 
@@ -374,26 +373,28 @@ function dbDeleteOrphans($target_table, $parents)
 function dbFetchRows($sql, $parameters = array())
 {
     $time_start = microtime(true);
-    $result         = dbQuery($sql, $parameters);
+    $result = dbQuery($sql, $parameters);
 
-    if (mysqli_num_rows($result) > 0) {
-        $rows = array();
-        while ($row = mysqli_fetch_assoc($result)) {
-            $rows[] = $row;
+    if ($result !== false) {
+        if (mysqli_num_rows($result) > 0) {
+            $rows = [];
+            while ($row = mysqli_fetch_assoc($result)) {
+                $rows[] = $row;
+            }
+
+            mysqli_free_result($result);
+
+            recordDbStatistic('fetchrows', $time_start);
+            return $rows;
         }
 
         mysqli_free_result($result);
-
-        recordDbStatistic('fetchrows', $time_start);
-        return $rows;
     }
-
-    mysqli_free_result($result);
 
     // no records, thus return empty array
     // which should evaluate to false, and will prevent foreach notices/warnings
     recordDbStatistic('fetchrows', $time_start);
-    return array();
+    return [];
 }//end dbFetchRows()
 
 
@@ -654,7 +655,7 @@ function dbGenPlaceholders($count)
  */
 function recordDbStatistic($stat, $start_time)
 {
-    global $db_stats;
+    global $db_stats, $db_stats_last;
 
     if (!isset($db_stats)) {
         $db_stats = array(
@@ -677,6 +678,7 @@ function recordDbStatistic($stat, $start_time)
                 'fetchrows' => 0.0,
             ),
         );
+        $db_stats_last = $db_stats;
     }
 
     $runtime = microtime(true) - $start_time;

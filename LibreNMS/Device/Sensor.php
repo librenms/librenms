@@ -304,7 +304,7 @@ class Sensor implements DiscoveryModule, PollerModule
         }
 
         // pre-fetch all standard sensors
-        $standard_sensors = call_user_func_array('array_merge', $sensors);
+        $standard_sensors = collect($sensors)->flatten(1)->all();
         $pre_fetch = self::fetchSnmpData($os->getDevice(), $standard_sensors);
 
         // poll standard sensors

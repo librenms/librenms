@@ -13,22 +13,10 @@
 
 $start = microtime(true);
 
-if (isset($_GET['debug'])) {
-    $debug = true;
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 0);
-    ini_set('log_errors', 0);
-    ini_set('error_reporting', E_ALL);
-} else {
-    $debug = false;
-    ini_set('display_errors', 0);
-    ini_set('display_startup_errors', 0);
-    ini_set('log_errors', 0);
-    ini_set('error_reporting', 0);
-}
-
 $init_modules = array('web', 'graphs');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
+
+set_debug(isset($_GET['debug']));
 
 rrdtool_initialize(false);
 

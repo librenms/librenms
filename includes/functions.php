@@ -11,6 +11,7 @@
  *
  */
 
+use Illuminate\Database\Events\QueryExecuted;
 use LibreNMS\Authentication\Auth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostExistsException;
@@ -24,15 +25,101 @@ use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\MemcacheLock;
 
-function set_debug($debug)
+/**
+ * Set debugging output
+ *
+ * @param bool $state If debug is enabled or not
+ * @param bool $silence When not debugging, silence every php error
+ * @return bool
+ */
+function set_debug($state = true, $silence = false)
 {
-    if (isset($debug)) {
+    global $debug;
+
+    $debug = $state; // set to global
+
+    $db = \LibreNMS\DB\Eloquent::DB();
+
+    restore_error_handler(); // disable Laravel error handler
+
+    if ($debug) {
         ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 0);
+        ini_set('display_startup_errors', 1);
         ini_set('log_errors', 0);
-        ini_set('allow_url_fopen', 0);
-        ini_set('error_reporting', E_ALL);
+        error_reporting(E_ALL & ~E_NOTICE);
+
+        if (class_exists('Log')) {
+            $logger = Log::getMonolog();
+
+            // only install if not existing
+            $install = true;
+            $logfile = Config::get('log_file', base_path('logs/librenms.log'));
+            foreach ($logger->getHandlers() as $handler) {
+                if ($handler instanceof \Monolog\Handler\StreamHandler) {
+                    if ($handler->getUrl() == 'php://stdout') {
+                        $install = false;
+                    } elseif ($handler->getUrl() == $logfile) {
+                        // send to librenms log file if not a cli app
+                        if (!App::runningInConsole()) {
+                            set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+                                Log::error("$errno $errfile:$errline $errstr");
+                            });
+                            $handler->setLevel(\Monolog\Logger::DEBUG);
+                        }
+                    }
+                }
+            }
+
+            if ($install) {
+                $handler = new \Monolog\Handler\StreamHandler(
+                    'php://stdout',
+                    \Monolog\Logger::DEBUG
+                );
+
+                $handler->setFormatter(new LibreNMS\Util\CliColorFormatter());
+
+                $logger->pushHandler($handler);
+            }
+        }
+
+        if ($db && !$db->getEventDispatcher()->hasListeners('Illuminate\Database\Events\QueryExecuted')) {
+            $db->listen(function (QueryExecuted $query) {
+                // collect bindings and make them a little more readable
+                $bindings = collect($query->bindings)->map(function ($item) {
+                    if ($item instanceof \Carbon\Carbon) {
+                        return $item->toDateTimeString();
+                    }
+
+                    return $item;
+                })->toJson();
+
+                if (class_exists('Log')) {
+                    Log::debug("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n", ['color' => true]);
+                } else {
+                    c_echo("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n");
+                }
+            });
+        }
+    } else {
+        ini_set('display_errors', 0);
+        ini_set('display_startup_errors', 0);
+        ini_set('log_errors', 1);
+        error_reporting($silence ? 0 : E_ERROR);
+
+        if (class_exists('Log')) {
+            $handlers = Log::getMonolog()->getHandlers();
+            if (isset($handlers[0]) && $handlers[0]->getUrl() == 'php://stdout') {
+                Log::getMonolog()->popHandler();
+            }
+        }
+
+        if ($db) {
+            // remove all query executed event handlers
+            $db->getEventDispatcher()->flush('Illuminate\Database\Events\QueryExecuted');
+        }
     }
+
+    return $debug;
 }//end set_debug()
 
 function array_sort_by_column($array, $on, $order = SORT_ASC)
@@ -689,12 +776,12 @@ function isSNMPable($device)
  * Check if the given host responds to ICMP echo requests ("pings").
  *
  * @param string $hostname The hostname or IP address to send ping requests to.
- * @param int $address_family The address family (AF_INET for IPv4 or AF_INET6 for IPv6) to use. Defaults to IPv4. Will *not* be autodetected for IP addresses, so it has to be set to AF_INET6 when pinging an IPv6 address or an IPv6-only host.
+ * @param int $address_family The address family ('ipv4' or 'ipv6') to use. Defaults to IPv4. Will *not* be autodetected for IP addresses, so it has to be set to 'ipv6' when pinging an IPv6 address or an IPv6-only host.
  * @param array $attribs The device attributes
  *
  * @return array  'result' => bool pingable, 'last_ping_timetaken' => int time for last ping, 'db' => fping results
  */
-function isPingable($hostname, $address_family = AF_INET, $attribs = array())
+function isPingable($hostname, $address_family = 'ipv4', $attribs = array())
 {
     global $config;
 
@@ -1444,7 +1531,7 @@ function ip_exists($ip)
     return false;
 }
 
-function fping($host, $params, $address_family = AF_INET)
+function fping($host, $params, $address_family = 'ipv4')
 {
 
     global $config;
@@ -1455,9 +1542,9 @@ function fping($host, $params, $address_family = AF_INET)
         2 => array("pipe", "w")
     );
 
-    // Default to AF_INET (IPv4)
+    // Default to ipv4
     $fping_path = $config['fping'];
-    if ($address_family == AF_INET6) {
+    if ($address_family == 'ipv6') {
         $fping_path = $config['fping6'];
     }
 
@@ -1533,23 +1620,19 @@ function force_influx_data($data)
  *                          "udp6", "tcp", or "tcp6". See `man snmpcmd`,
  *                          section "Agent Specification" for a full list.
  *
- * @return int The address family associated with the given transport
- *             specifier: AF_INET for IPv4 (or local connections not associated
- *             with an IP stack), AF_INET6 for IPv6.
+ * @return string The address family associated with the given transport
+ *             specifier: 'ipv4' (or local connections not associated
+ *             with an IP stack) or 'ipv6'.
  */
 function snmpTransportToAddressFamily($transport)
 {
-    if (!isset($transport)) {
-        $transport = 'udp';
-    }
-
-    $ipv6_snmp_transport_specifiers = array('udp6', 'udpv6', 'udpipv6', 'tcp6', 'tcpv6', 'tcpipv6');
+    $ipv6_snmp_transport_specifiers = ['udp6', 'udpv6', 'udpipv6', 'tcp6', 'tcpv6', 'tcpipv6'];
 
     if (in_array($transport, $ipv6_snmp_transport_specifiers)) {
-        return AF_INET6;
-    } else {
-        return AF_INET;
+        return 'ipv6';
     }
+
+    return 'ipv4';
 }
 
 /**
@@ -2033,6 +2116,7 @@ function get_toner_levels($device, $raw_value, $capacity)
 function initStats()
 {
     global $snmp_stats, $rrd_stats;
+    global $snmp_stats_last, $rrd_stats_last;
 
     if (!isset($snmp_stats, $rrd_stats)) {
         $snmp_stats = array(
@@ -2047,6 +2131,7 @@ function initStats()
                 'snmpwalk' => 0.0,
             )
         );
+        $snmp_stats_last = $snmp_stats;
 
         $rrd_stats = array(
             'ops' => array(
@@ -2060,6 +2145,7 @@ function initStats()
                 'other' => 0.0,
             ),
         );
+        $rrd_stats_last = $rrd_stats;
     }
 }
 
@@ -2098,47 +2184,55 @@ function printStats()
 {
     global $snmp_stats, $db_stats, $rrd_stats;
 
-    printf(
-        "SNMP [%d/%.2fs]: Get[%d/%.2fs] Getnext[%d/%.2fs] Walk[%d/%.2fs]\n",
-        array_sum($snmp_stats['ops']),
-        array_sum($snmp_stats['time']),
-        $snmp_stats['ops']['snmpget'],
-        $snmp_stats['time']['snmpget'],
-        $snmp_stats['ops']['snmpgetnext'],
-        $snmp_stats['time']['snmpgetnext'],
-        $snmp_stats['ops']['snmpwalk'],
-        $snmp_stats['time']['snmpwalk']
-    );
-    printf(
-        "MySQL [%d/%.2fs]: Cell[%d/%.2fs] Row[%d/%.2fs] Rows[%d/%.2fs] Column[%d/%.2fs] Update[%d/%.2fs] Insert[%d/%.2fs] Delete[%d/%.2fs]\n",
-        array_sum($db_stats['ops']),
-        array_sum($db_stats['time']),
-        $db_stats['ops']['fetchcell'],
-        $db_stats['time']['fetchcell'],
-        $db_stats['ops']['fetchrow'],
-        $db_stats['time']['fetchrow'],
-        $db_stats['ops']['fetchrows'],
-        $db_stats['time']['fetchrows'],
-        $db_stats['ops']['fetchcolumn'],
-        $db_stats['time']['fetchcolumn'],
-        $db_stats['ops']['update'],
-        $db_stats['time']['update'],
-        $db_stats['ops']['insert'],
-        $db_stats['time']['insert'],
-        $db_stats['ops']['delete'],
-        $db_stats['time']['delete']
-    );
-    printf(
-        "RRD [%d/%.2fs]: Update[%d/%.2fs] Create [%d/%.2fs] Other[%d/%.2fs]\n",
-        array_sum($rrd_stats['ops']),
-        array_sum($rrd_stats['time']),
-        $rrd_stats['ops']['update'],
-        $rrd_stats['time']['update'],
-        $rrd_stats['ops']['create'],
-        $rrd_stats['time']['create'],
-        $rrd_stats['ops']['other'],
-        $rrd_stats['time']['other']
-    );
+    if ($snmp_stats) {
+        printf(
+            "SNMP [%d/%.2fs]: Get[%d/%.2fs] Getnext[%d/%.2fs] Walk[%d/%.2fs]\n",
+            array_sum($snmp_stats['ops']),
+            array_sum($snmp_stats['time']),
+            $snmp_stats['ops']['snmpget'],
+            $snmp_stats['time']['snmpget'],
+            $snmp_stats['ops']['snmpgetnext'],
+            $snmp_stats['time']['snmpgetnext'],
+            $snmp_stats['ops']['snmpwalk'],
+            $snmp_stats['time']['snmpwalk']
+        );
+    }
+
+    if ($db_stats) {
+        printf(
+            "MySQL [%d/%.2fs]: Cell[%d/%.2fs] Row[%d/%.2fs] Rows[%d/%.2fs] Column[%d/%.2fs] Update[%d/%.2fs] Insert[%d/%.2fs] Delete[%d/%.2fs]\n",
+            array_sum($db_stats['ops']),
+            array_sum($db_stats['time']),
+            $db_stats['ops']['fetchcell'],
+            $db_stats['time']['fetchcell'],
+            $db_stats['ops']['fetchrow'],
+            $db_stats['time']['fetchrow'],
+            $db_stats['ops']['fetchrows'],
+            $db_stats['time']['fetchrows'],
+            $db_stats['ops']['fetchcolumn'],
+            $db_stats['time']['fetchcolumn'],
+            $db_stats['ops']['update'],
+            $db_stats['time']['update'],
+            $db_stats['ops']['insert'],
+            $db_stats['time']['insert'],
+            $db_stats['ops']['delete'],
+            $db_stats['time']['delete']
+        );
+    }
+
+    if ($rrd_stats) {
+        printf(
+            "RRD [%d/%.2fs]: Update[%d/%.2fs] Create [%d/%.2fs] Other[%d/%.2fs]\n",
+            array_sum($rrd_stats['ops']),
+            array_sum($rrd_stats['time']),
+            $rrd_stats['ops']['update'],
+            $rrd_stats['time']['update'],
+            $rrd_stats['ops']['create'],
+            $rrd_stats['time']['create'],
+            $rrd_stats['ops']['other'],
+            $rrd_stats['time']['other']
+        );
+    }
 }
 
 /**
