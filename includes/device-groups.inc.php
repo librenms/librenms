@@ -25,6 +25,8 @@
  * @subpackage Devices
  */
 
+use LibreNMS\Config;
+
 /**
  * Add a new device group
  * @param $pattern

@@ -2143,47 +2143,55 @@ function printStats()
 {
     global $snmp_stats, $db_stats, $rrd_stats;
 
-    printf(
-        "SNMP [%d/%.2fs]: Get[%d/%.2fs] Getnext[%d/%.2fs] Walk[%d/%.2fs]\n",
-        array_sum($snmp_stats['ops']),
-        array_sum($snmp_stats['time']),
-        $snmp_stats['ops']['snmpget'],
-        $snmp_stats['time']['snmpget'],
-        $snmp_stats['ops']['snmpgetnext'],
-        $snmp_stats['time']['snmpgetnext'],
-        $snmp_stats['ops']['snmpwalk'],
-        $snmp_stats['time']['snmpwalk']
-    );
-    printf(
-        "MySQL [%d/%.2fs]: Cell[%d/%.2fs] Row[%d/%.2fs] Rows[%d/%.2fs] Column[%d/%.2fs] Update[%d/%.2fs] Insert[%d/%.2fs] Delete[%d/%.2fs]\n",
-        array_sum($db_stats['ops']),
-        array_sum($db_stats['time']),
-        $db_stats['ops']['fetchcell'],
-        $db_stats['time']['fetchcell'],
-        $db_stats['ops']['fetchrow'],
-        $db_stats['time']['fetchrow'],
-        $db_stats['ops']['fetchrows'],
-        $db_stats['time']['fetchrows'],
-        $db_stats['ops']['fetchcolumn'],
-        $db_stats['time']['fetchcolumn'],
-        $db_stats['ops']['update'],
-        $db_stats['time']['update'],
-        $db_stats['ops']['insert'],
-        $db_stats['time']['insert'],
-        $db_stats['ops']['delete'],
-        $db_stats['time']['delete']
-    );
-    printf(
-        "RRD [%d/%.2fs]: Update[%d/%.2fs] Create [%d/%.2fs] Other[%d/%.2fs]\n",
-        array_sum($rrd_stats['ops']),
-        array_sum($rrd_stats['time']),
-        $rrd_stats['ops']['update'],
-        $rrd_stats['time']['update'],
-        $rrd_stats['ops']['create'],
-        $rrd_stats['time']['create'],
-        $rrd_stats['ops']['other'],
-        $rrd_stats['time']['other']
-    );
+    if ($snmp_stats) {
+        printf(
+            "SNMP [%d/%.2fs]: Get[%d/%.2fs] Getnext[%d/%.2fs] Walk[%d/%.2fs]\n",
+            array_sum($snmp_stats['ops']),
+            array_sum($snmp_stats['time']),
+            $snmp_stats['ops']['snmpget'],
+            $snmp_stats['time']['snmpget'],
+            $snmp_stats['ops']['snmpgetnext'],
+            $snmp_stats['time']['snmpgetnext'],
+            $snmp_stats['ops']['snmpwalk'],
+            $snmp_stats['time']['snmpwalk']
+        );
+    }
+
+    if ($db_stats) {
+        printf(
+            "MySQL [%d/%.2fs]: Cell[%d/%.2fs] Row[%d/%.2fs] Rows[%d/%.2fs] Column[%d/%.2fs] Update[%d/%.2fs] Insert[%d/%.2fs] Delete[%d/%.2fs]\n",
+            array_sum($db_stats['ops']),
+            array_sum($db_stats['time']),
+            $db_stats['ops']['fetchcell'],
+            $db_stats['time']['fetchcell'],
+            $db_stats['ops']['fetchrow'],
+            $db_stats['time']['fetchrow'],
+            $db_stats['ops']['fetchrows'],
+            $db_stats['time']['fetchrows'],
+            $db_stats['ops']['fetchcolumn'],
+            $db_stats['time']['fetchcolumn'],
+            $db_stats['ops']['update'],
+            $db_stats['time']['update'],
+            $db_stats['ops']['insert'],
+            $db_stats['time']['insert'],
+            $db_stats['ops']['delete'],
+            $db_stats['time']['delete']
+        );
+    }
+
+    if ($rrd_stats) {
+        printf(
+            "RRD [%d/%.2fs]: Update[%d/%.2fs] Create [%d/%.2fs] Other[%d/%.2fs]\n",
+            array_sum($rrd_stats['ops']),
+            array_sum($rrd_stats['time']),
+            $rrd_stats['ops']['update'],
+            $rrd_stats['time']['update'],
+            $rrd_stats['ops']['create'],
+            $rrd_stats['time']['create'],
+            $rrd_stats['ops']['other'],
+            $rrd_stats['time']['other']
+        );
+    }
 }
 
 /**

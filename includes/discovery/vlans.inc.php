@@ -47,7 +47,7 @@ foreach ($device['vlans'] as $domain_id => $vlans) {
             echo str_pad('dot1d id', 10).str_pad('ifIndex', 10).str_pad('Port Name', 25).str_pad('Priority', 10).str_pad('State', 15).str_pad('Cost', 10)."\n";
         }
 
-        foreach ($vlan_data as $ifIndex => $vlan_port) {
+        foreach ((array)$vlan_data as $ifIndex => $vlan_port) {
             $port = get_port_by_index_cache($device['device_id'], $ifIndex);
             echo str_pad($vlan_port_id, 10).str_pad($ifIndex, 10).str_pad($port['ifDescr'], 25).str_pad($vlan_port['dot1dStpPortPriority'], 10).str_pad($vlan_port['dot1dStpPortState'], 15).str_pad($vlan_port['dot1dStpPortPathCost'], 10);
 
