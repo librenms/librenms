@@ -7,13 +7,8 @@ require __DIR__ . '/../includes/init.php';
 $options = getopt('t:h:r:p:s:d::');
 
 if ($options['r'] && $options['h']) {
-    if (isset($options['d'])) {
-        $debug = true;
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        ini_set('log_errors', 1);
-        ini_set('error_reporting', 1);
-    }
+    set_debug(isset($options['d']));
+
     $rule_id = (int)$options['r'];
     $device_id = ctype_digit($options['h']) ? $options['h'] : getidbyname($options['h']);
     $where = "alerts.device_id = $device_id && alerts.rule_id = $rule_id";

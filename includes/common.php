@@ -667,14 +667,15 @@ function is_valid_hostname($hostname)
  */
 function d_echo($text, $no_debug_text = null)
 {
-    global $debug, $php_debug;
-    if ($debug) {
-        if (isset($php_debug)) {
-            $php_debug[] = $text;
-        } else {
-            print_r($text);
-        }
-    } elseif ($no_debug_text) {
+    global $debug;
+
+    if (class_exists('\Log')) {
+        \Log::debug(is_string($text) ? rtrim($text) : $text);
+    } elseif ($debug) {
+        print_r($text);
+    }
+
+    if (!$debug && $no_debug_text) {
         echo "$no_debug_text";
     }
 } // d_echo
@@ -1684,11 +1685,11 @@ function uw_to_dbm($value)
  */
 function set_null($value, $default = null, $min = null)
 {
-    if (is_nan($value)) {
+    if (!is_numeric($value)) {
+        return $default;
+    } elseif (is_nan($value)) {
         return $default;
     } elseif (is_infinite($value)) {
-        return $default;
-    } elseif (!is_numeric($value)) {
         return $default;
     } elseif (isset($min) && $value < $min) {
         return $default;
@@ -1702,10 +1703,9 @@ function set_null($value, $default = null, $min = null)
  */
 function set_numeric($value, $default = 0)
 {
-    if (is_nan($value) ||
-        is_infinite($value) ||
-        !isset($value) ||
-        !is_numeric($value)
+    if (!is_numeric($value) ||
+        is_nan($value) ||
+        is_infinite($value)
     ) {
         $value = $default;
     }

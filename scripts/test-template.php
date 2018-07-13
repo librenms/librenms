@@ -7,13 +7,8 @@ require __DIR__ . '/../includes/init.php';
 $options = getopt('t:h:r:p:s:d::');
 
 if ($options['t'] && $options['h'] && $options['r']) {
-    if (isset($options['d'])) {
-        $debug = true;
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        ini_set('log_errors', 1);
-        ini_set('error_reporting', 1);
-    }
+    set_debug(isset($options['d']));
+
     $template_id = $options['t'];
     $device_id = ctype_digit($options['h']) ? $options['h'] : getidbyname($options['h']);
     $rule_id = $options['r'];
