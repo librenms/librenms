@@ -204,7 +204,7 @@ if (empty($vars['dtpickerto'])) {
             zoomMax: <?php
             $first_date = reset($data);
             $last_date = end($data);
-            $milisec_diff = abs(strtotime($first_date[x]) - strtotime($last_date[x])) * 1000;
+            $milisec_diff = abs(strtotime($first_date['x']) - strtotime($last_date['x'])) * 1000;
             echo $milisec_diff;
             ?>,
             orientation: 'top'

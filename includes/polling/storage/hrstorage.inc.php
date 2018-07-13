@@ -6,7 +6,7 @@ if (!is_array($storage_cache['hrstorage'])) {
     d_echo($storage_cache);
 }
 
-$entry = $storage_cache['hrstorage'][$storage[storage_index]];
+$entry = $storage_cache['hrstorage'][$storage['storage_index']];
 
 $storage['units']       = $entry['hrStorageAllocationUnits'];
 $entry['hrStorageUsed'] = fix_integer_value($entry['hrStorageUsed']);

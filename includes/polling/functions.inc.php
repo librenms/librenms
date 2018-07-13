@@ -244,7 +244,8 @@ function poll_device($device, $force_module = false)
     echo 'Device ID: ' . $device['device_id'] . PHP_EOL;
     echo 'OS: ' . $device['os'];
     $ip = dnslookup($device);
-    $db_ip = inet_pton($ip);
+
+    $db_ip = isset($ip) ? inet_pton($ip) : null;
 
     if (!empty($db_ip) && inet6_ntop($db_ip) != inet6_ntop($device['ip'])) {
         log_event('Device IP changed to ' . $ip, $device, 'system', 3);
