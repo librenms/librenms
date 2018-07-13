@@ -157,7 +157,7 @@ foreach ($tables as $tablevalue) {
                     $swstatenumber++;
                     $descr = $tablevalue[3] . $swstatenumber;
                 } elseif ($state_name == 'cswStackPortOperStatus') {
-                    $stack_port_descr = get_port_by_index_cache($device, $index);
+                    $stack_port_descr = get_port_by_index_cache($device['device_id'], $index);
                     $descr = $tablevalue[3] . $stack_port_descr['ifDescr'];
                 } elseif ($state_name == 'cefcFRUPowerOperStatus') {
                     $descr = snmp_get($device, 'entPhysicalName.'.$index, '-Oqv', 'ENTITY-MIB');

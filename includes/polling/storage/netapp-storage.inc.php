@@ -5,7 +5,7 @@ if (!is_array($storage_cache['netapp-storage'])) {
     d_echo($storage_cache);
 }
 
-$entry = $storage_cache['netapp-storage'][$storage[storage_index]];
+$entry = $storage_cache['netapp-storage'][$storage['storage_index']];
 
 $storage['units'] = 1024;
 if (isset($entry['df64TotalKBytes']) && is_numeric($entry['df64TotalKBytes'])) {

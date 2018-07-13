@@ -94,14 +94,14 @@ function getLastPortCounter($port_id, $bill_id)
     $return = array();
     $row    = dbFetchRow("SELECT timestamp, in_counter, in_delta, out_counter, out_delta FROM bill_port_counters WHERE `port_id` = ? AND `bill_id` = ?", array($port_id, $bill_id));
     if (!is_null($row)) {
-        $return[timestamp]   = $row['timestamp'];
-        $return[in_counter]  = $row['in_counter'];
-        $return[in_delta]    = $row['in_delta'];
-        $return[out_counter] = $row['out_counter'];
-        $return[out_delta]   = $row['out_delta'];
-        $return[state]       = 'ok';
+        $return['timestamp']   = $row['timestamp'];
+        $return['in_counter']  = $row['in_counter'];
+        $return['in_delta']    = $row['in_delta'];
+        $return['out_counter'] = $row['out_counter'];
+        $return['out_delta']   = $row['out_delta'];
+        $return['state']       = 'ok';
     } else {
-        $return[state]       = 'failed';
+        $return['state']       = 'failed';
     }
     return $return;
 }//end getLastPortCounter()
@@ -112,13 +112,13 @@ function getLastMeasurement($bill_id)
     $return = array();
     $row    = dbFetchRow("SELECT timestamp,delta,in_delta,out_delta FROM bill_data WHERE bill_id = ? ORDER BY timestamp DESC LIMIT 1", array($bill_id));
     if (!is_null($row)) {
-        $return[delta]     = $row['delta'];
-        $return[delta_in]  = $row['delta_in'];
-        $return[delta_out] = $row['delta_out'];
-        $return[timestamp] = $row['timestamp'];
-        $return[state]     = 'ok';
+        $return['delta']     = $row['delta'];
+        $return['delta_in']  = $row['delta_in'];
+        $return['delta_out'] = $row['delta_out'];
+        $return['timestamp'] = $row['timestamp'];
+        $return['state']     = 'ok';
     } else {
-        $return[state] = 'failed';
+        $return['state'] = 'failed';
     }
     return ($return);
 }//end getLastMeasurement()
@@ -260,7 +260,7 @@ function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
     $out_data   = array();
     $tot_data   = array();
     $ticks      = array();
-    
+
     if (!isset($reducefactor) || !is_numeric($reducefactor) || $reducefactor < 1) {
         // Auto calculate reduce factor
         $expectedpoints = ceil(($to - $from) / 300);
@@ -316,7 +316,7 @@ function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
         'to'            => $to,
         'first'         => $first,
         'last'          => $last,
-        
+
         'in_data'       => $in_data,
         'out_data'      => $out_data,
         'tot_data'      => $tot_data,
@@ -379,7 +379,7 @@ function getHistoricTransferGraphData($bill_id)
     }
 
     $graph_name = 'Historical bandwidth over the last 12 billing periods';
-    
+
     return array(
         'graph_name'        => $graph_name,
         'in_data'           => $in_data,
