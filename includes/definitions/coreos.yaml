@@ -1,4 +1,4 @@
-os: coreos
+os: linux
 type: server
 group: unix
 text: CoreOS
