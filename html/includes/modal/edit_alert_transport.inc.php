@@ -43,6 +43,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <option value="boxcar-form">Boxcar</option>
                                     <option value="canopsis-form">Canopsis</option>
                                     <option value="ciscospark-form">Cisco Spark</option>
+                                    <option value="clickatell-form">Clickatell</option>
                                     <option value="discord-form">Discord</option>
                                     <option value="elasticsearch-form">Elasticsearch</option>
                                     <option value="gitlab-form">Gitlab</option>
