@@ -22,6 +22,7 @@
  * @subpackage Alerts
  */
 
+use LibreNMS\Alert\Template;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Authentication\Auth;
 
@@ -345,80 +346,6 @@ function GetContacts($results)
     return $tmp_contacts;
 }
 
-
-/**
- * Format Alert
- * @param array  $obj Alert-Array
- * @return string
- */
-function FormatAlertTpl($obj)
-{
-    $tpl    = $obj["template"];
-    $msg    = '$ret .= "'.str_replace(array('{else}', '{/if}', '{/foreach}'), array('"; } else { $ret .= "', '"; } $ret .= "', '"; } $ret .= "'), addslashes($tpl)).'";';
-    $parsed = $msg;
-    $s      = strlen($msg);
-    $x      = $pos = -1;
-    $buff   = '';
-    $if     = $for = $calc = false;
-    while (++$x < $s) {
-        if ($msg[$x] == '{' && $buff == '') {
-            $buff .= $msg[$x];
-        } elseif ($buff == '{ ') {
-            $buff = '';
-        } elseif ($buff != '') {
-            $buff .= $msg[$x];
-        }
-
-        if ($buff == '{if') {
-            $pos = $x;
-            $if  = true;
-        } elseif ($buff == '{foreach') {
-            $pos = $x;
-            $for = true;
-        } elseif ($buff == '{calc') {
-            $pos  = $x;
-            $calc = true;
-        }
-
-        if ($pos != -1 && $msg[$x] == '}') {
-            $orig = $buff;
-            $buff = '';
-            $pos  = -1;
-            if ($if) {
-                $if     = false;
-                $o      = 3;
-                $native = array(
-                    '"; if( ',
-                    ' ) { $ret .= "',
-                );
-            } elseif ($for) {
-                $for    = false;
-                $o      = 8;
-                $native = array(
-                    '"; foreach( ',
-                    ' as $key=>$value) { $ret .= "',
-                );
-            } elseif ($calc) {
-                $calc   = false;
-                $o      = 5;
-                $native = array(
-                    '"; $ret .= (float) (0+(',
-                    ')); $ret .= "',
-                );
-            } else {
-                continue;
-            }
-
-            $cond   = trim(populate(substr($orig, $o, -1), false));
-            $native = $native[0].$cond.$native[1];
-            $parsed = str_replace($orig, $native, $parsed);
-            unset($cond, $o, $orig, $native);
-        }//end if
-    }//end while
-    $parsed = populate($parsed);
-    return RunJail($parsed, $obj);
-}//end FormatAlertTpl()
-
 /**
  * Populate variables
  * @param string  $txt  Text with variables
@@ -476,19 +403,19 @@ function DescribeAlert($alert)
 {
     $obj         = array();
     $i           = 0;
-    $device      = dbFetchRow('SELECT hostname, sysName, sysDescr, hardware, version, location, purpose, notes, uptime FROM devices WHERE device_id = ?', array($alert['device_id']));
+    $device      = dbFetchRow('SELECT hostname, sysName, sysDescr, sysContact, os, type, ip, hardware, version, location, purpose, notes, uptime FROM devices WHERE device_id = ?', array($alert['device_id']));
     $attribs     = get_dev_attribs($alert['device_id']);
     if (can_ping_device($attribs)) {
         $ping_stats = dbFetchRow('SELECT `timestamp`, `loss`, `min`, `max`, `avg` FROM `device_perf` WHERE `device_id` = ? ORDER BY `timestamp` LIMIT 1', [$alert['device_id']]);
     }
-    $tpl         = dbFetchRow('SELECT `template`,`title`,`title_rec` FROM `alert_templates` JOIN `alert_template_map` ON `alert_template_map`.`alert_templates_id`=`alert_templates`.`id` WHERE `alert_template_map`.`alert_rule_id`=?', array($alert['rule_id']));
-    if (!$tpl) {
-        $tpl = dbFetchRow("SELECT `template`,`title`,`title_rec` FROM `alert_templates`  WHERE `name`='Default Alert Template'");
-    }
-    $default_tpl = "%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: {if %name}%name{else}%rule{/if}\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}";
+
     $obj['hostname']     = $device['hostname'];
     $obj['sysName']      = $device['sysName'];
     $obj['sysDescr']     = $device['sysDescr'];
+    $obj['sysContact']   = $device['sysContact'];
+    $obj['os']           = $device['os'];
+    $obj['type']         = $device['type'];
+    $obj['ip']           = inet6_ntop($device['ip']);
     $obj['hardware']     = $device['hardware'];
     $obj['version']      = $device['version'];
     $obj['location']     = $device['location'];
@@ -499,6 +426,7 @@ function DescribeAlert($alert)
     $obj['notes']        = $device['notes'];
     $obj['alert_notes']  = $alert['note'];
     $obj['device_id']    = $alert['device_id'];
+    $obj['rule_id']      = $alert['rule_id'];
     if (can_ping_device($attribs)) {
         $obj['ping_timestamp'] = $ping_stats['template'];
         $obj['ping_loss']      = $ping_stats['loss'];
@@ -507,17 +435,12 @@ function DescribeAlert($alert)
         $obj['ping_avg']       = $ping_stats['avg'];
     }
     $extra               = $alert['details'];
-    if (!isset($tpl['template'])) {
-        $obj['template'] = $default_tpl;
-    } else {
-        $obj['template'] = $tpl['template'];
-    }
+
+    $tpl                 = new Template;
+    $template            = $tpl->getTemplate($obj);
+
     if ($alert['state'] >= 1) {
-        if (!empty($tpl['title'])) {
-            $obj['title'] = $tpl['title'];
-        } else {
-            $obj['title'] = 'Alert for device '.$device['hostname'].' - '.($alert['name'] ? $alert['name'] : $alert['rule']);
-        }
+        $obj['title'] = $template->title ?: 'Alert for device '.$device['hostname'].' - '.($alert['name'] ? $alert['name'] : $alert['rule']);
         if ($alert['state'] == 2) {
             $obj['title'] .= ' got acknowledged';
         } elseif ($alert['state'] == 3) {
@@ -529,9 +452,10 @@ function DescribeAlert($alert)
         foreach ($extra['rule'] as $incident) {
             $i++;
             $obj['faults'][$i] = $incident;
+            $obj['faults'][$i]['string'] = null;
             foreach ($incident as $k => $v) {
                 if (!empty($v) && $k != 'device_id' && (stristr($k, 'id') || stristr($k, 'desc') || stristr($k, 'msg')) && substr_count($k, '_') <= 1) {
-                    $obj['faults'][$i]['string'] .= $k.' => '.$v.'; ';
+                    $obj['faults'][$i]['string'] .= $k.' = '.$v.'; ';
                 }
             }
         }
@@ -552,11 +476,7 @@ function DescribeAlert($alert)
         $extra['count'] = 0;
         dbUpdate(array('details' => gzcompress(json_encode($id['details']), 9)), 'alert_log', 'id = ?', array($alert['id']));
 
-        if (!empty($tpl['title_rec'])) {
-            $obj['title'] = $tpl['title_rec'];
-        } else {
-            $obj['title']   = 'Device '.$device['hostname'].' recovered from '.($alert['name'] ? $alert['name'] : $alert['rule']);
-        }
+        $obj['title'] = $template->title_rec ?: 'Device '.$device['hostname'].' recovered from '.($alert['name'] ? $alert['name'] : $alert['rule']);
         $obj['elapsed'] = TimeFormat(strtotime($alert['time_logged']) - strtotime($id['time_logged']));
         $obj['id']      = $id['id'];
         foreach ($extra['rule'] as $incident) {
@@ -571,6 +491,7 @@ function DescribeAlert($alert)
     } else {
         return 'Unknown State';
     }//end if
+    $obj['builder']   = $alert['builder'];
     $obj['uid']       = $alert['id'];
     $obj['alert_id']  = $alert['alert_id'];
     $obj['severity']  = $alert['severity'];
@@ -579,9 +500,7 @@ function DescribeAlert($alert)
     $obj['timestamp'] = $alert['time_logged'];
     $obj['contacts']  = $extra['contacts'];
     $obj['state']     = $alert['state'];
-    if (strstr($obj['title'], '%')) {
-        $obj['title'] = RunJail('$ret = "'.populate(addslashes($obj['title'])).'";', $obj);
-    }
+    $obj['template']  = $template;
     return $obj;
 }//end DescribeAlert()
 
@@ -886,6 +805,7 @@ function ExtTransports($obj)
 {
     global $config;
     $tmp = false;
+    $type  = new Template;
     // To keep scrutinizer from naging because it doesnt understand eval
     foreach ($config['alert']['transports'] as $transport => $opts) {
         if (is_array($opts)) {
@@ -894,8 +814,10 @@ function ExtTransports($obj)
         $class  = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport);
         if (($opts === true || !empty($opts)) && $opts != false && class_exists($class)) {
             $obj['transport'] = $transport;
-            $msg        = FormatAlertTpl($obj);
-            $obj['msg'] = $msg;
+            $obj['alert']     = collect($obj);
+            $obj['title']     = $type->getTitle($obj);
+            $obj['alert']['title'] = $obj['title'];
+            $obj['msg']       = $type->getBody($obj);
             echo $transport.' => ';
             $instance = new $class;
             $tmp = $instance->deliverAlert($obj, $opts);

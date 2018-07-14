@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-$init_modules = array('alerts');
+$init_modules = ['alerts', 'alerts-cli'];
 require __DIR__ . '/../includes/init.php';
 
 $options = getopt('t:h:r:p:s:d::');
@@ -20,6 +20,7 @@ if ($options['r'] && $options['h']) {
     $alert = $alerts[0];
 
     $alert['details']['delay'] = 0;
+    $alert['note'] = 'Testing';
     IssueAlert($alert);
 } else {
     c_echo("

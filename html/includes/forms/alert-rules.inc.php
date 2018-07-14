@@ -44,8 +44,8 @@ $rule_id      = $_POST['rule_id'];
 $count        = mres($_POST['count']);
 $delay        = mres($_POST['delay']);
 $interval     = mres($_POST['interval']);
-$mute         = mres($_POST['mute']);
-$invert       = mres($_POST['invert']);
+$mute         = mres(isset($_POST['mute']) ? $_POST['mute'] : null);
+$invert       = mres(isset($_POST['invert']) ? $_POST['invert'] : null);
 $name         = mres($_POST['name']);
 $proc         = mres($_POST['proc']);
 $recovery     = ($vars['recovery']);
@@ -138,7 +138,7 @@ if (is_numeric($rule_id) && $rule_id > 0) {
 if (is_numeric($rule_id) && $rule_id > 0) {
     $devices = [];
     $groups = [];
-    foreach ((array)$_POST['maps'] as $item) {
+    foreach ((array)$vars['maps'] as $item) {
         if (starts_with($item, 'g')) {
             $groups[] = (int)substr($item, 1);
         } else {
