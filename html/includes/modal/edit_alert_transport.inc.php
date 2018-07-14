@@ -60,6 +60,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <option value="rocket-form">Rocket.chat</option>
                                     <option value="slack-form">Slack</option>
                                     <option value="syslog-form">Syslog</option>
+                                    <option value="telegram-form">Telegram</option>
                                     <option value="victorops-form">Victorops</option>
                                     <!--Insert more transport type options here has support is added. Value should be: [transport_name]-form -->
                                 </select>
