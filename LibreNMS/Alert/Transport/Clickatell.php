@@ -54,8 +54,7 @@ class Clickatell extends Transport
         $ret  = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code > 200) {
-            var_dump($ret);
-            return false;
+            return var_dump($ret);
         }
         return true;
     }
