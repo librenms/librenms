@@ -20,12 +20,12 @@ require_once 'includes/modal/edit_transport_group.inc.php';
 <div class="table-responsive">
     <table class="table table-hover table-condensed">
     <tr>
-    <th>#</th>
-    <th>Transport Name</th>
-    <th>Transport Type</th>
-    <th>Default</th>
-    <th>Details</th>
-    <th style="width:86px;">Action</th>
+        <th>#</th>
+        <th>Transport Name</th>
+        <th>Transport Type</th>
+        <th>Default</th>
+        <th>Details</th>
+        <th style="width:86px;">Action</th>
     </tr>
     <td colspan="6">
 <?php
@@ -38,7 +38,7 @@ echo "</td>";
 // Iterate through each alert transport
 $query = "SELECT `transport_id` AS `id`, `transport_name` AS `name`, `transport_type` AS `type`, `is_default`, `transport_config` AS `config` FROM `alert_transports`";
 foreach (dbFetchRows($query) as $transport) {
-    echo "<tr>";
+    echo "<tr id=\"alert-transport-{$transport['id']}\">";
     echo "<td><i>#".((int)$transport['id'])."</i></td>";
     echo "<td>".$transport['name']."</td>";
     echo "<td>".$transport['type']."</td>";

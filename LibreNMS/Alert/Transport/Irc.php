@@ -23,9 +23,9 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Irc implements Transport
+class Irc extends Transport
 {
     public function deliverAlert($obj, $opts)
     {

@@ -289,13 +289,10 @@ foreach (scandir($transport_dir) as $transport) {
                 success: function(data) {
                     if (data.status == 'ok') {
                         toastr.success(data.message);
-                        setTimeout(function () {
-                            $("#delete-alert-transport").modal("hide");
-                            window.location.reload();
-                        }, 500)
-                    } else {
-                        $("#message").html("<div class='alert alert-info'>"+data.message+"</div>");
+                        $("#alert-transport-" + transport_id).remove();
                         $("#delete-alert-transport").modal("hide");
+                    } else {
+                        toastr.error(data.message);
                     }
                 },
                 error: function() {

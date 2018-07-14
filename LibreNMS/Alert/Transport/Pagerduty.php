@@ -23,9 +23,9 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Pagerduty implements Transport
+class Pagerduty extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
