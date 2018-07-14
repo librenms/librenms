@@ -455,7 +455,7 @@ function del_device()
         $device = device_by_id_cache($device_id);
     }
 
-    if (!device) {
+    if (!$device) {
         api_error(404, "Device $hostname not found");
     }
 

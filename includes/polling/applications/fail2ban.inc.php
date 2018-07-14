@@ -33,7 +33,7 @@ try {
     return;
 }
 
-$f2b = $f2b[data];
+$f2b = $f2b['data'];
 
 $metrics = [];
 

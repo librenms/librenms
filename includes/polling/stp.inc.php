@@ -1,6 +1,6 @@
 <?php
 /*
- * LibreNMS 
+ * LibreNMS
  *
  * Copyright (c) 2015 Vitali Kari <vitali.kari@gmail.com>
  *
@@ -28,11 +28,11 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
     // some vendors like PBN dont follow the 802.1D implementation and use seconds in SNMP
     if ($device['os'] == 'pbn') {
         preg_match('/^.* Build (?<build>\d+)/', $device['version'], $version);
-        if ($version[build] <= 16607) { // Buggy version :-(
+        if ($version['build'] <= 16607) { // Buggy version :-(
             $tm = '1';
         }
     }
-    
+
     // read the 802.1D subtree
     $stp_raw = snmpwalk_cache_oid($device, 'dot1dStp', array(), 'RSTP-MIB');
     d_echo($stp_raw);
@@ -56,7 +56,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
 
     // read the 802.1D bridge address and set as MAC in database
     $mac_raw = snmp_get($device, 'dot1dBaseBridgeAddress.0', '-Oqv', 'RSTP-MIB');
-    
+
     // read Time as timetics (in hundredths of a seconds) since last topology change and convert to seconds
     $time_since_change = snmp_get($device, 'dot1dStpTimeSinceTopologyChange.0', '-Ovt', 'RSTP-MIB');
     if ($time_since_change > '100') {
@@ -94,12 +94,12 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
         if ($stp_db['designatedRoot'] != $stp['designatedRoot']) {
             log_event('STP designated root changed: ' . $stp_db['designatedRoot'] . ' > ' . $stp['designatedRoot'], $device, 'stp', 4);
         }
-        
+
         // Logging if designated root port changed since last db update
         if (isset($stp['rootPort']) && $stp_db['rootPort'] != $stp['rootPort']) {
             log_event('STP root port changed: ' . $stp_db['rootPort'] . ' > ' . $stp['rootPort'], $device, 'stp', 4);
         }
-        
+
         // Logging if topology changed since last db update
         if ($stp_db['timeSinceTopologyChange'] > $stp['timeSinceTopologyChange']) {
             // FIXME log_event should log really changing time, not polling time
@@ -129,17 +129,17 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
                 'designatedPort'        => $stp_raw[$port]['dot1dStpPortDesignatedPort'],
                 'forwardTransitions'    => $stp_raw[$port]['dot1dStpPortForwardTransitions']
             );
-            
+
             // set device binding
             $stp_port['device_id'] = $device['device_id'];
-            
+
             // set port binding
             $stp_port['port_id'] = dbFetchCell('SELECT port_id FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', array($device['device_id'], $stp_raw[$port]['dot1dStpPort']));
-            
+
             $dr = str_replace(array(' ', ':', '-'), '', strtolower($stp_raw[$port]['dot1dStpPortDesignatedRoot']));
             $dr = substr($dr, -12); //remove first two octets
             $stp_port['designatedRoot'] = $dr;
-            
+
             $db = str_replace(array(' ', ':', '-'), '', strtolower($stp_raw[$port]['dot1dStpPortDesignatedBridge']));
             $db = substr($db, -12); //remove first two octets
             $stp_port['designatedBridge'] = $db;
@@ -159,7 +159,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
                 $dp = substr($stp_raw[$port]['dot1dStpPortDesignatedPort'], -2); //discard the first octet (priority part)
                 $stp_port['designatedPort'] = hexdec($dp);
             }
-            
+
             //d_echo($stp_port);
 
             // Update db

@@ -63,7 +63,7 @@ class FileLock implements Lock
             return;
         }
 
-        if ($this->handle !== false) {
+        if (is_resource($this->handle)) {
             flock($this->handle, LOCK_UN);
             fclose($this->handle);
         }

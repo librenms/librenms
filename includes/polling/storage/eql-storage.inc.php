@@ -60,8 +60,8 @@ foreach ($storage_cache2['eql-storage'] as $index => $vsentry) {
 }
 d_echo($storage_cache20);
 
-$entry1 = $storage_cache10[$storage[storage_index]];
-$entry2 = $storage_cache20[$storage[storage_index]];
+$entry1 = $storage_cache10[$storage['storage_index']];
+$entry2 = $storage_cache20[$storage['storage_index']];
 
 $storage['units'] = 1000000;
 $storage['size'] = ($entry1['eqliscsiVolumeSize'] * $storage['units']);
