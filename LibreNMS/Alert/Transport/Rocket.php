@@ -33,7 +33,7 @@ class Rocket extends Transport
             return $this->deliverAlertOld($obj, $opts);
         }
         $rocket_opts['url'] = $this->config['rocket-url'];
-        foreach (explode(PHP_EOL, $this->config['options']) as $option) {
+        foreach (explode(PHP_EOL, $this->config['rocket-options']) as $option) {
             list($k,$v) = explode('=', $option);
             $rocket_opts[$k] = $v;
         }
@@ -97,7 +97,7 @@ class Rocket extends Transport
                 ],
                 [
                     'title' => 'Rocket.chat Options',
-                    'name' => 'options',
+                    'name' => 'rocket-options',
                     'descr' => 'Rocket.chat Options',
                     'type' => 'textarea',
                 ]

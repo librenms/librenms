@@ -49,6 +49,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <option value="jira-form">Jira</option>
                                     <option value="mail-form" selected>Mail</option>
                                     <option value="msteams-form">Microsoft Teams</option>
+                                    <option value="nagios-form">Nagios</option>
                                     <option value="opsgenie-form">OpsGenie</option>
                                     <option value="osticket-form">osTicket</option>
                                     <option value="hue-form">Phillips Hue</option>
@@ -217,13 +218,14 @@ foreach (scandir($transport_dir) as $transport) {
             $("#" + $("#transport-choice").val()).show().find("input:text").val("");
              
             // Populate the field values
-            console.log(transport.details);
             transport.details.forEach(function(config) {
                 var $field = $("#" + config.name);
                 if ($field.prop('type') == 'checkbox') {
                     $field.bootstrapSwitch('state', config.value);
                 } else {
                     $field.val(config.value);
+                    $("#options").val('dasdsaddasdsa');
+                    console.log($("#options").val());
                 }
             });
         }
