@@ -24,48 +24,50 @@
 
 use LibreNMS\Authentication\Auth;
 
-header('Content-type: text/plain');
+$status = 'error';
 
 if (!Auth::user()->hasGlobalAdmin()) {
-    die('ERROR: You need to be admin');
+    header('Content-Type: application/json');
+    $response = array('status' => $status, 'message' => 'You need to be admin');
+    die(_json_encode($response));
 }
 
-$status = 'error';
 $template_id = 0;
 
-$name = mres($_POST['name']);
-if (!empty($name)) {
-    if (is_numeric($_REQUEST['template_id']) && $_REQUEST['rule_id']) {
+$name = mres($vars['name']);
+if (isset($vars['template']) && empty(view(['template' => $vars['template']], [])->__toString())) {
+    $message = 'Template failed to be parsed, please check the syntax';
+} elseif (!empty($name)) {
+    if ((isset($vars['template_id']) && is_numeric($vars['template_id'])) && (isset($vars['rule_id']) && $vars['rule_id'])) {
         //Update the template/rule mapping
 
-        if (is_array($_REQUEST['rule_id'])) {
-            $_REQUEST['rule_id'] = implode(",", $_REQUEST['rule_id']);
+        if (is_array($vars['rule_id'])) {
+            $vars['rule_id'] = implode(",", $vars['rule_id']);
         }
-        if (substr($_REQUEST['rule_id'], 0, 1) != ",") {
-            $_REQUEST['rule_id'] = ",".$_REQUEST['rule_id'];
+        if (substr($vars['rule_id'], 0, 1) != ",") {
+            $vars['rule_id'] = ",".$vars['rule_id'];
         }
-        if (substr($_REQUEST['rule_id'], -1, 1) != ",") {
-            $_REQUEST['rule_id'] .= ",";
+        if (substr($vars['rule_id'], -1, 1) != ",") {
+            $vars['rule_id'] .= ",";
         }
-        if (dbUpdate(array('rule_id' => mres($_REQUEST['rule_id']), 'name' => $name), "alert_templates", "id = ?", array($_REQUEST['template_id'])) >= 0) {
+        if (dbUpdate(array('rule_id' => mres($vars['rule_id']), 'name' => $name), "alert_templates", "id = ?", array($vars['template_id'])) >= 0) {
             $message = "Updated template and rule id mapping";
         } else {
             $message ="Failed to update the template and rule id mapping";
         }
-    } elseif ($_REQUEST['template'] && is_numeric($_REQUEST['template_id'])) {
+    } elseif ($vars['template'] && is_numeric($vars['template_id'])) {
         //Update template-text
-
-        if (dbUpdate(array('template' => $_REQUEST['template'], 'name' => $name, 'title' => $_REQUEST['title'], 'title_rec' => $_REQUEST['title_rec']), "alert_templates", "id = ?", array($_REQUEST['template_id'])) >= 0) {
+        if (dbUpdate(array('template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']), "alert_templates", "id = ?", array($vars['template_id'])) >= 0) {
             $status = 'ok';
             $message = "Alert template updated";
         } else {
             $message = "Failed to update the template";
         }
-    } elseif ($_REQUEST['template']) {
+    } elseif ($vars['template']) {
         //Create new template
 
         if ($name != 'Default Alert Template') {
-            $template_id = dbInsert(array('template' => $_REQUEST['template'], 'name' => $name, 'title' => $_REQUEST['title'], 'title_rec' => $_REQUEST['title_rec']), "alert_templates");
+            $template_id = dbInsert(array('template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']), "alert_templates");
             if ($template_id != false) {
                 $status = 'ok';
                 $message = "Alert template has been created.";
@@ -84,5 +86,4 @@ if (!empty($name)) {
 
 $response = array('status' => $status, 'message' => $message, 'newid' => $template_id);
 
-header('Content-Type: application/json');
 echo _json_encode($response);

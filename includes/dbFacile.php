@@ -175,10 +175,6 @@ function dbInsert($data, $table)
         dbCommitTransaction();
         // return $id;
     } else {
-        if ($table != 'Contact') {
-            trigger_error('QDB - Insert failed.', E_USER_WARNING);
-        }
-
         dbRollbackTransaction();
         $id = null;
     }
@@ -285,7 +281,7 @@ function dbUpdate($data, $table, $where = null, $parameters = array())
         $return = mysqli_affected_rows($database_link);
     } else {
         // echo("$fullSql");
-        trigger_error('QDB - Update failed.', E_USER_WARNING);
+        //trigger_error('QDB - Update failed.', E_USER_WARNING);
         $return = false;
     }
 
