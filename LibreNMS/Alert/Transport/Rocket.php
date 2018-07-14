@@ -45,6 +45,7 @@ class Rocket extends Transport
         foreach ($opts as $tmp_api) {
             $this->contactRocket($obj, $tmp_api);
         }
+        return true;
     }
 
     public static function contactRocket($obj, $api)
@@ -83,6 +84,7 @@ class Rocket extends Transport
             var_dump("Return: " . $ret); //FIXME: propper debuging
             return 'HTTP Status code ' . $code;
         }
+        return true;
     }
 
     public static function configTemplate()

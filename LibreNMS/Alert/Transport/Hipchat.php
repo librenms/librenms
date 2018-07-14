@@ -48,6 +48,7 @@ class Hipchat extends Transport
         foreach ($opts as $option) {
             $this->contactHipchat($obj, $option);
         }
+        return true;
     }
 
     public function contactHipchat($obj, $option)

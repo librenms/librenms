@@ -38,7 +38,7 @@ class Nagios extends Transport
 
     public function deliverAlertOld($obj, $opts)
     {
-        $this->contactNagios($obj, $opts);
+        return $this->contactNagios($obj, $opts);
     }
 
     public static function contactNagios($obj, $opts)

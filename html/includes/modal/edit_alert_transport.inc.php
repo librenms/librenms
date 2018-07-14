@@ -40,6 +40,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                             <div class="col-sm-3">
                                 <select name='transport-choice' id='transport-choice' class='form-control'>
                                     <option value="api-form">API</option>
+                                    <option value="boxcar-form">Boxcar</option>
                                     <option value="canopsis-form">Canopsis</option>
                                     <option value="ciscospark-form">Cisco Spark</option>
                                     <option value="discord-form">Discord</option>
