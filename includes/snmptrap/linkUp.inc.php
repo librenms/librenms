@@ -1,13 +1,13 @@
 <?php
 
-$interface = dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?", array($device['device_id'],$entry[2]));
+$interface = dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?", array($device['device_id'],$who));
 
 if (!$interface) {
     exit;
 }
 
-$ifOperStatus = "up";
-$ifAdminStatus = "up";
+$ifOperStatus = $detail2;
+$ifAdminStatus = $detail1;
 
 log_event("SNMP Trap: linkUp $ifAdminStatus/$ifOperStatus " . $interface['ifDescr'], $device, "interface", 1, $interface['port_id']);
 
