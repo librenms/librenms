@@ -245,7 +245,7 @@ A big thank you to the following 24 contributors this last month:
 * Avaya Avaya ERS and VSP to Extreme VOSS and BOSS ([#8469](https://github.com/librenms/librenms/pull/8469))
 * Added detection for HWG Poseidon 4002 ([#8593](https://github.com/librenms/librenms/pull/8593))
 * Rewrite state sensors to walk entire table for TIMOS ([#8588](https://github.com/librenms/librenms/pull/8588))
-* Added detection for CoreOS devices ([#8574](https://github.com/librenms/librenms/pull/8574))
+* Added detection for Corero CMS devices ([#8574](https://github.com/librenms/librenms/pull/8574))
 * Added detection for Red Lion Sixnet devices ([#8576](https://github.com/librenms/librenms/pull/8576))
 
 #### WebUI
