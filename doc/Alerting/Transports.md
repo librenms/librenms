@@ -483,7 +483,8 @@ $config['alert']['transports']['syslog']['syslog_facility'] = 3;
 
 3. Add your bot to telegram with the following url: `http://telegram.me/<botname>` and send some text to the bot.
 
-4. Now copy your token code and go to the following page in chrome: `https://api.telegram.org/bot<tokencode>/getUpdates`
+4. The BotFather should have responded with a token, copy your token code and go to the following page in chrome: `https://api.telegram.org/bot<tokencode>/getUpdates`
+(this could take a while so continue to refresh until you see something similar to below)
 
 5. You see a json code with the message you sent to the bot. Copy the Chat id. In this example that is “-9787468”
    `"message":{"message_id":7,"from":"id":656556,"first_name":"Joo","last_name":"Doo","username":"JohnDoo"},"chat":{"id":-9787468,"title":"Telegram Group"},"date":1435216924,"text":"Hi"}}]}`
