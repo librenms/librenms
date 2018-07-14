@@ -103,7 +103,6 @@ alert_schedule_items:
 alert_templates:
   Columns:
     - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
-    - { Field: rule_id, Type: varchar(255), 'Null': false, Extra: '', Default: ',' }
     - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: template, Type: longtext, 'Null': false, Extra: '' }
     - { Field: title, Type: varchar(255), 'Null': true, Extra: '' }

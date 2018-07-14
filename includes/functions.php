@@ -42,7 +42,7 @@ function set_debug($state = true, $silence = false)
 
     restore_error_handler(); // disable Laravel error handler
 
-    if ($debug) {
+    if (isset($debug) && $debug) {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         ini_set('log_errors', 0);
@@ -1025,7 +1025,7 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         'datetime' => array("NOW()"),
         'severity' => $severity,
         'message' => $text,
-        'username'  => Auth::user()->username ?: '',
+        'username'  => isset(Auth::user()->username) ? Auth::user()->username : '',
      );
 
     dbInsert($insert, 'eventlog');
