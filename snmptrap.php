@@ -25,7 +25,7 @@ if (set_debug(isset($options['d']))) {
 }
 
 // Creates an array with trap info
-while ($f = fgets(STDIN)){
+while ($f = fgets(STDIN)) {
     $entry[] = $f;
 }
 
