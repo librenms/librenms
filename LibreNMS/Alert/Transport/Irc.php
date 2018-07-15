@@ -24,13 +24,18 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Config;
 
 class Irc extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        global $config;
-        $f = $config['install_dir'] . "/.ircbot.alert";
+        return $this->contactIrc($obj, $opts);
+    }
+
+    public function contactIrc($obj, $opts)
+    {
+        $f = Config::get('install_dir') . "/.ircbot.alert";
         if (file_exists($f) && filetype($f) == "fifo") {
             $f = fopen($f, "w+");
             $r = fwrite($f, json_encode($obj) . "\n");
