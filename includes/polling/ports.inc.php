@@ -1,6 +1,7 @@
 <?php
 
 // Build SNMP Cache Array
+use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 
 $data_oids = array(
@@ -214,7 +215,8 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
         unset($data);
     } else {
         // For devices that are on the bad_ifXentry list, try fetching ifAlias to have nice interface descriptions.
-        if (!in_array(strtolower($device['hardware']), array_map('strtolower', $config['os'][$device['os']]['bad_ifXEntry']))) {
+
+        if (!in_array(strtolower($device['hardware']), array_map('strtolower', (array)Config::getOsSetting($device['os'], 'bad_ifXEntry', [])))) {
             $port_stats = snmpwalk_cache_oid($device, 'ifXEntry', $port_stats, 'IF-MIB');
         } else {
             $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB', null, '-OQUst');
@@ -731,7 +733,7 @@ foreach ($ports as $port) {
         $port['stats']['ifOutBits_rate'] = round(($port['stats']['ifOutOctets_rate'] * 8));
 
         // If we have a valid ifSpeed we should populate the stats for checking.
-        if (is_numeric($this_port['ifSpeed'])) {
+        if (is_numeric($this_port['ifSpeed']) && $this_port['ifSpeed'] > 0) {
             $port['stats']['ifInBits_perc']  = round(($port['stats']['ifInBits_rate'] / $this_port['ifSpeed'] * 100));
             $port['stats']['ifOutBits_perc'] = round(($port['stats']['ifOutBits_rate'] / $this_port['ifSpeed'] * 100));
         }

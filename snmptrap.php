@@ -15,13 +15,14 @@
 
 chdir(__DIR__); // cwd to the directory containing this script
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-ini_set('log_errors', 1);
-ini_set('error_reporting', E_ALL);
-
 $init_modules = array();
 require __DIR__ . '/includes/init.php';
+
+$options = getopt('d::');
+
+if (set_debug(isset($options['d']))) {
+    echo "DEBUG!\n";
+}
 
 // Creates an array with trap info
 while ($f = fgets(STDIN)){

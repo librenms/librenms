@@ -352,7 +352,7 @@ function list_devices()
 
 
     if (!Auth::user()->hasGlobalRead()) {
-        $sql .= " AND `device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
+        $sql .= " AND `d`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
         $param[] = Auth::id();
     }
     $devices = array();
@@ -455,7 +455,7 @@ function del_device()
         $device = device_by_id_cache($device_id);
     }
 
-    if (!device) {
+    if (!$device) {
         api_error(404, "Device $hostname not found");
     }
 
@@ -834,14 +834,14 @@ function list_available_health_graphs()
                     'name' => 'device_processor'
                 ));
             }
-    
+
             if ($device->storage()->count() > 0) {
                 array_push($graphs, array(
                     'desc' => 'Storage',
                     'name' => 'device_storage'
                 ));
             }
-    
+
             if ($device->mempools()->count() > 0) {
                 array_push($graphs, array(
                     'desc' => 'Memory Pools',
@@ -1237,7 +1237,7 @@ function list_oxidized()
         $params = array($hostname);
     }
 
-    foreach (dbFetchRows("SELECT hostname,sysname,os,location,ip AS ip FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `disabled`='0' AND `ignore` = 0 AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os)) $sql", $params) as $device) {
+    foreach (dbFetchRows("SELECT hostname,sysname,sysDescr,hardware,os,location,ip AS ip FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `disabled`='0' AND `ignore` = 0 AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os)) $sql", $params) as $device) {
         // Convert from packed value to human value
         $device['ip'] = inet6_ntop($device['ip']);
 
@@ -1250,7 +1250,7 @@ function list_oxidized()
             if ($maps_column == "group" && (!isset($config['oxidized']['group_support']) or $config['oxidized']['group_support'] !== true)) {
                 continue;
             }
-            
+
             foreach ($maps as $field_type => $fields) {
                 foreach ($fields as $field) {
                     if (isset($field['regex']) && preg_match($field['regex'].'i', $device[$field_type])) {
@@ -1274,6 +1274,8 @@ function list_oxidized()
 
         unset($device['location']);
         unset($device['sysname']);
+        unset($device['sysDescr']);
+        unset($device['hardware']);
         $devices[] = $device;
     }
 

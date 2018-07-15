@@ -3,6 +3,7 @@
 // Pre-cache the existing state of VLANs for this device from the database
 use LibreNMS\Config;
 
+$vlans_db = [];
 $vlans_db_raw = dbFetchRows('SELECT * FROM `vlans` WHERE `device_id` = ?', array($device['device_id']));
 foreach ($vlans_db_raw as $vlan_db) {
     $vlans_db[$vlan_db['vlan_domain']][$vlan_db['vlan_vlan']] = $vlan_db;
@@ -46,8 +47,8 @@ foreach ($device['vlans'] as $domain_id => $vlans) {
             echo str_pad('dot1d id', 10).str_pad('ifIndex', 10).str_pad('Port Name', 25).str_pad('Priority', 10).str_pad('State', 15).str_pad('Cost', 10)."\n";
         }
 
-        foreach ($vlan_data as $ifIndex => $vlan_port) {
-            $port = get_port_by_index_cache($device, $ifIndex);
+        foreach ((array)$vlan_data as $ifIndex => $vlan_port) {
+            $port = get_port_by_index_cache($device['device_id'], $ifIndex);
             echo str_pad($vlan_port_id, 10).str_pad($ifIndex, 10).str_pad($port['ifDescr'], 25).str_pad($vlan_port['dot1dStpPortPriority'], 10).str_pad($vlan_port['dot1dStpPortState'], 15).str_pad($vlan_port['dot1dStpPortPathCost'], 10);
 
             $db_w = array(

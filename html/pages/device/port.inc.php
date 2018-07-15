@@ -50,13 +50,13 @@ echo '</table></div>';
 
 $pos = strpos(strtolower($ifname), 'vlan');
 if ($pos !== false) {
-    $broke = yes;
+    $broke = 'yes';
 }
 
 $pos = strpos(strtolower($ifname), 'loopback');
 
 if ($pos !== false) {
-    $broke = yes;
+    $broke = 'yes';
 }
 
 echo "<div style='clear: both;'>";

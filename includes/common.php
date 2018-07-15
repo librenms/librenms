@@ -667,14 +667,15 @@ function is_valid_hostname($hostname)
  */
 function d_echo($text, $no_debug_text = null)
 {
-    global $debug, $php_debug;
-    if ($debug) {
-        if (isset($php_debug)) {
-            $php_debug[] = $text;
-        } else {
-            print_r($text);
-        }
-    } elseif ($no_debug_text) {
+    global $debug;
+
+    if (class_exists('\Log')) {
+        \Log::debug(is_string($text) ? rtrim($text) : $text);
+    } elseif ($debug) {
+        print_r($text);
+    }
+
+    if (!$debug && $no_debug_text) {
         echo "$no_debug_text";
     }
 } // d_echo
@@ -1029,7 +1030,7 @@ function object_is_cached($section, $obj)
 function can_ping_device($attribs)
 {
     global $config;
-    if ($config['icmp_check'] === true && $attribs['override_icmp_disable'] != "true") {
+    if ($config['icmp_check'] === true && (isset($attribs['override_icmp_disable']) && $attribs['override_icmp_disable'] != "true")) {
         return true;
     } else {
         return false;
@@ -1568,7 +1569,7 @@ function load_os(&$device)
     }
 
     // Set type to a predefined type for the OS if it's not already set
-    if ($device['attribs']['override_device_type'] != 1 && $config['os'][$device['os']]['type'] != $device['type']) {
+    if ((!isset($device['attribs']['override_device_type']) && $device['attribs']['override_device_type'] != 1) && $config['os'][$device['os']]['type'] != $device['type']) {
         log_event('Device type changed ' . $device['type'] . ' => ' . $config['os'][$device['os']]['type'], $device, 'system', 3);
         $device['type'] = $config['os'][$device['os']]['type'];
         dbUpdate(array('type' => $device['type']), 'devices', 'device_id=?', array($device['device_id']));
@@ -1684,11 +1685,11 @@ function uw_to_dbm($value)
  */
 function set_null($value, $default = null, $min = null)
 {
-    if (is_nan($value)) {
+    if (!is_numeric($value)) {
+        return $default;
+    } elseif (is_nan($value)) {
         return $default;
     } elseif (is_infinite($value)) {
-        return $default;
-    } elseif (!is_numeric($value)) {
         return $default;
     } elseif (isset($min) && $value < $min) {
         return $default;
@@ -1702,10 +1703,9 @@ function set_null($value, $default = null, $min = null)
  */
 function set_numeric($value, $default = 0)
 {
-    if (is_nan($value) ||
-        is_infinite($value) ||
-        !isset($value) ||
-        !is_numeric($value)
+    if (!is_numeric($value) ||
+        is_nan($value) ||
+        is_infinite($value)
     ) {
         $value = $default;
     }

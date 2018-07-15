@@ -25,7 +25,7 @@ foreach (dbFetch('SELECT * FROM `entPhysical_state` WHERE `device_id` = ?', arra
 
 // End Set Entity Attrivs
 // Delete Entity state
-foreach ($entPhysical_state as $epi => $entity) {
+foreach ((array)$entPhysical_state as $epi => $entity) {
     foreach ($entity as $subindex => $si) {
         foreach ($si as $group => $ti) {
             foreach ($ti as $key => $value) {

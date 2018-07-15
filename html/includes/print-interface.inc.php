@@ -103,7 +103,7 @@ if ($port['ifSpeed']) {
 
 echo '<br />';
 
-if ($port[ifDuplex] != 'unknown') {
+if ($port['ifDuplex'] != 'unknown') {
     echo '<span class=box-desc>'.$port['ifDuplex'].'</span>';
 } else {
     echo '-';

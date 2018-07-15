@@ -294,7 +294,7 @@ class Component
 
         $OLD = $this->getComponents($device_id);
         // Loop over each component.
-        foreach ($ARRAY as $COMPONENT => $AVP) {
+        foreach ((array)$ARRAY as $COMPONENT => $AVP) {
             // Make sure the component already exists.
             if (!isset($OLD[$device_id][$COMPONENT])) {
                 // Error. Component doesn't exist in the database.

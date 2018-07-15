@@ -11,6 +11,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use LibreNMS\Config;
+
 $init_modules = array('polling', 'alerts');
 require __DIR__ . '/includes/init.php';
 
@@ -58,24 +60,24 @@ if (isset($options['i']) && $options['i'] && isset($options['n'])) {
 
 if (!$where) {
     echo "-h <device id> | <device hostname wildcard>  Poll single device\n";
-    echo "-h odd                                       Poll odd numbered devices  (same as -i 2 -n 0)\n";
-    echo "-h even                                      Poll even numbered devices (same as -i 2 -n 1)\n";
-    echo "-h all                                       Poll all devices\n\n";
+    echo "-h odd             Poll odd numbered devices  (same as -i 2 -n 0)\n";
+    echo "-h even            Poll even numbered devices (same as -i 2 -n 1)\n";
+    echo "-h all             Poll all devices\n\n";
     echo "-i <instances> -n <number>                   Poll as instance <number> of <instances>\n";
-    echo "                                             Instances start at 0. 0-3 for -n 4\n\n";
+    echo "                   Instances start at 0. 0-3 for -n 4\n\n";
     echo "Debugging and testing options:\n";
-    echo "-r                                           Do not create or update RRDs\n";
-    echo "-f                                           Do not insert data into InfluxDB\n";
-    echo "-p                                           Do not insert data into Prometheus\n";
-    echo "-d                                           Enable debugging output\n";
-    echo "-v                                           Enable verbose debugging output\n";
-    echo "-m                                           Specify module(s) to be run\n";
+    echo "-r                 Do not create or update RRDs\n";
+    echo "-f                 Do not insert data into InfluxDB\n";
+    echo "-p                 Do not insert data into Prometheus\n";
+    echo "-d                 Enable debugging output\n";
+    echo "-v                 Enable verbose debugging output\n";
+    echo "-m                 Specify module(s) to be run. Comma separate modules, submodules may be added with /\n";
     echo "\n";
     echo "No polling type specified!\n";
     exit;
 }
 
-if (isset($options['d']) || isset($options['v'])) {
+if (set_debug(isset($options['d'])) || isset($options['v'])) {
     $versions = version_info();
     echo <<<EOH
 ===================================
@@ -94,18 +96,7 @@ EOH;
     if (isset($options['v'])) {
         $vdebug = true;
     }
-    $debug = true;
     update_os_cache(true); // Force update of OS Cache
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    ini_set('log_errors', 1);
-    ini_set('error_reporting', 1);
-} else {
-    $debug = false;
-    // ini_set('display_errors', 0);
-    ini_set('display_startup_errors', 0);
-    ini_set('log_errors', 0);
-    // ini_set('error_reporting', 0);
 }
 
 if (isset($options['r'])) {
@@ -142,6 +133,9 @@ if ($config['nographite'] !== true && $config['graphite']['enable'] === true) {
     $graphite = false;
 }
 
+// If we've specified modules with -m, use them
+$module_override = parse_modules('poller', $options);
+
 rrdtool_initialize();
 
 echo "Starting polling run:\n\n";
@@ -158,7 +152,7 @@ foreach (dbFetch($query) as $device) {
         $device['vrf_lite_cisco'] = '';
     }
 
-    if (!poll_device($device, $options)) {
+    if (!poll_device($device, $module_override)) {
         $unreachable_devices++;
     }
 
