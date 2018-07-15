@@ -37,7 +37,7 @@ header('Content-type: application/json');
 if (!Auth::user()->hasGlobalAdmin()) {
     die(json_encode([
         'status' => 'error',
-        'message' => 'ERROR: You need to be admin'
+        'message' => 'You need to be admin'
     ]));
 }
 

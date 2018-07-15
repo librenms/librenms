@@ -30,7 +30,7 @@ header('Content-type: application/json');
 if (!Auth::user()->hasGlobalAdmin()) {
     die(json_encode([
         'status' => 'error',
-        'message' => 'ERROR: You need to be admin'
+        'message' => 'You need to be admin'
     ]));
 }
 
@@ -48,8 +48,8 @@ foreach ((array)$vars['members'] as $target) {
 if (empty($name)) {
     $status = 'error';
     $message = 'No transport group name provided';
-} elseif (sizeof($target_members) <= 1) {
-    // Not enough members for a group; requires 2 at least
+} elseif (sizeof($target_members) < 1) {
+    // Not enough members for a group; requires 1 at least
     $status = 'error';
     $message = 'Not enough group members';
 } else {
@@ -91,7 +91,7 @@ if (empty($name)) {
         $message = 'Updated alert transport group';
     } else {
         $status = 'error';
-        $message = 'ERROR: Did not update alert transport group';
+        $message = 'Did not update alert transport group';
     }
 }
 

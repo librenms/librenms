@@ -296,8 +296,7 @@ foreach (scandir($transport_dir) as $transport) {
                     }
                 },
                 error: function() {
-                    $("#message").html("<div class='alert alert-info'>The alert transport could not be deleted.</div>");
-                    $("#delete-alert-transport").modal("hide");
+                    toastr.error("The alert transport could not be deleted.");
                 }
             });
         });

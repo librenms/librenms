@@ -25,7 +25,7 @@ require_once 'includes/modal/edit_transport_group.inc.php';
         <th>Transport Type</th>
         <th>Default</th>
         <th>Details</th>
-        <th style="width:86px;">Action</th>
+        <th style="width:126px;">Action</th>
     </tr>
     <td colspan="6">
 <?php
@@ -76,8 +76,9 @@ foreach (dbFetchRows($query) as $transport) {
     // Add action buttons for admin users only
     if (Auth::user()->hasGlobalAdmin()) {
         echo "<div class='btn-group btn-group-sm' role='group'>";
-        echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='".$transport['id']."' name='edit-alert-rule' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
-        echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-toggle='modal' data-target='#delete-alert-transport' data-transport_id='".$transport['id']."' name='delete-alert-transport' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+        echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='".$transport['id']."' name='edit-alert-rule' data-container='body' data-toggle='popover' data-content='Edit transport'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
+        echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-toggle='modal' data-target='#delete-alert-transport' data-transport_id='".$transport['id']."' name='delete-alert-transport' data-container='body' data-toggle='popover' data-content='Delete transport'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+        echo "<button type='button' class='btn btn-warning' data-transport_id='".$transport['id']."' data-transport='{$transport['type']}' name='test-transport' id='test-transport' data-toggle='popover' data-content='Test transport'><i class='fa fa-lg fa-check' aria-hidden='true'></i></button> ";
         echo "</div>";
     }
     echo "</td>";
@@ -105,7 +106,7 @@ echo "</td>";
 //Iterate through alert groups
 $query = "SELECT `transport_group_id` AS `id`, `transport_group_name` AS `name` FROM `alert_transport_groups`";
 foreach (dbFetchRows($query) as $group) {
-    echo "<tr>";
+    echo "<tr id=\"alert-transport-group-{$group['id']}\">";
     echo "<td><i>#".((int)$group['id'])."</i></td>";
     echo "<td>".$group['name']."</td>";
 
@@ -121,8 +122,8 @@ foreach (dbFetchRows($query) as $group) {
     echo "<td>";
     if (Auth::user()->hasGlobalAdmin()) {
         echo "<div class='btn-group btn-group-sm' role='group'>";
-        echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-target='#edit-transport-group' data-group_id='".$group['id']."' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
-        echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-toggle='modal' data-target='#delete-transport-group' data-group_id='".$group['id']."' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+        echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-target='#edit-transport-group' data-group_id='".$group['id']."' data-container='body' data-toggle='popover' data-content='Edit transport group'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
+        echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-toggle='modal' data-target='#delete-transport-group' data-group_id='".$group['id']."' data-container='body' data-toggle='popover' data-content='Delete transport group'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
         echo "</div>";
     }
     echo "</td>";
@@ -131,3 +132,32 @@ foreach (dbFetchRows($query) as $group) {
 ?>
     </table>
 </div>
+
+<script>
+    $("button#test-transport").click(function() {
+        var $this = $(this);
+        var transport_id = $this.data("transport_id");
+        var transport = $this.data("transport");
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: { type: "test-transport", transport_id: transport_id },
+            dataType: "json",
+            success: function(data){
+                if (data.status == 'ok') {
+                    toastr.success('Test to ' + transport + ' ok');
+                } else {
+                    toastr.error('Test to ' + transport + ' failed');
+                }
+            },
+            error: function(){
+                toastr.error('Test to ' + transport + ' failed - general error');
+            }
+        });
+    });
+
+    $("[data-toggle='popover']").popover({
+        trigger: 'hover',
+        placement: 'top'
+    });
+</script>

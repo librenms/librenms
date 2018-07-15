@@ -169,18 +169,14 @@ if (Auth::user()->hasGlobalAdmin()) {
             success: function(data) {
                 if (data.status == 'ok') {
                     toastr.success(data.message);
-                    setTimeout(function () {
-                        $("#delete-transport-group").modal("hide");
-                        window.location.reload();
-                    }, 500);
-                } else {
-                    $("#message").html("<div class='alert alert-info>"+data.message+"</div>");
+                    $("#alert-transport-group-" + group_id).remove();
                     $("#delete-transport-group").modal("hide");
+                } else {
+                    toastr.error(data.message);
                 }
             },
             error: function() {
-                $("#message").html("<div class='alert alert-info'>The alert transport could not be deleted.</div>");
-                $("#delete-transport-group").modal("hide");
+                toastr.error("The alert transport could not be deleted.");
             } 
         });
     });
