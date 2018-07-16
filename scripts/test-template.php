@@ -1,8 +1,10 @@
 #!/usr/bin/env php
 <?php
 
-$init_modules = array('alerts');
+$init_modules = ['alerts', 'alerts-cli'];
 require __DIR__ . '/../includes/init.php';
+
+use LibreNMS\Alert\Template;
 
 $options = getopt('t:h:r:p:s:d::');
 
@@ -20,13 +22,16 @@ if ($options['t'] && $options['h'] && $options['r']) {
     }
     $alert['details'] = json_decode(gzuncompress($alert['details']), true);
     $obj = DescribeAlert($alert);
-    $obj['template'] = dbFetchCell('SELECT `template` FROM `alert_templates` WHERE `id`=?', array($template_id));
     if (isset($options['p'])) {
         $obj['transport'] = $options['p'];
     }
     d_echo($obj);
-    $ack = FormatAlertTpl($obj);
-    print_r($ack);
+    $type  = new Template;
+    $obj['alert']     = collect($obj);
+    $obj['title']     = $type->getTitle($obj);
+    $obj['alert']['title'] = $obj['title'];
+    $obj['msg']       = $type->getBody($obj);
+    print_r($obj);
 } else {
     c_echo("
 Usage:
