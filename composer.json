@@ -44,13 +44,15 @@
         "influxdb/influxdb-php": "^1.14",
         "laravel/laravel": "5.4.*",
         "oriceon/toastr-5-laravel": "dev-master",
+        "wpb/string-blade-compiler": "3.4.x-dev",
+
+        "vlucas/phpdotenv": "2.4.0",
         "doctrine/inflector": "1.1.*",
         "symfony/event-dispatcher": "3.*",
         "symfony/css-selector": "3.*",
         "doctrine/instantiator": "1.0.*",
         "phpdocumentor/reflection-docblock": "3.*",
         "phpunit/php-token-stream": "1.*",
-        "wpb/string-blade-compiler": "3.4.x-dev",
         "myclabs/deep-copy": "1.7.*",
         "nikic/php-parser": "v3.1.*"
     },
