@@ -1,12 +1,14 @@
 #!/usr/bin/env php
 <?php
 
-$init_modules = array('alerts');
+$init_modules = ['alerts', 'alerts-cli'];
 require __DIR__ . '/../includes/init.php';
+
+use LibreNMS\Alert\Template;
 
 $options = getopt('t:h:r:p:s:d::');
 
-if ($options['t'] && $options['h'] && $options['r']) {
+if (isset($options['t']) && isset($options['h']) && isset($options['r'])) {
     set_debug(isset($options['d']));
 
     $template_id = $options['t'];
@@ -20,13 +22,14 @@ if ($options['t'] && $options['h'] && $options['r']) {
     }
     $alert['details'] = json_decode(gzuncompress($alert['details']), true);
     $obj = DescribeAlert($alert);
-    $obj['template'] = dbFetchCell('SELECT `template` FROM `alert_templates` WHERE `id`=?', array($template_id));
     if (isset($options['p'])) {
         $obj['transport'] = $options['p'];
     }
-    d_echo($obj);
-    $ack = FormatAlertTpl($obj);
-    print_r($ack);
+    $type  = new Template;
+    $obj['title']     = $type->getTitle($obj);
+    $obj['msg']       = $type->getBody($obj);
+    unset($obj['template']);
+    print_r($obj);
 } else {
     c_echo("
 Usage:
@@ -37,7 +40,7 @@ Usage:
     -s Is the alert state <0|1|2|3|4> (optional - defaults to current state.)
        0 = ok, 1 = alert, 2 = acknowledged, 3 = got worse, 4 = got better
     -d Debug
-    
+
 Example:
 ./scripts/test-template.php -t 10 -d -h localhost -r 2 -p mail
 
