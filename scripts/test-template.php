@@ -26,6 +26,7 @@ if (isset($options['t']) && isset($options['h']) && isset($options['r'])) {
         $obj['transport'] = $options['p'];
     }
     $type  = new Template;
+    $obj['alert']     = collect($obj);
     $obj['title']     = $type->getTitle($obj);
     $obj['msg']       = $type->getBody($obj);
     unset($obj['template']);
