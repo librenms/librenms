@@ -89,12 +89,10 @@ $('#hostdep-save').click('', function(event) {
     var device_id = $("#edit-device_id").val();
     var device_ids = [];
     var parent_ids = [];
-    var parent_hosts = [];
     device_ids.push(device_id);
     $("#availableparents option:selected").each( function() {
         if ($(this).length) {
             parent_ids.push($(this).val());
-            parent_hosts.push($(this).text());
         }
     });
 

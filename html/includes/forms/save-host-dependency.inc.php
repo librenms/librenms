@@ -15,45 +15,48 @@
 use LibreNMS\Authentication\Auth;
 
 if (!Auth::user()->hasGlobalAdmin()) {
-    $status = array('status' => 1, 'message' => 'You need to be admin');
+    $status = ['status' => 1, 'message' => 'You need to be admin'];
 } else {
-    foreach ($_POST['parent_ids'] as $parent) {
+    foreach ($vars['parent_ids'] as $parent) {
         if (!is_numeric($parent)) {
-            $status = array('status' => 1, 'message' => 'Parent ID must be an integer!');
+            $status = ['status' => 1, 'message' => 'Parent ID must be an integer!'];
             break;
         }
     }
 
-    if (count($_POST['parent_ids']) > 1 && in_array('0', $_POST['parent_ids'])) {
-        $status = array('status' => 1, 'message' => 'Multiple parents cannot contain None-Parent!');
+    if (count($vars['parent_ids']) > 1 && in_array('0', $vars['parent_ids'])) {
+        $status = ['status' => 1, 'message' => 'Multiple parents cannot contain None-Parent!'];
     }
 
     // A bit of an effort to reuse this code with dependency editing and the dependency wizard (editing multiple hosts at the same time)
-    $device_arr = array();
-    foreach ($_POST['device_ids'] as $dev) {
+    $device_arr = [];
+    foreach ($vars['device_ids'] as $dev) {
         if (!is_numeric($dev)) {
-            $status = array('status' => 1, 'message' => 'Device ID must be an integer!');
+            $status = ['status' => 1, 'message' => 'Device ID must be an integer!'];
             break;
-        } elseif (in_array($dev, $_POST['parent_ids'])) {
-            $status = array('status' => 1, 'message' => 'A device cannot depend itself');
+        } elseif (in_array($dev, $vars['parent_ids'])) {
+            $status = ['status' => 1, 'message' => 'A device cannot depend itself'];
             break;
         }
-        $insert = array();
-        foreach ($_POST['parent_ids'] as $parent) {
+        $insert = [];
+        foreach ($vars['parent_ids'] as $parent) {
+            if (!is_numeric($parent)) {
+                $parent = getidbyname($parent);
+            }
             if (is_numeric($parent) && $parent != 0) {
-                $insert[] = array('parent_device_id' => $parent, 'child_device_id' => $dev);
+                $insert[] = ['parent_device_id' => $parent, 'child_device_id' => $dev];
             } elseif ($parent == 0) {
                 // In case we receive a mixed array with $parent = 0 (which shouldn't happen)
                 // Empty the insert array so we remove any previous dependency so 'None' takes precedence
-                $insert = array();
+                $insert = [];
                 break;
             }
         }
-        dbDelete('device_relationships', '`child_device_id` = ?', array($dev));
+        dbDelete('device_relationships', '`child_device_id` = ?', [$dev]);
         if (!empty($insert)) {
             dbBulkInsert($insert, 'device_relationships');
         }
-        $status = array('status' => 0, 'message' => 'Device dependencies have been saved');
+        $status = ['status' => 0, 'message' => 'Device dependencies have been saved'];
     }
 }
 header('Content-Type: application/json');
