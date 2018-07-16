@@ -76,7 +76,7 @@ $('#alert-template').on('show.bs.modal', function (event) {
                 $('#title').val(output['title']);
                 $('#title_rec').val(output['title_rec']);
                 if(output['template'].indexOf("{/if}")>=0){
-                    toastr.info('The old template syntax is no longer supported. Please see https://docs.librenms.org/Alerting/Old-Templates/');
+                    toastr.info('The old template syntax is no longer supported. Please see https://docs.librenms.org/Alerting/Old_Templates/');
                 }
             }
         });
