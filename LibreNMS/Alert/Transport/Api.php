@@ -83,7 +83,11 @@ class Api extends Transport
                     'title' => 'API Method',
                     'name' => 'api-method',
                     'descr' => 'API Method: GET or POST',
-                    'type' => 'text',
+                    'type' => 'select',
+                    'options' => [
+                        'get' => 'get',
+                        'get' => 'get'
+                    ]
                 ],
                 [
                     'title' => 'API URL',

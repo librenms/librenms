@@ -101,9 +101,9 @@ class Gitlab extends Transport
                     'type'=> 'text',
                 ],
                 [
-                    'title' => 'API Key',
+                    'title' => 'Personal Access Token',
                     'name' => 'gitlab-key',
-                    'descr' => 'Gitlab API Key',
+                    'descr' => 'Personal Access Token',
                     'type' => 'text',
                 ]
             ],

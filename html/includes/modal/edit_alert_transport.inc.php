@@ -210,7 +210,7 @@ foreach (scandir($transport_dir) as $transport) {
                 
                 // Turn on all switches in form
                 var switches = <?php echo json_encode($switches);?>;
-                $.each(switches, function(name, state){
+                $.each(switches, function(name, state) {
                     $("input[name="+name+"]").bootstrapSwitch('state', state);
                 });
             }
@@ -231,7 +231,6 @@ foreach (scandir($transport_dir) as $transport) {
                 } else {
                     $field.val(config.value);
                     $("#options").val('dasdsaddasdsa');
-                    console.log($("#options").val());
                 }
             });
         }

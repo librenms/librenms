@@ -93,15 +93,15 @@ class Jira extends Transport
         return [
             'config' => [
                 [
-                    'title' => 'Project Key',
-                    'name' => 'jira-key',
-                    'descr' => 'Jira Project Key',
-                    'type' => 'text'
-                ],
-                [
                     'title' => 'URL',
                     'name' => 'jira-url',
                     'descr' => 'Jira URL',
+                    'type' => 'text'
+                ],
+                [
+                    'title' => 'Project Key',
+                    'name' => 'jira-key',
+                    'descr' => 'Jira Project Key',
                     'type' => 'text'
                 ],
                 [

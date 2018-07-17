@@ -2,82 +2,54 @@ source: Alerting/Transports.md
 
 # Transports
 
-Transports are located within `LibreNMS/Alert/Transport/` and defined as well as configured via ~~`$config['alert']['transports']['Example'] = 'Some Options'`~~.
+Transports are located within `LibreNMS/Alert/Transport/` and can be configured within the WebUI under Alerts -> Alert Transports.
 
 Contacts will be gathered automatically and passed to the configured transports.
-By default the Contacts will be only gathered when the alert triggers and will ignore future changes in contacts for the incident. If you want contacts to be re-gathered before each dispatch, please set ~~`$config['alert']['fixed-contacts'] = false;`~~ in your config.php.
+By default the Contacts will be only gathered when the alert triggers and will ignore future changes in contacts for the incident.
+If you want contacts to be re-gathered before each dispatch, please set 'Updates to contact email addresses not honored' to Off in the WebUI.
 
-The contacts will always include the `SysContact` defined in the Device's SNMP configuration and also every LibreNMS-User that has at least `read`-permissions on the entity that is to be alerted.
+The contacts will always include the `SysContact` defined in the Device's SNMP configuration and also every LibreNMS user that has at least `read`-permissions on the entity that is to be alerted.
 
 At the moment LibreNMS only supports Port or Device permissions.
 
-You can exclude the `SysContact` by setting:
+You can exclude the `SysContact` by toggling 'Issue alerts to sysContact'.
 
-```php
-$config['alert']['syscontact'] = false;
-```
+To include users that have `Global-Read`, `Administrator` or `Normal-User` permissions it is required to toggle the options:
 
-To include users that have `Global-Read` or `Administrator` permissions it is required to add these additions to the `config.php` respectively:
-
-```php
-$config['alert']['globals'] = true; //Include Global-Read into alert-contacts
-$config['alert']['admins']  = true; //Include Administrators into alert-contacts
-```
+  - Issue alerts to admins.
+  - Issue alerts to read only users
+  - Issue alerts to normal users.
 
 ## API
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
 API transports definitions are a bit more complex than the E-Mail configuration.
-The basis for configuration is ~~`$config['alert']['transports']['api'][METHOD]`~~ where `METHOD` can be `get`,`post` or `put`.
-This basis has to contain an array with URLs of each API to call.
 The URL can have the same placeholders as defined in the [Template-Syntax](Templates#syntax).
-If the `METHOD` is `get`, all placeholders will be URL-Encoded.
-The API transport uses cURL to call the APIs, therefore you might need to install `php5-curl` or similar in order to make it work.
-__Note__: it is highly recommended to define own [Templates](Templates) when you want to use the API transport. The default template might exceed URL-length for GET requests and therefore cause all sorts of errors.
+If the `Api Method` is `get`, all placeholders will be URL-Encoded.
+The API transport uses cURL to call the APIs, therefore you might need to install `php curl` to make it work.
+__Note__: it is highly recommended to define your own [Templates](Templates) when you want to use the API transport. The default template might exceed URL-length for GET requests and therefore cause all sorts of errors.
 
-Example:
-
-```php
-$config['alert']['transports']['api']['get'][] = "https://api.thirdparti.es/issue?apikey=abcdefg&subject=%title";
-```
 
 ## Boxcar
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
 Enabling Boxcar support is super easy.
-Copy your access token from the Boxcar app or from the Boxcar.io website and setup the transport in your config.php like:
-
-```php
-$config['alert']['transports']['boxcar'][] = array(
-                                                    "access_token" => 'ACCESSTOKENGOESHERE',
-                                                    );
-```
-
-To modify the Critical alert sound, add the 'sound_critical' parameter, example:
-
-```php
-$config['alert']['transports']['boxcar'][] = array(
-                                                    "access_token" => 'ACCESSTOKENGOESHERE',
-                                                    "sound_critical" => 'detonator-charge',
-                                                    );
-```
+Copy your access token from the Boxcar app or from the Boxcar.io website and setup the transport.
 
 ## Canopsis
 
-Canopsis is a hypervision tool. LibreNMS can send alerts to Canopsis which are then converted to canopsis events. To configure the transport, go to:
-
-Global Settings -> Alerting Settings -> Canopsis Transport.
+Canopsis is a hypervision tool. LibreNMS can send alerts to Canopsis which are then converted to canopsis events. 
 
 You will need to fill this paramaters :
 
 ```php
-$config['alert']['transports']['canopsis']['host'] = 'www.xxx.yyy.zzz';
-$config['alert']['transports']['canopsis']['port'] = '5672';
-$config['alert']['transports']['canopsis']['user'] = 'admin';
-$config['alert']['transports']['canopsis']['passwd'] = 'my_password';
-$config['alert']['transports']['canopsis']['vhost'] = 'canopsis';
+Hostname = www.xxx.yyy.zzz
+Port Number = 5672
+User = admin
+Password = my_password
+Vhost = canopsis
 ```
 
 For more information about canopsis and its events, take a look here :
@@ -88,42 +60,39 @@ For more information about canopsis and its events, take a look here :
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
-
 Cisco Spark. LibreNMS can send alerts to a Cisco Spark room. To make this possible you need to have a RoomID and a token. 
 
 For more information about Cisco Spark RoomID and token, take a look here :
- https://developer.ciscospark.com/getting-started.html
- https://developer.ciscospark.com/resource-rooms.html
 
-To configure the transport, go to:
-
-Global Settings -> Alerting Settings -> Cisco Spark transport.
-
-This can also be done manually in config.php :
-
-```php
-$config['alert']['transports']['ciscospark']['token'] = '1234567890QWERTYUIOP';
-$config['alert']['transports']['ciscospark']['roomid'] = '1234567890QWERTYUIOP';
-```
+  - [Getting started](https://developer.ciscospark.com/getting-started.html)
+  - [Rooms](https://developer.ciscospark.com/resource-rooms.html)
 
 ## Clickatell
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
 Clickatell provides a REST-API requiring an Authorization-Token and at least one Cellphone number.
-Please consult Clickatell's documentation regarding number formatting.
+
+[Clickatell Docs](https://www.clickatell.com/developers/api-documentation/rest-api-request-parameters/)
+
 Here an example using 3 numbers, any amount of numbers is supported:
 
 ```php
-$config['alert']['transports']['clickatell']['token'] = 'MYFANCYACCESSTOKEN';
-$config['alert']['transports']['clickatell']['to'][]  = '+1234567890';
-$config['alert']['transports']['clickatell']['to'][]  = '+1234567891';
-$config['alert']['transports']['clickatell']['to'][]  = '+1234567892';
++1234567890
++1234567891
++1234567892
 ```
 
 ## Discord
 
-The Discord transport will POST the alert message to your Discord Incoming WebHook (https://discordapp.com/developers/docs/resources/webhook). Simple html tags are stripped from the message. The only required value is for url, without this no call to Discord will be made. Below is an example webhook url: 
+The Discord transport will POST the alert message to your Discord Incoming WebHook. Simple html tags are stripped from the message. 
+
+The only required value is for url, without this no call to Discord will be made. The Options field supports the JSON/Form Params listed
+in the Discord Docs below.
+
+[Discord Docs](https://discordapp.com/developers/docs/resources/webhook#execute-webhook)
+
+An example webhook url: 
 
 ```
 https://discordapp.com/api/webhooks/4515489001665127664/82-sf4385ysuhfn34u2fhfsdePGLrg8K7cP9wl553Fg6OlZuuxJGaa1d54fe
@@ -131,108 +100,54 @@ https://discordapp.com/api/webhooks/4515489001665127664/82-sf4385ysuhfn34u2fhfsd
 
 ## Elasticsearch
 
-You can have LibreNMS emit alerts to an elasticsearch database. Each fault will be sent as a separate document.
+[Using a proxy?](../Support/Configuration.md#proxy-support)
+
+You can have LibreNMS send alerts to an elasticsearch database. Each fault will be sent as a separate document.
+
 The index pattern uses strftime() formatting.
-The proxy setting uses the proxy set in config.php if true and does not if false; this allows you to use local servers.
+
+As an example:
 
 ```php
-$config['alert']['transports']['elasticsearch']['es_host']   = '127.0.0.1';
-$config['alert']['transports']['elasticsearch']['es_port']  = 9200;
-$config['alert']['transports']['elasticsearch']['es_index']  = 'librenms-%Y.%m.%d';
-$config['alert']['transports']['elasticsearch']['es_proxy'] = false;
-```
-
-## E-Mail
-
-> You can configure these options within the WebUI now, please avoid setting these options within config.php
-
-For all but the default contact, we support setting multiple email addresses separated by a comma. So you can 
-set the devices sysContact, override the sysContact or have your users emails set like:
-
-`email@domain.com, alerting@domain.com`
-
-E-Mail transport is enabled with adding the following to your `config.php`:
-```php
-$config['alert']['transports']['mail'] = true;
-```
-
-The E-Mail transports uses the same email-configuration like the rest of LibreNMS.
-As a small reminder, here is it's configuration directives including defaults:
-
-```php
-$config['email_backend']                   = 'mail';               // Mail backend. Allowed: "mail" (PHP's built-in), "sendmail", "smtp".
-$config['email_from']                      = NULL;                 // Mail from. Default: "ProjectName" <projectid@`hostname`>
-$config['email_user']                      = $config['project_id'];
-$config['email_sendmail_path']             = '/usr/sbin/sendmail'; // The location of the sendmail program.
-$config['email_html']                      = FALSE;                // Whether to send HTML email as opposed to plaintext
-$config['email_smtp_host']                 = 'localhost';          // Outgoing SMTP server name.
-$config['email_smtp_port']                 = 25;                   // The port to connect.
-$config['email_smtp_timeout']              = 10;                   // SMTP connection timeout in seconds.
-$config['email_smtp_secure']               = NULL;                 // Enable encryption. Use 'tls' or 'ssl'
-$config['email_smtp_auth']                 = FALSE;                // Whether or not to use SMTP authentication.
-$config['email_smtp_username']             = NULL;                 // SMTP username.
-$config['email_smtp_password']             = NULL;                 // Password for SMTP authentication.
-
-$config['alert']['default_only']           = false;                //Only issue to default_mail
-$config['alert']['default_mail']           = '';                   //Default email
+Host = 127.0.0.1
+Port = 9200
+Index Patter = librenms-%Y.%m.%d
 ```
 
 ## Gitlab
 
-LibreNMS will create issues for warning and critical level alerts however only title and description are set.  Uses Personal access tokens to authenticate with Gitlab and will store the token in cleartext.
+LibreNMS will create issues for warning and critical level alerts however only title and description are set. 
+Uses Personal access tokens to authenticate with Gitlab and will store the token in cleartext.
 
 ```php
-$config['alert']['transports']['gitlab']['host'] = 'http://gitlab.host.tld';
-$config['alert']['transports']['gitlab']['project_id'] = '1';
-$config['alert']['transports']['gitlab']['key'] = 'AbCdEf12345';
+Host = http://gitlab.host.tld
+Project ID = 1
+Personal Access Token = AbCdEf12345
 ```
 
 ## HipChat
 
-> You can configure these options within the WebUI now, please avoid setting these options within config.php
-
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
-The HipChat transport requires the following:
-
-__room_id__ = HipChat Room ID
-
-__url__ = HipChat API URL+API Key
-
-__from__ = The name that will be displayed
-
-The HipChat transport makes the following optional:
-
-__color__ = Any of HipChat's supported message colors
-
-__message_format__ = Any of HipChat's supported message formats
-
-__notify__ = 0 or 1
-
-See the HipChat API Documentation for
-[rooms/message](https://www.hipchat.com/docs/api/method/rooms/message)
+See the HipChat API Documentation for [rooms/message](https://www.hipchat.com/docs/api/method/rooms/message)
 for details on acceptable values.
 
 > You may notice that the link points at the "deprecated" v1 API.  This is
 > because the v2 API is still in beta.
 
-Below are two examples of sending messages to a HipChat room.
+Below is an example of sending a message to a HipChat room.
 
 ```php
-$config['alert']['transports']['hipchat'][] = array("url" => "https://api.hipchat.com/v1/rooms/message?auth_token=9109jawregoaih",
-                                                    "room_id" => "1234567",
-                                                    "from" => "LibreNMS");
-
-$config['alert']['transports']['hipchat'][] = array("url" => "https://api.hipchat.com/v1/rooms/message?auth_token=109jawregoaihj",
-                                                    "room_id" => "7654321",
-                                                    "from" => "LibreNMS",
-                                                    "color" => "red",
-                                                    "notify" => 1,
-                                                    "message_format" => "text");
+API URL = https://api.hipchat.com/v1/rooms/message?auth_token=109jawregoaihj
+Room ID = 7654321
+From Name = LibreNMS
+Options = 
+  color = red
+  notify = 1
+  message_format = text
 ```
 
-These settings can also be configured from the WebUI, here's an example used for the HipChat V2 API:
-![HipChat V2 WebUI Example](/img/hipchatv2-webui.png)
+At present the following options are supported: `color`, `notify` and `message_format`. 
 
 > Note: The default message format for HipChat messages is HTML.  It is
 > recommended that you specify the `text` message format to prevent unexpected
@@ -241,39 +156,44 @@ These settings can also be configured from the WebUI, here's an example used for
 
 ## IRC
 
-> You can configure these options within the WebUI now, please avoid setting these options within config.php
-
 The IRC transports only works together with the LibreNMS IRC-Bot.
 Configuration of the LibreNMS IRC-Bot is described [here](https://github.com/librenms/librenms/blob/master/doc/Extensions/IRC-Bot.md).
 
-```php
-$config['alert']['transports']['irc'] = true;
-```
-
 ## JIRA
 
-You can have LibreNMS create issues on a Jira instance for critical and warning alerts. The Jira transport only sets summary and description fiels. Therefore your Jira project must not have any other mandatory field for the provided issuetype. The config fields that need to set are Jira URL, Jira username, Jira password, Project key, and issue type. 
-Currently http authentication is used to access Jira and Jira username and password will be stored as cleartext in the LibreNMS database.
+You can have LibreNMS create issues on a Jira instance for critical and warning alerts. The Jira transport only sets 
+summary and description fields. Therefore your Jira project must not have any other mandatory field for the provided 
+issuetype. The config fields that need to set are Jira URL, Jira username, Jira password, Project key, and issue type. 
+Currently http authentication is used to access Jira and Jira username and password will be stored as cleartext in the 
+LibreNMS database.
+
+[Jira Issue Types](https://confluence.atlassian.com/adminjiracloud/issue-types-844500742.html)
 
 ```php
-$config['alert']['transports']['jira']['url']   = 'https://myjira.mysite.com';
-$config['alert']['transports']['jira']['username']  = 'myjirauser';
-$config['alert']['transports']['jira']['password'] = 'myjirapass';
-$config['alert']['transports']['jira']['prjkey'][]  = 'JIRAPROJECTKEY';
-$config['alert']['transports']['jira']['issuetype'][]  = 'Myissuetype';
+URL = https://myjira.mysite.com
+Project Key = JIRAPROJECTKEY
+Issue Type = Myissuetype
+Jira Username = myjirauser
+Jira Password = myjirapass
 ```
+
+## Mail
+
+For all but the default contact, we support setting multiple email addresses separated by a comma. So you can 
+set the devices sysContact, override the sysContact or have your users emails set like:
+
+`email@domain.com, alerting@domain.com`
+
+The E-Mail transports uses the same email-configuration like the rest of LibreNMS.
+As a small reminder, here is it's configuration directives including defaults:
 
 ## Microsoft Teams
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
-Microsoft Teams. LibreNMS can send alerts to Microsoft Teams Connector API which are then posted to a specific channel. To configure the transport, go to:
+Microsoft Teams. LibreNMS can send alerts to Microsoft Teams Connector API which are then posted to a specific channel. 
 
-Global Settings -> Alerting Settings -> Microsoft Teams Transport.
-
-This can also be done manually in config.php :
-
-```php
+```
 $config['alert']['transports']['msteams']['url'] = 'https://outlook.office365.com/webhook/123456789';
 ```
 
