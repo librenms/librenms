@@ -59,4 +59,14 @@ class Pagerduty extends Transport
         }
         return true;
     }
+
+    public function contactPagerduty()
+    {
+        return [];// Pagerduty is a custom transport.
+    }
+
+    public static function configTemplate()
+    {
+        return [];// Pagerduty is a custom transport.
+    }
 }
