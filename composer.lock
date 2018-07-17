@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "46d46ce8e19364160fd20746ac67425c",
+    "content-hash": "d962cf418393daf777aa51f999b40933",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -3488,6 +3488,50 @@
             "time": "2018-01-29T19:49:41+00:00"
         },
         {
+            "name": "wpb/string-blade-compiler",
+            "version": "3.4.x-dev",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/librenms/StringBladeCompiler.git",
+                "reference": "30c974a305c14f412af3a8c515b74528429c4f5f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/librenms/StringBladeCompiler/zipball/30c974a305c14f412af3a8c515b74528429c4f5f",
+                "reference": "30c974a305c14f412af3a8c515b74528429c4f5f",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "5.4.*",
+                "php": ">=5.6.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Wpb\\String_Blade_Compiler\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Terre Porter",
+                    "email": "tporter@webpage-builders.com"
+                }
+            ],
+            "description": "Laravel Blade String Compiler, render string as blade templates",
+            "keywords": [
+                "blade",
+                "compiler",
+                "laravel"
+            ],
+            "support": {
+                "source": "https://github.com/librenms/StringBladeCompiler/tree/3.4"
+            },
+            "time": "2018-06-21T21:13:41+00:00"
+        },
+        {
             "name": "xjtuwangke/passwordhash",
             "version": "dev-master",
             "source": {
@@ -5029,7 +5073,8 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "xjtuwangke/passwordhash": 20,
-        "oriceon/toastr-5-laravel": 20
+        "oriceon/toastr-5-laravel": 20,
+        "wpb/string-blade-compiler": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
