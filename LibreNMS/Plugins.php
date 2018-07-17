@@ -100,44 +100,51 @@ class Plugins
      */
     public static function load($file, $pluginName)
     {
+        $plugin = self::getInstance($file, $pluginName);
 
-        $plugin    = false;
+        $class = get_class($plugin);
+        $hooks = get_class_methods($class);
+
+        foreach ((array)$hooks as $hookName) {
+            if ($hookName[0] != '_') {
+                self::$plugins[$hookName][] = $class;
+            }
+        }
+
+        return $plugin;
+    }
+
+    /**
+     * Get an instance of this plugin
+     * Search various namespaces and include files if needed.
+     *
+     * @param string $file
+     * @param string $pluginName
+     * @return object|null
+     */
+    private static function getInstance($file, $pluginName)
+    {
         $ns_prefix = 'LibreNMS\\Plugins\\';
         $ns_psr4   = $ns_prefix.$pluginName.'\\'.$pluginName;
         $ns_plugin = $ns_prefix.$pluginName;
         $ns_global = $pluginName;
 
-        if (class_exists($ns_psr4) && !$plugin) {
-            $pluginName = $ns_psr4;
-            $plugin     = new $ns_psr4;
+        if (class_exists($ns_psr4)) {
+            return new $ns_psr4;
         }
 
-        if (class_exists($ns_plugin) && !$plugin) {
-            $pluginName = $ns_plugin;
-            $plugin     = new $ns_plugin();
+        if (class_exists($ns_plugin)) {
+            return new $ns_plugin;
         }
 
-        // Include file because it's not psr4
-        if (!$plugin) {
-            include $file;
+        // Include file because it's not psr4 (may have been included by previous class_exists calls
+        include_once $file;
+
+        if (class_exists($ns_global)) {
+            return new $ns_global;
         }
 
-        if (class_exists($ns_global) && !$plugin) {
-            $pluginName = $ns_plugin;
-            $plugin     = new $ns_plugin();
-        }
-
-        if (!$plugin) {
-            return null;
-        }
-
-        $hooks = get_class_methods($plugin);
-        foreach ($hooks as $hookName) {
-            if ($hookName{0} != '_') {
-                self::$plugins[$hookName][] = $pluginName;
-            }
-        }
-        return $plugin;
+        return null;
     }
 
     /**
