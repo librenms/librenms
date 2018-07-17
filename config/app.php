@@ -161,7 +161,6 @@ return [
         Illuminate\Session\SessionServiceProvider::class,
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
-        Wpb\String_Blade_Compiler\ViewServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -177,6 +176,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\ComposerServiceProvider::class,
+        App\Providers\ViewServiceProvider::class,
 
         /*
          * Vendor Service Providers...
