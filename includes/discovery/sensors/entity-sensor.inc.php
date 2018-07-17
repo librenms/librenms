@@ -21,7 +21,7 @@ if (!empty($entity_array)) {
     echo ' entPhySensorValue';
     $entity_oids = snmpwalk_cache_multi_oid($device, 'entPhySensorValue', $entity_oids, 'ENTITY-SENSOR-MIB');
     if ($device['os'] === 'arista_eos') {
-        require 'includes/discovery/sensors/misc/arista-eos-limits.inc.php';
+        $entity_oids = snmpwalk_cache_oid($device, 'aristaEntSensorThresholdTable', $entity_oids, 'ARISTA-ENTITY-SENSOR-MIB');
     }
 }
 
