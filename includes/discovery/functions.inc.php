@@ -110,10 +110,15 @@ function load_discovery(&$device)
     }
 }
 
-function discover_device(&$device, $options = null)
+/**
+ * @param array $device The device to poll
+ * @param bool $force_module Ignore device module overrides
+ * @return bool if the device was discovered or skipped
+ */
+function discover_device(&$device, $force_module = false)
 {
     if ($device['snmp_disable'] == '1') {
-        return 0;
+        return false;
     }
 
     global $valid;
@@ -131,7 +136,7 @@ function discover_device(&$device, $options = null)
     $response = device_is_up($device, true);
 
     if ($response['status'] !== '1') {
-        return 0;
+        return false;
     }
 
     if ($device['os'] == 'generic') {
@@ -151,18 +156,6 @@ function discover_device(&$device, $options = null)
     $os = OS::make($device);
 
     echo "\n";
-
-    $force_module = false;
-    // If we've specified modules, use them, else walk the modules array
-    if ($options['m']) {
-        Config::set('discovery_modules', array());
-        foreach (explode(',', $options['m']) as $module) {
-            if (is_file("includes/discovery/$module.inc.php")) {
-                Config::set("discovery_modules.$module", 1);
-                $force_module = true;
-            }
-        }
-    }
 
     $discovery_devices = Config::get('discovery_modules', array());
     $discovery_devices = array('core' => true) + $discovery_devices;
@@ -208,7 +201,7 @@ function discover_device(&$device, $options = null)
     echo "Discovered in $device_time seconds\n";
 
     echo PHP_EOL;
-    return 1;
+    return true;
 }
 //end discover_device()
 
@@ -954,7 +947,7 @@ function can_skip_sensor($value, $data, $group, $pre_cache = array())
         }
     }
 
-    $skip_value_gt = array_reduce((array)$group['skip_value_gt'], (array)$data['skip_value_gt']);
+    $skip_value_gt = array_replace((array)$group['skip_value_gt'], (array)$data['skip_value_gt']);
     foreach ($skip_value_gt as $skip_value) {
         if ($value > $skip_value) {
             return true;

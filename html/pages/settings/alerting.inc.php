@@ -1568,6 +1568,7 @@ echo '
                         <label for="hue_duration" class="col-sm-4 control-label">Philips Hue Duration</label>
                         <div class="col-sm-4">
                             <select id="hue_duration" class="form-control" name="global-config-select" data-config_id="'.$hue_duration['config_id'].'">
+                                <option '.( $hue_duration['config_value'] == "" ? "selected" : ""). ' value=""></option>
                                 <option '.( $hue_duration['config_value'] == "select" ? "selected" : ""). ' value="select">1 Second</option>
                                 <option '.( $hue_duration['config_value'] == "lselect" ? "selected" : ""). ' value="lselect">15 Seconds</option>
                             </select>

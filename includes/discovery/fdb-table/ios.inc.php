@@ -30,7 +30,7 @@ foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
                 $portid_dict[$portLocal] = $port['port_id'];
             }
 
-            foreach ($fdbPort_table['dot1dTpFdbPort'] as $mac => $dot1dBasePort) {
+            foreach ((array)$fdbPort_table['dot1dTpFdbPort'] as $mac => $dot1dBasePort) {
                 $mac_address = implode(array_map('zeropad', explode(':', $mac)));
                 if (strlen($mac_address) != 12) {
                     d_echo("MAC address padding failed for $mac\n");

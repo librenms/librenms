@@ -60,7 +60,7 @@ class DBSetupTest extends DBTestCase
                 }
 
                 // cannot assume user use the librenms database name
-                if (str_contains($line, 'librenms')) {
+                if (str_contains($line, 'librenms.')) {
                     throw new PHPUnitException("Do not include the database name in schema files\n$file: $line");
                 }
             }
