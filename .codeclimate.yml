@@ -11,6 +11,9 @@ engines:
     enabled: true
     config:
         standard: "PSR2"
+    checks:
+      Generic Files LineLength TooLong:
+        enabled: false
   duplication:
     enabled: true
     config:
