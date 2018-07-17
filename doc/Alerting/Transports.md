@@ -20,6 +20,9 @@ To include users that have `Global-Read`, `Administrator` or `Normal-User` permi
   - Issue alerts to read only users
   - Issue alerts to normal users.
 
+## Using a Proxy?
+[Proxy Configuration](../Support/Configuration.md#proxy-support)
+
 ## API
 API transports definitions are a bit more complex than the E-Mail configuration.
 
@@ -37,8 +40,6 @@ API Method | get
 API URL    | http://my.example.com/api
 
 ## Boxcar
-[Using a proxy?](../Support/Configuration.md#proxy-support)
-
 Copy your access token from the Boxcar app or from the Boxcar.io website and setup the transport.
 
 [Boxcar Docs](http://developer.boxcar.io/api/publisher/)
@@ -61,9 +62,6 @@ Password | my_password
 Vhost | canopsis
 
 ## Cisco Spark
-
-[Using a proxy?](../Support/Configuration.md#proxy-support)
-
 Cisco Spark. LibreNMS can send alerts to a Cisco Spark room. To make this possible you need to have a RoomID and a token. 
 
 For more information about Cisco Spark RoomID and token, take a look here :
@@ -71,17 +69,22 @@ For more information about Cisco Spark RoomID and token, take a look here :
   - [Getting started](https://developer.ciscospark.com/getting-started.html)
   - [Rooms](https://developer.ciscospark.com/resource-rooms.html)
 
+Config | Example
+------ | -------
+API Token | ASd23r23edewda
+RoomID | 34243243251
+
 ## Clickatell
-
-[Using a proxy?](../Support/Configuration.md#proxy-support)
-
 Clickatell provides a REST-API requiring an Authorization-Token and at least one Cellphone number.
 
 [Clickatell Docs](https://www.clickatell.com/developers/api-documentation/rest-api-request-parameters/)
 
 Here an example using 3 numbers, any amount of numbers is supported:
 
-```php
+Config | Example
+------ | -------
+Token | dsaWd3rewdwea
+Mobile Numbers | ```
 +1234567890
 +1234567891
 +1234567892
