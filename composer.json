@@ -74,6 +74,7 @@
         "psr-4": {
             "App\\": "app",
             "LibreNMS\\": "LibreNMS",
+            "LibreNMS\\Plugins\\" : "html/plugins",
             "LibreNMS\\Tests\\": "tests"
         }
     },
