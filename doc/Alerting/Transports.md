@@ -34,6 +34,7 @@ The API transport uses cURL to call the APIs, therefore you might need to instal
 
 __Note__: it is highly recommended to define your own [Templates](Templates) when you want to use the API transport. The default template might exceed URL-length for GET requests and therefore cause all sorts of errors.
 
+**Example:**
 Config | Example
 ------ | -------
 API Method | get
@@ -44,6 +45,7 @@ Copy your access token from the Boxcar app or from the Boxcar.io website and set
 
 [Boxcar Docs](http://developer.boxcar.io/api/publisher/)
 
+**Example:**
 Config | Example
 ------ | -------
 Access Token | i23f23mr23rwerw
@@ -53,6 +55,7 @@ Canopsis is a hypervision tool. LibreNMS can send alerts to Canopsis which are t
 
 [Canopsis Docs](http://www.canopsis.org/wp-content/themes/canopsis/doc/sakura/user-guide/event-spec.html)
 
+**Example:**
 Config | Example
 ------ | -------
 Hostname | www.xxx.yyy.zzz
@@ -69,6 +72,7 @@ For more information about Cisco Spark RoomID and token, take a look here :
   - [Getting started](https://developer.ciscospark.com/getting-started.html)
   - [Rooms](https://developer.ciscospark.com/resource-rooms.html)
 
+**Example:**
 Config | Example
 ------ | -------
 API Token | ASd23r23edewda
@@ -81,78 +85,66 @@ Clickatell provides a REST-API requiring an Authorization-Token and at least one
 
 Here an example using 3 numbers, any amount of numbers is supported:
 
+**Example:**
 Config | Example
 ------ | -------
 Token | dsaWd3rewdwea
-Mobile Numbers | ```
-+1234567890
-+1234567891
-+1234567892
-```
+Mobile Numbers | +1234567890,+1234567891,+1234567892
 
 ## Discord
+The Discord transport will POST the alert message to your Discord Incoming WebHook. Simple html tags are stripped from 
+the message. 
 
-The Discord transport will POST the alert message to your Discord Incoming WebHook. Simple html tags are stripped from the message. 
-
-The only required value is for url, without this no call to Discord will be made. The Options field supports the JSON/Form Params listed
-in the Discord Docs below.
+The only required value is for url, without this no call to Discord will be made. The Options field supports the
+JSON/Form Params listed in the Discord Docs below.
 
 [Discord Docs](https://discordapp.com/developers/docs/resources/webhook#execute-webhook)
 
-An example webhook url: 
-
-```
-https://discordapp.com/api/webhooks/4515489001665127664/82-sf4385ysuhfn34u2fhfsdePGLrg8K7cP9wl553Fg6OlZuuxJGaa1d54fe
-```
+**Example:**
+Config | Example
+------ | -------
+Discord URL | https://discordapp.com/api/webhooks/4515489001665127664/82-sf4385ysuhfn34u2fhfsdePGLrg8K7cP9wl553Fg6OlZuuxJGaa1d54fe
+Options | username=myname
 
 ## Elasticsearch
-
-[Using a proxy?](../Support/Configuration.md#proxy-support)
-
 You can have LibreNMS send alerts to an elasticsearch database. Each fault will be sent as a separate document.
 
 The index pattern uses strftime() formatting.
 
-As an example:
-
-```php
-Host = 127.0.0.1
-Port = 9200
-Index Patter = librenms-%Y.%m.%d
-```
+**Example:**
+Config | Example
+------ | -------
+Host | 127.0.0.1
+Port | 9200
+Index Patter | librenms-%Y.%m.%d
 
 ## Gitlab
-
 LibreNMS will create issues for warning and critical level alerts however only title and description are set. 
 Uses Personal access tokens to authenticate with Gitlab and will store the token in cleartext.
 
-```php
-Host = http://gitlab.host.tld
-Project ID = 1
-Personal Access Token = AbCdEf12345
-```
+**Example:**
+Config | Example
+------ | -------
+Host | http://gitlab.host.tld
+Project ID | 1
+Personal Access Token | AbCdEf12345
 
 ## HipChat
-
-[Using a proxy?](../Support/Configuration.md#proxy-support)
-
 See the HipChat API Documentation for [rooms/message](https://www.hipchat.com/docs/api/method/rooms/message)
 for details on acceptable values.
 
 > You may notice that the link points at the "deprecated" v1 API.  This is
 > because the v2 API is still in beta.
 
-Below is an example of sending a message to a HipChat room.
-
-```php
-API URL = https://api.hipchat.com/v1/rooms/message?auth_token=109jawregoaihj
-Room ID = 7654321
-From Name = LibreNMS
-Options = 
-  color = red
-  notify = 1
-  message_format = text
-```
+**Example:**
+Config | Example
+------ | -------
+API URL | https://api.hipchat.com/v1/rooms/message?auth_token=109jawregoaihj
+Room ID | 7654321
+From Name | LibreNMS
+Options | color = red
+ | notify = 1
+ | message_format = text
 
 At present the following options are supported: `color`, `notify` and `message_format`. 
 
@@ -162,12 +154,15 @@ At present the following options are supported: `color`, `notify` and `message_f
 > `>`).
 
 ## IRC
-
 The IRC transports only works together with the LibreNMS IRC-Bot.
 Configuration of the LibreNMS IRC-Bot is described [here](https://github.com/librenms/librenms/blob/master/doc/Extensions/IRC-Bot.md).
 
-## JIRA
+**Example:**
+Config | Example
+------ | -------
+IRC | enabled
 
+## JIRA
 You can have LibreNMS create issues on a Jira instance for critical and warning alerts. The Jira transport only sets 
 summary and description fields. Therefore your Jira project must not have any other mandatory field for the provided 
 issuetype. The config fields that need to set are Jira URL, Jira username, Jira password, Project key, and issue type. 
@@ -176,16 +171,16 @@ LibreNMS database.
 
 [Jira Issue Types](https://confluence.atlassian.com/adminjiracloud/issue-types-844500742.html)
 
-```php
-URL = https://myjira.mysite.com
-Project Key = JIRAPROJECTKEY
-Issue Type = Myissuetype
-Jira Username = myjirauser
-Jira Password = myjirapass
-```
+**Example:**
+Config | Example
+------ | -------
+URL | https://myjira.mysite.com
+Project Key | JIRAPROJECTKEY
+Issue Type | Myissuetype
+Jira Username | myjirauser
+Jira Password | myjirapass
 
 ## Mail
-
 For all but the default contact, we support setting multiple email addresses separated by a comma. So you can 
 set the devices sysContact, override the sysContact or have your users emails set like:
 
@@ -194,27 +189,29 @@ set the devices sysContact, override the sysContact or have your users emails se
 The E-Mail transports uses the same email-configuration like the rest of LibreNMS.
 As a small reminder, here is it's configuration directives including defaults:
 
+**Example:**
+Config | Example
+------ | -------
+Email | me@example.com
+
 ## Microsoft Teams
-
-[Using a proxy?](../Support/Configuration.md#proxy-support)
-
 Microsoft Teams. LibreNMS can send alerts to Microsoft Teams Connector API which are then posted to a specific channel. 
 
-```
-WebHook URL: https://outlook.office365.com/webhook/123456789
-```
+**Example:**
+Config | Example
+------ | -------
+WebHook URL | https://outlook.office365.com/webhook/123456789
 
 ## Nagios Compatible
 The nagios transport will feed a FIFO at the defined location with the same format that nagios would.
 This allows you to use other alerting systems with LibreNMS, for example [Flapjack](http://flapjack.io).
 
-```php
-Nagios FIFO: /path/to/my.fifo
-```
+**Example:**
+Config | Example
+------ | -------
+Nagios FIFO | /path/to/my.fifo
 
 ## OpsGenie
-[Using a proxy?](../Support/Configuration.md#proxy-support)
-
 Using OpsGenie LibreNMS integration, LibreNMS forwards alerts to OpsGenie with detailed information.
 OpsGenie acts as a dispatcher for LibreNMS alerts, determines the right people to notify based on on-call 
 schedules and notifies via email, text messages (SMS), phone calls and iOS & Android push notifications.
@@ -226,23 +223,21 @@ once you signup. Then copy the API key from OpsGenie to LibreNMS.
 If you want to automatically ack and close alerts, leverage Marid integration. More detail with screenshots is 
 available in [OpsGenie LibreNMS Integration page](https://docs.opsgenie.com/docs/librenms-integration).
 
-```
-WebHook URL: https://url/path/to/webhook
-```
+**Example:**
+Config | Example
+------ | -------
+WebHook URL | https://url/path/to/webhook
 
 ## osTicket
-[Using a proxy?](../Support/Configuration.md#proxy-support)
-
 LibreNMS can send alerts to osTicket API which are then converted to osTicket tickets. 
 
-```php
-API URL: http://osticket.example.com/api/http.php/tickets.json
-API Token: 123456789
-```
+**Example:**
+Config | Example
+------ | -------
+API URL | http://osticket.example.com/api/http.php/tickets.json
+API Token | 123456789
 
 ## PagerDuty
-[Using a proxy?](../Support/Configuration.md#proxy-support)
-
 PagerDuty setup is currently done by a two way integration. Start this process from Settings -> Alerting Settings from within LibreNMS.
 
 [PagerDuty Docs](https://www.pagerduty.com/docs/guides/librenms-integration-guide/)
@@ -260,16 +255,14 @@ To setup, go to the you http://`your-bridge-ip`/debug/clip.html
 
 More Info: [Philips Hue Documentation](https://www.developers.meethue.com/documentation/getting-started)
 
-```
-Host: http://your-bridge-ip
-Hue User: username
-Duration: 1 Second
-```
+**Example:**
+Config | Example
+------ | -------
+Host | http://your-bridge-ip
+Hue User | username
+Duration | 1 Second
 
 ## PlaySMS
-
-[Using a proxy?](../Support/Configuration.md#proxy-support)
-
 PlaySMS is an open source SMS-Gateway that can be used via their HTTP API using a Username and WebService Token.
 Please consult PlaySMS's documentation regarding number formatting.
 
@@ -277,34 +270,27 @@ Please consult PlaySMS's documentation regarding number formatting.
 
 Here an example using 3 numbers, any amount of numbers is supported:
 
-```
-PlaySMS: https://localhost/index.php?app=ws
-User: user1
-Token: MYFANCYACCESSTOKEN
-From: My Name
-Mobiles:
-    +1234567892
-    +1234567890
-    +1234567891
-```
+**Example:**
+Config | Example
+------ | -------
+PlaySMS | https://localhost/index.php?app=ws
+User | user1
+Token | MYFANCYACCESSTOKEN
+From | My Name
+Mobiles | +1234567892,+1234567890,+1234567891
 
 ## Pushbullet
-[Using a proxy?](../Support/Configuration.md#proxy-support)
-
 Get your Access Token from your Pushbullet's settings page and set it in your transport:
 
-```php
-Access Token: MYFANCYACCESSTOKEN
-```
+**Example:**
+Config | Example
+------ | -------
+Access Token | MYFANCYACCESSTOKEN
 
 ## Pushover
-[Using a proxy?](../Support/Configuration.md#proxy-support)
-
 If you want to change the [notification sounds](https://pushover.net/api#sounds) then add it in Pushover Options:
 
-```php
-sound_critical=falling
-```
+`sound_critical=falling`
 
 Enabling Pushover support is fairly easy, there are only two required parameters.
 
@@ -314,34 +300,30 @@ Now copy your API Key and obtain your User Key from the newly created Applicatio
 
 [Pushover Docs](https://pushover.net/api)
 
-```php
-Api Key: APPLICATIONAPIKEYGOESHERE
-User Key: USERKEYGOESHERE
-Pushover Options:
-   sound_critical=falling
-```
+**Example:**
+Config | Example
+------ | -------
+Api Key | APPLICATIONAPIKEYGOESHERE
+User Key | USERKEYGOESHERE
+Pushover Options | sound_critical=falling
 
 ## Rocket.chat
-[Using a proxy?](../Support/Configuration.md#proxy-support)
-
 The Rocket.chat transport will POST the alert message to your Rocket.chat Incoming WebHook using the
 attachments option. Simple html tags are stripped from the message. All options are optional, the only
 required value is for url, without this then no call to Rocket.chat will be made.
 
 [Rocket.chat Docs](https://rocket.chat/docs/developer-guides/rest-api/chat/postmessage)
 
-```php
-Webhook URL: https://rocket.url/api/v1/chat.postMessage
-Rocket.chat Options:
-    channel=#Alerting
-    username=myname
-    icon_url=http://someurl/image.gif
-    icon_emoji=:smirk:
-```
+**Example:**
+Config | Example
+------ | -------
+Webhook URL | https://rocket.url/api/v1/chat.postMessage
+Rocket.chat Options | channel=#Alerting
+ | username=myname
+ | icon_url=http://someurl/image.gif
+ | icon_emoji=:smirk:
 
 ## Slack
-[Using a proxy?](../Support/Configuration.md#proxy-support)
-
 The Slack transport will POST the alert message to your Slack Incoming WebHook using the attachments option,
 you are able to specify multiple webhooks along with the relevant options to go with it. Simple html tags 
 are stripped from the message. All options are optional, the only required value is for url, without this 
@@ -353,29 +335,27 @@ We currently support the following attachment options:
 
 [Slack docs](https://api.slack.com/docs/message-attachments)
 
-```
-Webhook URL: https://slack.com/url/somehook
-Slack Options:
-    author_name=Me
-```
+**Example:**
+Config | Example
+------ | -------
+Webhook URL | https://slack.com/url/somehook
+Slack Options | author_name=Me
 
 ## SMSEagle
-[Using a proxy?](../Support/Configuration.md#proxy-support)
-
 SMSEagle is a hardware SMS Gateway that can be used via their HTTP API using a Username and password.
 
 Destination numbers are one per line, with no spaces. They can be in either local or international dialling format.
 
 [SMSEagle Docs](http://www.smseagle.eu)
 
-```php
-SMSEagle URL: ip.add.re.ss
-User: smseagle_user
-Password: smseagle_user_password
-Mobiles:
-    +3534567890
-    0834567891
-```
+**Example:**
+Config | Example
+------ | -------
+SMSEagle URL | ip.add.re.ss
+User | smseagle_user
+Password | smseagle_user_password
+Mobiles | +3534567890
+ | 0834567891
 
 ## Syslog
 You can have LibreNMS emit alerts as syslogs complying with RFC 3164.
@@ -386,15 +366,14 @@ Example output: `<26> Mar 22 00:59:03 librenms.host.net librenms[233]: [Critical
 
 Each fault will be sent as a separate syslog.
 
-```php
-Host: 127.0.0.1
-Port: 514
-Facility: 3
-```
+**Example:**
+Config | Example
+------ | -------
+Host | 127.0.0.1
+Port | 514
+Facility | 3
 
 ## Telegram
-[Using a proxy?](../Support/Configuration.md#proxy-support)
-
 > Thank you to [snis](https://github.com/snis) for these instructions.
 
 1. First you must create a telegram account and add BotFather to you list. To do this click on the following url: https://telegram.me/botfather
@@ -414,14 +393,13 @@ Click on 'Add Telegram config' and put your chat id and token into the relevant 
 
 [Telegram Docs](https://core.telegram.org/api)
 
-```
-Chat ID: 34243432
-Token: 3ed32wwf235234
-```
+**Example:**
+Config | Example
+------ | -------
+Chat ID | 34243432
+Token | 3ed32wwf235234
 
 ## VictorOps
-[Using a proxy?](../Support/Configuration.md#proxy-support)
-
 VictorOps provide a webHook url to make integration extremely simple. To get the URL required login to your VictorOps 
 account and go to:
 
@@ -432,6 +410,7 @@ sending the alerts such as librenms. I.e:
 
 `https://alert.victorops.com/integrations/generic/20132414/alert/2f974ce1-08fc-4dg8-a4f4-9aee6cf35c98/librenms`
 
-```
-Post URL: https://alert.victorops.com/integrations/generic/20132414/alert/2f974ce1-08fc-4dg8-a4f4-9aee6cf35c98/librenms
-```
+**Example:**
+Config | Example
+------ | -------
+Post URL | https://alert.victorops.com/integrations/generic/20132414/alert/2f974ce1-08fc-4dg8-a4f4-9aee6cf35c98/librenms
