@@ -25,7 +25,6 @@
 
 namespace App\Providers;
 
-
 class ViewServiceProvider extends \Illuminate\View\ViewServiceProvider
 {
     public function register()
