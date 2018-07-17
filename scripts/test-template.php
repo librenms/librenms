@@ -31,6 +31,7 @@ if (isset($options['t']) && isset($options['h']) && isset($options['r'])) {
     $obj['title']     = $type->getTitle($obj);
     $obj['msg']       = $type->getBody($obj);
     unset($obj['template']);
+    unset($obj['alert']);
     print_r($obj);
 } else {
     c_echo("
