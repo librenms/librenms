@@ -118,9 +118,9 @@ class Plugins
      * Get an instance of this plugin
      * Search various namespaces and include files if needed.
      *
-     * @param $file
-     * @param $pluginName
-     * @return null
+     * @param string $file
+     * @param string $pluginName
+     * @return object|null
      */
     private static function getInstance($file, $pluginName)
     {
