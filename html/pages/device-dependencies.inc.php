@@ -124,27 +124,23 @@ var grid = $("#hostdeps").bootgrid({
 $(document).ready(function() {
     var editSelect = $('#availableparents').select2({
         dropdownParent: $('#edit-dependency'),
-        width: 'resolve',
-        tags: true,
+        width: 'resolve'
 
     });
 
     var manParentDevstoClr = $('#manclearchildren').select2({
         dropdownParent: $('#manage-dependencies'),
-        width: 'resolve',
-        tags: true
+        width: 'resolve'
     });
 
     var manParentDevs = $('#manavailableparents').select2({
         dropdownParent: $('#manage-dependencies'),
-        width: 'resolve',
-        tags: true
+        width: 'resolve'
     });
 
     var manAllDevs = $('#manalldevices').select2({
         dropdownParent: $('#manage-dependencies'),
-        width: 'resolve',
-        tags: true
+        width: 'resolve'
     });
 
     $.ajax({
