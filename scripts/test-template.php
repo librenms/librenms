@@ -5,6 +5,7 @@ $init_modules = ['alerts', 'alerts-cli'];
 require __DIR__ . '/../includes/init.php';
 
 use LibreNMS\Alert\Template;
+use LibreNMS\Alert\AlertData;
 
 $options = getopt('t:h:r:p:s:d::');
 
@@ -26,9 +27,11 @@ if (isset($options['t']) && isset($options['h']) && isset($options['r'])) {
         $obj['transport'] = $options['p'];
     }
     $type  = new Template;
+    $obj['alert']     = new AlertData($obj);
     $obj['title']     = $type->getTitle($obj);
     $obj['msg']       = $type->getBody($obj);
     unset($obj['template']);
+    unset($obj['alert']);
     print_r($obj);
 } else {
     c_echo("
