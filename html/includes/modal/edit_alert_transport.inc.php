@@ -126,7 +126,7 @@ foreach (scandir($transport_dir) as $transport) {
             echo '</div>';
         } elseif ($item['type'] === 'textarea') {
             echo '<div class="col-sm-3">';
-            echo '<textarea name="' . $item['name'] . '" id="' . $item['name'] . '" class="form-control">';
+            echo '<textarea name="' . $item['name'] . '" id="' . $item['name'] . '" class="form-control" placeholder="'.$item['descr'].'">';
             echo '</textarea>';
             echo '</div>';
         }
