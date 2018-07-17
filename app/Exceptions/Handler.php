@@ -68,9 +68,9 @@ class Handler extends ExceptionHandler
 
         if (config('app.debug')) {
             return parent::render($request, $exception);
-        } else {
-            return view('errors.generic')->with('exception', $exception);
         }
+
+        return view('errors.generic')->with('exception', $exception);
     }
 
     /**
