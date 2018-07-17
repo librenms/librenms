@@ -122,7 +122,8 @@ class Plugins
      * @param $pluginName
      * @return null
      */
-    private static function getInstance($file, $pluginName) {
+    private static function getInstance($file, $pluginName)
+    {
         $ns_prefix = 'LibreNMS\\Plugins\\';
         $ns_psr4   = $ns_prefix.$pluginName.'\\'.$pluginName;
         $ns_plugin = $ns_prefix.$pluginName;
