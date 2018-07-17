@@ -303,17 +303,17 @@ foreach (dbFetchRows('SELECT `notifications`.* FROM `notifications` WHERE NOT ex
 }
 
 if (is_array($msg_box)) {
-    echo("<script>
+    echo "<script>
         toastr.options.timeout = 10;
         toastr.options.extendedTimeOut = 20;
-    ");
+        </script>
+    ";
+
     foreach ($msg_box as $message) {
-        $message['type'] = mres($message['type']);
-        $message['message'] = mres($message['message']);
-        $message['title'] = mres($message['title']);
-        echo "toastr.".$message['type']."('".$message['message']."','".$message['title']."');\n";
+        Toastr::add($message['type'], $message['message'], $message['title']);
     }
-    echo("</script>");
+
+    echo Toastr::render();
 }
 
 if ($no_refresh !== true && $config['page_refresh'] != 0) {
