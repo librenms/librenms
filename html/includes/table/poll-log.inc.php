@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Config;
 use LibreNMS\Authentication\Auth;
 
 $sql = ' FROM `devices` AS D ';
