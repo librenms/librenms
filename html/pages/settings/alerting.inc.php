@@ -398,6 +398,7 @@ $mail_conf = array(
 );
 
 echo '
+<div class="well"><strong>DEPRECATED</strong>: Please use the new Alert Transports section under Alerts to configure transports - <a href="https://docs.librenms.org/Alerting/Transports/" target="_blank">docs</a>.</div>
 <div class="panel-group" id="accordion">
     <form class="form-horizontal" role="form" action="" method="post">
 ';

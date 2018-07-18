@@ -823,11 +823,13 @@ function ExtTransports($obj)
             if (is_array($opts)) {
                 $opts = array_filter($opts);
             }
+            $class  = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport);
             if (($opts === true || !empty($opts)) && $opts != false && class_exists($class)) {
                 $transport_maps[] = [
                     'transport_id' => null,
                     'transport_type' => $transport,
                     'opts' => $opts,
+                    'legacy' => true,
                 ];
             }
         }
@@ -837,18 +839,23 @@ function ExtTransports($obj)
     foreach ($transport_maps as $item) {
         $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($item['transport_type']);
         if (class_exists($class)) {
+            $transport_title = ($item['legacy'] === true) ? "{$item['transport_type']} (legacy)" : $item['transport_type'];
             $obj['transport'] = $item['transport_type'];
             $obj['alert']     = new AlertData($obj);
             $obj['title']     = $type->getTitle($obj);
             $obj['alert']['title'] = $obj['title'];
             $obj['msg']       = $type->getBody($obj);
-            echo $item['transport_type'] . ' => ';
+            echo "$transport_title => ";
             $instance = new $class($item['transport_id']);
             $tmp = $instance->deliverAlert($obj, $item['opts']);
             AlertLog($tmp, $obj, $obj['transport']);
             unset($instance);
             echo '; ';
         }
+    }
+
+    if (count($transport_maps) === 0) {
+        echo 'No configured transports';
     }
 }//end ExtTransports()
 
