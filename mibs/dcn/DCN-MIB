@@ -14919,7 +14919,7 @@ dhcpSnoopingStatisticDiscardPktsNum OBJECT-TYPE
                      src-ip(5),
                      dst-ip(6),
                      dst-src-mac-ip(7),
-                            enhance-profile&#40;8&#41;
+                     enhance-profile(8)
                 }
      MAX-ACCESS read-create
      STATUS     current
@@ -18705,8 +18705,7 @@ ntpEntNTPCompliance MODULE-COMPLIANCE
     MODULE  -- this module
         MANDATORY-GROUPS {
                            ntpEntObjectsGroup1,
-                           ntpEntObjectsGroup2,
-                           ntpEntNotifPrefixGroup
+                           ntpEntObjectsGroup2
         }
         ::= { ntpEntCompliances 1 }
 
@@ -18781,22 +18780,6 @@ ntpEntObjectsGroup2 OBJECT-GROUP
          for NTP or SNTP entities to implement."
     ::= { ntpEntGroups 2 }
 
---ntpEntNotifPrefixGroup NOTIFICATION-GROUP
---    NOTIFICATIONS {
---                    ntpEntNotifModeChange,
---                    ntpEntNotifStratumChange,
---                    ntpEntNotifSyspeerChanged,
---                    ntpEntNotifAddAssociation,
---                    ntpEntNotifRemoveAssociation,
---                    ntpEntNotifConfigChanged,
---                    ntpEntNotifLeapSecondAnnounced,
---                    ntpEntNotifHeartbeat
---    }
---    STATUS      current
---    DESCRIPTION
---        "A collection of notifications for the NTP MIB"
---    ::= { ntpEntGroups 3 }
- 
 --********************************************************************************************************
 --********************************************************************************************************              
 
