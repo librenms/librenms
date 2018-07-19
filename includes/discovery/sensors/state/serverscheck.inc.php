@@ -1,8 +1,8 @@
 <?php
 /**
- * etherprobe2.inc.php
+ * serverscheck.inc.php
  *
- * LibreNMS state discover module for Atal EtherProbe2
+ * LibreNMS state discover module for serverscheck flooding sensor
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
