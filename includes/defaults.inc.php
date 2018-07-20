@@ -341,18 +341,22 @@ $config['graph_colours']['mega']=array_merge(
 
 // Map colors
 $config['network_map_legend'] = array(
-    '0'   => '#aeaeae',
-    '10'  => '#79847e',
-    '20'  => '#97ffca',
-    '30'  => '#a800ff',
-    '40'  => '#6c00ff',
-    '50'  => '#00d2ff',
-    '60'  => '#0090ff',
-    '70'  => '#ffe400',
-    '80'  => '#ffa200',
-    '90'  => '#ff6600',
-    '100' => '#ff0000',
+    '0'        => '#aeaeae',
+    '10'       => '#79847e',
+    '20'       => '#97ffca',
+    '30'       => '#a800ff',
+    '40'       => '#6c00ff',
+    '50'       => '#00d2ff',
+    '60'       => '#0090ff',
+    '70'       => '#ffe400',
+    '80'       => '#ffa200',
+    '90'       => '#ff6600',
+    '100'      => '#ff0000',
+    'd.edge'   => '#eeeeee',
+    'd.border' => '#dddddd',
+    'd.node'   => '#eeeeee',
 );
+
 
 // Default mini graph time options:
 $config['graphs']['mini']['widescreen'] = array(
