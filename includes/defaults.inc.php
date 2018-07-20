@@ -357,7 +357,6 @@ $config['network_map_legend'] = array(
     'd.node'   => '#eeeeee',
 );
 
-
 // Default mini graph time options:
 $config['graphs']['mini']['widescreen'] = array(
     'sixhour' => '6 Hours',
