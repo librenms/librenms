@@ -120,7 +120,7 @@ snmpwalk <various options depending on your setup> localhost NET-SNMP-EXTEND-MIB
 A small shell script that reports various Asterisk call status.
 
 ##### SNMP Extend
-1. Copy the [asterisk script](https://github.com/librenms/librenms-agent/blob/master/snmp//asterisk) to `/etc/snmp/` on your asterisk server.
+1. Copy the [asterisk script](https://github.com/librenms/librenms-agent/blob/master/snmp/asterisk) to `/etc/snmp/` on your asterisk server.
 
 2. Run `chmod +x /etc/snmp/asterisk`
 
