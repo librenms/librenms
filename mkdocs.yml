@@ -105,6 +105,7 @@ pages:
       - Alerting/Rules.md
       - Alerting/Templates.md
       - Alerting/Transports.md
+      - Alerting/Creating-Transport.md
       - Alerting/Entities.md
       - Alerting/Macros.md
       - Alerting/Testing.md

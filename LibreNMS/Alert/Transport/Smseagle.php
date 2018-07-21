@@ -23,18 +23,35 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Smseagle implements Transport
+class Smseagle extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        $params = array(
+        if (empty($this->config)) {
+            return $this->deliverAlertOld($obj, $opts);
+        }
+        $smseagle_opts['url']   = $this->config['playsms-url'];
+        $smseagle_opts['user']  = $this->config['playsms-user'];
+        $smseagle_opts['token'] = $this->config['playsms-pass'];
+        $smseagle_opts['to']    = preg_split('/([,\r\n]+)/', $this->config['playsms-mobiles']);
+        return $this->contactSmseagle($obj, $smseagle_opts);
+    }
+
+    public function deliverAlertOld($obj, $opts)
+    {
+        return $this->contactSmseagle($obj, $opts);
+    }
+
+    public static function contactSmseagle($obj, $opts)
+    {
+        $params = [
             'login' => $opts['user'],
             'pass' => $opts['token'],
             'to' => implode(',', $opts['to']),
             'message' => $obj['title'],
-        );
+        ];
         $url    = 'http://' . $opts['url'] . '/index.php/http_api/send_sms?' . http_build_query($params);
         $curl   = curl_init($url);
 
@@ -48,5 +65,43 @@ class Smseagle implements Transport
         } else {
             return false;
         }
+    }
+
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'SMSEagle URL',
+                    'name' => 'smseagle-url',
+                    'descr' => 'SMSEagle URL',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'User',
+                    'name' => 'smseagle-user',
+                    'descr' => 'SMSEagle User',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Password',
+                    'name' => 'smseagle-pass',
+                    'descr' => 'SMSEagle Password',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Mobiles',
+                    'name' => 'smseagle-mobiles',
+                    'descr' => 'SMSEagle Mobiles, can be new line or comma separated',
+                    'type' => 'textarea',
+                ],
+            ],
+            'validation' => [
+                'smseagle-url'     => 'required|url',
+                'smseagle-user'    => 'required|string',
+                'smseagle-pass'    => 'required|string',
+                'smseagle-mobiles' => 'required',
+            ]
+        ];
     }
 }

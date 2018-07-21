@@ -23,8 +23,10 @@
  */
 
 use LibreNMS\Alert\Template;
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Authentication\Auth;
+use LibreNMS\Alert\AlertUtil;
 
 /**
  * @param $rule
@@ -806,38 +808,80 @@ function ExtTransports($obj)
     global $config;
     $tmp = false;
     $type  = new Template;
-    // To keep scrutinizer from naging because it doesnt understand eval
-    foreach ($config['alert']['transports'] as $transport => $opts) {
-        if (is_array($opts)) {
-            $opts = array_filter($opts);
+    
+    // If alert transport mapping exists, override the default transports
+    $transport_maps = AlertUtil::getAlertTransports($obj['alert_id']);
+
+    if (!$transport_maps) {
+        $transport_maps = AlertUtil::getDefaultAlertTransports();
+        $legacy_transports  = AlertUtil::getDefaultTransportList();
+        foreach ($config['alert']['transports'] as $transport => $opts) {
+            if (in_array($transport, $legacy_transports)) {
+                // If it is a default transport type, then the alert has already been sent out, so skip
+                continue;
+            }
+            if (is_array($opts)) {
+                $opts = array_filter($opts);
+            }
+            $class  = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport);
+            if (($opts === true || !empty($opts)) && $opts != false && class_exists($class)) {
+                $transport_maps[] = [
+                    'transport_id' => null,
+                    'transport_type' => $transport,
+                    'opts' => $opts,
+                    'legacy' => true,
+                ];
+            }
         }
-        $class  = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport);
-        if (($opts === true || !empty($opts)) && $opts != false && class_exists($class)) {
-            $obj['transport'] = $transport;
-            $obj['alert']     = collect($obj);
+        unset($legacy_transports);
+    }
+
+    foreach ($transport_maps as $item) {
+        $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($item['transport_type']);
+        if (class_exists($class)) {
+            $transport_title = ($item['legacy'] === true) ? "{$item['transport_type']} (legacy)" : $item['transport_type'];
+            $obj['transport'] = $item['transport_type'];
+            $obj['alert']     = new AlertData($obj);
             $obj['title']     = $type->getTitle($obj);
             $obj['alert']['title'] = $obj['title'];
             $obj['msg']       = $type->getBody($obj);
-            echo $transport.' => ';
-            $instance = new $class;
-            $tmp = $instance->deliverAlert($obj, $opts);
-            $prefix = array( 0=>"recovery", 1=>$obj['severity']." alert", 2=>"acknowledgment" );
-            $prefix[3] = &$prefix[0];
-            $prefix[4] = &$prefix[0];
-            if ($tmp === true) {
-                echo 'OK';
-                log_event('Issued ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], 'alert', 1);
-            } elseif ($tmp === false) {
-                echo 'ERROR';
-                log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, 5);
-            } else {
-                echo "ERROR: $tmp\r\n";
-                log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $tmp, $obj['device_id'], 'error', 5);
-            }
+            echo "$transport_title => ";
+            $instance = new $class($item['transport_id']);
+            $tmp = $instance->deliverAlert($obj, $item['opts']);
+            AlertLog($tmp, $obj, $obj['transport']);
+            unset($instance);
             echo '; ';
         }
     }
+
+    if (count($transport_maps) === 0) {
+        echo 'No configured transports';
+    }
 }//end ExtTransports()
+
+// Log alert event
+function AlertLog($result, $obj, $transport)
+{
+    $prefix = [
+        0 => "recovery",
+        1 => $obj['severity']." alert",
+        2 => "acknowledgment"
+    ];
+    $prefix[3] = &$prefix[0];
+    $prefix[4] = &$prefix[0];
+    if ($result === true) {
+        echo 'OK';
+        log_event('Issued ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], 'alert', 1);
+    } elseif ($result === false) {
+        echo 'ERROR';
+        log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, 5);
+    } else {
+        echo "ERROR: $result\r\n";
+        log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $result, $obj['device_id'], 'error', 5);
+    }
+    return;
+}//end AlertLog()
+
 
 /**
  * Check if a device's all parent are down

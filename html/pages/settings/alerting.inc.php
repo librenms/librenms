@@ -398,6 +398,7 @@ $mail_conf = array(
 );
 
 echo '
+<div class="well"><strong>DEPRECATED</strong>: Please use the new Alert Transports section under Alerts to configure transports - <a href="https://docs.librenms.org/Alerting/Transports/" target="_blank">docs</a>.</div>
 <div class="panel-group" id="accordion">
     <form class="form-horizontal" role="form" action="" method="post">
 ';
@@ -1726,23 +1727,13 @@ echo '
             dataType: "json",
             success: function(data){
                 if (data.status == 'ok') {
-                    $this.removeClass('btn-primary').addClass('btn-success');
-                    setTimeout(function(){
-                        $this.removeClass('btn-success').addClass('btn-primary');
-                    }, 2000);
-                }
-                else {
-                    $this.removeClass('btn-primary').addClass('btn-danger');
-                    setTimeout(function(){
-                        $this.removeClass('btn-danger').addClass('btn-primary');
-                    }, 2000);
+                    toastr.success('Test to ' + transport + ' ok');
+                } else {
+                    toastr.error('Test to ' + transport + ' failed');
                 }
             },
             error: function(){
-                $this.removeClass('btn-primary').addClass('btn-danger');
-                setTimeout(function(){
-                    $this.removeClass('btn-danger').addClass('btn-primary');
-                }, 2000);
+                toastr.error('Test to ' + transport + ' failed - general error');
             }
         });
     });

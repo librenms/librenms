@@ -23,9 +23,9 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Pagerduty implements Transport
+class Pagerduty extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
@@ -58,5 +58,15 @@ class Pagerduty implements Transport
             return 'HTTP Status code ' . $code;
         }
         return true;
+    }
+
+    public function contactPagerduty()
+    {
+        return [];// Pagerduty is a custom transport.
+    }
+
+    public static function configTemplate()
+    {
+        return [];// Pagerduty is a custom transport.
     }
 }
