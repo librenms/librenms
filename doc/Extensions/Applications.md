@@ -36,6 +36,7 @@ After you have enabled the application module, it would be wise to then also ena
 The unix-agent does not have a discovery module, only a poller module. That poller module is always disabled by default. It needs to be manually enabled if using the agent. Some applications will be automatically enabled by the unix-agent poller module. It is better to ensure that your application is enabled for monitoring. You can check by following the steps under the `SNMP Extend` heading.
 
 1. [Apache](#apache) - SNMP extend, Agent
+1. [Asterisk](#asterisk) - SNMP extend
 1. [BIND9/named](#bind9-aka-named) - SNMP extend, Agent
 1. [C.H.I.P.](#chip) - SNMP extend
 1. [DHCP Stats](#dhcp-stats) - SNMP extend
@@ -114,6 +115,27 @@ snmpwalk <various options depending on your setup> localhost NET-SNMP-EXTEND-MIB
 1. Verify it is working by running /usr/lib/check_mk_agent/local/apache
 (If you get error like "Can't locate LWP/Simple.pm". libwww-perl needs to be installed: apt-get install libwww-perl)
 2. On the device page in Librenms, edit your host and check the `Apache` under the Applications tab.
+
+### Asterisk
+A small shell script that reports various Asterisk call status.
+
+##### SNMP Extend
+1. Copy the [asterisk script](https://github.com/librenms/librenms-agent/blob/master/snmp/asterisk) to `/etc/snmp/` on your asterisk server.
+
+2. Run `chmod +x /etc/snmp/asterisk`
+
+3. Configure `ASCLI` in the script.
+
+4. Verify it is working by running `/etc/snmp/asterisk`
+
+5. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+```
+extend asterisk /etc/snmp/asterisk
+```
+
+6. Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
 
 ### BIND9 aka named
 
