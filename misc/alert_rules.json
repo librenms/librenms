@@ -34,12 +34,12 @@
     "default": true
   },
   {
-    "rule": "sensors.sensor_current > sensors.sensor_limit && sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
+    "rule": "sensors.sensor_current > `sensors.sensor_limit` && sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
     "name": "Sensor over limit - Check Device Health Settings",
     "default": true
   },
   {
-    "rule": "sensors.sensor_current < sensors.sensor_limit_low && sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
+    "rule": "sensors.sensor_current < `sensors.sensor_limit_low` && sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
     "name": "Sensor under limit - Check Device Health Settings",
     "default": true
   },
@@ -49,12 +49,12 @@
     "default": true
   },
   {
-    "rule": "wireless_sensors.sensor_current >= wireless_sensors.sensor_limit && wireless_sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
+    "rule": "wireless_sensors.sensor_current >= `wireless_sensors.sensor_limit` && wireless_sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
     "name": "Wireless Sensor over limit",
     "default": true
   },
   {
-    "rule": "wireless_sensors.sensor_current <= wireless_sensors.sensor_limit_low && wireless_sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
+    "rule": "wireless_sensors.sensor_current <= `wireless_sensors.sensor_limit_low` && wireless_sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
     "name": "Wireless Sensor under limit",
     "default": true
   },
