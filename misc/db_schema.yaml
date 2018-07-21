@@ -117,6 +117,29 @@ alert_template_map:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     alert_templates_id: { Name: alert_templates_id, Columns: [alert_templates_id, alert_rule_id], Unique: false, Type: BTREE }
+alert_transports:
+  Columns:
+    - { Field: transport_id, Type: int(11), 'Null': false, Extra: auto_increment }
+    - { Field: transport_name, Type: varchar(30), 'Null': false, Extra: '' }
+    - { Field: transport_type, Type: varchar(20), 'Null': false, Extra: '', Default: mail }
+    - { Field: is_default, Type: tinyint(1), 'Null': false, Extra: '', Default: '0' }
+    - { Field: transport_config, Type: text, 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [transport_id], Unique: true, Type: BTREE }
+alert_transport_groups:
+  Columns:
+    - { Field: transport_group_id, Type: int(11), 'Null': false, Extra: auto_increment }
+    - { Field: transport_group_name, Type: varchar(30), 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [transport_group_id], Unique: true, Type: BTREE }
+alert_transport_map:
+  Columns:
+    - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
+    - { Field: rule_id, Type: int(11), 'Null': false, Extra: '' }
+    - { Field: transport_or_group_id, Type: int(11), 'Null': false, Extra: '' }
+    - { Field: target_type, Type: varchar(16), 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 api_tokens:
   Columns:
     - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
@@ -1566,6 +1589,10 @@ toner:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [toner_id], Unique: true, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
+transport_group_transport:
+  Columns:
+    - { Field: transport_group_id, Type: int(11), 'Null': false, Extra: '' }
+    - { Field: transport_id, Type: int(11), 'Null': false, Extra: '' }
 ucd_diskio:
   Columns:
     - { Field: diskio_id, Type: int(11), 'Null': false, Extra: auto_increment }

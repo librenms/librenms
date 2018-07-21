@@ -19,7 +19,8 @@ if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
-$transport = mres($_POST['transport']);
+$transport = $vars['transport'] ?: null;
+$transport_id = $vars['transport_id'] ?: null;
 
 require_once $config['install_dir'].'/includes/alerts.inc.php';
 $tmp = array(dbFetchRow('select device_id,hostname,sysDescr,version,hardware,location from devices order by device_id asc limit 1'));
@@ -37,7 +38,7 @@ $obj = array(
     "faults"    => false,
     "uid"       => "000",
     "severity"  => "critical",
-    "rule"      => "%macros.device = 1",
+    "rule"      => "macros.device = 1",
     "name"      => "Test-Rule",
     "string"      => "#1: test => string;",
     "timestamp" => date("Y-m-d H:i:s"),
@@ -48,11 +49,14 @@ $obj = array(
 
 $status = 'error';
 
+if ($transport_id) {
+    $transport = dbFetchCell("SELECT `transport_type` FROM `alert_transports` WHERE `transport_id` = ?", [$transport_id]);
+}
 $class  = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport);
 if (class_exists($class)) {
     $opts = $config['alert']['transports'][$transport];
     if ($opts) {
-        $instance = new $class;
+        $instance = new $class($transport_id);
         $tmp = $instance->deliverAlert($obj, $opts);
         if ($tmp) {
             $status = 'ok';

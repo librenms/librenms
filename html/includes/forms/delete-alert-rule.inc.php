@@ -20,14 +20,14 @@ if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
-if (!is_numeric($_POST['alert_id'])) {
+if (!is_numeric($vars['alert_id'])) {
     echo 'ERROR: No alert selected';
     exit;
 } else {
-    if (dbDelete('alert_rules', '`id` =  ?', array($_POST['alert_id']))) {
-        dbDelete('alert_device_map', 'rule_id=?', [$_POST['alert_id']]);
-        dbDelete('alert_group_map', 'rule_id=?', [$_POST['alert_id']]);
-
+    if (dbDelete('alert_rules', '`id` =  ?', array($vars['alert_id']))) {
+        dbDelete('alert_device_map', 'rule_id=?', [$vars['alert_id']]);
+        dbDelete('alert_group_map', 'rule_id=?', [$vars['alert_id']]);
+        dbDelete('alert_transport_map', 'rule_id=?', [$vars['alert_id']]);
         echo 'Alert rule has been deleted.';
         exit;
     } else {
