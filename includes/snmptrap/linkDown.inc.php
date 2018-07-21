@@ -6,8 +6,8 @@ if (!$interface) {
     exit;
 }
 
-$ifOperStatus = $detail2;
-$ifAdminStatus = $detail1;
+$ifOperStatus = trim(strstr($entry['6'], " "));
+$ifAdminStatus = trim(strstr($entry['5'], " "));
 
 log_event('SNMP Trap: linkDown ' . $interface['ifDescr'], $device, 'interface', 5, $interface['port_id']);
 

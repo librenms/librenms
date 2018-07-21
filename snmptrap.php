@@ -36,8 +36,6 @@ $ip = trim(strstr($ip, ":", true));
 $oid = trim(strstr($entry['3'], " "));
 $oid = str_replace("::", "", strstr($oid, "::"));
 $who = trim(strstr($entry['4'], " "));
-$detail1 = trim(strstr($entry['5'], " "));
-$detail2 = trim(strstr($entry['6'], " "));
 
 $device = @dbFetchRow('SELECT * FROM devices WHERE `hostname` = ?', [$hostname]);
 
@@ -46,6 +44,7 @@ if (!$device['device_id']) {
 }
 
 if (!$device['device_id']) {
+    echo "unknow device\n";
     exit;
 }
 
