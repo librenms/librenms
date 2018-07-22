@@ -50,7 +50,7 @@
                     "sensor_descr": "Flooding",
                     "sensor_divisor": "1",
                     "sensor_multiplier": "1",
-                    "sensor_current": "0",
+                    "sensor_current": null,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
