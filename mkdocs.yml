@@ -105,6 +105,7 @@ pages:
       - Alerting/Rules.md
       - Alerting/Templates.md
       - Alerting/Transports.md
+      - Alerting/Creating-Transport.md
       - Alerting/Entities.md
       - Alerting/Macros.md
       - Alerting/Testing.md
@@ -154,6 +155,7 @@ pages:
           - Intro: Support/Device-Notes/index.md
           - Carel pCOweb: Support/Device-Notes/Carel-pCOweb-Devices.md
   - hidden:
+      - Alerting/Old_Templates.md
       - API/API-Docs.md
       - Installation/Installing-LibreNMS.md
       - Extensions/Alerting.md

@@ -90,6 +90,13 @@ if (module_selected('polling', $init_modules)) {
 if (module_selected('alerts', $init_modules)) {
     require_once $install_dir . '/includes/device-groups.inc.php';
     require_once $install_dir . '/includes/alerts.inc.php';
+    if (module_selected('alerts-cli', $init_modules)) {
+        // Boot Laravel - we only use it in alerting at present
+        require $install_dir . '/bootstrap/autoload.php';
+        $app = require_once $install_dir . '/bootstrap/app.php';
+        $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+        $kernel->bootstrap();
+    }
 }
 
 // Display config.php errors instead of http 500
@@ -99,8 +106,6 @@ ini_set('display_errors', 1);
 if (!module_selected('nodb', $init_modules)) {
     // Connect to database
     try {
-        // \LibreNMS\DB\Eloquent::boot();
-
         dbConnect();
     } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
         if (isCli()) {
@@ -111,6 +116,17 @@ if (!module_selected('nodb', $init_modules)) {
             throw $e;
         }
     }
+}
+
+if (module_selected('laravel', $init_modules)) {
+    // make sure Laravel isn't already booted
+    if (!class_exists('App') || !App::isBooted()) {
+        $app = require_once $install_dir . '/bootstrap/app.php';
+        $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+        $kernel->bootstrap();
+    }
+} elseif (module_selected('eloquent', $init_modules)) {
+    \LibreNMS\DB\Eloquent::boot();
 }
 
 // Load config if not already loaded (which is the case if inside Laravel)
