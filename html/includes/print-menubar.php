@@ -611,6 +611,7 @@ if ($alerts['active_count'] > 0) {
                     <li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><i class="fa fa-list fa-fw fa-lg" aria-hidden="true"></i> Alert Rules</a></li>
                     <li><a href="<?php echo(generate_url(array('page'=>'alert-schedule'))); ?>"><i class="fa fa-calendar fa-fw fa-lg" aria-hidden="true"></i> Scheduled Maintenance</a></li>
                     <li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><i class="fa fa-file fa-fw fa-lg" aria-hidden="true"></i> Alert Templates</a></li>
+                    <li><a href="<?php echo(generate_url(array('page'=>'alert-transports'))); ?>"><i class="fa fa-bus fa-fw fa-lg" aria-hidden="true"></i> Alert Transports</a></li>
                 <?php } ?>
           </ul>
       </li>
