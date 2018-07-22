@@ -58,7 +58,7 @@ foreach ($pre_cache['serverscheck_control'] as $oid_name => $oid_value) {
                     dbInsert($insert, 'state_translations');
                 }
             }
-            discover_sensor($valid['sensor'], 'state', $device, $serverscheck_oids[$tmp_oid], $index, $state, $descr, 1, 1);
+            discover_sensor($valid['sensor'], 'state', $device, $serverscheck_oids[$tmp_oid], $index, $state, $descr, 1, 1, null, null, null, null, 1);
             create_sensor_to_state_index($device, $state, $index);
         }
     }
