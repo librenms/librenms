@@ -46,14 +46,8 @@ $message = '';
 
 $transport_id        = $vars['transport_id'];
 $name                = $vars['name'];
-$is_default          = isset($vars['is_default']) ? $vars['is_default'] : null;
+$is_default          = isset($vars['is_default']) ? 1 : 0;
 $transport_type      = $vars['transport-type'];
-
-if ($is_default == 'on') {
-    $is_default = true;
-} else {
-    $is_default = false;
-}
 
 if (empty($name)) {
     $status = 'error';
@@ -62,7 +56,6 @@ if (empty($name)) {
     $status = 'error';
     $message = 'Missing transport information';
 } else {
-    $is_default = $is_default ? 1 : 0;
     $details = array(
         'transport_name' => $name,
         'is_default' => $is_default
