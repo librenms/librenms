@@ -175,8 +175,8 @@ class ModuleTestHelper
         $save_vedbug = $vdebug;
         $debug = true;
         $vdebug = false;
-        discover_device($device, $this->getArgs());
-        poll_device($device, $this->getArgs());
+        discover_device($device, $this->parseArgs('discovery'));
+        poll_device($device, $this->parseArgs('poller'));
         $debug = $save_debug;
         $vdebug = $save_vedbug;
         $collection_output = ob_get_contents();
@@ -306,13 +306,13 @@ class ModuleTestHelper
         return array_unique($full_list);
     }
 
-    private function getArgs()
+    private function parseArgs($type)
     {
         if (empty($this->modules)) {
-            return [];
+            return false;
         }
 
-        return ['m' => implode(',', $this->modules)];
+        return parse_modules($type, ['m' => implode(',', $this->modules)]);
     }
 
     private function qPrint($var)
@@ -519,7 +519,7 @@ class ModuleTestHelper
         }
         ob_start();
 
-        discover_device($device, $this->getArgs());
+        discover_device($device, $this->parseArgs('discovery'));
 
         $this->discovery_output = ob_get_contents();
         if ($this->quiet) {
@@ -547,7 +547,7 @@ class ModuleTestHelper
         }
         ob_start();
 
-        poll_device($device, $this->getArgs());
+        poll_device($device, $this->parseArgs('poller'));
 
         $this->poller_output = ob_get_contents();
         if ($this->quiet) {

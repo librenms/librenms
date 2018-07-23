@@ -263,8 +263,7 @@ if ($updated && $update_message) {
         }
     });
     $('#parent_id').select2({
-        width: 'resolve',
-        tags: true,
+        width: 'resolve'
     });
 </script>
 <?php

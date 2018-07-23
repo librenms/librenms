@@ -141,6 +141,9 @@ function nicecase($item)
         case 'zfs':
             return 'ZFS';
 
+        case 'asterisk':
+            return 'Asterisk';
+
         default:
             return ucfirst($item);
     }

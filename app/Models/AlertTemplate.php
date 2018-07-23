@@ -1,8 +1,8 @@
 <?php
 /**
- * arista-eos-limits.inc.php
+ * app/Models/AlertTemplate.php
  *
- * LibreNMS Arista EOS sensor limits
+ * Model for access to alert_templates table data
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,20 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Neil Lathwood
- * @author     Neil Lathwood <neil@lathwood.co.uk>
+ * @copyright  2018 Neil Lathwood
+ * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-$oids = snmpwalk_cache_oid($device, 'aristaEntSensorThresholdTable', $oids, 'ARISTA-ENTITY-SENSOR-MIB');
+namespace App\Models;
+
+class AlertTemplate extends BaseModel
+{
+    public $timestamps = false;
+
+    // ---- Define Relationships ----
+
+    public function map()
+    {
+        return $this->hasMany('App\Models\AlertTemplateMap', 'alert_templates_id', 'id');
+    }
+}

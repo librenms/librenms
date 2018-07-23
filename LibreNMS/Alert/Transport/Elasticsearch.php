@@ -16,11 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Elasticsearch implements Transport
+class Elasticsearch extends Transport
 {
     public function deliverAlert($obj, $opts)
+    {
+        if (!empty($this->config)) {
+            $opts['es_host'] = $this->config['es-host'];
+            $opts['es_port'] = $this->config['es-port'];
+            $opts['es_index'] = $this->config['es-pattern'];
+            $opts['es_proxy'] = $this-> config['es-proxy'];
+        }
+
+        return $this->contactElasticsearch($obj, $opts);
+    }
+
+    public function contactElasticsearch($obj, $opts)
     {
         $es_host  = '127.0.0.1';
         $es_port  = 9200;
@@ -183,5 +195,43 @@ class Elasticsearch implements Transport
             }
         }
         return true;
+    }
+
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'Host',
+                    'name' => 'es-host',
+                    'descr' => 'Elasticsearch Host',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Port',
+                    'name' => 'es-port',
+                    'descr' => 'Elasticsearch Port',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Index Pattern',
+                    'name' => 'es-pattern',
+                    'descr' => 'Elasticsearch Index Pattern',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Use proxy if configured?',
+                    'name' => 'es-proxy',
+                    'descr' => 'Elasticsearch Proxy',
+                    'type' => 'checkbox',
+                    'default' => false
+                ]
+            ],
+            'validation' => [
+                'es-host' => 'required|string',
+                'es-port' => 'required|string',
+                'es-pattern' => 'required|string'
+            ]
+        ];
     }
 }

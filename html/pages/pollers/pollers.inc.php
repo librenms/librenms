@@ -121,13 +121,6 @@ if (count($rows) !== 0) {
         $first_row = true;
 
         foreach ($stat_row as $stats) {
-            $health_query = 'SELECT * FROM `poller_cluster_queue_health` WHERE `parent_poller`=' . $poller['id'] . ' AND `poller_type`="' . $stats['poller_type'] . '";';
-
-            $pending = "";
-            foreach (dbFetchRows($health_query) as $health) {
-                $pending .= '<small>Group ' . $health['poller_group'] . ': ' . $health['depth'] . '</small><br>';
-            }
-
             // Emit the row container
             echo '<tr class="'.$row_class.'" id="row_' . $poller['id'] . '">';
 
@@ -147,7 +140,7 @@ if (count($rows) !== 0) {
             <td>'.$stats['poller_type'].'</td>
             <td>'.$stats['workers'].'</td>
             <td>'.$stats['devices'].'</td>
-            <td>'.$pending.'</td>
+            <td>'.$stats['depth'].'</td>
             <td>'.$stats['worker_seconds'].' / '.$stats['frequency']*$stats['workers'].'</td>';
 
             if ($first_row) {

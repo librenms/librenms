@@ -25,6 +25,8 @@
  * @subpackage Devices
  */
 
+use LibreNMS\Config;
+
 /**
  * Add a new device group
  * @param $pattern
@@ -263,9 +265,10 @@ function GetGroupsFromDevice($device_id, $extra = 0)
  */
 function RunGroupMacros($rule, $x = 1)
 {
-    global $config;
-    krsort($config['alert']['macros']['group']);
-    foreach ($config['alert']['macros']['group'] as $macro => $value) {
+    $macros = Config::get('alert.macros.group', []);
+
+    krsort($macros);
+    foreach ($macros as $macro => $value) {
         if (!strstr($macro, " ")) {
             $rule = str_replace('%macros.'.$macro, '('.$value.')', $rule);
         }
