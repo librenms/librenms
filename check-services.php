@@ -77,7 +77,7 @@ foreach (dbFetchRows($sql) as $service) {
     if ($service['status'] === "1" || ($service['status'] === '0' && $service['status_reason'] === 'snmp') ||
         $service['attrib_value'] === 'true' || ($service['service_ip'] !== $service['hostname'] &&
         $service['service_ip'] !== inet6_ntop($service['ip']) )) {
-        // Mark service check as enabled if it was disabled previosly because device was down
+        // Mark service check as enabled if it was disabled previously because device was down
         if ($service['service_disabled'] === "1") {
             dbUpdate(
                 array('service_disabled' => '0'),
