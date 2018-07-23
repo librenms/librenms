@@ -89,3 +89,10 @@ then you can run the following command to help troubleshoot services.
 ```
 ./check-services.php -d
 ```
+## Service checks polling logic
+
+By default, service checks will be skipped if the associated device is not pingable, and an appropriate entry will be populated in the event log. An exception to this rule are service checks with `IP address` parameter different from the associated device's IP address.
+
+To override the default logic and always poll service checks, you can disable ICMP testing for any device by switching `Disable ICMP Test` setting (Edit -> Misc) to ON.
+
+Service checks will never be polled on disabled devices.
