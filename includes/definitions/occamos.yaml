@@ -1,11 +1,11 @@
-os: calix
-text: Calix Legacy
+os: occamos
+text: Calix B6 System
 type: network
-ifname: true
-empty_ifdescr: true
 icon: calix
+mib_dir:
+ - calix
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:
     - sysObjectID:
-        - .1.3.6.1.4.1.6321.1.2.3
+        - .1.3.6.1.4.1.6066.1.
