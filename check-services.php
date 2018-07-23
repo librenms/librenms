@@ -89,7 +89,7 @@ foreach (dbFetchRows($sql) as $service) {
         poll_service($service);
         $polled_services++;
     } else {
-        d_echo("\nNagios Service - ".$service['service_id']."\nSkipping service check because device "
+        d_echo("\nService check - ".$service['service_id']."\nSkipping service check because device "
                .$service['hostname']." is down due to icmp.\n");
         // Mark service check as disabled while device is down and log to eventlog that service check is skipped,
         // but only if it's not already marked as disabled
@@ -101,7 +101,7 @@ foreach (dbFetchRows($sql) as $service) {
                 array($service['service_id'])
             );
             log_event(
-                "Nagios Service - {$service['service_desc']} ({$service['service_id']}) - 
+                "Service check - {$service['service_desc']} ({$service['service_id']}) - 
                 Skipping service check because device {$service['hostname']} is down due to icmp",
                 $device,
                 'service',
