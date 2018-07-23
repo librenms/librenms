@@ -62,6 +62,8 @@ if (empty($name)) {
     $status = 'error';
     $message = 'Missing transport information';
 } else {
+    
+    $is_default = $is_default ? 1 : 0;
     $details = array(
         'transport_name' => $name,
         'is_default' => $is_default
