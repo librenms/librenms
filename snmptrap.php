@@ -44,7 +44,7 @@ if (!$device['device_id']) {
 }
 
 if (!$device['device_id']) {
-    echo "unknow device\n";
+    echo "unknown device\n";
     exit;
 }
 
