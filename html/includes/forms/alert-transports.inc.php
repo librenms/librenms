@@ -46,7 +46,7 @@ $message = '';
 
 $transport_id        = $vars['transport_id'];
 $name                = $vars['name'];
-$is_default          = isset($vars['is_default']) ? 1 : 0;
+$is_default          = (int)(isset($vars['is_default']) && $vars['is_default'] == 'on');
 $transport_type      = $vars['transport-type'];
 
 if (empty($name)) {
