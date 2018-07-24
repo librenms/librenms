@@ -173,7 +173,7 @@ foreach ($list as $items) {
             $devices_by_id[$local_device_id] = array_merge($devices_by_id[$local_device_id], $node_disabled_style);
         } elseif ($items['local_status'] == '0') {
             $devices_by_id[$local_device_id] = array_merge($devices_by_id[$local_device_id], $node_down_style);
-        } 
+        }
     }
 
     $remote_device_id = $items['remote_device_id'];
@@ -213,7 +213,7 @@ foreach ($list as $items) {
     }
     if (($items['remote_disabled'] != '0') && ($items['local_disabled'] != '0')) {
         $link_style = $edge_disabled_style;
-    }elseif (($items['remote_status'] == '0') && ($items['local_status'] == '0')) {
+    } elseif (($items['remote_status'] == '0') && ($items['local_status'] == '0')) {
         $link_style = $edge_down_style;
     } elseif (($items['remote_status'] == '1' && $items['remote_ifoperstatus'] == 'down') || ($items['local_status'] == '1' && $items['local_ifoperstatus'] == 'down')) {
         $link_style = $edge_down_style;
