@@ -111,9 +111,7 @@ if (module_selected('laravel', $init_modules)) {
 \LibreNMS\DB\Eloquent::initLegacyListeners();
 
 // set non-strict mode if for legacy code
-if (\LibreNMS\DB\Eloquent::isConnected()) {
-    \LibreNMS\DB\Eloquent::DB()->statement("SET sql_mode = '' ");
-}
+\LibreNMS\DB\Eloquent::setStrictMode(false);
 
 // Load config if not already loaded (which is the case if inside Laravel)
 if (!Config::has('install_dir')) {

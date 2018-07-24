@@ -62,6 +62,21 @@ class Eloquent
         }
     }
 
+    /**
+     * Set the strict mode for the current connection (will not persist)
+     * @param bool $strict
+     */
+    public static function setStrictMode($strict = true)
+    {
+        if (self::isConnected()) {
+            if ($strict) {
+                self::DB()->getPdo()->exec("SET sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            } else {
+                self::DB()->getPdo()->exec("SET sql_mode=''");
+            }
+        }
+    }
+
     public static function isConnected()
     {
         $conn = self::DB();

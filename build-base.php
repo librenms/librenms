@@ -24,31 +24,27 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\Exceptions\DatabaseConnectException;
-
 if (!isset($init_modules)) {
     $init_modules = array('nodb');
     require __DIR__ . '/includes/init.php';
 
     $opts = getopt('ldh:u:p:n:t:s:');
 
-    try {
-        if (isset($opts['h'])) {
-            dbConnect(
-                isset($opts['h']) ? $opts['h'] : null,
-                isset($opts['u']) ? $opts['u'] : '',
-                isset($opts['p']) ? $opts['p'] : '',
-                isset($opts['n']) ? $opts['n'] : '',
-                isset($opts['t']) ? $opts['t'] : null,
-                isset($opts['s']) ? $opts['s'] : null
-            );
-        } else {
-            // use configured database credentials
-            dbConnect();
-        }
-    } catch (DatabaseConnectException $e) {
-        echo $e->getMessage() . PHP_EOL;
-        exit;
+    if (isset($opts['h'])) {
+        // FIXME broken for now
+        dbConnect(
+            isset($opts['h']) ? $opts['h'] : null,
+            isset($opts['u']) ? $opts['u'] : '',
+            isset($opts['p']) ? $opts['p'] : '',
+            isset($opts['n']) ? $opts['n'] : '',
+            isset($opts['t']) ? $opts['t'] : null,
+            isset($opts['s']) ? $opts['s'] : null
+        );
+    } else {
+        // use configured database credentials
+        \LibreNMS\DB\Eloquent::boot();
+        \LibreNMS\DB\Eloquent::initLegacyListeners(); // init listeners to handle $PDO_FETCH_ASSOC for dbFacile
+        \LibreNMS\DB\Eloquent::setStrictMode(false); // set non-strict mode if for legacy code
     }
 
     $debug = isset($opts['d']);

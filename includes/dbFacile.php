@@ -54,16 +54,26 @@ function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '',
     return Eloquent::DB();
 }
 
-/*
+/**
  * Performs a query using the given string.
- * Used by the other _query functions.
- * */
-
-
-function dbQuery($sql, $parameters = array())
+ * @param string $sql
+ * @param array $parameters
+ * @return bool if query was successful or not
+ */
+function dbQuery($sql, $parameters = [])
 {
-    return Eloquent::DB()->statement($sql, $parameters);
-}//end dbQuery()
+    try {
+        if (empty($parameters)) {
+            // don't use prepared statements for queries without parameters
+            return Eloquent::DB()->getPdo()->exec($sql) !== false;
+        }
+
+        return Eloquent::DB()->statement($sql, $parameters);
+    } catch (PDOException $pdoe) {
+        dbHandleException($pdoe);
+        return false;
+    }
+}
 
 
 /*
@@ -211,11 +221,14 @@ function dbUpdate($data, $table, $where = null, $parameters = array())
         $sql .= ',';
     }
 
+    // strip keys
+    $data = array_values($data);
+
     $sql = substr($sql, 0, -1);
     // strip off last comma
     if ($where) {
         $sql .= ' WHERE '.$where;
-        $data = array_merge(array_values($data), $parameters);
+        $data = array_merge($data, $parameters);
     }
 
     try {
@@ -391,7 +404,7 @@ function dbFetchCell($sql, $parameters = [])
         $row = Eloquent::DB()->selectOne($sql, $parameters);
         recordDbStatistic('fetchcell', $time_start);
         if ($row) {
-            return array_shift($row);
+            return reset($row);
             // shift first field off first row
         }
     } catch (PDOException $pdoe) {
@@ -420,7 +433,7 @@ function dbFetchColumn($sql, $parameters = [])
     try {
         $PDO_FETCH_ASSOC = true;
         foreach (Eloquent::DB()->select($sql, $parameters) as $row) {
-            $cells[] = array_shift($row);
+            $cells[] = reset($row);
         }
         $PDO_FETCH_ASSOC = false;
 

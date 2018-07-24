@@ -64,11 +64,8 @@ if (getenv('SNMPSIM')) {
 if (getenv('DBTEST')) {
     global $schema, $sql_mode;
 
-    try {
-        dbConnect();
-    } catch (DatabaseConnectException $e) {
-        echo $e->getMessage() . PHP_EOL;
-    }
+    \LibreNMS\DB\Eloquent::boot();
+    \LibreNMS\DB\Eloquent::initLegacyListeners(); // init listeners to handle $PDO_FETCH_ASSOC for dbFacile
 
     $sql_mode = dbFetchCell("SELECT @@global.sql_mode");
     $db_name = dbFetchCell("SELECT DATABASE()");

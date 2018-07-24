@@ -138,11 +138,13 @@ if (!file_exists(Config::get('install_dir').'/config.php')) {
 
 
 // Connect to MySQL
-try {
-    dbConnect();
+\LibreNMS\DB\Eloquent::boot();
+\LibreNMS\DB\Eloquent::initLegacyListeners(); // init listeners to handle $PDO_FETCH_ASSOC for dbFacile
+\LibreNMS\DB\Eloquent::setStrictMode(false); // set non-strict mode if for legacy code
 
+if (\LibreNMS\DB\Eloquent::isConnected()) {
     $validator->ok('Database connection successful', null, 'database');
-} catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
+} else {
     $validator->fail('Error connecting to your database. '.$e->getMessage(), null, 'database');
 }
 
