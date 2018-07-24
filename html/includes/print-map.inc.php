@@ -148,8 +148,25 @@ $list = array_merge($ports, $devices);
 
 // Build the style variables we need
 
-$node_disabled_style = array('color' => array('highlight' => array('background' => $config['network_map_legend']['di.node']), 'border' => $config['network_map_legend']['di.border'],  'background' => $config['network_map_legend']['di.node']));
-$node_down_style = array('color' => array('highlight' => array('background' => $config['network_map_legend']['dn.node'], 'border' => $config['network_map_legend']['dn.border']), 'border' => $config['network_map_legend']['dn.border'],  'background' => $config['network_map_legend']['dn.node']));
+$node_disabled_style = array(
+    'color' => array(
+        'highlight' => array(
+            'background' => $config['network_map_legend']['di.node'],
+        ),
+        'border' => $config['network_map_legend']['di.border'],
+        'background' => $config['network_map_legend']['di.node'],
+    ),
+);
+$node_down_style = array(
+    'color' => array(
+        'highlight' => array(
+            'background' => $config['network_map_legend']['dn.node'],
+            'border' => $config['network_map_legend']['dn.border'],
+        ),
+        'border' => $config['network_map_legend']['dn.border'],
+        'background' => $config['network_map_legend']['dn.node'],
+    ),
+);
 
 $edge_disabled_style = array('dashes' => array(8,12), 'color' => array('color' => $config['network_map_legend']['di.edge'], 'highlight' => $config['network_map_legend']['di.edge']));
 $edge_down_style = array('dashes' => array(8,12), 'color' => array('border' => $config['network_map_legend']['dn.border'], 'highlight' => $config['network_map_legend']['dn.edge'], 'color' => $config['network_map_legend']['dn.edge']));
