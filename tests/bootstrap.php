@@ -86,7 +86,7 @@ if (getenv('DBTEST')) {
 
     register_shutdown_function(function () use ($empty_db, $sql_mode) {
         global $config;
-        dbConnect();
+        \LibreNMS\DB\Eloquent::boot();
 
         echo "Cleaning database...\n";
 

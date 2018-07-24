@@ -31,7 +31,6 @@ if (!isset($init_modules)) {
     $opts = getopt('ldh:u:p:n:t:s:');
 
     if (isset($opts['h'])) {
-        // FIXME broken for now
         dbConnect(
             isset($opts['h']) ? $opts['h'] : null,
             isset($opts['u']) ? $opts['u'] : '',
@@ -45,7 +44,7 @@ if (!isset($init_modules)) {
         \LibreNMS\DB\Eloquent::boot();
     }
 
-    $debug = isset($opts['d']);
+    set_debug(isset($opts['d']));
     $skip_schema_lock = isset($opts['l']);
 }
 

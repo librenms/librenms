@@ -49,7 +49,15 @@ function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '',
         throw new DatabaseConnectException("mysqli extension not loaded!");
     }
 
-    Eloquent::boot();
+    try {
+        if (is_null($db_host) && empty($db_name)) {
+            Eloquent::boot();
+        } else {
+            Eloquent::boot(get_defined_vars());
+        }
+    } catch (PDOException $e) {
+        throw new DatabaseConnectException($e->getMessage(), $e->getCode(), $e);
+    }
 
     return Eloquent::DB();
 }

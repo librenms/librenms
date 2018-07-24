@@ -35,15 +35,35 @@ class Eloquent
     private static $capsule;
     private static $legacy_listener_installed = false;
 
-    public static function boot()
+    public static function boot($options = [])
     {
         // boot Eloquent outside of Laravel
         if (!defined('LARAVEL_START') && class_exists(Capsule::class) && is_null(self::$capsule)) {
             $install_dir = realpath(__DIR__ . '/../../');
 
-            self::$capsule = new Capsule;
             $db_config = include($install_dir . '/config/database.php');
-            self::$capsule->addConnection($db_config['connections'][$db_config['default']]);
+            $settings = $db_config['connections'][$db_config['default']];
+
+            // legacy connection override
+            if (!empty($options)) {
+                $fields = [
+                    'host' => 'db_host',
+                    'port' => 'db_port',
+                    'database' => 'db_name',
+                    'username' => 'db_user',
+                    'password' => 'db_pass',
+                    'unix_socket' => 'db_socket',
+                ];
+
+                foreach ($fields as $new => $old) {
+                    if (isset($options[$old])) {
+                        $settings[$new] = $options[$old];
+                    }
+                }
+            }
+
+            self::$capsule = new Capsule;
+            self::$capsule->addConnection($settings);
             self::$capsule->setEventDispatcher(new Dispatcher());
             self::$capsule->setAsGlobal();
             self::$capsule->bootEloquent();
