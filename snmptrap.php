@@ -30,12 +30,12 @@ while ($f = fgets(STDIN)) {
 }
 
 // Formatting array
-$hostname = trim($entry['0']);
-$ip = str_replace(array("UDP:","[","]"), "", $entry['1']);
+$hostname = trim($entry[0]);
+$ip = str_replace(array("UDP:","[","]"), "", $entry[1]);
 $ip = trim(strstr($ip, ":", true));
-$oid = trim(strstr($entry['3'], " "));
+$oid = trim(strstr($entry[3], " "));
 $oid = str_replace("::", "", strstr($oid, "::"));
-$who = trim(strstr($entry['4'], " "));
+$who = trim(strstr($entry[4], " "));
 
 $device = @dbFetchRow('SELECT * FROM devices WHERE `hostname` = ?', [$hostname]);
 
@@ -52,5 +52,5 @@ $file = $config['install_dir'].'/includes/snmptrap/'.$oid.'.inc.php';
 if (is_file($file)) {
     include "$file";
 } else {
-    echo "unknown trap ($file)";
+    echo "unknown trap ($oid)";
 }
