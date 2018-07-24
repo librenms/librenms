@@ -63,15 +63,8 @@ class Slack extends Transport
                     'text' => $slack_msg,
                     'mrkdwn_in' => ['text', 'fallback'],
                     'author_name' => $api['author_name'],
-                    'fields' => [
-                        [
-                            'title' => 'Priority',
-                            'value' => ucfirst($obj['severity']),
-                            'short' => false,
-                        ]
                     ],
                 ],
-            ],
             'channel' => $api['channel'],
         ];
         $alert_message = json_encode($data);
