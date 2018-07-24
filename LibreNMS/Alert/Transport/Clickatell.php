@@ -65,7 +65,7 @@ class Clickatell extends Transport
             'config' => [
                 [
                     'title' => 'Token',
-                    'name'  => 'cickatell-token',
+                    'name'  => 'clickatell-token',
                     'descr' => 'Clickatell Token',
                     'type'  => 'text',
                 ],
