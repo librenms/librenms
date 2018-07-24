@@ -1,8 +1,8 @@
 <?php
 /**
- * cmts.inc.php
+ * arris-c3.inc.php
  *
- * LibreNMS snr discovery module for Arris CMTS
+ * LibreNMS os sensor pre-cache module for Arris CMTS
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,14 +24,11 @@
  * Based on Neil Lathwood Cisco EPC files
  */
 
-foreach ($pre_cache['cmts_docsIfSignalQualityTable'] as $index => $data) {
-    if (is_numeric($data['docsIfSigQSignalNoise'])) {
-        $descr   = "Channel {$pre_cache['cmts_ifAlias'][$index]['ifAlias']} - {$pre_cache['cmts_ifName'][$index]['ifName']}";
-        $oid     = '.1.3.6.1.2.1.10.127.1.1.4.1.5.' . $index;
-        $divisor = 10;
-        $value   = $data['docsIfSigQSignalNoise'];
-        if (preg_match("/.0$/", $pre_cache['cmts_ifName'][$index]['ifName'])) {
-            discover_sensor($valid['sensor'], 'snr', $device, $oid, 'docsIfSigQSignalNoise.'.$index, 'cmts', $descr, $divisor, '1', null, null, null, null, $value);
-        }
-    }
-}
+echo 'ifName ';
+$pre_cache['ar-c3_ifName'] = snmpwalk_cache_oid($device, 'ifName', array(), 'DOCS-IF-MIB');
+
+echo 'ifAlias ';
+$pre_cache['ar-c3_ifAlias'] = snmpwalk_cache_oid($device, 'ifAlias', array(), 'DOCS-IF-MIB');
+
+echo 'docsIfSignalQualityTable ';
+$pre_cache['ar-c3_docsIfSignalQualityTable'] = snmpwalk_cache_oid($device, 'docsIfSignalQualityTable', array(), 'DOCS-IF-MIB');
