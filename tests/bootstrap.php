@@ -64,13 +64,20 @@ if (getenv('SNMPSIM')) {
 if (getenv('DBTEST')) {
     global $schema, $sql_mode;
 
-    \LibreNMS\DB\Eloquent::boot();
-    \LibreNMS\DB\Eloquent::initLegacyListeners(); // init listeners to handle $PDO_FETCH_ASSOC for dbFacile
+    // create testing table if needed
+    $db_config = Config::getDatabaseSettings();
+    $db_name = $db_config['db_name'];
 
-    $sql_mode = dbFetchCell("SELECT @@global.sql_mode");
-    $db_name = dbFetchCell("SELECT DATABASE()");
+    $connection = new PDO("mysql:", $db_config['db_user'], $db_config['db_pass']);
+    $connection->query("CREATE DATABASE IF NOT EXISTS $db_name");
+    unset($connection); // close connection
+
+    \LibreNMS\DB\Eloquent::boot();
+    \LibreNMS\DB\Eloquent::setStrictMode();
+
+//    $sql_mode = dbFetchCell("SELECT @@global.sql_mode");
     $empty_db = (dbFetchCell("SELECT count(*) FROM `information_schema`.`tables` WHERE `table_type` = 'BASE TABLE' AND `table_schema` = ?", [$db_name]) == 0);
-    dbQuery("SET GLOBAL sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+//    dbQuery("SET GLOBAL sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
 
     $cmd = $config['install_dir'] . '/build-base.php';
     exec($cmd, $schema);

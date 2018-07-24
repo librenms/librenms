@@ -33,11 +33,12 @@ class Eloquent
 {
     /** @var Capsule static reference to capsule */
     private static $capsule;
+    private static $legacy_listener_installed = false;
 
     public static function boot()
     {
         // boot Eloquent outside of Laravel
-        if (!defined('LARAVEL_START') && class_exists(Capsule::class)) {
+        if (!defined('LARAVEL_START') && class_exists(Capsule::class) && is_null(self::$capsule)) {
             $install_dir = realpath(__DIR__ . '/../../');
 
             self::$capsule = new Capsule;
@@ -47,11 +48,14 @@ class Eloquent
             self::$capsule->setAsGlobal();
             self::$capsule->bootEloquent();
         }
+
+        self::initLegacyListeners();
+        self::setStrictMode(false); // set non-strict mode if for legacy code
     }
 
     public static function initLegacyListeners()
     {
-        if (self::isConnected()) {
+        if (self::isConnected() && !self::$legacy_listener_installed) {
             // set FETCH_ASSOC for queries that required by setting the global variable $PDO_FETCH_ASSOC (for dbFacile)
             self::DB()->getEventDispatcher()->listen(StatementPrepared::class, function ($event) {
                 global $PDO_FETCH_ASSOC;
@@ -59,6 +63,7 @@ class Eloquent
                     $event->statement->setFetchMode(\PDO::FETCH_ASSOC);
                 }
             });
+            self::$legacy_listener_installed = true;
         }
     }
 

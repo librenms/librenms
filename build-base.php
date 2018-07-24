@@ -43,8 +43,6 @@ if (!isset($init_modules)) {
     } else {
         // use configured database credentials
         \LibreNMS\DB\Eloquent::boot();
-        \LibreNMS\DB\Eloquent::initLegacyListeners(); // init listeners to handle $PDO_FETCH_ASSOC for dbFacile
-        \LibreNMS\DB\Eloquent::setStrictMode(false); // set non-strict mode if for legacy code
     }
 
     $debug = isset($opts['d']);

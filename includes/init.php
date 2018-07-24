@@ -107,12 +107,6 @@ if (module_selected('laravel', $init_modules)) {
     \LibreNMS\DB\Eloquent::boot();
 }
 
-// init listeners to handle $PDO_FETCH_ASSOC for dbFacile
-\LibreNMS\DB\Eloquent::initLegacyListeners();
-
-// set non-strict mode if for legacy code
-\LibreNMS\DB\Eloquent::setStrictMode(false);
-
 // Load config if not already loaded (which is the case if inside Laravel)
 if (!Config::has('install_dir')) {
     Config::load();

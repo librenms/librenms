@@ -391,7 +391,7 @@ function dbFetchColumn($sql, $parameters = [])
         $PDO_FETCH_ASSOC = false;
     }
 
-return [];
+    return [];
 }//end dbFetchColumn()
 
 
@@ -433,7 +433,6 @@ function dbArrayToRaw($data)
         if (is_array($item)) {
             $item = Eloquent::DB()->raw(reset($item));
         }
-
     });
 
     return $data;
