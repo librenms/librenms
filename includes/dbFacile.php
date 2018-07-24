@@ -76,26 +76,14 @@ function dbQuery($sql, $parameters = [])
 }
 
 
-/*
- * Passed an array and a table name, it attempts to insert the data into the table.
- * Check for boolean false to determine whether insert failed
- * */
-
-
+/**
+ * @param array $data
+ * @param string $table
+ * @return null|int
+ */
 function dbInsert($data, $table)
 {
     $time_start = microtime(true);
-
-    // the following block swaps the parameters if they were given in the wrong order.
-    // it allows the method to work for those that would rather it (or expect it to)
-    // follow closer with SQL convention:
-    // insert into the TABLE this DATA
-    if (is_string($data) && is_array($table)) {
-        $tmp   = $data;
-        $data  = $table;
-        $table = $tmp;
-        // trigger_error('QDB - Parameters passed to insert() were in reverse order, but it has been allowed', E_USER_NOTICE);
-    }
 
     $sql = 'INSERT IGNORE INTO `'.$table.'` (`'.implode('`,`', array_keys($data)).'`)  VALUES ('.implode(',', dbPlaceHolders($data)).')';
 
@@ -114,31 +102,18 @@ function dbInsert($data, $table)
 }//end dbInsert()
 
 
-/*
+/**
  * Passed an array and a table name, it attempts to insert the data into the table.
  * $data is an array (rows) of key value pairs.  keys are fields.  Rows need to have same fields.
  * Check for boolean false to determine whether insert failed
- * */
-
-
+ *
+ * @param array $data
+ * @param string $table
+ * @return bool
+ */
 function dbBulkInsert($data, $table)
 {
     $time_start = microtime(true);
-    // the following block swaps the parameters if they were given in the wrong order.
-    // it allows the method to work for those that would rather it (or expect it to)
-    // follow closer with SQL convention:
-    // insert into the TABLE this DATA
-    if (is_string($data) && is_array($table)) {
-        $tmp   = $data;
-        $data  = $table;
-        $table = $tmp;
-    }
-
-//    try {
-//        $result = Eloquent::DB()->table($table)->insert(dbArrayToRaw($data));
-//    } catch (PDOException $pdoe) {
-//        dbHandleException($pdoe);
-//    }
 
     // check that data isn't an empty array
     if (empty($data)) {
@@ -149,28 +124,6 @@ function dbBulkInsert($data, $table)
     if (empty($fields)) {
         return false;
     }
-
-
-//    $sql = 'INSERT IGNORE INTO `'.$table.'` (`'.implode('`,`', $fields).'`)  VALUES ';
-//    $values ='';
-//
-//    foreach ($data as $row) {
-//        if ($values != '') {
-//            $values .= ',';
-//        }
-//        $rowvalues='';
-//        foreach ($row as $key => $value) {
-//            if ($rowvalues != '') {
-//                $rowvalues .= ',';
-//            }
-//            if (is_null($value)) {
-//                $rowvalues .= 'NULL';
-//            } else {
-//                $rowvalues .= "'" . $value . "'";
-//            }
-//        }
-//        $values .= "(".$rowvalues.")";
-//    }
 
     try {
         //        $result = Eloquent::DB()->insert($sql.$values);
@@ -186,26 +139,19 @@ function dbBulkInsert($data, $table)
 }//end dbBulkInsert()
 
 
-/*
+/**
  * Passed an array, table name, WHERE clause, and placeholder parameters, it attempts to update a record.
  * Returns the number of affected rows
- * */
-
-
-function dbUpdate($data, $table, $where = null, $parameters = array())
+ *
+ * @param array $data
+ * @param string $table
+ * @param string $where
+ * @param array $parameters
+ * @return bool|int
+ */
+function dbUpdate($data, $table, $where = null, $parameters = [])
 {
     $time_start = microtime(true);
-
-    // the following block swaps the parameters if they were given in the wrong order.
-    // it allows the method to work for those that would rather it (or expect it to)
-    // follow closer with SQL convention:
-    // update the TABLE with this DATA
-    if (is_string($data) && is_array($table)) {
-        $tmp   = $data;
-        $data  = $table;
-        $table = $tmp;
-        // trigger_error('QDB - The first two parameters passed to update() were in reverse order, but it has been allowed', E_USER_NOTICE);
-    }
 
     // need field name and placeholder value
     // but how merge these field placeholders with actual $parameters array for the WHERE clause
