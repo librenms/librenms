@@ -75,9 +75,7 @@ if (getenv('DBTEST')) {
     \LibreNMS\DB\Eloquent::boot();
     \LibreNMS\DB\Eloquent::setStrictMode();
 
-//    $sql_mode = dbFetchCell("SELECT @@global.sql_mode");
     $empty_db = (dbFetchCell("SELECT count(*) FROM `information_schema`.`tables` WHERE `table_type` = 'BASE TABLE' AND `table_schema` = ?", [$db_name]) == 0);
-//    dbQuery("SET GLOBAL sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
 
     $cmd = $config['install_dir'] . '/build-base.php';
     exec($cmd, $schema);
@@ -89,9 +87,6 @@ if (getenv('DBTEST')) {
         \LibreNMS\DB\Eloquent::boot();
 
         echo "Cleaning database...\n";
-
-        // restore sql_mode
-        dbQuery("SET GLOBAL sql_mode='$sql_mode'");
 
         $db_name = dbFetchCell('SELECT DATABASE()');
         if ($empty_db) {
