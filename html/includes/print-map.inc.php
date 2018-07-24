@@ -167,25 +167,62 @@ $node_down_style = array(
         'background' => $config['network_map_legend']['dn.node'],
     ),
 );
-
-$edge_disabled_style = array('dashes' => array(8,12), 'color' => array('color' => $config['network_map_legend']['di.edge'], 'highlight' => $config['network_map_legend']['di.edge']));
-$edge_down_style = array('dashes' => array(8,12), 'color' => array('border' => $config['network_map_legend']['dn.border'], 'highlight' => $config['network_map_legend']['dn.edge'], 'color' => $config['network_map_legend']['dn.edge']));
-
+$edge_disabled_style = array(
+    'dashes' => array(8,12),
+    'color' => array(
+        'color' => $config['network_map_legend']['di.edge'],
+        'highlight' => $config['network_map_legend']['di.edge'],
+    ),
+);
+$edge_down_style = array(
+    'dashes' => array(8,12),
+    'color' => array(
+        'border' => $config['network_map_legend']['dn.border'],
+        'highlight' => $config['network_map_legend']['dn.edge'],
+        'color' => $config['network_map_legend']['dn.edge'],
+    ),
+);
 
 // Iterate though ports and links, generating a set of devices (nodes)
 // and links (edges) that make up the topology graph.
 
 foreach ($list as $items) {
-    $local_device = array('device_id'=>$items['local_device_id'], 'os'=>$items['local_os'], 'hostname'=>$items['local_hostname']);
-    $remote_device = array('device_id'=>$items['remote_device_id'], 'os'=>$items['remote_os'], 'hostname'=>$items['remote_hostname']);
-
-    $local_port = array('port_id'=>$items['local_port_id'],'device_id'=>$items['local_port_device_id'],'ifName'=>$items['local_ifname'],'ifSpeed'=>$items['local_ifspeed'],'ifOperStatus'=>$items['local_ifoperstatus'],'ifAdminStatus'=>$items['local_adminstatus']);
-    $remote_port = array('port_id'=>$items['remote_port_id'],'device_id'=>$items['remote_port_device_id'],'ifName'=>$items['remote_ifname'],'ifSpeed'=>$items['remote_ifspeed'],'ifOperStatus'=>$items['remote_ifoperstatus'],'ifAdminStatus'=>$items['remote_adminstatus']);
+    $local_device = array(
+        'device_id'=>$items['local_device_id'],
+        'os'=>$items['local_os'],
+        'hostname'=>$items['local_hostname'],
+    );
+    $remote_device = array(
+        'device_id'=>$items['remote_device_id'],
+        'os'=>$items['remote_os'],
+        'hostname'=>$items['remote_hostname'],
+    );
+    $local_port = array(
+        'port_id'=>$items['local_port_id'],
+        'device_id'=>$items['local_port_device_id'],
+        'ifName'=>$items['local_ifname'],
+        'ifSpeed'=>$items['local_ifspeed'],
+        'ifOperStatus'=>$items['local_ifoperstatus'],
+        'ifAdminStatus'=>$items['local_adminstatus'],
+    );
+    $remote_port = array(
+        'port_id'=>$items['remote_port_id'],
+        'device_id'=>$items['remote_port_device_id'],
+        'ifName'=>$items['remote_ifname'],
+        'ifSpeed'=>$items['remote_ifspeed'],
+        'ifOperStatus'=>$items['remote_ifoperstatus'],
+        'ifAdminStatus'=>$items['remote_adminstatus'],
+    );
 
     $local_device_id = $items['local_device_id'];
     if (!array_key_exists($local_device_id, $devices_by_id)) {
         $items['sysName'] = $items['local_sysName'];
-        $devices_by_id[$local_device_id] = array('id'=>$local_device_id,'label'=>shorthost(format_hostname($items, $items['local_hostname']), 1),'title'=>generate_device_link($local_device, '', array(), '', '', '', 0),'shape'=>'box');
+        $devices_by_id[$local_device_id] = array(
+            'id'=>$local_device_id,
+            'label'=>shorthost(format_hostname($items, $items['local_hostname']), 1),
+            'title'=>generate_device_link($local_device, '', array(), '', '', '', 0),
+            'shape'=>'box',
+        );
         if ($items['local_disabled'] != '0') {
             $devices_by_id[$local_device_id] = array_merge($devices_by_id[$local_device_id], $node_disabled_style);
         } elseif ($items['local_status'] == '0') {
@@ -248,7 +285,16 @@ foreach ($list as $items) {
         !array_key_exists($device_id2, $device_assoc_seen)) {
         $local_port = cleanPort($local_port);
         $remote_port = cleanPort($remote_port);
-        $links[] = array_merge(array('from'=>$items['local_device_id'],'to'=>$items['remote_device_id'],'label'=>shorten_interface_type($local_port['ifName']) . ' > ' . shorten_interface_type($remote_port['ifName']),'title'=>generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=".$items['local_port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#", "", $row_colour)."'>\n", '', 0, 1),'width'=>$width), $link_style);
+        $links[] = array_merge(
+            array(
+                'from'=>$items['local_device_id'],
+                'to'=>$items['remote_device_id'],
+                'label'=>shorten_interface_type($local_port['ifName']) . ' > ' . shorten_interface_type($remote_port['ifName']),
+                'title'=>generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=".$items['local_port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#", "", $row_colour)."'>\n", '', 0, 1),
+                'width'=>$width,
+            ),
+            $link_style
+        );
     }
     $link_assoc_seen[$link_id1] = 1;
     $link_assoc_seen[$link_id2] = 1;
