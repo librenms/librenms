@@ -26,6 +26,7 @@
 namespace LibreNMS\DB;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Events\StatementPrepared;
 use Illuminate\Events\Dispatcher;
 
 class Eloquent
@@ -45,6 +46,19 @@ class Eloquent
             self::$capsule->setEventDispatcher(new Dispatcher());
             self::$capsule->setAsGlobal();
             self::$capsule->bootEloquent();
+        }
+    }
+
+    public static function initLegacyListeners()
+    {
+        if (self::isConnected()) {
+            // set FETCH_ASSOC for queries that required by setting the global variable $PDO_FETCH_ASSOC (for dbFacile)
+            self::DB()->getEventDispatcher()->listen(StatementPrepared::class, function ($event) {
+                global $PDO_FETCH_ASSOC;
+                if ($PDO_FETCH_ASSOC) {
+                    $event->statement->setFetchMode(\PDO::FETCH_ASSOC);
+                }
+            });
         }
     }
 

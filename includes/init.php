@@ -96,21 +96,6 @@ if (module_selected('alerts', $init_modules)) {
 $display_bak = ini_get('display_errors');
 ini_set('display_errors', 1);
 
-if (!module_selected('nodb', $init_modules)) {
-    // Connect to database
-    try {
-        dbConnect();
-    } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
-        if (isCli()) {
-            echo 'MySQL Error: ' . $e->getMessage() . PHP_EOL;
-            exit(2);
-        } else {
-            // punt to the Laravel error handler
-            throw $e;
-        }
-    }
-}
-
 if (module_selected('laravel', $init_modules)) {
     // make sure Laravel isn't already booted
     if (!class_exists('App') || !App::isBooted()) {
@@ -118,8 +103,16 @@ if (module_selected('laravel', $init_modules)) {
         $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
         $kernel->bootstrap();
     }
-} elseif (module_selected('eloquent', $init_modules)) {
+} elseif (!module_selected('nodb', $init_modules)) {
     \LibreNMS\DB\Eloquent::boot();
+}
+
+// init listeners to handle $PDO_FETCH_ASSOC for dbFacile
+\LibreNMS\DB\Eloquent::initLegacyListeners();
+
+// set non-strict mode if for legacy code
+if (\LibreNMS\DB\Eloquent::isConnected()) {
+    \LibreNMS\DB\Eloquent::DB()->statement("SET sql_mode = '' ");
 }
 
 // Load config if not already loaded (which is the case if inside Laravel)

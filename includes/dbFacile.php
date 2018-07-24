@@ -19,15 +19,11 @@
 
 use LibreNMS\Config;
 use LibreNMS\Exceptions\DatabaseConnectException;
+use LibreNMS\DB\Eloquent;
 
 function dbIsConnected()
 {
-    global $database_link;
-    if (empty($database_link)) {
-        return false;
-    }
-
-    return mysqli_ping($database_link);
+    return Eloquent::isConnected();
 }
 
 /**
@@ -40,70 +36,22 @@ function dbIsConnected()
  * @param string $db_name
  * @param string $db_port
  * @param string $db_socket
- * @return mysqli
+ * @return \Illuminate\Database\Connection
  * @throws DatabaseConnectException
  */
 function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '', $db_port = null, $db_socket = null)
 {
-    global $database_link;
-
-    if (dbIsConnected()) {
-        return $database_link;
+    if (Eloquent::isConnected()) {
+        return Eloquent::DB();
     }
 
     if (!function_exists('mysqli_connect')) {
         throw new DatabaseConnectException("mysqli extension not loaded!");
     }
 
-    if (is_null($db_host)) {
-        $db_config = Config::getDatabaseSettings();
-        extract($db_config);
-        /** @var string $db_host */
-        /** @var string $db_port */
-        /** @var string $db_socket */
-        /** @var string $db_name */
-        /** @var string $db_user */
-        /** @var string $db_pass */
-    }
+    Eloquent::boot();
 
-    if (empty($db_socket)) {
-        $db_socket = null;
-    }
-    if (!is_numeric($db_port)) {
-        $db_port = null;
-    }
-
-    if (!$db_host && !$db_socket) {
-        throw new DatabaseConnectException("Database configuration not configured");
-    }
-
-    $database_link = @mysqli_connect('p:' . $db_host, $db_user, $db_pass, null, $db_port, $db_socket);
-    if ($database_link === false) {
-        $error = mysqli_connect_error();
-        if ($error == 'No such file or directory') {
-            $error = 'Could not connect to ' . $db_host;
-        }
-        throw new DatabaseConnectException($error);
-    }
-
-    mysqli_options($database_link, MYSQLI_OPT_LOCAL_INFILE, false);
-
-    $database_db = mysqli_select_db($database_link, $db_name);
-    if (!$database_db) {
-        $db_create_sql = "CREATE DATABASE $db_name CHARACTER SET utf8 COLLATE utf8_unicode_ci";
-        mysqli_query($database_link, $db_create_sql);
-        $database_db = mysqli_select_db($database_link, $db_name);
-    }
-
-    if (!$database_db) {
-        throw new DatabaseConnectException("Could not select database: $db_name. " . mysqli_error($database_link));
-    }
-
-    dbQuery("SET NAMES 'utf8'");
-    dbQuery("SET CHARACTER SET 'utf8'");
-    dbQuery("SET COLLATION_CONNECTION = 'utf8_unicode_ci'");
-
-    return $database_link;
+    return Eloquent::DB();
 }
 
 /*
@@ -114,33 +62,7 @@ function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '',
 
 function dbQuery($sql, $parameters = array())
 {
-    global $fullSql, $debug, $database_link, $config;
-    $fullSql = dbMakeQuery($sql, $parameters);
-    if ($debug) {
-        $fullSql = str_replace(PHP_EOL, '', $fullSql);
-
-        // hide binary field updates and inserts
-        $fullSql = preg_replace("/(.*alert_log.*details[` ]*= *')[^']*('.*)/i", '$1<binary data>$2', $fullSql);
-        if (class_exists('Log')) {
-            Log::info("SQL[%y$fullSql%n]", ['color' => true]);
-        } else {
-            c_echo("SQL[%y$fullSql%n] \n");
-        }
-    }
-
-    $result = mysqli_query($database_link, $fullSql);
-    if (!$result) {
-        $mysql_error = mysqli_error($database_link);
-        if (isset($config['mysql_log_level']) && ((in_array($config['mysql_log_level'], array('INFO', 'ERROR')) && !preg_match('/Duplicate entry/', $mysql_error)) || in_array($config['mysql_log_level'], array('DEBUG')))) {
-            if (!empty($mysql_error)) {
-                $error_msg =  "MySQL Error: $mysql_error ($fullSql)";
-                c_echo("%R$error_msg%n\n", isCli() || $debug);
-                logfile(date($config['dateformat']['compact']) . ' ' . $error_msg);
-            }
-        }
-    }
-
-    return $result;
+    return Eloquent::DB()->statement($sql, $parameters);
 }//end dbQuery()
 
 
@@ -152,7 +74,6 @@ function dbQuery($sql, $parameters = array())
 
 function dbInsert($data, $table)
 {
-    global $database_link;
     $time_start = microtime(true);
 
     // the following block swaps the parameters if they were given in the wrong order.
@@ -166,21 +87,20 @@ function dbInsert($data, $table)
         // trigger_error('QDB - Parameters passed to insert() were in reverse order, but it has been allowed', E_USER_NOTICE);
     }
 
-    $sql = 'INSERT INTO `'.$table.'` (`'.implode('`,`', array_keys($data)).'`)  VALUES ('.implode(',', dbPlaceHolders($data)).')';
+    $sql = 'INSERT IGNORE INTO `'.$table.'` (`'.implode('`,`', array_keys($data)).'`)  VALUES ('.implode(',', dbPlaceHolders($data)).')';
 
-    dbBeginTransaction();
-    $result = dbQuery($sql, $data);
-    if ($result) {
-        $id = mysqli_insert_id($database_link);
-        dbCommitTransaction();
-        // return $id;
-    } else {
-        dbRollbackTransaction();
-        $id = null;
+    try {
+        $result = Eloquent::DB()->insert($sql, $data);
+    } catch (PDOException $pdoe) {
+        dbHandleException($pdoe);
     }
 
     recordDbStatistic('insert', $time_start);
-    return $id;
+    if ($result) {
+        return Eloquent::DB()->getPdo()->lastInsertId();
+    } else {
+        return null;
+    }
 }//end dbInsert()
 
 
@@ -203,6 +123,13 @@ function dbBulkInsert($data, $table)
         $data  = $table;
         $table = $tmp;
     }
+
+//    try {
+//        $result = Eloquent::DB()->table($table)->insert(dbArrayToRaw($data));
+//    } catch (PDOException $pdoe) {
+//        dbHandleException($pdoe);
+//    }
+
     // check that data isn't an empty array
     if (empty($data)) {
         return false;
@@ -213,31 +140,39 @@ function dbBulkInsert($data, $table)
         return false;
     }
 
-    $sql = 'INSERT INTO `'.$table.'` (`'.implode('`,`', $fields).'`)  VALUES ';
-    $values ='';
 
-    foreach ($data as $row) {
-        if ($values != '') {
-            $values .= ',';
-        }
-        $rowvalues='';
-        foreach ($row as $key => $value) {
-            if ($rowvalues != '') {
-                $rowvalues .= ',';
-            }
-            if (is_null($value)) {
-                $rowvalues .= 'NULL';
-            } else {
-                $rowvalues .= "'" . mres($value) . "'";
-            }
-        }
-        $values .= "(".$rowvalues.")";
+//    $sql = 'INSERT IGNORE INTO `'.$table.'` (`'.implode('`,`', $fields).'`)  VALUES ';
+//    $values ='';
+//
+//    foreach ($data as $row) {
+//        if ($values != '') {
+//            $values .= ',';
+//        }
+//        $rowvalues='';
+//        foreach ($row as $key => $value) {
+//            if ($rowvalues != '') {
+//                $rowvalues .= ',';
+//            }
+//            if (is_null($value)) {
+//                $rowvalues .= 'NULL';
+//            } else {
+//                $rowvalues .= "'" . $value . "'";
+//            }
+//        }
+//        $values .= "(".$rowvalues.")";
+//    }
+
+    try {
+        //        $result = Eloquent::DB()->insert($sql.$values);
+        $result = Eloquent::DB()->table($table)->insert($data);
+
+        recordDbStatistic('insert', $time_start);
+        return $result;
+    } catch (PDOException $pdoe) {
+        dbHandleException($pdoe);
     }
 
-    $result = dbQuery($sql.$values);
-
-    recordDbStatistic('insert', $time_start);
-    return $result;
+    return false;
 }//end dbBulkInsert()
 
 
@@ -249,7 +184,6 @@ function dbBulkInsert($data, $table)
 
 function dbUpdate($data, $table, $where = null, $parameters = array())
 {
-    global $fullSql, $database_link;
     $time_start = microtime(true);
 
     // the following block swaps the parameters if they were given in the wrong order.
@@ -267,32 +201,38 @@ function dbUpdate($data, $table, $where = null, $parameters = array())
     // but how merge these field placeholders with actual $parameters array for the WHERE clause
     $sql = 'UPDATE `'.$table.'` set ';
     foreach ($data as $key => $value) {
-        $sql .= '`'.$key.'` '.'=:'.$key.',';
+        $sql .= '`'.$key.'`=';
+        if (is_array($value)) {
+            $sql .= reset($value);
+            unset($data[$key]);
+        } else {
+            $sql .= '?';
+        }
+        $sql .= ',';
     }
 
     $sql = substr($sql, 0, -1);
     // strip off last comma
     if ($where) {
         $sql .= ' WHERE '.$where;
-        $data = array_merge($data, $parameters);
+        $data = array_merge(array_values($data), $parameters);
     }
 
-    if (dbQuery($sql, $data)) {
-        $return = mysqli_affected_rows($database_link);
-    } else {
-        // echo("$fullSql");
-        //trigger_error('QDB - Update failed.', E_USER_WARNING);
-        $return = false;
+    try {
+        $result = Eloquent::DB()->update($sql, $data);
+
+        recordDbStatistic('update', $time_start);
+        return $result;
+    } catch (PDOException $pdoe) {
+        dbHandleException($pdoe);
     }
 
-    recordDbStatistic('update', $time_start);
-    return $return;
+    return false;
 }//end dbUpdate()
 
 
 function dbDelete($table, $where = null, $parameters = array())
 {
-    global $database_link;
     $time_start = microtime(true);
 
     $sql = 'DELETE FROM `'.$table.'`';
@@ -300,14 +240,14 @@ function dbDelete($table, $where = null, $parameters = array())
         $sql .= ' WHERE '.$where;
     }
 
-    $result = dbQuery($sql, $parameters);
+    try {
+        $result = Eloquent::DB()->delete($sql, $parameters);
+    } catch (PDOException $pdoe) {
+        dbHandleException($pdoe);
+    }
 
     recordDbStatistic('delete', $time_start);
-    if ($result) {
-        return mysqli_affected_rows($database_link);
-    } else {
-        return false;
-    }
+    return $result;
 }//end dbDelete()
 
 
@@ -321,7 +261,6 @@ function dbDelete($table, $where = null, $parameters = array())
  */
 function dbDeleteOrphans($target_table, $parents)
 {
-    global $database_link;
     $time_start = microtime(true);
 
     if (empty($parents)) {
@@ -350,14 +289,15 @@ function dbDeleteOrphans($target_table, $parents)
     }
 
     $query = "$sql WHERE" . implode(' AND', $where);
-    $result = dbQuery($query, array());
+
+    try {
+        $result = Eloquent::DB()->delete($query);
+    } catch (PDOException $pdoe) {
+        dbHandleException($pdoe);
+    }
 
     recordDbStatistic('delete', $time_start);
-    if ($result) {
-        return mysqli_affected_rows($database_link);
-    } else {
-        return false;
-    }
+    return $result;
 }
 
 /*
@@ -366,30 +306,23 @@ function dbDeleteOrphans($target_table, $parents)
  * */
 
 
-function dbFetchRows($sql, $parameters = array())
+function dbFetchRows($sql, $parameters = [])
 {
+    global $PDO_FETCH_ASSOC;
     $time_start = microtime(true);
-    $result = dbQuery($sql, $parameters);
 
-    if ($result !== false) {
-        if (mysqli_num_rows($result) > 0) {
-            $rows = [];
-            while ($row = mysqli_fetch_assoc($result)) {
-                $rows[] = $row;
-            }
+    try {
+        $PDO_FETCH_ASSOC = true;
+        $rows = Eloquent::DB()->select($sql, $parameters);
 
-            mysqli_free_result($result);
-
-            recordDbStatistic('fetchrows', $time_start);
-            return $rows;
-        }
-
-        mysqli_free_result($result);
+        recordDbStatistic('fetchrows', $time_start);
+        return $rows;
+    } catch (PDOException $pdoe) {
+        dbHandleException($pdoe);
+    } finally {
+        $PDO_FETCH_ASSOC = false;
     }
 
-    // no records, thus return empty array
-    // which should evaluate to false, and will prevent foreach notices/warnings
-    recordDbStatistic('fetchrows', $time_start);
     return [];
 }//end dbFetchRows()
 
@@ -400,7 +333,7 @@ function dbFetchRows($sql, $parameters = array())
  * */
 
 
-function dbFetch($sql, $parameters = array())
+function dbFetch($sql, $parameters = [])
 {
     return dbFetchRows($sql, $parameters);
     /*
@@ -422,19 +355,24 @@ function dbFetch($sql, $parameters = array())
  * */
 
 
-function dbFetchRow($sql = null, $parameters = array())
+function dbFetchRow($sql = null, $parameters = [])
 {
+    global $PDO_FETCH_ASSOC;
     $time_start = microtime(true);
-    $result         = dbQuery($sql, $parameters);
-    if ($result) {
-        $row = mysqli_fetch_assoc($result);
-        mysqli_free_result($result);
+
+    try {
+        $PDO_FETCH_ASSOC = true;
+        $row = Eloquent::DB()->selectOne($sql, $parameters);
 
         recordDbStatistic('fetchrow', $time_start);
         return $row;
-    } else {
-        return null;
+    } catch (PDOException $pdoe) {
+        dbHandleException($pdoe);
+    } finally {
+        $PDO_FETCH_ASSOC = false;
     }
+
+    return [];
 }//end dbFetchRow()
 
 
@@ -443,16 +381,25 @@ function dbFetchRow($sql = null, $parameters = array())
  * */
 
 
-function dbFetchCell($sql, $parameters = array())
+function dbFetchCell($sql, $parameters = [])
 {
+    global $PDO_FETCH_ASSOC;
     $time_start = microtime(true);
-    $row = dbFetchRow($sql, $parameters);
 
-    recordDbStatistic('fetchcell', $time_start);
-    if ($row) {
-        return array_shift($row);
-        // shift first field off first row
+    try {
+        $PDO_FETCH_ASSOC = true;
+        $row = Eloquent::DB()->selectOne($sql, $parameters);
+        recordDbStatistic('fetchcell', $time_start);
+        if ($row) {
+            return array_shift($row);
+            // shift first field off first row
+        }
+    } catch (PDOException $pdoe) {
+        dbHandleException($pdoe);
+    } finally {
+        $PDO_FETCH_ASSOC = false;
     }
+
     return null;
 }//end dbFetchCell()
 
@@ -463,16 +410,29 @@ function dbFetchCell($sql, $parameters = array())
  * */
 
 
-function dbFetchColumn($sql, $parameters = array())
+function dbFetchColumn($sql, $parameters = [])
 {
+    global $PDO_FETCH_ASSOC;
     $time_start = microtime(true);
-    $cells          = array();
-    foreach (dbFetch($sql, $parameters) as $row) {
-        $cells[] = array_shift($row);
+
+    $cells = [];
+
+    try {
+        $PDO_FETCH_ASSOC = true;
+        foreach (Eloquent::DB()->select($sql, $parameters) as $row) {
+            $cells[] = array_shift($row);
+        }
+        $PDO_FETCH_ASSOC = false;
+
+        recordDbStatistic('fetchcolumn', $time_start);
+        return $cells;
+    } catch (PDOException $pdoe) {
+        dbHandleException($pdoe);
+    } finally {
+        $PDO_FETCH_ASSOC = false;
     }
 
-    recordDbStatistic('fetchcolumn', $time_start);
-    return $cells;
+return [];
 }//end dbFetchColumn()
 
 
@@ -502,91 +462,46 @@ function dbFetchKeyValue($sql, $parameters = array())
     return $data;
 }//end dbFetchKeyValue()
 
-
-/*
- * This combines a query and parameter array into a final query string for execution
- * PDO drivers don't need to use this
+/**
+ * Legacy dbFacile indicates DB::raw() as a value wrapped in an array
+ *
+ * @param array $data
+ * @return array
  */
-
-
-function dbMakeQuery($sql, $parameters)
+function dbArrayToRaw($data)
 {
-    // bypass extra logic if we have no parameters
-    if (sizeof($parameters) == 0) {
-        return $sql;
-    }
+    array_walk($data, function (&$item) {
+        if (is_array($item)) {
+            $item = Eloquent::DB()->raw(reset($item));
+        }
 
-    $parameters = dbPrepareData($parameters);
-    // separate the two types of parameters for easier handling
-    $questionParams = array();
-    $namedParams    = array();
-    foreach ($parameters as $key => $value) {
-        if (is_numeric($key)) {
-            $questionParams[] = $value;
-        } else {
-            $namedParams[':'.$key] = $value;
+    });
+
+    return $data;
+}
+
+function dbHandleException(\Exception $exception)
+{
+    $file = $exception->getFile() . ':' . $exception->getLine();
+    foreach ($exception->getTrace() as $trace) {
+        if (!str_contains($trace['file'], ['/vendor/', 'dbFacile'])) {
+            $file = $trace['file'] . ':' . $trace['line'];
+            break;
         }
     }
 
-    // sort namedParams in reverse to stop substring squashing
-    krsort($namedParams);
+    $message = $exception->getMessage() . ' in ' . $file;
 
-    // split on question-mark and named placeholders
-    if (preg_match('/(\[\[:[\w]+:\]\])/', $sql)) {
-        $result = preg_split('/(\?[a-zA-Z0-9_-]*)/', $sql, -1, (PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE));
+    if (class_exists('Log')) {
+        Log::error($message);
     } else {
-        $result = preg_split('/(\?|:[a-zA-Z0-9_-]+)/', $sql, -1, (PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE));
+        c_echo("%rSQL Error!%n ");
+        echo $message . PHP_EOL;
     }
 
-    // every-other item in $result will be the placeholder that was found
-    $query            = '';
-    $res_size = sizeof($result);
-    for ($i = 0; $i < $res_size; $i += 2) {
-        $query .= $result[$i];
-
-        $j = ($i + 1);
-        if (array_key_exists($j, $result)) {
-            $test = $result[$j];
-            if ($test == '?') {
-                $query .= array_shift($questionParams);
-            } else {
-                $query .= $namedParams[$test];
-            }
-        }
-    }
-
-    return $query;
-}//end dbMakeQuery()
-
-
-function dbPrepareData($data)
-{
-    global $database_link;
-    $values = array();
-
-    foreach ($data as $key => $value) {
-        $escape = true;
-        // don't quote or esc if value is an array, we treat it
-        // as a "decorator" that tells us not to escape the
-        // value contained in the array
-        if (is_array($value) && !is_object($value)) {
-            $escape = false;
-            $value  = array_shift($value);
-        }
-
-        // it's not right to worry about invalid fields in this method because we may be operating on fields
-        // that are aliases, or part of other tables through joins
-        // if(!in_array($key, $columns)) // skip invalid fields
-        // continue;
-        if ($escape) {
-            $values[$key] = "'".mysqli_real_escape_string($database_link, $value)."'";
-        } else {
-            $values[$key] = $value;
-        }
-    }
-
-    return $values;
-}//end dbPrepareData()
+    // TODO remove this
+//    exit;
+}
 
 /**
  * Given a data array, this returns an array of placeholders
@@ -595,11 +510,15 @@ function dbPrepareData($data)
  * @param array $values
  * @return array
  */
-function dbPlaceHolders($values)
+function dbPlaceHolders(&$values)
 {
     $data = array();
     foreach ($values as $key => $value) {
-        if (is_numeric($key)) {
+        if (is_array($value)) {
+            // array wrapped values are raw sql
+            $data[] = reset($value);
+            unset($values[$key]);
+        } elseif (is_numeric($key)) {
             $data[] = '?';
         } else {
             $data[] = ':'.$key;
@@ -612,22 +531,19 @@ function dbPlaceHolders($values)
 
 function dbBeginTransaction()
 {
-    global $database_link;
-    mysqli_query($database_link, 'begin');
+    Eloquent::DB()->beginTransaction();
 }//end dbBeginTransaction()
 
 
 function dbCommitTransaction()
 {
-    global $database_link;
-    mysqli_query($database_link, 'commit');
+    Eloquent::DB()->commit();
 }//end dbCommitTransaction()
 
 
 function dbRollbackTransaction()
 {
-    global $database_link;
-    mysqli_query($database_link, 'rollback');
+    Eloquent::DB()->rollBack();
 }//end dbRollbackTransaction()
 
 /**
