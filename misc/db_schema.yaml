@@ -1062,6 +1062,31 @@ pollers:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [poller_name], Unique: true, Type: BTREE }
     id: { Name: id, Columns: [id], Unique: false, Type: BTREE }
+poller_cluster:
+  Columns:
+    - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
+    - { Field: node_id, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: poller_name, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: poller_version, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
+    - { Field: poller_groups, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
+    - { Field: last_report, Type: datetime, 'Null': false, Extra: '' }
+    - { Field: master, Type: tinyint(1), 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [node_id], Unique: true, Type: BTREE }
+    id: { Name: id, Columns: [id], Unique: true, Type: BTREE }
+poller_cluster_stats:
+  Columns:
+    - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
+    - { Field: parent_poller, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
+    - { Field: poller_type, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
+    - { Field: depth, Type: 'int(11) unsigned', 'Null': false, Extra: '' }
+    - { Field: devices, Type: 'int(11) unsigned', 'Null': false, Extra: '' }
+    - { Field: worker_seconds, Type: 'double unsigned', 'Null': false, Extra: '' }
+    - { Field: workers, Type: 'int(11) unsigned', 'Null': false, Extra: '' }
+    - { Field: frequency, Type: 'int(11) unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [parent_poller, poller_type], Unique: true, Type: BTREE }
+    id: { Name: id, Columns: [id], Unique: true, Type: BTREE }
 poller_groups:
   Columns:
     - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
@@ -1116,30 +1141,30 @@ ports:
     - { Field: pagpEthcOperationMode, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: pagpDeviceId, Type: varchar(48), 'Null': true, Extra: '' }
     - { Field: pagpGroupIfIndex, Type: int(11), 'Null': true, Extra: '' }
-    - { Field: ifInUcastPkts, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInUcastPkts_prev, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInUcastPkts_delta, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInUcastPkts_rate, Type: int(11), 'Null': true, Extra: '' }
-    - { Field: ifOutUcastPkts, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutUcastPkts_prev, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutUcastPkts_delta, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutUcastPkts_rate, Type: int(11), 'Null': true, Extra: '' }
-    - { Field: ifInErrors, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInErrors_prev, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInErrors_delta, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInErrors_rate, Type: int(11), 'Null': true, Extra: '' }
-    - { Field: ifOutErrors, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutErrors_prev, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutErrors_delta, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutErrors_rate, Type: int(11), 'Null': true, Extra: '' }
-    - { Field: ifInOctets, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInOctets_prev, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInOctets_delta, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInOctets_rate, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutOctets, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutOctets_prev, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutOctets_delta, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutOctets_rate, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: ifInUcastPkts, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInUcastPkts_prev, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInUcastPkts_delta, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInUcastPkts_rate, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutUcastPkts, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutUcastPkts_prev, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutUcastPkts_delta, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutUcastPkts_rate, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInErrors, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInErrors_prev, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInErrors_delta, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInErrors_rate, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutErrors, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutErrors_prev, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutErrors_delta, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutErrors_rate, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInOctets, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInOctets_prev, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInOctets_delta, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInOctets_rate, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutOctets, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutOctets_prev, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutOctets_delta, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutOctets_rate, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
     - { Field: poll_time, Type: int(11), 'Null': true, Extra: '' }
     - { Field: poll_prev, Type: int(11), 'Null': true, Extra: '' }
     - { Field: poll_period, Type: int(11), 'Null': true, Extra: '' }
@@ -1558,13 +1583,13 @@ users:
     - { Field: username, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: password, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: realname, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: remember_token, Type: varchar(100), 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
     - { Field: email, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: descr, Type: char(30), 'Null': false, Extra: '' }
     - { Field: level, Type: tinyint(4), 'Null': false, Extra: '', Default: '0' }
     - { Field: can_modify_passwd, Type: tinyint(4), 'Null': false, Extra: '', Default: '1' }
     - { Field: created_at, Type: timestamp, 'Null': false, Extra: '', Default: '1970-01-02 00:00:01' }
-    - { Field: updated_at, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
-    - { Field: remember_token, Type: varchar(100), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [user_id], Unique: true, Type: BTREE }
     username: { Name: username, Columns: [username], Unique: true, Type: BTREE }
