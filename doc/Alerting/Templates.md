@@ -70,7 +70,7 @@ If you'd like to reuse a common template for your alerts follow below
 
 create a file in
 ` resources/views/alerts/template.blade.php`
-Scaffold this file with the following
+As an example, add the following:
 
 ```
 <html>
@@ -89,7 +89,7 @@ Scaffold this file with the following
 ```
 The important part being the `@yield('content')`
 
-style this any way you'd like from then on to use for a common template
+You can use plain text or html as per Alert templates and this will form the basis of your common template.
 
 In your alert template just use
 
@@ -102,7 +102,6 @@ In your alert template just use
   ...
 @endsection
 ```
-
 
 More info: https://laravel.com/docs/5.4/blade#extending-a-layout
 
