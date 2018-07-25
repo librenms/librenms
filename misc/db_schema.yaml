@@ -1163,30 +1163,30 @@ ports:
     - { Field: pagpEthcOperationMode, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: pagpDeviceId, Type: varchar(48), 'Null': true, Extra: '' }
     - { Field: pagpGroupIfIndex, Type: int(11), 'Null': true, Extra: '' }
-    - { Field: ifInUcastPkts, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInUcastPkts_prev, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInUcastPkts_delta, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInUcastPkts_rate, Type: int(11), 'Null': true, Extra: '' }
-    - { Field: ifOutUcastPkts, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutUcastPkts_prev, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutUcastPkts_delta, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutUcastPkts_rate, Type: int(11), 'Null': true, Extra: '' }
-    - { Field: ifInErrors, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInErrors_prev, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInErrors_delta, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInErrors_rate, Type: int(11), 'Null': true, Extra: '' }
-    - { Field: ifOutErrors, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutErrors_prev, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutErrors_delta, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutErrors_rate, Type: int(11), 'Null': true, Extra: '' }
-    - { Field: ifInOctets, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInOctets_prev, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInOctets_delta, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInOctets_rate, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutOctets, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutOctets_prev, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutOctets_delta, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutOctets_rate, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: ifInUcastPkts, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInUcastPkts_prev, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInUcastPkts_delta, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInUcastPkts_rate, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutUcastPkts, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutUcastPkts_prev, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutUcastPkts_delta, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutUcastPkts_rate, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInErrors, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInErrors_prev, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInErrors_delta, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInErrors_rate, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutErrors, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutErrors_prev, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutErrors_delta, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutErrors_rate, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInOctets, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInOctets_prev, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInOctets_delta, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInOctets_rate, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutOctets, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutOctets_prev, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutOctets_delta, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutOctets_rate, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
     - { Field: poll_time, Type: int(11), 'Null': true, Extra: '' }
     - { Field: poll_prev, Type: int(11), 'Null': true, Extra: '' }
     - { Field: poll_period, Type: int(11), 'Null': true, Extra: '' }
