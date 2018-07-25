@@ -91,7 +91,8 @@ then you can run the following command to help troubleshoot services.
 ```
 ## Service checks polling logic
 
-By default, service checks will be skipped if the associated device is not pingable, and an appropriate entry will be populated in the event log. An exception to this rule are service checks with `IP address` parameter different from the associated device's IP address.
+Service check is skipped when the associated device is not pingable, and an appropriate entry is populated in the event log. 
+Service check is polled if it's `IP address` parameter is not equal to associated device's IP address, even when the associated device is not pingable.
 
 To override the default logic and always poll service checks, you can disable ICMP testing for any device by switching `Disable ICMP Test` setting (Edit -> Misc) to ON.
 
