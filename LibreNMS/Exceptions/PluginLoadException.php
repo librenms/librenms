@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin.php
+ * HostIpExistsException.php
  *
  * -Description-
  *
@@ -18,29 +18,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @package    LibreNMS
+ * @subpackage Plugins
+ * @author     LibreNMS Group
  * @link       http://librenms.org
- * @copyright  2018 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2016
  */
 
-namespace App\Models;
+namespace LibreNMS\Exceptions;
 
-use Illuminate\Database\Eloquent\Builder;
-
-class Plugin extends BaseModel
+/**
+ * Description of PluginLoadException
+ *
+ * @author daryl
+ */
+class PluginLoadException extends \Exception
 {
-    public $timestamps = false;
-    protected $primaryKey = 'plugin_id';
-    protected $fillable = array('plugin_name', 'plugin_active');
-
-    // ---- Query scopes ----
-
-    /**
-     * @param Builder $query
-     * @return Builder
-     */
-    public function scopeIsActive($query)
-    {
-        return $query->where('plugin_active', 1);
-    }
+    
 }
