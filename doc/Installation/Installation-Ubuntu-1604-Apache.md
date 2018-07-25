@@ -42,7 +42,6 @@ Within the `[mysqld]` section please add:
 
 ```bash
 innodb_file_per_table=1
-sql-mode=""
 lower_case_table_names=0
 ```
     systemctl restart mysql

@@ -111,25 +111,6 @@ class DBSetupTest extends DBTestCase
         $this->assertEmpty($collation, 'Wrong Column Collation or Character set: ' . $error);
     }
 
-    public function testSqlMode()
-    {
-        global $sql_mode;
-        $this->assertNotNull($sql_mode, 'Query to save SQL Mode in bootstrap.php failed');
-
-        // sql_mode can only be set by users with access
-        $access = array(
-            'GRANT ALL PRIVILEGES ON *.*',
-            'SUPER'
-        );
-
-        if (str_contains(join(PHP_EOL, dbFetchColumn('SHOW GRANTS')), $access)) {
-            $this->assertEquals(
-                array('ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'),
-                dbFetchColumn("SELECT @@global.sql_mode")
-            );
-        }
-    }
-
     public function testValidateSchema()
     {
         if (is_file('misc/db_schema.yaml')) {

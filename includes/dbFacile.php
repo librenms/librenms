@@ -102,6 +102,7 @@ function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '',
     dbQuery("SET NAMES 'utf8'");
     dbQuery("SET CHARACTER SET 'utf8'");
     dbQuery("SET COLLATION_CONNECTION = 'utf8_unicode_ci'");
+    dbQuery("SET SQL_MODE = ''");
 
     return $database_link;
 }

@@ -49,8 +49,6 @@ Find the line: `bind-address = 127.0.0.1`
 
 Change `127.0.0.1` to the IP address that your MySQL server should listen on.  Restart MySQL:
 
-If you see a line that starts `sql-mode` then change this to `sql-mode=""`.
-
     service mysql restart
 
 ### On the NMS ###
