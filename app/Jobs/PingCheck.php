@@ -301,7 +301,5 @@ class PingCheck implements ShouldQueue
             // create a new tier containing this data
             $this->deferred->put($device->max_depth, collect([$device->hostname => $data]));
         }
-
-
     }
 }
