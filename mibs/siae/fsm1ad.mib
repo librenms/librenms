@@ -1,0 +1,734 @@
+-- Copyright (C) 2006-2012 Aricent Group . All Rights Reserved
+
+-- $Id: fsm1ad.mib,v 1.11 2013/12/05 12:47:19 siva Exp $
+
+ARICENT-MIDOT1AD-MIB DEFINITIONS ::= BEGIN 
+ 
+IMPORTS
+ 
+    OBJECT-TYPE,MODULE-IDENTITY,
+    Integer32, Unsigned32, enterprises
+       FROM SNMPv2-SMI
+    RowStatus, MacAddress, TruthValue,TEXTUAL-CONVENTION
+       FROM SNMPv2-TC
+    EnabledStatus  FROM ARICENTP-BRIDGE-MIB;
+            
+dot1adMIMIB MODULE-IDENTITY
+    LAST-UPDATED "201209050000Z"
+    ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+    CONTACT-INFO "support@aricent.com"
+    DESCRIPTION "||||||"
+    REVISION "201209050000Z"
+    DESCRIPTION "||||||"
+
+::= { enterprises futuresoftware(2076) 133}
+
+-- Textual Conventions
+
+PriorityCodePoint ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "To specify the priority code point selection row"
+    SYNTAX      INTEGER {
+                            codePoint8p0d(1),
+                            codePoint7p1d(2),
+                            codePoint6p2d(3),
+                            codePoint5p3d(4)
+                        }
+
+VlanId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A 12-bit VLAN ID used in the VLAN Tag header."
+    SYNTAX      Integer32 (1..4094)
+
+
+--MIB objects for configuring the IEEE802.1ad Provider Bridging
+
+dot1adMIProviderBridge  OBJECT IDENTIFIER  ::= { dot1adMIMIB 1 }
+
+
+-- -------------------------------------------------------------
+-- The 802.1ad Provider Bridge Port Configuration Table
+-- -------------------------------------------------------------
+
+dot1adMIPortTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot1adMIPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing provider bridge port related configurations.
+   
+        All the values for the objects in this table will take effect
+        only when the Bridge Mode is set as  
+        ProviderCoreBridge or ProviderEdgeBridge."
+    ::= { dot1adMIProviderBridge 1 }
+    
+dot1adMIPortEntry   OBJECT-TYPE
+    SYNTAX      Dot1adMIPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information controlling per port configurations for 
+        the externally accessible ports of Provider Bridges."
+    INDEX { dot1adMIPortNum  }
+    ::= { dot1adMIPortTable  1 }
+            
+Dot1adMIPortEntry  ::=
+    SEQUENCE {
+        dot1adMIPortNum                       Integer32,
+        dot1adMIPortPcpSelectionRow           PriorityCodePoint,
+        dot1adMIPortUseDei                    TruthValue,
+        dot1adMIPortReqDropEncoding           TruthValue,
+	    dot1adMIPortSVlanPriorityType         INTEGER,
+	    dot1adMIPortSVlanPriority             INTEGER
+    }
+    
+dot1adMIPortNum OBJECT-TYPE
+   SYNTAX      Integer32 (1..65535)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The Index value of the port in the system for which this entry
+      applies. The maximum index value of the port is defined by the
+      system."
+   ::= { dot1adMIPortEntry 1 }
+
+dot1adMIPortPcpSelectionRow OBJECT-TYPE
+   SYNTAX      PriorityCodePoint
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The row to be used on this port for PCP encoding and PCP decoding
+       tables. PCP encoding and PCP decoding on a port will be based on the row
+       configured as per this mib object for this port. This can be set for all 
+       bride port types."
+    DEFVAL { 1 }
+    ::= { dot1adMIPortEntry 2 }
+
+dot1adMIPortUseDei OBJECT-TYPE 
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+       "The object to specify whether drop_eligible parameter in the PCP can be
+       used for encoding and decoding.
+       
+       If this object is set to True for the port, then drop_eligible parameter
+       will be encoded in the DEI of transmitted frames.If the DEI is set in the 
+       S-tag or the PCP decoding table indicates that drop_eligible True, 
+       then drop_eligible will become true for the received frames.
+       
+       If this object is set to False, the DEI will be transmitted as zero
+       and ignored on receipt.
+       
+       This object can be set only on PNPs and external CNPs."
+
+   DEFVAL   { false }
+   ::= { dot1adMIPortEntry 3 }
+
+dot1adMIPortReqDropEncoding OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "When this object is set to True and if the bridge port can not 
+       encode particular priorities with drop_eligible, then frames queued 
+       with those priorites and drop_eligible true can be discarded and not 
+       transmitted.
+
+       This object can be set only on PNPs and external CNPs."
+
+   DEFVAL   { false } 
+   ::= { dot1adMIPortEntry 4 } 
+
+dot1adMIPortSVlanPriorityType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    fixed(1),
+                    copy(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to determine the outgoing SVLAN priority type.
+        When dot1adMIPortSVlanPriorityType is configured as none(0) the outgoing
+        SVLAN priority is not modified.
+
+        When dot1adMIPortSVlanPriorityType is configured as fixed(1) the outgoing
+        SVLAN priority is set to a fixed value as per the priority configured
+        in dot1adMIPortSVlanPriority mib object,
+
+        When dot1adMIPortSVlanPriorityType is configured as copy(2) it copies
+        the incoming CVLAN priority to outgoing SVLAN priority of the packets
+        that are being S-tagged on CNP S-tagged and CNP-PortBased Ports."
+
+   DEFVAL      { fixed }
+    ::= { dot1adMIPortEntry 5 }
+
+dot1adMIPortSVlanPriority OBJECT-TYPE
+    SYNTAX      INTEGER (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The object sets a fixed SVLAN priority to the packets that are being S-tagged
+        on CNP S-tagged and CNP-PortBased Ports.
+
+        The priority value configured in this object is not applicable when the
+        dot1adMIPortSVlanPriorityType is copy or none"
+
+    DEFVAL      { 0 }
+    ::= { dot1adMIPortEntry 6 }
+
+-- ----------------------------------------------------------------
+-- VID Translation Table 
+-- This is the VID translation table (Ref. IEEE802.1ad/D6 - Section
+-- (12.13.2.1)
+-- ----------------------------------------------------------------
+
+dot1adMIVidTranslationTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot1adMIVidTranslationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    " This VID Translation table provides a bidirectional mapping between a
+     Local S-VID and a relay S-VID. This table is applicable only for the
+    externally accessible network ports (ie) Customer Network Port / Provider
+    Network Port / Proprietary Customer Network Port."
+    ::= { dot1adMIProviderBridge 2 }
+    
+dot1adMIVidTranslationEntry  OBJECT-TYPE
+    SYNTAX      Dot1adMIVidTranslationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Entry  contains the information of translating a Local Service Vlan 
+    in the packet to the Relay Service VLAN. This entry shall only be
+    applicable at Network ports."
+    INDEX { dot1adMIPortNum, 
+            dot1adMIVidTranslationLocalVid }
+
+    ::= { dot1adMIVidTranslationTable  1 }
+            
+Dot1adMIVidTranslationEntry  ::=
+    SEQUENCE {
+        dot1adMIVidTranslationLocalVid      VlanId,
+        dot1adMIVidTranslationRelayVid      VlanId,
+        dot1adMIVidTranslationRowStatus     RowStatus
+    }
+   
+dot1adMIVidTranslationLocalVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+    " A Service VLAN Identifier used in the S-Tag of frames transmitted
+      and received through this customer Network Port / Provider Network Port 
+      / Proprietary Customer Network Port."
+    ::= { dot1adMIVidTranslationEntry  1 }
+
+dot1adMIVidTranslationRelayVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    " This Service VLAN identifier used by the filtering and forwarding processes
+      of the S-VLAN component in the provider bridge. This Vlan is identified for
+      a given port (CNP/ Prop CNP/ PNP) and the specified Local S-VLAN present in
+      the frame"
+    ::= { dot1adMIVidTranslationEntry  2 }
+
+dot1adMIVidTranslationRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus 
+    MAX-ACCESS  read-create 
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry. An entry is
+        created in this table when this object is SET to 'createAndWait'.
+        The entry in this table is not used when this 
+        object is SET 'notInService'. An entry created in this table is
+        be deleted when this object is SET 'destroy'.
+        The Entry in this table is used only when the translation status for a
+        Port (CNP/ PropCNP/PNP) is enabled and the Row status is SET 'active'."
+    ::= { dot1adMIVidTranslationEntry  3 }
+
+-- -------------------------------------------------------------
+-- This table is the C-VID Registration table (Ref. Section
+-- 12.13.3.1 IEEE802.1ad/D6)
+-- -------------------------------------------------------------
+dot1adMICVidRegistrationTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot1adMICVidRegistrationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       " This table provides a mapping between a customer VLAN Identifier (C-VID)
+         and service instance represented by Service VLAN identifier(S-VID)  
+         for a customer edge port.
+         An Entry in this table result in 'cvlan' type of SVLAN classification for 
+         CEP Ports. This can be configured only on Customer Edge Port."
+    ::= { dot1adMIProviderBridge 3 }
+
+dot1adMICVidRegistrationEntry  OBJECT-TYPE
+    SYNTAX      Dot1adMICVidRegistrationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       " An Entry in this table provides functionality of
+         a) Configuring PVID of the internal Customer Network Port of SVLAN component.
+         b) Adding PEP on the C-VLAN component to member set of C-VLAN
+         c) Adding PEP and/or CEP to the untagged set of C-VLAN, if it is desired."
+    INDEX { dot1adMIPortNum, 
+            dot1adMICVidRegistrationCVid 
+          }
+    ::= { dot1adMICVidRegistrationTable  1 }
+
+Dot1adMICVidRegistrationEntry ::=
+    SEQUENCE {
+        dot1adMICVidRegistrationCVid               VlanId,
+        dot1adMICVidRegistrationSVid               VlanId,
+        dot1adMICVidRegistrationUntaggedPep        TruthValue,
+        dot1adMICVidRegistrationUntaggedCep        TruthValue,
+        dot1adMICVidRegistrationRowStatus          RowStatus,
+	    dot1adMICVidRegistrationSVlanPriorityType  INTEGER,
+	    dot1adMICVidRegistrationSVlanPriority      INTEGER
+    }
+    
+dot1adMICVidRegistrationCVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The customer VLAN ID in the customer VLAN tag of an ingress frame
+        at this specified port or the customer VLAN ID to which the ingress
+        frame is classified to, at this specified port."
+    ::= { dot1adMICVidRegistrationEntry  1 }
+    
+dot1adMICVidRegistrationSVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "S-VLAN Id for the service instance to which this port and this 
+        C-VLAN are mapped to.
+         ie) CEP,C-VID ===> S-VID."
+    ::= { dot1adMICVidRegistrationEntry  2 }
+
+dot1adMICVidRegistrationUntaggedPep OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to retain/add/remove the Customer VLAN tag
+        from the packet, before sending it out of Provider Edge Port (PEP).
+        
+        When it is set to 'True' the C-VLAN tag will be stripped. Otherwise
+        the packet will be sent out with a C-tag and with valid C-VID."
+    DEFVAL { false }
+    ::= { dot1adMICVidRegistrationEntry  3 }
+    
+dot1adMICVidRegistrationUntaggedCep OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to retain/add/remove the Customer VLAN tag
+        from the packet, before sending it out of Customer Edge Port (CEP).
+
+        When it is set to 'True' the C-VLAN tag will be stripped. Otherwise 
+        the tag will be added if the packet is C-VLAN untagged."
+
+    DEFVAL { false }
+    ::= { dot1adMICVidRegistrationEntry  4 }
+
+dot1adMICVidRegistrationRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry. An entry is
+        created in this table when this object is SET to 'createAndWait'.
+        The entry in this table is used when the status of this object 
+        is SET 'active'. The entry in this table is not used when this 
+        object is SET 'notInService'. An entry created in this table is
+        deleted when this object is SET 'destroy'."
+    ::= { dot1adMICVidRegistrationEntry  5 }
+
+dot1adMICVidRegistrationSVlanPriorityType OBJECT-TYPE
+SYNTAX      INTEGER {
+                none(0),
+                fixed(1),
+                copy(2)
+            }
+MAX-ACCESS  read-write
+STATUS      current
+DESCRIPTION
+    "This object is used to determine the outgoing SVLAN priority type.
+    When dot1adMICVidRegistrationSVlanPriorityType is configured as none(0)
+    the outgoing SVLAN priority is not modified.
+
+    When dot1adMICVidRegistrationSVlanPriorityType is configured as fixed(1)
+    the outgoing SVLAN priority is set to a fixed value as per the priority
+    configured in dot1adMICVidRegistrationSVlanPriority mib object,
+
+    When dot1adMICVidRegistrationSVlanPriorityType is configured as copy(2)
+    it copies the incoming CVLAN priority to outgoing SVLAN priority
+    of the packets that are being S-tagged on a CEP port."
+
+    DEFVAL      { fixed }
+::= { dot1adMICVidRegistrationEntry 6 }
+
+
+dot1adMICVidRegistrationSVlanPriority OBJECT-TYPE
+SYNTAX      INTEGER (0..7)
+MAX-ACCESS  read-write
+STATUS      current
+DESCRIPTION
+    "The object sets a fixed SVLAN priority to the packets that are being S-tagged
+    on a CEP port.
+
+    The priority value configured in this object is not applicable when the
+    dot1adMICVidRegistrationSVlanPriorityType is copy or none"
+
+DEFVAL      { 0 }
+::= { dot1adMICVidRegistrationEntry 7 }
+
+
+-- ----------------------------------------------------------------
+-- Provider Edge Port configuration table (Ref. IEEE802.1ad/D6 - Section
+-- 12.13.3.3 and 12.13.3.4)
+-- ----------------------------------------------------------------
+
+dot1adMIPepTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot1adMIPepEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The table provides configuration options (PVID,Acceptable
+    frame type, default user priority and ingress filtering) for the internal
+    PEP interfaces created when an entry is created in C-VID registration table."
+    
+    ::= { dot1adMIProviderBridge 4 }
+    
+dot1adMIPepEntry OBJECT-TYPE
+    SYNTAX      Dot1adMIPepEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+
+    "Entry  contains information (PVID, Acceptable frame type, default user priority
+    and ingress filtering) for the packets received over internal PEPs.
+    
+    Creation of an entry in this table is not allowed and only modification
+    is allowed."
+        
+    INDEX {dot1adMIPortNum, 
+           dot1adMICVidRegistrationSVid
+          }
+   ::= { dot1adMIPepTable 1 }
+            
+Dot1adMIPepEntry ::=
+    SEQUENCE {
+        dot1adMIPepPvid                VlanId,
+        dot1adMIPepDefaultUserPriority INTEGER,
+        dot1adMIPepAccptableFrameTypes INTEGER,
+        dot1adMIPepIngressFiltering    TruthValue
+    }
+
+dot1adMIPepPvid OBJECT-TYPE
+   SYNTAX      VlanId
+   MAX-ACCESS  read-write 
+   STATUS      current
+   DESCRIPTION
+   "The VLAN ID to be used for the untagged packets received over this
+   PEP. This refers to the customer VLAN ID to which the untagged packets
+   received over this PEP will be classified. And this is the VLAN ID
+   put in the C-VLAN tag when the outgoing CEP is tagged i.e untagged CEP is 
+   set to False for this port in the C-VID registration table entry."
+   
+   ::= { dot1adMIPepEntry 1 }
+
+dot1adMIPepDefaultUserPriority OBJECT-TYPE
+    SYNTAX      INTEGER (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default ingress user priority to be used for the untagged
+         packets received over provider edge ports.This will be used for
+         the PCP encoding of C-VLAN tag for the outgoing packets when the 
+         outgoing CEP is tagged i.e untagged CEP is set to False in the 
+         C-VID registration table entry for this port."
+    DEFVAL      { 0 }
+    ::= { dot1adMIPepEntry 2 }
+
+dot1adMIPepAccptableFrameTypes OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    admitAll(1),
+                    admitOnlyVlanTagged(2),
+                    admitOnlyUntaggedAndPriorityTagged (3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When this is admitOnlyVlanTagged(2) the device will
+        discard untagged frames or Priority-Tagged frames
+        received on this port.  When admitAll(1) is set, all frames
+        tagged/untagged/priority tagged frames received on this port
+        will be accepted.
+        When admitOnlyUntaggedAndPriorityTagged(3) is set, untagged and 
+        priority tagged frames alone will be accepted and tagged 
+        frames received over this PEP will be discarded."
+
+    DEFVAL      { admitAll }
+    ::= { dot1adMIPepEntry 3 }
+
+
+dot1adMIPepIngressFiltering OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When this is true(1), if this port is not in the member set of a 
+      C-VLAN, then frames received on this port classified to that C-VLAN 
+      will be discarded. When false(2), the port will accept all
+      incoming frames received over this PEP"
+
+    DEFVAL      { false }
+    ::= { dot1adMIPepEntry 4 }
+
+-- ----------------------------------------------------------------
+-- Service Priority regeneration configuration table (Ref.
+-- IEEE802.1ad/D6 - Section 12.13.3.5 and 12.13.3.6)
+-- ----------------------------------------------------------------
+
+dot1adMIServicePriorityRegenerationTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot1adMIServicePriorityRegenerationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+     "This table maps each receive priority to a regenerated priority on 
+      this internal customer network port.
+     
+      Creation of an entry in this table is not allowed and only modification 
+      is allowed. 
+
+      An entry will be created in this table with default values for the
+      CEP and S-VLAN pair,when the corresponding entry is created in C-VID
+      registration table."
+      
+    ::= { dot1adMIProviderBridge 5 }
+    
+dot1adMIServicePriorityRegenerationEntry  OBJECT-TYPE
+    SYNTAX      Dot1adMIServicePriorityRegenerationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+
+    "This table maintains the mapping of incoming priority and regenerated
+     priority for internal customer network ports."
+    INDEX { dot1adMIPortNum, 
+            dot1adMICVidRegistrationSVid,
+            dot1adMIServicePriorityRegenReceivedPriority }
+    ::= { dot1adMIServicePriorityRegenerationTable 1 }
+
+Dot1adMIServicePriorityRegenerationEntry  ::=
+    SEQUENCE {
+        dot1adMIServicePriorityRegenReceivedPriority      INTEGER,
+        dot1adMIServicePriorityRegenRegeneratedPriority   INTEGER
+    }
+
+dot1adMIServicePriorityRegenReceivedPriority OBJECT-TYPE
+    SYNTAX      INTEGER(0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The received priority value for a frame over the internal customer
+        network port. For tagged packets, this refers to the priority of C-tag 
+        received over the CEPs. 
+        For untagged packets, the default user priority of CEP will be used as 
+        the receive priority."
+        
+    ::= { dot1adMIServicePriorityRegenerationEntry  1 }
+
+dot1adMIServicePriorityRegenRegeneratedPriority OBJECT-TYPE
+    SYNTAX      INTEGER(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The regenerated priority value for the received priority for a frame
+         received over the internal customer network port. The PCP encoding
+         for the frames that are to be sent out will be based on the regenerated
+         priority value got from this object."
+    ::= { dot1adMIServicePriorityRegenerationEntry  2 }
+
+-- ----------------------------------------------------------------
+-- PCP decoding table (Priority Code Point decoding table)
+-- (Ref. IEEE802.1ad/D6 - section 12.6.2.8 and 12.6.2.9)
+-- ----------------------------------------------------------------
+dot1adMIPcpDecodingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot1adMIPcpDecodingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The priority and drop_eligible parameters of the received frames
+    are decoded from the PCP using Priority Code Point decoding table. For
+    each port, the PCP decoding table has eight entries corresponding to each
+    of the possible PCP values."
+      
+    ::= { dot1adMIProviderBridge 6 }
+    
+dot1adMIPcpDecodingEntry OBJECT-TYPE
+    SYNTAX      Dot1adMIPcpDecodingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+
+    "The table entry contains the priority and drop_eligible information for
+    a particular port, PCP selection row and PCP value.
+    
+    Creation of an entry in this table is not allowed and only modification 
+    is permitted"
+     
+    INDEX { dot1adMIPortNum, 
+            dot1adMIPcpDecodingPcpSelRow, 
+            dot1adMIPcpDecodingPcpValue
+          }
+    ::= { dot1adMIPcpDecodingTable 1 }
+            
+Dot1adMIPcpDecodingEntry ::=
+    SEQUENCE {
+        dot1adMIPcpDecodingPcpSelRow           PriorityCodePoint,
+        dot1adMIPcpDecodingPcpValue            INTEGER,
+        dot1adMIPcpDecodingPriority            INTEGER,
+        dot1adMIPcpDecodingDropEligible        TruthValue
+    }
+
+dot1adMIPcpDecodingPcpSelRow OBJECT-TYPE
+    SYNTAX      PriorityCodePoint
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The PCP selection row in the decoding table for which the priority and
+        drop eligible parameters are to be mapped for a given PCP value."
+        
+    ::= { dot1adMIPcpDecodingEntry 1 }
+
+dot1adMIPcpDecodingPcpValue OBJECT-TYPE
+    SYNTAX      INTEGER (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The PCP value in the decoding table for which the priority and 
+        drop eligible parameters are to be derived."
+        
+    ::= { dot1adMIPcpDecodingEntry 2 }
+
+dot1adMIPcpDecodingPriority OBJECT-TYPE
+    SYNTAX      INTEGER (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Priority associated with the particular PCP and PCP selection row in
+         the PCP decoding table.This is the priority decoded for the PCP associated
+         with the received frame. The frame will further be processed with this
+         priority value."
+        
+    ::= { dot1adMIPcpDecodingEntry 3 }
+
+dot1adMIPcpDecodingDropEligible OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "The drop_eligible value associated with the particular PCP and PCP 
+         selection row in the PCP decoding table. When this is set to True,
+         frames should be discarded in preference to other frames with drop_eligible 
+         False."
+
+    ::= { dot1adMIPcpDecodingEntry 4 }
+
+-- ----------------------------------------------------------------
+-- PCP encoding table (Priority Code Point encoding table)
+-- (Ref. IEEE802.1ad/D6 - section 12.6.2.10 and 12.6.2.11)
+-- ----------------------------------------------------------------
+dot1adMIPcpEncodingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot1adMIPcpEncodingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The priority and drop_eligible parameters are encoded in the Priority Code
+    Point field of the VLAN tag using the Priority Code Point encoding table
+    for the port. For each port, PCP encoding table has 16 entries, corresponding
+    to each of the possible combinations of the eight possible values of priority 
+    and two possible values of drop_eligible."
+    ::= { dot1adMIProviderBridge 7 }
+    
+dot1adMIPcpEncodingEntry OBJECT-TYPE
+    SYNTAX      Dot1adMIPcpEncodingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+
+    "The table entry contains the PCP value for a particular port,PCP selection 
+    row, priority and drop_eligible value.
+    
+    Creation of an entry in this table is not allowed and only modification
+    is permitted."
+
+    INDEX {dot1adMIPortNum, 
+           dot1adMIPcpEncodingPcpSelRow, 
+           dot1adMIPcpEncodingPriority, 
+           dot1adMIPcpEncodingDropEligible
+          }
+    ::= { dot1adMIPcpEncodingTable 1 }
+            
+Dot1adMIPcpEncodingEntry ::=
+    SEQUENCE {
+        dot1adMIPcpEncodingPcpSelRow           PriorityCodePoint,
+        dot1adMIPcpEncodingPriority            INTEGER,
+        dot1adMIPcpEncodingDropEligible        TruthValue,
+        dot1adMIPcpEncodingPcpValue            INTEGER
+    }
+
+dot1adMIPcpEncodingPcpSelRow OBJECT-TYPE
+    SYNTAX      PriorityCodePoint
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The PCP selection row in the encoding table for which the the PCP value
+        to be mapped for a particular priority and drop_eligible combination."
+        
+    ::= { dot1adMIPcpEncodingEntry 1 }
+
+dot1adMIPcpEncodingPriority OBJECT-TYPE
+    SYNTAX      INTEGER (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The priority associated with a particular PCP selection row.
+         Priority and drop_eligible combination for a particular port will
+         be mapped to a PCP valule."
+        
+    ::= { dot1adMIPcpEncodingEntry 2 }
+
+dot1adMIPcpEncodingDropEligible OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The drop_eligible parameter associated with a particular priority 
+        and PCP selection row in the PCP encoding table."
+        
+    ::= { dot1adMIPcpEncodingEntry 3 }
+
+dot1adMIPcpEncodingPcpValue OBJECT-TYPE
+    SYNTAX      INTEGER (0..7) 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The PCP value associated with the particular priority and drop_eligible
+        combination of the PCP selection row in PCP encoding table. This will be
+        encoded in the transmitted frames."
+
+    ::= { dot1adMIPcpEncodingEntry 4 }
+
+END

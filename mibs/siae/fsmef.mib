@@ -1,0 +1,2833 @@
+-- Copyright (C) 2012 Aricent Group . All Rights Reserved
+
+-- $Id: fsmef.mib,v 1.12 2014/08/22 11:43:01 siva Exp $
+
+ARICENT-MEF-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS                                                                          
+   OBJECT-TYPE, MODULE-IDENTITY, Integer32,Gauge32,Unsigned32,enterprises
+      FROM SNMPv2-SMI
+   TEXTUAL-CONVENTION,TruthValue,RowStatus,DisplayString,TimeInterval,TimeStamp,
+   MacAddress FROM SNMPv2-TC
+   IANAifType FROM IANAifType-MIB
+   VlanId  FROM Q-BRIDGE-MIB
+   Dot1agCfmMepId,Dot1agCfmMepIdOrZero FROM IEEE8021-CFM-MIB
+   SnmpAdminString  FROM SNMP-FRAMEWORK-MIB
+   ifIndex,InterfaceIndex  FROM IF-MIB
+   FsY1731TransmitStatus,FsY1731LmmInterval,FsY1731TimeRepresentation,
+   FsY1731AvailabilityInterval,FsY1731AvailabilityType
+   FROM ARICENT-ECFM-Y1731-MI-MIB
+   IndexInteger FROM DIFFSERV-MIB
+   MeterColorMode, MeterType FROM ARICENT-DIFFSERV-MIB;
+
+   fsmef MODULE-IDENTITY
+       LAST-UPDATED "201402040000Z"
+       ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+       CONTACT-INFO "support@aricent.com"
+
+       DESCRIPTION
+           "This MIB is a proprietary MIB and defined to provide support for
+            MEF 6.1 and 10.2 specification view."
+       REVISION  "201404020000Z"
+       DESCRIPTION
+            "EIR keyword changed to PIR (Peek information Rate)
+       REVISION  "201401140000Z"
+       DESCRIPTION
+            "WRED Enhancement"
+       REVISION  "201209050000Z"
+       DESCRIPTION
+            "For MEF 6.1 and 10.2"
+       ::= { enterprises aricent-communication-holding-ltd(29601) iss(2) 71 }
+
+ -- -----------------------------------------------------------------------------
+                        -- Textual conventions for MEF MIB
+ -- -----------------------------------------------------------------------------
+   
+  UniL2CPStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the action to be taken for the given
+        layer 2 control protocol service frames.
+
+            discard
+                The port must discard all ingress service frames
+                carrying the layer 2 control protocol service
+                frames.When this action is set at the port,
+                an EVC cannot process the layer 2 control protocol
+                service frames.
+
+            tunnel
+                The layer 2 control protocol service frames will be
+                 Tunneled.
+
+            peer
+                The port must act as a peer, meaning it actively
+                participates with the Customer Equipment, in the
+                operation of the layer 2 control protocol service
+                frames. When this action is set at the port, an EVC
+                cannot process the layer 2 control protocol service frames."
+
+        SYNTAX      INTEGER {
+                             peer(1),
+                             tunnel(2),
+                             discard(3)
+                             }
+
+FsEvcL2CPProtocol ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the types of L2CP protocols. 
+
+         fsEvcL2CPDot1x(0) Specifies the DOT1X Protocol.
+         fsEvcL2CPLacp(1) Specifies the LACP Protocol.
+         fsEvcL2CPStp(2)  Specifies the STP Protocol.
+         fsEvcL2CPGvrp(3) Specifies the GVRP Protocol.
+         fsEvcL2CPGmrp(4) Specifies the GMRP Protocol.
+         fsEvcL2CPIgmp(5) Specifies the GMRP Protocol.
+         fsEvcL2CPMvrp(6) Specifies the MVRP Protocol.
+         fsEvcL2CPMmrp(7) Specifies the MMRP Protocol.
+         fsEvcL2CPElmi(8) Specifies the LLDP Protocol.
+         fsEvcL2CPLldp(9) Specifies the ELMI Protocol.
+         fsEvcL2CPEcfm(10) Specifies the ECFM Protocol.
+         fsEvcL2CPEoam(11) Specifies the EOAM Protocol.
+         fsEvcL2CPPtp(12) Specifies the PTP Protocol."
+    SYNTAX      BITS {
+       			   fsEvcL2CPDot1x(0),                       
+       			   fsEvcL2CPLacp(1),
+       			   fsEvcL2CPStp(2),
+       			   fsEvcL2CPGvrp(3),
+       			   fsEvcL2CPGmrp(4),
+       			   fsEvcL2CPIgmp(5),
+       			   fsEvcL2CPMvrp(6),
+       			   fsEvcL2CPMmrp(7),
+       			   fsEvcL2CPElmi(8),
+       			   fsEvcL2CPLldp(9),
+       			   fsEvcL2CPEcfm(10),
+       			   fsEvcL2CPEoam(11),
+       			   fsEvcL2CPPtp(12)
+                         }
+
+EnabledStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A simple status value for the object."
+    SYNTAX      INTEGER { enabled(1), disabled(2) }
+
+  -- --------------------------------------------------------------------------
+                          -- groups in the MIB
+  -- --------------------------------------------------------------------------
+
+   fsMefContext           OBJECT IDENTIFIER   ::= { fsmef 1 }
+   fsMefUni               OBJECT IDENTIFIER   ::= { fsmef 2 }
+   fsEvc                  OBJECT IDENTIFIER   ::= { fsmef 3 }
+   fsMefETree             OBJECT IDENTIFIER   ::= { fsmef 4 }
+   fsUniCVlanEvc          OBJECT IDENTIFIER   ::= { fsmef 5 } 
+   fsMefProfile           OBJECT IDENTIFIER   ::= { fsmef 6 } 
+   fsMefPerformance       OBJECT IDENTIFIER   ::= { fsmef 7 } 
+  -- --------------------------------------------------------------------------
+                          -- MEF Scalar GROUP
+  -- --------------------------------------------------------------------------
+  -- -------------------------------------------------------------------------
+                           -- fsMefContextTable START
+  -- -------------------------------------------------------------------------
+  
+  fsMefContextTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF FsMefContextEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+        "This table contains list of per virtual context MEF Module Parameters."
+      ::= { fsMefContext 1 }
+  
+  fsMefContextEntry OBJECT-TYPE
+      SYNTAX      FsMefContextEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+        "Each entry contains virtual context MEF module parameters."
+      INDEX { fsMefContextId }
+      ::= { fsMefContextTable 1 }
+  
+  FsMefContextEntry ::= SEQUENCE {
+        fsMefContextId                 Unsigned32,
+        fsMefContextName               DisplayString,
+        fsMefTransmode                 INTEGER,
+        fsMefFrameLossBufferClear      TruthValue,
+        fsMefFrameDelayBufferClear     TruthValue,
+        fsMefFrameLossBufferSize       Integer32,
+        fsMefFrameDelayBufferSize      Integer32
+        }
+  
+  fsMefContextId OBJECT-TYPE
+       SYNTAX      Unsigned32
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+         "Identifies the virtual context in the system "
+      ::= { fsMefContextEntry 1 }
+  
+  fsMefContextName OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE (1..32))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+          "Name of the virtual context"
+       ::= { fsMefContextEntry 2 }
+
+  fsMefTransmode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        dot1ad(1),
+                        mplspw(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   
+         "The object defines under lying transport mode
+          dot1ad - Provider Bridge as transport mode
+          mplspw - MPLS cloud as transport mode"
+                      
+    DEFVAL { dot1ad }
+    ::= { fsMefContextEntry 3 } 
+  
+  fsMefFrameLossBufferClear OBJECT-TYPE 
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current 
+       DESCRIPTION 
+          "Trigger to remove the contents of Buffer maintained for storing
+           frame-loss measured at various times.
+           
+           Note: Get operation value should be ignored.
+          "
+       ::= { fsMefContextEntry 4 } 
+  
+  fsMefFrameDelayBufferClear OBJECT-TYPE 
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current 
+       DESCRIPTION 
+          "Trigger to remove the contents of Buffer maintained for storing
+           frame-delay measured at various times.
+           
+           Note: Get operation value should be ignored.
+           "
+       ::= { fsMefContextEntry 5 } 
+  
+  fsMefFrameLossBufferSize OBJECT-TYPE 
+       SYNTAX      Integer32(1..4096)
+       MAX-ACCESS  read-write
+       STATUS      current 
+       DESCRIPTION 
+          "The Maximum number of entries for the  Frame Loss Buffer.
+          "
+       DEFVAL  { 1024 }
+       ::= { fsMefContextEntry 6 } 
+  
+  fsMefFrameDelayBufferSize OBJECT-TYPE 
+       SYNTAX      Integer32(1..4096)
+       MAX-ACCESS  read-write
+       STATUS      current 
+       DESCRIPTION 
+          "The Maximum number of entries for the Frame Delay Buffer.
+          "
+       DEFVAL  { 1024 }
+       ::= { fsMefContextEntry 7 }
+
+ -- -------------------------------------------------------------------------
+                          -- fsMefContextTable END
+ -- -------------------------------------------------------------------------
+ -- -----------------------------------------------------------------------------
+                           -- MEF Table Group
+ -- -----------------------------------------------------------------------------
+ -- -----------------------------------------------------------------------------
+                           -- fsUniTable START
+ -- -----------------------------------------------------------------------------
+
+   fsUniTable OBJECT-TYPE
+      SYNTAX        SEQUENCE OF FsUniEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION 
+        "This table contains list of the UNIs configured on the system."
+      ::= { fsMefUni 1 }
+
+   fsUniEntry OBJECT-TYPE
+      SYNTAX       FsUniEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+        "This entry represents UNI and its service attributes."
+      INDEX { ifIndex }
+      ::= { fsUniTable 1 }
+
+   FsUniEntry ::= SEQUENCE {
+       fsUniId                              DisplayString,
+       fsUniPhysicalMedium                  IANAifType,
+       fsUniSpeed                           Gauge32,
+       fsUniMode                            INTEGER,
+       fsUniMacLayer                        SnmpAdminString,
+       fsUniMtu                             Integer32,
+       fsUniServiceMultiplexingBundling     BITS,
+       fsUniCVlanId                         VlanId,
+       fsUniMaxEvcs                         Integer32,
+       fsUniL2CPDot1x                       UniL2CPStatus,
+       fsUniL2CPLacp                        UniL2CPStatus,
+       fsUniL2CPStp                         UniL2CPStatus,
+       fsUniL2CPGvrp                        UniL2CPStatus,
+       fsUniL2CPGmrp                        UniL2CPStatus,
+       fsUniL2CPMvrp                        UniL2CPStatus,
+       fsUniL2CPMmrp                        UniL2CPStatus,
+       fsUniL2CPLldp                        UniL2CPStatus,
+       fsUniL2CPElmi                        UniL2CPStatus,
+       fsUniRowStatus                       RowStatus,
+       fsUniL2CPEcfm                        UniL2CPStatus,
+       fsUniL2CPOverrideOption              EnabledStatus,
+       fsUniL2CPEoam                        UniL2CPStatus
+       }
+
+   fsUniId OBJECT-TYPE
+      SYNTAX        DisplayString (SIZE  (0..32)) 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION 
+           "The UNI Identifier  is independent of the EVCs at the UNI. 
+            It is assigned to the UNI by the Service Provider. It must
+            be a string and the string may have any value. The UNI 
+            Identifier MUST be unique among all UNIs for the MEN.
+
+            If the UNI identifier value is not specified for the UNI or it
+            is unknown, the value of the fsUniId column is a
+            zero-length string."
+
+      ::=  { fsUniEntry 1}
+
+   fsUniPhysicalMedium OBJECT-TYPE
+      SYNTAX         IANAifType
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+           "It always return ethernetCsmacd (6)."
+      ::=  { fsUniEntry 2}
+
+   fsUniSpeed OBJECT-TYPE
+      SYNTAX         Gauge32
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+           "Speed is bits per second,It is dependent on the ethernet type.
+            The speed should be one of the give below.
+            - 10 Mbps
+            - 100 Mbps 
+            - 10 or 100 Mbps Auto Negotiation
+            - 1 Gbps
+            - 10 Gbps."
+      ::=  { fsUniEntry 3}
+
+   fsUniMode OBJECT-TYPE
+      SYNTAX       INTEGER {
+                             fullDuplex (1),
+                             halfDuplex (2)
+                           }
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+           "This mode defines the type of communication between the CE and UNI."
+      DEFVAL { fullDuplex }
+      ::=  { fsUniEntry 4}
+
+   fsUniMacLayer OBJECT-TYPE
+      SYNTAX        SnmpAdminString
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "It should return IEEE 802.3 - 2005"
+      ::=  { fsUniEntry 5}
+    
+   fsUniMtu OBJECT-TYPE
+      SYNTAX         Integer32
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+           "The size of the largest packet which can be sent and received
+            on the interface, specified in octets.For interfaces that 
+            are used for transmitting network datagrams, this is the 
+            size of the largest network datagram that can be sent on the
+            interface.it should be greater than or equal to 1522"
+      ::=  { fsUniEntry 6}
+
+   fsUniServiceMultiplexingBundling OBJECT-TYPE
+      SYNTAX       BITS {
+                         serviceMultiplexing(0),
+                         bundling(1),
+                         allToOneBundling(2)
+                        }
+
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+           "This object specifies the UNI service attributes.
+
+            service-Multiplexing :
+            This bit specifies whether the UNI supports multiple
+            EVCs.  Point-to-Point EVCs and Multipoint-to-Multipoint
+            EVCs may be multiplexed in any combination at the UNI
+            if this bit is set to 1.
+
+            bundling :
+            This bit specifies whether the UNI has the bundling
+            attribute configured.  If this bit is set to 1, more
+            than one CE-VLAN ID can map to a particular EVC at the
+            UNI.
+
+            allToOneBundling :
+            This bit specifies whether the UNI has the all to one
+            bundling attribute.  If this bit is set to 1, all
+            CE-VLAN IDs map to a single EVC at the UNI.But if it is 
+            set to 1 than serviceMultiplexing and bundling should be 0.
+
+            To summarize the valid combinations of serviceMultiplexing(0),
+            bundling(1) and allToOneBundling(2) bits for an UNI, consider
+            the following diagram:
+
+                              VALID COMBINATIONS
+            -----------------------------------------------
+           |UNI ATTRIBUTES |   1   |   2   |   3   |   4   |
+            -----------------------------------------------
+           |Service        |       |       |       |       |
+           |Multiplexing   |   Y   |   Y   |       |       |
+           |               |       |       |       |       |
+            -----------------------------------------------
+           |               |       |       |       |       |
+           |Bundling       |       |   Y   |   Y   |       |
+           |               |       |       |       |       |
+            -----------------------------------------------
+           |All to One     |       |       |       |       |
+           |Bundling       |       |       |       |   Y   |
+           |               |       |       |       |       |
+            -----------------------------------------------
+ 
+           This object will take care of different service for example
+           if you set all-in-bundling bit to 1 than serviceMultiplexing and
+           bundling bits will set 0."
+      
+      ::=  { fsUniEntry 7}
+
+   fsUniCVlanId OBJECT-TYPE
+      SYNTAX         VlanId
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+           "A 12-bit UNI CE-VID to be used for untagged frames received"
+      ::=  { fsUniEntry 8}
+
+   fsUniMaxEvcs OBJECT-TYPE
+      SYNTAX         Integer32
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+           "This attribute defines the maximum number of EVCs that the UNI 
+            can support. It MUST have a value of at least one."
+      DEFVAL {1}
+      ::=  { fsUniEntry 9}
+
+   fsUniL2CPDot1x OBJECT-TYPE
+      SYNTAX      UniL2CPStatus
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "The object to specify whether to discard or peer or tunnel 
+           the Dot1x packets received on this port."
+     ::= { fsUniEntry 10}
+
+   fsUniL2CPLacp OBJECT-TYPE
+      SYNTAX      UniL2CPStatus
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "The object to specify whether to discard or peer or tunnel
+          the LACP packets received on this port."
+     ::= { fsUniEntry 11 }
+
+   fsUniL2CPStp OBJECT-TYPE
+      SYNTAX      UniL2CPStatus
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+        "The object to specify whether to discard or peer or tunnel 
+         the STP packets received on this port."
+      ::= { fsUniEntry 12 }
+
+   fsUniL2CPGvrp OBJECT-TYPE
+      SYNTAX      UniL2CPStatus
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "The object to specify whether to discard or peer or tunnel
+          the GVRP packets received on this port."
+      ::= { fsUniEntry 13 }
+
+   fsUniL2CPGmrp OBJECT-TYPE
+      SYNTAX      UniL2CPStatus
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "The object to specify whether to discard or peer or tunnel
+          the GMRP packets received on this port."
+      ::= { fsUniEntry 14 }
+
+    fsUniL2CPMvrp OBJECT-TYPE
+      SYNTAX      UniL2CPStatus
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "The object to specify whether to discard or peer or tunnel
+          the MVRP packets received on this port."
+      ::= { fsUniEntry 15 }
+
+    fsUniL2CPMmrp OBJECT-TYPE
+      SYNTAX      UniL2CPStatus
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "The object to specify whether to discard or peer or tunnel
+          the MMRP packets received on this port."
+      ::= { fsUniEntry 16 }
+    
+    fsUniL2CPLldp OBJECT-TYPE
+      SYNTAX      UniL2CPStatus
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "The object to specify whether to discard or peer or tunnel
+          the LLDP packets received on this port."
+      ::= { fsUniEntry 17 }
+
+    fsUniL2CPElmi OBJECT-TYPE
+      SYNTAX      UniL2CPStatus
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "The object to specify whether to discard or peer or tunnel
+          the ELMI packets received on this port."
+      ::= { fsUniEntry 18 }
+
+    fsUniRowStatus  OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+          "Row Status for the UNI table."
+      ::= { fsUniEntry 19 }
+        
+    fsUniL2CPEcfm OBJECT-TYPE
+      SYNTAX      UniL2CPStatus
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "The object to specify whether to discard or peer or tunnel
+          the ECFM packets received on this port."
+      ::= { fsUniEntry 20 }
+
+    fsUniL2CPOverrideOption OBJECT-TYPE
+      SYNTAX      EnabledStatus
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+	 "This object specifies whether Override option is enabled or disabled on 
+	  the Port. 
+          If this option is set to enable, Tunnel status for all the Layer 2 control
+          protocol will be referred from Uni Table.
+          If this option is set to disable, Tunnel status for Layer 2 control
+          protocols which operates over a service vlan will be referred from Evc Table."
+      DEFVAL {2}
+
+      ::= { fsUniEntry 21 }
+
+    fsUniL2CPEoam OBJECT-TYPE
+      SYNTAX      UniL2CPStatus
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "This object specifies whether to discard or peer or tunnel
+          the EOAM packets received on the port."
+      ::= { fsUniEntry 22 }
+	
+ -- -----------------------------------------------------------------------------
+                        -- fsUniTable END
+ -- -----------------------------------------------------------------------------
+ -- -----------------------------------------------------------------------------
+                        -- fsEvcTable START
+ -- -----------------------------------------------------------------------------
+
+   fsEvcTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF FsEvcEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+        "This table contains list of the EVCs locally configured 
+         on the system."
+      ::= { fsEvc 1 }
+
+   fsEvcEntry OBJECT-TYPE
+      SYNTAX       FsEvcEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+        "This entry represents EVC and its attributes."
+      INDEX { fsEvcContextId, fsEvcIndex}
+      ::= { fsEvcTable 1 }
+
+   FsEvcEntry ::= SEQUENCE {
+      fsEvcContextId                            Integer32,
+      fsEvcIndex                                VlanId,
+      fsEvcId                                   DisplayString, 
+      fsEvcType                                 INTEGER,
+      fsEvcMaxUni                               Integer32,
+      fsEvcCVlanIdPreservation                  TruthValue,
+      fsEvcCVlanCoSPreservation                 TruthValue,
+      fsEvcRowStatus                            RowStatus,
+      fsEvcMtu                                  Integer32,
+      fsEvcL2CPTunnel                           FsEvcL2CPProtocol,
+      fsEvcL2CPPeer                             FsEvcL2CPProtocol,
+      fsEvcL2CPDiscard                          FsEvcL2CPProtocol,
+      fsEvcLoopbackStatus                       INTEGER
+      }
+
+   fsEvcContextId OBJECT-TYPE
+        SYNTAX      Integer32 (0..65535)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Identifies the Virtual Bridge Context."
+    ::= { fsEvcEntry  1 }
+
+   fsEvcIndex OBJECT-TYPE
+     SYNTAX       VlanId
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+        "This object indicates service provider VLAN (S-VLAN) if value is 
+         less than 4094. If the value is greater than 4094 this object
+         indicates VFI"
+    ::= { fsEvcEntry  2 }
+
+   fsEvcId OBJECT-TYPE
+      SYNTAX       DisplayString (SIZE  (0..32))
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+        "An arbitrary string, unique across the MEN, for the 
+         EVC supporting the service instance."
+      ::= { fsEvcEntry  3 }
+
+   fsEvcType OBJECT-TYPE
+      SYNTAX      INTEGER {
+                           pointtoPoint(1),
+                           multipointtoMultipoint(2),
+                           rootedMultipoint(3)
+                           }
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+        "There are three type of EVC.
+
+         Point-to-Point :
+         In a Point-to-Point EVC (E-Line), exactly two UNIs must be associated
+         with one another.
+
+         Multipoint-to-Multipoint :
+         In a Multipoint-to-Multipoint EVC (E-LAN), two or more UNIs must be 
+         associated with one another and all should be root node.
+
+         Rooted-Multipoint :
+         In a Rooted-Multipoint EVC (E-Tree), one or more of the UNIs must be 
+         designated as a Root and each of the other UNIs MUST be 
+         designated as a Leaf.A root can send packet to all other root 
+         and leaf node but leaf node can send packet to only root node."
+
+      DEFVAL {multipointtoMultipoint}
+      ::= { fsEvcEntry 4 }
+
+   fsEvcMaxUni OBJECT-TYPE
+      SYNTAX       Integer32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+        "The Maximum Number of UNIs (MNU) service attribute specifies the 
+         maximum number of UNIs allowed in the UNI List service attribute.
+         For a Point-to-Point EVC, MNU must be two. For a Multipoint EVC, 
+         MNU must be two or greater."
+      DEFVAL {2}
+      ::= { fsEvcEntry 5 }
+   
+   fsEvcCVlanIdPreservation OBJECT-TYPE
+      SYNTAX       TruthValue
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+          "An EVC attribute in which the CE-VLAN ID of an egress Service Frame
+           is identical to the CE-VLAN ID of the corresponding ingress
+           Service Frame. If set to true CE-VLAN ID should be preserved."
+      ::= { fsEvcEntry 6 }
+
+   fsEvcCVlanCoSPreservation OBJECT-TYPE
+      SYNTAX       TruthValue
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+        "In an EVC with CE-VLAN CoS Preservation set (true),
+         an egress Service Frame resulting from an ingress Service Frame
+         that contains a CE-VLAN CoS must have the identical CE-VLAN CoS."
+      ::= { fsEvcEntry 7 }
+
+   fsEvcRowStatus  OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+          "Row Status for the UNI table."
+      ::= { fsEvcEntry 8 }
+
+   fsEvcMtu OBJECT-TYPE
+      SYNTAX       Integer32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+           "The size of the largest packet which can be allowed on the EVC, 
+            specified in octets.For interfaces connected to the EVC,they 
+            must be capable of supporting this service frame.
+            It should be greater than or equal to 1522"
+      ::= { fsEvcEntry 9 }
+
+   fsEvcL2CPTunnel OBJECT-TYPE
+      SYNTAX      FsEvcL2CPProtocol
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "This object specifies the tunnel status of the protocol 
+          configured as TUNNEL on the Evc."
+      ::= { fsEvcEntry 10 }
+	
+   fsEvcL2CPPeer OBJECT-TYPE
+      SYNTAX      FsEvcL2CPProtocol
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "This object specifies the tunnel status of the protocol 
+          configured as PEER on the Evc."
+      ::= { fsEvcEntry 11 }
+	
+   fsEvcL2CPDiscard OBJECT-TYPE
+      SYNTAX      FsEvcL2CPProtocol
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "This object specifies the tunnel status of the protocol 
+          configured as DISCARD on the Evc."
+      ::= { fsEvcEntry 12 }
+
+      fsEvcLoopbackStatus OBJECT-TYPE
+      SYNTAX      INTEGER { enabled(1), disabled(2) }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+      "This object specifies the loopback status of the EVC."
+      DEFVAL  { disabled }
+      ::= { fsEvcEntry 13 }
+
+ -- -----------------------------------------------------------------------------
+                        -- fsEvcTable END
+ -- -----------------------------------------------------------------------------
+ -- -----------------------------------------------------------------------------
+                        -- fsEvcFilterTable START
+ -- -----------------------------------------------------------------------------
+
+   fsEvcFilterTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF FsEvcFilterEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+        "This table contains list of the EVC's Unicast, Multicast frame
+         delivery conditions. Service Frame received on EVC can be Discarded,
+         Deliver Unconditionally or Deliver Conditionally. In case of deliver
+         conditionally all objects are mandatory in this table. In case of
+         Discard fsEvcFilterDestMacAddress object should not be configured.
+         In case of deliver unconditionally this table is optional"
+      ::= { fsEvc 2 }
+
+   fsEvcFilterEntry OBJECT-TYPE
+      SYNTAX       FsEvcFilterEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+        "This entry represents EVC's one of the frame delivery conditions."
+      INDEX { fsEvcContextId, fsEvcIndex,  fsEvcFilterInstance}
+      ::= { fsEvcFilterTable 1 }
+
+   FsEvcFilterEntry ::= SEQUENCE {
+      fsEvcFilterInstance                       Integer32,
+      fsEvcFilterDestMacAddress                 MacAddress,
+      fsEvcFilterAction                         INTEGER,   
+      fsEvcFilterId                             Integer32,
+      fsEvcFilterRowStatus                      RowStatus 
+      }
+
+   fsEvcFilterInstance OBJECT-TYPE
+      SYNTAX       Integer32 (1..20)
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+        "If multiple conditions are mapped to the same EVC, this index is
+         used to uniquely identify the individual row"
+      ::= { fsEvcFilterEntry 1 }
+
+   fsEvcFilterDestMacAddress OBJECT-TYPE
+      SYNTAX         MacAddress
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+        "Destination MAC address to be matched with the service frame
+         Destination MAC address.In case if service frame delivery condition
+         is drop. This field is not mandatory. In case of service fame delivery
+         is conditional this object is mandatory."
+      ::= { fsEvcFilterEntry 2 }
+
+   fsEvcFilterAction OBJECT-TYPE
+      SYNTAX       INTEGER{
+                   allow (1),
+                   drop  (2)
+                   }
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+        "Specifies the action to be taken on the service frame."
+      ::= { fsEvcFilterEntry 3 }
+
+   fsEvcFilterId OBJECT-TYPE
+      SYNTAX       Integer32
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+        "Specifies the filter number. This filter id should be unique across the
+         EVCs and virtual contexts"
+      ::= { fsEvcFilterEntry 4 }
+   
+   fsEvcFilterRowStatus  OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+          "Row Status for the EVC Filter table."
+      ::= { fsEvcFilterEntry 5 }
+
+ -- -----------------------------------------------------------------------------
+                       -- fsEvcFilterTable END
+ -- -----------------------------------------------------------------------------
+ -- -----------------------------------------------------------------------------
+                       -- fsMefETreeTable START
+ -- -----------------------------------------------------------------------------
+
+   fsMefETreeTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF FsMefETreeEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+         "This table is used to configure the E-Tree feature."
+      ::= { fsMefETree 1 }
+
+   fsMefETreeEntry OBJECT-TYPE
+      SYNTAX        FsMefETreeEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+         "Each entry in this table gives a ingress port to egress port mapping."
+      INDEX {fsMefETreeIngresPort, fsMefETreeEvcIndex, fsMefETreeEgressPort}
+      ::= { fsMefETreeTable 1 }
+
+   FsMefETreeEntry  ::= SEQUENCE {
+         fsMefETreeIngresPort      InterfaceIndex,
+         fsMefETreeEvcIndex        Integer32,
+         fsMefETreeEgressPort      InterfaceIndex,
+         fsMefETreeRowStatus       RowStatus
+         }
+
+    fsMefETreeIngresPort  OBJECT-TYPE
+       SYNTAX      InterfaceIndex
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "This object specifies the ingress port ifIndex."
+      ::= { fsMefETreeEntry 1 }
+
+    fsMefETreeEvcIndex  OBJECT-TYPE        
+       SYNTAX      Integer32 (1..65535)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+         "This object specifies the EVC on which E-Tree service to be
+          configured"
+       ::= { fsMefETreeEntry 2 }
+
+    fsMefETreeEgressPort  OBJECT-TYPE   
+       SYNTAX      InterfaceIndex
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "This object specifies one of the allowed egress ports for the given
+           ingress port identified by the first index for this row."
+      ::= { fsMefETreeEntry 3 }
+
+    fsMefETreeRowStatus  OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+          "Denotes the Row Status for port E-Tree table entry.
+           Only 'CreateAndGo' and 'destroy' values are allowed for this
+           object. 'CreateAndWait' and 'notInService' values are not allowed.
+
+           Example:
+              To add ports 5, 6  ports are connecting the Leaf UNIs in
+              the E-Tree for root UNI connected to port 7. EVC index is 1
+              In this table, the following sequence to be followed:
+                 1. Set the fsMefETreeRowStatus as 'CreateAndGo' for the
+                    entry with index 
+                    (fsMefETreeIngresPort = 7, fsMefETreeEvcIndex = 1, 
+                     fsMefETreeEgressPort = 5)
+                 2. Set the fsMefETreeRowStatus as 'CreateAndGo' for the
+                    entry with index 
+                    (fsMefETreeIngresPort = 7, fsMefETreeEvcIndex = 1, 
+                     fsMefETreeEgressPort = 6)
+                 3. Set the fsMefETreeRowStatus as 'CreateAndGo' for the
+                    entry with index
+                    (fsMefETreeIngresPort = 5, fsMefETreeEvcIndex = 1,
+                     fsMefETreeEgressPort = 7)
+                 4. Set the fsMefETreeRowStatus as 'CreateAndGo' for the
+                    entry with index
+                    (fsMefETreeIngresPort = 6, fsMefETreeEvcIndex = 1,
+                     fsMefETreeEgressPort = 7)"
+
+      ::= { fsMefETreeEntry 4 }
+
+ -- ----------------------------------------------------------------------------
+                        -- fsEvcL2CPTable END
+ -- ----------------------------------------------------------------------------
+                        -- fsEvcCVlanMapTable START
+ -- ----------------------------------------------------------------------------
+
+   fsUniCVlanEvcTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF FsUniCVlanEvcEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+        "This table contains list of the CE-VLAN ID UNI ID mapped with EVC."
+      ::= { fsUniCVlanEvc 1 }
+
+   fsUniCVlanEvcEntry OBJECT-TYPE
+      SYNTAX       FsUniCVlanEvcEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+         "This entry represents UNI,CE-VLAN and EVC mapping."
+      INDEX { ifIndex,
+              fsUniCVlanEvcCVlanId }
+      ::= { fsUniCVlanEvcTable 1 }
+
+   FsUniCVlanEvcEntry ::=
+      SEQUENCE {
+      fsUniCVlanEvcCVlanId         VlanId,
+      fsUniCVlanEvcEvcIndex        Integer32,
+      fsUniCVlanEvcRowStatus       RowStatus,
+      fsUniEvcId                   DisplayString
+      }
+
+   fsUniCVlanEvcCVlanId  OBJECT-TYPE
+      SYNTAX      VlanId
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "This object represents the CE-VLAN that needs to be mapped to the EVC"
+      ::= {fsUniCVlanEvcEntry 1}
+
+   fsUniCVlanEvcEvcIndex  OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "This object represents the EVC to which the CE-VLAN at the UNI to be
+          mapped"
+      ::= {fsUniCVlanEvcEntry 2}
+
+   fsUniCVlanEvcRowStatus  OBJECT-TYPE
+      SYNTAX      RowStatus
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+        "This indicates the rowstatus of an entry in this table used to
+         map/unmap CE-VLAN to EVC at the UNI used to create and delete entries."
+      ::= {fsUniCVlanEvcEntry 3}
+
+   fsUniEvcId OBJECT-TYPE
+      SYNTAX        DisplayString (SIZE  (0..32)) 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION 
+           "This is used to identify an EVC at the UNI and intended 
+           for management and control purposes. UNI EVC ID is for 
+           each EVC at the UNI." 
+      ::=  { fsUniCVlanEvcEntry 4}
+
+ -- ----------------------------------------------------------------------------
+                        -- fsEvcCVlanMapTable END
+ -- ----------------------------------------------------------------------------
+   fsMefFilterTable OBJECT-TYPE                                                  
+      SYNTAX      SEQUENCE OF FsMefFilterEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          " A table to configure filter rule used by the classifier table."
+      ::= { fsMefProfile 1 }
+   
+   fsMefFilterEntry OBJECT-TYPE
+      SYNTAX      FsMefFilterEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          " Each entry in this table is a filter rule Index to the table
+            is filter number."
+      INDEX { fsMefFilterNo}
+      ::= { fsMefFilterTable 1 }
+
+   FsMefFilterEntry ::=
+      SEQUENCE {
+      fsMefFilterNo                Integer32,
+      fsMefFilterDscp              Integer32,
+      fsMefFilterDirection         INTEGER,
+      fsMefFilterEvc               Integer32,
+      fsMefFilterCVlanPriority     Integer32,
+      fsMefFilterIfIndex           Integer32,
+      fsMefFilterStatus            RowStatus
+      }
+   
+   fsMefFilterNo OBJECT-TYPE
+      SYNTAX      Integer32 (1..65535)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "Filter rule number."
+      ::= { fsMefFilterEntry 1 }
+   
+   fsMefFilterDscp              OBJECT-TYPE
+           SYNTAX          Integer32 (-1..63)
+           MAX-ACCESS      read-create
+           STATUS          current
+           DESCRIPTION
+          "The IP Dscp value to be checked against the packet. This object is 
+           configured when CoS ID section is based on the DSCP.            
+           A value of '-1' means, the DSCP Field becomes do not care."
+           DEFVAL  { -1 }
+           ::= { fsMefFilterEntry 2 }
+   
+   fsMefFilterDirection OBJECT-TYPE
+      SYNTAX      INTEGER {
+                             in (1),
+                             out(2)
+                          }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "Specifies the direction of this filter to be applied. By Default the
+          filter will be applied on ingress direction.
+          When the direction of this filter is 'in', It is applied on UNI ingress
+          traffic.
+          When the direction of this filter is 'out', It is applied on UNI egress
+          traffic"
+      DEFVAL  { in }
+           ::= { fsMefFilterEntry 3 }
+   
+   fsMefFilterEvc OBJECT-TYPE
+      SYNTAX      Integer32 (1..4094)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "This object represents the EVC for which the bandwidth profiles to
+          configured based. This also represents the CoS identifier selection 
+          based on the EVC"
+      DEFVAL  { 1 }
+      ::= { fsMefFilterEntry 4 }
+   
+   fsMefFilterCVlanPriority OBJECT-TYPE
+      SYNTAX      Integer32 (-1..7)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "Customer Vlan Priority present in traffic.This object is
+          configured when CoS ID section is based on the priority code point
+          field of the CE-VLAN. A value of '-1' means the CE-VLAN PCP
+          becomes do not care."
+      DEFVAL  { -1 }
+      ::= { fsMefFilterEntry 5 }
+  
+   fsMefFilterIfIndex OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "This Object represents the UNI on which the filter should be applied."
+      ::= { fsMefFilterEntry 6 }
+ 
+   fsMefFilterStatus OBJECT-TYPE
+      SYNTAX      RowStatus
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+           "This object indicates the status of this entry. An entry is
+           created in this table when this object is SET to 'createAndWait'.
+           The entry in this table is used when the status of this object
+           is SET 'active'. The entry in this table is not used when this
+           object is SET 'notInService'. An entry created in this table is
+           be deleted when this object is SET 'destroy'."
+      ::= { fsMefFilterEntry 7 }
+
+-- --------------------------------------------------------------------------
+-- Mef ClassMap Table
+-- --------------------------------------------------------------------------
+   fsMefClassMapTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF FsMefClassMapEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "This table contains the Multifield Classifier details. It takes input
+           from the table fsMefFilterTable and outputs a CLASS for the
+           traffic-class pattern/match."
+       ::= { fsMefProfile 2 }
+   
+   fsMefClassMapEntry OBJECT-TYPE
+       SYNTAX       FsMefClassMapEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "A Multi-field Classifier entry maps fsMefFilterTable to a CLASS"
+       INDEX { fsMefClassMapId }
+       ::= { fsMefClassMapTable 1 }
+
+   FsMefClassMapEntry ::= SEQUENCE {
+       fsMefClassMapId                 IndexInteger,
+       fsMefClassMapName               DisplayString,
+       fsMefClassMapFilterId           Unsigned32,
+       fsMefClassMapCLASS              Unsigned32,
+       fsMefClassMapStatus             RowStatus
+   }
+   
+   fsMefClassMapId OBJECT-TYPE
+       SYNTAX         IndexInteger
+       MAX-ACCESS     not-accessible
+       STATUS         current
+       DESCRIPTION
+          "An index that enumerates the MultiField Classifier table."
+       ::= { fsMefClassMapEntry 1 }
+   
+   fsMefClassMapName  OBJECT-TYPE
+       SYNTAX         DisplayString (SIZE(1..31))
+       MAX-ACCESS     read-write
+       STATUS         current
+       DESCRIPTION
+           "This object indicates the name for the classmap Entry."
+       ::= { fsMefClassMapEntry 2 }
+   
+   fsMefClassMapFilterId OBJECT-TYPE
+       SYNTAX         Unsigned32 (0..65535)
+       MAX-ACCESS     read-write
+       STATUS         current
+       DESCRIPTION
+          "This Object specifies the index of the fsMefFilterTable, the details
+           of which should be matched against the incoming packet."
+       ::= { fsMefClassMapEntry 3 }
+   
+   fsMefClassMapCLASS OBJECT-TYPE
+       SYNTAX      Unsigned32 (0..65535)
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "This represents the traffic CLASS to which an incoming frame pattern
+            is classified. The administrator needs to define the logical groups
+            that represent this CLASS. Multiple filter entries can
+            map to the same CLASS value. '0' is not configurable but it is the
+            default value."
+       DEFVAL { 0 }
+       ::= { fsMefClassMapEntry 4 }
+   
+   fsMefClassMapStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+          "The status of this conceptual row. All writable objects in this
+           row may be modified only when the row status is not active.
+           CreateAndGo not allowed ,it can be deleted 'destroy',
+           only if it is not referenced
+           by other table; otherwise return inconsistentValue error."
+       ::= { fsMefClassMapEntry 5 }
+ 
+-- --------------------------------------------------------------------------
+-- ClassTable
+-- --------------------------------------------------------------------------
+   fsMefClassTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF FsMefClassEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+           "This table assigns is provided for easy mapping of CLASS policymap
+            and class map tables." 
+       ::= { fsMefProfile 3 }
+   
+   fsMefClassEntry OBJECT-TYPE
+       SYNTAX       FsMefClassEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "An entry specifies CLASS used to map policymap and class map tables."
+       INDEX { fsMefClassCLASS }
+       ::= { fsMefClassTable 1 }
+   
+   FsMefClassEntry ::= SEQUENCE {
+       fsMefClassCLASS            IndexInteger,
+       fsMefClassStatus           RowStatus
+   }
+   
+   fsMefClassCLASS OBJECT-TYPE
+       SYNTAX      IndexInteger
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "This represents the Traffic CLASS to which an incoming frame pattern
+            is classified. The administrator needs to define the traffic
+            class patterns that represent this CLASS. Multiple
+            filter entries can map to the same CLASS value."
+       ::= { fsMefClassEntry 1 }
+   
+   fsMefClassStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+          "The status of this conceptual row. All writable objects in this
+           row may be modified only when the row status is not active.
+           it can be deleted 'destroy', only if it is not referenced
+           by other table; otherwise return inconsistentValue error."
+       ::= { fsMefClassEntry 2 }
+
+-- ------------------------------------------------------------------
+-- Meter Table
+-- ------------------------------------------------------------------
+    fsMefMeterTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF FsMefMeterEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+           "This table enumerates specific meters that a system may use to
+            police a stream of traffic. This may include all traffic on an
+            interface."
+        ::= { fsMefProfile 4 }
+    
+    fsMefMeterEntry OBJECT-TYPE
+        SYNTAX       FsMefMeterEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+           "An entry in the meter table describes a single conformance level
+           of a meter."
+        INDEX { fsMefMeterId }
+        ::= { fsMefMeterTable 1 }
+    
+    FsMefMeterEntry ::= SEQUENCE  {
+        fsMefMeterId                                  IndexInteger,
+        fsMefMeterName                                DisplayString,
+        fsMefMeterType                                MeterType,
+        fsMefMeterColorMode                           MeterColorMode,
+        fsMefMeterCIR                                 Unsigned32,
+        fsMefMeterCBS                                 Unsigned32,
+        fsMefMeterPIR                                 Unsigned32,
+        fsMefMeterEBS                                 Unsigned32,
+        fsMefMeterStatus                              RowStatus
+    }
+    
+    fsMefMeterId OBJECT-TYPE
+        SYNTAX       IndexInteger
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+           "An index that enumerates the Meter entries."
+        ::= { fsMefMeterEntry 1 }
+    
+    fsMefMeterName OBJECT-TYPE
+        SYNTAX         DisplayString (SIZE(1..31))
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION
+           "This indicates the Name for the meter entry.
+           It should be unique in this Table."
+        ::= { fsMefMeterEntry 2 }
+    
+    fsMefMeterType OBJECT-TYPE
+        SYNTAX       MeterType
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+           "The Metering algorithm associated with the Token Bucket meter.
+            It supports only mefDecoupledMeter(6), mefCoupledMeter(7) types."
+        ::= { fsMefMeterEntry 3 }
+    
+    fsMefMeterColorMode    OBJECT-TYPE
+        SYNTAX      MeterColorMode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The user defined Meter Color Mode."
+        DEFVAL  { colorBlind }
+        ::= { fsMefMeterEntry 4 }
+    
+    fsMefMeterCIR OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..10485760)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The committed information rate as per MEF.
+            Must be >= 0. CIR must be less than or equal to  PIR, if PIR > 0"
+        ::= { fsMefMeterEntry 5 }
+    
+    fsMefMeterCBS OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..10485760)
+        UNITS       "Bytes"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The committed burst size as per MEF. Must be > 0 if CIR > 0.
+             Maximum allowable size will be jumbo frame size."
+        ::= { fsMefMeterEntry 6 }
+    
+    fsMefMeterPIR OBJECT-TYPE
+        SYNTAX       Unsigned32 (0..10485760)
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+           "The Peak information rate as per MEF.
+            Must be >= 0. PIR must be greater than or equal to CIR, if PIR > 0."
+        ::= { fsMefMeterEntry 7 }
+    
+    fsMefMeterEBS OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..10485760)
+        UNITS       "Bytes"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+           "The excess burst size as per MEF. Must be > 0 if PIR > 0."
+        ::= { fsMefMeterEntry 8 }
+    
+    fsMefMeterStatus OBJECT-TYPE
+        SYNTAX       RowStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+           "The status of this conceptual row. All writable objects in this
+           row may be modified only of the Entry is not ACTIVE.
+           It can be deleted 'destroy', only if it is not referenced
+           by other table; otherwise return inconsistentValue error."
+        ::= { fsMefMeterEntry 9 }
+
+
+-- ------------------------------------------------------------------
+-- Policy-Map Table ( ClassMap To PolicyMap Table )
+-- ------------------------------------------------------------------
+
+   fsMefPolicyMapTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF FsMefPolicyMapEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION  "This table contains the class-map to policy-map mapping 
+                     details."
+       ::= { fsMefProfile 5 }
+   
+   fsMefPolicyMapEntry OBJECT-TYPE
+       SYNTAX       FsMefPolicyMapEntry
+       MAX-ACCESS   not-accessible	   
+       STATUS       current
+       DESCRIPTION
+          "An entry to map a policy for a class-map."
+       INDEX { fsMefPolicyMapId }
+       ::= { fsMefPolicyMapTable 1 }
+   
+   
+   FsMefPolicyMapEntry ::= SEQUENCE  {
+       fsMefPolicyMapId                                  IndexInteger,
+       fsMefPolicyMapName                                DisplayString,
+       fsMefPolicyMapCLASS                               Unsigned32,
+       fsMefPolicyMapMeterTableId                        Unsigned32,  -- meter
+       fsMefPolicyMapStatus                              RowStatus
+   }
+   
+   fsMefPolicyMapId OBJECT-TYPE
+       SYNTAX       IndexInteger
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION "An index that enumerates the policy-map table entries."
+	   ::= { fsMefPolicyMapEntry 1 }
+   
+   fsMefPolicyMapName OBJECT-TYPE
+       SYNTAX         DisplayString (SIZE(1..31))
+       MAX-ACCESS     read-write
+       STATUS         current
+       DESCRIPTION
+          "This the Name for a policy entry. It should be unique in this Table."
+       ::= { fsMefPolicyMapEntry 2 }
+   
+   fsMefPolicyMapCLASS OBJECT-TYPE
+       SYNTAX       Unsigned32
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+           "This indicates the Traffic CLASS for which the policy-map
+            needs to be applied. A valid value is not necessary for
+            creation of an entry in this table. When this object is configured as
+            dont-care(0), it is mandatory that the PolicyMapIfIndex is
+            configured. This implies that the policy is interface-specific
+            and not CLASS-specific."
+       DEFVAL { 0 }
+       ::= { fsMefPolicyMapEntry 3 }
+	   
+   fsMefPolicyMapMeterTableId OBJECT-TYPE
+       SYNTAX       Unsigned32
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "The Object refers to a Meter table Id which is the index
+           for the Meter  table. A Valid value of this object is
+           not mandatory for the creation of an entry in this table."
+    DEFVAL { 0 }
+    ::= { fsMefPolicyMapEntry 4 }
+
+   fsMefPolicyMapStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The status of this conceptual row."
+       ::= { fsMefPolicyMapEntry 5 }
+
+ -- -------------------------------------------------------------------------
+                          -- fsMefMepTable START
+ -- -------------------------------------------------------------------------
+
+fsMefMepTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsMefMepEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The Maintenance Entity Group End Point (MEP) table. The indexs of the
+        Table fsMefContextId, fsMefMegIndex, fsMefMeIndex, fsMefMepIdentifier
+        points to the fsMIY1731ContextId, fsMIY1731MegIndex, fsMIY1731MeIndex,
+        fsMIY1731MepIdentifier. Entries in the table will not be created
+        by configuring this table. These entities have to be created explicitly
+        in ECFM module.
+       "
+    ::= { fsMefPerformance 1 }
+
+fsMefMepEntry OBJECT-TYPE
+    SYNTAX      FsMefMepEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The MEP table entry"
+    INDEX { fsMefContextId,
+            fsMefMegIndex,
+            fsMefMeIndex,
+            fsMefMepIdentifier
+          }
+    ::= { fsMefMepTable 1 }
+FsMefMepEntry ::= SEQUENCE {
+        fsMefMegIndex                          Unsigned32,
+        fsMefMeIndex                           Unsigned32,
+        fsMefMepIdentifier                     Dot1agCfmMepId,
+        fsMefMepTransmitLmmStatus              FsY1731TransmitStatus,
+        fsMefMepTransmitLmmResultOK            TruthValue,
+        fsMefMepTransmitLmmInterval            FsY1731LmmInterval,
+        fsMefMepTransmitLmmDeadline            Unsigned32,
+        fsMefMepTransmitLmmDropEnable          TruthValue,
+        fsMefMepTransmitLmmPriority            Integer32,
+        fsMefMepTransmitLmmDestMacAddress      MacAddress,
+        fsMefMepTransmitLmmDestMepId           Dot1agCfmMepIdOrZero,
+        fsMefMepTransmitLmmDestIsMepId         TruthValue,
+        fsMefMepTransmitLmmMessages            Integer32,
+        fsMefMepTxFCf                          Unsigned32,
+        fsMefMepRxFCb                          Unsigned32,
+        fsMefMepTxFCb                          Unsigned32,
+        fsMefMepNearEndFrameLossThreshold      Unsigned32,
+        fsMefMepFarEndFrameLossThreshold       Unsigned32,
+        fsMefMepTransmitDmStatus               FsY1731TransmitStatus,
+        fsMefMepTransmitDmResultOK             TruthValue,
+        fsMefMepTransmitDmType                 INTEGER,
+        fsMefMepTransmitDmInterval             TimeInterval,
+        fsMefMepTransmitDmMessages             Integer32,
+        fsMefMepTransmitDmmDropEnable          TruthValue,
+        fsMefMepTransmit1DmDropEnable          TruthValue,
+        fsMefMepTransmitDmmPriority            Integer32,
+        fsMefMepTransmit1DmPriority            Integer32,
+        fsMefMepTransmitDmDestMacAddress       MacAddress,
+        fsMefMepTransmitDmDestMepId            Dot1agCfmMepIdOrZero,
+        fsMefMepTransmitDmDestIsMepId          TruthValue,
+        fsMefMepTransmitDmDeadline             Unsigned32,
+        fsMefMepDmrOptionalFields              TruthValue,
+        fsMefMep1DmRecvCapability              INTEGER,
+        fsMefMepFrameDelayThreshold            Unsigned32,
+        fsMefMepRowStatus                      RowStatus,
+        fsMefMepRxFCf                          Unsigned32,
+        fsMefMep1DmTransInterval               TimeInterval 
+        }
+
+fsMefMegIndex OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Internally this object will refer to mib object dot1agCfmMdIndex of
+        ECFM and fsMIY1731MegIndex of Y1731."
+
+    ::= { fsMefMepEntry 1 }
+
+fsMefMeIndex OBJECT-TYPE
+   SYNTAX      Unsigned32(1..4294967295)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Internally this object will refer to mib object 
+        dot1agCfmMaIndex of ECFM and fsMIY1731MeIndex of Y1731"
+   ::= { fsMefMepEntry 2 }
+
+fsMefMepIdentifier OBJECT-TYPE
+    SYNTAX      Dot1agCfmMepId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Internally this object will refer to mib object 
+        dot1agCfmMepIdentifier of ECFM and fsMIY1731MepIdentifier of Y1731"
+    ::= { fsMefMepEntry 3 }
+
+fsMefMepTransmitLmmStatus OBJECT-TYPE
+   SYNTAX       FsY1731TransmitStatus
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "An Enumerated value set to 'start' to initiate LM transmission 
+        and 'stop' to stop LM transmission.
+        'ready' and 'notReady' indicates whether LM can be initiated or not.
+
+        Note: User can not set to 'ready' or 'notReady'.
+       "
+   DEFVAL { ready }
+    ::= { fsMefMepEntry 4 }
+
+fsMefMepTransmitLmmResultOK OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the result of the operation:
+
+        - true    The Loss measurement Message (LMM) will be (or has been) sent.
+
+        - false   The Loss measurement Message (LMM) will not be sent.
+       "
+    DEFVAL { true }
+    ::= { fsMefMepEntry 5 }
+
+fsMefMepTransmitLmmInterval OBJECT-TYPE
+    SYNTAX      FsY1731LmmInterval
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Interval between two successive LMM transmissions to be used by the MEP.
+       "
+    DEFVAL { interval100ms }
+    ::= { fsMefMepEntry 6 }
+
+fsMefMepTransmitLmmDeadline OBJECT-TYPE
+    SYNTAX      Unsigned32(1..172800)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Specify  a  timeout, in seconds, before loss measurement exits.
+        Loss Measurement exits, if configured number of messages are sent 
+        before timeout.
+       "
+    ::= { fsMefMepEntry 7 }
+
+fsMefMepTransmitLmmDropEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Drop Enable bit value to be used in the VLAN tag, if present
+        in the transmitted LMM frame.
+       "
+    DEFVAL { false }
+    ::= { fsMefMepEntry 8 }
+
+fsMefMepTransmitLmmPriority OBJECT-TYPE
+    SYNTAX      Integer32(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Priority. 3 bit value to be used in the VLAN tag, if present
+        in the transmitted LMM frame.
+       "
+   DEFVAL { 7 }
+    ::= { fsMefMepEntry 9 }
+
+fsMefMepTransmitLmmDestMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The Target MAC Address Field to be transmitted: A unicast
+        destination MAC address to be used for LMM.
+       "
+    ::= { fsMefMepEntry 10 }
+
+fsMefMepTransmitLmmDestMepId OBJECT-TYPE
+    SYNTAX      Dot1agCfmMepIdOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "An indication of the Target MAC Address Field to be
+        transmitted:
+        The Maintenance association End Point Identifier of
+        another MEP in the same Maintenance Association
+        This address will be used if the value of the column
+        fsMefMepTransmitLmmDestIsMepId is 'true'.
+       "
+    ::= { fsMefMepEntry 11 }
+
+fsMefMepTransmitLmmDestIsMepId OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "True indicates that MEPID of the target MEP is used for
+        LM frame transmission.
+        False indicates that unicast destination MAC address of the
+        target MEP is used for Frame Loss Measurement transmission.
+       "
+    ::= { fsMefMepEntry 12 }
+
+fsMefMepTransmitLmmMessages OBJECT-TYPE
+    SYNTAX      Integer32(1..8192)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The number of LMM messages to be transmitted.
+       "
+    ::= { fsMefMepEntry 13 }
+
+fsMefMepTxFCf OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The counter of in-profile data frames transmitted towards its 
+        peer MEP transmitted in the last CCM or LMM.
+       "
+    ::= { fsMefMepEntry 14 }
+
+fsMefMepRxFCb OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The counter of in-profile data frames received from its peer MEP at the
+        time of receiving the last CCM frame.
+       "
+    ::= { fsMefMepEntry 15 }
+
+fsMefMepTxFCb OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The value of fsMefMepTxFCf field in the last CCM or LMR frame 
+        received from its peer MEP.
+       "
+    ::= { fsMefMepEntry 16 }
+
+fsMefMepNearEndFrameLossThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Threshold value for the near-end frame loss.
+        Notification is sent to Management Application if calculated near-end 
+        frame loss exceeds configured threshold.
+       "
+    ::= { fsMefMepEntry 17 }
+
+fsMefMepFarEndFrameLossThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Threshold value for the far-end frame loss.
+        Notification is sent to Management Application if calculated far-end 
+        frame loss exceeds configured threshold.
+        This refers to Oneway Frame Loss ratio objective mentioned in section
+        6.9.6 of standard 10.2.
+       "
+    ::= { fsMefMepEntry 18 }
+   
+fsMefMepTransmitDmStatus OBJECT-TYPE
+   SYNTAX       FsY1731TransmitStatus
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "An Enumerated value set to 'start' to initiate 1DM or DMM transmission 
+        and 'stop' to stop 1DM or DMM transmission.
+        'ready' and 'notReady' indicates whether 1DM or DMM can be initiated 
+         or not.
+
+        Note: User can not set to 'ready' or 'notReady'.
+       "
+   DEFVAL { ready }
+    ::= { fsMefMepEntry 19 }
+
+fsMefMepTransmitDmResultOK OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the result of the operation:
+
+        - true    The Delay measurement Message (1DM or DMM) will be 
+                  (or has been) sent.
+        - false   The Delay measurement Message (1DM  or DMM) will not be sent.
+       "
+    DEFVAL { true }
+    ::= { fsMefMepEntry 20 }
+
+fsMefMepTransmitDmType OBJECT-TYPE
+    SYNTAX      INTEGER { oneWay(1), twoWay(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Type of delay measurement to be initiated:
+        
+        - oneWay(1)   Measurement (by 1DM) is calculated at destination end.
+        - twoWay(2)   Measurement (by DMM-DMR) is calculated at initiation end.
+       "
+    DEFVAL { 2 }
+    ::= { fsMefMepEntry 21 }
+
+fsMefMepTransmitDmInterval OBJECT-TYPE
+    SYNTAX      TimeInterval(1..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Interval between two successive DM messages 
+        (1DM or DMM) transmissions to be used by the MEP. This refers
+        to the interval between frame pairs as mentioned in section 6.9.4
+        of MEF 10.2 standard.  
+       "
+    DEFVAL { 100 }
+    ::= { fsMefMepEntry 22 }
+
+fsMefMepTransmitDmMessages  OBJECT-TYPE
+    SYNTAX      Integer32(1..8192)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The number of DM (1DM or DMM) messages to be transmitted.
+       "
+    ::= { fsMefMepEntry 23 }
+
+fsMefMepTransmitDmmDropEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Drop Enable bit value to be used in the VLAN tag, if present
+        in the transmitted DMM frame.
+       "
+    DEFVAL { false }
+    ::= { fsMefMepEntry 24 }
+
+fsMefMepTransmit1DmDropEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Drop Enable bit value to be used in the VLAN tag, if present
+        in the transmitted 1DM frame.
+       "
+    DEFVAL { false }
+    ::= { fsMefMepEntry 25 }
+
+fsMefMepTransmitDmmPriority OBJECT-TYPE
+    SYNTAX      Integer32(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Priority. 3 bit value to be used in the VLAN tag, if present
+        in the transmitted DMM frame.
+       "
+   DEFVAL { 7 }
+    ::= { fsMefMepEntry 26 }
+
+fsMefMepTransmit1DmPriority OBJECT-TYPE
+    SYNTAX      Integer32(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Priority. 3 bit value to be used in the VLAN tag, if present
+        in the transmitted 1DM frame.
+       "
+   DEFVAL { 7 }
+    ::= { fsMefMepEntry 27 }
+
+fsMefMepTransmitDmDestMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The Target MAC Address Field to be transmitted: A unicast
+        destination MAC address to be used for 1DM or DMM.
+       "
+    ::= { fsMefMepEntry 28 }
+
+fsMefMepTransmitDmDestMepId OBJECT-TYPE
+    SYNTAX      Dot1agCfmMepIdOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "An indication of the Target MAC Address Field to be
+        transmitted:
+        The Maintenance association End Point Identifier of
+        another MEP in the same Maintenance Association
+        This address will be used if the value of the column
+        fsMefMepTransmitDmDestIsMepId is 'true'.
+       "
+    ::= { fsMefMepEntry 29 }
+
+fsMefMepTransmitDmDestIsMepId OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "True indicates that MEPID of the target MEP is used for
+        Delay frame transmission.
+
+        False indicates that unicast destination MAC address of the
+        target MEP is used for Delay frame transmission.
+       "
+    ::= { fsMefMepEntry 30 }
+
+fsMefMepTransmitDmDeadline OBJECT-TYPE
+    SYNTAX      Unsigned32(1..172800)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Specify a timeout, in seconds, before Delay Measurement operation exits.
+        Delay Measurement operation exits, if configured number of messages are 
+        sent before timeout.
+       "
+    ::= { fsMefMepEntry 31 }
+
+fsMefMepDmrOptionalFields OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Indicates whether to include optional fields in the DMR Frame or not.
+        True indicates optional fields are to be included and False indicates 
+        optional fields are not included.
+
+        Optional fields are included to include the processing time at peer MEP.
+       "
+    DEFVAL { false }
+    ::= { fsMefMepEntry 32 }
+
+fsMefMep1DmRecvCapability OBJECT-TYPE
+    SYNTAX      INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The administrative status of 1DM Frame reception. This enables 
+        or disables the capability of MEP to process the 1DM Frames. 
+        A value of 'enabled' (1) indicates to accept and process 1DM Frames.
+        A value of 'disabled' (2) indicates not to process the 1DM Frames.
+       "
+    DEFVAL { enabled }
+    ::= { fsMefMepEntry 33 }
+
+fsMefMepFrameDelayThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Threshold (in microseconds) for the Frame delay.
+        Notification is sent to Management application if calculated frame delay 
+        exceeds configured threshold. This refers to Inter Frame Delay Variation
+        Performance Objective mentioned in section 6.9.4 of standard 10.2.  
+       "
+    DEFVAL { 200 }
+    ::= { fsMefMepEntry 34 }
+
+fsMefMepRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Indicates the status of MEP row.
+        The writable columns in a row can not be changed if the row
+        is active. All columns must have a valid value before a row
+        can be activated, possible values are row status active and
+        row status not active.
+       "
+   ::= { fsMefMepEntry 35 }
+
+fsMefMepRxFCf OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The value of fsMefMepRxFCf field is the value of in-profile data frames 
+        received from its peer MEP.
+       "
+    ::= { fsMefMepEntry 36 }
+
+fsMefMep1DmTransInterval OBJECT-TYPE
+    SYNTAX      TimeInterval(0..1500)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Time interval (in 0.01 seconds) between two successive One-way
+        DM Transactions and is used to carry out Delay Variation Measurement for
+        1DM transactions. The value '0' indicates One-way Delay Variation
+        measurement cannot take place. The value should be greater than the
+        DM Interval.
+       "
+    DEFVAL { 0 }
+    ::= { fsMefMepEntry 37 }
+ -- -------------------------------------------------------------------------
+                          -- fsMefMepTable END
+ -- -------------------------------------------------------------------------
+
+ -- -------------------------------------------------------------------------
+                          -- fsMefFdTable  START
+ -- -------------------------------------------------------------------------
+
+fsMefFdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsMefFdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table extends the MEP table and contains a list of
+        information about the Frame Delay measured at various times by a 
+        MEP.
+        Size of this table is defined by the object
+        fsMefFrameDelayBufferSize. If the addition of a frame delay entry 
+        would exceed the resources allocated to table, then the oldest entries 
+        in the table are deleted until sufficient resources are available to 
+        hold the new frame delay entry.
+
+        Delay Measured can be of one-way or two-way.
+        
+       "
+    ::= { fsMefPerformance 2 }
+
+fsMefFdEntry OBJECT-TYPE
+    SYNTAX      FsMefFdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The Frame delay buffer table entry."
+    INDEX { fsMefContextId,
+            fsMefMegIndex,
+            fsMefMeIndex,
+            fsMefMepIdentifier,
+            fsMefFdTransId,
+            fsMefFdSeqNumber        
+          }
+    ::= { fsMefFdTable 1 }
+
+FsMefFdEntry ::= SEQUENCE {
+      fsMefFdTransId                      Unsigned32,
+      fsMefFdSeqNumber                    Unsigned32,
+      fsMefFdTxTimeStampf                 FsY1731TimeRepresentation,
+      fsMefFdMeasurementTimeStamp         TimeStamp,
+      fsMefFdPeerMepMacAddress            MacAddress,
+      fsMefFdIfIndex                      InterfaceIndex,
+      fsMefFdDelayValue                   FsY1731TimeRepresentation,
+      fsMefFdIFDV                         FsY1731TimeRepresentation,
+      fsMefFdFDV                          FsY1731TimeRepresentation,
+      fsMefFdMeasurementType              INTEGER
+    }
+
+fsMefFdTransId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Identifies a delay measurement transaction.
+       "
+    ::= { fsMefFdEntry 1 }
+
+fsMefFdSeqNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Locally maintained sequence number of FD Entries"
+    ::= { fsMefFdEntry 2}
+
+fsMefFdTxTimeStampf OBJECT-TYPE
+    SYNTAX      FsY1731TimeRepresentation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "TxTimeStampf value sent in a Delay measurement message (DMM).
+        or received in 1DM frame.
+       "
+    ::= { fsMefFdEntry 3 }
+
+fsMefFdMeasurementTimeStamp OBJECT-TYPE
+    SYNTAX      TimeStamp 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Time at which measurement takes place.
+       "
+    ::= { fsMefFdEntry 4}
+
+fsMefFdPeerMepMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Identifies the Mac Address of the peer MEP to which DM message(s) 
+        is sent.
+       "
+    ::= { fsMefFdEntry 5 }
+
+fsMefFdIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is the interface index of the interface either a
+        bridge port, or an aggregated IEEE 802.1 link within a bridge port, 
+        to which the MEP at which measurement takes place is attached.
+       "
+    ::= { fsMefFdEntry 6 }
+
+fsMefFdDelayValue OBJECT-TYPE
+    SYNTAX      FsY1731TimeRepresentation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the measured frame delay value. This refers
+        to One way Frame Delay mentioned in section 6.9.2 of MEF 10.2
+        standard.  
+       "
+    ::= { fsMefFdEntry 7 }
+
+fsMefFdIFDV OBJECT-TYPE
+    SYNTAX      FsY1731TimeRepresentation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Inter frame delay variation, (IFDV), calculated with respect to 
+        current transaction. This refers
+        to Inter Frame Delay variation mentioned in section 6.9.4 of MEF 10.2
+        standard.  
+       "
+    ::= { fsMefFdEntry 8 }
+
+fsMefFdFDV OBJECT-TYPE
+    SYNTAX      FsY1731TimeRepresentation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Frame delay variation, (IFDV), calculated with respect to current 
+        transaction.
+       "
+    ::= { fsMefFdEntry 9 }
+
+fsMefFdMeasurementType OBJECT-TYPE
+    SYNTAX      INTEGER { oneWay(1), twoWay(2) } 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Type of the frame-delay measurement (oneWay or twoWay).
+       "
+    ::= { fsMefFdEntry 10 }
+ -- -------------------------------------------------------------------------
+                          -- fsMefFdTable END
+ -- -------------------------------------------------------------------------
+ -- -------------------------------------------------------------------------
+                          -- fsMefFdStatsTable  END
+ -- -------------------------------------------------------------------------
+
+fsMefFdStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsMefFdStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table extends the MEP table and contains output of one-way and 
+        two-way delay measurement transaction. 
+       "
+    ::= { fsMefPerformance 3 }
+
+fsMefFdStatsEntry OBJECT-TYPE
+    SYNTAX      FsMefFdStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The Delay Statistics table entry."
+    INDEX { fsMefContextId,
+            fsMefMegIndex,
+            fsMefMeIndex,
+            fsMefMepIdentifier,
+            fsMefFdTransId
+          }
+    ::= { fsMefFdStatsTable 1 }
+
+FsMefFdStatsEntry ::= SEQUENCE {
+      fsMefFdStatsTimeStamp             TimeStamp,
+      fsMefFdStatsDmmOut                Unsigned32,
+      fsMefFdStatsDmrIn                 Unsigned32,
+      fsMefFdStatsDelayAverage          FsY1731TimeRepresentation,
+      fsMefFdStatsFDVAverage            FsY1731TimeRepresentation,
+      fsMefFdStatsIFDVAverage           FsY1731TimeRepresentation,
+      fsMefFdStatsDelayMin              FsY1731TimeRepresentation, 
+      fsMefFdStatsDelayMax              FsY1731TimeRepresentation
+    }
+
+fsMefFdStatsTimeStamp OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Time stamp at which one-way or two-way delay measurement (DMM) is
+        initiated.
+       "
+    ::= { fsMefFdStatsEntry 1 }
+
+fsMefFdStatsDmmOut OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Number of DMMs sent for a two-way delay measurement
+        transaction.
+       "
+    ::= { fsMefFdStatsEntry 2 }
+
+fsMefFdStatsDmrIn OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Number of requests received for a one-way or responses received for
+       two-way delay measurement transaction.
+       "
+    ::= { fsMefFdStatsEntry 3 }
+
+fsMefFdStatsDelayAverage OBJECT-TYPE
+    SYNTAX      FsY1731TimeRepresentation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Average delay measured for a one-way or two-way delay measurement
+        transaction. This refers to one way mean delay of section 6.9.2 of
+        MEF 10.2 
+       "
+    ::= { fsMefFdStatsEntry 4 }
+
+fsMefFdStatsFDVAverage OBJECT-TYPE
+    SYNTAX      FsY1731TimeRepresentation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Frame Delay Variation (FDV) average calculated for a 
+       delay measurement transaction.
+       "
+    ::= { fsMefFdStatsEntry 5 }
+
+fsMefFdStatsIFDVAverage OBJECT-TYPE
+    SYNTAX      FsY1731TimeRepresentation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Inter Frame Delay Variation (IFDV) average calculated for 
+       delay measurement transaction.
+       "
+    ::= { fsMefFdStatsEntry 6 }
+
+fsMefFdStatsDelayMin OBJECT-TYPE
+    SYNTAX      FsY1731TimeRepresentation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the minimum value of frame-delay.
+       "
+    ::= { fsMefFdStatsEntry 7 }
+
+fsMefFdStatsDelayMax OBJECT-TYPE
+    SYNTAX      FsY1731TimeRepresentation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the maximum value of frame-delay.
+       "
+    ::= { fsMefFdStatsEntry 8 }
+ -- -------------------------------------------------------------------------
+                          -- fsMefFdStatsTable END
+ -- -------------------------------------------------------------------------
+ -- -------------------------------------------------------------------------
+                          -- fsMefFlTable  START
+ -- -------------------------------------------------------------------------
+
+fsMefFlTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsMefFlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table extends the MEP table and contains a information about
+        the Frame-loss measured at various times by a MEP. 
+        
+        Size of this table is defined by the object
+        fsMefFrameLossBufferSize. If the addition of a frame loss entry 
+        would exceed the resources allocated to table, then the oldest entries 
+        in the table are deleted until sufficient resources are available to 
+        hold the new frame loss entry.
+       "
+    ::= { fsMefPerformance 4 }
+
+fsMefFlEntry OBJECT-TYPE
+    SYNTAX      FsMefFlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The Frame Loss Statistics table entry."
+    INDEX { fsMefContextId,
+            fsMefMegIndex,
+            fsMefMeIndex,
+            fsMefMepIdentifier,
+            fsMefFlTransId,
+            fsMefFlSeqNumber
+          }
+    ::= { fsMefFlTable 1 }
+
+FsMefFlEntry ::= SEQUENCE {
+      fsMefFlTransId                  Unsigned32,
+      fsMefFlSeqNumber                Unsigned32,
+      fsMefFlMeasurementTimeStamp     TimeStamp,
+      fsMefFlPeerMepMacAddress        MacAddress,
+      fsMefFlIfIndex                  InterfaceIndex,
+      fsMefFlFarEndLoss               Unsigned32,
+      fsMefFlNearEndLoss              Unsigned32,
+      fsMefFlMeasurementTime          TimeInterval
+    }
+
+fsMefFlTransId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Identifies a loss measurement transaction.
+       "
+    ::= { fsMefFlEntry 1 }
+
+fsMefFlSeqNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Locally maintained sequence number of Frame Loss Entries"
+    ::= { fsMefFlEntry 2 }
+
+fsMefFlMeasurementTimeStamp OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Time at which frame-loss is actually measured.
+       "
+    ::= { fsMefFlEntry 3 }
+
+fsMefFlPeerMepMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Identifies the Mac Address of the peer MEP to which loss measurement 
+        message(s) is sent.
+       "
+    ::= { fsMefFlEntry 4 }
+
+fsMefFlIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is the interface index of the interface either a
+        bridge port, or an aggregated IEEE 802.1 link within a bridge port, 
+        to which the MEP at which measurement takes place is attached.
+       "
+    ::= { fsMefFlEntry 5 }
+
+fsMefFlFarEndLoss OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the far-end frame-loss value.
+       "
+    ::= { fsMefFlEntry 6 }
+
+fsMefFlNearEndLoss OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the near-end frame-loss value.
+       "
+    ::= { fsMefFlEntry 7 }
+
+fsMefFlMeasurementTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Time taken to measure frame-loss.
+       "
+    ::= { fsMefFlEntry 8 }
+
+ -- -------------------------------------------------------------------------
+                          -- fsMefFlTable END
+ -- -------------------------------------------------------------------------
+ -- -------------------------------------------------------------------------
+                          -- fsMefFlStatsTable START
+ -- -------------------------------------------------------------------------
+
+fsMefFlStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsMefFlStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table extends the MEP table and contains output of 
+        frame-loss measurement transaction. 
+       "
+    ::= { fsMefPerformance 5 }
+
+fsMefFlStatsEntry OBJECT-TYPE
+    SYNTAX      FsMefFlStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The Frame Loss Statistics table entry."
+    INDEX { fsMefContextId,
+            fsMefMegIndex,
+            fsMefMeIndex,
+            fsMefMepIdentifier,
+            fsMefFlTransId
+          }
+    ::= { fsMefFlStatsTable 1 }
+
+FsMefFlStatsEntry ::= SEQUENCE {
+      fsMefFlStatsTimeStamp             TimeStamp,
+      fsMefFlStatsMessagesOut           Unsigned32,
+      fsMefFlStatsMessagesIn            Unsigned32,
+      fsMefFlStatsFarEndLossAverage     Unsigned32,
+      fsMefFlStatsNearEndLossAverage    Unsigned32,
+      fsMefFlStatsMeasurementType       INTEGER,
+      fsMefFlStatsFarEndLossMin         Unsigned32, 
+      fsMefFlStatsFarEndLossMax         Unsigned32,
+      fsMefFlStatsNearEndLossMin        Unsigned32,
+      fsMefFlStatsNearEndLossMax        Unsigned32
+    }
+
+fsMefFlStatsTimeStamp OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Time stamp at which frame-loss measurement transaction is initiated.
+       "
+    ::= { fsMefFlStatsEntry 1 }
+
+fsMefFlStatsMessagesOut OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Number of frames with ETH-LM information sent for a transaction.
+       "
+    ::= { fsMefFlStatsEntry 2 }
+
+fsMefFlStatsMessagesIn OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Number of frames with ETH-LM information received for a  
+       transaction.
+       "
+    ::= { fsMefFlStatsEntry 3 }
+
+fsMefFlStatsFarEndLossAverage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Average of the far-end frame-loss measured for a transaction.
+       "
+    ::= { fsMefFlStatsEntry 4 }
+
+fsMefFlStatsNearEndLossAverage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Average of the near-end frame-loss measured for a transaction.
+       "
+    ::= { fsMefFlStatsEntry 5 }
+
+fsMefFlStatsMeasurementType OBJECT-TYPE
+    SYNTAX      INTEGER { singleEnded(1), dualEnded(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Type of the frame-loss measurement (Single-ended or Dual-ended) done.
+       "
+    ::= { fsMefFlStatsEntry 6 }
+
+fsMefFlStatsFarEndLossMin OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the minimum value of far-end frame-loss.
+       "
+    ::= { fsMefFlStatsEntry 7 }
+
+fsMefFlStatsFarEndLossMax OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the maximum value of far-end frame-loss.
+       "
+    ::= { fsMefFlStatsEntry 8 }
+
+fsMefFlStatsNearEndLossMin OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the minimum value of near-end frame-loss.
+       "
+    ::= { fsMefFlStatsEntry 9 }
+
+fsMefFlStatsNearEndLossMax OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the maximum value of near-end frame-loss.
+       "
+    ::= { fsMefFlStatsEntry 10 }
+
+ -- ----------------------------------------------------------------------------
+                          -- fsMefFlStatsTable END
+ -- -------------------------------------------------------------------------
+ -- ----------------------------------------------------------------------------
+                          -- fsMefMepAvailabilityTable START
+ -- -------------------------------------------------------------------------
+
+fsMefMepAvailabilityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsMefMepAvailabilityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The Maintenance Entity Group End Point (MEP) Availability 
+        table.
+
+        Each row in the table is associated with a different MEP. 
+
+        This table uses three indices. The first two indices are the
+        indices of the Maintenance Entity Group (MEG) and Maintenance 
+        Entity (ME) tables, the reason being that a MEP is always 
+        related to an ME and MEG.
+
+        The MEP table stores all the managed objects for availability
+        measurement.
+
+        The objects which are used to initiate a transaction are to
+        be set only when the row-status of the table is active.
+        'fsMefMepTransmit' naming convention is used to isolate 
+        these objects from the others.
+       "
+    ::= { fsMefPerformance 6 }
+
+fsMefMepAvailabilityEntry OBJECT-TYPE
+    SYNTAX      FsMefMepAvailabilityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The MEP Availability table entry"
+    INDEX { fsMefContextId,
+            fsMefMegIndex,
+            fsMefMeIndex,
+            fsMefMepIdentifier
+          }
+    ::= { fsMefMepAvailabilityTable 1 }
+
+FsMefMepAvailabilityEntry ::= SEQUENCE {
+        fsMefMepAvailabilityStatus                  FsY1731TransmitStatus,
+        fsMefMepAvailabilityResultOK                TruthValue, 
+        fsMefMepAvailabilityInterval                FsY1731AvailabilityInterval,
+        fsMefMepAvailabilityDeadline                Unsigned32,
+        fsMefMepAvailabilityLowerThreshold          OCTET STRING,
+        fsMefMepAvailabilityUpperThreshold          OCTET STRING,
+        fsMefMepAvailabilityModestAreaIsAvailable   TruthValue,
+        fsMefMepAvailabilityWindowSize              Unsigned32,
+        fsMefMepAvailabilityDestMacAddress          MacAddress,
+        fsMefMepAvailabilityDestMepId               Dot1agCfmMepIdOrZero,
+        fsMefMepAvailabilityDestIsMepId             TruthValue,
+        fsMefMepAvailabilityType                    FsY1731AvailabilityType,
+        fsMefMepAvailabilitySchldDownInitTime       Unsigned32,
+        fsMefMepAvailabilitySchldDownEndTime        Unsigned32,
+        fsMefMepAvailabilityPriority                Unsigned32,
+        fsMefMepAvailabilityDropEnable              TruthValue,
+        fsMefMepAvailabilityPercentage              OCTET STRING,
+        fsMefMepAvailabilityRowStatus               RowStatus
+        }
+
+fsMefMepAvailabilityStatus OBJECT-TYPE
+   SYNTAX       FsY1731TransmitStatus
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "An Enumerated value set to 'start' to initiate Availability Measurement 
+        and 'stop' to stop Availability Measurement.
+        'ready' and 'notReady' indicates whether Availability Measurement
+        can be initiated or not.
+
+        Note: User can not set to 'ready' or 'notReady'.
+       "
+   DEFVAL { ready }
+    ::= { fsMefMepAvailabilityEntry 1 }
+
+fsMefMepAvailabilityResultOK OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the result of the operation:
+
+        - true    Initiating Availability measurement by sending
+                  LM Message (LMM) is successful.
+
+        - false   Initiating Availability measurement has failed 
+                  as failure encountered in sending LM Message (LMM).
+       "
+    DEFVAL { true }
+    ::= { fsMefMepAvailabilityEntry 2 }
+
+fsMefMepAvailabilityInterval OBJECT-TYPE
+    SYNTAX      FsY1731AvailabilityInterval 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "A time interval much smaller than Deadline, 
+        Interval between two successive LMM transmissions to be used by the MEP
+        for calculating Availability. 
+       "
+    DEFVAL { interval100ms }
+    ::= { fsMefMepAvailabilityEntry 3 }
+
+fsMefMepAvailabilityDeadline OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Specify  a  timeout, in seconds, the Time interval to conduct 
+        the availability functionality
+       "
+    ::= { fsMefMepAvailabilityEntry 4 }
+
+fsMefMepAvailabilityLowerThreshold OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..6))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Availability frame loss ratio threshold, the lower threshold used
+        to define an interval as available. If far-end loss ratio is lesser than 
+        configured lower threshold, that interval will be declared as available.
+        AvailabilityLowerThreshold can be equal to AvailabilityUpperThreshold.
+        Example: 50% should be given as 35:30:2e:30:30
+                 39.61% should be given as 33:39:2e:36:31
+       "
+    ::= { fsMefMepAvailabilityEntry 5 }
+
+fsMefMepAvailabilityUpperThreshold OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..6))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Unavailability frame loss ratio threshold, the upper threshold to define
+        an interval as unavailable. If far-end loss ratio is greater than 
+        configured upper threshold, that interval will be declared as
+        unavailable.
+        Example: 50% should be given as 35:30:2e:30:30
+                 39.61% should be given as 33:39:2e:36:31
+       "
+    ::= { fsMefMepAvailabilityEntry 6 }
+
+fsMefMepAvailabilityModestAreaIsAvailable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Defines whether the area between upper and lower 
+        threshold is referred as available or unavailable.
+
+       True -  If Calculated Frame loss ratio falls 
+               between upper and lower threshold, 
+               it will be declared as Available.
+
+       False - If Calculated Frame loss ratio falls 
+               between upper and lower threshold, 
+               it will be declared as Unavailable.
+       "
+    ::= { fsMefMepAvailabilityEntry 7 }
+
+fsMefMepAvailabilityWindowSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Number of consecutive small time intervals for assessing availability 
+       "
+    ::= { fsMefMepAvailabilityEntry 8 }
+
+fsMefMepAvailabilityDestMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The Target MAC Address Field to be transmitted: A unicast
+        destination MAC address to be used for Availability Measurement.
+       "
+    ::= { fsMefMepAvailabilityEntry 9 }
+
+fsMefMepAvailabilityDestMepId OBJECT-TYPE
+    SYNTAX      Dot1agCfmMepIdOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "An indication of the Target MAC Address Field to be
+        transmitted:
+        The Maintenance association End Point Identifier of
+        another MEP in the same Maintenance Association
+        This address will be used if the value of the column
+        fsMefMepAvailabilityDestIsMepId is 'true'.
+       "
+    ::= { fsMefMepAvailabilityEntry 10 }
+
+fsMefMepAvailabilityDestIsMepId OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "True indicates that MEPID of the target MEP is used for
+        LMM transmission during Availability Measurement.
+        False indicates that unicast destination MAC address of the
+        target MEP is used for LMM transmission during Availability 
+        Measurement.
+       "
+    ::= { fsMefMepAvailabilityEntry 11 }
+
+fsMefMepAvailabilityType OBJECT-TYPE
+    SYNTAX      FsY1731AvailabilityType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "
+        defStatic indicates that the algorithm for Availability Measurement
+        is static window algorithm. The availability measurement will be 
+        conducted as per MEF 10.2 
+        (Section 6.9.7. Availability Performance for a Point-to-Point EVC)
+
+        defSliding indicates that the algorithm for Availability Measurement
+        is sliding window algorithm. The availability measurement will be
+        conducted as per ITU-T Y.1563 
+        ( Section 9 Ethernet service availability )
+       "
+    DEFVAL { defStatic }
+    ::= { fsMefMepAvailabilityEntry 12 }
+
+fsMefMepAvailabilitySchldDownInitTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Time when Scheduled down time is initiated, denotes the beginning of 
+        time interval agreed upon by both the Subscriber and Service Provider 
+        during which a service may be disabled by the Service Provider.
+        Init Time should be defined with reference to zero and deadline.
+       "
+    ::= { fsMefMepAvailabilityEntry 13 }
+
+fsMefMepAvailabilitySchldDownEndTime OBJECT-TYPE 
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Time when Scheduled down time is ending, denotes the ending of
+        time interval agreed upon by both the Subscriber and Service Provider
+        during which a service may be disabled by the Service Provider.
+        End Time should be defined with reference to zero and deadline.
+       "
+    ::= { fsMefMepAvailabilityEntry 14 }
+
+fsMefMepAvailabilityPriority OBJECT-TYPE
+    SYNTAX      Unsigned32(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Priority. 3 bit value to be used in the VLAN tag, if present
+        in the transmitted LMM frame.
+       "
+   DEFVAL { 7 }
+    ::= { fsMefMepAvailabilityEntry 15 }
+
+fsMefMepAvailabilityDropEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Drop Enable bit value to be used in the VLAN tag, if present
+        in the transmitted LMM frame.
+       "
+    DEFVAL { false }
+    ::= { fsMefMepAvailabilityEntry 16 }
+
+fsMefMepAvailabilityPercentage OBJECT-TYPE 
+    SYNTAX      OCTET STRING (SIZE(1..6))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       " This object contains the percentage of Availability
+
+         If fsMefMepAvailabilityType is selected as defStatic,
+         this object contains the Availability Performance metric 
+         as defined in MEF 10.2 
+         (Section 6.9.7. Availability Performance for a Point-to-Point EVC)
+
+         If fsMefMepAvailabilityType is selected as defSliding,
+         this object contains Percent Ethernet service availability
+         as defined in ITU-T Y.1563 
+         ( Section 9 Ethernet service availability )
+         Example: 50%    will be given as 35:30:2e:30:30
+                  39.61% will be given as 33:39:2e:36:31
+       "
+    ::= { fsMefMepAvailabilityEntry 17 }
+
+fsMefMepAvailabilityRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Indicates the status of MEP Availability Table row.
+
+        The writable columns in a row can not be changed if the row
+        is active. All columns must have a valid value before a row
+        can be activated, possible values are row status active and
+        row status not active.
+       "
+   ::= { fsMefMepAvailabilityEntry 18 }
+ -- -------------------------------------------------------------------------
+                          -- fsMefMepAvailabilityTable END
+ -- -------------------------------------------------------------------------
+
+ -- ----------------------------------------------------------------------------
+                          -- fsMefUniListTable START
+ -- -------------------------------------------------------------------------
+
+fsMefUniListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsMefUniListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The Uni List for an EVC is a list of pairs containing <UNI Identifier, UNI Type>
+       This List must have exactly one such pair for each UNI in the EVC."
+      ::= { fsMefUni 2 }
+
+fsMefUniListEntry OBJECT-TYPE
+    SYNTAX      FsMefUniListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The MEF Uni List Table entry"
+    INDEX { fsMefContextId , fsEvcIndex, ifIndex }
+
+    ::= { fsMefUniListTable 1 }
+
+FsMefUniListEntry ::= SEQUENCE {
+        fsMefUniId                  DisplayString,
+        fsMefUniType                INTEGER,
+        fsMefUniListRowStatus       RowStatus
+        }
+
+   fsMefUniId OBJECT-TYPE
+      SYNTAX        DisplayString (SIZE  (0..32)) 
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION 
+           "The UNI Identifier  is independent of the EVCs at the UNI. 
+            It is assigned to the UNI by the Service Provider. It must
+            be a string and the string may have any value. The UNI 
+            Identifier MUST be unique among all UNIs for the MEN.
+
+            If the UNI identifier value is not specified for the UNI or it
+            is unknown, the value of the fsUniId column is a
+            zero-length string."
+
+      ::=  { fsMefUniListEntry 1}
+
+   fsMefUniType OBJECT-TYPE
+      SYNTAX      INTEGER {
+                           root(1),
+                           leaf(2)
+                           }
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+        "The UNI Type must have the value either Root or Leaf. If the type of EVC is 
+        point-to-point or Multipoint-to-Multipoint, then the UNI Type must equal Root"
+
+      DEFVAL { root }
+      ::= { fsMefUniListEntry 2 }
+
+    fsMefUniListRowStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+          "Row Status for the UNI List table."
+      ::= { fsMefUniListEntry 3 }
+ -- ----------------------------------------------------------------------------
+                          -- fsMefUniListTable END
+ -- -------------------------------------------------------------------------
+END
+ -- ------------------------------------------------------------------------
+                              --  END OF MIB
+ -- -------------------------------------------------------------------------

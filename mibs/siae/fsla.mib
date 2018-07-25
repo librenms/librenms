@@ -1,0 +1,2128 @@
+-- Copyright (C) 2006-2012 Aricent Group . All Rights Reserved
+
+-- $Id: fsla.mib,v 1.39 2015/03/11 10:58:03 siva Exp $
+--    LA Proprietary MIB Definition
+      
+--    This document explains the proprietary MIB implemented
+--    for LA product.
+      
+--    This proprietary MIB definition, supplements the standard IEEE802.3ad 
+--    MIB and also provides management of certain proprietary features of LA. 
+      
+--    The proprietary MIB definitions follows:
+
+
+      ARICENT-LA-MIB DEFINITIONS ::= BEGIN
+    
+      IMPORTS
+         MODULE-IDENTITY, OBJECT-TYPE, 
+         enterprises,Integer32,NOTIFICATION-TYPE,TimeTicks,Unsigned32,Counter32,
+         Gauge32
+         FROM SNMPv2-SMI
+         TEXTUAL-CONVENTION, MacAddress
+         FROM SNMPv2-TC
+         InterfaceIndex,InterfaceIndexOrZero    
+         FROM IF-MIB
+         PortList FROM Q-BRIDGE-MIB;
+    
+---   futuresoftware OBJECT IDENTIFIER ::= { enterprises 2076 }
+                                                 
+
+      fsla MODULE-IDENTITY
+            LAST-UPDATED "201403010000Z"
+            ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+            CONTACT-INFO "support@aricent.com"
+            DESCRIPTION
+               " The proprietary MIB module for LA. "
+	    REVISION "201403010000Z"
+            DESCRIPTION
+               " The proprietary MIB module for LA. "
+         ::=  { enterprises futuresoftware (2076) 63 }
+   
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+   
+     PortLaMode ::= TEXTUAL-CONVENTION
+         STATUS         current
+         DESCRIPTION    
+           "Defines how a Port Channel does channeling.
+           lacp(1)      - place the port into passive 
+                           negotiation state, in which the
+                           port waits for its peer to 
+                           initiate negotiation.
+           manual(2)    - force the port to enable 
+                           channeling.
+           disable(3)   - channeling is disabled."
+                     
+     SYNTAX INTEGER {
+                       lacp(1),
+                       manual(2),
+                       disable(3)
+                    }
+
+     LacpKey ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT "d"
+         STATUS    current
+         DESCRIPTION
+                "The Actor or Partner Key value."
+         SYNTAX Integer32 (0..65535)
+ 
+    
+   LacpState ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+         "The Actor and Partner State values from the LACPDU."
+      SYNTAX BITS {
+           lacpActivity(0),
+           lacpTimeout(1),
+           aggregation(2),
+           synchronization(3),
+           collecting(4),
+           distributing(5),
+           defaulted(6),
+           expired(7)
+          }
+
+-- ------------------------------------------------------------ 
+-- groups in the MIB 
+-- ------------------------------------------------------------
+
+      fsLaSystem                  OBJECT IDENTIFIER ::= { fsla 1 }
+      fsLaPortChannel             OBJECT IDENTIFIER ::= { fsla 2 }
+      fsLaPort                    OBJECT IDENTIFIER ::= { fsla 3 }
+      fsLaTrapObjects             OBJECT IDENTIFIER ::= { fsla 4 }
+      fsFutureLaTraps             OBJECT IDENTIFIER ::= { fsla 5 }
+      fsLaDLAGRemotePortChannel   OBJECT IDENTIFIER ::= { fsla 6 }
+      fsLaDLAGRemotePort          OBJECT IDENTIFIER ::= { fsla 7 }
+      fsLaMCLAGRemotePortChannel  OBJECT IDENTIFIER ::= { fsla 8 }
+      fsLaMCLAGRemotePort         OBJECT IDENTIFIER ::= { fsla 9 }
+
+-- ------------------------------------------------------------------
+-- The La System Group
+-- ------------------------------------------------------------------
+
+      fsLaSystemControl OBJECT-TYPE
+           SYNTAX      INTEGER { start(1), shutdown(2)}
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+               "Start or shutdown Link Aggregation Module in the system
+
+                When set as 'start',resources required by Link aggregation 
+                module are allocated & Link aggregation module starts running.
+
+                When shutdown, all resources used by Link aggregation module 
+                will be released to the system "
+           ::= { fsLaSystem 1 }
+
+
+      fsLaStatus OBJECT-TYPE
+           SYNTAX      INTEGER { enabled(1), disabled(2) }
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+               "Sets the Link Aggregation Module administrative status as 
+                enabled or disabled. The module can be enabled only when this
+                object is set to 'enabled'."
+           ::= { fsLaSystem 2 }
+
+      fsLaTraceOption OBJECT-TYPE
+           SYNTAX      Integer32
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+               "This object is used to enable Trace Statements in 
+                Link Aggregation Module.
+
+                A FOUR BYTE integer is used for enabling the level of tracing. 
+                Each BIT in the four byte integer, represents a particular 
+                level of Trace. 
+                
+                The mapping between the bit positions & the level of trace is 
+                as follows: 
+                        0 - Init and Shutdown Traces
+                        1 - Management Traces
+                        2 - Data Path Traces
+                        3 - Control Plane Traces
+                        4 - Packet Dump Traces
+                        5 - Traces related to All Resources except Buffers
+                        6 - All Failure Traces
+                        7 - Buffer Traces
+
+                The remaining bits are unused. Combination of levels are 
+                also allowed.
+
+                For example if the bits 0 and 1 are set, then the Trace
+                statements related to Init-Shutdown and management 
+                will be printed.
+
+                The user has to enter the corresponding INTEGER VALUE for the
+                bits set. For example if bits 0 and 1 are set then user has to 
+                set the value 3."
+        DEFVAL  { 0 }
+        ::= { fsLaSystem 3 } 
+
+   fsLaMaxPortsPerPortChannel OBJECT-TYPE
+           SYNTAX      Integer32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+                   "This Object specifies the maximun number of
+                    ports that can attach to a port-channel"
+           ::= { fsLaSystem 4 }
+
+    fsLaMaxPortChannels  OBJECT-TYPE
+          SYNTAX      Integer32
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                  "This Object specifies the maximum number of
+                  Port-channels Present in the system"
+          ::= { fsLaSystem 5 }
+
+
+      fsLaOperStatus OBJECT-TYPE
+           SYNTAX      INTEGER { enabled(1), disabled(2) }
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "This read only objects gives actual status of the Link 
+                Aggregation Module (Operational status of module). When
+                Module is enabled Link Aggregation protocol starts 
+                functioning. When the module is disabled all the dynamically
+                allocated memory will be freed and Link Aggregation protocol
+                stops functioning."
+          ::= { fsLaSystem 6 }
+
+
+      fsLaActorSystemID    OBJECT-TYPE
+                SYNTAX       MacAddress
+                MAX-ACCESS   read-write
+                STATUS       current
+                DESCRIPTION
+              	  "A 6-octet read-write MAC address value used as a unique
+                identifier for the System."
+         ::= { fsLaSystem 7 }
+
+      fsLaNoPartnerIndep OBJECT-TYPE
+           SYNTAX      INTEGER { enabled(1), disabled(2) }
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+               "When enabled, and if there is no remote partner information 
+                available in the system then the port-channel becomes
+                operationally down and the member ports of the port-channel
+                operate as independent ports and these ports are visible to 
+                higher layers.When disabled and if there is no remote partner
+                information available in the system then the port-channel
+                becomes operationally up based on the default values assigned
+                for the partner and the member ports of the port-channel 
+                becomes operationally up and will not be visible to higher
+                layers."
+        DEFVAL  { 2 }
+           ::= { fsLaSystem 8 }
+
+      fsLaDLAGSystemStatus OBJECT-TYPE
+           SYNTAX      INTEGER { enabled(1), disabled(2) }
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+               "This object if enabled, will enable Active-Active DLAG in  
+                the system."
+
+        DEFVAL  { 2 }
+           ::= { fsLaSystem 9 }
+
+    fsLaDLAGSystemID OBJECT-TYPE
+          SYNTAX       MacAddress
+          MAX-ACCESS   read-write
+          STATUS       current
+          DESCRIPTION
+               "This object is used to configure the global common System Identifier in
+               D-LAG (Active-Active) nodes to be used for communicating with the
+               peer node when global D-LAG System status is enabled.
+
+               Since all the D-LAG nodes use this common D-LAG System Identifier to
+               communicate with the peer node, for peer node it looks like
+               it has established a LAG with a single peer node though the
+               LAG is shared across multiple D-LAG nodes.
+
+               Configuring this object is not allowed when global D-LAG status
+               is enabled. To configure this object first
+               global D-LAG status should be set to disabled.
+
+               This will be applied to all port-channels when global D-LAG is
+               enabled."
+
+            ::= { fsLaSystem 10 }
+
+     fsLaDLAGSystemPriority OBJECT-TYPE
+          SYNTAX      Integer32 (0..65535)
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+               "This object is used for configuring global common System Priority in
+               D-LAG (Active-Active) nodes to be used for communicating with
+               the peer node when global D-LAG System status is enabled.
+
+               Since all the D-LAG nodes use this common D-LAG System Priority
+               to communicate with the peer node, for peer node it looks like
+               it has established a LAG with a single peer node though the
+               LAG is shared across multiple D-LAG nodes.
+
+               Configuring this object is not allowed when global D-LAG status
+               is enabled. To configure this object first global
+               D-LAG status should be set to disabled.
+
+               This will be applied to all port-channels when global D-LAG is
+               enabled."
+
+          DEFVAL  { 32768 }
+          ::= { fsLaSystem 11 }
+
+      fsLaDLAGPeriodicSyncTime OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..90)
+          UNITS       "seconds"
+          MAX-ACCESS read-write
+          STATUS     current
+          DESCRIPTION
+               "This object is used to configure the D-LAG periodic sync timer
+               used in Active-Active Distributed Link Aggregation.
+               Periodic sync timer is used to configure the transmission
+               interval of D-LAG periodic-sync PDUs. Periodic-sync timer
+               will be running individually in each D-LAG node.
+
+               If this object is configured with a value of '0', then no
+               periodic-sync messages will be sent from that D-LAG node.
+
+               The configured value of this timer is applicable only
+               from the next start/re-start of the timer.
+                
+               In master node this timer is used for expiring the slave
+               node information and also for sending periodic update
+               message to all slaves.
+
+               Inconsistency may be observed(node addition & removal) 
+               if master & slave periodic time differs by a long value.
+
+               The periodic sync timer has a period from 0 to 90 seconds,
+               configurable in units of seconds.
+               Default periodic sync timer value is 2 seconds."
+
+          DEFVAL { 2 }
+          ::= {fsLaSystem 12 }
+
+    fsLaDLAGRolePlayed OBJECT-TYPE
+          SYNTAX      INTEGER { none(0), master(1), slave(2)}
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+               "This object is used to hold the current role played by the device
+               participating in Active-Active Distributed LAG.
+
+               If role played by node is master all the port-channel will act as 
+               master and do the consolidation of neighbor nodes port channel ports.
+
+               Periodic sync, event update messages are not sent by master but by slaves.
+
+               Periodic update & add delete PDU's are sent only by master 
+               and processed by slaves.              
+                                              
+               Role Played by device can be
+                     none(0)           - Current role played by the device is none 
+                                         when not configured. 
+                     master(1)         - Current role played by the device is master.
+
+                     slave (2)         - Current role played by the device is slave."
+
+          ::= {fsLaSystem 13 }      
+
+    fsLaDLAGDistributingPortIndex OBJECT-TYPE
+          SYNTAX      InterfaceIndexOrZero
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+               "This object is used to configure the distributing
+               port on which D-LAG periodic-sync and D-LAG event-update
+               messages will be sent/received for Active-Active D-LAG internal
+               communication between the Active D-LAG nodes.
+
+               Ports which are already part of port channel should not be
+               configured as distributing port."
+            
+        ::= {fsLaSystem 14 }
+
+    fsLaDLAGDistributingPortList OBJECT-TYPE
+          SYNTAX      PortList
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+               "This object is used to configure the distributing
+               port list on which D-LAG periodic-sync and
+               D-LAG event-update messages will be sent/received
+               for D-LAG internal communication between the D-LAG
+               nodes.
+
+               Ports which are already part of port channel should not be
+               added to distributing port list."
+
+          ::= { fsLaSystem 15 }
+
+      fsLaMCLAGSystemStatus OBJECT-TYPE
+           SYNTAX      INTEGER { enabled(1), disabled(2) }
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+                "This object specifies the admin status of Multi-Chassis LAG in 
+                the system. The admin status can be
+                enabled(1)  - Enables MC-LAG in the system
+                disabled(2) - Disables MC-LAG in the system"
+
+        DEFVAL  { disabled }
+           ::= { fsLaSystem 16 }
+
+    fsLaMCLAGSystemID OBJECT-TYPE
+          SYNTAX       MacAddress
+          MAX-ACCESS   read-write
+          STATUS       current
+          DESCRIPTION
+               "This object is used to configure the global common System Identifier in
+               MC-LAG (Active-Active) nodes to be used for communicating with the
+               peer node when global MC-LAG System status is enabled.
+
+               Since all the MC-LAG nodes use this common MC-LAG System Identifier to
+               communicate with the peer node, for peer node it looks like
+               it has established a LAG with a single peer node though the
+               LAG is shared across multiple MC-LAG nodes.
+
+               Configuring this object is not allowed when global MC-LAG status
+               is enabled. To configure this object first
+               global MC-LAG status should be set to disabled.
+
+               This will be applied to all port-channels when global MC-LAG is
+               enabled."
+
+          DEFVAL   { '000000000000'h }
+            ::= { fsLaSystem 17 }
+
+     fsLaMCLAGSystemPriority OBJECT-TYPE
+          SYNTAX      Integer32 (0..65535)
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+               "This object is used for configuring global common System Priority in
+               MC-LAG (Active-Active) nodes to be used for communicating with
+               the peer node when global MC-LAG System status is enabled.
+
+               Since all the MC-LAG nodes use this common MC-LAG System Priority
+               to communicate with the peer node, for peer node it looks like
+               it has established a LAG with a single peer node though the
+               LAG is shared across multiple MC-LAG nodes.
+
+               Configuring this object is not allowed when global MC-LAG status
+               is enabled. To configure this object first global
+               MC-LAG status should be set to disabled.
+
+               This will be applied to all port-channels when global MC-LAG is
+               enabled."
+
+          DEFVAL  { 32768 }
+          ::= { fsLaSystem 18 }
+
+      fsLaMCLAGPeriodicSyncTime OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..90)
+          UNITS       "seconds"
+          MAX-ACCESS read-write
+          STATUS     current
+          DESCRIPTION
+               "This object is used to configure the MC-LAG periodic sync timer
+               used in Active-Active Multi Chassis Link Aggregation.
+               Periodic sync timer is used to configure the transmission
+               interval of MC-LAG periodic-sync PDUs. Periodic-sync timer
+               will be running individually in each MC-LAG node.
+
+               If this object is configured with a value of '0', then no
+               periodic-sync messages will be sent from that MC-LAG node.
+
+               The configured value of this timer is applicable only
+               from the next start/re-start of the timer.
+
+               In master node this timer is used for expiring the slave
+               node information and also for sending periodic update
+               message to all slaves.
+
+               Inconsistency may be observed(node addition & removal)
+               if master & slave periodic time differs by a long value.
+
+               The periodic sync timer has a period from 0 to 90 seconds,
+               configurable in units of seconds.
+               Default periodic sync timer value is 2 seconds."
+
+          DEFVAL { 2 }
+          ::= {fsLaSystem 19 }
+
+--
+-- Port Channel Table
+--
+
+fsLaPortChannelTable  OBJECT-TYPE
+        SYNTAX     SEQUENCE OF FsLaPortChannelEntry 
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+           "A Port-channel is created through ifMain table.
+           After the creation of the port-channel, corresponding logical
+           interface will be created in the ifMain table. 
+           This Port-channel table is indexed through Key values and allows to 
+           configure link selection policy and the Mac address for 
+           the port-channel. All other objects in this table displays 
+           the details of the port-channel"
+
+        ::= { fsLaPortChannel 1 }
+
+fsLaPortChannelEntry OBJECT-TYPE
+        SYNTAX     FsLaPortChannelEntry 
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+              "There is one entry in this table for each created
+               port-channel port"
+
+        INDEX { fsLaPortChannelIfIndex }
+        ::= { fsLaPortChannelTable 1 }
+
+FsLaPortChannelEntry ::= 
+            SEQUENCE {
+              fsLaPortChannelIfIndex                       InterfaceIndex,
+              fsLaPortChannelGroup                         LacpKey,
+              fsLaPortChannelAdminMacAddress               MacAddress,
+              fsLaPortChannelMacSelection                  INTEGER,
+              fsLaPortChannelMode                          PortLaMode,
+              fsLaPortChannelPortCount                     Integer32,
+              fsLaPortChannelActivePortCount               Integer32,
+              fsLaPortChannelSelectionPolicy               INTEGER,
+              fsLaPortChannelDefaultPortIndex              InterfaceIndexOrZero,
+              fsLaPortChannelMaxPorts                      Integer32, 
+              fsLaPortChannelSelectionPolicyBitList        Integer32,
+              fsLaPortChannelDLAGDistributingPortIndex     InterfaceIndexOrZero,
+              fsLaPortChannelDLAGSystemID                  MacAddress,
+              fsLaPortChannelDLAGSystemPriority            Integer32,
+              fsLaPortChannelDLAGPeriodicSyncTime          Unsigned32,
+              fsLaPortChannelDLAGMSSelectionWaitTime       Unsigned32,
+              fsLaPortChannelDLAGRolePlayed                INTEGER,
+              fsLaPortChannelDLAGStatus                    INTEGER,
+              fsLaPortChannelDLAGRedundancy                INTEGER,
+              fsLaPortChannelDLAGMaxKeepAliveCount         Integer32,
+              fsLaPortChannelDLAGPeriodicSyncPduTxCount    Counter32,
+              fsLaPortChannelDLAGPeriodicSyncPduRxCount    Counter32,
+              fsLaPortChannelDLAGEventUpdatePduTxCount     Counter32,
+              fsLaPortChannelDLAGEventUpdatePduRxCount     Counter32,
+              fsLaPortChannelDLAGElectedAsMasterCount      Counter32,
+              fsLaPortChannelDLAGElectedAsSlaveCount       Counter32,
+              fsLaPortChannelTrapTxCount                   Counter32,
+              fsLaPortChannelDLAGDistributingPortList      PortList,
+              fsLaPortChannelMCLAGStatus                   INTEGER,
+              fsLaPortChannelMCLAGSystemID                 MacAddress,
+              fsLaPortChannelMCLAGSystemPriority           Integer32,
+              fsLaPortChannelMCLAGPeriodicSyncTime         Unsigned32,
+              fsLaPortChannelMCLAGRolePlayed               INTEGER,
+              fsLaPortChannelMCLAGMaxKeepAliveCount        Integer32,
+              fsLaPortChannelMCLAGPeriodicSyncPduTxCount   Counter32,
+              fsLaPortChannelMCLAGPeriodicSyncPduRxCount   Counter32,
+              fsLaPortChannelMCLAGEventUpdatePduTxCount    Counter32,
+              fsLaPortChannelMCLAGEventUpdatePduRxCount    Counter32
+              }
+
+fsLaPortChannelIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+              "The ifIndex of the port-channel(Aggregator's 
+               interface index). "
+        ::= { fsLaPortChannelEntry 1 }
+
+fsLaPortChannelGroup OBJECT-TYPE
+        SYNTAX      LacpKey
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "An index that uniquely identifies an entry in this table. "
+        ::= { fsLaPortChannelEntry 2 }
+
+        
+fsLaPortChannelAdminMacAddress OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  read-write
+        STATUS      deprecated
+        DESCRIPTION
+              "This object is used for configuring MacAddress that is
+              to be used by the port-channel when fsLaPortChannelMacSelection
+              is force.
+              WARNING:The value configured should not conflict 
+              with the MAC address of system ports that are not configured
+              to select this port-channel."
+        ::= { fsLaPortChannelEntry 3 }
+
+fsLaPortChannelMacSelection OBJECT-TYPE
+        SYNTAX      INTEGER { dynamic(1), force(2) }
+        MAX-ACCESS  read-write
+        STATUS      deprecated
+        DESCRIPTION
+        "Indicates the MAC address selection method for
+         for the port-channel.
+         Dynamic - System will reserve certain MAC address
+                   for aggregators. These MAC address are
+                   derived from BaseMac. If this object is
+                   configured as dynamic, the system will
+                   allocate MAC address from this pool.
+         Force   - Port-channel MAC address configured through 
+                   fsLaPortChannelAdminMacAddress is used.
+         The value can be changed to Force only after configuring
+         a valid MAC address in fsLaPortChannelAdminMacAddress."
+        DEFVAL { 1 }
+        ::= { fsLaPortChannelEntry 4 }
+
+fsLaPortChannelMode OBJECT-TYPE
+       SYNTAX       PortLaMode
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+         "Current Operating Channel Mode of the port
+                     Lacp(1)    - forcing the port to negotiate with the
+                                  partner.
+                     manual(2)  - force the port to enable channeling (Manual).
+                     disable(3) - channeling is disabled."
+        ::= { fsLaPortChannelEntry 5 }
+         
+fsLaPortChannelPortCount OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+         "The number of ports actually configured to the port-channel"
+         ::= { fsLaPortChannelEntry 6 }
+
+fsLaPortChannelActivePortCount OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+         "This object will give the number of ports that are attached to the 
+         port-channel and actively carrying data traffic on the link."
+         ::= { fsLaPortChannelEntry 7 }
+
+fsLaPortChannelSelectionPolicy OBJECT-TYPE
+          SYNTAX  INTEGER {
+                      macSrc(1), 
+                      macDst(2),
+                      macSrcDst(3),
+                      ipSrc(4),
+                      ipDst(5),
+                      ipSrcDst(6),
+                      vlanId(7),
+                      isid(8),
+                      macSrcVid(9),
+                      macDstVid(10),
+                      macSrcDstVid(11),
+                      mplsVcLabel(12),
+                      mplsTunnelLabel(13),
+                      mplsVcTunnelLabel(14)
+                  }
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+            "Link selection policy to be used by the port-channel. 
+	    Selection policy isid implies selection based on Service-instance 
+	    and is applicable only in Provider BackBone bridge."
+          DEFVAL {macSrcDst}
+          ::= {fsLaPortChannelEntry 8}
+
+fsLaPortChannelDefaultPortIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndexOrZero
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+              "The ifIndex of the default port that gets attached to the
+              aggregator. A value of 0 means there is no default port for
+              this port-channel.
+               If this object is set to 0, it will remove the current default
+              port from the aggregator.
+               To change the default port of an aggregator, first reset the
+               object to 0 and then set the new ifIndex as default port."
+        DEFVAL  { 0 }
+        ::= { fsLaPortChannelEntry 9 }
+
+fsLaPortChannelMaxPorts OBJECT-TYPE
+        SYNTAX      Integer32 (1..8)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+              "This object specifies the maximun number of
+               ports that can attach to a port-channel."
+        DEFVAL  { 8 } 
+        ::= { fsLaPortChannelEntry 10 }
+
+fsLaPortChannelSelectionPolicyBitList  OBJECT-TYPE
+          SYNTAX      Integer32
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+               " This object is used to set the Link selection policy to be
+               used by the port-channel.
+               A FOUR BYTE integer is used for setting the selecting policy.
+               Each BIT in the four byte integer, represents a particular
+               selection policy.
+               The maping between the bit positions & the selection policy is
+               as follows:
+                      macSrc(0),     -- source MAC
+                      macDst(1),     -- destination MAC
+                      vlanId(2),     -- VLAN ID
+                      isid(3),       -- ISID
+                      mplsLabel0(4), -- MPLS Label 0 ( top label )
+                      mplsLabel1(5), -- MPLS Label 1 ( inner label 1)
+                      mplsLabel2(6), -- MPLS Label 2 ( inner label 2)
+                      ipSrc(7),      -- Source IP address
+                      ipDst(8),      -- Destination IP address
+                      ip6Src(9),     -- Source IPv6 address
+                      ip6Dst(10),    -- Destination IPv6 address
+                      l3Protocol(11),-- Layer 3 protocol specified in IP header
+                      l4SrcPort(12), -- Layer 4 source port specified in L4 header ( tcp/udp port )
+                      l4DstPort (13) -- Layer 4 destination port specified in L4 header ( tcp/udp port )
+
+                The remaining bits are unused. Selection of multiple bits 
+                implies selection of corresponding attributes in the 
+                packet header for configuring the port-channel selection policy.
+
+                For example if the bits 0 and 1 are set, then the selection
+                policy is based on source mac and destination mac.
+
+                This object would return failure if the selected bitlist is not supported in the 
+                system(hardware)"
+          ::= {fsLaPortChannelEntry 11}
+
+fsLaPortChannelDLAGDistributingPortIndex OBJECT-TYPE
+          SYNTAX      InterfaceIndexOrZero
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+               "This object is used to configure the distributing
+               port on which D-LAG periodic-sync and
+               D-LAG event-update messages will be sent/received
+               for D-LAG internal communication between the D-LAG
+               nodes.
+
+               Ports which are already part of Port channel should not be
+               configured as Distributing port.
+
+               D-LAG node should immediately detect and handle distributing port
+               failure with high priority and allow load to be carried on the all
+               the configured ports."
+
+          ::= { fsLaPortChannelEntry 12 }
+
+fsLaPortChannelDLAGSystemID OBJECT-TYPE
+          SYNTAX       MacAddress
+          MAX-ACCESS   read-write
+          STATUS       current
+          DESCRIPTION
+               "This object is used to configure the common System ID in
+               D-LAG nodes to be used for communicating with the peer node
+               when D-LAG status is enabled.
+
+               Since all the D-LAG nodes use this common D-LAG system ID to
+               communicate with the peer node, for peer node it looks like
+               it has established a LAG with a single peer node though the
+               LAG is shared across multiple D-LAG nodes.
+
+               Configuring this object is not allowed when D-LAG status
+               is enabled. To configure this object first
+               D-LAG status should be set to disabled.
+
+               Disabling D-LAG/port-channel will not delete/reset the configured
+               value for this object.
+               
+               This object uniquely identifies a D-LAG node and used in
+               master-slave-selection process when redundancy feature is
+               enabled in a D-LAG node to elect master/slave."
+
+    ::= { fsLaPortChannelEntry 13 }
+
+
+fsLaPortChannelDLAGSystemPriority OBJECT-TYPE
+          SYNTAX      Integer32 (0..65535)
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+               "This object is used for configuring common system priority in
+               D-LAG nodes to be used for communicating with the peer node when
+               D-LAG status is enabled.
+
+               Since all the D-LAG nodes use this common D-LAG system priority
+               to communicate with the peer node, for peer node it looks like
+               it has established a LAG with a single peer node though the
+               LAG is shared across multiple D-LAG nodes.
+
+               Configuring this object is not allowed when D-LAG status
+               is enabled. To configure this object first
+               D-LAG status should be set to disabled.
+
+               Disabling D-LAG/port-channel will not delete/reset the configured
+               value for this object.
+
+               Value of this object is used in master-slave-selection process
+               when redundancy feature is enabled in a D-LAG node to elect
+               master/slave."
+               
+          DEFVAL  { 32768 } 
+          ::= { fsLaPortChannelEntry 14 }
+
+
+fsLaPortChannelDLAGPeriodicSyncTime OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..90000)
+          UNITS       "milliseconds"
+          MAX-ACCESS read-write
+          STATUS     current
+          DESCRIPTION
+               "This object is used to configure the D-LAG periodic sync timer
+               used in Distributed Link Aggregation.
+               Periodic sync timer is used to configure the transmission
+               interval of D-LAG periodic-sync PDUs. Periodic-sync timer
+               will be running individually in each D-LAG node.
+
+               if this object is configured with a value of '0', then no
+               periodic-sync messages will be sent from that D-LAG node.
+
+ 
+               The configured value of this timer is applicable only
+               from the next start/re-start of the timer.
+
+               Value of this object should be same in all D-LAG nodes,
+               Configuring this object to different values across the
+               D-LAG nodes of the same D-LAG may result in deletion of 
+               maintained neighbor node information because of keep alive
+               mechanism and when D-LAG redundancy feature is enabled
+               then repeated toggling of role played by D-LAG nodes may
+               be observed.
+               
+               The periodic sync timer has a period from 0 to 90 seconds,
+               configurable in units of 1 ms. For example, to configure
+               periodic sync timer as 6 seconds, configure the value as
+               6000. Default periodic sync timer value is 1 second."
+          DEFVAL { 1000 }
+          ::={fsLaPortChannelEntry 15 }
+
+fsLaPortChannelDLAGMSSelectionWaitTime OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..90000)
+          UNITS       "milliseconds"
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+               "This object is used to configure the period for the 
+               master slave selection wait timer used in Distributed
+               Link Aggregation.
+
+               This object is applicable, only if D-LAG status 
+               and D-LAG redundancy feature is enabled.
+               Configuring this object when D-LAG staus and D-LAG redundancy
+               feature is disabled will not have any effect on functionality,
+               instead the value will be stored and the stored value will be
+               used next time when D-LAG the redundancy feature and D-LAG
+               status is enabled.
+
+               The master slave selection wait timer will be
+               started in D-LAG node to synchronize the
+               LAG information from the other D-LAG nodes when
+               Master-slave-selection process is initiated in a D-LAG node,
+               and on expiry of this timer master-slave-selection algorithm
+               will be applied.
+
+               The configured value of this timer is applicable only
+               from the next start/re-start of the timer.
+               
+               The master slave selection wait timer has a period
+               from 0 to 90 seconds, configurable in units of 1 ms.
+               For example, to configure master slave selection wait
+               timer as 6 seconds, configure the value as
+               6000. Default master slave selection wait timer value
+               is 0 milliseconds."
+
+          DEFVAL { 0 }
+          ::={fsLaPortChannelEntry 16 }
+
+fsLaPortChannelDLAGRolePlayed OBJECT-TYPE
+          SYNTAX      INTEGER { none(0), master(1), slave(2), backupmaster(3) }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+               "This object is used to hold the current role played by the device
+               participating in Distributed LAG.
+
+               This object is applicable, only if D-LAG status and D-LAG
+               redundancy feature is enabled.
+
+               This object will have the value 'master' when Master-Slave-selection
+               process is under progress (i.e. All the devices participating in
+               D-LAG Master-Slave-selection process will initially set this object
+               to value 'master') and after completion of Master-Slave-selection process,
+               role decided in the selection process for this device will be set to
+               this object.
+
+               Role Played by device can be
+                     none(0)           - Current role played by the device will be set
+                                         to none when redundancy feature is disabled.
+                     master(1)         - Current role played by the device is master.
+                     slave (2)         - Current role played by the device is slave.
+                     backupmaster(3)   - Current role played by the device will be set 
+                                         to backup master when redundancy feature is disabled."
+
+          ::={fsLaPortChannelEntry 17 }
+
+fsLaPortChannelDLAGStatus OBJECT-TYPE
+          SYNTAX      INTEGER { enabled(1), disabled(2) }
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+               "This object is used to enable or disable the D-LAG
+               functionality.
+
+               This object can be modified irrespective of whether
+               corresponding port-channel is enabled/disabled.
+
+               Configuring D-LAG status to enabled will only enable
+               load sharing functionality in D-LAG nodes.
+
+               Disabling a port-channel will not change/reset the
+               value of this object but configuring this object to
+               disabled will disable the D-LAG load sharing
+               functionality in that D-LAG node.
+
+               Configuring this object to enabled will not be allowed
+               if any of the below mentioned mandatory parameters for
+               D-LAG are not configured.
+                        1. fsLaPortChannelDLAGSystemID
+                        2. fsLaPortChannelDLAGDistributingPortIndex
+                         or fsLaPortChannelDLAGDistributingPortList
+
+               Configuring this object to disabled will not delete 
+               the above mentioned D-LAG mandatory parameters, Instead
+               same configured values will be used when the D-LAG status
+               is enabled again.
+
+               Default value for this object is disabled."
+               
+          DEFVAL { disabled }
+          ::= { fsLaPortChannelEntry 18 }
+
+fsLaPortChannelDLAGRedundancy OBJECT-TYPE
+          SYNTAX      INTEGER { on(1), off(2) }
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+               "This object is used to enable/disable the redundancy feature
+               in D-LAG node.
+
+               When D-LAG redundancy feature is enabled, master-slave-selection
+               algorithm can be used to select master/slave/backup-master.
+
+               D-LAG redundancy configuration must be uniform across all the 
+               D-LAG nodes. i.e. if D-LAG redundancy feature is enabled (on) in
+               one node then it should be enabled (on) in all the nodes that are
+               part of the same D-LAG. Configuring this object to different
+               values across the D-LAG nodes of the same D-LAG may result in
+               improper working of D-LAG redundancy feature.
+               
+               Default value for this object is off."
+               
+          DEFVAL { off }
+          ::= { fsLaPortChannelEntry 19 }
+
+fsLaPortChannelDLAGMaxKeepAliveCount OBJECT-TYPE
+          SYNTAX       Integer32 (0..5)
+          MAX-ACCESS   read-only
+          STATUS       current
+          DESCRIPTION
+               "This read-only mib object is used to provide keep alive
+               mechanism when D-LAG status is enabled.
+               Each D-LAG node will have a Max Keep alive count and each D-LAG
+               node maintains seperate keep alive counts for all other remote
+               D-LAG nodes. 
+               keep alive count of all remote D-LAG nodes will be incremented
+               every time periodic-sync timer expires but reset to zero for a
+               particular D-LAG node only on receiving periodic-sync/
+               event-update message from that particular remote D-LAG node.
+               if keep alive count of any of the Remote D-LAG node reaches
+               the max keep alive count, then that Remote D-LAG node will be
+               declared as operationally down/dead.
+
+               If this object is configured to value '0', then Keep-alive
+               mechanism will be disabled in that D-LAG node."
+          DEFVAL { 3 }
+          ::= { fsLaPortChannelEntry 20 }
+
+fsLaPortChannelDLAGPeriodicSyncPduTxCount OBJECT-TYPE
+          SYNTAX       Counter32
+          MAX-ACCESS   read-only
+          STATUS       current
+          DESCRIPTION
+               "This object is used when Distributing feature is enabled in a
+               node to hold the number of periodic-sync PDUs sent on the
+               distributing port."
+          ::= { fsLaPortChannelEntry 21 }
+ 
+fsLaPortChannelDLAGPeriodicSyncPduRxCount OBJECT-TYPE
+          SYNTAX       Counter32
+          MAX-ACCESS   read-only
+          STATUS       current
+          DESCRIPTION
+               "This object is used when Distributing feature is enabled in a
+               node to hold the number of periodic-sync PDUs received on the
+               distributing port."
+          ::= { fsLaPortChannelEntry 22 }
+
+fsLaPortChannelDLAGEventUpdatePduTxCount OBJECT-TYPE
+          SYNTAX       Counter32
+          MAX-ACCESS   read-only
+          STATUS       current
+          DESCRIPTION
+               "This object is used when Distributing feature is enabled in a
+               node to hold the number of event-update PDUs sent on the
+               distributing port."
+          ::={ fsLaPortChannelEntry 23 }
+
+fsLaPortChannelDLAGEventUpdatePduRxCount OBJECT-TYPE
+          SYNTAX       Counter32
+          MAX-ACCESS   read-only
+          STATUS       current
+          DESCRIPTION
+               "This object is used when Distributing feature is enabled in a
+               node to hold the number of event-update PDUs received on the
+               distributing port."
+          ::={ fsLaPortChannelEntry 24 }
+
+fsLaPortChannelDLAGElectedAsMasterCount OBJECT-TYPE
+          SYNTAX       Counter32
+          MAX-ACCESS   read-only
+          STATUS       current
+          DESCRIPTION
+               "This object is used when Distributing feature and redundancy
+               feature both are enabled in a D-LAG node to hold the number of
+               times the port-channel has been selected as master."
+          ::={fsLaPortChannelEntry 25 }
+
+
+fsLaPortChannelDLAGElectedAsSlaveCount OBJECT-TYPE
+          SYNTAX       Counter32
+          MAX-ACCESS   read-only
+          STATUS       current
+          DESCRIPTION
+               "This object is used when Distributing feature and redundancy
+               feature both are enabled in a D-LAG node to hold the number of
+               times the port-channel has been selected as slave."
+          ::={fsLaPortChannelEntry 26 }
+
+fsLaPortChannelTrapTxCount OBJECT-TYPE
+          SYNTAX       Counter32
+          MAX-ACCESS   read-only
+          STATUS       current
+          DESCRIPTION
+               "The number of trap messages sent from the port-channel."
+          ::={fsLaPortChannelEntry 27 }
+
+fsLaPortChannelDLAGDistributingPortList OBJECT-TYPE
+          SYNTAX      PortList
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+               "This object is used to configure the distributing
+               port list on which D-LAG periodic-sync and
+               D-LAG event-update messages will be sent/received
+               for D-LAG internal communication between the D-LAG
+               nodes.
+
+               Ports which are already part of Port channel should not be
+               added to Distributing port list.
+
+               D-LAG node should immediately detect and handle distributing port
+               failure with high priority and allow load to be carried on the all
+               the configured ports."
+
+          ::= { fsLaPortChannelEntry 28 }
+
+fsLaPortChannelMCLAGStatus OBJECT-TYPE
+          SYNTAX      INTEGER { enabled(1), disabled(2) }
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+               "This object is used to enable or disable the MC-LAG
+               functionality.
+
+               This object can be modified irrespective of whether
+               corresponding port-channel is enabled/disabled.
+
+               Configuring MC-LAG status to enabled will only enable
+               load sharing functionality in MC-LAG nodes.
+
+               Disabling a port-channel will not change/reset the
+               value of this object but configuring this object to
+               disabled will disable the MC-LAG load sharing
+               functionality in that MC-LAG node.
+
+               Configuring this object to enabled will not be allowed
+               if below mentioned mandatory parameters for
+               MC-LAG is not configured.
+                        1. fsLaPortChannelMCLAGSystemID
+
+               Configuring this object to disabled will not delete
+               the above mentioned MC-LAG mandatory parameters, Instead
+               same configured values will be used when the MC-LAG status
+               is enabled again.
+
+               Default value for this object is disabled."
+
+          DEFVAL { disabled }
+          ::= { fsLaPortChannelEntry 29 }
+
+fsLaPortChannelMCLAGSystemID OBJECT-TYPE
+          SYNTAX       MacAddress
+          MAX-ACCESS   read-write
+          STATUS       current
+          DESCRIPTION
+               "This object is used to configure the common System ID in
+               MC-LAG nodes to be used for communicating with the peer node
+               when MC-LAG status is enabled.
+
+               Since all the MC-LAG nodes use this common MC-LAG system ID to
+               communicate with the peer node, for peer node it looks like
+               it has established a LAG with a single peer node though the
+               LAG is shared across multiple MC-LAG nodes.
+
+               Configuring this object is not allowed when MC-LAG status
+               is enabled. To configure this object first
+               MC-LAG status should be set to disabled.
+
+               Disabling MC-LAG/port-channel will not delete/reset the configured
+               value for this object.
+
+               This object uniquely identifies a MC-LAG node and used in
+               master-slave-selection process when redundancy feature is
+               enabled in a MC-LAG node to elect master/slave."
+
+          DEFVAL   { '000000000000'h }
+    ::= { fsLaPortChannelEntry 30 }
+
+fsLaPortChannelMCLAGSystemPriority OBJECT-TYPE
+          SYNTAX      Integer32 (0..65535)
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+               "This object is used for configuring common system priority in
+               MC-LAG nodes to be used for communicating with the peer node when
+               MC-LAG status is enabled.
+
+               Since all the MC-LAG nodes use this common MC-LAG system priority
+               to communicate with the peer node, for peer node it looks like
+               it has established a LAG with a single peer node though the
+               LAG is shared across multiple MC-LAG nodes.
+
+               Configuring this object is not allowed when MC-LAG status
+               is enabled. To configure this object first
+               MC-LAG status should be set to disabled.
+
+               Disabling MC-LAG/port-channel will not delete/reset the configured
+               value for this object.
+
+               Value of this object is used in master-slave-selection process
+               when redundancy feature is enabled in a MC-LAG node to elect
+               master/slave."
+
+          DEFVAL  { 32768 }
+          ::= { fsLaPortChannelEntry 31 }
+
+fsLaPortChannelMCLAGPeriodicSyncTime OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..90000)
+          UNITS       "milliseconds"
+          MAX-ACCESS read-write
+          STATUS     current
+          DESCRIPTION
+               "This object is used to configure the MC-LAG periodic sync timer
+               used in Multi Chassis Link Aggregation.
+               Periodic sync timer is used to configure the transmission
+               interval of MC-LAG periodic-sync PDUs. Periodic-sync timer
+               will be running individually in each MC-LAG node.
+
+               if this object is configured with a value of '0', then no
+               periodic-sync messages will be sent from that MC-LAG node.
+
+
+               The configured value of this timer is applicable only
+               from the next start/re-start of the timer.
+
+               Value of this object should be same in all MC-LAG nodes,
+               Configuring this object to different values across the
+               MC-LAG nodes of the same MC-LAG may result in deletion of
+               maintained neighbor node information because of keep alive
+               mechanism and when MC-LAG redundancy feature is enabled
+               then repeated toggling of role played by MC-LAG nodes may
+               be observed.
+
+               The periodic sync timer has a period from 0 to 90 seconds,
+               configurable in units of 1 ms. For example, to configure
+               periodic sync timer as 6 seconds, configure the value as
+               6000. Default periodic sync timer value is 1 second."
+          DEFVAL { 1000 }
+          ::={fsLaPortChannelEntry 32 }
+
+fsLaPortChannelMCLAGRolePlayed OBJECT-TYPE
+          SYNTAX      INTEGER { none(0), master(1), slave(2) }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+               "This object is used to hold the current role played by the device
+               participating in MC-LAG.
+
+               This object is applicable, only if MC-LAG status and MC-LAG
+               redundancy feature is enabled.
+
+               This object will have the value 'master' when Master-Slave-selection
+               process is under progress (i.e. All the devices participating in
+               MC-LAG Master-Slave-selection process will initially set this object
+               to value 'master') and after completion of Master-Slave-selection process,
+               role decided in the selection process for this device will be set to
+               this object.
+
+               Role Played by device can be
+                     none(0)           - Current role played by the device will be set
+                                         to none when redundancy feature is disabled.
+                     master(1)         - Current role played by the device is master.
+                     slave (2)         - Current role played by the device is slave."
+
+          ::={fsLaPortChannelEntry 33 }
+
+fsLaPortChannelMCLAGMaxKeepAliveCount OBJECT-TYPE
+          SYNTAX       Integer32 (0..5)
+          MAX-ACCESS   read-only
+          STATUS       current
+          DESCRIPTION
+               "This read-only mib object is used to provide keep alive
+               mechanism when MC-LAG status is enabled.
+               Each MC-LAG node will have a Max Keep alive count and each MC-LAG
+               node maintains seperate keep alive counts for all other remote
+               MC-LAG nodes.
+               keep alive count of all remote MC-LAG nodes will be incremented
+               every time periodic-sync timer expires but reset to zero for a
+               particular MC-LAG node only on receiving periodic-sync/
+               event-update message from that particular remote MC-LAG node.
+               if keep alive count of any of the Remote MC-LAG node reaches
+               the max keep alive count, then that Remote MC-LAG node will be
+               declared as operationally down/dead.
+
+               If this object is configured to value '0', then Keep-alive
+               mechanism will be disabled in that MC-LAG node."
+          DEFVAL { 3 }
+          ::= { fsLaPortChannelEntry 34 }
+
+fsLaPortChannelMCLAGPeriodicSyncPduTxCount OBJECT-TYPE
+          SYNTAX       Counter32
+          MAX-ACCESS   read-only
+          STATUS       current
+          DESCRIPTION
+               "This object is used when MC-LAG feature is enabled in a
+               node to hold the number of periodic-sync PDUs sent on the
+               ICCL port."
+          ::= { fsLaPortChannelEntry 35 }
+
+fsLaPortChannelMCLAGPeriodicSyncPduRxCount OBJECT-TYPE
+          SYNTAX       Counter32
+          MAX-ACCESS   read-only
+          STATUS       current
+          DESCRIPTION
+               "This object is used when MC-LAG feature is enabled in a
+               node to hold the number of periodic-sync PDUs received on the
+               ICCL port."
+          ::= { fsLaPortChannelEntry 36 }
+
+fsLaPortChannelMCLAGEventUpdatePduTxCount OBJECT-TYPE
+          SYNTAX       Counter32
+          MAX-ACCESS   read-only
+          STATUS       current
+          DESCRIPTION
+               "This object is used when MC-LAG feature is enabled in a
+               node to hold the number of event-update PDUs sent on the
+               ICCL port."
+          ::={ fsLaPortChannelEntry 37 }
+
+fsLaPortChannelMCLAGEventUpdatePduRxCount OBJECT-TYPE
+          SYNTAX       Counter32
+          MAX-ACCESS   read-only
+          STATUS       current
+          DESCRIPTION
+               "This object is used when MC-LAG feature is enabled in a
+               node to hold the number of event-update PDUs received on the
+               ICCL port."
+          ::={ fsLaPortChannelEntry 38 }
+
+-- END OF LaPortChannel Table
+
+-- -------------------------------------------------------------
+-- The Fs Aggregation Port Group 
+-- -------------------------------------------------------------
+
+   fsLaPortTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF FsLaPortEntry
+      MAX-ACCESS         not-accessible
+      STATUS             current
+      DESCRIPTION
+         "A table that contains objects to set the port lacp mode
+         of dot3adAggPortTable."
+      ::={fsLaPort 1 }
+
+   fsLaPortEntry OBJECT-TYPE
+      SYNTAX      FsLaPortEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "Each entry in this table is for each physical port that participates 
+         in Link Aggregation which can be either aggregatable or individual.
+         This table is indexed by the PortIndex."
+      INDEX {fsLaPortIndex }
+      ::={fsLaPortTable 1 }
+
+   FsLaPortEntry ::=
+      SEQUENCE {
+         fsLaPortIndex                           InterfaceIndex,
+         fsLaPortMode                            PortLaMode,
+         fsLaPortBundleState                     INTEGER,
+         fsLaPortActorResetAdminState            LacpState,
+         fsLaPortAggregateWaitTime               TimeTicks,
+         fsLaPortPartnerResetAdminState          LacpState,
+         fsLaPortActorAdminPort                  Integer32,
+         fsLaPortRestoreMtu                      Integer32,
+         fsLaPortSelectAggregator                INTEGER
+        }
+
+   fsLaPortIndex OBJECT-TYPE
+      SYNTAX     InterfaceIndex
+      MAX-ACCESS not-accessible
+      STATUS     current
+      DESCRIPTION
+         "The ifIndex of the port"
+      ::={fsLaPortEntry 1 }
+      
+   fsLaPortMode OBJECT-TYPE
+      SYNTAX      PortLaMode
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+       "This object is used to enable LACP , disable LACP or manually
+       aggregate a port"
+      ::={fsLaPortEntry 2 }
+
+      
+   fsLaPortBundleState OBJECT-TYPE
+      SYNTAX  INTEGER {
+                      upInBndl(0),
+                      standby(1),
+                      down(2),
+                      upIndividual(3)
+      }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION 
+      "This read-only object is used to display the port state in aggregation
+         upInBndl(0)      - The port is operationally up and actively 
+                            takes part in aggregation.
+         standby(1)       - The port is capable of joining in
+                            aggregation group, when any of the ports in  
+                            aggregation group goes down.
+         down(2)          - The port is operationally down in lower layers.
+                            or the port is operational in lower layers
+                            but temporarily not able to participate
+                            in aggregation because of different partner
+                            information in the same group.
+         upIndividual(3)  - The port is operating individually and
+                            is not taking part in aggregation."
+      ::={fsLaPortEntry 3}
+
+    fsLaPortActorResetAdminState OBJECT-TYPE
+      SYNTAX     LacpState
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+      "A string of 8 bits,corresponding to the administrative values
+      of Actor_State as transmitted by the Actor in LACPDUs.
+      The first bit corresponds to bit 0 of Actor_State (LACP_Activity),
+      the second bit corresponds to bit 1 (LACP_Timeout),the third bit
+      corresponds to bit 2 (Aggregation),the fourth bit corresponds to
+      bit 3 (Synchronization),the fifth bit corresponds to bit 4
+      (Collecting),the sixth bit corresponds to bit 5 (Distributing),
+      the seventh bit corresponds to bit 6 (Defaulted),and the eighth
+      bit corresponds to bit 7 (Expired).
+      This object allows the RESET of the values of Actor LACP_Activity, 
+      LACP_Timeout and Aggregation.
+      Get operation on this object always returns zero.
+      To get the current Port State of the Actor, use
+      dot3adAggPortActorAdminState mib."
+      ::={fsLaPortEntry 4 }
+
+
+    fsLaPortAggregateWaitTime OBJECT-TYPE
+      SYNTAX     TimeTicks
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+            "Duration of the port to attach to the PortChannel."
+      DEFVAL { 2 }
+      ::={fsLaPortEntry 5 }
+
+    fsLaPortPartnerResetAdminState OBJECT-TYPE
+      SYNTAX     LacpState
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+      "A string of 8 bits,corresponding to the administrative values
+      of Partner_State.The first bit corresponds to bit 0 of Partner_State
+	   (LACP_Activity),the second bit corresponds to bit 1 (LACP_Timeout),
+	   the third bit corresponds to bit 2 (Aggregation),the fourth bit 
+	   corresponds to bit 3 (Synchronization),the fifth bit corresponds to
+	   bit 4 (Collecting),the sixth bit corresponds to bit 5 (Distributing),
+      the seventh bit corresponds to bit 6 (Defaulted),and the eighth
+      bit corresponds to bit 7 (Expired).
+      This object allows the RESET of the values of Partner LACP_Activity, 
+      LACP_Timeout and Aggregation.
+      Get operation on this object returns zeros for  
+      the Partner administrative values"
+      ::={fsLaPortEntry 6 }
+
+    fsLaPortActorAdminPort OBJECT-TYPE
+      SYNTAX     Integer32 (1..65535)
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+            "The port number used as dot3adAggPortActorPort and is 
+             communicated in LACPDUs as the Actor_Port."
+      ::={fsLaPortEntry 7 }
+
+    fsLaPortRestoreMtu OBJECT-TYPE
+      SYNTAX     Integer32 
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+            "The Restore mtu stores the original MTU of the port 
+             before getting aggregated to port channel.
+             A SET on the MIB object is not allowed for SNMP users.
+             This operation is allowed only during config-save-restore 
+             operation , during system initialization."
+
+      ::={fsLaPortEntry 8 }
+
+    fsLaPortSelectAggregator OBJECT-TYPE
+      SYNTAX  INTEGER {
+                      static(0),
+                      dynamic(1)
+      }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION 
+      "This read-only object is used to display whether the port participates
+      in dynamic aggregator selection. The default will be static aggregation
+      selection.
+         static(0)      - The port is involved only in static aggregation.
+                          i.e. the port can be a member of only the aggregation
+                          to which it is configured.
+         dynamic(1)     - The port participates in dynamic aggregation
+                          selection. i.e. the port will be a part of best
+                          aggregation selected based on System id and Admin key.
+       This object is set to 'dynamic' once the port is configured as a default
+       port of a port channel."
+      ::={fsLaPortEntry 9}
+
+
+-- END OF LAPort Table
+
+-- -------------------------------------------------------------
+-- The Trap objects Group 
+-- -------------------------------------------------------------
+
+fsLaHwFailTrapObjectsTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF FsLaHwFailTrapObjectsEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+       " This table is used to store the notification information
+         occurred "
+   ::= { fsLaTrapObjects 1 }
+
+fsLaHwFailTrapObjectsEntry OBJECT-TYPE
+   SYNTAX      FsLaHwFailTrapObjectsEntry 
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " This entry is used to store the notification information"
+   INDEX { fsLaTrapPortChannelIndex, fsLaTrapPortIndex}
+   ::= { fsLaHwFailTrapObjectsTable 1 }
+
+FsLaHwFailTrapObjectsEntry ::=
+        SEQUENCE {
+               fsLaTrapPortChannelIndex InterfaceIndex,
+               fsLaTrapPortIndex InterfaceIndexOrZero,
+               fsLaHwFailTrapType  INTEGER
+        }
+
+ fsLaTrapPortChannelIndex OBJECT-TYPE
+   SYNTAX      InterfaceIndex
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The ifIndex of the port-channel for which the failure has occured."
+   ::= { fsLaHwFailTrapObjectsEntry 1 }
+
+ fsLaTrapPortIndex OBJECT-TYPE
+   SYNTAX      InterfaceIndexOrZero
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The ifIndex of the port for which the failure has occured.
+       A value of 0 means the failure is not port-specific."
+   ::= { fsLaHwFailTrapObjectsEntry 2 }
+
+ fsLaHwFailTrapType OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  createAgg(0),
+                  addLinkToAgg(1),
+                  deleteAgg(2),
+                  removeLinkFromAgg(3),
+                  setSelectionPolicy(4),
+                  enableCollection(5),
+                  disableCollection(6),
+                  enableDistribution(7)
+                  }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The hardware error type."
+   ::= { fsLaHwFailTrapObjectsEntry 3 }
+
+
+-- -------------------------------------------------------------
+-- The Trap Notifications 
+-- -------------------------------------------------------------
+
+ fsLaTraps OBJECT IDENTIFIER ::= {fsFutureLaTraps 0}
+
+ fsLaHwFailureTrap NOTIFICATION-TYPE
+        OBJECTS {
+           fsLaHwFailTrapType
+                }
+        STATUS             current
+        DESCRIPTION
+        "Generated when any of the fsLaHwFailTrapType event occurs"
+   ::= { fsLaTraps 1 }
+
+------------------------------------------------------------
+-- D-LAG Trap table
+------------------------------------------------------------
+
+fsLaDLAGTrapObjectsTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF FsLaDLAGTrapObjectsEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+       "This table is used to store the notification information
+         occurred for the Distributed Link Aggregation."
+   ::= { fsLaTrapObjects 2 }
+
+fsLaDLAGTrapObjectsEntry OBJECT-TYPE
+   SYNTAX      FsLaDLAGTrapObjectsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "This entry is used to store the notification information."
+   INDEX { fsLaDLAGTrapPortChannelIndex }
+   ::= { fsLaDLAGTrapObjectsTable 1 }
+
+FsLaDLAGTrapObjectsEntry ::=
+        SEQUENCE {
+               fsLaDLAGTrapPortChannelIndex InterfaceIndex,
+               fsLaDLAGTrapType  INTEGER
+        }
+
+fsLaDLAGTrapPortChannelIndex OBJECT-TYPE
+   SYNTAX      InterfaceIndex
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The port-channel interface index of the node which is
+       role change event has occurred because of the
+       master-slave-re-selection process.
+       The role change can be either from master to slave
+       or from slave to master."
+   ::= { fsLaDLAGTrapObjectsEntry 1 }
+
+fsLaDLAGTrapType OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  mastertobackupmaster (0),
+                  backupmastertomaster (1),
+                  slavetobackupmaster (2),
+                  backupmastertoslave (3),
+                  mastertoslave (4),
+                  slavetomaster (5)
+                  }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Traps generated in the master-slave selection/ master-slave-reselection process
+        Trap Type can be
+       mastertobackupmaster  : When the role played by the device changes
+                                  from master to backup-master.
+       backupmastertomaster  : When the role played by the device changes
+                                  from backup-master to master.
+       slavetobackupmaster   : When the role played by the device changes
+                                  from slave to backup-master.
+       backupmastertoslave   : When the role played by the device changes
+                                  from backup-master to slave.
+       mastertoslave         : When the role played by the device changes
+                                  from master to slave.
+       slavetomaster         : When the role played by the device changes
+                                  from slave to master."
+   ::= { fsLaDLAGTrapObjectsEntry 2 }
+
+-- -------------------------------------------------------------
+-- The D-LAG Trap Notifications
+-- -------------------------------------------------------------
+
+ fsLaDLAGTrap NOTIFICATION-TYPE
+        OBJECTS {
+           fsLaDLAGTrapType
+                }
+        STATUS             current
+        DESCRIPTION
+        "Generated when any of the fsLaDLAGTrapType event occurs."
+   ::= { fsLaTraps 2 }
+
+---------------------------------------------------------------
+-- The Remote Fs Aggregation Port Channel Table
+-- -------------------------------------------------------------
+
+fsLaDLAGRemotePortChannelTable OBJECT-TYPE
+          SYNTAX SEQUENCE OF FsLaDLAGRemotePortChannelEntry
+          MAX-ACCESS         not-accessible
+          STATUS             current
+          DESCRIPTION
+               "This table is used to access the stored details of
+               all remote port-channels that are part of same D-LAG.
+               This table is indexed by Port channel index and
+               remote port-channel unique system id.
+               All other objects in this table displays stored 
+               details of the remote port-channel."
+          ::= { fsLaDLAGRemotePortChannel 1 }
+
+fsLaDLAGRemotePortChannelEntry OBJECT-TYPE
+          SYNTAX      FsLaDLAGRemotePortChannelEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+               "There is one entry in this table for each remote port-channel
+               participating in Distributed LAG other than the self." 
+          INDEX { fsLaPortChannelIfIndex, fsLaDLAGRemotePortChannelSystemID }
+          ::= { fsLaDLAGRemotePortChannelTable 1 }
+
+FsLaDLAGRemotePortChannelEntry ::=
+          SEQUENCE {
+             fsLaDLAGRemotePortChannelSystemID           MacAddress,
+             fsLaDLAGRemotePortChannelSystemPriority     Integer32,
+             fsLaDLAGRemotePortChannelRolePlayed         INTEGER,
+             fsLaDLAGRemotePortChannelKeepAliveCount     Integer32, 
+             fsLaDLAGRemotePortChannelSpeed              Gauge32,
+             fsLaDLAGRemotePortChannelHighSpeed          Gauge32,
+             fsLaDLAGRemotePortChannelMtu                Integer32
+          }
+
+fsLaDLAGRemotePortChannelSystemID OBJECT-TYPE
+          SYNTAX       MacAddress
+          MAX-ACCESS   not-accessible
+          STATUS       current
+          DESCRIPTION
+               "This is used to read the stored 6-octet MAC address value
+               of each remote D-LAG node, which uniquely identifies the
+               remote D-LAG node."
+          ::= { fsLaDLAGRemotePortChannelEntry 1 }
+
+fsLaDLAGRemotePortChannelSystemPriority OBJECT-TYPE
+          SYNTAX       Integer32 (0..65535)
+          MAX-ACCESS   read-only
+          STATUS       current
+          DESCRIPTION
+               "This object is used to read the stored system priority of
+               each remote D-LAG node"
+          ::={fsLaDLAGRemotePortChannelEntry 2}
+
+fsLaDLAGRemotePortChannelRolePlayed OBJECT-TYPE
+          SYNTAX      INTEGER { none(0), master(1), slave(2), backupmaster(3) }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+               "This object is used to read the stored value of
+               current role played by each remote D-LAG node
+
+                Value of Role Played by the remote D-LAG node can be
+                     none (0)          - Current role played by the remote D-LAG node
+                                         is none.
+                     master (1)        - Current role played by the remote D-LAG node
+                                         is master.
+                     slave  (2)        - Current role played by the remote D-LAG node
+                                         is slave.
+                     backupmaster (3)  - Current role played by the remote D-LAG node
+                                         is backup-master."
+    ::={fsLaDLAGRemotePortChannelEntry 3}
+
+fsLaDLAGRemotePortChannelKeepAliveCount OBJECT-TYPE
+          SYNTAX       Integer32 
+          MAX-ACCESS   read-only
+          STATUS       current
+          DESCRIPTION
+               "This object represents the current keep alive count value of
+               running keep alive counter maintained for each remote D-LAG node.
+
+               This count will be incremented by value 1 for all the remote
+               D-LAG node entries on each periodic-sync timer expiry and will
+               be reset to zero for a particular remote D-LAG node entry on
+               receiving a periodic-sync/event-update message from that 
+               particular remote D-LAG node. 
+               If this count value for a remote D-LAG node becomes equal to
+               fsLaPortChannelDLAGMaxKeepAliveCount then that remote D-LAG node
+               will be considered as down/dead and corresponding entry will be
+               deleted from the remote port-channel info list."
+
+          ::={fsLaDLAGRemotePortChannelEntry 4 }
+
+fsLaDLAGRemotePortChannelSpeed OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the current speed of remote node port-channel, this 
+             can be refered in units of bits per second. If the speed of the particular
+             port channel is greater among all the port-channels, then the active 
+             links of this port-channel are considered for selecting best links. 
+
+             Speed is given first priority for selecting best port-channel.
+
+             For example 
+             speed is 1 Gbps for node 1 port-channel 1 
+             and 100 Mbps for node 2 port-channel 1
+             then node 1 port-channel 1 ports are selected as best links among 
+             all other port-channel links." 
+             
+          ::={fsLaDLAGRemotePortChannelEntry 5 }
+
+fsLaDLAGRemotePortChannelHighSpeed OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "This object represents the current speed of remote node port-channel, this
+             can be refered in units of 1,000,000 bits per second. If the speed of the particular
+             port channel is greater among all the port-channels, then the active
+             links of this port-channel are considered for selecting best links.
+
+             High speed is given second priority if speed exceeds the maximum
+             value.
+
+             For example
+             high speed is 10 Gbps for node 1 port-channel 1 
+             and 40 Gbps for node 2 port-channel 1
+             then node 2 port-channel 1  ports are selected as best links among
+             all other port-channel links." 
+
+          ::={fsLaDLAGRemotePortChannelEntry 6 }
+
+fsLaDLAGRemotePortChannelMtu    OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "This object represents the current MTU of remote port-channel
+             which is used for selecting best links in case of Active-Active
+             DLAG.
+
+             If the MTU of the particular port channel is greater among all the port-channels, 
+             then the active links of this port-channel are considered for selecting best links.
+
+             MTU is given third priority for selecting port-channel if speed
+             and high speed are same.
+
+             For example 
+             speed is 4296 Mbps ,high speed is 10 Gbps for node 1 & node 2
+             port-channel 1 but MTU is greater for node 1 port-channel 1(1600)
+             with node 2 port-channel 1(1500) then node 1 port-channel 
+             ports are selected as best links among all other port-channel links."
+
+          ::={fsLaDLAGRemotePortChannelEntry 7 }
+
+----------------------------------------------------------------
+-- END OF Remote D-LAG Aggregation Port Channel Table
+-- -------------------------------------------------------------
+
+---------------------------------------------------------------
+-- The Remote D-LAG Aggregation Port Table
+-- -------------------------------------------------------------
+
+fsLaDLAGRemotePortTable OBJECT-TYPE
+          SYNTAX SEQUENCE OF FsLaDLAGRemotePortEntry
+          MAX-ACCESS         not-accessible
+          STATUS             current
+          DESCRIPTION
+               "This table is used to access the stored port list information
+               of each remote D-LAG node.
+               This table is indexed by combination of port-channel index,
+               remote port-channel unique system ID, and port indices configured
+               for that remote D-LAG node."
+
+          ::= { fsLaDLAGRemotePort 1 }
+
+fsLaDLAGRemotePortEntry OBJECT-TYPE
+          SYNTAX      FsLaDLAGRemotePortEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+               "There is one entry in this table for each port belonging
+                to the remote D-LAG node."
+          INDEX { fsLaPortChannelIfIndex, fsLaDLAGRemotePortChannelSystemID, fsLaDLAGRemotePortIndex }
+          ::= { fsLaDLAGRemotePortTable 1 }
+
+FsLaDLAGRemotePortEntry ::=
+          SEQUENCE {
+             fsLaDLAGRemotePortIndex                 InterfaceIndex,
+             fsLaDLAGRemotePortBundleState           INTEGER,
+             fsLaDLAGRemotePortSyncStatus            INTEGER,
+             fsLaDLAGRemotePortPriority              INTEGER
+          }
+
+fsLaDLAGRemotePortIndex OBJECT-TYPE
+          SYNTAX     InterfaceIndex
+          MAX-ACCESS not-accessible
+          STATUS     current
+          DESCRIPTION
+               "This object is used to get the ifIndex of each port
+               belonging to the remote D-LAG node."
+          ::={fsLaDLAGRemotePortEntry 1 }
+      
+fsLaDLAGRemotePortBundleState OBJECT-TYPE
+          SYNTAX  INTEGER {
+                      upInBndl(0),
+                      standby(1),
+                      down(2),
+                      upIndividual(3)
+          }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION 
+               "This read-only object is used to get the port bundle states of each port belonging
+               to the remote D-LAG node
+                     upInBndl(0)      - The port is operationally up and actively takes part in aggregation.
+                     standby(1)       - The port is capable of joining in aggregation group, when any of the ports in  
+                                        aggregation group goes down.
+                     down(2)          - The port is operationally down in lower layers.
+                                        or the port is operational in lower layers but temporarily not able
+                                        to participate in aggregation because of different partner
+                                        information in the same group.
+                     upIndividual(3)  - The port is operating individually and is not taking part in aggregation."
+          ::={fsLaDLAGRemotePortEntry 2}
+
+fsLaDLAGRemotePortSyncStatus OBJECT-TYPE
+          SYNTAX  INTEGER {
+                      inSync(1),
+                      outofSync(2)
+          }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION 
+               "This read-only object is used to get the current sync status 
+               of the each port belonging to the remote D-LAG node 
+                         inSync(1)     -  The port sync status is inSync. 
+                         outofSync(2)  -  The port sync status is out-of-sync."
+          ::={fsLaDLAGRemotePortEntry 3}
+
+
+fsLaDLAGRemotePortPriority OBJECT-TYPE
+          SYNTAX  Integer32 (0..65535)
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+               "This read-only object is used to get the current port priority
+               of the each port belonging to the remote D-LAG node."
+          ::={fsLaDLAGRemotePortEntry 4}
+
+
+-------------------------------------------------------
+-- END OF Remote D-LAG Aggregation Port Table
+------------------------------------------------------
+
+---------------------------------------------------------------
+-- The Remote Fs Aggregation Port Channel Table
+---------------------------------------------------------------
+
+fsLaMCLAGRemotePortChannelTable OBJECT-TYPE
+          SYNTAX SEQUENCE OF FsLaMCLAGRemotePortChannelEntry
+          MAX-ACCESS         not-accessible
+          STATUS             current
+          DESCRIPTION
+               "This table is used to access the stored details of
+               all remote port-channels that are part of same MC-LAG.
+               This table is indexed by Port channel index and
+               remote port-channel unique system id.
+               All other objects in this table displays stored
+               details of the remote port-channel."
+          ::= { fsLaMCLAGRemotePortChannel 1 }
+
+fsLaMCLAGRemotePortChannelEntry OBJECT-TYPE
+          SYNTAX      FsLaMCLAGRemotePortChannelEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+               "There is one entry in this table for each remote port-channel
+               participating in  MC-LAG other than the self."
+          INDEX { fsLaPortChannelIfIndex, fsLaMCLAGRemotePortChannelSystemID }
+          ::= { fsLaMCLAGRemotePortChannelTable 1 }
+
+FsLaMCLAGRemotePortChannelEntry ::=
+          SEQUENCE {
+             fsLaMCLAGRemotePortChannelSystemID           MacAddress,
+             fsLaMCLAGRemotePortChannelSystemPriority     Integer32,
+             fsLaMCLAGRemotePortChannelRolePlayed         INTEGER,
+             fsLaMCLAGRemotePortChannelKeepAliveCount     Integer32,
+             fsLaMCLAGRemotePortChannelSpeed              Gauge32,
+             fsLaMCLAGRemotePortChannelHighSpeed          Gauge32,
+             fsLaMCLAGRemotePortChannelMtu                Integer32
+          }
+
+fsLaMCLAGRemotePortChannelSystemID OBJECT-TYPE
+          SYNTAX       MacAddress
+          MAX-ACCESS   not-accessible
+          STATUS       current
+          DESCRIPTION
+               "This is used to read the stored 6-octet MAC address value
+               of each remote MC-LAG node, which uniquely identifies the
+               remote MC-LAG node."
+          ::= { fsLaMCLAGRemotePortChannelEntry 1 }
+
+fsLaMCLAGRemotePortChannelSystemPriority OBJECT-TYPE
+          SYNTAX       Integer32 (0..65535)
+          MAX-ACCESS   read-only
+          STATUS       current
+          DESCRIPTION
+               "This object is used to read the stored system priority of
+               each remote MC-LAG node"
+          ::={fsLaMCLAGRemotePortChannelEntry 2}
+
+fsLaMCLAGRemotePortChannelRolePlayed OBJECT-TYPE
+          SYNTAX      INTEGER { none(0), master(1), slave(2) }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+               "This object is used to read the stored value of
+               current role played by each remote MC-LAG node
+
+                Value of Role Played by the remote MC-LAG node can be
+                     none (0)          - Current role played by the remote MC-LAG node
+                                         is none.
+                     master (1)        - Current role played by the remote MC-LAG node
+                                         is master.
+                     slave  (2)        - Current role played by the remote MC-LAG node
+                                         is slave."
+    ::={fsLaMCLAGRemotePortChannelEntry 3}
+
+fsLaMCLAGRemotePortChannelKeepAliveCount OBJECT-TYPE
+          SYNTAX       Integer32
+          MAX-ACCESS   read-only
+          STATUS       current
+          DESCRIPTION
+               "This object represents the current keep alive count value of
+               running keep alive counter maintained for each remote MC-LAG node.
+
+               This count will be incremented by value 1 for all the remote
+               MC-LAG node entries on each periodic-sync timer expiry and will
+               be reset to zero for a particular remote MC-LAG node entry on
+               receiving a periodic-sync/event-update message from that
+               particular remote MC-LAG node.
+               If this count value for a remote MC-LAG node becomes equal to
+               fsLaPortChannelMCLAGMaxKeepAliveCount then that remote MC-LAG node
+               will be considered as down/dead and corresponding entry will be
+               deleted from the remote port-channel info list."
+
+          ::={fsLaMCLAGRemotePortChannelEntry 4 }
+
+fsLaMCLAGRemotePortChannelSpeed OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the current speed of remote node port-channel, this
+             can be refered in units of bits per second. If the speed of the particular
+             port channel is greater among all the port-channels, then the active
+             links of this port-channel are considered for selecting best links.
+
+             Speed is given first priority for selecting best port-channel.
+
+             For example
+             speed is 1 Gbps for node 1 port-channel 1
+             and 100 Mbps for node 2 port-channel 1
+             then node 1 port-channel 1 ports are selected as best links among
+             all other port-channel links."
+
+          ::={fsLaMCLAGRemotePortChannelEntry 5 }
+
+fsLaMCLAGRemotePortChannelHighSpeed OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "This object represents the current speed of remote node port-channel, this
+             can be refered in units of 1,000,000 bits per second. If the speed of the particular
+             port channel is greater among all the port-channels, then the active
+             links of this port-channel are considered for selecting best links.
+
+             High speed is given second priority if speed exceeds the maximum
+             value.
+
+             For example
+             high speed is 10 Gbps for node 1 port-channel 1
+             and 40 Gbps for node 2 port-channel 1
+             then node 2 port-channel 1  ports are selected as best links among
+             all other port-channel links."
+
+          ::={fsLaMCLAGRemotePortChannelEntry 6 }
+
+fsLaMCLAGRemotePortChannelMtu    OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "This object represents the current MTU of remote port-channel
+             which is used for selecting best links in case of Active-Active
+             MC-LAG.
+
+             If the MTU of the particular port channel is greater among all the port-channels,
+             then the active links of this port-channel are considered for selecting best links.
+
+             MTU is given third priority for selecting port-channel if speed
+             and high speed are same.
+
+             For example
+             speed is 4296 Mbps ,high speed is 10 Gbps for node 1 & node 2
+             port-channel 1 but MTU is greater for node 1 port-channel 1(1600)
+             with node 2 port-channel 1(1500) then node 1 port-channel
+             ports are selected as best links among all other port-channel links."
+
+          ::={fsLaMCLAGRemotePortChannelEntry 7 }
+
+
+----------------------------------------------------------------
+-- END OF Remote MC-LAG Aggregation Port Channel Table
+-- -------------------------------------------------------------
+
+---------------------------------------------------------------
+-- The Remote MC-LAG Aggregation Port Table
+-- -------------------------------------------------------------
+
+fsLaMCLAGRemotePortTable OBJECT-TYPE
+          SYNTAX SEQUENCE OF FsLaMCLAGRemotePortEntry
+          MAX-ACCESS         not-accessible
+          STATUS             current
+          DESCRIPTION
+              "This table is used to access the stored port list information
+               of each remote MC-LAG node.
+               This table is indexed by combination of port-channel index,
+               remote port-channel unique system ID, and port indices configured
+               for that remote MC-LAG node."
+
+          ::= { fsLaMCLAGRemotePort 1 }
+
+fsLaMCLAGRemotePortEntry OBJECT-TYPE
+          SYNTAX      FsLaMCLAGRemotePortEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+               "There is one entry in this table for each port belonging
+                to the remote MC-LAG node."
+          INDEX { fsLaPortChannelIfIndex, fsLaMCLAGRemotePortChannelSystemID, fsLaMCLAGRemotePortIndex }
+          ::= { fsLaMCLAGRemotePortTable 1 }
+
+FsLaMCLAGRemotePortEntry ::=
+          SEQUENCE {
+             fsLaMCLAGRemotePortIndex                 InterfaceIndex,
+             fsLaMCLAGRemotePortSlotIndex             Integer32,
+             fsLaMCLAGRemotePortBundleState           INTEGER,
+             fsLaMCLAGRemotePortSyncStatus            INTEGER,
+             fsLaMCLAGRemotePortPriority              Integer32
+          }
+
+fsLaMCLAGRemotePortIndex OBJECT-TYPE
+          SYNTAX     InterfaceIndex
+          MAX-ACCESS not-accessible
+          STATUS     current
+          DESCRIPTION
+               "This object is used to get the ifIndex of each port
+               belonging to the remote MC-LAG node."
+          ::={fsLaMCLAGRemotePortEntry 1 }
+
+fsLaMCLAGRemotePortSlotIndex OBJECT-TYPE
+          SYNTAX  Integer32 (0..2147483647)
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+               "This read-only object is used to get the current slot index
+               of the each port belonging to the remote MC-LAG node."
+          ::={fsLaMCLAGRemotePortEntry 2}
+
+fsLaMCLAGRemotePortBundleState OBJECT-TYPE
+          SYNTAX  INTEGER {
+                      upInBndl(0),
+                      standby(1),
+                      down(2),
+                      upIndividual(3)
+          }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+               "This read-only object is used to get the port bundle states of each port belonging
+               to the remote MC-LAG node
+                     upInBndl(0)      - The port is operationally up and actively takes part in aggregation.
+                     standby(1)       - The port is capable of joining in aggregation group, when any of the ports in
+                                        aggregation group goes down.
+                     down(2)          - The port is operationally down in lower layers.
+                                        or the port is operational in lower layers but temporarily not able
+                                        to participate in aggregation because of different partner
+                                        information in the same group.
+                     upIndividual(3)  - The port is operating individually and is not taking part in aggregation."
+          ::={fsLaMCLAGRemotePortEntry 3}
+
+fsLaMCLAGRemotePortSyncStatus OBJECT-TYPE
+          SYNTAX  INTEGER {
+                      inSync(1),
+                      outofSync(2)
+          }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+               "This read-only object is used to get the current sync status
+               of the each port belonging to the remote MC-LAG node
+                         inSync(1)     -  The port sync status is inSync.
+                         outofSync(2)  -  The port sync status is out-of-sync."
+          ::={fsLaMCLAGRemotePortEntry 4}
+
+fsLaMCLAGRemotePortPriority OBJECT-TYPE
+          SYNTAX  Integer32 (0..65535)
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+               "This read-only object is used to get the current port priority
+               of the each port belonging to the remote MC-LAG node."
+          ::={fsLaMCLAGRemotePortEntry 5}
+
+-------------------------------------------------------
+-- END OF Remote MC-LAG Aggregation Port Table
+-------------------------------------------------------
+END

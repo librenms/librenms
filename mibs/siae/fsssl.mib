@@ -1,0 +1,185 @@
+-- Copyright (C) 2006-2012 Aricent Group . All Rights Reserved
+
+-- $Id: fsssl.mib,v 1.10 2012/09/07 09:52:06 siva Exp $
+
+-- SSL proprietary MIB Definition
+
+ARICENT-SSL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS 
+   MODULE-IDENTITY, OBJECT-TYPE, 
+   enterprises, IpAddress, Integer32   
+   FROM SNMPv2-SMI 
+   TruthValue, DisplayString 
+   FROM SNMPv2-TC; 
+
+   ssl MODULE-IDENTITY
+      LAST-UPDATED "20120905000Z" 
+      ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE" 
+      CONTACT-INFO "support@aricent.com" 
+      DESCRIPTION
+         "The proprietary MIB for SSL."
+      REVISION "20120905000Z"
+      DESCRIPTION 
+         "The proprietary MIB for SSL." 
+   ::= { enterprises futuresoftware (2076) 96 }
+
+
+-- ----------------------------------------------------------------- --
+-- groups in the MIB
+-- ----------------------------------------------------------------- --
+ 
+      sslGeneralGroup             OBJECT IDENTIFIER ::= { ssl 1 }
+      sslCiphers                  OBJECT IDENTIFIER ::= { ssl 2 }
+ 
+-- ---------------------------------------------------------------- --
+
+-- General Group 
+
+-- This object has been renamed as issHttpStatus and moved to fsiss.mib
+--sslHttpStatus  OBJECT-TYPE
+--   SYNTAX       INTEGER {
+--                enable(1),
+--                disable(2)
+--               }
+--   MAX-ACCESS  read-write 
+--   STATUS      current 
+--   DESCRIPTION 
+--      "This object is for enabling or disabling HTTP in the system."
+--
+--   DEFVAL  { enable } 
+--   ::= { sslGeneralGroup 1 }
+
+sslSecureHttpStatus OBJECT-TYPE 
+   SYNTAX       INTEGER {
+                enable(1),
+                disable(2)
+                }
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "This object is for enabling or disabling secure HTTP in the system."
+
+   DEFVAL  { disable } 
+   ::= { sslGeneralGroup 2 }
+
+sslPort      OBJECT-TYPE
+   SYNTAX       Integer32 (1..65535)
+   MAX-ACCESS   read-write 
+   STATUS       current 
+   DESCRIPTION 
+      "This object is to configure the SSL port."
+
+   DEFVAL  { 443 } 
+   ::= { sslGeneralGroup 3 }
+
+sslTrace     OBJECT-TYPE
+         SYNTAX        Integer32
+         MAX-ACCESS    read-write
+         STATUS        current
+         DESCRIPTION
+         "Set the trace level for SSL.
+            BIT 0 - Initialisation and Shutdown Trace.
+            BIT 1 - Management trace.
+            BIT 2 - Data path trace.
+            BIT 3 - Control Plane trace.
+            BIT 4 - Packet Dump.
+            BIT 5 - OS Resource trace.
+            BIT 6 - All Failure trace (All failures including Packet Validation)
+            BIT 7 - Buffer Trace.
+            
+            Note:BIT 0 - Least significant bit
+                 BIT 7 - Most significant bit
+
+            For example,setting the trace level to the value -0001 0101, 
+            will enable Init-Shutdown, data path and packet dump trace levels.
+
+            Setting all the bits will enable all the trace levels and 
+            resetting them will disable all the trace levels."
+
+         ::= { sslGeneralGroup 4 }
+
+sslVersion  OBJECT-TYPE
+    SYNTAX  INTEGER {
+            all(1),
+            ssl3(2),
+            tls1(3)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "This object is to configure the SSL version" 
+    DEFVAL  { tls1}
+    ::= { sslGeneralGroup 5 }
+
+
+-- Ciphers group
+
+sslCipherList OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+      
+         "This object is to configure the cipher-suites list.
+
+	      This field is a bit mask, setting a bit indicates that the 
+		  corresponding cipher-list will be involved in the server
+          authentication.
+          
+          BIT 0 - RSA-NULL-MD5
+          BIT 1 - RSA-NULL-SHA
+          BIT 2 - RSA-DES-SHA
+          BIT 3 - RSA-3DES-SHA
+          BIT 4 - DH-RSA-DES-SHA
+          BIT 5 - DH-RSA-3DES-SHA
+          BIT 6 - RSA-EXP1024-DES-SHA
+          BIT 7 - RSA-WITH-AES-128-CBC-SHA
+          BIT 8 - RSA-WITH-AES-256-CBC-SHA
+          BIT 9 - DHE-RSA-WITH-AES-128-CBC-SHA
+          BIT 10 - DHE-RSA-WITH-AES-256-CBC-SHA 
+                                       
+
+          Note:BIT 0 - Least significant bit
+               BIT 10 - Most significant bit
+
+          For example,setting the cipher list to the value - 001 0101, 
+          will include RSA-NULL-MD5, RSA-DES-SHAa and DH-RSA-DES-SHA as 
+          cipher-list for authentication.
+         
+          In the FIPS (American Security Standard Mode) Mode,  
+          Only the following cipher list should be supported.
+                 TLS_RSA_3DES_SHA1 
+                 TLS_ DHE_RSA_3DES_SHA1
+                 TLS_RSA_WITH_AES_128_CBC_SHA 
+                 TLS_RSA_WITH_AES_256_CBC_SHA 
+                 TLS_DHE_RSA_WITH_AES_128_CBC_SHA 
+                 TLS_DHE_RSA_WITH_AES_256_CBC_SHA 
+          hence the default value in FIPS mode will be
+                 TLS_RSA_3DES_SHA1 | TLS_ DHE_RSA_3DES_SHA1 | TLS_RSA_WITH_AES_128_CBC_SHA |
+                 TLS_RSA_WITH_AES_256_CBC_SHA | TLS_DHE_RSA_WITH_AES_128_CBC_SHA |
+                 TLS_DHE_RSA_WITH_AES_256_CBC_SHA"
+
+   DEFVAL  { 8 }
+   ::= { sslCiphers 1}
+
+
+   sslDefaultCipherList OBJECT-TYPE
+   SYNTAX TruthValue  
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+
+   "This object is to set the default cipher-suites list in 'sslCipherList'.
+
+   Setting DefaultCipherList to TRUE would set the following cipher-list for 
+   authentication:
+   - RSA_3DES_SHA1  
+   - RSA_DES_SHA1 
+   - RSA_EXP1024_DES_SHA1 
+
+   The value of this object reverts back to FALSE once the default cipher list is set."
+   DEFVAL  { false }
+   ::= { sslCiphers 2}
+
+END

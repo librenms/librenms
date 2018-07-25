@@ -1,0 +1,1641 @@
+-- Copyright (C) 2006-2012 Aricent Group . All Rights Reserved
+
+-- $Id: fspb.mib,v 1.14 2013/12/05 12:47:19 siva Exp $
+
+ARICENT-PROVIDERBRIDGE-MIB DEFINITIONS ::= BEGIN 
+ 
+IMPORTS
+ 
+    OBJECT-TYPE,MODULE-IDENTITY,
+    Integer32, Unsigned32, Counter32, IpAddress, enterprises
+       FROM SNMPv2-SMI
+    RowStatus, MacAddress, TEXTUAL-CONVENTION
+       FROM SNMPv2-TC
+    VlanId, dot1qVlanIndex 
+       FROM Q-BRIDGE-MIB
+    dot1adPepEntry FROM ARICENT-DOT1AD-MIB
+    EnabledStatus  
+       FROM P-BRIDGE-MIB;
+            
+futureProviderBridgeMIB MODULE-IDENTITY
+    LAST-UPDATED "201505120000Z"
+    ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+    CONTACT-INFO "support@aricent.com"
+    DESCRIPTION "||||||"
+    REVISION "201505120000Z"
+    DESCRIPTION "||||||"
+::= { enterprises futuresoftware(2076) 113}
+
+-- revision history
+
+-- REVISION "201505120000Z"
+-- DESCRIPTION
+--    "Added fsPbInnerTPID to set inner tpid for all ports."
+
+TunnelStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "To specify how to handle the L2 protocol packets received on a
+         particular port.
+         
+         When the option is set to 'peer', the L2 protocol packets received
+         on a particular port will be processed in the Bridge.
+         
+         When the option is set to 'tunnel', the L2 protocol packets received
+         on a particular port will be transparently transmitted in the provider
+         network and will not be processed in the Provider Bridges/Provider Edge
+         Bridges.
+         
+         When the option is set to 'discard', the L2 protocol packets
+         received over a particular port will not be processed and discarded."
+
+    SYNTAX      INTEGER { peer(1), tunnel(2), discard(3) }
+
+--Proprietary MIB implementation for the Provider Bridging functionality
+
+fsPbSystem  OBJECT IDENTIFIER   ::= { futureProviderBridgeMIB 1 }
+fsPbConfig  OBJECT IDENTIFIER   ::= { futureProviderBridgeMIB 2 }
+
+-- SCALAR BEGIN
+
+fsPbMulticastMacLimit OBJECT-TYPE
+   SYNTAX      Unsigned32 (0..4294967295)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The Multicast MAC table size of the device. The upper
+      limit value that can be SET for this object is limited by the
+      underlying hardware. While on initialisation this object hold
+      the maximum size of the Multicast MAC table of the device."
+   ::= { fsPbSystem 1 }
+
+fsPbTunnelStpAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The MAC address to be used for Customer STP BPDUs tunneling inside
+        Provider Network.
+        When tunneling is enabled on a port, this MAC address will be
+        used as the the destination MAC address of the customer BPDUs received
+        on a port where STP tunneling is enabled and the outgoing port is a
+        proprietary PNP.
+        
+        Inside Provider Network, the BPDUs received with this MAC address
+        will be treated as data packets and not processed.
+        
+        When the BPDU is sent out of the Provider Network, this MAC address
+        will be replaced with the reserved address defined for Customer STP
+        BPDUs.
+        This configuration is allowed only for Provider Core or 
+        Edge Bridges."
+        
+    ::= { fsPbSystem 2 }
+
+fsPbTunnelLacpAddress OBJECT-TYPE
+    SYNTAX      MacAddress 
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The MAC address to be used for LACP packets tunneling inside Provider
+        Network. When tunneling is enabled on a port, this MAC address will be
+        used as the the destination MAC address of the customer LACP packets
+        received over this port.
+        
+        Inside Provider Network, LACP packets received with this MAC address 
+        will be treated as data packets and not processed.
+        
+        When the tunneled LACP packets are sent out of the Provider Network, 
+        this MAC address will be replaced with the reserved address defined 
+        for LACP packets.
+
+        This configuration is allowed only for Provider Core or 
+        Edge Bridges."
+           
+    ::= { fsPbSystem 3 }
+
+fsPbTunnelDot1xAddress OBJECT-TYPE
+    SYNTAX      MacAddress 
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The MAC address to be used for Dot1x packets tunneling inside Provider 
+        Network. When tunneling is enabled on a port, this MAC address will be 
+        used as the the destination MAC address of the customer Dot1x packets 
+        received over this port. 
+        
+        Inside Provider Network, Dot1x packets received with this MAC address 
+        will be treated as data packets and not processed.
+        
+        When the tunneled Dot1x packets are sent out of the Provider Network, 
+        this MAC address will be replaced with the reserved address defined 
+        for Dot1x packets.
+        This configuration is allowed only when the Bridge is configured in 
+        Provider Code or Edge Bridge mode.
+
+        This configuration is allowed only for Provider Core or 
+        Edge Bridges."
+        
+        
+    ::= { fsPbSystem 4 }
+
+fsPbTunnelGvrpAddress OBJECT-TYPE
+    SYNTAX      MacAddress 
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The MAC address to be used for GVRP PDUs tunneling inside Provider 
+        Network. When tunneling is enabled on a port, this MAC address will be 
+        used as the the destination MAC address of the customer GVRP PDUs 
+        received on a port where GVRP tunneling is enable and the outgoing 
+        port is a proprietary PNP.
+        
+        Inside Provider Network, GVRP PDUs received with this MAC address 
+        will be treated as data packets and not processed.
+        
+        When the tunneled GVRP PDUs are sent out of the Provider Network, 
+        this MAC address will be replaced with the reserved address defined 
+        for GVRP PDUs.
+
+        This configuration is allowed only for Provider Core or 
+        Edge Bridges."
+        
+    ::= { fsPbSystem 5 }
+
+fsPbTunnelGmrpAddress OBJECT-TYPE
+    SYNTAX      MacAddress 
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The MAC address to be used for GMRP PDUs tunneling inside Provider 
+        Network. When tunneling is enabled on a port, this MAC address will be 
+        used as the the destination MAC address of the customer GMRP PDUs 
+        received over this port. 
+        
+        Inside Provider Network, GMRP PDUs received with this MAC address 
+        will be treated as data packets and not processed.
+        
+        When the tunneled GMRP PDUs are sent out of the Provider Network, 
+        this MAC address will be replaced with the reserved address defined 
+        for GMRP PDUs.
+    
+        This configuration is allowed only for Provider Core or 
+        Edge Bridges."
+        
+    ::= { fsPbSystem 6 }
+
+
+fsPbInnerTPID OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "This object configures the Inner TPID type for all Ports."
+
+    DEFVAL   { 33024 }
+    ::= { fsPbSystem 7 }
+
+
+-- SCALAR END
+
+-- -------------------------------------------------------------
+-- The Provider Bridge Port Type Configuration Table
+-- -------------------------------------------------------------
+
+fsPbPortInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsPbPortInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing provider bridge releated 
+        configurations for the externally accessible ports.
+   
+        All the objects in this table are applicable 
+        only when the Bridge Mode is set as ProviderBridge or 
+        ProviderCoreBridge or ProviderEdgeBridge."
+    ::= { fsPbConfig 1 }
+    
+fsPbPortInfoEntry OBJECT-TYPE
+    SYNTAX      FsPbPortInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table specifies the Provider Bridge related
+         port configurations. This table is indexed by ifIndex. "
+
+    INDEX { fsPbPort }
+            ::= { fsPbPortInfoTable 1 }
+            
+FsPbPortInfoEntry ::=
+    SEQUENCE {
+                fsPbPort                          Integer32,
+                fsPbPortSVlanClassificationMethod INTEGER,
+                fsPbPortSVlanIngressEtherType     Integer32,
+                fsPbPortSVlanEgressEtherType      Integer32,
+                fsPbPortSVlanEtherTypeSwapStatus  EnabledStatus,
+                fsPbPortSVlanTranslationStatus    EnabledStatus,
+                fsPbPortUnicastMacLearning        EnabledStatus,
+                fsPbPortUnicastMacLimit           Unsigned32,
+                fsPbPortBundleStatus              EnabledStatus,
+                fsPbPortMultiplexStatus           EnabledStatus
+    }
+    
+fsPbPort OBJECT-TYPE
+   SYNTAX      Integer32 (1..65535)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The Index value of the port in the system for which this entry
+      applies. The maximum index value of the port is defined by the
+      system."
+   ::= { fsPbPortInfoEntry 1 }
+
+
+fsPbPortSVlanClassificationMethod OBJECT-TYPE
+   SYNTAX      INTEGER {
+                        sourceMac (1),
+                        destinationMac (2),
+                        cvlanSrcMac (3),
+                        cvlanDstMac (4),
+                        dscp (5),
+                        cvlanDscp (6),
+                        sourceIp (7),
+                        destinationIp (8),
+                        srcIpDstIp (9),
+                        cvlanDstIp (10),
+                        cvlan (11),
+                        pvid (12)
+    }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+    "This object indicates the type of SVLAN classification that has to be used
+     for a given type of port.
+
+     providerNetworkPort / customerNetworkPort  -  Port's 'pvid' will be the
+     SVLAN classification for the untagged packets received over this interface.
+
+     customerEdgePort - The SVLAN classification mechanism is always based on
+     'cvlan' (i.e CVidRegistrationTable ).No other SVLAN classification mechanism is
+     allowed for this port type.
+
+     propCustomerNetworkPort / propCustomerEdgePort  - 'pvid' will be
+     default SVLAN classification mechanism for this port. But the user is free to
+     configure any other SVLAN classification mechanism except the
+     CVidRegistrationTable (ie cvlan mechanism)
+
+     For proprietary CEP and proprietary CNP ports,the SVLAN classification
+     is based on one of the configured SVLAN classification methods mentioned
+     here. If it is not configured, by default the port's 'PVID' is considered
+     as the SVLAN for untagged packets."
+
+   ::= { fsPbPortInfoEntry 2 }
+ 
+fsPbPortSVlanIngressEtherType OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        " This object indicates the primary S-VLAN tag ether type used for the packets 
+          received on this port.Packets received on a port are considered tagged,
+          when the packet ethertype matches with the port ether type configured.
+          Otherwise, they will be considered untagged.
+          
+          By default, on all the ports, 0x88a8 will be configured as the ether type.
+          On Proprietary Provider Network Ports 0x8100 will be configured as 
+          the ingress ethertype.
+          
+          This object is deprecated. The new MIB object dot1qFutureVlanPortIngressEtherType
+          indicates the Ingress Ethertype for a port."
+
+    DEFVAL { 34984 }
+    ::= { fsPbPortInfoEntry 3 }
+
+fsPbPortSVlanEgressEtherType OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        " This object indicates the ether type of the S-VLAN tag that has to
+        be applied for all the outgoing packets on this port. If a valid value is
+        in this object, all the packets which are outgoing on this port will
+        contain the ether type as configured in this object. By Default 0x88a8
+        will be used for packets transmitted  with S-VLAN on the ports.
+        On Proprietary Provider Network Ports and Customer Edge Ports, 0x8100
+        will be used as the ether type for the outgoing packets.
+
+        This object is deprecated. The new MIB object dot1qFutureVlanPortEgressEtherType
+        indicates the Egress Ethertype for a port."
+        
+    DEFVAL { 34984 }
+    ::= { fsPbPortInfoEntry 4}
+
+fsPbPortSVlanEtherTypeSwapStatus OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    " This object indicates whether the Ether Type Swapping can be
+    applied on the S-VLAN tagged packets over this port.
+    The Ether type swapping will only be applied on S-VLAN tag of a packet.
+    This configuration is applicable for all values of Port Type other 
+    than customer edge ports."
+    DEFVAL { disabled }
+    ::= { fsPbPortInfoEntry 5 }
+
+fsPbPortSVlanTranslationStatus OBJECT-TYPE
+    SYNTAX      EnabledStatus 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    " This object indicates whether the VID Translation table can be 
+    enabled on the incoming/outgoing packets on a particular port.
+    The Service Vlan swapping is applicable only for the externally 
+    accesible network ports (ie) Provider Network Port ,Customer Network port
+    and proprietary Customer Network Port. The Service Vlan Translation status
+    can be enabled or disabled on per port basis. By default, it is enabled on
+    Provider Network Port and Customer Network Port(S-Tagged) and disabled on 
+    the other applicable port-types."
+    ::= { fsPbPortInfoEntry 6 }
+
+fsPbPortUnicastMacLearning OBJECT-TYPE 
+   SYNTAX      EnabledStatus
+   MAX-ACCESS  read-write 
+   STATUS      deprecated 
+   DESCRIPTION 
+      "A Truth value indicating the unicast MAC learning enabled/disabled
+       status for this port. When Unicast Mac Learning is disabled, No
+       Entry will be learned from the point of configuration on this port.
+       When Mac Learning is enabled, Entries will be learned on this port."
+   DEFVAL   { enabled } 
+   ::= { fsPbPortInfoEntry 7 } 
+
+fsPbPortUnicastMacLimit OBJECT-TYPE
+   SYNTAX      Unsigned32 (0..4294967295)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The Limiting value on the number of distinct unicast destination MAC
+       addresses that can be dynamically learnt over this interface.
+       The lower limit and upper limit value that can be SET for this object
+       is determined by the underlying hardware. This Limit is applicable for
+       only dynamically learned entries and NOT for static unicast entries"
+   ::= { fsPbPortInfoEntry 8 }
+
+fsPbPortBundleStatus OBJECT-TYPE
+   SYNTAX      EnabledStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "A Truth value indicating that Bundling enabled/disabled on port, 
+       this Object can be enabled/disabled only for CEP.  For other ports 
+       setting and getting is not meaningful."
+   DEFVAL   { enabled }    
+   ::= { fsPbPortInfoEntry 9 }
+
+fsPbPortMultiplexStatus OBJECT-TYPE
+   SYNTAX      EnabledStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "A Truth value indicating that Bundling enabled/disabled on port,                                                             this Object can be enabled/disabled only for CEP.  For other ports
+       setting and getting is not meaningful."
+   DEFVAL   { enabled }    
+   ::= { fsPbPortInfoEntry 10 }
+
+
+-- -------------------------------------------------------------
+-- The S-VLAN Port , SourceMAC based Configuration Table
+-- -------------------------------------------------------------
+
+fsPbSrcMacSVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsPbSrcMacSVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing per port, per SourceMAC based Service VLAN
+        classification information in the device. Entries can be configured
+        into this table only when the bridge is configured as a
+        Provider Bridge and the Port Type for this port is SET
+        as  Proprietary Customer Edge Port / Proprietary Customer Network Port."
+    ::= { fsPbConfig 2 }
+
+fsPbSrcMacSVlanEntry OBJECT-TYPE
+    SYNTAX      FsPbSrcMacSVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information controlling Service VLAN classification at this
+        specified port for an ingress frame with the specified Source
+        MAC address in the ethernet header of the frame."
+    INDEX { fsPbPort, fsPbSrcMacAddress }
+            ::= { fsPbSrcMacSVlanTable 1 }
+
+FsPbSrcMacSVlanEntry ::=
+    SEQUENCE {
+        fsPbSrcMacAddress            MacAddress,
+        fsPbSrcMacSVlan              VlanId,
+        fsPbSrcMacRowStatus          RowStatus
+    }
+
+fsPbSrcMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Source MAC address present in the ethernet header of the
+        frame received on this port for which Service VLAN is assigned
+        based on this entry."
+    ::= { fsPbSrcMacSVlanEntry 1 }
+
+fsPbSrcMacSVlan OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Service VLAN ID assigned to frames received on this port when
+        the Source MAC address in the ethernet header of the frame is same
+        as specified in this entry."
+    ::= { fsPbSrcMacSVlanEntry 2 }
+    
+fsPbSrcMacRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry. An entry is
+        created in this table when this object is SET to 'createAndWait'.
+        The entry in this table is used when the status of this object 
+        is SET 'active'. The entry in this table is not used when this 
+        object is SET 'notInService'. An entry created in this table is
+        be deleted when this object is SET 'destroy'."
+    ::= { fsPbSrcMacSVlanEntry 3 }
+    
+-- -------------------------------------------------------------
+-- The S-VLAN Port , DestinationMAC based Configuration Table
+-- -------------------------------------------------------------
+
+fsPbDstMacSVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsPbDstMacSVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing per port, per Destination MAC based Service
+        VLAN classification information in the device. Entries can be 
+        configured into this table only when the bridge is configured 
+        as a Provider Bridge. An entry in this table is possible only when the
+        'Port Type' for this port is SET as Proprietary Customer Network Port
+        or Proprietary Customer Edge Port."
+    ::= { fsPbConfig 3 }
+
+fsPbDstMacSVlanEntry OBJECT-TYPE
+    SYNTAX      FsPbDstMacSVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information controlling Service VLAN classification at this
+        specified port for an ingress frame with the
+        specified Destination MAC address in the ethernet header of the frame."
+    INDEX { fsPbPort, fsPbDstMacAddress }
+            ::= { fsPbDstMacSVlanTable 1 }
+
+FsPbDstMacSVlanEntry ::=
+    SEQUENCE {
+        fsPbDstMacAddress            MacAddress,
+        fsPbDstMacSVlan              VlanId,
+        fsPbDstMacRowStatus          RowStatus
+    }
+
+fsPbDstMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Destination MAC address present in the ethernet header of the
+        frame received on this port for which Service VLAN is assigned
+        based on this entry."
+    ::= { fsPbDstMacSVlanEntry 1 }
+
+    
+fsPbDstMacSVlan OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Service VLAN ID assigned to frames received on this port when
+        the Destination MAC address in the ethernet header of the frame is
+        same as specified in this entry."
+    ::= { fsPbDstMacSVlanEntry 2 }
+    
+fsPbDstMacRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry. An entry is
+        created in this table when this object is SET to 'createAndWait'.
+        The entry in this table is used when the status of this object 
+        is SET 'active'. The entry in this table is not used when this 
+        object is SET 'notInService'. An entry created in this table is
+        deleted when this object is SET 'destroy'."
+    ::= { fsPbDstMacSVlanEntry 3 }
+   
+-- -------------------------------------------------------------
+-- The S-VLAN Port , C-VLAN, Source MAC based Configuration Table
+-- -------------------------------------------------------------
+
+fsPbCVlanSrcMacSVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsPbCVlanSrcMacSVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing per Port, per Customer VLAN ID,
+        per Source MAC based S-VLAN classification information in the device.
+        Entries can be configured into this table only when the  bridge is
+        configured as a Provider Bridge. An entry in this table is
+        possible only when the 'PortType' for this port is SET as 
+        Proprietary Customer Edge Port / Proprietary Customer Network Port."
+    ::= { fsPbConfig 4 }
+
+fsPbCVlanSrcMacSVlanEntry OBJECT-TYPE
+    SYNTAX      FsPbCVlanSrcMacSVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information controlling Service VLAN classification at this specified
+        port for an ingress frame with the classified Customer VLAN ID and
+        with the specified Source MAC address in the ethernet header of the frame.
+        
+        Classification of Customer VLAN ID may be from the Customer VLAN tag
+        in the received frame OR based on Port CVLAN table."
+    INDEX { fsPbPort, fsPbCVlanSrcMacCVlan, fsPbCVlanSrcMacAddr }
+            ::= { fsPbCVlanSrcMacSVlanTable 1 }
+
+FsPbCVlanSrcMacSVlanEntry ::=
+    SEQUENCE {
+        fsPbCVlanSrcMacCVlan         VlanId,
+        fsPbCVlanSrcMacAddr          MacAddress,
+        fsPbCVlanSrcMacSVlan         VlanId,
+        fsPbCVlanSrcMacRowStatus     RowStatus
+    }
+
+fsPbCVlanSrcMacCVlan OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Customer VLAN ID in the Customer VLAN tag of an ingress frame
+        at this specified port OR the Customer VLAN ID for which the ingress
+        frame is classified to this specified port."
+    ::= { fsPbCVlanSrcMacSVlanEntry 1 }
+    
+fsPbCVlanSrcMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Source MAC address in the ethernet header of the
+        frame received on this port."
+    ::= { fsPbCVlanSrcMacSVlanEntry 2 }
+    
+fsPbCVlanSrcMacSVlan OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Service VLAN assigned to frames received on this port,
+        When the Classified Customer VLAN ID is same as specified in 
+        this entry and  When the Source MAC address in the ethernet header
+        of the frame is same as specified in this entry.
+     
+        Classification of Customer VLAN ID may be from the Customer VLAN tag
+        in the received frame OR based on Port CVLAN table."
+    ::= { fsPbCVlanSrcMacSVlanEntry 3 }
+    
+ fsPbCVlanSrcMacRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry. An entry is
+        created in this table when this object is SET to 'createAndWait'.
+        The entry in this table is used when the status of this object 
+        is SET 'active'. The entry in this table is not used when this 
+        object is SET 'notInService'. An entry created in this table is
+        deleted when this object is SET 'destroy'."
+
+    ::= { fsPbCVlanSrcMacSVlanEntry 4 }
+    
+ -- -------------------------------------------------------------
+-- The S-VLAN Port , C-VLAN, Destination MAC based Configuration Table
+-- -------------------------------------------------------------
+
+fsPbCVlanDstMacSVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsPbCVlanDstMacSVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing per Port, per Customer VLAN ID,
+        per Destination MAC based S-VLAN classification information in the
+        device. Entries can be configured into this table only when the 
+        bridge is configured as a Provider Bridge. An entry in this table
+        is possible only when the 'Port Type' for this port is SET
+        as Proprietary Customer Edge Port / Proprietary Customer Network Port."
+
+    ::= { fsPbConfig 5 }
+
+fsPbCVlanDstMacSVlanEntry OBJECT-TYPE
+    SYNTAX      FsPbCVlanDstMacSVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information controlling Service VLAN classification at this specified
+        port for an ingress frame with the classified Customer VLAN ID and
+        with the specified Destination MAC address in the ethernet header of 
+        the frame.
+
+        Classification of Customer VLAN ID may be from the Customer VLAN tag
+        in the received frame OR based on Port CVLAN table."
+    INDEX { fsPbPort, fsPbCVlanDstMacCVlan, fsPbCVlanDstMacAddr }
+            ::= { fsPbCVlanDstMacSVlanTable 1 }
+
+FsPbCVlanDstMacSVlanEntry ::=
+    SEQUENCE {
+        fsPbCVlanDstMacCVlan         VlanId,
+        fsPbCVlanDstMacAddr          MacAddress,
+        fsPbCVlanDstMacSVlan         VlanId,
+        fsPbCVlanDstMacRowStatus     RowStatus
+    }
+
+fsPbCVlanDstMacCVlan OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Customer VLAN ID in the Customer VLAN tag of an ingress frame
+        at this specified port or the Customer VLAN ID for which the ingress
+        frame is classified for at this specified port."
+    ::= { fsPbCVlanDstMacSVlanEntry 1 }
+    
+fsPbCVlanDstMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Destination MAC address in the ethernet header of the
+        frame received on this port."
+    ::= { fsPbCVlanDstMacSVlanEntry 2 }
+    
+fsPbCVlanDstMacSVlan OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Service VLAN assigned to frames received on this port
+        when the Classified Customer VLAN ID and when the Destination 
+        MAC address in the ethernet header  of the frame is same as 
+        specified in this entry.
+
+        Classification of Customer VLAN ID may be from the Customer VLAN tag
+        in the received frame OR based on Port CVLAN table."
+    ::= { fsPbCVlanDstMacSVlanEntry 3 }
+    
+ fsPbCVlanDstMacRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry. An entry is
+        created in this table when this object is SET to 'createAndWait'.
+        The entry in this table is used when the status of this object 
+        is SET 'active'. The entry in this table is not used when this 
+        object is SET 'notInService'. An entry created in this table is
+        deleted when this object is SET 'destroy'."
+
+    ::= { fsPbCVlanDstMacSVlanEntry 4 }
+   
+-- -------------------------------------------------------------
+-- The S-VLAN Port , DSCP based Configuration Table
+-- -------------------------------------------------------------
+
+fsPbDscpSVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsPbDscpSVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing per port, per DiffServ Code Point (DSCP) value
+        based Service VLAN classification information in the device.
+        Entries can be configured into this table only when the bridge is 
+        configured as a Provider Bridge and the 'PortType' for
+        this port is SET as Proprietary Customer Network Port or 
+        Proprietary Customer Edge Port."
+
+    ::= { fsPbConfig 6 }
+
+fsPbDscpSVlanEntry OBJECT-TYPE
+    SYNTAX      FsPbDscpSVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information controlling Service VLAN classification at this 
+        specified port for an ingress IP frame with the DSCP value as
+        specified in this entry."
+    INDEX { fsPbPort, fsPbDscp }
+            ::= { fsPbDscpSVlanTable 1 }
+
+FsPbDscpSVlanEntry ::=
+    SEQUENCE {
+        fsPbDscp             Integer32,
+        fsPbDscpSVlan        VlanId,
+        fsPbDscpRowStatus    RowStatus
+    }
+
+fsPbDscp OBJECT-TYPE
+    SYNTAX      Integer32 (0..63)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The DSCP value in the IP header of the frame received on
+        this port for which Service VLAN is assigned based on this entry."
+    ::= { fsPbDscpSVlanEntry 1 }
+
+    
+fsPbDscpSVlan OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Service VLAN ID assigned to IP frames received on this port
+        when the DSCP value in the IP header of the frame is same as
+        specified in this entry."
+    ::= { fsPbDscpSVlanEntry 2 }
+    
+fsPbDscpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry. An entry is
+        created in this table when this object is SET to 'createAndWait'.
+        The entry in this table is used when the status of this object 
+        is SET 'active'. The entry in this table is not used when this 
+        object is SET 'notInService'. An entry created in this table is
+        deleted when this object is SET 'destroy'."
+
+    ::= { fsPbDscpSVlanEntry 3 }
+    
+-- -------------------------------------------------------------
+-- The S-VLAN Port ,C-VLAN and DSCP based Configuration Table
+-- -------------------------------------------------------------
+
+fsPbCVlanDscpSVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsPbCVlanDscpSVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing per port, per Customer VLAN ID, per DiffServ Code
+        Point (DSCP) value based Service VLAN classification information in
+        the device. Entries can be configured into this table only when the
+        bridge is configured as a Provider Bridge and the 'PortType' for 
+        this port is SET as Proprietary Customer Edge Port / Proprietary Customer 
+        Network Port."
+
+    ::= { fsPbConfig 7 }
+
+fsPbCVlanDscpSVlanEntry OBJECT-TYPE
+    SYNTAX      FsPbCVlanDscpSVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information controlling Service VLAN classification at this 
+        specified port for an ingress IP frame with the classified 
+        Customer VLAN ID as specified in this entry and the DSCP value 
+        in the frame as specified in this entry.
+
+        Classification of Customer VLAN ID may be from the Customer VLAN tag
+        in the received frame OR based on Port CVLAN table."
+    INDEX { fsPbPort, fsPbCVlanDscpCVlan, fsPbCVlanDscp }
+            ::= { fsPbCVlanDscpSVlanTable 1 }
+
+FsPbCVlanDscpSVlanEntry ::=
+    SEQUENCE {
+        fsPbCVlanDscpCVlan          VlanId, 
+        fsPbCVlanDscp               Integer32,
+        fsPbCVlanDscpSVlan          VlanId,
+        fsPbCVlanDscpRowStatus      RowStatus
+    }
+    
+fsPbCVlanDscpCVlan OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Customer VLAN ID in the Customer VLAN tag of an ingress frame
+        at this specified port or the Customer VLAN ID for which the ingress
+        frame is classified for at this specified port."
+    ::= { fsPbCVlanDscpSVlanEntry 1 }
+
+fsPbCVlanDscp OBJECT-TYPE
+    SYNTAX      Integer32 (0..63)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The DSCP value in the IP header of the frame received on
+        this port."
+    ::= { fsPbCVlanDscpSVlanEntry 2 }
+
+    
+fsPbCVlanDscpSVlan OBJECT-TYPE
+    SYNTAX      VlanId 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Service VLAN ID assigned to frames received on this port,
+        when the classified Customer VLAN ID is the same as specified in 
+        this entry and when the DSCP value in the IP header of the frame
+        is same as specified in this entry.
+ 
+        Classification of Customer VLAN ID may be from the Customer VLAN tag
+        in the received frame OR based on Port CVLAN table."
+    ::= { fsPbCVlanDscpSVlanEntry 3 }
+    
+fsPbCVlanDscpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry. An entry is
+        created in this table when this object is SET to 'createAndWait'.
+        The entry in this table is used when the status of this object 
+        is SET 'active'. The entry in this table is not used when this 
+        object is SET 'notInService'. An entry created in this table is
+        deleted when this object is SET 'destroy'."
+
+    ::= { fsPbCVlanDscpSVlanEntry 4 }
+    
+-- -------------------------------------------------------------
+-- The S-VLAN Port ,Source IP Address based Configuration Table
+-- -------------------------------------------------------------
+
+fsPbSrcIpAddrSVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsPbSrcIpAddrSVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing per port, per Source IP Address, based Service VLAN
+        classification information in the device. Entries can be configured
+        into this table only when the bridge is configured as a Provider
+        Bridge and the 'PortType' for this port is SET as
+        Proprietary Customer Network Port or Proprietary Customer Edge Port."
+    ::= { fsPbConfig 8 }
+
+fsPbSrcIpAddrSVlanEntry OBJECT-TYPE
+    SYNTAX      FsPbSrcIpAddrSVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information controlling Service VLAN classification at this 
+        specified port for an ingress IP frame with the Source IP Address
+        in the IP header of the frame as specified in this entry."
+    INDEX { fsPbPort, fsPbSrcIpAddr }
+    ::= { fsPbSrcIpAddrSVlanTable 1 }
+
+FsPbSrcIpAddrSVlanEntry ::=
+    SEQUENCE {
+        fsPbSrcIpAddr            IpAddress,
+        fsPbSrcIpSVlan           VlanId,
+        fsPbSrcIpRowStatus       RowStatus
+    }
+    
+fsPbSrcIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Source IP Address in the IP header of an ingress
+        IP frame at this specified port."
+    ::= { fsPbSrcIpAddrSVlanEntry 1 }
+
+fsPbSrcIpSVlan OBJECT-TYPE
+    SYNTAX      VlanId 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Service VLAN ID assigned to frames ingress at this port
+        when the Source IP address in the IP header of the frame is 
+        same as specified in this entry."
+    ::= { fsPbSrcIpAddrSVlanEntry 2 }
+    
+fsPbSrcIpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry. An entry is
+        created in this table when this object is SET to 'createAndWait'.
+        The entry in this table is used when the status of this object 
+        is SET 'active'. The entry in this table is not used when this 
+        object is SET 'notInService'. An entry created in this table is
+        deleted when this object is SET 'destroy'."
+
+    ::= { fsPbSrcIpAddrSVlanEntry 3 }
+    
+ -- -------------------------------------------------------------
+-- The S-VLAN Port ,Destination IP Address based Configuration Table
+-- -------------------------------------------------------------
+
+fsPbDstIpAddrSVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsPbDstIpAddrSVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing per port, per Destination IP Address, based
+        Service VLAN classification information in the device. Entries can
+        be configured into this table only when the bridge is configured as 
+        a Provider Bridge and the 'PortType' for this port is SET
+        as Proprietary Customer Network Port or Proprietary Customer Edge Port."
+    ::= { fsPbConfig 9 }
+
+fsPbDstIpAddrSVlanEntry OBJECT-TYPE
+    SYNTAX      FsPbDstIpAddrSVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information controlling Service VLAN classification at this 
+        specified port for an ingress IP frame with the Destination IP
+        Address in the IP header of the frame as specified in this entry."
+    INDEX { fsPbPort, fsPbDstIpAddr }
+    ::= { fsPbDstIpAddrSVlanTable 1 }
+
+FsPbDstIpAddrSVlanEntry ::=
+    SEQUENCE {
+        fsPbDstIpAddr            IpAddress,
+        fsPbDstIpSVlan           VlanId,
+        fsPbDstIpRowStatus       RowStatus
+    }
+    
+fsPbDstIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Destination IP Address in the IP header of an ingress
+        IP frame at this specified port."
+    ::= { fsPbDstIpAddrSVlanEntry 1 }
+
+fsPbDstIpSVlan OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Service VLAN ID assigned to frames ingress at this port
+        when the Destination IP address in the IP header of the frame is 
+        same as specified in this entry."
+    ::= { fsPbDstIpAddrSVlanEntry 2 }
+    
+fsPbDstIpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry. An entry is
+        created in this table when this object is SET to 'createAndWait'.
+        The entry in this table is used when the status of this object 
+        is SET 'active'. The entry in this table is not used when this 
+        object is SET 'notInService'. An entry created in this table is
+        deleted when this object is SET 'destroy'."
+    ::= { fsPbDstIpAddrSVlanEntry 3 }
+   
+-- -------------------------------------------------------------
+-- The S-VLAN Port ,SourceIP Address, DestinationIP Address  based
+-- Configuration Table
+-- -------------------------------------------------------------
+
+fsPbSrcDstIpSVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsPbSrcDstIpSVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing per port, per Source IP Address, per Destination
+        IP Address based Service VLAN  classification information in the
+        device. Entries can be configured into this table only when the bridge
+        is configured as a Provider Bridge and the'PortType' for
+        this port is SET as Proprietary Customer Network Port or Proprietary 
+        Customer Edge Port."
+    ::= { fsPbConfig  10}
+
+fsPbSrcDstIpSVlanEntry OBJECT-TYPE
+    SYNTAX      FsPbSrcDstIpSVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information controlling Service VLAN classification at this 
+        specified port for an ingress IP frame with the Source and Destination
+        IP Address in the IP header of the frame as specified in this entry."
+    INDEX { fsPbPort, fsPbSrcDstSrcIpAddr, fsPbSrcDstDstIpAddr }
+    ::= { fsPbSrcDstIpSVlanTable 1 }
+
+FsPbSrcDstIpSVlanEntry ::=
+    SEQUENCE {
+        fsPbSrcDstSrcIpAddr            IpAddress,
+        fsPbSrcDstDstIpAddr            IpAddress,
+        fsPbSrcDstIpSVlan              VlanId,
+        fsPbSrcDstIpRowStatus          RowStatus
+    }
+    
+fsPbSrcDstSrcIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Source IP Address in the IP header of an ingress
+        IP frame at this specified port."
+    ::= { fsPbSrcDstIpSVlanEntry 1 }
+    
+fsPbSrcDstDstIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Destination IP Address in the IP header of an ingress
+        IP frame at this specified port."
+    ::= { fsPbSrcDstIpSVlanEntry 2 }
+
+
+fsPbSrcDstIpSVlan OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Service VLAN ID assigned to frames ingress at this port
+        when the Source and Destination IP address in the IP header of 
+        the frame are same as specified in this entry."
+    ::= { fsPbSrcDstIpSVlanEntry 3 }
+    
+fsPbSrcDstIpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry. An entry is
+        created in this table when this object is SET to 'createAndWait'.
+        The entry in this table is used when the status of this object 
+        is SET 'active'. The entry in this table is not used when this 
+        object is SET 'notInService'. An entry created in this table is
+        deleted when this object is SET 'destroy'."
+
+    ::= { fsPbSrcDstIpSVlanEntry 4 }
+    
+-- -------------------------------------------------------------
+-- The S-VLAN Port ,Customer VLAN ID, Destination IP Address based
+-- Configuration Table
+-- -------------------------------------------------------------
+
+fsPbCVlanDstIpSVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsPbCVlanDstIpSVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing per port, per Customer VLAN ID, per Destination
+        IP Address, based Service VLAN classification information in the 
+        device. Entries can be configured into this table only when the bridge
+        is configured as Provider Bridge or Provider Edge Bridge and the 
+        Port Type for this port is SET as Proprietary Customer Edge Port 
+        / Proprietary Customer Network Port."
+    ::= { fsPbConfig 11 }
+
+fsPbCVlanDstIpSVlanEntry OBJECT-TYPE
+    SYNTAX      FsPbCVlanDstIpSVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information controlling Service VLAN classification at this specified
+        port for an ingress IP frame with the classified Customer VLAN ID as 
+        specified in this entry and the Destination IP Address in the IP header 
+        of the frame as specified in this entry.
+
+        Classification of Customer VLAN ID may be from the Customer VLAN tag
+        in the received frame OR based on Port CVLAN table."
+    INDEX { fsPbPort, fsPbCVlanDstIpCVlan, fsPbCVlanDstIp }
+    ::= { fsPbCVlanDstIpSVlanTable 1 }
+
+FsPbCVlanDstIpSVlanEntry ::=
+    SEQUENCE {
+        fsPbCVlanDstIpCVlan          VlanId,
+        fsPbCVlanDstIp               IpAddress,
+        fsPbCVlanDstIpSVlan          VlanId,
+        fsPbCVlanDstIpRowStatus      RowStatus
+    }
+    
+fsPbCVlanDstIpCVlan OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Customer VLAN ID in the Customer VLAN tag of an ingress frame
+        at this specified port or the Customer VLAN ID for which the ingress
+        frame is classified for at this specified port."
+    ::= { fsPbCVlanDstIpSVlanEntry 1 }
+    
+fsPbCVlanDstIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Destination IP Address in the IP header of an ingress
+        IP frame at this specified port."
+    ::= { fsPbCVlanDstIpSVlanEntry 2 }
+
+fsPbCVlanDstIpSVlan OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Service VLAN ID assigned to frames ingress at this port
+        when the classified Customer VLAN ID is same as specified in this entry 
+        and the Destination IP address in the IP header of the frame is same 
+        as specified in this entry.
+
+        Classification of Customer VLAN ID may be from the Customer VLAN tag
+        in the received frame OR based on Port CVLAN table."
+    ::= { fsPbCVlanDstIpSVlanEntry 3 }
+    
+fsPbCVlanDstIpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry. An entry is
+        created in this table when this object is SET to 'createAndWait'.
+        The entry in this table is used when the status of this object 
+        is SET 'active'. The entry in this table is not used when this 
+        object is SET 'notInService'. An entry created in this table is
+        deleted when this object is SET 'destroy'."
+
+    ::= { fsPbCVlanDstIpSVlanEntry 4 }
+    
+-- -------------------------------------------------------------
+-- The C-VLAN Port based Configuration Table
+-- -------------------------------------------------------------
+
+fsPbPortBasedCVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsPbPortBasedCVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing Customer Edge Port / Proprietary Customer Edge Port / 
+         Proprietary Customer Network Port mapping to Customer VLAN on a
+         providerBridge. This table is used for a classifying a untagged frame 
+         received on above mentioned customer ports."
+    ::= { fsPbConfig 12 }
+    
+fsPbPortBasedCVlanEntry OBJECT-TYPE
+    SYNTAX      FsPbPortBasedCVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An Entry in this table will be created whenever a port is configured as
+        Customer Edge Port / Proprietary Customer Edge Port / Proprietary Customer
+        Network Port.This Entry will be used on the ingress frame on the specified
+        ports based on enabled status for classifying the frame to CVLAN. Also 
+        the Entry will be deleted in this table, when the port type is modified 
+        anything other than the specified one."
+    INDEX { fsPbPort }
+    ::= { fsPbPortBasedCVlanTable 1 }
+            
+FsPbPortBasedCVlanEntry ::=
+    SEQUENCE {
+        fsPbPortCVlan                   VlanId,
+        fsPbPortCVlanClassifyStatus     EnabledStatus,
+        fsPbPortCVlanPriority           Integer32
+    }
+    
+fsPbPortCVlan OBJECT-TYPE
+   SYNTAX      VlanId
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "The Customer VLAN ID assigned to untagged frames ingress at this
+        specified Customer Edge Port / Proprietary Customer Edge Port /
+        Proprietary Customer Network Port."
+    ::= { fsPbPortBasedCVlanEntry 1 }
+
+fsPbPortCVlanClassifyStatus OBJECT-TYPE
+   SYNTAX      EnabledStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "This object indicate C-VLAN classification status on a port.
+         This Object can be enabled/disabled only for PropCEP/PropCNP. For CEP, 
+         this object cannot be disabled."
+    DEFVAL { enabled }
+    ::= { fsPbPortBasedCVlanEntry 2 }
+
+fsPbPortCVlanPriority OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "The port priority is assigned to untagged frames ingress at this
+        specified Customer Edge Port / Proprietary Customer Edge Port /
+        Proprietary Customer Network Port."
+    ::= { fsPbPortBasedCVlanEntry 3 }
+    
+-- -------------------------------------------------------------
+-- EtherType SwappingTable 
+-- -------------------------------------------------------------
+
+fsPbEtherTypeSwapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsPbEtherTypeSwapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A Table containing the Translation information of  the ethertype for a 
+    Service VLAN in a given packet. This Table shall be used only at ingress 
+    and NOT at egress of the Customer Network Port / Proprietary Customer Network 
+    Port / Provider Network Port. 
+    This translation table is applicable for only Service VLAN and not 
+    for customer VLAN's."
+    ::= { fsPbConfig 13 }
+    
+fsPbEtherTypeSwapEntry OBJECT-TYPE
+    SYNTAX      FsPbEtherTypeSwapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Entry containing the Local and Relay Ether type for a given packet on
+    a particular port. This entry shall be applicable on all types of ports
+    if and only if fsPbPortSVlanEtherTypeSwapStatus is Enabled on that Port."
+    INDEX { fsPbPort, fsPbLocalEtherType}
+    ::= { fsPbEtherTypeSwapTable 1 }
+            
+FsPbEtherTypeSwapEntry ::=
+    SEQUENCE {
+        fsPbLocalEtherType             Integer32,
+        fsPbRelayEtherType             Integer32,
+        fsPbEtherTypeSwapRowStatus     RowStatus
+    }
+   
+fsPbLocalEtherType OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535) 
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+    "The Ether type present in the service vlan tag of the ingress packet at
+    the given port."
+    ::= { fsPbEtherTypeSwapEntry 1 }
+
+fsPbRelayEtherType OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535) 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The Relay Ether type mapped for the ether type present in the local
+    service vlan tag of the ingress packet at the given port."
+    ::= { fsPbEtherTypeSwapEntry 2 }
+
+fsPbEtherTypeSwapRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus 
+    MAX-ACCESS  read-create 
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry. An entry is
+        created in this table when this object is SET to 'createAndWait'.
+        The entry in this table is used when the status of this object 
+        is SET 'active'. The entry in this table is not used when this 
+        object is SET 'notInService'. An entry created in this table is
+        be deleted when this object is SET 'destroy'."
+    ::= { fsPbEtherTypeSwapEntry 3 }
+
+-- ----------------------------------------------------------------
+-- S-VLAN configuration table
+-- ----------------------------------------------------------------
+fsPbSVlanConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsPbSVlanConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The table to configure the service type supported by an S-VLAN. Based 
+     on the service type configured for the S-VLAN, the oper point-to-point  
+     state of PEP ports will be determined."
+    ::= { fsPbConfig 14 }
+    
+fsPbSVlanConfigEntry OBJECT-TYPE
+    SYNTAX      FsPbSVlanConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+
+    " The service type can be configured for an S-VLAN only when the VLAN 
+    is already created in the system."
+
+    INDEX {dot1qVlanIndex}
+    ::= { fsPbSVlanConfigTable 1 }
+            
+FsPbSVlanConfigEntry ::=
+    SEQUENCE {
+        fsPbSVlanConfigServiceType          INTEGER
+    }
+
+fsPbSVlanConfigServiceType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    eLine (1),
+                    eLan  (2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The object to specify the service type supported by the S-VLAN. When 
+       it is set to 'eLine', the S-VLAN connects not more than two customer 
+       interfaces. If the service type for a vlan is 'eLine', then learning 
+       member ports through GVRP will not be allowed.
+
+       Hence the oper point-to-point state of the PEPs connecting the S-VLAN can
+       be set to True.
+
+       When it is set to 'eLan', the S-VLAN connects more than two customer
+       interfaces.So the oper point-to-point state of the PEPs connecting the
+       S-VLAN will be set to False.
+       
+       In case of IVL, When the service type is set to E-Line for a VLAN, 
+       the MAC learning status will be set to 'disabled'. When it is set  
+       to E-LAN, MAC learning status will be enabled for that VLAN."
+       
+
+    ::= { fsPbSVlanConfigEntry 1 }
+
+-- ----------------------------------------------------------------
+-- Tunnel protocol configuration table
+-- ----------------------------------------------------------------
+fsPbTunnelProtocolTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF FsPbTunnelProtocolEntry
+   MAX-ACCESS  not-accessible
+   STATUS      deprecated
+   DESCRIPTION
+      "This table contains information about the handling (Tunnel/Peer/
+      Discard)of customer Layer 2 protocols (STP/GVRP/GMRP/LACP/Dot1x
+      and IGMP) inside service provider network.
+      This table is supported only for Provider Core or Provider Edge 
+      Bridges."
+      
+   ::= { fsPbConfig 15 }
+ 
+fsPbTunnelProtocolEntry OBJECT-TYPE
+   SYNTAX      FsPbTunnelProtocolEntry
+   MAX-ACCESS  not-accessible
+   STATUS      deprecated
+   DESCRIPTION 
+      "Entry indicating the handling (Tunnel/Peer/Discard) of Layer 2
+      protocols (STP/GVRP/GMRP/LACP/Dot1x and IGMP) on this port."
+   INDEX { fsPbPort }
+   ::= { fsPbTunnelProtocolTable 1 }
+    
+ FsPbTunnelProtocolEntry ::=
+ SEQUENCE {
+    fsPbTunnelProtocolDot1x      TunnelStatus,
+    fsPbTunnelProtocolLacp       TunnelStatus,
+    fsPbTunnelProtocolStp        TunnelStatus,
+    fsPbTunnelProtocolGvrp       TunnelStatus,
+    fsPbTunnelProtocolGmrp       TunnelStatus,
+    fsPbTunnelProtocolIgmp       TunnelStatus
+ }
+
+fsPbTunnelProtocolDot1x OBJECT-TYPE
+   SYNTAX      TunnelStatus
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "The object to specify whether to peer/tunnel/discard the Dot1x packets
+            received on this port."
+   ::= { fsPbTunnelProtocolEntry  1 }
+
+fsPbTunnelProtocolLacp OBJECT-TYPE
+   SYNTAX      TunnelStatus
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "The object to specify whether to peer/tunnel/discard the LACP packets
+            received on this port."
+   ::= { fsPbTunnelProtocolEntry 2 }
+
+fsPbTunnelProtocolStp OBJECT-TYPE
+   SYNTAX      TunnelStatus
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "The object to specify whether to peer/tunnel/discard the STP packets
+            received on this port."
+   ::= { fsPbTunnelProtocolEntry 3 }
+
+fsPbTunnelProtocolGvrp OBJECT-TYPE
+   SYNTAX      TunnelStatus
+   MAX-ACCESS  read-write
+   STATUS      deprecated 
+   DESCRIPTION 
+      "The object to specify whether to peer/tunnel/discard the GVRP packets
+            received on this port."
+   ::= { fsPbTunnelProtocolEntry 4 } 
+
+fsPbTunnelProtocolGmrp OBJECT-TYPE
+   SYNTAX      TunnelStatus
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "The object to specify whether to peer/tunnel/discard the GMRP packets
+            received on this port."
+   ::= { fsPbTunnelProtocolEntry 5 }
+
+fsPbTunnelProtocolIgmp OBJECT-TYPE
+   SYNTAX      TunnelStatus
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "The object to specify whether to peer/tunnel/discard the IGMP packets
+            received on this port."
+   ::= { fsPbTunnelProtocolEntry 6 }
+
+-- ----------------------------------------------------------------
+-- Tunnel protocol statistics table
+-- ----------------------------------------------------------------
+fsPbTunnelProtocolStatsTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF FsPbTunnelProtocolStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      deprecated
+   DESCRIPTION
+      "This table contains statistics information about the tunneled 
+       Layer 2 protocols (STP/GVRP/GMRP/LACP/Dot1x and IGMP) received 
+       and transmitted over a port."
+   ::= { fsPbConfig 16 }
+ 
+fsPbTunnelProtocolStatsEntry OBJECT-TYPE
+   SYNTAX      FsPbTunnelProtocolStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      deprecated
+   DESCRIPTION 
+      "Entry indicating the handling (Tunnel/Peer/Discard) of Layer 2
+      protocols (STP/GVRP/GMRP/LACP/Dot1x and IGMP) on this port.
+
+      This table is supported only for Provider Core or Provider Edge 
+      Bridges."
+      
+   INDEX { fsPbPort }
+   ::= { fsPbTunnelProtocolStatsTable 1 }
+    
+FsPbTunnelProtocolStatsEntry ::=
+ SEQUENCE {
+      fsPbTunnelProtocolDot1xPktsRecvd Counter32,
+      fsPbTunnelProtocolDot1xPktsSent  Counter32,
+      fsPbTunnelProtocolLacpPktsRecvd  Counter32,
+      fsPbTunnelProtocolLacpPktsSent   Counter32,
+      fsPbTunnelProtocolStpPDUsRecvd   Counter32,
+      fsPbTunnelProtocolStpPDUsSent    Counter32,
+      fsPbTunnelProtocolGvrpPDUsRecvd  Counter32,
+      fsPbTunnelProtocolGvrpPDUsSent   Counter32,
+      fsPbTunnelProtocolGmrpPktsRecvd  Counter32,
+      fsPbTunnelProtocolGmrpPktsSent   Counter32,
+      fsPbTunnelProtocolIgmpPktsRecvd  Counter32,
+      fsPbTunnelProtocolIgmpPktsSent   Counter32
+   }
+
+fsPbTunnelProtocolDot1xPktsRecvd OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      deprecated
+   DESCRIPTION
+      "The number of tunneled Dot1x Packets received."
+   ::= { fsPbTunnelProtocolStatsEntry 1 }
+
+fsPbTunnelProtocolDot1xPktsSent OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      deprecated 
+   DESCRIPTION 
+      "The number of tunneled Dot1x Packets transmitted."
+   ::= { fsPbTunnelProtocolStatsEntry 2 }
+
+fsPbTunnelProtocolLacpPktsRecvd OBJECT-TYPE 
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      deprecated 
+   DESCRIPTION 
+      "The number of tunneled LACP Packets received."
+   ::= { fsPbTunnelProtocolStatsEntry 3 } 
+
+fsPbTunnelProtocolLacpPktsSent OBJECT-TYPE 
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      deprecated 
+   DESCRIPTION 
+      "The number of tunneled LACP packets transmitted."
+   ::= { fsPbTunnelProtocolStatsEntry 4 } 
+
+fsPbTunnelProtocolStpPDUsRecvd OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      deprecated 
+   DESCRIPTION 
+      "The number of tunneled STP PDUs received."
+   ::= { fsPbTunnelProtocolStatsEntry 5 } 
+
+fsPbTunnelProtocolStpPDUsSent OBJECT-TYPE 
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      deprecated 
+   DESCRIPTION 
+      "The number of tunneled STP PDUs transmitted."
+   ::= { fsPbTunnelProtocolStatsEntry 6 } 
+
+fsPbTunnelProtocolGvrpPDUsRecvd OBJECT-TYPE 
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      deprecated 
+   DESCRIPTION 
+      "The number of tunneled  GVRP PDUs received."
+   ::= { fsPbTunnelProtocolStatsEntry 7 } 
+
+fsPbTunnelProtocolGvrpPDUsSent OBJECT-TYPE 
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      deprecated 
+   DESCRIPTION 
+      "The number of tunneled GVRP PDUs transmitted."
+   ::= { fsPbTunnelProtocolStatsEntry 8 } 
+
+fsPbTunnelProtocolGmrpPktsRecvd OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      deprecated
+   DESCRIPTION
+      "The number of tunneled GMRP PDUs packets received."
+   ::= { fsPbTunnelProtocolStatsEntry 9 }
+
+fsPbTunnelProtocolGmrpPktsSent OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      deprecated 
+   DESCRIPTION 
+      "The number of tunneled GMRP packets transmitted."
+   ::= { fsPbTunnelProtocolStatsEntry 10 }
+
+fsPbTunnelProtocolIgmpPktsRecvd OBJECT-TYPE 
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      deprecated 
+   DESCRIPTION 
+      "The number of tunneled IGMP packets received."
+   ::= { fsPbTunnelProtocolStatsEntry 11 } 
+
+fsPbTunnelProtocolIgmpPktsSent OBJECT-TYPE 
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      deprecated 
+   DESCRIPTION 
+      "The number of tunneled  IGMP packets transmitted."
+   ::= { fsPbTunnelProtocolStatsEntry 12 }
+
+-- ----------------------------------------------------------------
+-- Provider Edge Port configuration table 
+-- ----------------------------------------------------------------
+
+fsPbPepExtTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsPbPepExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This is an extention of dot1adPepTable table, and it provides       
+    additional configurations to PEPs (like Cos Preservations,..). 
+    when a entry in dot1adPepTable is created, then an entry will be
+    created in this table."
+    
+    ::= { fsPbConfig 17 }
+    
+fsPbPepExtEntry OBJECT-TYPE
+    SYNTAX      FsPbPepExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+
+    "Entry  contains information like (COS preservation, ..) for the 
+    internal PEPs. Creation of an entry in this table is not allowed 
+    and only modification is allowed."
+   
+   AUGMENTS    { dot1adPepEntry }
+   ::= { fsPbPepExtTable 1 }
+            
+FsPbPepExtEntry ::=
+    SEQUENCE {
+        fsPbPepExtCosPreservation     EnabledStatus
+    }
+
+fsPbPepExtCosPreservation OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "This object is used to enable or disable COS preservation for a    
+       service provided by this PEP." 
+
+    DEFVAL      { disabled }
+    ::= { fsPbPepExtEntry 1 }
+
+END

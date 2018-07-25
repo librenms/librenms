@@ -1,0 +1,976 @@
+-- Copyright (C) 2006-2012 Aricent Group . All Rights Reserved
+
+-- $Id: fsmsbext.mib,v 1.5 2012/09/07 09:52:05 siva Exp $
+
+ARICENTP-BRIDGE-MIB DEFINITIONS ::= BEGIN
+
+-- -------------------------------------------------------------
+-- MIB for IEEE 802.1p devices
+-- -------------------------------------------------------------
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Counter64, Integer32
+        FROM SNMPv2-SMI
+    TruthValue, TimeInterval, MacAddress, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    fsDot1dTp, fsDot1dTpPort, fsDot1dBridge,
+    fsDot1dBasePortEntry, fsDot1dBasePort
+        FROM ARICENT-MIStdBRIDGE-MIB;
+
+fsPBridgeMIB MODULE-IDENTITY
+    LAST-UPDATED "201209050000Z"
+    ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+    CONTACT-INFO "support@aricent.com"
+    DESCRIPTION
+        "The Bridge MIB Extension module with multiple instance capability 
+        for managing Priority and Multicast Filtering, defined by 
+        IEEE 802.1D-1998, including Restricted Group Registration 
+        defined by IEEE 802.1t-2001."
+    REVISION "201209050000Z"
+    DESCRIPTION
+        "The Bridge MIB Extension module with multiple instance capability 
+        for managing Priority and Multicast Filtering, defined by 
+        IEEE 802.1D-1998, including Restricted Group Registration 
+        defined by IEEE 802.1t-2001."
+
+    ::= { fsDot1dBridge 6 }
+
+fsPBridgeMIBObjects OBJECT IDENTIFIER ::= { fsPBridgeMIB 1 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+EnabledStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A simple status value for the object."
+    SYNTAX      INTEGER { enabled(1), disabled(2) }
+
+-- -------------------------------------------------------------
+-- groups in the FSP-BRIDGE MIB
+-- -------------------------------------------------------------
+
+fsDot1dExtBase    OBJECT IDENTIFIER ::= { fsPBridgeMIBObjects 1 }
+fsDot1dPriority   OBJECT IDENTIFIER ::= { fsPBridgeMIBObjects 2 }
+fsDot1dGarp       OBJECT IDENTIFIER ::= { fsPBridgeMIBObjects 3 }
+fsDot1dGmrp       OBJECT IDENTIFIER ::= { fsPBridgeMIBObjects 4 }
+
+-- -------------------------------------------------------------
+-- fsDot1dExtBase group
+-- -------------------------------------------------------------
+
+fsDot1dExtBaseTable OBJECT-TYPE
+   SYNTAX        SEQUENCE OF FsDot1dExtBaseEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+     "List of fsDot1dExtBase group objects that can be configured per
+     virtual context in the system."
+   ::= { fsDot1dExtBase 1 }
+
+fsDot1dExtBaseEntry OBJECT-TYPE
+   SYNTAX       FsDot1dExtBaseEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+     "fsDot1dExtBase group objects per virtual context."
+   INDEX { fsDot1dBridgeContextId }
+   ::= { fsDot1dExtBaseTable 1 }
+
+FsDot1dExtBaseEntry ::=
+   SEQUENCE {
+          fsDot1dBridgeContextId
+             Integer32,
+          fsDot1dDeviceCapabilities
+             BITS,
+          fsDot1dTrafficClassesEnabled
+             TruthValue,
+          fsDot1dGmrpStatus
+             EnabledStatus
+}
+
+fsDot1dBridgeContextId OBJECT-TYPE
+   SYNTAX        Integer32 (0..65535)
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+     "Identifies the virtual context."
+   ::= {fsDot1dExtBaseEntry 1 }
+
+fsDot1dDeviceCapabilities OBJECT-TYPE
+   SYNTAX      BITS {
+       dot1dExtendedFilteringServices(0),
+                             -- can perform filtering of
+                             -- individual multicast addresses
+                             -- controlled by GMRP.
+       dot1dTrafficClasses(1),
+                             -- can map user priority to
+                             -- multiple traffic classes.
+       dot1qStaticEntryIndividualPort(2),
+                             -- fsDot1qStaticUnicastReceivePort &
+                             -- fsDot1qStaticMulticastReceivePort
+                             -- can represent non-zero entries.
+       dot1qIVLCapable(3),   -- Independent VLAN Learning.
+       dot1qSVLCapable(4),   -- Shared VLAN Learning.
+       dot1qHybridCapable(5),
+                             -- both IVL & SVL simultaneously.
+       dot1qConfigurablePvidTagging(6),
+                             -- whether the implementation
+                             -- supports the ability to
+                             -- override the default PVID
+                             -- setting and its egress status
+                             -- (VLAN-Tagged or Untagged) on
+                             -- each port.
+       dot1dLocalVlanCapable(7)
+                             -- can support multiple local
+                             -- bridges, outside of the scope
+                             -- of 802.1Q defined VLANs.
+   }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Indicates the optional parts of IEEE 802.1D and 802.1Q
+     that are implemented by this device and are manageable
+     through this MIB.  Capabilities that are allowed on a
+     per-port basis are indicated in fsDot1dPortCapabilities."
+   REFERENCE
+     "ISO/IEC 15802-3 Section 5.2,
+     IEEE 802.1Q/D11 Section 5.2, 12.10.1.1.3/b/2"
+   ::= { fsDot1dExtBaseEntry 2 }
+
+fsDot1dTrafficClassesEnabled OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The value true(1) indicates that Traffic Classes are
+     enabled on this bridge.  When false(2), the bridge
+     operates with a single priority level for all traffic."
+   DEFVAL      { true }
+   ::= { fsDot1dExtBaseEntry 3 }
+
+fsDot1dGmrpStatus OBJECT-TYPE
+   SYNTAX      EnabledStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The administrative status requested by management for
+     GMRP.  The value enabled(1) indicates that GMRP should
+     be enabled on this device, in all VLANs, on all ports
+     for which it has not been specifically disabled.  When
+     disabled(2), GMRP is disabled, in all VLANs, on all
+     ports and all GMRP packets will be forwarded
+     transparently.  This object affects both Applicant and
+     Registrar state machines.  A transition from disabled(2)
+     to enabled(1) will cause a reset of all GMRP state
+     machines on all ports.By default this value is enabled(1) for default 
+     context and it is disabled(2) for other contexts."
+   ::= { fsDot1dExtBaseEntry 4 }
+
+-- -------------------------------------------------------------
+-- Port Capabilities Table
+-- -------------------------------------------------------------
+
+fsDot1dPortCapabilitiesTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF FsDot1dPortCapabilitiesEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "A table that contains capabilities information about
+     every port that is associated with this bridge."
+   ::= { fsDot1dExtBase 2 }
+
+fsDot1dPortCapabilitiesEntry OBJECT-TYPE
+   SYNTAX      FsDot1dPortCapabilitiesEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "A set of capabilities information about this port
+     indexed by fsDot1dBasePort."
+   AUGMENTS { fsDot1dBasePortEntry }
+   ::= { fsDot1dPortCapabilitiesTable 1 }
+
+FsDot1dPortCapabilitiesEntry ::=
+    SEQUENCE {
+           fsDot1dPortCapabilities
+              BITS
+}
+
+fsDot1dPortCapabilities OBJECT-TYPE
+   SYNTAX      BITS {
+       dot1qDot1qTagging(0), -- supports 802.1Q VLAN tagging of
+                             -- frames and GVRP.
+       dot1qConfigurableAcceptableFrameTypes(1),
+                             -- allows modified values of
+                             -- fsDot1qPortAcceptableFrameTypes.
+       dot1qIngressFiltering(2)
+                             -- supports the discarding of any
+                             -- frame received on a Port whose
+                             -- VLAN classification does not
+                             -- include that Port in its Member
+                             -- set.
+   }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Indicates the parts of IEEE 802.1D and 802.1Q that are
+     optional on a per-port basis that are implemented by
+     this device and are manageable through this MIB."
+   REFERENCE
+     "ISO/IEC 15802-3 Section 5.2,
+     IEEE 802.1Q/D11 Section 5.2"
+   ::= { fsDot1dPortCapabilitiesEntry 1 }
+
+-- -------------------------------------------------------------
+-- the fsDot1dPriority group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- Port Priority Table
+-- -------------------------------------------------------------
+
+fsDot1dPortPriorityTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF FsDot1dPortPriorityEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "A table that contains information about every port that
+     is associated with this transparent bridge."
+   ::= { fsDot1dPriority 1 }
+
+fsDot1dPortPriorityEntry OBJECT-TYPE
+   SYNTAX      FsDot1dPortPriorityEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "A list of Default User Priorities for each port of a
+     transparent bridge.  This is indexed by fsDot1dBasePort."
+   AUGMENTS { fsDot1dBasePortEntry }
+   ::= { fsDot1dPortPriorityTable 1 }
+
+FsDot1dPortPriorityEntry ::=
+   SEQUENCE {
+          fsDot1dPortDefaultUserPriority
+             INTEGER,
+          fsDot1dPortNumTrafficClasses
+             INTEGER
+}
+
+fsDot1dPortDefaultUserPriority OBJECT-TYPE
+   SYNTAX      INTEGER (0..7)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The default ingress User Priority for this port.  This
+     only has effect on media, such as Ethernet, that do not
+     support native User Priority."
+   ::= { fsDot1dPortPriorityEntry 1 }
+
+fsDot1dPortNumTrafficClasses OBJECT-TYPE
+   SYNTAX      INTEGER (1..8)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The number of egress traffic classes supported on this
+     port.  This object may optionally be read-only."
+   ::= { fsDot1dPortPriorityEntry 2 }
+
+-- -------------------------------------------------------------
+-- User Priority Regeneration Table
+-- -------------------------------------------------------------
+
+fsDot1dUserPriorityRegenTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF FsDot1dUserPriorityRegenEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "A list of Regenerated User Priorities for each received
+     User Priority on each port of a bridge.  The Regenerated
+     User Priority value may be used to index the Traffic
+     Class Table for each input port.  This only has effect
+     on media that support native User Priority.  The default
+     values for Regenerated User Priorities are the same as
+     the User Priorities."
+   REFERENCE
+     "ISO/IEC 15802-3 Section 6.4"
+   ::= { fsDot1dPriority 2 }
+
+fsDot1dUserPriorityRegenEntry OBJECT-TYPE
+   SYNTAX      FsDot1dUserPriorityRegenEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "A mapping of incoming User Priority to a Regenerated
+     User Priority."
+   INDEX   { fsDot1dBasePort, fsDot1dUserPriority }
+   ::= { fsDot1dUserPriorityRegenTable 1 }
+
+FsDot1dUserPriorityRegenEntry ::=
+   SEQUENCE {
+          fsDot1dUserPriority
+             INTEGER,
+          fsDot1dRegenUserPriority
+             INTEGER
+}
+
+fsDot1dUserPriority OBJECT-TYPE
+   SYNTAX      INTEGER (0..7)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "The User Priority for a frame received on this port."
+   ::= { fsDot1dUserPriorityRegenEntry 1 }
+
+fsDot1dRegenUserPriority OBJECT-TYPE
+   SYNTAX      INTEGER (0..7)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The Regenerated User Priority the incoming User
+     Priority is mapped to for this port."
+   ::= { fsDot1dUserPriorityRegenEntry 2 }
+
+-- -------------------------------------------------------------
+-- Traffic Class Table
+-- -------------------------------------------------------------
+
+fsDot1dTrafficClassTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF FsDot1dTrafficClassEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "A table mapping evaluated User Priority to Traffic
+     Class, for forwarding by the bridge.  Traffic class is a
+     number in the range (0..(fsDot1dPortNumTrafficClasses-1))."
+   REFERENCE
+     "ISO/IEC 15802-3 Table 7-2"
+   ::= { fsDot1dPriority 3 }
+
+fsDot1dTrafficClassEntry OBJECT-TYPE
+   SYNTAX      FsDot1dTrafficClassEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "User Priority to Traffic Class mapping."
+   INDEX   { fsDot1dBasePort, fsDot1dTrafficClassPriority }
+   ::= { fsDot1dTrafficClassTable 1 }
+
+FsDot1dTrafficClassEntry ::=
+   SEQUENCE {
+          fsDot1dTrafficClassPriority
+             INTEGER,
+          fsDot1dTrafficClass
+             INTEGER
+}
+
+fsDot1dTrafficClassPriority OBJECT-TYPE
+   SYNTAX      INTEGER (0..7)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "The Priority value determined for the received frame.
+     This value is equivalent to the priority indicated in
+     the tagged frame received, or one of the evaluated
+     priorities, determined according to the media-type.
+
+     For untagged frames received from Ethernet media, this
+     value is equal to the fsDot1dPortDefaultUserPriority value
+     for the ingress port.
+
+     For untagged frames received from non-Ethernet media,
+     this value is equal to the fsDot1dRegenUserPriority value
+     for the ingress port and media-specific user priority."
+   ::= { fsDot1dTrafficClassEntry 1 }
+
+fsDot1dTrafficClass OBJECT-TYPE
+   SYNTAX      INTEGER (0..7)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The Traffic Class the received frame is mapped to."
+   ::= { fsDot1dTrafficClassEntry 2 }
+
+-- -------------------------------------------------------------
+-- Outbound Access Priority Table
+-- -------------------------------------------------------------
+
+fsDot1dPortOutboundAccessPriorityTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF FsDot1dPortOutboundAccessPriorityEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "A table mapping Regenerated User Priority to Outbound
+     Access Priority.  This is a fixed mapping for all port
+     types, with two options for 802.5 Token Ring."
+   REFERENCE
+     "ISO/IEC 15802-3 Table 7-3"
+   ::= { fsDot1dPriority 4 }
+
+fsDot1dPortOutboundAccessPriorityEntry OBJECT-TYPE
+   SYNTAX      FsDot1dPortOutboundAccessPriorityEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "Regenerated User Priority to Outbound Access Priority
+     mapping."
+   INDEX   { fsDot1dBasePort, fsDot1dRegenUserPriority }
+   ::= { fsDot1dPortOutboundAccessPriorityTable 1 }
+
+FsDot1dPortOutboundAccessPriorityEntry ::=
+   SEQUENCE {
+          fsDot1dPortOutboundAccessPriority
+             INTEGER
+}
+
+fsDot1dPortOutboundAccessPriority OBJECT-TYPE
+   SYNTAX      INTEGER (0..7)
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "The Outbound Access Priority the received frame is
+     mapped to."
+   ::= { fsDot1dPortOutboundAccessPriorityEntry 1 }
+
+-- -------------------------------------------------------------
+-- the fsDot1dGarp group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- The GARP Port Table
+-- -------------------------------------------------------------
+
+fsDot1dPortGarpTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF FsDot1dPortGarpEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "A table of GARP control information about every bridge
+     port.  This is indexed by fsDot1dBasePort."
+   ::= { fsDot1dGarp 1 }
+
+fsDot1dPortGarpEntry OBJECT-TYPE
+   SYNTAX      FsDot1dPortGarpEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "GARP control information for a bridge port."
+   AUGMENTS { fsDot1dBasePortEntry }
+   ::= { fsDot1dPortGarpTable 1 }
+
+FsDot1dPortGarpEntry ::=
+   SEQUENCE {
+          fsDot1dPortGarpJoinTime
+             TimeInterval,
+          fsDot1dPortGarpLeaveTime
+             TimeInterval,
+          fsDot1dPortGarpLeaveAllTime
+             TimeInterval
+}
+
+fsDot1dPortGarpJoinTime OBJECT-TYPE
+   SYNTAX      TimeInterval
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The GARP Join time, in centiseconds."
+   DEFVAL      { 20 }
+   ::= { fsDot1dPortGarpEntry 1 }
+
+fsDot1dPortGarpLeaveTime OBJECT-TYPE
+   SYNTAX      TimeInterval
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The GARP Leave time, in centiseconds."
+   DEFVAL      { 60 }
+   ::= { fsDot1dPortGarpEntry 2 }
+
+fsDot1dPortGarpLeaveAllTime OBJECT-TYPE
+   SYNTAX      TimeInterval
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The GARP LeaveAll time, in centiseconds."
+   DEFVAL      { 1000 }
+   ::= { fsDot1dPortGarpEntry 3 }
+
+-- -------------------------------------------------------------
+-- The GMRP Port Configuration and Status Table
+-- -------------------------------------------------------------
+
+fsDot1dPortGmrpTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF FsDot1dPortGmrpEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "A table of GMRP control and status information about
+     every bridge port.  Augments the fsDot1dBasePortTable."
+   ::= { fsDot1dGmrp 1 }
+
+fsDot1dPortGmrpEntry OBJECT-TYPE
+   SYNTAX      FsDot1dPortGmrpEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "GMRP control and status information for a bridge port."
+   AUGMENTS { fsDot1dBasePortEntry }
+   ::= { fsDot1dPortGmrpTable 1 }
+
+FsDot1dPortGmrpEntry ::=
+   SEQUENCE {
+          fsDot1dPortGmrpStatus
+             EnabledStatus,
+          fsDot1dPortGmrpFailedRegistrations
+             Counter32,
+          fsDot1dPortGmrpLastPduOrigin
+             MacAddress,
+          fsDot1dPortRestrictedGroupRegistration
+             TruthValue
+}
+
+fsDot1dPortGmrpStatus OBJECT-TYPE
+   SYNTAX      EnabledStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The administrative state of GMRP operation on this port. The
+     value enabled(1) indicates that GMRP is enabled on this port
+     in all VLANs as long as fsDot1dGmrpStatus is also enabled(1).
+     A value of disabled(2) indicates that GMRP is disabled on
+     this port in all VLANs: any GMRP packets received will
+     be silently discarded and no GMRP registrations will be
+     propagated from other ports. Setting this to a value of
+     enabled(1) will be stored by the agent but will only take
+     effect on the GMRP protocol operation if fsDot1dGmrpStatus
+     also indicates the value enabled(1).  This object affects
+     all GMRP Applicant and Registrar state machines on this
+     port.  A transition from disabled(2) to enabled(1) will
+     cause a reset of all GMRP state machines on this port."
+   DEFVAL      { enabled }
+   ::= { fsDot1dPortGmrpEntry 1 }
+
+fsDot1dPortGmrpFailedRegistrations OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "The total number of failed GMRP registrations, for any
+     reason, in all VLANs, on this port."
+   ::= { fsDot1dPortGmrpEntry 2 }
+
+fsDot1dPortGmrpLastPduOrigin OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "The Source MAC Address of the last GMRP message
+     received on this port."
+   ::= { fsDot1dPortGmrpEntry 3 }
+
+fsDot1dPortRestrictedGroupRegistration OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The state of Restricted Group Registration on this port.
+     If the value of this control is true(1), then creation
+     of a new dynamic entry is permitted only if there is a
+     Static Filtering Entry for the VLAN concerned, in which
+     the Registrar Administrative Control value is Normal
+     Registration."
+   REFERENCE
+     "IEEE 802.1t clause 10.3.2.3, 14.10.1.3."
+   DEFVAL      { false }
+   ::= { fsDot1dPortGmrpEntry 4 }
+
+-- -------------------------------------------------------------
+--  High Capacity Port Table for Transparent Bridges
+-- -------------------------------------------------------------
+
+fsDot1dTpHCPortTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF FsDot1dTpHCPortEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "A table that contains information about every high
+     capacity port that is associated with this transparent
+     bridge."
+   ::= { fsDot1dTp 5 }
+
+fsDot1dTpHCPortEntry OBJECT-TYPE
+   SYNTAX      FsDot1dTpHCPortEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "Statistics information for each high capacity port of a
+     transparent bridge."
+   INDEX   { fsDot1dTpPort }
+   ::= { fsDot1dTpHCPortTable 1 }
+
+FsDot1dTpHCPortEntry ::=
+   SEQUENCE {
+          fsDot1dTpHCPortInFrames
+             Counter64,
+          fsDot1dTpHCPortOutFrames
+             Counter64,
+          fsDot1dTpHCPortInDiscards
+             Counter64
+}
+
+fsDot1dTpHCPortInFrames OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "The number of frames that have been received by this
+     port from its segment.  Note that a frame received on
+     the interface corresponding to this port is only counted
+     by this object if and only if it is for a protocol being
+     processed by the local bridging function, including
+     bridge management frames."
+   REFERENCE
+     "ISO/IEC 15802-3 Section 14.6.1.1.3"
+   ::= { fsDot1dTpHCPortEntry 1 }
+
+fsDot1dTpHCPortOutFrames OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "The number of frames that have been transmitted by this
+     port to its segment.  Note that a frame transmitted on
+     the interface corresponding to this port is only counted
+     by this object if and only if it is for a protocol being
+     processed by the local bridging function, including
+     bridge management frames."
+   REFERENCE
+     "ISO/IEC 15802-3 Section 14.6.1.1.3"
+   ::= { fsDot1dTpHCPortEntry 2 }
+
+fsDot1dTpHCPortInDiscards OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of valid frames that have been received by this
+     port from its segment which were discarded (i.e.,
+     filtered) by the Forwarding Process."
+   REFERENCE
+     "ISO/IEC 15802-3 Section 14.6.1.1.3"
+   ::= { fsDot1dTpHCPortEntry 3 }
+
+-- ----------------------------------------------------
+--  Upper part of High Capacity Port Table for Transparent Bridges
+-- ----------------------------------------------------
+
+fsDot1dTpPortOverflowTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF FsDot1dTpPortOverflowEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "A table that contains the most-significant bits of
+     statistics counters for ports that are associated with this
+     transparent bridge that are on high capacity interfaces, as
+     defined in the conformance clauses for this table. This table
+     is provided as a way to read 64-bit counters for agents which
+     support only SNMPv1.
+
+     Note that the reporting of most-significant and
+     least-significant counter bits separately runs the risk of
+     missing an overflow of the lower bits in the interval between
+     sampling. The manager must be aware of this possibility, even
+     within the same varbindlist, when interpreting the results of
+     a request or asynchronous notification."
+   ::= { fsDot1dTp 6 }
+
+fsDot1dTpPortOverflowEntry OBJECT-TYPE
+   SYNTAX      FsDot1dTpPortOverflowEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "The most significant bits of statistics counters for a high
+     capacity interface of a transparent bridge. Each object is
+     associated with a corresponding object in fsDot1dTpPortTable
+     which indicates the least significant bits of the counter."
+   INDEX   { fsDot1dTpPort }
+   ::= { fsDot1dTpPortOverflowTable 1 }
+
+FsDot1dTpPortOverflowEntry ::=
+   SEQUENCE {
+          fsDot1dTpPortInOverflowFrames
+             Counter32,
+          fsDot1dTpPortOutOverflowFrames
+             Counter32,
+          fsDot1dTpPortInOverflowDiscards
+             Counter32
+}
+
+fsDot1dTpPortInOverflowFrames OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "The number of times the associated fsDot1dTpPortInFrames
+     counter has overflowed."
+   REFERENCE
+     "ISO/IEC 15802-3 Section 14.6.1.1.3"
+   ::= { fsDot1dTpPortOverflowEntry 1 }
+
+fsDot1dTpPortOutOverflowFrames OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "The number of times the associated fsDot1dTpPortOutFrames
+     counter has overflowed."
+   REFERENCE
+     "ISO/IEC 15802-3 Section 14.6.1.1.3"
+   ::= { fsDot1dTpPortOverflowEntry 2 }
+
+fsDot1dTpPortInOverflowDiscards OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "The number of times the associated
+     fsDot1dTpPortInDiscards counter has overflowed."
+   REFERENCE
+     "ISO/IEC 15802-3 Section 14.6.1.1.3"
+   ::= { fsDot1dTpPortOverflowEntry 3 }
+
+-- -------------------------------------------------------------
+-- IEEE 802.1p MIB - Conformance Information
+-- -------------------------------------------------------------
+
+fsPBridgeConformance OBJECT IDENTIFIER ::= { fsPBridgeMIB 2 }
+
+fsPBridgeGroups OBJECT IDENTIFIER ::= { fsPBridgeConformance 1 }
+
+fsPBridgeCompliances OBJECT IDENTIFIER ::= { fsPBridgeConformance 2 }
+
+-- -------------------------------------------------------------
+-- units of conformance
+-- -------------------------------------------------------------
+
+fsPBridgeExtCapGroup OBJECT-GROUP
+    OBJECTS {
+        fsDot1dDeviceCapabilities,
+        fsDot1dPortCapabilities
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects indicating the optional
+        capabilities of the device."
+    ::= { fsPBridgeGroups 1 }
+
+fsPBridgeDeviceGmrpGroup OBJECT-GROUP
+    OBJECTS {
+        fsDot1dGmrpStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing device-level control
+        for the Multicast Filtering extended bridge services."
+    ::= { fsPBridgeGroups 2 }
+
+fsPBridgeDevicePriorityGroup OBJECT-GROUP
+    OBJECTS {
+        fsDot1dTrafficClassesEnabled
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing device-level control
+        for the Priority services."
+    ::= { fsPBridgeGroups 3 }
+
+fsPBridgeDefaultPriorityGroup OBJECT-GROUP
+    OBJECTS {
+        fsDot1dPortDefaultUserPriority
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects defining the User Priority
+        applicable to each port for media which do not support
+        native User Priority."
+    ::= { fsPBridgeGroups 4 }
+
+fsPBridgeRegenPriorityGroup OBJECT-GROUP
+    OBJECTS {
+        fsDot1dRegenUserPriority
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects defining the User Priorities
+        applicable to each port for media which support native
+        User Priority."
+    ::= { fsPBridgeGroups 5 }
+
+fsPBridgePriorityGroup OBJECT-GROUP
+    OBJECTS {
+        fsDot1dPortNumTrafficClasses,
+        fsDot1dTrafficClass
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects defining the traffic classes
+        within a bridge for each evaluated User Priority."
+    ::= { fsPBridgeGroups 6 }
+
+fsPBridgeAccessPriorityGroup OBJECT-GROUP
+    OBJECTS {
+        fsDot1dPortOutboundAccessPriority
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects defining the media dependent
+        outbound access level for each priority."
+    ::= { fsPBridgeGroups 7 }
+
+fsPBridgePortGarpGroup OBJECT-GROUP
+    OBJECTS {
+        fsDot1dPortGarpJoinTime,
+        fsDot1dPortGarpLeaveTime,
+        fsDot1dPortGarpLeaveAllTime
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing port level control
+        and status information for GARP operation."
+    ::= { fsPBridgeGroups 8 }
+
+fsPBridgePortGmrpGroup OBJECT-GROUP
+    OBJECTS {
+        fsDot1dPortGmrpStatus,
+        fsDot1dPortGmrpFailedRegistrations,
+        fsDot1dPortGmrpLastPduOrigin,
+        fsDot1dPortRestrictedGroupRegistration
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing port level control
+        and status information for GMRP operation."
+    ::= { fsPBridgeGroups 9 }
+
+fsPBridgeHCPortGroup OBJECT-GROUP
+    OBJECTS {
+        fsDot1dTpHCPortInFrames,
+        fsDot1dTpHCPortOutFrames,
+        fsDot1dTpHCPortInDiscards
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing 64-bit statistics
+         counters for high capacity bridge ports."
+    ::= { fsPBridgeGroups 10 }
+
+fsPBridgePortOverflowGroup OBJECT-GROUP
+    OBJECTS {
+        fsDot1dTpPortInOverflowFrames,
+        fsDot1dTpPortOutOverflowFrames,
+        fsDot1dTpPortInOverflowDiscards
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing overflow statistics
+        counters for high capacity bridge ports."
+    ::= { fsPBridgeGroups 11 }
+
+-- -------------------------------------------------------------
+-- compliance statements
+-- -------------------------------------------------------------
+
+fsPBridgeCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for device support of Priority
+        and Multicast Filtering extended bridging services."
+
+    MODULE
+        MANDATORY-GROUPS { fsPBridgeExtCapGroup }
+
+        GROUP       fsPBridgeDeviceGmrpGroup
+        DESCRIPTION
+            "This group is mandatory for devices supporting the GMRP
+            application, defined by IEEE 802.1D Extended Filtering
+            Services."
+
+        GROUP       fsPBridgeDevicePriorityGroup
+        DESCRIPTION
+            "This group is mandatory only for devices supporting
+            the priority forwarding operations defined by IEEE
+            802.1D."
+        GROUP       fsPBridgeDefaultPriorityGroup
+        DESCRIPTION
+            "This group is mandatory only for devices supporting
+            the priority forwarding operations defined by the
+            extended bridge services with media types, such as
+            Ethernet, that do not support native User Priority."
+
+        GROUP       fsPBridgeRegenPriorityGroup
+        DESCRIPTION
+            "This group is mandatory only for devices supporting
+            the priority forwarding operations defined by IEEE 802.1D
+            and which have interface media types that support
+            native User Priority e.g. IEEE 802.5."
+
+        GROUP       fsPBridgePriorityGroup
+        DESCRIPTION
+            "This group is mandatory only for devices supporting
+            the priority forwarding operations defined by IEEE 802.1D."
+
+        GROUP       fsPBridgeAccessPriorityGroup
+        DESCRIPTION
+            "This group is optional and is relevant only for devices
+            supporting the priority forwarding operations defined by
+            IEEE 802.1D and which have interface media types that support
+            native Access Priority e.g. IEEE 802.5."
+
+        GROUP       fsPBridgePortGarpGroup
+        DESCRIPTION
+            "This group is mandatory for devices supporting any
+            of the GARP applications: e.g. GMRP, defined by the
+            extended filtering services of 802.1D; or GVRP,
+            defined by 802.1Q (refer to the Q-BRIDGE-MIB for
+            conformance statements for GVRP)."
+
+        GROUP       fsPBridgePortGmrpGroup
+        DESCRIPTION
+            "This group is mandatory for devices supporting the
+            GMRP application, as defined by IEEE 802.1D Extended
+            Filtering Services."
+
+        GROUP       fsPBridgeHCPortGroup
+        DESCRIPTION
+            "Support for this group in a device is mandatory for those
+            bridge ports which map to network interfaces that have the
+            value of the corresponding instance of ifSpeed
+            greater than 650,000,000 bits/second."
+
+        GROUP       fsPBridgePortOverflowGroup
+        DESCRIPTION
+            "Support for this group in a device is mandatory for those
+            bridge ports which map to network interfaces that have the
+            value of the corresponding instance of ifSpeed
+            greater than 650,000,000 bits/second."
+
+        OBJECT      fsDot1dPortNumTrafficClasses
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required."
+
+        OBJECT      fsDot1dTrafficClass
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required."
+
+        OBJECT      fsDot1dRegenUserPriority
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required."
+
+       ::= { fsPBridgeCompliances 1 }
+
+END

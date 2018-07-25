@@ -1,0 +1,875 @@
+-- Copyright (C) 2006-2012 Aricent Group . All Rights Reserved
+
+-- $Id: fsdhcps.mib,v 1.15 2014/03/31 13:58:07 siva Exp $
+
+    ARICENT-DHCP-SERVER-MIB DEFINITIONS ::= BEGIN
+ 
+ IMPORTS
+     MODULE-IDENTITY, OBJECT-TYPE, 
+     Counter32, enterprises,
+     Unsigned32, Integer32, IpAddress, TimeTicks, NOTIFICATION-TYPE
+                  FROM SNMPv2-SMI
+     DisplayString, TruthValue, RowStatus           FROM SNMPv2-TC;
+   
+
+ futureDhcpSrvMIB MODULE-IDENTITY
+    LAST-UPDATED "201209050000Z"           
+    ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+    CONTACT-INFO "support@aricent.com" 
+	DESCRIPTION " The DHCP Server MIB is placed under 
+                  futuresoftware MIB branch."
+	REVISION "201209050000Z"
+	DESCRIPTION " The DHCP Server MIB is placed under 
+                  futuresoftware MIB branch."
+	::= { enterprises futuresoftware (2076) 84 } 
+
+
+
+ dhcpSrvConfig             OBJECT IDENTIFIER ::= { futureDhcpSrvMIB 1 }
+ dhcpSrvBinding            OBJECT IDENTIFIER ::= { futureDhcpSrvMIB 2 }
+ dhcpSrvCounters           OBJECT IDENTIFIER ::= { futureDhcpSrvMIB 3 }
+ dhcpSrvTrapGroup          OBJECT IDENTIFIER ::= { futureDhcpSrvMIB 4 }
+
+--- dhcpScalars
+
+dhcpSrvEnable OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+            "This object is for enabling or disabling DHCP server in 
+            the router."
+      ::= { dhcpSrvConfig 1 }
+
+dhcpSrvDebugLevel OBJECT-TYPE
+      SYNTAX Integer32 (0..65535)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+            "The mask which is used to enable selective debug levels in 
+             DHCP server module.Each allowed BIT in the integer, represents 
+             a particular level of Trace.The maping between the bit 
+             positions & the level of trace is as follows: 
+                  0 - Event Traces
+                  2 - Management Trace
+                  3 - packet Trace
+                  4 - Bind Trace
+                  6 - All Failure Traces
+             The remaining bits are unused. Combination of levels are also 
+             allowed. For example if the bits 0 and 2 are set, then the 
+             Trace statements related to events and management will 
+             be printed. The user has to enter the corresponding INTEGER VALUE 
+             for the bits set. For example if bits 0 and 2 are set then user 
+             has to give the value 5."
+      DEFVAL    { 0 }
+      ::= { dhcpSrvConfig 2 }
+
+dhcpSrvOfferReuseTimeOut OBJECT-TYPE
+      SYNTAX TimeTicks
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+            "Offer Reuse Timer Value (in seconds). This timer value
+            represents the amount of time the DHCP server entity would
+            wait for the DHCP REQUEST from the client, before reusing 
+            the offer, like the blocked IP address. The value zero
+            disables this timer."
+
+      DEFVAL  { 5 }
+      ::= { dhcpSrvConfig 3 }
+
+dhcpSrvIcmpEchoEnable OBJECT-TYPE
+   SYNTAX       TruthValue
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+            "Indicates whether ICMP echo is enabled for the DHCP server
+             entity. This object controls the server to probe for the IP
+             address before allocating the IP address to a client through
+             the ICMP echo message.  The default value is FALSE."
+   DEFVAL  { false }
+      ::= { dhcpSrvConfig 4 }
+
+dhcpSrvBootServerAddress OBJECT-TYPE
+   SYNTAX       IpAddress
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+            "IP address of next server to use in bootstrap."
+      ::= { dhcpSrvConfig 5 }
+
+dhcpSrvDefBootFilename OBJECT-TYPE
+   SYNTAX       OCTET STRING (SIZE(0..64))
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+            "Default Boot file name, null terminated string."
+      ::= { dhcpSrvConfig 6 }
+
+dhcpSrvBootpClientsSupported OBJECT-TYPE
+   SYNTAX       TruthValue
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+            "Indicates whether bootp clients are suppored by the 
+             dhcp server."
+   DEFVAL    { true }
+      ::= { dhcpSrvConfig 7 }
+
+dhcpSrvAutomaticBootpEnabled OBJECT-TYPE
+   SYNTAX       TruthValue
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+            "Indicates whether automatic address allocation to bootp
+             clients is supported."
+   DEFVAL    { true }
+      ::= { dhcpSrvConfig 8 }
+
+
+--- dhcpSubnetPool
+
+dhcpSrvSubnetPoolConfigTable OBJECT-TYPE  
+    SYNTAX SEQUENCE OF DhcpSrvSubnetPoolConfigEntry  
+    MAX-ACCESS not-accessible  
+    STATUS current  
+    DESCRIPTION  
+        " This table contains the subnet specific IpAddress Range that
+          are to be used by the server on response to a DHCP DISCOVER
+          message in a DHCP OFFER message."
+      ::=  { dhcpSrvConfig 9 }  
+  
+dhcpSrvSubnetPoolConfigEntry OBJECT-TYPE  
+    SYNTAX DhcpSrvSubnetPoolConfigEntry  
+    MAX-ACCESS not-accessible  
+    STATUS current  
+    DESCRIPTION  
+        "Entries of the dhcpSrvSubnetPoolConfigTable"
+    INDEX {dhcpSrvSubnetPoolIndex}
+    ::=  { dhcpSrvSubnetPoolConfigTable 1 }  
+  
+--
+DhcpSrvSubnetPoolConfigEntry ::= SEQUENCE {  
+    dhcpSrvSubnetPoolIndex           INTEGER,  
+    dhcpSrvSubnetSubnet              IpAddress,  
+    dhcpSrvSubnetPortNumber          INTEGER,  
+    dhcpSrvSubnetMask                IpAddress,  
+    dhcpSrvSubnetStartIpAddress      IpAddress,  
+    dhcpSrvSubnetEndIpAddress        IpAddress,  
+    dhcpSrvSubnetLeaseTime           INTEGER,  
+    dhcpSrvSubnetPoolName            DisplayString,
+    dhcpSrvSubnetUtlThreshold        INTEGER,
+    dhcpSrvSubnetPoolRowStatus       RowStatus
+   }  
+
+
+dhcpSrvSubnetPoolIndex OBJECT-TYPE  
+    SYNTAX INTEGER (1..2147483647) 
+    MAX-ACCESS not-accessible
+    STATUS current  
+    DESCRIPTION  
+        "Index of one entry in dhcpSrvSubnetPoolConfigTable"  
+    ::=  { dhcpSrvSubnetPoolConfigEntry 1 }  
+ 
+dhcpSrvSubnetSubnet OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current 
+    DESCRIPTION
+        "Subnet corresponds to this Entry."
+    ::=  { dhcpSrvSubnetPoolConfigEntry 2 }  
+
+dhcpSrvSubnetPortNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current 
+    DESCRIPTION
+        "Port number of this subnet"
+    ::=  { dhcpSrvSubnetPoolConfigEntry 3 }  
+
+dhcpSrvSubnetMask OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current 
+    DESCRIPTION
+        "Netmask of this subnet entry"
+    ::=  { dhcpSrvSubnetPoolConfigEntry 4 }  
+
+dhcpSrvSubnetStartIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current 
+    DESCRIPTION
+        "The IP Address of the first address in this range."
+    ::=  { dhcpSrvSubnetPoolConfigEntry 5 }  
+
+dhcpSrvSubnetEndIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current 
+    DESCRIPTION
+        "The IP Address of the last address in this range."
+    ::=  { dhcpSrvSubnetPoolConfigEntry 6 }  
+
+dhcpSrvSubnetLeaseTime OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current 
+    DESCRIPTION
+        "Lease time in seconds for an IpAddress in this range."
+    ::=  { dhcpSrvSubnetPoolConfigEntry 7 }  
+
+dhcpSrvSubnetPoolName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..64))
+    MAX-ACCESS read-write
+    STATUS current 
+    DESCRIPTION
+        "Name for the subnet pool.Null terminated string."
+    ::=  { dhcpSrvSubnetPoolConfigEntry 8 }  
+
+dhcpSrvSubnetUtlThreshold OBJECT-TYPE  
+    SYNTAX INTEGER (0..100) 
+    MAX-ACCESS read-write  
+    STATUS current  
+    DESCRIPTION  
+        "Utilization threshold for this pool in percentage value.
+         If the pool utilization is above this value, a trap will be sent. 
+         0 represents sending trap is disabled."
+    DEFVAL    { 75 }
+    ::=  { dhcpSrvSubnetPoolConfigEntry 9 }  
+
+dhcpSrvSubnetPoolRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current 
+    DESCRIPTION
+        "RowStatus of this entry."
+    ::=  { dhcpSrvSubnetPoolConfigEntry 10 }  
+
+
+
+
+--- dhcpSrvExludeIpAddresses
+
+      dhcpSrvExcludeIpAddressTable   OBJECT-TYPE 
+            SYNTAX SEQUENCE OF DhcpSrvExcludeIpAddressEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                    "This table contains IpAddresses,which should not 
+                    be allocated to any dhcp clients."
+            ::= { dhcpSrvConfig 10 }
+
+       dhcpSrvExcludeIpAddressEntry OBJECT-TYPE 
+            SYNTAX DhcpSrvExcludeIpAddressEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                    " "
+            INDEX { dhcpSrvSubnetPoolIndex,dhcpSrvExcludeStartIpAddress }
+            ::= { dhcpSrvExcludeIpAddressTable 1 }
+
+--
+       DhcpSrvExcludeIpAddressEntry ::=
+       SEQUENCE {
+                    dhcpSrvExcludeStartIpAddress       IpAddress,
+                    dhcpSrvExcludeEndIpAddress         IpAddress,
+                    dhcpSrvExcludeAddressRowStatus     RowStatus
+                 }
+
+dhcpSrvExcludeStartIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current 
+    DESCRIPTION
+        "The IP Address of the first address in this range."
+    ::=  { dhcpSrvExcludeIpAddressEntry 1 }  
+
+dhcpSrvExcludeEndIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current 
+    DESCRIPTION
+        "The IP Address of the last address in this range.Default 
+        value is same as dhcpSrvExcludeStartIpAddress."
+    ::=  { dhcpSrvExcludeIpAddressEntry 2 }  
+
+dhcpSrvExcludeAddressRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current 
+    DESCRIPTION
+        "RowStatus of this entry."
+    ::=  { dhcpSrvExcludeIpAddressEntry 3 }  
+
+
+
+--- dhcpGlobalOptions
+
+      dhcpSrvGblOptTable   OBJECT-TYPE 
+            SYNTAX SEQUENCE OF DhcpSrvGblOptEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                    "This table contains the  global  options that are
+                    to be used by the server on response to a DHCP 
+                    DISCOVER message in a DHCP OFFER message. This 
+                    Table would contain entries indexed serially by the 
+                    object an dhcpSrvGblOptType "
+            ::= { dhcpSrvConfig 11 }
+
+       dhcpSrvGblOptEntry   OBJECT-TYPE 
+            SYNTAX DhcpSrvGblOptEntry 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                    "The various option objects common to all DHCP offer
+                    messages." 
+            INDEX { dhcpSrvGblOptType }
+            ::= { dhcpSrvGblOptTable 1 }
+
+--
+       DhcpSrvGblOptEntry ::=
+       SEQUENCE {
+                    dhcpSrvGblOptType        INTEGER,
+                    dhcpSrvGblOptLen         INTEGER,
+                    dhcpSrvGblOptVal         OCTET STRING,
+                    dhcpSrvGblOptRowStatus   RowStatus
+                 }
+
+        dhcpSrvGblOptType  OBJECT-TYPE
+            SYNTAX INTEGER (1..2147483647) 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                    "The object identifies the option, this is the
+                    tag octet of the DHCP option. This option is the
+                    index in the dhcpSrvGblOptTable."
+        ::= { dhcpSrvGblOptEntry 1 }
+
+        dhcpSrvGblOptLen  OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+                    "This object identifies the length of the option
+                    indicated by the option type. This length does not
+                    include the two octets specifiying the tag and length. "
+        ::= { dhcpSrvGblOptEntry 2 }
+
+
+        dhcpSrvGblOptVal  OBJECT-TYPE
+            SYNTAX OCTET STRING 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+                    "This object identifies the octets of data, of length
+                    specified by dhcpSrvGblOptLen for that entry. "
+        ::= { dhcpSrvGblOptEntry 3 }
+
+        dhcpSrvGblOptRowStatus  OBJECT-TYPE
+            SYNTAX  RowStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+                    "Row status of this entry."
+        ::= { dhcpSrvGblOptEntry 4 }
+
+
+
+--- dhcpSrvSubnetOptTable
+
+      dhcpSrvSubnetOptTable   OBJECT-TYPE 
+            SYNTAX SEQUENCE OF DhcpSrvSubnetOptEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                    "This table contains the subnet specific options
+                    that are to be used by the server on response to
+                    a DHCP DISCOVER message in a DHCP OFFER message."
+            ::= { dhcpSrvConfig 12 }
+
+       dhcpSrvSubnetOptEntry   OBJECT-TYPE 
+            SYNTAX DhcpSrvSubnetOptEntry 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                    "The various option objects common to all DHCP offer
+                    messages." 
+            INDEX { dhcpSrvSubnetPoolIndex,dhcpSrvSubnetOptType }
+            ::= { dhcpSrvSubnetOptTable 1 }
+
+--
+       DhcpSrvSubnetOptEntry ::=
+       SEQUENCE {
+                    dhcpSrvSubnetOptType        INTEGER,
+                    dhcpSrvSubnetOptLen         INTEGER,
+                    dhcpSrvSubnetOptVal         OCTET STRING,
+                    dhcpSrvSubnetOptRowStatus   RowStatus
+                 }
+
+
+        dhcpSrvSubnetOptType  OBJECT-TYPE
+            SYNTAX INTEGER (1..2147483647) 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                    "The object identifies the option, this is the
+                    tag octet of the DHCP option. This option is the
+                    index in the dhcpSrvSubnetOptTable."
+        ::= { dhcpSrvSubnetOptEntry 1 }
+
+        dhcpSrvSubnetOptLen  OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+                    "This object identifies the length of the option
+                    indicated by the option type. This length does not
+                    include the two octets specifiying the tag and length. "
+        ::= { dhcpSrvSubnetOptEntry 2 }
+
+
+        dhcpSrvSubnetOptVal  OBJECT-TYPE
+            SYNTAX OCTET STRING 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+                    "This object identifies the octets of data, of length
+                    specified by dhcpSrvSubnetOptLen for that entry. "
+        ::= { dhcpSrvSubnetOptEntry 3 }
+
+        dhcpSrvSubnetOptRowStatus  OBJECT-TYPE
+            SYNTAX  RowStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+                    "Row status of this entry."
+        ::= { dhcpSrvSubnetOptEntry 4 }
+
+
+
+--- dhcpSrvHostOptTable
+
+      dhcpSrvHostOptTable   OBJECT-TYPE 
+            SYNTAX SEQUENCE OF DhcpSrvHostOptEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                    "This table contains the  host specific options that
+                    are to be used by the server on response to a DHCP 
+                    DISCOVER message in a DHCP OFFER message."
+            ::= { dhcpSrvConfig 13 }
+
+       dhcpSrvHostOptEntry   OBJECT-TYPE 
+            SYNTAX DhcpSrvHostOptEntry 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                    "The various option objects common to all DHCP offer
+                    messages." 
+            INDEX { dhcpSrvHostType, dhcpSrvHostId,
+                    dhcpSrvSubnetPoolIndex,dhcpSrvHostOptType }
+            ::= { dhcpSrvHostOptTable 1 }
+
+--
+       DhcpSrvHostOptEntry ::=
+       SEQUENCE {
+                    dhcpSrvHostType           INTEGER,
+                    dhcpSrvHostId             OCTET STRING,
+                    dhcpSrvHostOptType        INTEGER,
+                    dhcpSrvHostOptLen         INTEGER,
+                    dhcpSrvHostOptVal         OCTET STRING,
+                    dhcpSrvHostOptRowStatus   RowStatus
+                 }
+
+        dhcpSrvHostType  OBJECT-TYPE
+            SYNTAX INTEGER (1..2147483647) 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                    "This object identifies the type of host identifier, 
+                    whether this host specific entry is based on hardware 
+                    or non-hardware of the client. This option is one of 
+                    the index in the dhcpSrvHostOptTable"
+        ::= { dhcpSrvHostOptEntry 1 }
+
+        dhcpSrvHostId  OBJECT-TYPE
+            SYNTAX OCTET STRING(SIZE(0..64))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                    "The object identifies the host.This id is an 
+                    index to this table"
+        ::= { dhcpSrvHostOptEntry 2 }
+
+        dhcpSrvHostOptType  OBJECT-TYPE
+            SYNTAX INTEGER (1..2147483647) 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                    "The object identifies the option, this is the
+                    tag octet of the DHCP option. This option is the
+                    index in the dhcpSrvSubnetOptTable."
+        ::= { dhcpSrvHostOptEntry 3 }
+
+        dhcpSrvHostOptLen  OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+                    "This object identifies the length of the option
+                    indicated by the option type. This length does not
+                    include the two octets specifiying the tag and length. "
+        ::= { dhcpSrvHostOptEntry 4 }
+
+
+        dhcpSrvHostOptVal  OBJECT-TYPE
+            SYNTAX OCTET STRING 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+                    "This object identifies the octets of data, of length
+                    specified by dhcpSrvSubnetOptLen for that entry. "
+        ::= { dhcpSrvHostOptEntry 5 }
+
+
+        dhcpSrvHostOptRowStatus  OBJECT-TYPE
+            SYNTAX  RowStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+                    "Row status of this entry."
+        ::= { dhcpSrvHostOptEntry 6 }
+
+
+
+--- dhcpSrvHostConfigTable
+
+      dhcpSrvHostConfigTable   OBJECT-TYPE 
+            SYNTAX SEQUENCE OF DhcpSrvHostConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                    "This table contains the IpAddress for specific hosts"
+            ::= { dhcpSrvConfig 14 }
+
+       dhcpSrvHostConfigEntry   OBJECT-TYPE 
+            SYNTAX DhcpSrvHostConfigEntry 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                    " "
+            INDEX { dhcpSrvHostType, dhcpSrvHostId,dhcpSrvSubnetPoolIndex }
+            ::= { dhcpSrvHostConfigTable 1 }
+
+--
+       DhcpSrvHostConfigEntry ::=
+       SEQUENCE {
+                    dhcpSrvHostIpAddress            IpAddress,
+                    dhcpSrvHostPoolName             INTEGER,
+                    dhcpSrvHostBootFileName         DisplayString,
+                    dhcpSrvHostBootServerAddress    IpAddress,
+                    dhcpSrvHostConfigRowStatus      RowStatus
+                 }
+
+        dhcpSrvHostIpAddress  OBJECT-TYPE
+            SYNTAX IpAddress 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+                    " IpAddress configured for this client"
+        ::= { dhcpSrvHostConfigEntry 1 }
+
+        dhcpSrvHostPoolName  OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+                    "This object identifies the subnet pool"
+        ::= { dhcpSrvHostConfigEntry 2 }
+
+        dhcpSrvHostBootFileName  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..64))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+                    "Boot file name, null terminated string."
+        ::= { dhcpSrvHostConfigEntry 3 }
+
+        dhcpSrvHostBootServerAddress  OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+                    "IP address of next server to use in bootstrap."
+        ::= { dhcpSrvHostConfigEntry 4 }
+
+        dhcpSrvHostConfigRowStatus  OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+                    "RowStatus of this entry"
+        ::= { dhcpSrvHostConfigEntry 5 }
+        
+--- dhcpSrvBindingTable
+
+      dhcpSrvBindingTable   OBJECT-TYPE 
+            SYNTAX SEQUENCE OF DhcpSrvBindingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                    "This table contains binding informations for 
+                    the client."
+            ::= { dhcpSrvBinding 1 }
+
+       dhcpSrvBindingEntry   OBJECT-TYPE 
+            SYNTAX DhcpSrvBindingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                    ""
+            INDEX { dhcpSrvBindIpAddress }
+            ::= { dhcpSrvBindingTable 1 }
+
+--
+       DhcpSrvBindingEntry ::=
+       SEQUENCE {
+                    dhcpSrvBindIpAddress          IpAddress,
+                    dhcpSrvBindHwType             INTEGER,
+                    dhcpSrvBindHwAddress          OCTET STRING,
+                    dhcpSrvBindExpireTime         INTEGER,
+                    dhcpSrvBindAllocMethod        INTEGER,
+                    dhcpSrvBindState              INTEGER,
+                    dhcpSrvBindXid                Unsigned32,
+                    dhcpSrvBindEntryStatus        RowStatus
+                 }
+
+        dhcpSrvBindIpAddress  OBJECT-TYPE
+            SYNTAX IpAddress 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                    " IpAddress associated with the binding."
+        ::= { dhcpSrvBindingEntry 1 }
+
+        dhcpSrvBindHwType  OBJECT-TYPE
+            SYNTAX INTEGER {
+                            clientid (0),
+                            ethernet (1)
+                   }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+                    " Hardware address type of the binding. Value 0,
+                    Indicates client identifier."
+        ::= { dhcpSrvBindingEntry 2 }
+
+        dhcpSrvBindHwAddress  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+                    " Hardware address of the binding."
+        ::= { dhcpSrvBindingEntry 3 }
+
+        dhcpSrvBindExpireTime  OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+                    " Indicates time remaining for the binding. Negative
+                    Values indicate already expired binding."
+        ::= { dhcpSrvBindingEntry 4 }
+
+        dhcpSrvBindAllocMethod  OBJECT-TYPE
+            SYNTAX INTEGER {
+                            dynamic (1),
+                            manual  (2)
+                   }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+                    " Indicates the binding is for statically assigned 
+                    ip-address or automatically assigned from the poll."
+        ::= { dhcpSrvBindingEntry 5 }
+
+        dhcpSrvBindState  OBJECT-TYPE
+            SYNTAX INTEGER {
+                            offered  (1),
+                            assigned (2),
+                            probing  (5)
+                   }
+
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+                    " State of the binding. In offered state offer has been
+                    sent, but no req has been received from the client.In
+                    assigned state the address is assigned to the client.
+                    In probing state the address is currently being probed 
+                    by the dhcp server."
+        ::= { dhcpSrvBindingEntry 6 }
+
+        dhcpSrvBindXid OBJECT-TYPE
+            SYNTAX  Unsigned32 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "Transaction ID, a random number chosen by the
+                    client, used by the client and server to associate
+                    messages and responses between a client and a
+                    server."
+            ::= { dhcpSrvBindingEntry 7 }
+
+        dhcpSrvBindEntryStatus  OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+                    " Binding entry status. Only DESTROY (6) is the 
+                    allowed configurable value. If the entry is present 
+                    value will be ACTIVE."
+        ::= { dhcpSrvBindingEntry 8 }
+
+
+--- dhcpSrvCounters Group
+             
+            dhcpCountDiscovers OBJECT-TYPE 
+               SYNTAX                         Counter32 
+               MAX-ACCESS  read-only 
+               STATUS                         current 
+               DESCRIPTION 
+                  "The number of DHCPDISCOVER (option 53 with value 1) packets 
+                  received." 
+               ::= { dhcpSrvCounters 1 } 
+             
+            dhcpCountRequests OBJECT-TYPE 
+               SYNTAX                         Counter32 
+               MAX-ACCESS  read-only 
+               STATUS                         current 
+               DESCRIPTION 
+                  "The number of DHCPREQUEST (option 53 with value 3) packets 
+                  received." 
+               ::= { dhcpSrvCounters 2 } 
+             
+            dhcpCountReleases OBJECT-TYPE 
+               SYNTAX                         Counter32 
+               MAX-ACCESS  read-only 
+               STATUS                         current 
+               DESCRIPTION 
+                  "The number of DHCPRELEASE (option 53 with value 7) packets 
+                  received." 
+               ::= { dhcpSrvCounters 3 } 
+             
+            dhcpCountDeclines OBJECT-TYPE 
+               SYNTAX                         Counter32 
+               MAX-ACCESS  read-only 
+               STATUS                         current 
+               DESCRIPTION 
+                  "The number of DHCPDECLINE (option 53 with value 4) packets 
+                  received." 
+               ::= { dhcpSrvCounters 4 } 
+             
+            dhcpCountInforms OBJECT-TYPE 
+               SYNTAX                         Counter32 
+               MAX-ACCESS  read-only 
+               STATUS                         current 
+               DESCRIPTION 
+                  "The number of DHCPINFORM (option 53 with value 8) packets 
+
+                  received." 
+               ::= { dhcpSrvCounters 5 } 
+             
+            dhcpCountInvalids OBJECT-TYPE 
+               SYNTAX                         Counter32 
+               MAX-ACCESS  read-only 
+               STATUS                         current 
+               DESCRIPTION 
+                  "The number of DHCP packets received whose DHCP message type 
+                  (i.e., option number 53) is not understood or handled by the 
+                  server." 
+               ::= { dhcpSrvCounters 6 } 
+             
+            dhcpCountOffers OBJECT-TYPE 
+               SYNTAX                         Counter32 
+               MAX-ACCESS  read-only 
+               STATUS                         current 
+               DESCRIPTION 
+                  "The number of DHCPOFFER (option 53 with value 2) packets 
+                  sent." 
+               ::= { dhcpSrvCounters 7 } 
+             
+            dhcpCountAcks OBJECT-TYPE 
+               SYNTAX                         Counter32 
+               MAX-ACCESS  read-only 
+               STATUS                         current 
+               DESCRIPTION 
+                  "The number of DHCPACK (option 53 with value 5) packets 
+            sent." 
+               ::= { dhcpSrvCounters 8 } 
+             
+            dhcpCountNacks OBJECT-TYPE 
+               SYNTAX                         Counter32 
+               MAX-ACCESS  read-only 
+               STATUS                         current 
+               DESCRIPTION 
+                  "The number of DHCPNACK (option 53 with value 6) packets 
+            sent." 
+               ::= { dhcpSrvCounters 9 } 
+             
+            dhcpCountDroppedUnknownClient OBJECT-TYPE 
+               SYNTAX                         Counter32 
+               MAX-ACCESS  read-only 
+               STATUS                         current 
+               DESCRIPTION 
+                  "The number of DHCP packets dropped due to the server not 
+                  recognizing or not providing service to the client-id and/or 
+                  hardware address received in the incoming packet." 
+               ::= { dhcpSrvCounters 10 } 
+             
+	       dhcpCountDroppedNotServingSubnet OBJECT-TYPE 
+	       SYNTAX                         Counter32 
+	       MAX-ACCESS  read-only 
+	       STATUS                         current 
+	       DESCRIPTION 
+	       "The number of DHCP packets dropped due to the server not 
+	       being 
+
+	       configured or not otherwise able to serve addresses on the 
+	       subnet from which this message was received." 
+	       ::= { dhcpSrvCounters 11 } 
+
+	       dhcpCountResetCounters OBJECT-TYPE 
+	       SYNTAX		INTEGER
+	       {
+		   set (1),
+	  	   notset (2)
+	       }
+	       MAX-ACCESS	read-write 
+               STATUS		current 
+               DESCRIPTION 
+               "This object is used to reset the statistics counters.
+                When set to set(1), statistics counters will be cleared. When set to notset(2), no
+                action will take place."
+
+               DEFVAL  { notset }
+
+               ::= { dhcpSrvCounters 12 } 
+
+
+--dhcp snmp trap Configuration
+ dhcpSrvTraps OBJECT IDENTIFIER ::= { dhcpSrvTrapGroup 0 }
+
+dhcpSrvPoolUtlTrap NOTIFICATION-TYPE
+      OBJECTS {
+      dhcpSrvSubnetUtlThreshold
+              }
+      STATUS             current
+      DESCRIPTION
+       "Generated when pool utilization exceeds the threshold value"
+ ::= {dhcpSrvTraps 1 }
+  
+ END 
+

@@ -1,0 +1,790 @@
+-- Copyright (C) 2008-2012 Aricent Group . All Rights Reserved
+
+-- $Id: fsdot1ay.mib,v 1.4 2013/03/30 12:07:21 siva Exp $
+
+--    This proprietary MIB definition, is a copy of the standard IEEE802.1Qay
+--    MIB. It is added to the proprietary tree because 
+--          a) the standard MIB has  not yet been assigned an OID and
+--          b) because the interface indexing used in ISS is different from the
+--             one used here 
+
+
+IEEE8021-PBBTE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, enterprises
+        FROM SNMPv2-SMI
+    RowStatus,
+    StorageType, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    IEEE8021PbbServiceIdentifier,
+    IEEE8021PbbTeEsp,
+    IEEE8021PbbTeProtectionGroupId,
+    IEEE8021PbbTeProtectionGroupConfigAdmin,
+    IEEE8021PbbTeTSidId,
+    IEEE8021VlanIndexOrWildcard
+        FROM IEEE8021-TC-MIB
+    fsDot1qVlanContextId
+        FROM ARICENTQ-BRIDGE-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF;
+
+fsdot1ay   MODULE-IDENTITY
+        LAST-UPDATED "201209050000Z"
+        ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+        CONTACT-INFO "support@aricent.com"
+        DESCRIPTION
+         "The proprietary MIB module for PBB-TE extensions."
+	REVISION "201209050000Z"
+        DESCRIPTION
+         "The proprietary MIB module for PBB-TE extensions."
+    ::=  { enterprises aricent-communication-holding-ltd(29601) iss(2) 12}
+------------------------------------------------------------------------------
+--TEXTUAL CONVENTIONS--
+------------------------------------------------------------------------------
+IfIndexList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight
+        interfaces indexes, with the first octet specifying interfaces indexes 1
+	through 8, the second octet specifying interfaces indexes 9 through 16,
+	etc.  Within each octet, the most significant bit represents
+        the lowest numbered IfIndex, and the least significant bit
+        represents the highest numbered IfIndex.  Thus, each IfIndex
+        of the bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of '1'
+        then that port is included in the set of interfaces indexes; the port
+        is not included if its bit has a value of '0'."
+    SYNTAX      OCTET STRING
+
+IEEE8021PbbTeProtectionGroupMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The operating mode of the protection group.  Each protection
+         group operates in either load sharing or non load sharing mode.
+         The mode of a group restricts the behaviors of the MAs associated
+         with the group.  In a nonLoadSharing group, each MA may belong to
+         exactly 1 protection group.  In a loadSharing group, each MA may belong
+         to more than 1 protection group."
+    REFERENCE   "12.19.1.1.3 a)"
+    SYNTAX     INTEGER {
+                   loadSharing(1),
+                   nonLoadSharing(2)
+               }
+
+IEEE8021PbbTeProtectionGroupConfigState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+       "This textual convention is used to represent the possible
+        states of the Protection Switching state machine.  This
+        machine is used to manage protection groups in the non load
+        shared case."
+    REFERENCE "26.10.3.5 12.19.2.1.3"
+    SYNTAX   INTEGER {
+               workingPath(1),
+               protectionPath(2),
+               holdOff(3),
+               waitToRestore(4),
+               protAdmin(5)
+             }
+
+IEEE8021PbbTeProtectionGroupConfigWTR ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+        "This textual convention is used to configure the
+        wait-to-restore timer for the protection group operation.  The
+        timer may be configured in steps of 1 minute between 5 and 12
+        minutes.  Additionally, the value 0 is used to indicate that
+        the protection group is to operate non-revertively."
+    REFERENCE "26.10.3.3.7"
+    SYNTAX    Unsigned32 ( 0 | 5..12 )
+
+IEEE8021PbbTeProtectionGroupConfigHoldOff ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS       current
+    DESCRIPTION
+       "This textual convention is used to configure the hold off
+        timer.  The purpose is to allow a service layer protection
+        mechanism to have a chance to fix athe problem before
+        switching at the client layer, or to allow an upstream
+        protected domain to switch before a downsream domain.  The
+        hold off timer has a period of from 0 to 10 seconds, the
+        default being 0, with a 100ms granularity."
+
+    SYNTAX Unsigned32 ( 0..100 )
+
+ieee8021PbbTeNotifications OBJECT IDENTIFIER ::= { fsdot1ay 0 }
+ieee8021PbbTeObjects       OBJECT IDENTIFIER ::= { fsdot1ay 1 }
+ieee8021PbbTeConformance   OBJECT IDENTIFIER ::= { fsdot1ay 2 }
+
+--
+-- 802.1Qay MIB Objects
+--
+
+ieee8021PbbTeProtectionGroupListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021PbbTeProtectionGroupListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The PBB-TE Protection group list table.  Each entry in this table
+         corresponds to a configured PBB-TE Protection Group configured on
+         the B-Component of a BEB."
+    REFERENCE
+        "12.19.1"
+    ::= { ieee8021PbbTeObjects 1 }
+
+ieee8021PbbTeProtectionGroupListEntry OBJECT-TYPE
+    SYNTAX Ieee8021PbbTeProtectionGroupListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The PBB-TE protection group list table entry.
+        Note that the component ID must refer to an B component"
+    INDEX { fsDot1qVlanContextId,
+            ieee8021PbbTeProtectionGroupListGroupId }
+    ::= { ieee8021PbbTeProtectionGroupListTable 1 }
+
+Ieee8021PbbTeProtectionGroupListEntry ::=
+    SEQUENCE {
+        ieee8021PbbTeProtectionGroupListGroupId       IEEE8021PbbTeProtectionGroupId,
+        ieee8021PbbTeProtectionGroupListMode          IEEE8021PbbTeProtectionGroupMode,
+        ieee8021PbbTeProtectionGroupListWorkingMA     Unsigned32,
+        ieee8021PbbTeProtectionGroupListProtectionMA  Unsigned32,
+        ieee8021PbbTeProtectionGroupListStorageType   StorageType,
+        ieee8021PbbTeProtectionGroupListRowStatus     RowStatus
+    }
+
+ieee8021PbbTeProtectionGroupListGroupId OBJECT-TYPE
+    SYNTAX      IEEE8021PbbTeProtectionGroupId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The unique identifier for the protection group."
+    REFERENCE
+        "12.19.2"
+    ::= { ieee8021PbbTeProtectionGroupListEntry 1 }
+
+ieee8021PbbTeProtectionGroupListMode OBJECT-TYPE
+    SYNTAX      IEEE8021PbbTeProtectionGroupMode
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The operating mode of the protection group.  Note that
+         the operating mode of a protection group cannot be changed
+         for groups whose row status is Active."
+    REFERENCE
+        "12.19.1.1.3 a)"
+    ::= { ieee8021PbbTeProtectionGroupListEntry 2 }
+
+
+ieee8021PbbTeProtectionGroupListWorkingMA OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This refers to the Maintenance Association that refers
+        to the PBB-TE MA that corresponds to the group's working
+        entity.  The MA index in this column must hold a value
+        that is the value of dot1agCfmStackMaIndex column for
+        some entry in the dot1agCfmStackTable before the RowStatus
+        for this row can be set to Active.  Furthermore, this column
+        may not be modified when the RowStatus for this row is Active."
+    REFERENCE
+        "12.19.1.1.3 b)"
+::= { ieee8021PbbTeProtectionGroupListEntry 3 }
+
+ieee8021PbbTeProtectionGroupListProtectionMA OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This refers to the Maintenance Association that refers
+        to the PBB-TE MA that corresponds to the group's protection
+        entity.  The MA index in this column must hold a value
+        that is the value of dot1agCfmStackMaIndex column for
+        some entry in the dot1agCfmStackTable before the RowStatus
+        for this row can be set to Active.  Furthermore, this column
+        may not be modified when the RowStatus for this row is Active."
+    REFERENCE
+        "12.19.1.1.3 c)"
+::= { ieee8021PbbTeProtectionGroupListEntry 4 }
+
+ieee8021PbbTeProtectionGroupListStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This object indicates the persistence of this entry."
+    DEFVAL { nonVolatile }
+    ::= { ieee8021PbbTeProtectionGroupListEntry 5 }
+
+ieee8021PbbTeProtectionGroupListRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "The status of this row.
+
+        The writable columns in a row cannot be changed if the row is
+        active.  The PbbTeProtectionGroupListMode,
+        PbbTeProtectionGroupListWorkingMA, and
+        PbbTeProtectionGroupListProtectionMA columns must be specified
+        before the row can be activated."
+    REFERENCE
+        "12.19.1.2"
+    ::= { ieee8021PbbTeProtectionGroupListEntry 6 }
+
+ieee8021PbbTeMASharedGroupTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Ieee8021PbbTeMASharedGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table contains references to all protection groups that
+         share a working or protection entity with a given protection
+         group."
+    REFERENCE
+        "12.19.1.1.3 d)"
+    ::= { ieee8021PbbTeObjects 2 }
+
+ieee8021PbbTeMASharedGroupEntry OBJECT-TYPE
+    SYNTAX     Ieee8021PbbTeMASharedGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The ieee801PbbTeMASharedGroupEntry table.  The table is
+        indexed by protection group and by a simple integer.  The
+        table lists all protection groups that load share with that
+        group."
+    INDEX { ieee8021PbbTeProtectionGroupListGroupId,
+            ieee8021PbbTeMASharedGroupSubIndex }
+    ::= { ieee8021PbbTeMASharedGroupTable 1 }
+
+Ieee8021PbbTeMASharedGroupEntry ::=
+    SEQUENCE {
+            ieee8021PbbTeMASharedGroupSubIndex Unsigned32,
+            ieee8021PbbTeMASharedGroupId       IEEE8021PbbTeProtectionGroupId
+    }
+
+ieee8021PbbTeMASharedGroupSubIndex OBJECT-TYPE
+    SYNTAX  Unsigned32(1..4294967295)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A simple integer to distinguish the members of the set
+        of MAs that comprise the set of load sharing MAs for the
+        specified protection group."
+     ::= { ieee8021PbbTeMASharedGroupEntry 1 }
+
+ieee8021PbbTeMASharedGroupId OBJECT-TYPE
+    SYNTAX     IEEE8021PbbTeProtectionGroupId
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "This column holds the group id of a protection group that shares
+        a working or protection group with the group whose index is the
+        first index of this row."
+    ::=  { ieee8021PbbTeMASharedGroupEntry 2 }
+
+ieee8021PbbTeTeSidTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Ieee8021PbbTeTeSidEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The PBB-TE TE-SID table contains information for each TE
+         service instance known to a system."
+    REFERENCE
+        "802.1Qay 3.11"
+    ::= { ieee8021PbbTeObjects 3 }
+
+ieee8021PbbTeTeSidEntry OBJECT-TYPE
+    SYNTAX     Ieee8021PbbTeTeSidEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The PBB-TE TE-SID entry.  Each entry refers to a
+         TE Service Instance by identifier and contains information about
+         one of the ESPs that comprise this TE Service Instance."
+    INDEX { ieee8021PbbTeTeSidId,
+            ieee8021PbbTeTeSidEspIndex }
+    ::= { ieee8021PbbTeTeSidTable 1 }
+
+Ieee8021PbbTeTeSidEntry ::=
+    SEQUENCE {
+        ieee8021PbbTeTeSidId          IEEE8021PbbTeTSidId,
+        ieee8021PbbTeTeSidEspIndex    Unsigned32,
+        ieee8021PbbTeTeSidEsp         IEEE8021PbbTeEsp,
+        ieee8021PbbTeTeSidStorageType StorageType,
+        ieee8021PbbTeTeSidRowStatus   RowStatus
+    }
+
+ieee8021PbbTeTeSidId OBJECT-TYPE
+    SYNTAX     IEEE8021PbbTeTSidId
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This is the unique identifier for a PBB-TE TE-SID."
+    REFERENCE
+        "802.1Qay 3.11"
+    ::= { ieee8021PbbTeTeSidEntry 1 }
+
+ieee8021PbbTeTeSidEspIndex OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..4294967295)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This is an identifier, of local signifigance to a particular
+         PBB-TE TE-SID which is used to index all of the ESPs associated
+         with the TE-SID."
+    REFERENCE
+        "802.1Qay 3.11"
+    ::= { ieee8021PbbTeTeSidEntry 2 }
+
+ieee8021PbbTeTeSidEsp OBJECT-TYPE
+    SYNTAX     IEEE8021PbbTeEsp
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This column holds the ESP identifier for one of the Ethernet
+         Switched Paths that comprise the set of ESPs that define the TE
+         service instance."
+    REFERENCE
+        "802.1Qay 3.10"
+    ::= { ieee8021PbbTeTeSidEntry 3 }
+
+ieee8021PbbTeTeSidStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This object indicates the persistence of this entry."
+    DEFVAL { nonVolatile }
+    ::= { ieee8021PbbTeTeSidEntry 4 }
+
+ieee8021PbbTeTeSidRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This column holds the status for this row.
+
+         When the status is active, no columns of this table may be
+         modified.  All columns must have a valid value before the row
+         can be activated."
+    ::= { ieee8021PbbTeTeSidEntry 5 }
+
+ieee8021PbbTeProtectionGroupConfigTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Ieee8021PbbTeProtectionGroupConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+
+        "The PBB-TE Protection group config table contains
+         configuration and status information for each configuration
+         group configured in the system.  Entries in this table are
+         created implicitly by the creation of entries in the
+         ieee8021PbbTeProtectionGroupListTable table."
+     REFERENCE
+         "12.19.2"
+     ::= { ieee8021PbbTeObjects 4 }
+
+ieee8021PbbTeProtectionGroupConfigEntry OBJECT-TYPE
+    SYNTAX     Ieee8021PbbTeProtectionGroupConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The protection group confguration table entry.  Rows are
+        created in this table implicitly when a row is added to the
+        ieee8021PbbTeProtectionGroupListTable."
+    INDEX { fsDot1qVlanContextId,
+            ieee8021PbbTeProtectionGroupListGroupId }
+    ::= { ieee8021PbbTeProtectionGroupConfigTable 1 }
+
+Ieee8021PbbTeProtectionGroupConfigEntry ::=
+    SEQUENCE {
+        ieee8021PbbTeProtectionGroupConfigState
+             IEEE8021PbbTeProtectionGroupConfigState,
+        ieee8021PbbTeProtectionGroupConfigCommandStatus
+             IEEE8021PbbTeProtectionGroupConfigAdmin,
+        ieee8021PbbTeProtectionGroupConfigCommandAdmin
+             IEEE8021PbbTeProtectionGroupConfigAdmin,
+        ieee8021PbbTeProtectionGroupConfigWTR
+             IEEE8021PbbTeProtectionGroupConfigWTR,
+        ieee8021PbbTeProtectionGroupConfigHoldOff
+             IEEE8021PbbTeProtectionGroupConfigHoldOff,
+        ieee8021PbbTeProtectionGroupConfigStorageType
+             StorageType
+    }
+
+ieee8021PbbTeProtectionGroupConfigState OBJECT-TYPE
+    SYNTAX     IEEE8021PbbTeProtectionGroupConfigState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "For a protection group configured for non load sharing
+        operation, this column indicates the current state of the
+        protection switching state machine.  For groups configured for
+        load sharing, the column always has the value
+        notApplicable(6)."
+    ::= { ieee8021PbbTeProtectionGroupConfigEntry 1 }
+
+ieee8021PbbTeProtectionGroupConfigCommandStatus OBJECT-TYPE
+    SYNTAX     IEEE8021PbbTeProtectionGroupConfigAdmin
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This column indicates the status of administrative commands
+        within the protection group.  It reflects the current
+        operational administrative command being acted upon by the
+        protection group."
+     REFERENCE "12.19.2.1.3 d)"
+    ::= { ieee8021PbbTeProtectionGroupConfigEntry 2 }
+
+ieee8021PbbTeProtectionGroupConfigCommandAdmin OBJECT-TYPE
+    SYNTAX     IEEE8021PbbTeProtectionGroupConfigAdmin
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This column is used by the operator to request that the
+       protection group state machine perform some administrative
+       operation.  The operator requests a command by writing the
+       command value to this column.  The state machine indicates the
+       command that it is performing by setting the value of the
+       CommandStatus column of this table.  This column always reads
+       back as noAdmin(1)."
+     REFERENCE "12.19.2.3.2"
+     DEFVAL { noAdmin }
+    ::= { ieee8021PbbTeProtectionGroupConfigEntry 3 }
+
+ieee8021PbbTeProtectionGroupConfigWTR OBJECT-TYPE
+    SYNTAX     IEEE8021PbbTeProtectionGroupConfigWTR
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This optional column contains the wait-to-restore period."
+    REFERENCE "12.19.2.1.3 e)"
+    ::= { ieee8021PbbTeProtectionGroupConfigEntry 4 }
+
+ieee8021PbbTeProtectionGroupConfigHoldOff OBJECT-TYPE
+    SYNTAX     IEEE8021PbbTeProtectionGroupConfigHoldOff
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This optional column contains the hold off timer period."
+    REFERENCE "12.19.2.1.3 f)"
+    DEFVAL { 0 }
+    ::= { ieee8021PbbTeProtectionGroupConfigEntry 5 }
+
+ieee8021PbbTeProtectionGroupConfigStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This object indicates the persistence of this entry."
+    DEFVAL { nonVolatile }
+    ::= { ieee8021PbbTeProtectionGroupConfigEntry 6 }
+
+ieee8021PbbTeProtectionGroupISidTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Ieee8021PbbTeProtectionGroupISidEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table contains entries for each I-SID that is
+        transported over TE-SIDs that belong to protection groups.
+        Each I-SID maps to a single protection group."
+    REFERENCE "12.19.2.1.3 b)"
+    ::= { ieee8021PbbTeObjects 5 }
+
+ieee8021PbbTeProtectionGroupISidEntry OBJECT-TYPE
+    SYNTAX     Ieee8021PbbTeProtectionGroupISidEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The ieee8021PbbTeProtectionGroupISidTable entry."
+    INDEX { ieee8021PbbTeProtectionGroupISidIndex }
+    ::= { ieee8021PbbTeProtectionGroupISidTable 1 }
+
+Ieee8021PbbTeProtectionGroupISidEntry ::=
+    SEQUENCE {
+        ieee8021PbbTeProtectionGroupISidIndex       IEEE8021PbbServiceIdentifier,
+        ieee8021PbbTeProtectionGroupISidGroupId     IEEE8021PbbTeProtectionGroupId,
+        ieee8021PbbTeProtectionGroupISidStorageType StorageType,
+        ieee8021PbbTeProtectionGroupISidRowStatus   RowStatus
+    }
+
+ ieee8021PbbTeProtectionGroupISidIndex OBJECT-TYPE
+     SYNTAX     IEEE8021PbbServiceIdentifier
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "This is the I-Sid that is to be mapped to a protection
+          group."
+     ::= { ieee8021PbbTeProtectionGroupISidEntry 1 }
+
+ ieee8021PbbTeProtectionGroupISidGroupId OBJECT-TYPE
+     SYNTAX     IEEE8021PbbTeProtectionGroupId
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This column contains the Id of the protection group used
+          to transport the data belonging to the service identified
+          by the I-SID value specified in the ISidIndex column of this
+          table."
+     ::= { ieee8021PbbTeProtectionGroupISidEntry 2 }
+
+ieee8021PbbTeProtectionGroupISidStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This object indicates the persistence of this entry."
+    DEFVAL { nonVolatile }
+    ::= { ieee8021PbbTeProtectionGroupISidEntry 3 }
+
+ieee8021PbbTeProtectionGroupISidRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This column contains the status for this row.  Once active
+         none of the columns in the row may be modified.  All columns
+         must be specfied when creating the row. Pay particular
+         attention to the restrictions described in the description of
+         the ieee8021PbbTEProtectionGroupISidPriority column when
+         creating rows for I-Sids that are to be carried across non
+         load sharing protection groups."
+    ::= { ieee8021PbbTeProtectionGroupISidEntry 4 }
+
+ieee8021PbbTeBridgeStaticForwardAnyUnicastTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Ieee8021PbbTeBridgeStaticForwardAnyUnicastEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table containing forwarding information for each vlan
+         specifying the set of ports to which forwarding of unicast
+         addressed frames for which no more specific forwarding information
+         applies.  This is configured statically by management."
+    REFERENCE "8.8.1"
+    ::= { ieee8021PbbTeObjects 6 }
+
+ieee8021PbbTeBridgeStaticForwardAnyUnicastEntry OBJECT-TYPE
+    SYNTAX Ieee8021PbbTeBridgeStaticForwardAnyUnicastEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Forwaring information for a VLAN, specifying the
+         set of ports to which forwarding of unicast addressed
+         frames for which no more specific forwarding information
+         applies.
+
+         The EgressPorts and ForbiddenPorts IfIndexList objects, together,
+         implement the PortMap control element listed in 802.1Q 8.8.1.c."
+    INDEX { fsDot1qVlanContextId,
+            ieee8021PbbTeBridgeStaticForwardAnyUnicastVlanIndex }
+    ::= { ieee8021PbbTeBridgeStaticForwardAnyUnicastTable 1 }
+
+
+Ieee8021PbbTeBridgeStaticForwardAnyUnicastEntry ::=
+    SEQUENCE  {
+          ieee8021PbbTeBridgeStaticForwardAnyUnicastVlanIndex
+              IEEE8021VlanIndexOrWildcard,
+          ieee8021PbbTeBridgeStaticForwardAnyUnicastEgressPorts
+              IfIndexList,
+          ieee8021PbbTeBridgeStaticForwardAnyUnicastForbiddenPorts
+              IfIndexList,
+          ieee8021PbbTeBridgeStaticForwardAnyUnicastStorageType
+              StorageType,
+          ieee8021PbbTeBridgeStaticForwardAnyUnicastRowStatus
+              RowStatus
+    }
+
+ieee8021PbbTeBridgeStaticForwardAnyUnicastVlanIndex OBJECT-TYPE
+    SYNTAX IEEE8021VlanIndexOrWildcard
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "The VLAN-ID or other identifier refering to the VLAN to
+       which this static filtering entry applies."
+    ::= { ieee8021PbbTeBridgeStaticForwardAnyUnicastEntry 1 }
+
+ieee8021PbbTeBridgeStaticForwardAnyUnicastEgressPorts OBJECT-TYPE
+    SYNTAX IfIndexList
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+       "The complete set of ports to which a unicast addressed frame
+        is to be forwarded.  This value is persistent and will be restored
+        upon system reboot.  A port may not be added to this set if it
+        is already a member of
+        ieee8021PbbTeBridgeStaticForwardAnyUnicastForbiddenPorts.  The default
+        value is a string of zeros of appropriate length.
+
+        The value of this object MUST be retained across
+        reinitialization of the management system."
+    REFERENCE "8.8.1 c)"
+    ::= { ieee8021PbbTeBridgeStaticForwardAnyUnicastEntry 2 }
+
+ieee8021PbbTeBridgeStaticForwardAnyUnicastForbiddenPorts OBJECT-TYPE
+    SYNTAX IfIndexList
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+       "The complete set of ports to which a unicast addressed frame
+        is to be filtered.  This value is persistent and will be restored
+        upon system reboot.  A port may not be added to this set if it
+        is already a member of
+        ieee8021PbbTeBridgeStaticForwardAnyUnicastEgress.  The default
+        value is a string of zeros of appropriate length.
+
+        The value of this object MUST be retained across
+        reinitialization of the management system."
+    REFERENCE "8.8.1 c)"
+    ::= { ieee8021PbbTeBridgeStaticForwardAnyUnicastEntry 3 }
+
+ieee8021PbbTeBridgeStaticForwardAnyUnicastStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "The storage type for this row."
+    DEFVAL { nonVolatile }
+    ::= { ieee8021PbbTeBridgeStaticForwardAnyUnicastEntry 4 }
+
+ieee8021PbbTeBridgeStaticForwardAnyUnicastRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This column contains the status for this row."
+    ::= { ieee8021PbbTeBridgeStaticForwardAnyUnicastEntry 5 }
+
+--
+-- MIB Module Compliance Statements
+--
+-- EDITOR's NOTE
+--   These module compilance statements are simply a first cut.  Mainly
+--   they are here to keep smilint quiet.
+
+ieee8021PbbTeCompliances OBJECT IDENTIFIER ::= { ieee8021PbbTeConformance 1 }
+ieee8021PbbTeGroups      OBJECT IDENTIFIER ::= { ieee8021PbbTeConformance 2 }
+
+--
+-- Units of Conformance
+
+ieee8021PbbTeGroupListGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021PbbTeProtectionGroupListMode,
+        ieee8021PbbTeProtectionGroupListWorkingMA,
+        ieee8021PbbTeProtectionGroupListProtectionMA,
+	ieee8021PbbTeProtectionGroupListStorageType,
+        ieee8021PbbTeProtectionGroupListRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "Objects for the GroupList group."
+    ::= { ieee8021PbbTeGroups 1 }
+
+ieee8021PbbTeMASharedGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021PbbTeMASharedGroupId
+    }
+    STATUS current
+    DESCRIPTION
+         "Objects for the MA Load Sharing Table Group."
+    ::= { ieee8021PbbTeGroups 2 }
+
+ieee8021PbbTeSidGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021PbbTeTeSidEsp,
+        ieee8021PbbTeTeSidStorageType,
+        ieee8021PbbTeTeSidRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "Objects for the TE-SID group."
+    ::= { ieee8021PbbTeGroups 3 }
+
+ieee8021PbbTeProtectionConfigManGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021PbbTeProtectionGroupConfigState,
+        ieee8021PbbTeProtectionGroupConfigCommandStatus,
+        ieee8021PbbTeProtectionGroupConfigCommandAdmin,
+        ieee8021PbbTeProtectionGroupConfigStorageType
+    }
+    STATUS current
+    DESCRIPTION
+        "Objects for the PbbTeConfiguration group."
+    ::= { ieee8021PbbTeGroups 4 }
+
+ieee8021PbbTeProtectionConfigOptGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021PbbTeProtectionGroupConfigWTR,
+        ieee8021PbbTeProtectionGroupConfigHoldOff
+    }
+    STATUS current
+    DESCRIPTION
+        "Objects for the PbbTeConfiguration group."
+    ::= { ieee8021PbbTeGroups 5 }
+
+ieee8021PbbTeProtectionGroupISidGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021PbbTeProtectionGroupISidGroupId,
+        ieee8021PbbTeProtectionGroupISidStorageType,
+        ieee8021PbbTeProtectionGroupISidRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "Objects for the ieee8021PbbTeProtectionGroupISidGroup group."
+    ::= { ieee8021PbbTeGroups 6 }
+
+ieee8021PbbTeFdbGroup OBJECT-GROUP
+    OBJECTS {
+       ieee8021PbbTeBridgeStaticForwardAnyUnicastEgressPorts,
+       ieee8021PbbTeBridgeStaticForwardAnyUnicastForbiddenPorts,
+       ieee8021PbbTeBridgeStaticForwardAnyUnicastStorageType,
+       ieee8021PbbTeBridgeStaticForwardAnyUnicastRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "Fdb extension objects group"
+    ::= { ieee8021PbbTeGroups 7 }
+
+ieee8021PbbTeCompiance MODULE-COMPLIANCE
+    STATUS    current
+    DESCRIPTION
+        "The compliance statement for support of the PBB-TE MIB module."
+    MODULE
+        MANDATORY-GROUPS {
+            ieee8021PbbTeGroupListGroup,
+            ieee8021PbbTeMASharedGroup,
+            ieee8021PbbTeSidGroup,
+            ieee8021PbbTeProtectionConfigManGroup,
+            ieee8021PbbTeProtectionGroupISidGroup,
+            ieee8021PbbTeFdbGroup
+        }
+        GROUP ieee8021PbbTeProtectionConfigOptGroup
+        DESCRIPTION
+           "This group allows implmementation to optionally change the
+            WaitToRestore and HoldOff timers for protection groups."
+
+    OBJECT ieee8021PbbTeProtectionGroupListRowStatus
+      SYNTAX       RowStatus { active(1), notInService(2) }
+      WRITE-SYNTAX RowStatus { notInService(2), createAndGo(4),
+                               destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    OBJECT ieee8021PbbTeTeSidRowStatus
+      SYNTAX       RowStatus { active(1), notInService(2) }
+      WRITE-SYNTAX RowStatus { notInService(2), createAndGo(4),
+                               destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    OBJECT ieee8021PbbTeProtectionGroupISidRowStatus
+      SYNTAX       RowStatus { active(1), notInService(2) }
+      WRITE-SYNTAX RowStatus { notInService(2), createAndGo(4),
+                               destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    ::= { ieee8021PbbTeCompliances 1 }
+
+END

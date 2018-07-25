@@ -1,0 +1,239 @@
+-- Copyright (C) 2009-2012 Aricent Group . All Rights Reserved
+
+-- $Id: fsclkiwf.mib,v 1.6 2014/07/16 12:54:49 siva Exp $
+
+--    ClockIwf Proprietary MIB Definition
+
+--    This file explains the proprietary MIB implemented
+--    for ClockIwf Module 
+
+ARICENT-CLKIWF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, 
+    enterprises, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue, DisplayString
+        FROM SNMPv2-TC;
+
+fsClkIwfMIB MODULE-IDENTITY
+    LAST-UPDATED "201209050000Z"
+
+    ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+
+    CONTACT-INFO "support@aricent.com" 
+    DESCRIPTION
+       "This file is proprietary MIB for clock Iwf module, 
+       which will select the time source to set the system clock and 
+       maintain the information about the clock quality such as clock
+       accuracy, class, variance etc."
+    REVISION "201209050000Z"
+    DESCRIPTION
+       "This file is proprietary MIB for clock Iwf module, 
+       which will select the time source to set the system clock and 
+       maintain the information about the clock quality such as clock
+       accuracy, class, variance etc."
+
+   ::= { enterprises aricent-communication-holding-ltd(29601) iss(2) 46 }
+
+fsClkIwfObjects			  OBJECT IDENTIFIER ::= { fsClkIwfMIB 1 }
+fsClkIwfNotifications		  OBJECT IDENTIFIER ::= { fsClkIwfMIB 2 }
+
+--
+-- FS PTP MIB Objects
+--
+
+fsClkIwfGeneralGroup                  OBJECT IDENTIFIER ::= { fsClkIwfObjects 1 }
+
+FsClkIwfTimeInterval ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "The time interval field represents the values in scalednanoseconds.
+             The scalednanoseconds member is the time interval expressed in
+             units of nanoseconds and multiplied by 2^16.
+             Positive or negative time intervals outside the maximum range of
+             this data type shall be encoded as the largest positive and
+             negative values of this data type, respectively. For example, 2.5 
+             nanoseconds, will be expressed as 2.5 * 2^16 and the value
+             converted to hexadecimal that will obviously evolve to
+             0000 0000 0002 8000 base 16."
+    SYNTAX   OCTET STRING (SIZE (8)) 
+
+-- Scalar Objects
+
+
+fsClkIwfClockVariance OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+      "This object denotes the variance of the primary clock. This object
+       can reflect the value provisioned by the external source (NTP/SNTP/GPS)
+       that synchronize the system clock. The default value of this 
+       object is 0 (Minimum variance)"
+   DEFVAL  { 0 }
+   ::= { fsClkIwfGeneralGroup 1 }
+
+fsClkIwfClockClass OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+      "This object denotes the class of the primary clock. This object
+       can reflect the value provisioned by the external source (NTP/SNTP/GPS)
+       that synchronize the system clock. "
+   DEFVAL  { 248 }
+   ::= { fsClkIwfGeneralGroup 2 }
+
+fsClkIwfClockAccuracy OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+      "This object denotes the accuracy of the primary clock. This object
+       can reflect the value provisioned by the external source (NTP/SNTP/GPS)
+       that synchronize the system clock"
+   DEFVAL  { 'FE'H }
+   ::= { fsClkIwfGeneralGroup 3 }
+
+fsClkIwfClockTimeSource OBJECT-TYPE
+   SYNTAX        INTEGER {
+                        atomicClock (16),
+                        gps (32),
+                        ptp (64),
+                        ntp (80),
+                        internalOscillator (160)
+   }
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+      "This object denotes the time source of the primary clock. 
+       The system clock will be synchronized only through 
+       this protocol "
+   DEFVAL  { ptp }
+   ::= { fsClkIwfGeneralGroup 4 }
+
+
+fsClkIwfCurrentUtcOffset OBJECT-TYPE
+   SYNTAX        FsClkIwfTimeInterval
+   MAX-ACCESS    read-write
+   STATUS        deprecated
+   DESCRIPTION
+      "This object denotes the current UTC offset in scaled nanoseconds 
+       with respect to the system time "
+   ::= { fsClkIwfGeneralGroup 5 }
+
+fsClkIwfARBTime OBJECT-TYPE
+   SYNTAX       DisplayString
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+         "This object denotes the current ARB time in string format
+          Format is +/- HH:MM
+          Example +04:00"
+   ::= { fsClkIwfGeneralGroup 6 }
+
+fsClkIwfHoldoverSpecification OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+      "This indicates the system clock is in hold over specification or not. 
+       if the value is TRUE it indicates the clock is in holdover mode. 
+       If the clock is synchronized or syntonized to another clock but now 
+       free-running based on its own internall oscillator, whose frequency is
+       adjusted using data acquired while it had been synchronized or syntonized 
+       to the other clock then the clock is said to be in holdover mode "
+   DEFVAL  { true }
+   ::= { fsClkIwfGeneralGroup 7 }
+
+fsClkIwfLostSync OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      " If the clock is synchronized or syntonized to another clock but now 
+       it lost synchronizing the clock with primary reference using the 
+       primary time source then this variable will be set to TRUE"
+   DEFVAL  { false }
+   ::= { fsClkIwfGeneralGroup 8 }
+
+fsClkIwfUtcOffset OBJECT-TYPE
+   SYNTAX        DisplayString
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+      "This object denotes the current UTC offset in string format 
+       with respect to the system time.
+       Format is +/- HH:MM
+       Example +09:30"
+   ::= { fsClkIwfGeneralGroup 9 }
+
+
+-- fsClkIwfNotifications Sub Tree
+
+fsClkIwfTrap OBJECT IDENTIFIER ::= { fsClkIwfNotifications 0 }
+
+fsClkIwfGlobalErrTrapType OBJECT-TYPE
+       SYNTAX       INTEGER   {
+                        none (0),
+                        memfail (1),
+                        bufffail (2),
+                        timesourcechange (3),
+                        clockclasschange (4),
+                        clockaccuracychange (5), 
+                        clockvariancechange (6), 
+                        holdovermodechange (7) 
+                    }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "This refers to the type of error that has been occured recently.
+            This object will be used in Notification PDUs.
+            none - none of the below values
+            memfail - memory allocation failure
+            bufffail - buffer allocation failure
+            timesourcechange - change in primary time source 
+            clockclasschange - change in clock class
+            clockaccuracychange - change in clock accuracy
+            clockvariancechange - change in clock variance
+            holdovermodechange - change in hold over mode "
+   ::= { fsClkIwfNotifications 1 }
+
+fsClkIwfNotification OBJECT-TYPE
+       SYNTAX       OCTET STRING
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+           "This refers to the traps that are enabled in CLKIWF module.
+            Each bit in this object corresponds to a particular trap
+            If the corresponding bit is set, then the particular
+            trap is enabled in PTP. The following traps are supported
+
+            BYTE   BIT                     Notification
+
+            0      1                       Memory Failure.
+            0      2                       Buffer Failure.       
+            0      3                       Time Source Value Change.  
+            0      4                       Clock Class Value Change.
+            0      5                       Clock Accuracy Change.  
+            0      6                       Clock Variance Change.
+            0      7                       Hold Over Mode Change."
+   ::= { fsClkIwfNotifications 2 }
+
+fsClkIwfGlobalErrorTrap NOTIFICATION-TYPE
+         OBJECTS {
+	     fsClkIwfGlobalErrTrapType
+	 }
+	 STATUS   current
+	 DESCRIPTION 
+	     "This trap is generated whenever any of the error events like 
+	     memory allocation failure or buffer allocation failure occurs in 
+	     Clock Iwf. The generated trap will be carrying the information about
+	     the type of the resource allocation failure (memory allocation 
+	     or buffer allocation) failure or clock quality change.
+         
+         For example, if the object has the value 5, then it indicates that
+         the variance of the clock has been changed."
+    ::= { fsClkIwfTrap 1 }
+END

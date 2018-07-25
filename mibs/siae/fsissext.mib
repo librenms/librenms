@@ -1,0 +1,864 @@
+
+-- Copyright (C) 2006-2012 Aricent Group . All Rights Reserved
+
+-- $Id: fsissext.mib,v 1.15 2014/11/13 12:20:45 siva Exp $
+ARICENT-ISS-EXT-MIB DEFINITIONS ::= BEGIN 
+
+IMPORTS 
+   MODULE-IDENTITY, OBJECT-TYPE, 
+   Counter32, enterprises, IpAddress, Integer32, Unsigned32   
+   FROM SNMPv2-SMI 
+   RowStatus,
+   TEXTUAL-CONVENTION, MacAddress                 FROM SNMPv2-TC; 
+
+   issExt MODULE-IDENTITY 
+      LAST-UPDATED "200702150000Z"
+      ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE" 
+      CONTACT-INFO 
+
+        "ARICENT COMMUNICATIONS SOFTWARE
+         3460 Hillview Avenue,
+         Palo Alto, CA 94304-1388, USA,
+         Phone : +1-650-391-1088
+         E-mail:support@aricent.com"
+
+         DESCRIPTION 
+       "The enterprise ID 2076 was originally assigned to Future Software Ltd.
+        Future Software is a part of Aricent."
+         REVISION "200702150000Z"
+
+      DESCRIPTION 
+         "The MIB for AricentISSExtension." 
+   ::= { enterprises futuresoftware (2076) 81 8}
+
+
+PortList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight
+        ports, with the first octet specifying ports 1 through
+        8, the second octet specifying ports 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered port, and the least significant bit
+        represents the highest numbered port.  Thus, each port
+        of the bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of '1'
+        then that port is included in the set of ports; the port
+        is not included if its bit has a value of '0'."
+    SYNTAX      OCTET STRING
+
+iss    OBJECT IDENTIFIER ::= { enterprises 2076 81 }
+
+-- ----------------------------------------------------------------- -- 
+-- groups in the MIB  
+-- ----------------------------------------------------------------- -- 
+
+      issExtRateControl           OBJECT IDENTIFIER ::= { issExt 1 }
+      issExtL2Filter              OBJECT IDENTIFIER ::= { issExt 2 }
+      issExtL3Filter              OBJECT IDENTIFIER ::= { issExt 3 }
+
+-- Rate Control Group --------------------------------------------- --
+
+issExtRateCtrlTable OBJECT-TYPE 
+   SYNTAX      SEQUENCE OF IssExtRateCtrlEntry 
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+      "A table to control the rate limiting parameters 
+       either for the entire switch or for each physical and port-channel
+       interface in the switch."
+   ::= { issExtRateControl 1 }
+
+issExtRateCtrlEntry OBJECT-TYPE 
+   SYNTAX      IssExtRateCtrlEntry 
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+      "An entry appears in this table for each physical and port-channel
+       interface in the switch."
+   INDEX { issExtRateCtrlIndex }
+   ::= { issExtRateCtrlTable 1 }
+   
+IssExtRateCtrlEntry ::= 
+   SEQUENCE { 
+      issExtRateCtrlIndex 
+         Integer32, 
+      issExtRateCtrlDLFLimitValue
+         Integer32, 
+      issExtRateCtrlBCASTLimitValue
+         Integer32, 
+      issExtRateCtrlMCASTLimitValue
+         Integer32,
+      issExtRateCtrlPortRateLimit
+         Integer32,
+      issExtRateCtrlPortBurstSize
+         Integer32
+  }
+
+issExtRateCtrlIndex OBJECT-TYPE 
+   SYNTAX      Integer32 (1..65535)
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+      "The interface index for which the configuration in this 
+       entry applies."
+   ::= { issExtRateCtrlEntry 1 }
+    
+issExtRateCtrlDLFLimitValue OBJECT-TYPE 
+   SYNTAX      Integer32 (0..2147483647)
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Allows to configure the limiting value for the maximum number
+       of dlf packets that can be transmitted per second over this interface.
+       Setting this object to the value zero disables rate limiting for 
+       Destination lookup failure packets on this interface. The value that
+       can be set for this object is limited by the underlying hardware"
+       
+   DEFVAL  {0}
+   ::= { issExtRateCtrlEntry 2 }
+
+issExtRateCtrlBCASTLimitValue OBJECT-TYPE 
+   SYNTAX      Integer32 (0..2147483647)
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Allows to configure the limiting value for the maximum number
+       of broadcast packets that can be transmitted per second over this 
+       interface. Setting this object to the value zero disables rate 
+       limiting for Broadcast packets on this interface. The value that
+       can be set for this object is limited by the underlying hardware"
+       
+   DEFVAL  {0}
+   ::= { issExtRateCtrlEntry 3 }
+
+
+issExtRateCtrlMCASTLimitValue OBJECT-TYPE 
+   SYNTAX      Integer32 (0..2147483647)
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Allows to configure the limiting value for the maximum number
+       of multicast packets that can be transmitted per second over this 
+       interface. Setting this object to the value zero disables rate 
+       limiting for Multicast packets on this interface. The value that
+       can be set for this object is limited by the underlying hardware"
+       
+   DEFVAL  {0}
+   ::= { issExtRateCtrlEntry 4}
+
+issExtRateCtrlPortRateLimit OBJECT-TYPE
+   SYNTAX      Integer32 (0..80000000)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Configures interface Rate Limit (Packet that can be transferred
+      on a port at a particular second).
+
+      This object's value will take effect on the interface speed. Based
+      on the operating speed of the port, the rate limit will be applied.
+      This value can also be affected by the metering. A value of zero(0)
+      disable rate limiting i.e. sets the port to full speed."
+
+   ::= { issExtRateCtrlEntry 5 }
+
+issExtRateCtrlPortBurstSize OBJECT-TYPE
+   SYNTAX      Integer32 (0..80000000)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Configures interface Burst Pkt Rate. (Packet Burst that can be
+       transferred on a port at a particular second)
+
+      This object's value will take effect on the interface speed. Based
+      on the operating speed of the port, the burst size of the port
+      will be applied. This value can also be affected by the metering. A
+      value of zero(0) disable burst rate limiting i.e. sets the port burst
+      rate limit to full speed."
+
+   ::= { issExtRateCtrlEntry 6 }
+
+
+   
+
+-- ------------------------------------------------------------------ 
+-- L2 Filter Group --------------------------------------------------
+
+issExtL2FilterTable OBJECT-TYPE 
+
+   SYNTAX      SEQUENCE OF IssExtL2FilterEntry
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+       "A table to configure L2 filter rules in the system."
+   ::= { issExtL2Filter 1 }
+
+issExtL2FilterEntry OBJECT-TYPE 
+   SYNTAX      IssExtL2FilterEntry
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+       "Each entry in this table is a L2 filter rule.
+   
+       Index to the table is the L2 filter number."
+   INDEX { issExtL2FilterNo}
+   ::= { issExtL2FilterTable 1 }
+   
+IssExtL2FilterEntry ::= 
+   SEQUENCE { 
+      issExtL2FilterNo 
+         Integer32, 
+      issExtL2FilterPriority 
+         Integer32, 
+      issExtL2FilterEtherType 
+         Integer32, 
+      issExtL2FilterProtocolType 
+         Unsigned32, 
+      issExtL2FilterDstMacAddr 
+         MacAddress, 
+      issExtL2FilterSrcMacAddr 
+         MacAddress, 
+      issExtL2FilterVlanId 
+         Integer32,
+      issExtL2FilterInPortList 
+         PortList,
+      issExtL2FilterAction 
+         INTEGER, 
+      issExtL2FilterMatchCount
+         Counter32, 
+      issExtL2FilterStatus
+         RowStatus,
+      issExtL2FilterOutPortList
+         PortList,
+      issExtL2FilterDirection
+         INTEGER
+      issExtL2FilterInPortChannelList
+         PortList,
+      issExtL2FilterOutPortChannelList
+         PortLis
+  }
+
+issExtL2FilterNo OBJECT-TYPE 
+   SYNTAX      Integer32 (1..65535)
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+      "L2 Filter rule number."
+   ::= { issExtL2FilterEntry 1 }
+    
+issExtL2FilterPriority OBJECT-TYPE 
+   SYNTAX      Integer32 (1..255)
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "The priority of the L2 filter can be used to decide which filter rule
+       is applicable when 
+          --> the packet matches with more than one filter rules
+          --> All the filter rules result in 'allow'ing the packet
+
+      Higher value of 'filter priority' implies a higher priority.
+
+      Usage of 'L2FilterPriority' is implementation dependant.
+      In bcm, 'L2FilterPriority' is not supported."
+   DEFVAL  { 1 }
+   ::= { issExtL2FilterEntry 2 }
+   
+issExtL2FilterEtherType OBJECT-TYPE 
+   SYNTAX      Integer32 (1..65535)
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "An arbitrary EtherType number of a packet with
+       Ethernet II or SNAP encapsulation in decimal.
+       Filter type can be changed only when the 'filter 
+       status' is not active."
+   ::= { issExtL2FilterEntry 3 }
+   
+issExtL2FilterProtocolType OBJECT-TYPE 
+   SYNTAX      Unsigned32 (0..65535) 
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Specifies the non IP protocol type to be filtered.
+       aarp | amber | dec-spanning | decnet-iv | 
+       diagnostic | dsm |etype-6000 | etype-8042 | 
+       lat | lavc-sca | mop-console | mop-dump | 
+       msdos | mumps | netbios | vines-echo |
+       vines-ip | xns-idp: A non-IP protocol.
+
+      A value of '0' means, the filter is applicable for all protocols."
+   DEFVAL  { 0 }
+   ::= { issExtL2FilterEntry 4 }
+
+issExtL2FilterDstMacAddr OBJECT-TYPE 
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Destination MAC address to be matched with the packet."
+      
+   ::= { issExtL2FilterEntry 5 }
+
+issExtL2FilterSrcMacAddr OBJECT-TYPE 
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Source MAC address to be matched with the packet."
+
+   ::= { issExtL2FilterEntry 6 }
+
+issExtL2FilterVlanId OBJECT-TYPE 
+   SYNTAX      Integer32 (0..4094)
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Vlan Id to be filtered. 
+      A value of '0' means, this object is unused. Configuring this value is not
+      allowed."
+   DEFVAL  { 0 }
+   ::= { issExtL2FilterEntry 7 }
+
+issExtL2FilterInPortList OBJECT-TYPE 
+   SYNTAX      PortList
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Specifies the complete set of ports over which if the packet arrives
+      the filter rule will be applicable.
+
+      If the incoming port list is '0', the filter rule is applicable for all the 
+      incoming ports.
+
+      By default inport list is maintained as '0'." 
+   ::= { issExtL2FilterEntry 8 }
+
+issExtL2FilterAction OBJECT-TYPE 
+   SYNTAX      INTEGER {
+                  allow (1),
+                  drop  (2),
+                  redirect (3)
+               }
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Specifies the action to be taken on the packet if the filter
+      rule matches.
+     
+      If the action is 'allow', the packet will be forwarded according
+      to the forwarding rules.
+      
+      If the action is 'drop', the packet will be discarded.
+
+      If the action is 'redirect', the packet will be switched according
+      to the redirect rules.
+      If the action is 'redirect', with 'any' 'any' alone as qualifier, then 
+      it serves the purpose of cross connection - whereas the switching is disabled
+      and a copy of the incoming packets is given to the redirected port."
+   DEFVAL  { allow } 
+   ::= { issExtL2FilterEntry 9 }
+
+issExtL2FilterMatchCount OBJECT-TYPE 
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "Number of times this filter is matched."
+
+   ::= { issExtL2FilterEntry 10 }
+
+issExtL2FilterStatus OBJECT-TYPE 
+   SYNTAX      RowStatus
+   MAX-ACCESS  read-create 
+   STATUS      current 
+   DESCRIPTION 
+      "This object indicates the status of this entry.
+      
+      The entry status will be made 'active' only if 
+
+         --> Either of ProtocolType/src mac address /dst mac address is 
+             configured in case of l2Filter.
+      "
+   ::= { issExtL2FilterEntry 11 }
+
+issExtL2FilterOutPortList OBJECT-TYPE
+   SYNTAX      PortList
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Specifies the complete set of ports over which this filter is applied
+       for packets egress at Ports in this list.
+      If the Out port list is '0', the filter rule is applicable for  the
+      outgoing packets on all ports.
+      Even though the issExtL2FilterOutPortList is configured, It is applicable only
+      if issExtL2FilterDirection is configured as 'out'.
+      By default outport list is maintained as '0'."
+   ::= { issExtL2FilterEntry 12 }
+
+issExtL2FilterDirection OBJECT-TYPE
+   SYNTAX      INTEGER {
+                    in (1),
+                    out (2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Specifies the direction of this filter to be applied. By Default the
+      filter will be applied on ingress direction.
+      When the direction of this filter is 'in', It is applied on specified
+      ports of the issExtL2FilterInPortList.
+      When the direction of this filter is 'out', It is applied on specified
+      ports of the issExtL2FilterOutPortList."
+   DEFVAL  { in }
+   ::= { issExtL2FilterEntry 13 }
+
+issExtL2FilterInPortChannelList OBJECT-TYPE
+   SYNTAX      PortList
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object specifies the complete set of port channel interfaces over which
+       the filter is applied for packets arriving at the ports in this list
+
+       By default InPortChannel list is '0'."
+   ::= { issExtL2FilterEntry 14 }
+
+issExtL2FilterOutPortChannelList OBJECT-TYPE
+   SYNTAX      PortList
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object specifies the complete set of portchannel interfaces over which the filter is applied
+       for packets egress at ports in this list.
+       This configuration is applicable only if issAclL2FilterDirection is configured as 'out'.
+       By default the outportchannel list is '0'."
+   ::= { issExtL2FilterEntry 15 }
+
+-- ------------------------------------------------------------------ 
+-- L3 Filter Group --------------------------------------------------
+
+issExtL3FilterTable OBJECT-TYPE 
+   SYNTAX      SEQUENCE OF IssExtL3FilterEntry
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+       " A table to configure L3 filter rules in the system.
+       "
+   ::= { issExtL3Filter 1 }
+
+issExtL3FilterEntry OBJECT-TYPE 
+   SYNTAX      IssExtL3FilterEntry
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+       " Each entry in this table is a L3 filter rule.
+         Index to the table is L3 filter number. "
+   INDEX { issExtL3FilterNo}
+   ::= { issExtL3FilterTable 1 }
+   
+IssExtL3FilterEntry ::= 
+   SEQUENCE { 
+      issExtL3FilterNo 
+         Integer32, 
+      issExtL3FilterPriority 
+         Integer32, 
+      issExtL3FilterProtocol  
+         Integer32, 
+      issExtL3FilterMessageType 
+         Integer32, 
+      issExtL3FilterMessageCode 
+         Integer32, 
+      issExtL3FilterDstIpAddr 
+         IpAddress, 
+      issExtL3FilterSrcIpAddr 
+         IpAddress, 
+      issExtL3FilterDstIpAddrMask 
+         IpAddress, 
+      issExtL3FilterSrcIpAddrMask 
+         IpAddress,
+      issExtL3FilterMinDstProtPort
+         Unsigned32, 
+      issExtL3FilterMaxDstProtPort
+         Unsigned32, 
+      issExtL3FilterMinSrcProtPort
+         Unsigned32, 
+      issExtL3FilterMaxSrcProtPort
+         Unsigned32, 
+      issExtL3FilterInPortList 
+         PortList,
+      issExtL3FilterOutPortList 
+         PortList, 
+      issExtL3FilterAckBit
+         INTEGER,
+      issExtL3FilterRstBit
+         INTEGER,
+      issExtL3FilterTos
+         Integer32,
+      issExtL3FilterDscp
+         Integer32,
+      issExtL3FilterDirection 
+         INTEGER, 
+      issExtL3FilterAction 
+         INTEGER, 
+      issExtL3FilterMatchCount
+         Counter32, 
+      issExtL3FilterStatus
+         RowStatus,
+      issExtL3FilterInPortChannelList
+         PortList,
+      issExtL3FilterOutPortChannelList
+         PortList
+  }
+
+issExtL3FilterNo OBJECT-TYPE 
+   SYNTAX      Integer32 (1..65535)
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+      "L3 Filter rule number."
+   ::= { issExtL3FilterEntry 1 }
+    
+issExtL3FilterPriority OBJECT-TYPE 
+   SYNTAX      Integer32 (1..255)
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "The priority of the filter can be used to decide which filter rule
+       is applicable when 
+          --> the packet matches with more than one filter rules
+          --> All the filter rules result in 'allow'ing the packet
+
+      Higher value of 'L3 filter priority' implies a higher priority.
+
+      Usage of 'L3FilterPriority' is implementation dependant.
+      In bcm, 'L3FilterPriority' is not supported."
+   DEFVAL  { 1 }
+   ::= { issExtL3FilterEntry 2 }
+   
+issExtL3FilterProtocol OBJECT-TYPE 
+   SYNTAX      Integer32 (0..255)
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      " The type of protocol to be checked against the packet. The
+      default value is 255. If the value is 255, it means that the
+      protocol type can be anything and it will not be checked to 
+      decide the action. "
+   DEFVAL   { 255 }
+   ::= { issExtL3FilterEntry 3 }
+   
+issExtL3FilterMessageType OBJECT-TYPE 
+   SYNTAX      Integer32 (0..65535)
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+     " The message type to be checked against the packet. If the
+      message type matches with the packet, then the packet will be
+      dropped / allowed based on the action set in issExtL3FilterAction.
+      The default value is 255. It means that message type is not
+      configured and need not be checked.
+      Generally the value zero is given as default. But here
+      zero can be an ICMP Type value. Hence 255 is given as the
+      default value. 
+      Some ICMP message types are: 
+           echoReply(0),
+           destinationUnreachable(3),
+           sourceQuench(4),
+           redirect(5),
+           echoRequest(8),
+           timeExceeded(11),
+           parameterProblem(12),
+           timestampRequest(13),
+           timestampReply(14),
+           informationRequest(15),
+           informationReply(16),
+           addressMaskRequest(17),
+           addressMaskReply (18),
+           noICMPType(255)
+      "
+   DEFVAL  { 255 }
+   ::= { issExtL3FilterEntry 4 }
+
+issExtL3FilterMessageCode OBJECT-TYPE 
+   SYNTAX      Integer32 (0..65535)
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      " The message code to be checked against the packet. If the
+      packet matches with the message code, then the packet will
+      be dropped / allowed based on the action set in issExtL3FilterAction.
+      The default value is 255. It means that message code is not 
+      configured and need not be checked. Generally the value zero 
+      will be given as default. But here, zero can be an ICMP Code 
+      value. Hence 255 is given as the default value.
+      Some ICMP message codes are :
+           networkUnreachable(0),
+           hostUnreachable(1),
+           protocolUnreachable(2),
+           portUnreachable(3),
+           fragmentNeed(4),
+           sourceRouteFail(5),
+           destNetworkUnknown(6),
+           destHostUnknown(7),
+           srcHostIsolated(8),
+           destNetworkAdminProhibited(9),
+           destHostAdminProhibited(10),
+           networkUnreachableTOS(11),
+           hostUnreachableTOS(12),
+           noICMPCode(255) 
+      "
+   DEFVAL   { 255 }
+   ::= { issExtL3FilterEntry 5 }     
+
+issExtL3FilterDstIpAddr OBJECT-TYPE 
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Destination IP address to be matched with the packet.
+      
+      This object is valid only if the 'issExtFilterType' is 'l3filter'."
+   ::= { issExtL3FilterEntry 6 }
+
+issExtL3FilterSrcIpAddr OBJECT-TYPE 
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Source IP address to be matched with the packet.
+      
+      This object is valid only if the 'issExtFilterType' is 'l3filter'."
+   ::= { issExtL3FilterEntry 7 }
+
+issExtL3FilterDstIpAddrMask OBJECT-TYPE 
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "The IP subnet mask for Destination IP address.
+      
+      This object is valid only if the 'issExtFilterType' is 'l3filter'."
+
+   DEFVAL  { 'FFFFFFFF'h }
+   ::= { issExtL3FilterEntry 8 }
+
+issExtL3FilterSrcIpAddrMask OBJECT-TYPE 
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "The IP subnet mask for Source IP address.
+      
+      This object is valid only if the 'issExtFilterType' is 'l3filter'."
+
+   DEFVAL  { 'FFFFFFFF'h }
+   ::= { issExtL3FilterEntry 9 }
+
+issExtL3FilterMinDstProtPort OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The minimum port in the destination port range. Please note 
+       these ports are the TCP / UDP ports."
+   DEFVAL   { 0 }
+   ::= { issExtL3FilterEntry 10 }
+
+issExtL3FilterMaxDstProtPort OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The maximum port in the destination port range. Please note 
+       these ports are the TCP / UDP ports."
+   DEFVAL   { 65535 }
+   ::= { issExtL3FilterEntry 11 }
+
+issExtL3FilterMinSrcProtPort OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The minimum port in the source port range. Please note 
+       these ports are the TCP / UDP ports."
+   DEFVAL   { 0 }
+   ::= { issExtL3FilterEntry 12 }
+
+issExtL3FilterMaxSrcProtPort OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The maximum port in the source port range. Please note 
+       these ports are the TCP / UDP ports."
+   DEFVAL   { 65535 }
+   ::= { issExtL3FilterEntry 13 }
+
+issExtL3FilterInPortList OBJECT-TYPE 
+   SYNTAX      PortList
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Specifies the complete set of ports over which if the packet arrives
+      the filter rule will be applicable.
+
+      If the incoming port list is '0', the filter rule is applicable for all the 
+      incoming ports.
+
+      By default inport list is maintained as '0'." 
+   ::= { issExtL3FilterEntry 14 }
+
+issExtL3FilterOutPortList OBJECT-TYPE 
+   SYNTAX      PortList
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "This object is applicable only if the 'FilterAction' is 'allow'.
+
+      If the out going port list is non-zero, the packet will be sent over
+      the specifed ports only.
+
+      If the out going port list is '0', the port over which the packet is
+      to be switched will be based on further processing on the packet.
+      By default inport list is maintained as '0'." 
+
+   ::= { issExtL3FilterEntry 15 }
+
+issExtL3FilterAckBit		OBJECT-TYPE
+	SYNTAX	INTEGER	{
+						establish(1),
+						notEstablish(2),
+					  	any(3)	
+					}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		" The TCP ACK bit to be checked against the packet. The default 
+		value is 'any'(3). It means that ACK bit will not be checked 
+            	to decide the action. "
+	DEFVAL	{ any }
+	::= { issExtL3FilterEntry 16 }
+
+issExtL3FilterRstBit	 OBJECT-TYPE
+	SYNTAX	INTEGER	{
+						set(1),
+						notSet(2),
+				     	any(3)	
+					}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		" The TCP RST bit to be checked against the packet. The default 
+		value is 'any'(3). It means that RST bit will not be checked to 
+		decide the action. "
+	DEFVAL	{ any }
+	::= { issExtL3FilterEntry 17 }
+
+issExtL3FilterTos		OBJECT-TYPE
+	SYNTAX		Integer32 (0..7)
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		" The IP TOS bit to be checked against the packet. This is a 
+	          single byte integer of which the first three bits (least 
+                  significant bits) indicate Precedence.All other bits are
+                  unused. i.e 'uuuuuppp', u-unused, p - Precedence.
+                  By Default the Tos value will be 8,which is an invalid value."
+	::= { issExtL3FilterEntry 18 }
+
+issExtL3FilterDscp		OBJECT-TYPE
+	SYNTAX		Integer32 (0..63)
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		" The IP Dscp value to be checked against the packet."
+	DEFVAL	{ 0 }
+	::= { issExtL3FilterEntry 19 }
+
+issExtL3FilterDirection OBJECT-TYPE
+   SYNTAX   INTEGER  {
+                  in (1),
+                  out (2)
+               }
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+      " This specifies in which direction the Filters are to be
+      applied on the packets, either to incoming or outgoing
+      packets. "
+   DEFVAL	{ in }
+   ::= { issExtL3FilterEntry 20 }
+
+issExtL3FilterAction OBJECT-TYPE 
+   SYNTAX      INTEGER {
+                  allow (1),
+                  drop  (2),
+                  redirect (3)
+               }
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Specifies the action to be taken on the packet if the filter
+      rule matches.
+      
+      If the action is 'allow', the packet will be sent to the
+      ports in 'out port list'. If the out port list is '0', 
+      the port over which the packet is to be switched will be decided
+      based on further processing on the packet.
+
+      If the action is 'drop', the packet will be discarded.
+
+      If the action is 'redirect', the packet will be switched according
+      to the redirect rules. 
+      If the action is 'redirect', with 'any' 'any' alone as qualifier, then 
+      it serves the purpose of cross connection - whereas the switching is disabled
+      and a copy of the incoming packets is given to the redirected port."
+ 
+   DEFVAL  { allow } 
+   ::= { issExtL3FilterEntry 21 }
+
+issExtL3FilterMatchCount OBJECT-TYPE 
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "Number of times this filter is matched."
+
+   ::= { issExtL3FilterEntry 22 }
+
+issExtL3FilterStatus OBJECT-TYPE 
+   SYNTAX      RowStatus
+   MAX-ACCESS  read-create 
+   STATUS      current 
+   DESCRIPTION 
+      "This object indicates the status of this entry.
+      
+      The entry status will be made 'active' only if 
+
+         --> Either of InPortList or OutPortList are configured in case of l3Filter."
+
+   ::= { issExtL3FilterEntry 23 }
+
+issExtL3FilterInPortChannelList OBJECT-TYPE
+   SYNTAX      PortList
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object specifies the complete set of port channel interfaces over which
+       the filter is applied for packets arriving at the ports in this list
+
+       By default InPortChannel list is '0'."
+   ::= { issExtL3FilterEntry 24 }
+
+issExtL3FilterOutPortChannelList OBJECT-TYPE
+   SYNTAX      PortList
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object specifies the complete set of portchannel interfaces over which the filter is applied
+       for packets egress at ports in this list.
+       This configuration is applicable only if issAclL2FilterDirection is configured as 'out'.
+       By default the outportchannel list is '0'."
+   ::= { issExtL3FilterEntry 25 }
+
+END

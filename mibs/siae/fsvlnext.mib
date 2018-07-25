@@ -1,0 +1,1267 @@
+-- Copyright (C) 2006-2012 Aricent Group . All Rights Reserved
+
+-- $Id: fsvlnext.mib,v 1.12 2014/08/22 11:43:01 siva Exp $
+
+ARICENT-VLAN-EXT-MIB DEFINITIONS ::= BEGIN
+ 
+IMPORTS
+ 
+    OBJECT-TYPE,MODULE-IDENTITY, Integer32,
+    enterprises,Counter32 FROM SNMPv2-SMI 
+    TEXTUAL-CONVENTION, MacAddress FROM SNMPv2-TC
+    EnabledStatus  FROM P-BRIDGE-MIB
+    VlanId FROM AricentMIVlan-MIB;
+
+
+futureVlanExtMIB MODULE-IDENTITY
+    LAST-UPDATED "201209050000Z"
+    ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+    CONTACT-INFO "support@aricent.com"
+    DESCRIPTION "||||||"
+    REVISION "201209050000Z"
+    DESCRIPTION "||||||"
+::= { enterprises futuresoftware(2076) 137}
+
+
+TunnelStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "To specify how to handle the L2 protocol packets received on a
+         particular port.
+         
+         When the option is set to 'peer', the L2 protocol packets received
+         on a particular port will be processed in the Bridge.
+         
+         When the option is set to 'tunnel', the L2 protocol packets received
+         on a particular port will be transparently transmitted in the provider
+         network and will not be processed in Bridges.
+         
+         When the option is set to 'discard', the L2 protocol packets
+         received over a particular port will not be processed and discarded."
+
+    SYNTAX      INTEGER { peer(1), tunnel(2), discard(3) }
+
+L2CPProtocols ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the types of Layer 2 protocols. Identifiers from
+        1 to 13 specify the standard protocols - dot1x(1), lacp(2), stp(3), gvrp(4),
+        gmrp(5), igmp(6), mvrp(7), mmrp(8), elmi(9), lldp(10), ecfm(11), eoam(12),
+        ptp(13). The identifier 14 to 23 (denoted as other) specify other protocols."
+
+    SYNTAX      INTEGER (1..23)
+
+--fsVlanTunnelObjects - This sub group contains mib objects for 
+-- configuring Tunneling feature in VLAN.
+
+fsVlanSystemConfig OBJECT IDENTIFIER  ::= { futureVlanExtMIB 1 }
+fsVlanTunnelObjects OBJECT IDENTIFIER  ::= { futureVlanExtMIB 2 }
+fsVlanDiscardObjects OBJECT IDENTIFIER  ::= { futureVlanExtMIB 3 }
+ 
+-- SCALAR BEGIN 
+
+fsVlanBridgeMode OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  customerBridge (1),
+                  providerBridge (2),
+                  providerEdgeBridge (3),
+                  providerCoreBridge (4),
+                  providerBackoneICompBridge (5),
+                  providerBackoneBCompBridge (6)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      
+      "This object indicates the Bridge mode of the switch.
+      
+      Setting this to 'customerBridge' means that the switch will operate 
+      as a 802.1Q VLAN Bridge.
+
+      Setting this to 'providerBridge' means that the Bridge will operate as 
+      a normal Q-in-Q Bridge.
+
+      Setting this to 'providerCoreBridge' means that the switch will operate 
+      as a 802.1ad compliant provider bridge with only S-VLAN component.
+
+      Setting this to 'providerEdgeBridge' means that the switch will operate 
+      as a 802.1ad provider edge bridge with S-VLAN component and atleast 
+      one C-VLAN component.
+
+      Setting this to 'providerBackoneICompBridge' means that the switch will operate 
+      as a 802.1ah provider backone bridge as an I component.
+
+      Setting this to 'providerBackoneBCompBridge' means that the switch will operate 
+      as a 802.1ah provider backone bridge as a B component.
+
+      For changing the bridge mode, GARP and STP modules should be shutdown."
+
+   ::= { fsVlanSystemConfig 1 }
+
+
+fsVlanTunnelBpduPri OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the default User Priority for all the tunneled Layer 2
+        BPDU's received on tunnel ports."
+    DEFVAL { 7 }
+    ::= { fsVlanTunnelObjects 1 }
+
+
+fsVlanTunnelStpAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The MAC address to be used for Customer STP BPDUs tunneling.
+
+        When STP tunneling is enabled on a port, this MAC address will be
+        used as the the destination MAC address of the customer BPDUs received.
+        This is the default behaviour in Provider (Q-in-Q) Bridges and customer
+        bridges. In case of 802.1ad bridges, this will be done only when the
+        outgoing port type is proprietary PNP.
+        
+        Inside a given Network,BPDUs received with this MAC address will be 
+        treated as data packets and not processed. This is the default
+        behaviour in case of Provider (Q-in-Q) Bridges and customer bridges. 
+        In case of 802.1ad Bridges, when the outgoing port type is not 
+        proprietary PNP, the destination address will be replaced with the 
+        reserved address defined for customer STP BPDU.Otherwise, they will
+        be treated as data packets.
+        
+        When the BPDU is sent out of the given Network, this MAC address
+        will be replaced with the reserved address defined for Customer STP
+        BPDU. This is done only when when STP protocol tunnel status is set to 
+        Tunnel on the outgoing port.Dropped otherwise."
+        
+    ::= { fsVlanTunnelObjects 2 }
+
+fsVlanTunnelLacpAddress OBJECT-TYPE
+    SYNTAX      MacAddress 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The MAC address to be used for LACP packets tunneling . When
+        LACP tunneling is enabled on a port, this MAC address will be
+        used as the the destination MAC address of the LACP packets
+        received over this port.
+        
+        LACP packets received with this MAC address will be treated as
+        data packets and not processed.
+        
+        When the tunneled LACP packets are sent out of the given Network, 
+        this MAC address will be replaced with the reserved address defined 
+        for LACP packets. This is done only when LACP protocol tunnel status 
+        is set to Tunnel on the outgoing port.Dropped otherwise."
+           
+    ::= { fsVlanTunnelObjects 3 }
+
+fsVlanTunnelDot1xAddress OBJECT-TYPE
+    SYNTAX      MacAddress 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The MAC address to be used for Dot1x packets tunneling.
+         When Dot1x tunneling is enabled on a port, this MAC address will 
+        be used as the the destination MAC address for the customer Dot1x
+        packets received with reserved address over this port. 
+        
+        Dot1x packets received with this MAC address will be treated as 
+        data packets and not processed.
+        
+        When the tunneled Dot1x packets are sent out of the given Network, 
+        this MAC address will be replaced with the reserved address defined 
+        for Dot1x packets. This is done only when Dot1x protocol tunnel 
+        status is set to Tunnel on the outgoing port.Dropped otherwise."
+        
+    ::= { fsVlanTunnelObjects 4 }
+
+fsVlanTunnelGvrpAddress OBJECT-TYPE
+    SYNTAX      MacAddress 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The MAC address to be used for GVRP PDUs tunneling.
+
+        When GVRP tunneling is enabled on a port, this MAC address will be
+        used as the the destination MAC address of the customer GVRP PDUs 
+        received.This is the default behaviour in Provider (Q-in-Q) Bridges and
+        customer bridges. In case of 802.1ad bridges, this will be done only 
+        when the outgoing port type is proprietary PNP.
+        
+        Inside a given Network,packets received with this MAC address will be 
+        treated as data packets and not processed. This is the default
+        behaviour in case of Provider (Q-in-Q) Bridges and customer bridges. 
+        In case of 802.1ad Bridges, when the outgoing port type is not 
+        proprietary PNP, the destination address will be replaced with the
+        reserved address defined for customer GVRP PDUs.Otherwise, they 
+        will be treated as data packets.
+        
+        When the GVRP PDU is sent out of the given Network, this MAC address
+        will be replaced with the reserved address defined for Customer GVRP
+        PDU. This is done only when when GVRP protocol tunnel status is set to 
+        Tunnel on the outgoing port.Dropped otherwise."
+        
+    ::= { fsVlanTunnelObjects 5 }
+
+fsVlanTunnelGmrpAddress OBJECT-TYPE
+    SYNTAX      MacAddress 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The MAC address to be used for GMRP PDUs tunneling. 
+        When GMRP tunneling is enabled on a port, this MAC address will be 
+        used as the the destination MAC address of the customer GMRP PDUs 
+        received over this port. 
+        
+        Inside a given Network, GMRP PDUs received with this MAC address 
+        will be treated as data packets and not processed.
+        
+        When the tunneled GMRP PDUs are sent out of the given Network, 
+        this MAC address will be replaced with the reserved address defined 
+        for GMRP PDUs.This is done only when GMRP protocol tunnel status is 
+        set to Tunnel on the outgoing port.Dropped otherwise."
+        
+    ::= { fsVlanTunnelObjects 6 }
+
+fsVlanTunnelMvrpAddress OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      " The MAC address to be used for MVRP PDUs tunneling.
+        When MVRP tunneling is enabled on a port, this MAC address will be
+        used as the the destination MAC address of the received MVRP PDUs.
+
+        Inside a given Network, packets received with this MAC address will be 
+        treated as data packets and not processed. This is the default
+        behaviour in case of Provider (Q-in-Q) Bridges and customer bridges. 
+        In case of 802.1ad Bridges, when the outgoing port type is not 
+        proprietary PNP, the destination address will be replaced with the
+        reserved address defined for customer MVRP PDUs.Otherwise, they 
+        will be treated as data packets.
+
+        When the MVRP PDU is sent out of the given Network, this MAC address
+        will be replaced with the reserved address defined for Customer MVRP
+        PDU. This is done only when when MVRP protocol tunnel status is set to
+        Tunnel on the outgoing port. Dropped otherwise."
+   ::= { fsVlanTunnelObjects 10 }
+
+fsVlanTunnelMmrpAddress OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      " The MAC address to be used for MMRP PDUs tunneling.
+        When MMRP tunneling is enabled on a port, this MAC address will be
+        used as the the destination MAC address of the MMRP PDUs received 
+        over this port.
+
+        Inside a given Network, MMRP PDUs received with this MAC address
+        will be treated as data packets and not processed.
+
+        When the tunneled MMRP PDUs are sent out of the given Network,
+        this MAC address will be replaced with the reserved address defined
+        for MMRP PDUs.This is done only when MMRP protocol tunnel status is
+        set to Tunnel on the outgoing port.Dropped otherwise."
+
+   ::= { fsVlanTunnelObjects 11 }
+
+fsVlanTunnelElmiAddress OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "The MAC address to be used for ELMI packets tunneling . When
+        ELMI tunneling is enabled on a port, this MAC address will be
+        used as the the destination MAC address of the ELMI packets
+        received over this port. ELMI packets received with this MAC 
+        address will be treated as data packets and not processed.
+        
+        When the tunneled ELMI packets are sent out of the given Network, 
+        this MAC address will be replaced with the reserved address defined 
+        for ELMI packets. This is done only when ELMI protocol tunnel status 
+        is set to Tunnel on the outgoing port.Dropped otherwise."
+
+   ::= { fsVlanTunnelObjects 12 }
+
+fsVlanTunnelLldpAddress OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "The MAC address to be used for LLDP packets tunneling . When
+        LLDP tunneling is enabled on a port, this MAC address will be
+        used as the the destination MAC address of the LLDP packets
+        received over this port.
+        
+        LLDP packets received with this MAC address will be treated as
+        data packets and not processed.
+        
+        When the tunneled LLDP packets are sent out of the given Network, 
+        this MAC address will be replaced with the reserved address defined 
+        for LLDP packets. This is done only when LLDP protocol tunnel status 
+        is set to Tunnel on the outgoing port.Dropped otherwise."
+
+   ::= { fsVlanTunnelObjects 13 }
+
+fsVlanTransTunnelStatus OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  enable (1),
+                  disable (2)
+                 }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object indicates the Transparent Tunnel of the system.
+
+       Setting this to 'enable' will allow the l2cp packets tunnel through the hardware
+       irrespective of the l2cp packet behaviour on the port.
+
+       Setting this to 'disable' will not allow the l2cp packets tunnel through the hardware
+       and will perform the actions defined on the ingress port for the l2 control packets."
+
+   DEFVAL { 2 }
+   ::= { fsVlanTunnelObjects 14 }
+
+fsVlanTunnelEcfmAddress OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "The MAC address to be used for ECFM packets tunneling . When
+        ECFM tunneling is enabled on a port, this MAC address will be
+        used as the the destination MAC address of the ECFM packets
+        received over this port.
+        
+        ECFM packets received with this MAC address will be treated as
+        data packets and not processed.
+        
+        When the tunneled ECFM packets are sent out of the given Network, 
+        this MAC address will be replaced with the reserved address defined 
+        for ECFM packets. This is done only when ECFM protocol tunnel status 
+        is set to Tunnel on the outgoing port.Dropped otherwise."
+
+   ::= { fsVlanTunnelObjects 16 }
+
+fsVlanTunnelEoamAddress OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the MAC address to be used for EOAM packets
+        tunneling . When EOAM tunneling is enabled on the port, this MAC address 
+        will be used as destination MAC address of the EOAM packets
+        received over the port.
+
+        EOAM packets received with this MAC address will be treated as
+        data packets and are not processed.
+
+        When the tunneled EOAM packets are sent out of the given Network,
+        this MAC address will be replaced with the reserved address defined
+        for EOAM packets. This is done only when EOAM protocol tunnel status
+        is set to Tunnel on the outgoing port, else the packets are dropped."
+
+   ::= { fsVlanTunnelObjects 17 }
+
+fsVlanTunnelIgmpAddress OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the MAC address to be used for IGMP packets
+        tunneling . When IGMP tunneling is enabled on the port, this MAC address
+        will be used as destination MAC address of the IGMP packets
+        received over the port.
+
+        IGMP packets received with this MAC address will be treated as
+        data packets and are not processed.
+
+        When the tunneled IGMP packets are sent out of the given network,
+        this MAC address will be replaced with the reserved address defined
+        for the IGMP packets. This is done only when IGMP protocol tunnel status
+        is set to Tunnel on the outgoing port, else the packets are dropped."
+
+   ::= { fsVlanTunnelObjects 18 }
+
+-- SCALAR END
+
+-- ---------------------------------------------------------------------------- 
+-- Vlan Tunnel Table 
+-- ---------------------------------------------------------------------------- 
+ 
+fsVlanTunnelTable OBJECT-TYPE 
+   SYNTAX      SEQUENCE OF FsVlanTunnelEntry 
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+      "This table contains information about the tunnel ports. A walk on 
+      this table will show only those interfaces that are configured for
+      tunneling.
+      This table is supported only when the Bridge is configured in Provider 
+      Bridge (Q-in-Q) mode."
+      
+   ::= { fsVlanTunnelObjects 7 } 
+ 
+fsVlanTunnelEntry OBJECT-TYPE 
+   SYNTAX      FsVlanTunnelEntry 
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+      "Entry indicating the tunnel information of the port."
+   INDEX { fsVlanPort } 
+   ::= { fsVlanTunnelTable 1 } 
+    
+FsVlanTunnelEntry ::= 
+   SEQUENCE { 
+      fsVlanPort         Integer32,
+      fsVlanTunnelStatus EnabledStatus 
+   } 
+
+fsVlanPort OBJECT-TYPE
+   SYNTAX      Integer32 (1..65535)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The Index value of the port in the system for which this entry
+      applies. The maximum index value of the port is defined by the
+      system."
+   ::= { fsVlanTunnelEntry 1 }
+
+
+fsVlanTunnelStatus OBJECT-TYPE 
+   SYNTAX      EnabledStatus
+   MAX-ACCESS  read-write
+   STATUS      current 
+   DESCRIPTION 
+      "Indicates whether Tunnelling is enabled or disabled on this port.
+      fsVlanTunnelStatus can be set to `enabled` if and only if the
+      Bridge mode is set to be `Provider Bridge Mode` and VLAN port 
+      type is set to 'accessPort'.  Tunnelling can be enabled only on ports 
+      which are in 'dot1x force-authorised' state."
+   DEFVAL      { disabled }
+   ::= { fsVlanTunnelEntry 2 } 
+
+
+-- ----------------------------------------------------------------
+-- Tunnel protocol configuration table
+-- ----------------------------------------------------------------
+fsVlanTunnelProtocolTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF FsVlanTunnelProtocolEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "This table contains information about the handling (Tunnel/Peer/
+      Discard)of customer Layer 2 protocols (STP/GVRP/GMRP/LACP/Dot1x/
+      IGMP/MVRP and MMRP) inside a given network."
+      
+   ::= { fsVlanTunnelObjects 8 }
+ 
+fsVlanTunnelProtocolEntry OBJECT-TYPE
+   SYNTAX      FsVlanTunnelProtocolEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION 
+      "Entry indicating the handling (Tunnel/Peer/Discard) of Layer 2
+      protocols (STP/GVRP/GMRP/LACP/Dot1x/IGMP/MVRP and MMRP) on this port.
+      
+      Tunnel Status cannot be set to `tunnel/discard`, if the protocol
+      is enabled on the port.Exception, Igmp and dot1x should be disabled 
+      globally for setting the tunnel status to `tunnel/discard`."
+   INDEX { fsVlanPort }
+   ::= { fsVlanTunnelProtocolTable 1 }
+    
+ FsVlanTunnelProtocolEntry ::=
+ SEQUENCE {
+    fsVlanTunnelProtocolDot1x      TunnelStatus,
+    fsVlanTunnelProtocolLacp       TunnelStatus,
+    fsVlanTunnelProtocolStp        TunnelStatus,
+    fsVlanTunnelProtocolGvrp       TunnelStatus,
+    fsVlanTunnelProtocolGmrp       TunnelStatus,
+    fsVlanTunnelProtocolIgmp       TunnelStatus,
+    fsVlanTunnelProtocolMvrp       TunnelStatus,
+    fsVlanTunnelProtocolMmrp       TunnelStatus,
+    fsVlanTunnelProtocolElmi       TunnelStatus,
+    fsVlanTunnelProtocolLldp       TunnelStatus,
+    fsVlanTunnelProtocolEcfm       TunnelStatus,
+    fsVlanTunnelOverrideOption     EnabledStatus,
+    fsVlanTunnelProtocolEoam       TunnelStatus
+ }
+
+fsVlanTunnelProtocolDot1x OBJECT-TYPE
+   SYNTAX      TunnelStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The object to specify whether to peer/tunnel/discard the Dot1x packets
+            received on this port."
+   ::= { fsVlanTunnelProtocolEntry  1 }
+
+fsVlanTunnelProtocolLacp OBJECT-TYPE
+   SYNTAX      TunnelStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The object to specify whether to peer/tunnel/discard the LACP packets
+            received on this port."
+   ::= { fsVlanTunnelProtocolEntry 2 }
+
+fsVlanTunnelProtocolStp OBJECT-TYPE
+   SYNTAX      TunnelStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The object to specify whether to peer/tunnel/discard the STP packets
+            received on this port."
+   ::= { fsVlanTunnelProtocolEntry 3 }
+
+fsVlanTunnelProtocolGvrp OBJECT-TYPE
+   SYNTAX      TunnelStatus
+   MAX-ACCESS  read-write
+   STATUS      current 
+   DESCRIPTION 
+      "The object to specify whether to peer/tunnel/discard the GVRP packets
+            received on this port."
+   ::= { fsVlanTunnelProtocolEntry 4 } 
+
+fsVlanTunnelProtocolGmrp OBJECT-TYPE
+   SYNTAX      TunnelStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The object to specify whether to peer/tunnel/discard the GMRP packets
+            received on this port."
+   ::= { fsVlanTunnelProtocolEntry 5 }
+
+fsVlanTunnelProtocolIgmp OBJECT-TYPE
+   SYNTAX      TunnelStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The object to specify whether to peer/tunnel/discard the IGMP packets
+            received on this port."
+   ::= { fsVlanTunnelProtocolEntry 6 }
+
+fsVlanTunnelProtocolMvrp OBJECT-TYPE
+   SYNTAX      TunnelStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The object to specify whether to peer/tunnel/discard the MVRP packets
+            received on this port."
+   ::= { fsVlanTunnelProtocolEntry 7 }
+
+fsVlanTunnelProtocolMmrp OBJECT-TYPE
+   SYNTAX      TunnelStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION 
+      "The object to specify whether to peer/tunnel/discard the MMRP packets
+            received on this port."
+   ::= { fsVlanTunnelProtocolEntry 8 }
+
+fsVlanTunnelProtocolElmi OBJECT-TYPE
+   SYNTAX      TunnelStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION 
+      "The object to specify whether to peer/tunnel/discard the ELMI packets
+            received on this port."
+   ::= { fsVlanTunnelProtocolEntry 9 }
+
+fsVlanTunnelProtocolLldp OBJECT-TYPE
+   SYNTAX      TunnelStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION 
+      "The object to specify whether to peer/tunnel/discard the LLDP packets
+            received on this port."
+   ::= { fsVlanTunnelProtocolEntry 10 }
+
+fsVlanTunnelProtocolEcfm OBJECT-TYPE
+   SYNTAX      TunnelStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION 
+      "The object to specify whether to peer/tunnel/discard the ECFM packets
+            received on this port."
+   ::= { fsVlanTunnelProtocolEntry 11 }
+
+fsVlanTunnelOverrideOption OBJECT-TYPE
+   SYNTAX      EnabledStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object specifies whether Override option is enabled or disabled on 
+      the Port. 
+      If this option is set to enable, Tunnel status for all the Layer 2 control
+      protocol will be referred from port Table.
+      If this option is set to disable, Tunnel status for Layer 2 control
+      protocols which operates over a vlan will be referred from VLAN Table."
+
+   DEFVAL      { disabled }
+   ::= { fsVlanTunnelProtocolEntry 12 }
+
+fsVlanTunnelProtocolEoam OBJECT-TYPE
+   SYNTAX      TunnelStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The object specifies whether to peer or tunnel or discard the EOAM packets
+       received on the port."
+   ::= { fsVlanTunnelProtocolEntry 13 }
+
+-- ----------------------------------------------------------------
+-- Tunnel protocol statistics table
+-- ----------------------------------------------------------------
+fsVlanTunnelProtocolStatsTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF FsVlanTunnelProtocolStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "This table contains statistics information about the tunneled 
+       Layer 2 protocols (STP/GVRP/GMRP/LACP/Dot1x/IGMP/MVRP and MMRP) 
+       received and transmitted over a port."
+   ::= { fsVlanTunnelObjects 9 }
+ 
+fsVlanTunnelProtocolStatsEntry OBJECT-TYPE
+   SYNTAX      FsVlanTunnelProtocolStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION 
+      "Entry indicating the handling (Tunnel/Peer/Discard) of Layer 2
+      protocols (STP/GVRP/GMRP/LACP/Dot1x/IGMP/MVRP and MMRP) on this port."
+      
+   INDEX { fsVlanPort }
+   ::= { fsVlanTunnelProtocolStatsTable 1 }
+    
+FsVlanTunnelProtocolStatsEntry ::=
+ SEQUENCE {
+      fsVlanTunnelProtocolDot1xPktsRecvd Counter32,
+      fsVlanTunnelProtocolDot1xPktsSent  Counter32,
+      fsVlanTunnelProtocolLacpPktsRecvd  Counter32,
+      fsVlanTunnelProtocolLacpPktsSent   Counter32,
+      fsVlanTunnelProtocolStpPDUsRecvd   Counter32,
+      fsVlanTunnelProtocolStpPDUsSent    Counter32,
+      fsVlanTunnelProtocolGvrpPDUsRecvd  Counter32,
+      fsVlanTunnelProtocolGvrpPDUsSent   Counter32,
+      fsVlanTunnelProtocolGmrpPktsRecvd  Counter32,
+      fsVlanTunnelProtocolGmrpPktsSent   Counter32,
+      fsVlanTunnelProtocolIgmpPktsRecvd  Counter32,
+      fsVlanTunnelProtocolIgmpPktsSent   Counter32,
+      fsVlanTunnelProtocolMvrpPktsRecvd  Counter32,
+      fsVlanTunnelProtocolMvrpPktsSent   Counter32,
+      fsVlanTunnelProtocolMmrpPktsRecvd  Counter32,
+      fsVlanTunnelProtocolMmrpPktsSent   Counter32,
+      fsVlanTunnelProtocolElmiPktsRecvd  Counter32,
+      fsVlanTunnelProtocolElmiPktsSent   Counter32,
+      fsVlanTunnelProtocolLldpPktsRecvd  Counter32,
+      fsVlanTunnelProtocolLldpPktsSent   Counter32,
+      fsVlanTunnelProtocolEcfmPktsRecvd  Counter32,
+      fsVlanTunnelProtocolEcfmPktsSent   Counter32,
+      fsVlanTunnelProtocolEoamPktsRecvd  Counter32,
+      fsVlanTunnelProtocolEoamPktsSent   Counter32
+
+   }
+
+fsVlanTunnelProtocolDot1xPktsRecvd OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of tunneled Dot1x Packets received."
+   ::= { fsVlanTunnelProtocolStatsEntry 1 }
+
+fsVlanTunnelProtocolDot1xPktsSent OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The number of tunneled Dot1x Packets transmitted."
+   ::= { fsVlanTunnelProtocolStatsEntry 2 }
+
+fsVlanTunnelProtocolLacpPktsRecvd OBJECT-TYPE 
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The number of tunneled LACP Packets received."
+   ::= { fsVlanTunnelProtocolStatsEntry 3 } 
+
+fsVlanTunnelProtocolLacpPktsSent OBJECT-TYPE 
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The number of tunneled LACP packets transmitted."
+   ::= { fsVlanTunnelProtocolStatsEntry 4 } 
+
+fsVlanTunnelProtocolStpPDUsRecvd OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The number of tunneled STP PDUs received."
+   ::= { fsVlanTunnelProtocolStatsEntry 5 } 
+
+fsVlanTunnelProtocolStpPDUsSent OBJECT-TYPE 
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The number of tunneled STP PDUs transmitted."
+   ::= { fsVlanTunnelProtocolStatsEntry 6 } 
+
+fsVlanTunnelProtocolGvrpPDUsRecvd OBJECT-TYPE 
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The number of tunneled  GVRP PDUs received."
+   ::= { fsVlanTunnelProtocolStatsEntry 7 } 
+
+fsVlanTunnelProtocolGvrpPDUsSent OBJECT-TYPE 
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The number of tunneled GVRP PDUs transmitted."
+   ::= { fsVlanTunnelProtocolStatsEntry 8 } 
+
+fsVlanTunnelProtocolGmrpPktsRecvd OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of tunneled GMRP PDUs packets received."
+   ::= { fsVlanTunnelProtocolStatsEntry 9 }
+
+fsVlanTunnelProtocolGmrpPktsSent OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The number of tunneled GMRP packets transmitted."
+   ::= { fsVlanTunnelProtocolStatsEntry 10 }
+
+fsVlanTunnelProtocolIgmpPktsRecvd OBJECT-TYPE 
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The number of tunneled IGMP packets received."
+   ::= { fsVlanTunnelProtocolStatsEntry 11 } 
+
+fsVlanTunnelProtocolIgmpPktsSent OBJECT-TYPE 
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The number of tunneled  IGMP packets transmitted."
+   ::= { fsVlanTunnelProtocolStatsEntry 12 }
+
+fsVlanTunnelProtocolMvrpPktsRecvd OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of MVRPDUs received on a port for which the MVRP tunneling 
+       status is enabled."
+   ::= { fsVlanTunnelProtocolStatsEntry 13 }
+
+fsVlanTunnelProtocolMvrpPktsSent OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION 
+      "The number of MVRPDUs transmitted on a port on which the MVRP tunneling 
+       status is enabled."
+   ::= { fsVlanTunnelProtocolStatsEntry 14 }
+
+fsVlanTunnelProtocolMmrpPktsRecvd OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of MMRPDUs received on a port for which the MMRP tunneling 
+       status is enabled."
+   ::= { fsVlanTunnelProtocolStatsEntry 15 }
+
+fsVlanTunnelProtocolMmrpPktsSent OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of MMRPDUs transmitted on a port on which the MMRP tunneling 
+       status is enabled."
+   ::= { fsVlanTunnelProtocolStatsEntry 16 }
+
+fsVlanTunnelProtocolElmiPktsRecvd OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of ELMI packets received on a port for which the ELMI tunneling 
+       status is enabled."
+   ::= { fsVlanTunnelProtocolStatsEntry 17 }
+
+fsVlanTunnelProtocolElmiPktsSent OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of ELMI packets transmitted on a port on which the ELMI tunneling 
+       status is enabled."
+   ::= { fsVlanTunnelProtocolStatsEntry 18 }
+
+fsVlanTunnelProtocolLldpPktsRecvd OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of LLDPUDs received on a port for which the LLDP tunneling 
+       status is enabled."
+   ::= { fsVlanTunnelProtocolStatsEntry 19 }
+
+fsVlanTunnelProtocolLldpPktsSent OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of LLDPUDs transmitted on a port on which the LLDP tunneling 
+       status is enabled."
+   ::= { fsVlanTunnelProtocolStatsEntry 20 }
+
+fsVlanTunnelProtocolEcfmPktsRecvd OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of ECFM packets received on a port for which the ECFM tunneling 
+       status is enabled."
+   ::= { fsVlanTunnelProtocolStatsEntry 21 }
+
+fsVlanTunnelProtocolEcfmPktsSent OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of ECFM packets transmitted on a port on which the ECFM tunneling 
+       status is enabled."
+   ::= { fsVlanTunnelProtocolStatsEntry 22 }
+
+fsVlanTunnelProtocolEoamPktsRecvd OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This object displays the number of EOAM packets received on a port 
+      on which the EOAM tunneling status is enabled."
+   ::= { fsVlanTunnelProtocolStatsEntry 23 }
+
+fsVlanTunnelProtocolEoamPktsSent OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This object displays the number of EOAM packets transmitted on a port 
+      for which the EOAM tunneling status is enabled."
+   ::= { fsVlanTunnelProtocolStatsEntry 24 }
+
+
+-- ----------------------------------------------------------------
+-- VLAN Discard statistics table
+-- ----------------------------------------------------------------
+fsVlanDiscardStatsTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF FsVlanDiscardStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "This table contains statistics information about the L2 protocol   
+       packets (STP/GVRP/GMRP/LACP/Dot1x/IGMP/MVRP and MMRP) discarded on 
+       reception and transmission side due to 'Discard' tunnel protocol 
+       status."
+
+   ::= { fsVlanDiscardObjects 1 }
+ 
+fsVlanDiscardStatsEntry OBJECT-TYPE
+   SYNTAX      FsVlanDiscardStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION 
+      "Entry indicating the Discard statistics for L2 protocol packets."
+
+   INDEX { fsVlanPort }
+   ::= { fsVlanDiscardStatsTable 1 }
+    
+FsVlanDiscardStatsEntry ::=
+ SEQUENCE {
+      fsVlanDiscardDot1xPktsRx   Counter32,
+      fsVlanDiscardDot1xPktsTx   Counter32,
+      fsVlanDiscardLacpPktsRx    Counter32,
+      fsVlanDiscardLacpPktsTx    Counter32,
+      fsVlanDiscardStpPDUsRx     Counter32,
+      fsVlanDiscardStpPDUsTx     Counter32,
+      fsVlanDiscardGvrpPktsRx    Counter32,
+      fsVlanDiscardGvrpPktsTx    Counter32,
+      fsVlanDiscardGmrpPktsRx    Counter32,
+      fsVlanDiscardGmrpPktsTx    Counter32,
+      fsVlanDiscardIgmpPktsRx    Counter32,
+      fsVlanDiscardIgmpPktsTx    Counter32,
+      fsVlanDiscardMvrpPktsRx    Counter32,
+      fsVlanDiscardMvrpPktsTx    Counter32,
+      fsVlanDiscardMmrpPktsRx    Counter32,
+      fsVlanDiscardMmrpPktsTx    Counter32,
+      fsVlanDiscardElmiPktsRx    Counter32,
+      fsVlanDiscardElmiPktsTx    Counter32,
+      fsVlanDiscardLldpPktsRx    Counter32,
+      fsVlanDiscardLldpPktsTx    Counter32,
+      fsVlanDiscardEcfmPktsRx    Counter32,
+      fsVlanDiscardEcfmPktsTx    Counter32,
+      fsVlanDiscardEoamPktsRx    Counter32,
+      fsVlanDiscardEoamPktsTx    Counter32
+   }
+
+fsVlanDiscardDot1xPktsRx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of Dot1x packets discarded on the reception side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 1 }
+
+fsVlanDiscardDot1xPktsTx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of Dot1x packets discarded on the transmission side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 2 }
+
+fsVlanDiscardLacpPktsRx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of LACP packets discarded on the reception side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 3 }
+
+fsVlanDiscardLacpPktsTx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of LACP packets discarded on the transmission side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 4 }
+
+fsVlanDiscardStpPDUsRx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of STP BPDUs discarded on the reception side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 5 }
+
+fsVlanDiscardStpPDUsTx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of STP BPDUs discarded on the transmission side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 6 }
+
+fsVlanDiscardGvrpPktsRx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of GVRP packets discarded on the reception side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 7 }
+
+fsVlanDiscardGvrpPktsTx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of GVRP packets discarded on the transmission side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 8 }
+
+fsVlanDiscardGmrpPktsRx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of GMRP packets discarded on the reception side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 9 }
+
+fsVlanDiscardGmrpPktsTx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of GMRP packets discarded on the transmission side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 10 }
+
+fsVlanDiscardIgmpPktsRx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of IGMP packets discarded on the reception side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 11 }
+
+fsVlanDiscardIgmpPktsTx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of IGMP packets discarded on the transmission side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 12 }
+
+fsVlanDiscardMvrpPktsRx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of MVRP packets discarded on the reception side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 13 }
+
+fsVlanDiscardMvrpPktsTx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of MVRP packets discarded on the transmission side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 14 }
+
+fsVlanDiscardMmrpPktsRx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of MMRP packets discarded on the reception side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 15 }
+
+fsVlanDiscardMmrpPktsTx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of MMRP packets discarded on the transmission side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 16 }
+
+fsVlanDiscardElmiPktsRx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of ELMI packets discarded on the reception side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 17 }
+
+fsVlanDiscardElmiPktsTx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of ELMI packets discarded on the transmission side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 18 }
+
+fsVlanDiscardLldpPktsRx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of LLDP packets discarded on the reception side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 19 }
+
+fsVlanDiscardLldpPktsTx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of LLDP packets discarded on the transmission side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 20 }
+
+fsVlanDiscardEcfmPktsRx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of ECFM packets discarded on the reception side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 21 }
+
+fsVlanDiscardEcfmPktsTx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of ECFM packets discarded on the transmission side 
+       due to Discard option."
+   ::= { fsVlanDiscardStatsEntry 22 }
+
+fsVlanDiscardEoamPktsRx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This object displays the number of EOAM packets discarded on 
+       the reception side when the tunnel protocol status is 
+       set as Discard."
+   ::= { fsVlanDiscardStatsEntry 23 }
+
+fsVlanDiscardEoamPktsTx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This object displays the number of EOAM packets discarded on 
+       the transmission side when the tunnel protocol status is 
+       set as Discard."
+   ::= { fsVlanDiscardStatsEntry 24 }
+
+-- ----------------------------------------------------------------
+-- Service Based Tunnel Protocol Configuration table
+-- ----------------------------------------------------------------
+fsServiceVlanTunnelProtocolTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF FsServiceVlanTunnelProtocolEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "This table contains information about the handling (Tunnel/Peer/
+      Discard)of customer Layer 2 protocols (GVRP/GMRP/IGMP/MVRP/MMRP/ECFM)
+      with service based inside service provider network."
+
+   ::= { fsVlanTunnelObjects 15 }
+
+fsServiceVlanTunnelProtocolEntry OBJECT-TYPE
+   SYNTAX      FsServiceVlanTunnelProtocolEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "This entry indicates the handling (Tunnel/Peer/Discard) of Layer 2
+      protocols (GVRP/GMRP/IGMP/MVRP/MMRP/ECFM) on the VLAN.
+
+      Tunnel Status cannot be set to `tunnel/discard`, if the protocol
+      is enabled globally.Example, For IGMP, igmp should be disabled
+      globally for setting the tunnel status to `tunnel/discard`."
+
+   INDEX { fsServiceVlanId, fsServiceProtocolEnum }
+   ::= { fsServiceVlanTunnelProtocolTable 1 }
+
+ FsServiceVlanTunnelProtocolEntry ::=
+ SEQUENCE {
+    fsServiceVlanId                   VlanId,
+    fsServiceProtocolEnum             L2CPProtocols,
+    fsServiceVlanRsvdMacaddress       MacAddress,
+    fsServiceVlanTunnelMacaddress     MacAddress,
+    fsServiceVlanTunnelProtocolStatus TunnelStatus,
+    fsServiceVlanTunnelPktsRecvd      Counter32,
+    fsServiceVlanTunnelPktsSent       Counter32,
+    fsServiceVlanDiscardPktsRx        Counter32,
+    fsServiceVlanDiscardPktsTx        Counter32
+ }
+
+fsServiceVlanId OBJECT-TYPE
+   SYNTAX      VlanId
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "This object specifies the service vlan identifier which is allocated
+       for the customer at provider domain."
+   ::= { fsServiceVlanTunnelProtocolEntry 1 }
+
+fsServiceProtocolEnum OBJECT-TYPE
+   SYNTAX      L2CPProtocols
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "This object specifies the protocols which are received on the service."
+   ::= { fsServiceVlanTunnelProtocolEntry 2 }
+
+fsServiceVlanRsvdMacaddress OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object specifies the reserved MAC address for the protocol and
+       it is applicable only when the value of the field fsServiceProtocolEnum
+       is `other`."
+   ::= { fsServiceVlanTunnelProtocolEntry 3 }
+
+fsServiceVlanTunnelMacaddress OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object specifies the Tunnel MAC address for the protocol and it is
+       applicable only when the value of the field fsServiceProtocolEnum is
+       `other`."
+   ::= { fsServiceVlanTunnelProtocolEntry 4 }
+
+fsServiceVlanTunnelProtocolStatus OBJECT-TYPE
+   SYNTAX      TunnelStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object specifies the status (peer/tunnel/discard) of L2 packets
+       received on the VLAN."
+   ::= { fsServiceVlanTunnelProtocolEntry  5 }
+
+fsServiceVlanTunnelPktsRecvd OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This object specifies the number of tunneled Packets received."
+   ::= { fsServiceVlanTunnelProtocolEntry  6 }
+
+fsServiceVlanTunnelPktsSent OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This object specifies the number of tunneled Packets transmitted."
+   ::= { fsServiceVlanTunnelProtocolEntry  7 }
+
+fsServiceVlanDiscardPktsRx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This object specifies the number of packets discarded on the reception side
+       due to discard option."
+   ::= { fsServiceVlanTunnelProtocolEntry  8 }
+
+fsServiceVlanDiscardPktsTx OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This object specifies the number of packets discarded on the transmission side
+       due to discard option."
+   ::= { fsServiceVlanTunnelProtocolEntry  9 }
+
+END

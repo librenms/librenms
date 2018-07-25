@@ -1,0 +1,704 @@
+-- Copyright (C) 2009-2012 Aricent Group . All Rights Reserved
+
+-- $Id: fsradext.mib,v 1.3 2012/09/07 09:44:14 siva Exp $
+
+-- ****************************************************************************
+-- *                         Document Version Info                            *
+-- ****************************************************************************
+-- *Version |    Date        |   Author             |        Changes          *
+-- * ------------------------------------------------------------------------ *
+-- * 1.1    |  4thAug 2009   | Private              |fsradius.mib, radauth.mib*
+-- *        |                |                      |radacc.mib extended for  *
+-- *        |                |                      |IPv6 support             *
+-- *        |                |                      |	 		              *
+-- ****************************************************************************
+
+-- RADIUS-CLIENT-MIB DEFINITIONS ::= BEGIN
+
+
+ARICENT-RADIUS-EXT-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS
+     MODULE-IDENTITY, OBJECT-TYPE,
+     Counter32, Gauge32, TimeTicks,
+     Integer32, enterprises           FROM SNMPv2-SMI
+     DisplayString, RowStatus         FROM SNMPv2-TC
+     SnmpAdminString                  FROM SNMP-FRAMEWORK-MIB
+     InetAddressType, InetAddress     FROM INET-ADDRESS-MIB;
+
+
+ futureRADIUSEXTMIB MODULE-IDENTITY
+    LAST-UPDATED "201209050000Z"
+    ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+    CONTACT-INFO "support@aricent.com"
+	DESCRIPTION "MIB for Radius. Extended for Ipv6 Support"
+	REVISION "201209050000Z"
+	DESCRIPTION "MIB for Radius. Extended for Ipv6 Support"
+         ::= { enterprises  aricent-communication-holding-ltd(29601) iss(2) 30 }
+
+
+
+fsRadExtClient           OBJECT IDENTIFIER ::= { futureRADIUSEXTMIB 1 }
+
+-- ---------------------------------------------------------- -- 
+-- ---------------------------------------------------------- -- 
+-- groups in the RADIUS EXTENDED MIB 
+-- ---------------------------------------------------------- -- 
+ 
+     fsRadExtServer        OBJECT IDENTIFIER ::= { fsRadExtClient 1 } 
+     fsRadAuthClient       OBJECT IDENTIFIER ::= { fsRadExtClient 2 } 
+     fsRadAccClient        OBJECT IDENTIFIER ::= { fsRadExtClient 3 } 
+ 
+-- ---------------------------------------------------------- -- 
+
+fsRadExtDebugMask OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "This object is used to enable Trace Statements in  
+        Radius Module. 
+
+        A FOUR BYTE integer is used for enabling the level of tracing.  
+        Each BIT in the four byte integer, represents a particular  
+        level of Trace.  
+
+        The maping between the bit positions & the level of trace is  
+        as follows:  
+        0 - Error Traces 
+        1 - Event Traces 
+        2 - Packet Traces 
+        3 - Response Traces 
+        4 - Timer Traces 
+
+        The remaining bits are unused. Combination of levels are  
+        also allowed. 
+
+        For example if the bits 0 and 1 are set, then the Trace 
+        statements related to Error and Event
+        will be printed. 
+
+        The user has to enter the corresponding INTEGER VALUE for the 
+        bits set. For example if bits 0 and 1 are set then user has to  
+        give the value 3." 
+ 
+      ::= { fsRadExtServer 1 }
+
+fsRadExtMaxNoOfUserEntries OBJECT-TYPE
+      SYNTAX Integer32 (1 ..100)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+     "Maximum of No of User entries stored. The value of this
+	 object will be stored for the MemPool Initialization."
+      ::= { fsRadExtServer 2 }
+      
+fsRadExtPrimaryServerAddressType OBJECT-TYPE
+   SYNTAX      InetAddressType
+   MAX-ACCESS  read-write 
+   STATUS      current
+   DESCRIPTION
+   "The address type of active server.This can be Ipv4 or Ipv6."
+      ::= { fsRadExtServer 3 }
+
+
+fsRadExtPrimaryServer   OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "A maximum of 5 RADIUS servers (IPv4 or IPv6) can be configured
+      in fsRadExtServerEntry. This object indicates the primary server 
+      among those 5 servers. The RADIUS client will first try to interact 
+      with the server mentioned in this object. Other servers are 
+      approached only if this server is not reachable. Setting this 
+      object to zero disables the primary server concept."
+      ::= { fsRadExtServer 4 }
+
+fsRadExtServerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RadExtServerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The (conceptual) table that lists the RADIUS servers with
+         which the client shares a secret."
+    ::=  { fsRadExtServer 5 }
+
+fsRadExtServerEntry OBJECT-TYPE
+    SYNTAX RadExtServerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry (conceptual row) representing a RADIUS server
+                 with which the client shares a secret."
+    INDEX {fsRadExtServerIndex}
+    ::=  { fsRadExtServerTable 1 }
+
+RadExtServerEntry ::= SEQUENCE {
+    fsRadExtServerIndex    Integer32,
+    fsRadExtServerAddrType    InetAddressType,
+    fsRadExtServerAddress   InetAddress,
+    fsRadExtServerType    INTEGER,
+    fsRadExtServerSharedSecret    DisplayString,
+    fsRadExtServerEnabled    INTEGER,
+    fsRadExtServerResponseTime Integer32,
+    fsRadExtServerMaximumRetransmission  Integer32,
+    fsRadExtServerEntryStatus		RowStatus
+   }
+
+
+fsRadExtServerIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..5)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This object enumerates the order in which the server should
+         be contacted.Index 1 is contacted first if the primary server
+         specified by fsRadExtPrimaryServer is not configured"
+    ::=  { fsRadExtServerEntry 1 }
+    
+fsRadExtServerAddrType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+       "The type of IP address to be configured for the RADIUS server.
+        While other types of addresses are defined in the InetAddressType
+        textual convention, like DNS names, this object is limited to IPv4
+        and IPv6 addresses."
+    ::= { fsRadExtServerEntry 2 }
+
+
+fsRadExtServerAddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The IP address(Ipv4 or Ipv6) of the RADIUS server
+         referred to in fsRadExtServerTable entry."
+    ::=  { fsRadExtServerEntry 3 }
+
+fsRadExtServerType OBJECT-TYPE
+    SYNTAX INTEGER { auth (1),
+                     acct (2),
+                     both (3)
+                   }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The RADIUS server type (Authentication or Accounting or Both).
+         For creating a server entry, the Server Type should be set"
+    ::=  { fsRadExtServerEntry 4 }
+
+fsRadExtServerSharedSecret OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The secret string which is shared between the Server and the 
+        Client"
+    ::=  { fsRadExtServerEntry 5 }
+
+fsRadExtServerEnabled OBJECT-TYPE
+    SYNTAX INTEGER { enabled (1),
+                     disabled (2),
+                     destroy (3)
+                   }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object informs whether the server is active or inactive"
+    DEFVAL { enabled }
+    ::=  { fsRadExtServerEntry 6 }
+
+fsRadExtServerResponseTime OBJECT-TYPE
+    SYNTAX Integer32  (1 ..120)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The maximum time within which the server has to respond for a
+         request from the client."
+    ::=  { fsRadExtServerEntry 7 }
+
+fsRadExtServerMaximumRetransmission OBJECT-TYPE
+    SYNTAX Integer32  (1 ..254)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The allowed maximum number of trials to be tried by a client to get
+         the response from the server for a request"
+    ::=  { fsRadExtServerEntry 8 }
+
+fsRadExtServerEntryStatus	OBJECT-TYPE
+   SYNTAX    			RowStatus
+   MAX-ACCESS 			read-write
+   STATUS 			current
+   DESCRIPTION
+      "The status of the entry can be used as specified in the SNMP V2
+      standard. "
+  ::=  {   fsRadExtServerEntry 9  }
+  
+-- ---------------------------------------------------------- --
+-- The Radius Authentication Group
+-- ---------------------------------------------------------- --
+-- The group for entities implementing the client
+-- side of the Remote Access Dial in User Service (RADIUS)
+-- authentication protocol.
+
+fsRadExtAuthClientInvalidServerAddresses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Response packets
+             received from unknown addresses."
+      ::=  { fsRadAuthClient 1 }
+
+fsRadExtAuthClientIdentifier OBJECT-TYPE
+      SYNTAX SnmpAdminString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The NAS-Identifier of the RADIUS authentication client.
+              This is not necessarily the same as sysName in MIB II."
+      ::=  { fsRadAuthClient 2 }
+
+fsRadExtAuthServerTable OBJECT-TYPE
+      SYNTAX     SEQUENCE OF RadiusAuthServerEntry
+      MAX-ACCESS not-accessible
+      STATUS     current
+      DESCRIPTION
+            "The (conceptual) table taht lists the RADIUS authentication
+             servers with which the client shares a secret."
+      ::=  { fsRadAuthClient 3 }
+
+fsRadExtAuthServerEntry OBJECT-TYPE
+      SYNTAX     RadiusAuthServerEntry
+      MAX-ACCESS not-accessible
+      STATUS     current
+      DESCRIPTION
+            "An entry (conceptual row) that represents a RADIUS
+             authentication server with which the client shares
+             a secret."
+      INDEX      { fsRadExtAuthServerIndex }
+      ::= { fsRadExtAuthServerTable 1 }
+
+RadiusAuthServerEntry ::= SEQUENCE {
+      fsRadExtAuthServerIndex                           Integer32,
+      fsRadExtAuthServerAddressType               InetAddressType,
+      fsRadExtAuthServerAddress                       InetAddress,
+      fsRadExtAuthClientServerPortNumber                Integer32,
+      fsRadExtAuthClientRoundTripTime                   TimeTicks,
+      fsRadExtAuthClientAccessRequests                  Counter32,
+      fsRadExtAuthClientAccessRetransmissions           Counter32,
+      fsRadExtAuthClientAccessAccepts                   Counter32,
+      fsRadExtAuthClientAccessRejects                   Counter32,
+      fsRadExtAuthClientAccessChallenges                Counter32,
+      fsRadExtAuthClientMalformedAccessResponses        Counter32,
+      fsRadExtAuthClientBadAuthenticators               Counter32,
+      fsRadExtAuthClientPendingRequests                   Gauge32,
+      fsRadExtAuthClientTimeouts                        Counter32,
+      fsRadExtAuthClientUnknownTypes                    Counter32,
+      fsRadExtAuthClientPacketsDropped                  Counter32
+}
+
+fsRadExtAuthServerIndex OBJECT-TYPE
+      SYNTAX     Integer32 (1..2147483647)
+      MAX-ACCESS not-accessible
+      STATUS     current
+      DESCRIPTION
+             "A number that uniquely idenfifies each RADIUS
+             Authentication server with which the client
+             communicates."
+      ::= { fsRadExtAuthServerEntry 1 }
+      
+fsRadExtAuthServerAddressType OBJECT-TYPE
+      SYNTAX     InetAddressType
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+            "The address type (IPv4 or IPv6) of the RADIUS authentication 
+            server referred to in the fsRadExtAuthServerTable entry."
+      ::= { fsRadExtAuthServerEntry 2 }
+
+
+fsRadExtAuthServerAddress OBJECT-TYPE
+      SYNTAX     InetAddress
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+            "The IP address (Ipv4 or Ipv6) of the RADIUS authentication 
+            server referred to in this table entry."
+      ::= { fsRadExtAuthServerEntry 3 }
+
+fsRadExtAuthClientServerPortNumber  OBJECT-TYPE
+      SYNTAX Integer32 (0..65535)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+            "The UDP port that the client uses to send requests to
+             this server."
+      ::= { fsRadExtAuthServerEntry 4 }
+
+fsRadExtAuthClientRoundTripTime  OBJECT-TYPE
+      SYNTAX TimeTicks
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The time interval (in hundredths of a second) between
+             the most recent Access-Reply/Access-Challenge and the
+             Access-Request that that matches with the 
+             Access-Reply/Access-Challengeit from the RADIUS
+             authentication server."
+      ::= { fsRadExtAuthServerEntry 5 }
+      
+-- Request/Response statistics
+--
+-- TotalIncomingPackets = Accepts + Rejects + Challenges + UnknownTypes
+--
+-- TotalIncomingPackets - MalformedResponses - BadAuthenticators -
+-- UnknownTypes - PacketsDropped = Successfully received
+--
+-- AccessRequests + PendingRequests + ClientTimeouts =
+-- Successfully Received
+--
+--
+
+fsRadExtAuthClientAccessRequests OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Request packets sent
+             to this server. This does not include retransmissions."
+      ::= { fsRadExtAuthServerEntry 6 }
+
+fsRadExtAuthClientAccessRetransmissions OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Request packets
+             retransmitted to this RADIUS authentication server."
+      ::= { fsRadExtAuthServerEntry 7 }
+
+fsRadExtAuthClientAccessAccepts OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Accept packets
+             (valid or invalid) received from this server."
+      ::= { fsRadExtAuthServerEntry 8 }
+
+fsRadExtAuthClientAccessRejects OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Reject packets
+             (valid or invalid) received from this server."
+      ::= { fsRadExtAuthServerEntry  9 }
+
+fsRadExtAuthClientAccessChallenges OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Challenge packets
+             (valid or invalid) received from this server."
+      ::= { fsRadExtAuthServerEntry 10 }
+
+-- "Access-Response" includes an Access-Accept, Access-Challenge
+-- or Access-Reject
+
+fsRadExtAuthClientMalformedAccessResponses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of malformed RADIUS Access-Response
+             packets received from this server.
+             Malformed packets include packets with
+             an invalid length. Bad authenticators or
+             Signature attributes or unknown types are not
+             included as malformed access responses."
+      ::= { fsRadExtAuthServerEntry 11 }
+
+fsRadExtAuthClientBadAuthenticators OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Response packets
+             containing invalid authenticators or Signature
+             attributes received from this server."
+      ::= { fsRadExtAuthServerEntry 12 }
+
+fsRadExtAuthClientPendingRequests OBJECT-TYPE
+      SYNTAX Gauge32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Request packets
+             destined for this server, which have not yet timed out
+             or received a response. This variable is incremented
+             when an Access-Request is sent and is decremented due to
+             receipt of an Access-Accept, Access-Reject or
+             Access-Challenge, a timeout or retransmission."
+      ::= { fsRadExtAuthServerEntry 13 }
+
+fsRadExtAuthClientTimeouts OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+            "The number of authentication timeouts to this server.
+             After the entry timeout the client may retry to the same
+             server, send to a different server, or
+             give up. Retry to the same server is counted as a
+             retransmit as well as a timeout. Send to a different
+             server is counted as a Request as well as a timeout."
+      ::= { fsRadExtAuthServerEntry  14 }
+
+fsRadExtAuthClientUnknownTypes OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS packets of unknown type, which
+             were received from this server on the authentication port."
+      ::= { fsRadExtAuthServerEntry  15 }
+
+fsRadExtAuthClientPacketsDropped OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS packets, which were
+             received from this server on the authentication port
+             and dropped for some other reason."
+      ::= { fsRadExtAuthServerEntry  16 }
+      
+      
+-- ---------------------------------------------------------- --
+-- The Radius Accounting Group
+-- ---------------------------------------------------------- --
+-- The group for entities implementing the client side of
+-- the Remote Access Dialin User Service (RADIUS) accounting
+-- protocol.
+
+
+
+
+fsRadExtAccClientInvalidServerAddresses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Accounting-Response packets
+             received from unknown addresses."
+      ::=  { fsRadAccClient 1 }
+
+fsRadExtAccClientIdentifier OBJECT-TYPE
+      SYNTAX SnmpAdminString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The NAS-Identifier of the RADIUS accounting client. This
+             is not necessarily the same as sysName in MIB II."
+      ::=  { fsRadAccClient 2 }
+
+fsRadExtAccServerTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF RadiusAccServerEntry
+      MAX-ACCESS not-accessible
+      STATUS     current
+      DESCRIPTION
+            "The (conceptual) table that lists the RADIUS accounting
+             servers with which the client shares a secret."
+      ::=  { fsRadAccClient 3 }
+
+fsRadExtAccServerEntry OBJECT-TYPE
+      SYNTAX     RadiusAccServerEntry
+      MAX-ACCESS not-accessible
+      STATUS     current
+      DESCRIPTION
+            "An entry (conceptual row) that represents a RADIUS
+             accounting server with which the client shares a secret."
+      INDEX      { fsRadExtAccServerIndex }
+      ::= { fsRadExtAccServerTable 1 }
+
+RadiusAccServerEntry ::= SEQUENCE {
+      fsRadExtAccServerIndex                           Integer32,
+      fsRadExtAccServerAddressType               InetAddressType,
+      fsRadExtAccServerAddress                       InetAddress,
+      fsRadExtAccClientServerPortNumber                Integer32,
+      fsRadExtAccClientRoundTripTime                   TimeTicks,
+      fsRadExtAccClientRequests                        Counter32,
+      fsRadExtAccClientRetransmissions                 Counter32,
+      fsRadExtAccClientResponses                       Counter32,
+      fsRadExtAccClientMalformedResponses              Counter32,
+      fsRadExtAccClientBadAuthenticators               Counter32,
+      fsRadExtAccClientPendingRequests                   Gauge32,
+      fsRadExtAccClientTimeouts                        Counter32,
+      fsRadExtAccClientUnknownTypes                    Counter32,
+      fsRadExtAccClientPacketsDropped                  Counter32
+}
+
+fsRadExtAccServerIndex OBJECT-TYPE
+      SYNTAX     Integer32 (1..2147483647)
+      MAX-ACCESS not-accessible
+      STATUS     current
+      DESCRIPTION
+            "A number uniquely identifying each RADIUS
+             accounting server with which this client
+             communicates."
+      ::= { fsRadExtAccServerEntry 1 }
+      
+fsRadExtAccServerAddressType OBJECT-TYPE
+      SYNTAX     InetAddressType
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+            "The IP address type (IPv4 of IPv6) of the RADIUS accounting 
+            server referred to in the fsRadExtAccServerTable entry."
+      ::= { fsRadExtAccServerEntry 2 }
+
+
+fsRadExtAccServerAddress OBJECT-TYPE
+      SYNTAX     InetAddress
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+            "The IP address of the RADIUS accounting server
+             referred to in this table entry."
+      ::= { fsRadExtAccServerEntry 3 }
+
+fsRadExtAccClientServerPortNumber  OBJECT-TYPE
+      SYNTAX Integer32 (0..65535)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+            "The UDP port that the client is using to send requests to
+             this server."
+      ::= { fsRadExtAccServerEntry 4 }
+
+fsRadExtAccClientRoundTripTime  OBJECT-TYPE
+      SYNTAX TimeTicks
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The time interval between the most recent
+             Accounting-Response and the Accounting-Request 
+             that matches with the Accounting-Response from
+             the RADIUS accounting server."
+      ::= { fsRadExtAccServerEntry 5 }
+
+-- Request/Response statistics
+--
+-- Requests = Responses + PendingRequests + ClientTimeouts
+--
+-- Responses - MalformedResponses - BadAuthenticators -
+-- UnknownTypes - PacketsDropped = Successfully received
+
+fsRadExtAccClientRequests OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Accounting-Request packets
+             sent. This does not include retransmissions."
+      ::= { fsRadExtAccServerEntry 6 }
+
+fsRadExtAccClientRetransmissions OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Accounting-Request packets
+             retransmitted to this RADIUS accounting server.
+             Retransmissions include retries where the
+             Identifier and Acct-Delay have been updated, as
+             well as those in which they remain the same."
+      ::= { fsRadExtAccServerEntry 7 }
+
+fsRadExtAccClientResponses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS packets received on the
+             accounting port from this server."
+      ::= { fsRadExtAccServerEntry 8 }
+
+fsRadExtAccClientMalformedResponses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The number of malformed RADIUS Accounting-Response
+              packets received from this server. Malformed packets
+             include packets with an invalid length. Bad
+             authenticators and unknown types are not included as
+             malformed accounting responses."
+      ::= { fsRadExtAccServerEntry 9 }
+
+fsRadExtAccClientBadAuthenticators OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Accounting-Response
+             packets, which contains invalid authenticators
+             received from this server."
+      ::= { fsRadExtAccServerEntry 10 }
+
+fsRadExtAccClientPendingRequests OBJECT-TYPE
+      SYNTAX Gauge32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Accounting-Request packets
+             sent to this server, which have not yet timed out or
+             received a response. This variable is incremented when an
+             Accounting-Request is sent and is decremented due to
+             receipt of an Accounting-Response, a timeout or
+             a retransmission."
+      ::= { fsRadExtAccServerEntry 11 }
+
+fsRadExtAccClientTimeouts OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "The number of accounting timeouts to this server.
+           After a timeout the client may retry to the same
+           server, send to a different server, or give up.
+           A retry to the same server is counted as a
+           retransmit as well as a timeout. A send to a different
+           server is counted as an Accounting-Request as well as
+           a timeout."
+      ::= { fsRadExtAccServerEntry  12 }
+
+fsRadExtAccClientUnknownTypes OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS packets of unknown type, which 
+             were received from this server on the accounting port."
+      ::= { fsRadExtAccServerEntry  13 }
+
+fsRadExtAccClientPacketsDropped OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS packets, which were received from
+             this server on the accounting port and dropped for some
+             other reason."
+      ::= { fsRadExtAccServerEntry  14 }
+
+
+END
+
