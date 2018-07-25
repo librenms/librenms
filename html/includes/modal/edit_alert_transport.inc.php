@@ -230,7 +230,6 @@ foreach (scandir($transport_dir) as $transport) {
                     $field.bootstrapSwitch('state', config.value);
                 } else {
                     $field.val(config.value);
-                    $("#options").val('dasdsaddasdsa');
                 }
             });
         }
