@@ -75,7 +75,7 @@ foreach ($files as $file) {
         $heartbeat = $icmp_step * 2;
     } else {
         $step = $system_step;
-        $heartbeat = $system_heartbeat * 2;
+        $heartbeat = $system_heartbeat;
     }
 
     $rrd_info = shell_exec("$rrdtool info $file");
