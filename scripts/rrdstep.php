@@ -72,7 +72,7 @@ foreach ($files as $file) {
 
     if ($rrd_file == 'ping-perf') {
         $step = $icmp_step;
-        $_heartbeat = $icmp_step * 2;
+        $heartbeat = $icmp_step * 2;
     } else {
         $step = $system_step;
         $heartbeat = $system_heartbeat * 2;
