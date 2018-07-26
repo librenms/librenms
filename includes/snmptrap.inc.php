@@ -12,7 +12,5 @@ function process_trap($device, $entry) {
         include "$file";
     } else {
         echo "unknown trap ($file)";
-    }
-    
+    }    
 }
-
