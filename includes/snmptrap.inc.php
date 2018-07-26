@@ -1,6 +1,6 @@
 <?php
 
-function process_trap($device, $entry) 
+function process_trap($device, $entry)
 {
     global $config;
 
