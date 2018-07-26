@@ -203,7 +203,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
         // remove the deleted and disabled ports and mark them skipped
         $polled_ports = array_filter($ports, function ($port) use ($ports) {
             $ports[$port['ifIndex']]['skipped'] = true;
-            return $port['deleted'] || $port['disabled'];
+            return !($port['deleted'] || $port['disabled']);
         });
 
         // if less than 5 ports or less than 10% of the total ports are skipped, walk the base oids instead of get
@@ -713,7 +713,7 @@ foreach ($ports as $port) {
 
         // We don't care about statistics for skipped selective polling ports
         if (!empty($port['skipped'])) {
-            echo " $port_id skipped.\n";
+            echo " $port_id skipped.";
         } else {
             // End parse ifAlias
             // Update IF-MIB metrics
