@@ -29,4 +29,20 @@ while ($f = fgets(STDIN)) {
     $entry[] = $f;
 }
 
-snmptrap($entry);
+$hostname = trim($entry[0]);
+$ip = str_replace(array("UDP:","[","]"), "", $entry[1]);
+$ip = trim(strstr($ip, ":", true));
+
+$device = @dbFetchRow('SELECT * FROM devices WHERE `hostname` = ?', [$hostname]);
+
+if (!$device['device_id']) {
+    $device = @dbFetchRow('SELECT * FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = ? AND I.port_id = A.port_id', [$ip]);
+}
+
+if (!$device['device_id']) {
+    echo "unknown device\n";
+    exit;
+}
+
+
+process_trap($device, $entry);

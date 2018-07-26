@@ -1,5 +1,6 @@
 <?php
 
+$who = trim(strstr($entry[4], " "));
 $interface = dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?", array($device['device_id'],$who));
 
 if (!$interface) {
