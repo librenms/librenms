@@ -1,6 +1,7 @@
 <?php
 
-function process_trap($device, $entry) {
+function process_trap($device, $entry) 
+{
     global $config;
 
     $oid = trim(strstr($entry[3], " "));
@@ -12,5 +13,5 @@ function process_trap($device, $entry) {
         include "$file";
     } else {
         echo "unknown trap ($file)";
-    }    
+    }
 }
