@@ -1,7 +1,6 @@
 <?php
 
-Use LibreNMS\Config;
-
+use LibreNMS\Config;
 
 function process_trap($device, $entry)
 {
