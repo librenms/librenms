@@ -78,7 +78,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                             <div class="col-sm-2" title="How many notifications to issue while active before stopping. -1 means no limit. If interval is 0, this has no effect.">
                                 <input type='text' id='count' name='count' class='form-control' size="4" value="123">
                             </div>
-                            <div class="col-sm-3" title="How log to wait before issuing a notification. If the alert clears before the delay, no notification will be issued. (s,m,h,d)">
+                            <div class="col-sm-3" title="How long to wait before issuing a notification. If the alert clears before the delay, no notification will be issued. (s,m,h,d)">
                                 <label for='delay' class='control-label' style="vertical-align: top;">Delay: </label>
                                 <input type='text' id='delay' name='delay' class='form-control' size="4">
                             </div>
