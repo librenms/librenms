@@ -147,12 +147,17 @@ DAEMON_USER=librenms
 BASE_OPTIONS="-B -F -R"
 ```
 
-3. Restart the rrdcached service
+3. Fix permissions
+```bash
+chown librenms:librenms /mnt/librenms/rrd/journal/
+```
+
+4. Restart the rrdcached service
 ```bash
     systemctl restart rrdcached.service
 ```
 
-4. Edit /opt/librenms/config.php to include:
+5. Edit /opt/librenms/config.php to include:
 
 For local RRDCached server
 ```php
