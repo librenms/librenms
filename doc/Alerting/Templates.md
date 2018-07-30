@@ -223,10 +223,10 @@ Service Alert:
 <b>Duration:</b> {{ $alert->elapsed }}<br>
 <br>
 
-@if ($alert->faults)                                                                                        
-@foreach ($alert->faults as $key => $value)<b>$value['service_desc'] - $value['service_type']</b><br>                                         
-$value['service_message']<br>
-<br>                                                                                         
+@if ($alert->faults)
+@foreach ($alert->faults as $key => $value) <b>{{ $value['service_desc'] }} - {{ $value['service_type'] }}</b><br>
+{{ $value['service_message'] }}<br>
+<br>
 @endforeach                                                                                                              
 @endif
 </div>
