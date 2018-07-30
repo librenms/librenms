@@ -24,6 +24,7 @@ use LibreNMS\Exceptions\LockException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\MemcacheLock;
+use Monolog\Logger;
 
 /**
  * Set debugging output

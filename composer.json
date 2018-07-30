@@ -45,6 +45,7 @@
         "laravel/laravel": "5.4.*",
         "oriceon/toastr-5-laravel": "dev-master",
         "wpb/string-blade-compiler": "3.4.x-dev",
+        "fico7489/laravel-pivot": "*",
 
         "vlucas/phpdotenv": "2.4.0",
         "doctrine/inflector": "1.1.*",
