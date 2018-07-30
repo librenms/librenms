@@ -73,10 +73,10 @@ foreach (explode(PHP_EOL, $vars['template']) as $line) {
         $replace = [
             '@if ($alert->\1) ',
             ' @else ',
-            ' @endif',
+            ' @endif ',
             '@foreach ($alert->faults as $key => $value)',
             '@foreach ($alert->contacts as $key => $value)',
-            '@endforeach ',
+            ' @endforeach ',
             '@php echo \1; @endphp ',
             '$value[\'string\']',
             '{{ $\1[\'\2\'] }}',
