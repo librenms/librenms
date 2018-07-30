@@ -55,7 +55,9 @@ if ($options['h']) {
     }
 }
 
-$sql = 'SELECT * FROM `devices` AS D'
+// need to specify D.device_id as D_device_id because device_id gets overriden in the resulting raw by A.device_id if no attribs are defined for this device
+// TODO: a cleaner way
+$sql = 'SELECT D.device_id as D_device_id,D.*,S.*,A.* FROM `devices` AS D'
        .' INNER JOIN `services` AS S ON S.device_id = D.device_id AND D.disabled = 0 '.$where
        .' LEFT JOIN `devices_attribs` as A ON D.device_id = A.device_id AND A.attrib_type = "override_icmp_disable"'
        .' ORDER by D.device_id DESC;';
@@ -75,7 +77,7 @@ foreach (dbFetchRows($sql) as $service) {
                 array($service['service_id'])
             );
         }
-        poll_service($service);
+        poll_service($service, $service['D_device_id']);
         $polled_services++;
     } else {
         d_echo("\nService check - ".$service['service_id']."\nSkipping service check because device "
@@ -92,7 +94,7 @@ foreach (dbFetchRows($sql) as $service) {
             log_event(
                 "Service check - {$service['service_desc']} ({$service['service_id']}) - 
                 Skipping service check because device {$service['hostname']} is down due to icmp",
-                $device,
+                $service['D_device_id'],
                 'service',
                 4,
                 $service['service_id']
