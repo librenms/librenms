@@ -6,6 +6,8 @@
  * (c) 2013 LibreNMS Contributors
  */
 
+use App\Models\Device;
+use Illuminate\Database\Eloquent\Collection;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\LockException;
 use LibreNMS\Util\MemcacheLock;
@@ -293,4 +295,30 @@ if ($options['f'] === 'peeringdb') {
 if ($options['f'] === 'refresh_os_cache') {
     echo 'Clearing OS cache' . PHP_EOL;
     unlink(Config::get('install_dir') . '/cache/os_defs.cache');
+}
+
+if ($options['f'] === 'recalculate_device_dependencies') {
+    // fix broken dependency max_depth calculation in case things weren't done though eloquent
+
+    try {
+        if (Config::get('distributed_poller')) {
+            MemcacheLock::lock('recalculate_device_dependencies', 0, 86000);
+        }
+        \LibreNMS\DB\Eloquent::boot();
+
+        // update all root nodes and recurse, chunk so we don't blow up
+        Device::doesntHave('parents')->with('children')->chunk(100, function (Collection $devices) {
+            // anonymous recursive function
+            $recurse = function (Device $device) use (&$recurse) {
+                $device->updateMaxDepth();
+
+                $device->children->each($recurse);
+            };
+
+            $devices->each($recurse);
+        });
+    } catch (LockException $e) {
+        echo $e->getMessage() . PHP_EOL;
+        exit(-1);
+    }
 }

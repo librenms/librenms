@@ -472,6 +472,7 @@ devices:
     - { Field: override_sysLocation, Type: tinyint(1), 'Null': true, Extra: '', Default: '0' }
     - { Field: notes, Type: text, 'Null': true, Extra: '' }
     - { Field: port_association_mode, Type: int(11), 'Null': false, Extra: '', Default: '1' }
+    - { Field: max_depth, Type: int(11), 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [device_id], Unique: true, Type: BTREE }
     status: { Name: status, Columns: [status], Unique: false, Type: BTREE }
