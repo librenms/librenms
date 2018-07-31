@@ -1098,11 +1098,7 @@ function send_mail($emails, $subject, $message, $html = false)
                 $mail->Mailer = 'mail';
                 break;
         }
-        if ($mail->send()) {
-            return true;
-        } else {
-            return $mail->ErrorInfo;
-        }
+        return $mail->send() ? true : $mail->ErrorInfo;
     }
 
     return "No contacts found";
