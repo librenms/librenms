@@ -1726,10 +1726,10 @@ echo '
             data: { type: "test-transport", transport: transport },
             dataType: "json",
             success: function(data){
-                if (data.status == 'ok') {
+                if (data.status === 'ok') {
                     toastr.success('Test to ' + transport + ' ok');
                 } else {
-                    toastr.error('Test to ' + transport + ' failed');
+                    toastr.error('Test to ' + transport + ' failed<br />' + data.message);
                 }
             },
             error: function(){

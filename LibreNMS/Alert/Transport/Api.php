@@ -35,7 +35,7 @@ class Api extends Transport
         }
         $url = $this->config['api-url'];
         $method = $this->config['api-method'];
-        $this->contactAPI($obj, $url, $method);
+        return $this->contactAPI($obj, $url, $method);
     }
 
     private function deliverAlertOld($obj, $opts)
@@ -73,6 +73,8 @@ class Api extends Transport
             var_dump("Return: ".$ret); //FIXME: propper debuging
             return 'HTTP Status code '.$code;
         }
+
+        return true;
     }
 
     public static function configTemplate()

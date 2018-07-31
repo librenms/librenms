@@ -118,6 +118,8 @@ class Hipchat extends Transport
             var_dump("Return: " . $ret);
             return 'HTTP Status code ' . $code;
         }
+
+        return true;
     }
 
     public static function configTemplate()

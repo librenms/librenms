@@ -118,6 +118,8 @@ class Boxcar extends Transport
             var_dump("Boxcar returned error"); //FIXME: proper debugging
             return false;
         }
+
+        return true;
     }
 
     public static function configTemplate()

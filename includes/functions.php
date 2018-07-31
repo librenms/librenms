@@ -1100,6 +1100,8 @@ function send_mail($emails, $subject, $message, $html = false)
         }
         return $mail->send() ? true : $mail->ErrorInfo;
     }
+
+    return "No contacts found";
 }
 
 function formatCiscoHardware(&$device, $short = false)

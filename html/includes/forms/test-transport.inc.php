@@ -13,6 +13,7 @@
  */
 
 use LibreNMS\Authentication\Auth;
+use LibreNMS\Config;
 
 if (!Auth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
@@ -47,19 +48,21 @@ $obj = array(
     "msg"       => "This is a test alert",
 );
 
-$status = 'error';
+$response = ['status' => 'error'];
 
 if ($transport_id) {
     $transport = dbFetchCell("SELECT `transport_type` FROM `alert_transports` WHERE `transport_id` = ?", [$transport_id]);
 }
 $class  = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport);
 if (class_exists($class)) {
-    $opts = $config['alert']['transports'][$transport];
+    $opts = Config::get("alert.transports.$transport");
     $instance = new $class($transport_id);
-    $tmp = $instance->deliverAlert($obj, $opts);
-    if ($tmp) {
-        $status = 'ok';
+    $result = $instance->deliverAlert($obj, $opts);
+    if ($result === true) {
+        $response['status'] = 'ok';
+    } else {
+        $response['message'] = $result;
     }
 }
 header('Content-type: application/json');
-echo _json_encode(array('status' => $status));
+echo json_encode($response);
