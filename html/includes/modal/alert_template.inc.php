@@ -46,6 +46,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
                             <input type="text" class="form-control input-sm" id="title_rec" name="title_rec" placeholder="Recovery Title">
                         </div>
                         <button type="button" class="btn btn-primary btn-sm" name="create-template" id="create-template">Create template</button>
+                        <button type="button" class="btn btn-default btn-sm" name="convert-template" id="convert-template" title="Convert template to new syntax" style="display: none">Convert template</button>
                     </div>
                 </div>
             </div>
@@ -77,6 +78,7 @@ $('#alert-template').on('show.bs.modal', function (event) {
                 $('#title_rec').val(output['title_rec']);
                 if(output['template'].indexOf("{/if}")>=0){
                     toastr.info('The old template syntax is no longer supported. Please see https://docs.librenms.org/Alerting/Old_Templates/');
+                    $('#convert-template').show();
                 }
             }
         });
@@ -94,6 +96,7 @@ $('#alert-template').on('hide.bs.modal', function(event) {
     $('#reset-default').remove();
     $('#name').prop("disabled",false);
     $('#error').val('');
+    $('#convert-template').hide();
 });
 
 $('#create-template').click('', function(e) {
@@ -104,6 +107,30 @@ $('#create-template').click('', function(e) {
     var title = $("#title").val();
     var title_rec = $("#title_rec").val();
     alertTemplateAjaxOps(template, name, template_id, title, title_rec);
+});
+
+$('#convert-template').click('', function(e) {
+    e.preventDefault();
+    var template = $("#template").val();
+    $.ajax({
+        type: "POST",
+        url: "ajax_form.php",
+        data: {type: "convert-template", template: template},
+        dataType: "json",
+        success: function(output) {
+            console.log(output);
+            if(output.status === 'ok') {
+                toastr.success(output.message);
+                $("#convert-template").hide();
+                $("#template").val(output.template)
+            } else {
+                toastr.error(output.message);
+            }
+        },
+        error: function(){
+            toastr.error('An error occurred updating this alert template.');
+        }
+    });
 });
 
 function alertTemplateAjaxOps(template, name, template_id, title, title_rec)
