@@ -21,16 +21,21 @@ class LdapAuthorizer extends AuthorizerBase
                     return true;
                 } else {
                     foreach ($ldap_groups as $ldap_group) {
-                        $ldap_comparison = ldap_compare(
-                            $connection,
-                            $ldap_group,
-                            Config::get('auth_ldap_groupmemberattr', 'memberUid'),
-                            if (Config::get('auth_ldap_userdn') === true) { 
+                        if (Config::get('auth_ldap_userdn') === true) {
+                            $ldap_comparison = ldap_compare(
+                                $connection,
+                                $ldap_group,
+                                Config::get('auth_ldap_groupmemberattr', 'memberUid'),
                                 $this->getFullDn($username)
-                            } else {
+                            );
+                        } else {
+                            $ldap_comparison = ldap_compare(
+                                $connection,
+                                $ldap_group,
+                                Config::get('auth_ldap_groupmemberattr', 'memberUid'),
                                 $this->getMembername($username)
-                            }
-                        );
+                            );
+                          }
                         if ($ldap_comparison === true) {
                             return true;
                         }
