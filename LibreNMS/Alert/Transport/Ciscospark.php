@@ -34,7 +34,6 @@ class Ciscospark extends Transport
             'roomId' => $room_id,
             'text' => $text
         );
-        $token = $token;
 
         $curl   = curl_init();
         set_curl_proxy($curl);

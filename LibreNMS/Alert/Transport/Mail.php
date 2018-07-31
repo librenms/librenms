@@ -30,10 +30,10 @@ class Mail extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        return $this->contactMail($obj, $opts);
+        return $this->contactMail($obj);
     }
 
-    public function contactMail($obj, $opts)
+    public function contactMail($obj)
     {
         if (empty($this->config['email'])) {
             $email = $obj['contacts'];

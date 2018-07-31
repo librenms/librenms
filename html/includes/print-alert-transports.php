@@ -47,9 +47,9 @@ foreach (dbFetchRows($query) as $transport) {
     } else {
         echo "<td>No</td>";
     }
-    
+
     echo "<td class='col-sm-4'>";
-    
+
     // Iterate through transport config template to display config details
     $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($transport['type']);
     if (!method_exists($class, 'configTemplate')) {
@@ -58,10 +58,10 @@ foreach (dbFetchRows($query) as $transport) {
     }
     $tmp = call_user_func($class.'::configTemplate');
     $transport_config = json_decode($transport['config'], true);
-    
+
     foreach ($tmp['config'] as $item) {
         $val = $transport_config[$item['name']];
-        
+
         // Match value to key name for select inputs
         if ($item['type'] == 'select') {
             $val = array_search($val, $item['options']);
@@ -144,10 +144,10 @@ foreach (dbFetchRows($query) as $group) {
             data: { type: "test-transport", transport_id: transport_id },
             dataType: "json",
             success: function(data){
-                if (data.status == 'ok') {
+                if (data.status === 'ok') {
                     toastr.success('Test to ' + transport + ' ok');
                 } else {
-                    toastr.error('Test to ' + transport + ' failed');
+                    toastr.error('Test to ' + transport + ' failed<br />' + data.message);
                 }
             },
             error: function(){

@@ -37,7 +37,7 @@ class Playsms extends Transport
         $playsms_opts['token'] = $this->config['playsms-token'];
         $playsms_opts['from']  = $this->config['playsms-from'];
         $playsms_opts['to']    = preg_split('/([,\r\n]+)/', $this->config['playsms-mobiles']);
-        return $this->contactDiscord($obj, $playsms_opts);
+        return $this->contactPlaysms($obj, $playsms_opts);
     }
 
     public function deliverAlertOld($obj, $opts)

@@ -1098,8 +1098,14 @@ function send_mail($emails, $subject, $message, $html = false)
                 $mail->Mailer = 'mail';
                 break;
         }
-        return $mail->send() ? true : $mail->ErrorInfo;
+        if ($mail->send()) {
+            return true;
+        } else {
+            return $mail->ErrorInfo;
+        }
     }
+
+    return "No contacts found";
 }
 
 function formatCiscoHardware(&$device, $short = false)

@@ -1,12 +1,12 @@
 #!/usr/bin/env php
 <?php
 
-$init_modules = ['alerts', 'alerts-cli'];
+$init_modules = ['alerts', 'laravel'];
 require __DIR__ . '/../includes/init.php';
 
 $options = getopt('t:h:r:p:s:d::');
 
-if ($options['r'] && $options['h']) {
+if (isset($options['r']) && isset($options['h'])) {
     set_debug(isset($options['d']));
 
     $rule_id = (int)$options['r'];
