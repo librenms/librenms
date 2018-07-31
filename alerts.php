@@ -27,7 +27,7 @@
 
 use LibreNMS\Util\FileLock;
 
-$init_modules = ['alerts', 'alerts-cli'];
+$init_modules = ['alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('d::');
