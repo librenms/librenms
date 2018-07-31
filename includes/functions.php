@@ -18,13 +18,11 @@ use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
-use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\LockException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
-use LibreNMS\Util\IP;
 use LibreNMS\Util\MemcacheLock;
-use Monolog\Logger;
+use Symfony\Component\Process\Process;
 
 /**
  * Set debugging output
@@ -1532,55 +1530,47 @@ function ip_exists($ip)
     return false;
 }
 
+/**
+ * Run fping against a device, only supports count mode, so -c should be in the $params
+ *
+ * @param string $host
+ * @param string $params
+ * @param string $address_family
+ * @return array
+ */
 function fping($host, $params, $address_family = 'ipv4')
 {
-
-    global $config;
-
-    $descriptorspec = array(
-        0 => array("pipe", "r"),
-        1 => array("pipe", "w"),
-        2 => array("pipe", "w")
-    );
-
     // Default to ipv4
-    $fping_path = $config['fping'];
-    if ($address_family == 'ipv6') {
-        $fping_path = $config['fping6'];
-    }
+    $fping_name = $address_family == 'ipv6' ? 'fping6' : 'fping';
+    $fping_path = Config::get($fping_name, $fping_name);
 
-    $process = proc_open($fping_path . ' -e -q ' .$params . ' ' .$host.' 2>&1', $descriptorspec, $pipes);
-    $read = '';
+    $cmd = "$fping_path -e -q $params $host";
+    d_echo("[FPING] $cmd\n");
 
-    $proc_status = 0;
-    if (is_resource($process)) {
-        fclose($pipes[0]);
+    $process = new Process($cmd);
+    $process->run();
+    $output = $process->getErrorOutput();
 
-        while (!feof($pipes[1])) {
-            $read .= fgets($pipes[1], 1024);
-        }
-        fclose($pipes[1]);
-        $proc_status = proc_get_status($process);
-        proc_close($process);
-    }
+    preg_match('#= (\d+)/(\d+)/(\d+)%, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+)$#', $output, $parsed);
+    list(, $xmt, $rcv, $loss, $min, $avg, $max) = $parsed;
 
-    preg_match('/[0-9]+\/[0-9]+\/[0-9]+%/', $read, $loss_tmp);
-    preg_match('/[0-9\.]+\/[0-9\.]+\/[0-9\.]*$/', $read, $latency);
-    $loss = preg_replace("/%/", "", $loss_tmp[0]);
-    list($xmt,$rcv,$loss) = preg_split("/\//", $loss);
-    list($min,$avg,$max) = preg_split("/\//", $latency[0]);
     if ($loss < 0) {
         $xmt = 1;
         $rcv = 1;
         $loss = 100;
     }
-    $xmt      = set_numeric($xmt);
-    $rcv      = set_numeric($rcv);
-    $loss     = set_numeric($loss);
-    $min      = set_numeric($min);
-    $max      = set_numeric($max);
-    $avg      = set_numeric($avg);
-    $response = array('xmt'=>$xmt,'rcv'=>$rcv,'loss'=>$loss,'min'=>$min,'max'=>$max,'avg'=>$avg,'exitcode'=>$proc_status['exitcode']);
+
+    $response = [
+        'xmt'  => set_numeric($xmt),
+        'rcv'  => set_numeric($rcv),
+        'loss' => set_numeric($loss),
+        'min'  => set_numeric($min),
+        'max'  => set_numeric($max),
+        'avg'  => set_numeric($avg),
+        'exitcode' => $process->getExitCode(),
+    ];
+    d_echo($response);
+
     return $response;
 }
 
