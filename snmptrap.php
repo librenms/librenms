@@ -17,6 +17,7 @@ chdir(__DIR__); // cwd to the directory containing this script
 
 $init_modules = array();
 require __DIR__ . '/includes/init.php';
+require __DIR__ . '/includes/snmptrap.inc.php';
 
 $options = getopt('d::');
 
