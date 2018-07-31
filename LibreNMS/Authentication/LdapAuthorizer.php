@@ -35,7 +35,7 @@ class LdapAuthorizer extends AuthorizerBase
                                 Config::get('auth_ldap_groupmemberattr', 'memberUid'),
                                 $this->getMembername($username)
                             );
-                          }
+                        }
                         if ($ldap_comparison === true) {
                             return true;
                         }
