@@ -46,6 +46,8 @@ class Irc extends Transport
                 return true;
             }
         }
+
+        return false;
     }
 
     public static function configTemplate()
