@@ -775,51 +775,34 @@ function isSNMPable($device)
  * Check if the given host responds to ICMP echo requests ("pings").
  *
  * @param string $hostname The hostname or IP address to send ping requests to.
- * @param int $address_family The address family ('ipv4' or 'ipv6') to use. Defaults to IPv4. Will *not* be autodetected for IP addresses, so it has to be set to 'ipv6' when pinging an IPv6 address or an IPv6-only host.
+ * @param string $address_family The address family ('ipv4' or 'ipv6') to use. Defaults to IPv4.
+ * Will *not* be autodetected for IP addresses, so it has to be set to 'ipv6' when pinging an IPv6 address or an IPv6-only host.
  * @param array $attribs The device attributes
  *
  * @return array  'result' => bool pingable, 'last_ping_timetaken' => int time for last ping, 'db' => fping results
  */
-function isPingable($hostname, $address_family = 'ipv4', $attribs = array())
+function isPingable($hostname, $address_family = 'ipv4', $attribs = [])
 {
-    global $config;
-
-    $response = array();
-    if (can_ping_device($attribs) === true) {
-        $fping_params = '';
-        if (is_numeric($config['fping_options']['timeout'])) {
-            if ($config['fping_options']['timeout'] < 50) {
-                $config['fping_options']['timeout'] = 50;
-            }
-            if ($config['fping_options']['interval'] < $config['fping_options']['timeout']) {
-                $config['fping_options']['interval'] = $config['fping_options']['timeout'];
-            }
-            $fping_params .= ' -t ' . $config['fping_options']['timeout'];
-        }
-        if (is_numeric($config['fping_options']['count']) && $config['fping_options']['count'] > 0) {
-            $fping_params .= ' -c ' . $config['fping_options']['count'];
-        }
-        if (is_numeric($config['fping_options']['interval'])) {
-            if ($config['fping_options']['interval'] < 20) {
-                $config['fping_options']['interval'] = 20;
-            }
-            $fping_params .= ' -p ' . $config['fping_options']['interval'];
-        }
-        $status = fping($hostname, $fping_params, $address_family);
-        if ($status['exitcode'] > 0 || $status['loss'] == 100) {
-            $response['result'] = false;
-        } else {
-            $response['result'] = true;
-        }
-        if (is_numeric($status['avg'])) {
-            $response['last_ping_timetaken'] = $status['avg'];
-        }
-        $response['db'] = array_intersect_key($status, array_flip(array('xmt','rcv','loss','min','max','avg')));
-    } else {
-        $response['result'] = true;
-        $response['last_ping_timetaken'] = 0;
+    if (can_ping_device($attribs) !== true) {
+        return [
+            'result' => true,
+            'last_ping_timetaken' => 0
+        ];
     }
-    return($response);
+
+    $status = fping(
+        $hostname,
+        Config::get('fping_options.count', 3),
+        Config::get('fping_options.interval', 500),
+        Config::get('fping_options.timeout', 500),
+        $address_family
+    );
+
+    return [
+        'result' => ($status['exitcode'] == 0 && $status['loss'] < 100),
+        'last_ping_timetaken' => $status['avg'],
+        'db' => array_intersect_key($status, array_flip(['xmt','rcv','loss','min','max','avg']))
+    ];
 }
 
 function getpollergroup($poller_group = '0')
@@ -1531,20 +1514,31 @@ function ip_exists($ip)
 }
 
 /**
- * Run fping against a device, only supports count mode, so -c should be in the $params
+ * Run fping against a hostname/ip in count mode and collect stats.
  *
  * @param string $host
- * @param string $params
- * @param string $address_family
+ * @param int $count (min 1)
+ * @param int $interval (min 20)
+ * @param int $timeout (not more than $interval)
+ * @param string $address_family ipv4 or ipv6
  * @return array
  */
-function fping($host, $params, $address_family = 'ipv4')
+function fping($host, $count = 3, $interval = 1000, $timeout = 500, $address_family = 'ipv4')
 {
     // Default to ipv4
     $fping_name = $address_family == 'ipv6' ? 'fping6' : 'fping';
     $fping_path = Config::get($fping_name, $fping_name);
 
-    $cmd = "$fping_path -e -q $params $host";
+    // build the parameters
+    $params = '-e -q -c ' . max($count, 1);
+
+    $interval = max($interval, 20);
+    $params .= ' -p ' . $interval;
+
+    $params .= ' -t ' . max($timeout, $interval);
+
+    $cmd = "$fping_path $params $host";
+
     d_echo("[FPING] $cmd\n");
 
     $process = new Process($cmd);
