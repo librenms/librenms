@@ -65,6 +65,46 @@ Placeholders can be used within the subjects for templates as well although $fau
 
 The Default Template is a 'one-size-fit-all'. We highly recommend defining your own templates for your rules to include more specific information.
 
+## Base Templates
+If you'd like to reuse a common template for your alerts follow below
+
+create a file in
+` resources/views/alerts/template.blade.php`
+As an example, add the following:
+
+```
+<html>
+    <head>
+        <title>LibreNMS Alert</title>
+    </head>
+    <body>
+        <div>
+            From the template master
+        </div>
+        <div class="container">
+            @yield('content')
+        </div>
+    </body>
+</html>
+```
+The important part being the `@yield('content')`
+
+You can use plain text or html as per Alert templates and this will form the basis of your common template.
+
+In your alert template just use
+
+```
+@extends('alerts.template');
+
+@section('content')
+  {{ $alert->title }}
+  Severity: {{ $alert->severity }}
+  ...
+@endsection
+```
+
+More info: https://laravel.com/docs/5.4/blade#extending-a-layout
+
 ## Examples
 
 Default Template:
