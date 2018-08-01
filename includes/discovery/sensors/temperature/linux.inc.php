@@ -52,7 +52,7 @@ if (preg_match("/(Linux).+(ntc)/", $device['sysDescr'])) {
     $descr = 'AXP209 Temperature';
     $index = '116.1';
     $value = snmp_get($device, $oid.$index, '-Oqv');
-    if ($value !== false) {
+    if (is_numeric($value)) {
         discover_sensor($valid['sensor'], 'temperature', $device, $oid.$index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
     }
 }
