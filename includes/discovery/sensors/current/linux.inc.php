@@ -21,7 +21,7 @@ if (preg_match("/(Linux).+(ntc)/", $device['sysDescr'])) {
     $descr = 'Battery current';
     $current = '116.7';
     $value = snmp_get($device, $oid.$current, '-Oqv');
-    if (is_numeric($value))) {
+    if (is_numeric($value)) {
         discover_sensor($valid['sensor'], 'current', $device, $oid.$current, $current, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
     }
 }
