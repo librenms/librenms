@@ -491,6 +491,9 @@ The application should be auto-discovered as described at the top of the page. I
 ### Memcached
 ##### SNMP Extend
 1. Copy the [memcached script](https://github.com/librenms/librenms-agent/blob/master/agent-local/memcached) to `/etc/snmp/` on your remote server.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/memcached -O /etc/snmp/memcached
+```
 
 2. Make the script executable: `chmod +x /etc/snmp/memcached`
 
