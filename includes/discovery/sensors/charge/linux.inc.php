@@ -23,7 +23,7 @@ if (!empty($value)) {
     $lowlimit = 0;
     $lowwarnlimit = 10;
     $descr = 'Battery Charge';
-    if ($value !== false) {
+    if (is_numeric($value)) {
         discover_sensor($valid['sensor'], 'ups_nut', $device, $oids, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, null, $limit, $value);
     }
 }
