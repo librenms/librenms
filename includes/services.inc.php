@@ -113,7 +113,7 @@ function discover_service($device, $service)
     echo "$service ";
 }
 
-function poll_service($service, $device)
+function poll_service($service)
 {
     global $config;
 
@@ -195,7 +195,7 @@ function poll_service($service, $device)
         log_event(
             "Service changed status from $old_status_text to $new_status_text - {$service['service_desc']} ({$service['service_id']}) - 
             $msg",
-            $device,
+            $service['device_id'],
             'service',
             4,
             $service['service_id']
