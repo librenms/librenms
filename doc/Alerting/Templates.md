@@ -68,9 +68,9 @@ The Default Template is a 'one-size-fit-all'. We highly recommend defining your 
 ## Base Templates
 If you'd like to reuse a common template for your alerts follow below
 
-create a file in
-` resources/views/alerts/template.blade.php`
-As an example, add the following:
+A default file is located in
+` resources/views/alerts/templates/default.blade.php`
+Displays the following:
 
 ```
 <html>
@@ -78,9 +78,6 @@ As an example, add the following:
         <title>LibreNMS Alert</title>
     </head>
     <body>
-        <div>
-            From the template master
-        </div>
         <div class="container">
             @yield('content')
         </div>
@@ -89,12 +86,12 @@ As an example, add the following:
 ```
 The important part being the `@yield('content')`
 
-You can use plain text or html as per Alert templates and this will form the basis of your common template.
+You can use plain text or html as per Alert templates and this will form the basis of your common template, feel free to make as many templates in the directory as needed.
 
 In your alert template just use
 
 ```
-@extends('alerts.template');
+@extends('alerts.templates.default');
 
 @section('content')
   {{ $alert->title }}
