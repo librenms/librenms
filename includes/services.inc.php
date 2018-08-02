@@ -197,7 +197,7 @@ function poll_service($service)
             $service['device_id'],
             'service',
             4,
-            $service['service_id'],
+            $service['service_id']
         );
     }
 
