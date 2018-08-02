@@ -42,22 +42,18 @@ A big thank you to the following 25 contributors this last month:
 * Removed nobulk option from routeros ([#8846](https://github.com/librenms/librenms/pull/8846)) - [laf](https://github.com/laf)
 
 #### Alerting
-* Convert alert templates in place ([#8951](https://github.com/librenms/librenms/pull/8951)) - [murrant](https://github.com/murrant)
-* Remove testing data ([#8945](https://github.com/librenms/librenms/pull/8945)) - [pheinrichs](https://github.com/pheinrichs)
-* Fix typo in clickatell ([#8937](https://github.com/librenms/librenms/pull/8937)) - [pheinrichs](https://github.com/pheinrichs)
-* Alert Transports Mapping ([#8660](https://github.com/librenms/librenms/pull/8660)) - [vivia11](https://github.com/vivia11)
+* Added new Alert Transports Mapping ([#8660](https://github.com/librenms/librenms/pull/8660)) - [vivia11](https://github.com/vivia11)
 * Fixed alert rules that use columns in value ([#8925](https://github.com/librenms/librenms/pull/8925)) - [laf](https://github.com/laf)
 * Refactor alert templates to use Laravel Blade templating engine ([#8803](https://github.com/librenms/librenms/pull/8803)) - [laf](https://github.com/laf)
 
 #### Webui
-* Convert alert templates in place ([#8951](https://github.com/librenms/librenms/pull/8951)) - [murrant](https://github.com/murrant)
 * Corrected display of minigraph when using sysName as hostname ([#8842](https://github.com/librenms/librenms/pull/8842)) - [InsaneSplash](https://github.com/InsaneSplash)
 * Custom error page ([#8911](https://github.com/librenms/librenms/pull/8911)) - [murrant](https://github.com/murrant)
 * Stop allowing search text to be tagged for select2 ([#8915](https://github.com/librenms/librenms/pull/8915)) - [laf](https://github.com/laf)
 * Fix plugin loading ([#8917](https://github.com/librenms/librenms/pull/8917)) - [murrant](https://github.com/murrant)
 * Fix errors in vars.inc.php ([#8913](https://github.com/librenms/librenms/pull/8913)) - [murrant](https://github.com/murrant)
 * GUI: Fix broken navigation on VRFs Page ([#8889](https://github.com/librenms/librenms/pull/8889)) - [PipoCanaja](https://github.com/PipoCanaja)
-* Feature: sort alerts by severity on the Alerts widget ([#8895](https://github.com/librenms/librenms/pull/8895)) - [dsgagi](https://github.com/dsgagi)
+* Sort alerts by severity on the Alerts widget ([#8895](https://github.com/librenms/librenms/pull/8895)) - [dsgagi](https://github.com/dsgagi)
 * Fix processor usage on edit page ([#8887](https://github.com/librenms/librenms/pull/8887)) - [murrant](https://github.com/murrant)
 * Fix up depth column in poller UI ([#8884](https://github.com/librenms/librenms/pull/8884)) - [TheMysteriousX](https://github.com/TheMysteriousX)
 * Collectd graph bug fix ([#8855](https://github.com/librenms/librenms/pull/8855)) - [komeda-shinji](https://github.com/komeda-shinji)
@@ -67,7 +63,7 @@ A big thank you to the following 25 contributors this last month:
 * Poll service check only if the associated device is available ([#8757](https://github.com/librenms/librenms/pull/8757)) - [dsgagi](https://github.com/dsgagi)
 * Support for HTML tags in TELEGRAM transport ([#8929](https://github.com/librenms/librenms/pull/8929)) - [jozefrebjak](https://github.com/jozefrebjak)
 * Asterisk Application support ([#8914](https://github.com/librenms/librenms/pull/8914)) - [TheGreatDoc](https://github.com/TheGreatDoc)
-* Alert Transports Mapping ([#8660](https://github.com/librenms/librenms/pull/8660)) - [vivia11](https://github.com/vivia11)
+* Added new Alert Transports Mapping ([#8660](https://github.com/librenms/librenms/pull/8660)) - [vivia11](https://github.com/vivia11)
 * Improved Logging and Debugging ([#8870](https://github.com/librenms/librenms/pull/8870)) - [murrant](https://github.com/murrant)
 * Support specifying submodules in poller and discovery for debug ([#8896](https://github.com/librenms/librenms/pull/8896)) - [murrant](https://github.com/murrant)
 * Add sysDescr and hardware for oxidized overrides ([#8885](https://github.com/librenms/librenms/pull/8885)) - [empi89](https://github.com/empi89)
@@ -100,7 +96,6 @@ A big thank you to the following 25 contributors this last month:
 #### Api
 * Add sysDescr and hardware for oxidized overrides ([#8885](https://github.com/librenms/librenms/pull/8885)) - [empi89](https://github.com/empi89)
 * Fix api list devices query for normal users ([#8881](https://github.com/librenms/librenms/pull/8881)) - [murrant](https://github.com/murrant)
-
 
 ##1.41
 *(2018-06-30)*
