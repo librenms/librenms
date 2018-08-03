@@ -71,13 +71,13 @@ foreach (explode(PHP_EOL, $vars['template']) as $line) {
             '/%([\w\d]+)/',// Replaces %anything
         ];
         $replace = [
-            '@if ($alert->\1) ',
+            ' @if ($alert->\1) ',
             ' @else ',
             ' @endif ',
-            '@foreach ($alert->faults as $key => $value)',
-            '@foreach ($alert->contacts as $key => $value)',
+            ' @foreach ($alert->faults as $key => $value)',
+            ' @foreach ($alert->contacts as $key => $value)',
             ' @endforeach ',
-            '@php echo \1; @endphp ',
+            ' @php echo \1; @endphp ',
             '{{ $value[\'string\'] }}',
             '{{ $\1[\'\2\'] }}',
             '{{ $alert->\1 }}',
