@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Snmptrap\Handler;
 
-use App\Models\BgpPeer;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
@@ -33,6 +32,14 @@ use Log;
 
 class BgpEstablished implements SnmptrapHandler
 {
+    /**
+     * Handle snmptrap.
+     * Data is pre-parsed and delivered as a Trap.
+     *
+     * @param Device $device
+     * @param Trap $trap
+     * @return void
+     */
     public function handle(Device $device, Trap $trap)
     {
         $state_oid = $trap->findOid('BGP4-MIB::bgpPeerState');
@@ -45,11 +52,12 @@ class BgpEstablished implements SnmptrapHandler
             return;
         }
 
-        $bgpStatus = $trap->getOidData($state_oid);
+        $bgpPeer->bgpPeerState = $trap->getOidData($state_oid);
 
-        log_event('SNMP Trap: BGP Up ' . $bgpPeer['bgpPeerIdentifier'] . ' ' . get_astext($bgpPeer['bgpPeerRemoteAs']) . ' is now ' . $bgpStatus, $device, 'bgpPeer', 1, $bgpPeerIp);
+        if ($bgpPeer->isDirty('bgpPeerState')) {
+            log_event('SNMP Trap: BGP Up ' . $bgpPeer->bgpPeerIdentifier . ' ' . get_astext($bgpPeer->bgpPeerRemoteAs) . ' is now ' . $bgpPeer->bgpPeerState, $device->toArray(), 'bgpPeer', 1, $bgpPeerIp);
+        }
 
-        $bgpPeer->bgpPeerState = $bgpStatus;
         $bgpPeer->save();
     }
 }

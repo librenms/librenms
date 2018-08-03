@@ -24,13 +24,5 @@ if (set_debug(isset($options['d']))) {
 
 $text = stream_get_contents(STDIN);
 $trap = new \LibreNMS\Snmptrap\Trap($text);
-$device = $trap->getDevice();
 
-if (empty($device)) {
-    Log::warning("Could not find device for trap", $text);
-    exit;
-}
-
-/** @var \LibreNMS\Interfaces\SnmptrapHandler $handler */
-$handler = app(\LibreNMS\Interfaces\SnmptrapHandler::class, [$trap->getTrapOid()]);
-$handler->handle($device, $trap);
+$trap->handle(); // create handle and send it this trap

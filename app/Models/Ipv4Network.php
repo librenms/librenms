@@ -1,6 +1,6 @@
 <?php
 /**
- * Ipv4Address.php
+ * Ipv4Network.php
  *
  * -Description-
  *
@@ -25,22 +25,17 @@
 
 namespace App\Models;
 
-class Ipv4Address extends BaseModel
+use Illuminate\Database\Eloquent\Model;
+
+class Ipv4Network extends Model
 {
     public $timestamps = false;
-    protected $primaryKey = 'ipv4_address_id';
-
-    // ---- Query scopes ----
-
-    public function scopeHasAccess($query, User $user)
-    {
-        return $this->hasPortAccess($query, $user);
-    }
+    protected $primaryKey = 'ipv4_network_id';
 
     // ---- Define Relationships ----
 
-    public function port()
+    public function ipv4()
     {
-        return $this->belongsTo('App\Models\Port', 'port_id', 'port_id');
+        return $this->hasMany('App\Models\Ipv4Address', 'ipv4_network_id');
     }
 }

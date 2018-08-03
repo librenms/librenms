@@ -39,10 +39,6 @@ class Ipv6Address extends BaseModel
 
     // ---- Define Relationships ----
 
-    /**
-     * Returns the port this entry belongs to.
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function port()
     {
         return $this->belongsTo('App\Models\Port', 'port_id', 'port_id');

@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Snmptrap\Handler;
 
-
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
@@ -53,11 +52,12 @@ class BgpBackwardTransition implements SnmptrapHandler
             return;
         }
 
-        $bgpStatus = $trap->getOidData($state_oid);
+        $bgpPeer->bgpPeerState = $trap->getOidData($state_oid);
 
-        log_event('SNMP Trap: BGP Down ' . $bgpPeer['bgpPeerIdentifier'] . ' ' . get_astext($bgpPeer['bgpPeerRemoteAs']) . ' is now ' . $bgpStatus, $device, 'bgpPeer', 5, $bgpPeerIp);
+        if ($bgpPeer->isDirty('bgpPeerState')) {
+            log_event('SNMP Trap: BGP Down ' . $bgpPeer->bgpPeerIdentifier . ' ' . get_astext($bgpPeer->bgpPeerRemoteAs) . ' is now ' . $bgpPeer->bgpPeerState, $device->toArray(), 'bgpPeer', 5, $bgpPeerIp);
+        }
 
-        $bgpPeer->bgpPeerState = $bgpStatus;
         $bgpPeer->save();
     }
 }

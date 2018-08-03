@@ -43,7 +43,7 @@ class AuthenticationFailure implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         //FIXME added device hostname format helper in some branch, use that when merged
-        log_event('SNMP Trap: Authentication Failure: ' . format_hostname($device->toArray()), $device, 'auth', 3, $device->hostname);
-
+        $device_array = $device->toArray();
+        log_event('SNMP Trap: Authentication Failure: ' . format_hostname($device_array), $device_array, 'auth', 3, $device->hostname);
     }
 }
