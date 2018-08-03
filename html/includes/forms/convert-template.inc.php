@@ -78,7 +78,7 @@ foreach (explode(PHP_EOL, $vars['template']) as $line) {
             '@foreach ($alert->contacts as $key => $value)',
             ' @endforeach ',
             '@php echo \1; @endphp ',
-            '$value[\'string\']',
+            '{{ $value[\'string\'] }}',
             '{{ $\1[\'\2\'] }}',
             '{{ $alert->\1 }}',
         ];
