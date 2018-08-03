@@ -2,7 +2,7 @@ source: Alerting/Templates.md
 
 # Templates
 
-> This page is for installs running version 1.41 or later. You can find the older docs [here](Old_Templates.md)
+> This page is for installs running version 1.42 or later. You can find the older docs [here](Old_Templates.md)
 
 Templates can be assigned to a single or a group of rules and can contain any kind of text. There is also a default template which is used for any rule that isn't associated with a template. This template can be found under `Alert Templates` page and can be edited. It also has an option revert it back to its default content. 
 
