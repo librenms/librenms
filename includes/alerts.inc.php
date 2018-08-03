@@ -391,7 +391,7 @@ function populate($txt, $wrap = true)
 function RunJail($code, $obj)
 {
     $ret = '';
-    eval($code);
+    @eval($code);
     return $ret;
 }//end RunJail()
 
@@ -808,7 +808,7 @@ function ExtTransports($obj)
     global $config;
     $tmp = false;
     $type  = new Template;
-    
+
     // If alert transport mapping exists, override the default transports
     $transport_maps = AlertUtil::getAlertTransports($obj['alert_id']);
 
