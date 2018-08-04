@@ -47,7 +47,7 @@ class LinkDown implements SnmptrapHandler
         $port = $device->ports()->where('ifIndex', $ifIndex)->first();
 
         if (!$port) {
-            Log::warning("Snmptrap linkUp: Could not find port at ifIndex $ifIndex for device: " . $device->hostname);
+            Log::warning("Snmptrap linkDown: Could not find port at ifIndex $ifIndex for device: " . $device->hostname);
             return;
         }
 
@@ -56,14 +56,14 @@ class LinkDown implements SnmptrapHandler
 
         $device_array = $device->toArray();
 
-        log_event('SNMP Trap: linkDown $port->ifAdminStatus/$port->ifOperStatus' . $port->ifDescr, $device_array, 'interface', 5, $port->port_id);
+        log_event("SNMP Trap: linkDown $port->ifAdminStatus/$port->ifOperStatus " . $port->ifDescr, $device_array, 'interface', 5, $port->port_id);
 
         if ($port->isDirty('ifAdminStatus')) {
             log_event("Interface Disabled : " . $port['ifDescr'] . " (TRAP)", $device_array, "interface", 3, $port['port_id']);
         }
 
         if ($port->isDirty('ifOperStatus')) {
-            log_event("Interface went Down : " . $port['ifDescr'] . " (TRAP)", $device_array, "interface", 1, $port['port_id']);
+            log_event("Interface went Down : " . $port['ifDescr'] . " (TRAP)", $device_array, "interface", 5, $port['port_id']);
         }
 
         $port->save();
