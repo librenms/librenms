@@ -1190,11 +1190,13 @@ function is_port_valid($port, $device)
     if (empty($port['ifDescr'])) {
         // If these are all empty, we are just going to show blank names in the ui
         if (empty($port['ifAlias']) && empty($port['ifName'])) {
+            d_echo("ignored: empty ifDescr, ifAlias and ifName\n");
             return false;
         }
 
         // ifDescr should not be empty unless it is explicitly allowed
         if (!Config::getOsSetting($device['os'], 'empty_ifdescr', false)) {
+            d_echo("ignored: empty ifDescr\n");
             return false;
         }
     }
