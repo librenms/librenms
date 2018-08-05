@@ -631,7 +631,7 @@ $config['auth_ldap_groupmemberattr']            = 'memberUid';
 $config['auth_ldap_emailattr']                  = 'mail';
 $config['auth_ldap_cache_ttl'] = 300;
 // How long in seconds should ldap* module cache user information in $_SESSION
-$config['auth_ldap_userdn']                     = true;
+$config['auth_ldap_userdn']                     = false;
 // Uses a users full DN as the value of the member attribute in a group (instead of member: username, it’s member: uid=username,ou=groups,dc=domain,dc=com).
 
 // Active Directory Authentication
