@@ -608,7 +608,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     }
 
     // Valid port assoc mode
-    if (!is_valid_port_assoc_mode($port_assoc_mode)) {
+    if (!in_array($port_assoc_mode, get_port_assoc_modes())) {
         throw new InvalidPortAssocModeException("Invalid port association_mode '$port_assoc_mode'. Valid modes are: " . join(', ', get_port_assoc_modes()));
     }
 
