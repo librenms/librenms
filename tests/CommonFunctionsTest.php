@@ -222,4 +222,20 @@ class CommonFunctionsTest extends TestCase
         $this->assertEquals('Testing IP', format_hostname($device_ip, 'hostname.like'));
         $this->assertEquals('Testing IP', format_hostname($device_ip, '10.10.10.10'));
     }
+
+    public function testPortAssociation()
+    {
+        $modes = [
+            1 => 'ifIndex',
+            2 => 'ifName',
+            3 => 'ifDescr',
+            4 => 'ifAlias',
+        ];
+
+        $this->assertEquals($modes, get_port_assoc_modes());
+        $this->assertEquals('ifIndex', get_port_assoc_mode_name(1));
+        $this->assertEquals(1, get_port_assoc_mode_id('ifIndex'));
+        $this->assertFalse(get_port_assoc_mode_name(666));
+        $this->assertFalse(get_port_assoc_mode_id('lucifer'));
+    }
 }
