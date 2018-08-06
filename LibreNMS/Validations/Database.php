@@ -220,7 +220,8 @@ class Database extends BaseValidation
         $columns = array_map(array($this, 'columnToSql'), $table_schema['Columns']);
         $indexes = array_map(array($this, 'indexToSql'), $table_schema['Indexes']);
 
-        $def = implode(', ', array_merge(array_values($columns), array_values($indexes)));
+        $def = implode(', ', array_merge(array_values((array)$columns), array_values((array)$indexes)));
+        var_dump($def);
 
         return "CREATE TABLE `$table` ($def);";
     }

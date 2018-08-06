@@ -24,6 +24,7 @@ use LibreNMS\Exceptions\LockException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\MemcacheLock;
+use Monolog\Logger;
 
 /**
  * Set debugging output
@@ -607,7 +608,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     }
 
     // Valid port assoc mode
-    if (!is_valid_port_assoc_mode($port_assoc_mode)) {
+    if (!in_array($port_assoc_mode, get_port_assoc_modes())) {
         throw new InvalidPortAssocModeException("Invalid port association_mode '$port_assoc_mode'. Valid modes are: " . join(', ', get_port_assoc_modes()));
     }
 
@@ -1099,6 +1100,8 @@ function send_mail($emails, $subject, $message, $html = false)
         }
         return $mail->send() ? true : $mail->ErrorInfo;
     }
+
+    return "No contacts found";
 }
 
 function formatCiscoHardware(&$device, $short = false)
@@ -1187,11 +1190,13 @@ function is_port_valid($port, $device)
     if (empty($port['ifDescr'])) {
         // If these are all empty, we are just going to show blank names in the ui
         if (empty($port['ifAlias']) && empty($port['ifName'])) {
+            d_echo("ignored: empty ifDescr, ifAlias and ifName\n");
             return false;
         }
 
         // ifDescr should not be empty unless it is explicitly allowed
         if (!Config::getOsSetting($device['os'], 'empty_ifdescr', false)) {
+            d_echo("ignored: empty ifDescr\n");
             return false;
         }
     }

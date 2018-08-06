@@ -78,7 +78,7 @@ class Template
         try {
             return view(['template' => $data['template']->template], $alert)->__toString();
         } catch (\Exception $e) {
-            return view(['template' => $this->getDefaultTemplate($data)], $alert)->__toString();
+            return view(['template' => $this->getDefaultTemplate()], $alert)->__toString();
         }
     }
 
@@ -198,16 +198,16 @@ class Template
      */
     public function getDefaultTemplate()
     {
-        return '{{ $title }}' . PHP_EOL .
-            'Severity: {{ $severity }}' . PHP_EOL .
-            '@if ($state == 0)Time elapsed: {{ $elapsed }} @endif ' . PHP_EOL .
-            'Timestamp: {{ $timestamp }}' . PHP_EOL .
-            'Unique-ID: {{ $uid }}' . PHP_EOL .
-            'Rule: @if ($name) {{ $name }} @else {{ $rule }} @endif ' . PHP_EOL .
-            '@if ($faults)Faults:' . PHP_EOL .
-            '@foreach ($faults as $key => $value)' . PHP_EOL .
+        return '{{ $alert->title }}' . PHP_EOL .
+            'Severity: {{ $alert->severity }}' . PHP_EOL .
+            '@if ($alert->state == 0)Time elapsed: {{ $alert->elapsed }} @endif ' . PHP_EOL .
+            'Timestamp: {{ $alert->timestamp }}' . PHP_EOL .
+            'Unique-ID: {{ $alert->uid }}' . PHP_EOL .
+            'Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif ' . PHP_EOL .
+            '@if ($alert->faults)Faults:' . PHP_EOL .
+            '@foreach ($alert->faults as $key => $value)' . PHP_EOL .
             '  #{{ $key }}: {{ $value[\'string\'] }} @endforeach' . PHP_EOL .
             '@endif' . PHP_EOL .
-            'Alert sent to: @foreach ($contacts as $key => $value) {{ $value }} <{{ $key }}> @endforeach';
+            'Alert sent to: @foreach ($alert->contacts as $key => $value) {{ $value }} <{{ $key }}> @endforeach';
     }
 }

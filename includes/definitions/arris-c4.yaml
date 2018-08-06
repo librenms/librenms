@@ -1,0 +1,12 @@
+os: arris-c4
+text: 'Arris CMTS'
+type: network
+icon: arris
+mib_dir:
+    - arris
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.4998.2.1
+        - .1.3.6.1.4.1.4998.2.2

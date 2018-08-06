@@ -23,11 +23,21 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Gitlab implements Transport
+class Gitlab extends Transport
 {
     public function deliverAlert($obj, $opts)
+    {
+        if (!empty($this->config)) {
+            $opts['project-id'] = $this->config['gitlab-id'];
+            $opts['key'] = $this->config['gitlab-key'];
+            $opts['host'] = $this->config['gitlab-host'];
+        }
+        return $this->contactGitlab($obj, $opts);
+    }
+
+    public function contactGitlab($obj, $opts)
     {
         // Don't create tickets for resolutions
         if ($obj['state'] == 0) {
@@ -72,5 +82,36 @@ class Gitlab implements Transport
                 return false;
             }
         }
+    }
+
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'Host',
+                    'name' => 'gitlab-host',
+                    'descr' => 'Gitlab Host',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Project ID',
+                    'name' => 'gitlab-id',
+                    'descr' => 'Gitlab Prokect ID',
+                    'type'=> 'text',
+                ],
+                [
+                    'title' => 'Personal Access Token',
+                    'name' => 'gitlab-key',
+                    'descr' => 'Personal Access Token',
+                    'type' => 'text',
+                ]
+            ],
+            'validation' => [
+                'gitlab-host' => 'required|string',
+                'gitlab-id' => 'required|string',
+                'gitlab-key' => 'required|string'
+            ]
+        ];
     }
 }
