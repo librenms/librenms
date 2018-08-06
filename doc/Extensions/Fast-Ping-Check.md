@@ -62,3 +62,11 @@ We add two entries, but add a delay before one.
 The ping.php script respects device dependencies, but the main poller does not (for technical reasons).
 However, using this script does not disable the icmp check in the poller and a child may be reported as
 down before the parent.
+
+### Configuration
+
+By default, ping.php will send 1 packet and, if fails, retries 2 times. To change this behavior, add to your config.php
+```
+$config['fping_options']['retries'] = X;
+```
+Where X is the number of retries.
