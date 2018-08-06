@@ -34,6 +34,8 @@ if ($config['webui']['availability_map_compact'] == 1) {
 
 $show_disabled_ignored = $widget_settings['show_disabled_and_ignored'];
 
+$filter_device_group = $widget_settings['filter_device_group'];
+
 if (defined('SHOW_SETTINGS')) {
     $common_output[] = '
     <form class="form" onsubmit="widget_settings(this); return false;">
@@ -94,6 +96,37 @@ if (defined('SHOW_SETTINGS')) {
             </select>
         </div>
     </div>';
+    
+    $query = 'SELECT id,name FROM device_groups ORDER BY name';
+            
+	$params = array('user' => Auth::id());
+	
+	$common_output[] = '
+    <div class="form-group">
+	    <div class="col-sm-4">
+            <label for="filter_device_group" class="control-label availability-map-widget-header">Device Group: </label>
+        </div>
+        <div class="col-sm-6">
+            <select class="form-control" name="filter_device_group">
+            	<option value="-1" >All</option>
+    ';
+	
+	$selected_filter_device_group = $widget_settings['filter_device_group'];
+	
+	foreach (dbFetchRows($query, $params) as $result) {
+		$selected = '';
+		if ($selected_filter_device_group == $result['id']) {
+			$selected = 'selected';
+		}
+        $common_output[] = '
+			<option value="'.$result['id'].'" '.$selected.' >'.$result['name'].'</option>
+		';
+    }
+
+    $common_output[] = '
+            </select>
+        </div>
+	</div>';
 
     $common_output[] = '
     <div class ="form-group">
@@ -168,7 +201,13 @@ if (defined('SHOW_SETTINGS')) {
         // Only show devices if mode is 0 or 2 (Only Devices or both)
         if ($config['webui']['availability_map_use_device_groups'] != 0) {
             $device_group = 'SELECT `D`.`device_id` FROM `device_group_device` AS `D` WHERE `device_group_id` = ?';
-            $param = array($_SESSION['group_view']);
+           
+            if ($widget_settings['filter_device_group'] == '-1'){
+	          $param = array($_SESSION['group_view']);  
+            } else {
+	            $param = array($widget_settings['filter_device_group']);
+            }
+            
             $devices = dbFetchRows($device_group, $param);
             foreach ($devices as $in_dev) {
                 $in_devices[] = $in_dev['device_id'];
