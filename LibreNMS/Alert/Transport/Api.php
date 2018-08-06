@@ -87,8 +87,8 @@ class Api extends Transport
                     'descr' => 'API Method: GET or POST',
                     'type' => 'select',
                     'options' => [
-                        'get' => 'get',
-                        'get' => 'get'
+                        'GET' => 'GET',
+                        'POST' => 'POST'
                     ]
                 ],
                 [
