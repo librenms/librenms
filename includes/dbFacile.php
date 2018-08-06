@@ -17,6 +17,7 @@
  * 3. Oh, and dbFetchAll() is now dbFetchRows()
  */
 
+use Illuminate\Database\QueryException;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\DatabaseConnectException;
 use LibreNMS\DB\Eloquent;
@@ -78,7 +79,7 @@ function dbQuery($sql, $parameters = [])
 
         return Eloquent::DB()->statement($sql, $parameters);
     } catch (PDOException $pdoe) {
-        dbHandleException($pdoe);
+        dbHandleException(new QueryException($sql, $parameters, $pdoe));
         return false;
     }
 }
@@ -93,12 +94,12 @@ function dbInsert($data, $table)
 {
     $time_start = microtime(true);
 
-    $sql = 'INSERT IGNORE INTO `'.$table.'` (`'.implode('`,`', array_keys($data)).'`)  VALUES ('.implode(',', dbPlaceHolders($data)).')';
+    $sql = 'INSERT INTO `'.$table.'` (`'.implode('`,`', array_keys($data)).'`)  VALUES ('.implode(',', dbPlaceHolders($data)).')';
 
     try {
         $result = Eloquent::DB()->insert($sql, $data);
     } catch (PDOException $pdoe) {
-        dbHandleException($pdoe);
+        dbHandleException(new QueryException($sql, $data, $pdoe));
     }
 
     recordDbStatistic('insert', $time_start);
@@ -140,7 +141,8 @@ function dbBulkInsert($data, $table)
         recordDbStatistic('insert', $time_start);
         return $result;
     } catch (PDOException $pdoe) {
-        dbHandleException($pdoe);
+        // FIXME query?
+        dbHandleException(new QueryException("Bulk insert $table", $data, $pdoe));
     }
 
     return false;
@@ -191,7 +193,7 @@ function dbUpdate($data, $table, $where = null, $parameters = [])
         recordDbStatistic('update', $time_start);
         return $result;
     } catch (PDOException $pdoe) {
-        dbHandleException($pdoe);
+        dbHandleException(new QueryException($sql, $data, $pdoe));
     }
 
     return false;
@@ -210,7 +212,7 @@ function dbDelete($table, $where = null, $parameters = array())
     try {
         $result = Eloquent::DB()->delete($sql, $parameters);
     } catch (PDOException $pdoe) {
-        dbHandleException($pdoe);
+        dbHandleException(new QueryException($sql, $parameters, $pdoe));
     }
 
     recordDbStatistic('delete', $time_start);
@@ -260,7 +262,7 @@ function dbDeleteOrphans($target_table, $parents)
     try {
         $result = Eloquent::DB()->delete($query);
     } catch (PDOException $pdoe) {
-        dbHandleException($pdoe);
+        dbHandleException(new QueryException($query, [], $pdoe));
     }
 
     recordDbStatistic('delete', $time_start);
@@ -285,7 +287,7 @@ function dbFetchRows($sql, $parameters = [])
         recordDbStatistic('fetchrows', $time_start);
         return $rows;
     } catch (PDOException $pdoe) {
-        dbHandleException($pdoe);
+        dbHandleException(new QueryException($sql, $parameters, $pdoe));
     } finally {
         $PDO_FETCH_ASSOC = false;
     }
@@ -334,7 +336,7 @@ function dbFetchRow($sql = null, $parameters = [])
         recordDbStatistic('fetchrow', $time_start);
         return $row;
     } catch (PDOException $pdoe) {
-        dbHandleException($pdoe);
+        dbHandleException(new QueryException($sql, $parameters, $pdoe));
     } finally {
         $PDO_FETCH_ASSOC = false;
     }
@@ -362,7 +364,7 @@ function dbFetchCell($sql, $parameters = [])
             // shift first field off first row
         }
     } catch (PDOException $pdoe) {
-        dbHandleException($pdoe);
+        dbHandleException(new QueryException($sql, $parameters, $pdoe));
     } finally {
         $PDO_FETCH_ASSOC = false;
     }
@@ -394,7 +396,7 @@ function dbFetchColumn($sql, $parameters = [])
         recordDbStatistic('fetchcolumn', $time_start);
         return $cells;
     } catch (PDOException $pdoe) {
-        dbHandleException($pdoe);
+        dbHandleException(new QueryException($sql, $parameters, $pdoe));
     } finally {
         $PDO_FETCH_ASSOC = false;
     }
@@ -446,17 +448,20 @@ function dbArrayToRaw($data)
     return $data;
 }
 
-function dbHandleException(\Exception $exception)
+function dbHandleException(QueryException $exception)
 {
-    $file = $exception->getFile() . ':' . $exception->getLine();
-    foreach ($exception->getTrace() as $trace) {
-        if (!str_contains($trace['file'], ['/vendor/', 'dbFacile'])) {
-            $file = $trace['file'] . ':' . $trace['line'];
-            break;
+    $message = $exception->getMessage();
+
+    // ? bindings should already be replaced, just replace named bindings
+    foreach ($exception->getBindings() as $key => $value) {
+        if (is_string($key)) {
+            $message = str_replace(":$key", $value, $message);
         }
     }
 
-    $message = $exception->getMessage() . ' in ' . $file;
+    foreach ($exception->getTrace() as $trace) {
+        $message .= "\n  " . $trace['file'] . ':' . $trace['line'];
+    }
 
     if (class_exists('Log')) {
         Log::error($message);
