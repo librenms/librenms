@@ -50,15 +50,27 @@ We add two entries, but add a delay before one.
     ```
 
 3. Update cron (removing any other ping.php or alert.php entries)
-    ```
-    *    *    * * *   librenms    /opt/librenms/ping.php >> /dev/null 2>&1
-    *    *    * * *   librenms    sleep 30 && /opt/librenms/ping.php >> /dev/null 2>&1
-    *    *    * * *   librenms    sleep 15 && /opt/librenms/alerts.php >> /dev/null 2>&1
-    *    *    * * *   librenms    sleep 45 && /opt/librenms/alerts.php >> /dev/null 2>&1
-    ```
+
+```
+*    *    * * *   librenms    /opt/librenms/ping.php >> /dev/null 2>&1
+*    *    * * *   librenms    sleep 30 && /opt/librenms/ping.php >> /dev/null 2>&1
+*    *    * * *   librenms    sleep 15 && /opt/librenms/alerts.php >> /dev/null 2>&1
+*    *    * * *   librenms    sleep 45 && /opt/librenms/alerts.php >> /dev/null 2>&1
+```
 
 ### Device dependencies
 
 The ping.php script respects device dependencies, but the main poller does not (for technical reasons).
 However, using this script does not disable the icmp check in the poller and a child may be reported as
 down before the parent.
+
+### Settings
+
+ping.php uses much the same settings as the poller fping with one exception: retries is used instead of count.
+ping.php does not measure loss and avg response time, only up/down, so once a device responds it stops pinging it.
+
+```
+$config['fping_options']['retries'] = 2;
+$config['fping_options']['timeout'] = 500;
+$config['fping_options']['interval'] = 500;
+```
