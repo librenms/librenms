@@ -20,6 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // Install legacy dbFacile fetch mode listener
+        \LibreNMS\DB\Eloquent::initLegacyListeners();
+
         // load config
         Config::load();
 
