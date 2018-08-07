@@ -99,34 +99,32 @@ if (defined('SHOW_SETTINGS')) {
     
     $query = 'SELECT id,name FROM device_groups ORDER BY name';
             
-	$params = array('user' => Auth::id());
-	
-	$common_output[] = '
+    $params = array('user' => Auth::id(), 'hithere' => 'hello');
+    
+    $common_output[] = '
     <div class="form-group">
-	    <div class="col-sm-4">
+        <div class="col-sm-4">
             <label for="filter_device_group" class="control-label availability-map-widget-header">Device Group: </label>
         </div>
         <div class="col-sm-6">
             <select class="form-control" name="filter_device_group">
-            	<option value="-1" >All</option>
+                <option value="-1" >All</option>
     ';
-	
-	$selected_filter_device_group = $widget_settings['filter_device_group'];
-	
-	foreach (dbFetchRows($query, $params) as $result) {
-		$selected = '';
-		if ($selected_filter_device_group == $result['id']) {
-			$selected = 'selected';
-		}
-        $common_output[] = '
-			<option value="'.$result['id'].'" '.$selected.' >'.$result['name'].'</option>
-		';
+    
+    $selected_filter_device_group = $widget_settings['filter_device_group'];
+    
+    foreach (dbFetchRows($query, $params) as $result) {
+        $selected = '';
+        if ($selected_filter_device_group == $result['id']) {
+            $selected = 'selected';
+        }
+        $common_output[] = '<option value="'.$result['id'].'" '.$selected.' >'.$result['name'].'</option>';
     }
 
     $common_output[] = '
             </select>
         </div>
-	</div>';
+    </div>';
 
     $common_output[] = '
     <div class ="form-group">
@@ -202,10 +200,10 @@ if (defined('SHOW_SETTINGS')) {
         if ($config['webui']['availability_map_use_device_groups'] != 0) {
             $device_group = 'SELECT `D`.`device_id` FROM `device_group_device` AS `D` WHERE `device_group_id` = ?';
            
-            if ($widget_settings['filter_device_group'] == '-1'){
-	          $param = array($_SESSION['group_view']);  
+            if ($widget_settings['filter_device_group'] == '-1') {
+                $param = array($_SESSION['group_view']);
             } else {
-	            $param = array($widget_settings['filter_device_group']);
+                $param = array($widget_settings['filter_device_group']);
             }
             
             $devices = dbFetchRows($device_group, $param);
