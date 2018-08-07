@@ -183,7 +183,6 @@ function RunRules($device_id)
             $inv = false;
         }
         d_echo(PHP_EOL);
-        $chk   = dbFetchRow("SELECT state FROM alerts WHERE rule_id = ? && device_id = ? ORDER BY id DESC LIMIT 1", array($rule['id'], $device_id));
         if (empty($rule['query'])) {
             $rule['query'] = GenSQL($rule['rule'], $rule['builder']);
         }
@@ -205,10 +204,12 @@ function RunRules($device_id)
         } else { //( $s > 0 && $inv == false ) {
             $doalert = false;
         }
+
+        $current_state = dbFetchCell("SELECT state FROM alerts WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1", [$rule['id'], $device_id]);
         if ($doalert) {
-            if ($chk['state'] === "2") {
+            if ($current_state == 2) {
                 c_echo('Status: %ySKIP');
-            } elseif ($chk['state'] >= "1") {
+            } elseif ($current_state >= 1) {
                 c_echo('Status: %bNOCHG');
                 // NOCHG here doesn't mean no change full stop. It means no change to the alert state
                 // So we update the details column with any fresh changes to the alert output we might have.
@@ -220,21 +221,26 @@ function RunRules($device_id)
                 dbUpdate(array('details' => $details), 'alert_log', 'id = ?', array($alert_log['id']));
             } else {
                 $extra = gzcompress(json_encode(array('contacts' => GetContacts($qry), 'rule'=>$qry)), 9);
-                if (dbInsert(array('state' => 1, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'details' => $extra), 'alert_log')) {
-                    if (!dbUpdate(array('state' => 1, 'open' => 1), 'alerts', 'device_id = ? && rule_id = ?', array($device_id,$rule['id']))) {
+                if (dbInsert(['state' => 1, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'details' => $extra], 'alert_log')) {
+                    if (is_null($current_state)) {
                         dbInsert(array('state' => 1, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1,'alerted' => 0), 'alerts');
+                    } else {
+                        dbUpdate(['state' => 1, 'open' => 1], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
                     }
                     c_echo(PHP_EOL . 'Status: %rALERT');
                 }
             }
         } else {
-            if ($chk['state'] === "0") {
+            if (!is_null($current_state) && $current_state == 0) {
                 c_echo('Status: %bNOCHG');
             } else {
-                if (dbInsert(array('state' => 0, 'device_id' => $device_id, 'rule_id' => $rule['id']), 'alert_log')) {
-                    if (!dbUpdate(array('state' => 0, 'open' => 1, 'note' => ''), 'alerts', 'device_id = ? && rule_id = ?', array($device_id,$rule['id']))) {
-                        dbInsert(array('state' => 0, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0), 'alerts');
+                if (dbInsert(['state' => 0, 'device_id' => $device_id, 'rule_id' => $rule['id']], 'alert_log')) {
+                    if (is_null($current_state)) {
+                        dbInsert(['state' => 0, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0], 'alerts');
+                    } else {
+                        dbUpdate(['state' => 0, 'open' => 1, 'note' => ''], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
                     }
+
                     c_echo(PHP_EOL . 'Status: %gOK');
                 }
             }
@@ -277,7 +283,7 @@ function GetContacts($results)
         }
         if (is_numeric($result["device_id"])) {
             if ($config['alert']['syscontact'] == true) {
-                if (dbFetchCell("SELECT attrib_value FROM devices_attribs WHERE attrib_type = 'override_sysContact_bool' AND device_id = ?", array($result["device_id"])) === "1") {
+                if (dbFetchCell("SELECT attrib_value FROM devices_attribs WHERE attrib_type = 'override_sysContact_bool' AND device_id = ?", [$result["device_id"]])) {
                     $tmpa = dbFetchCell("SELECT attrib_value FROM devices_attribs WHERE attrib_type = 'override_sysContact_string' AND device_id = ?", array($result["device_id"]));
                 } else {
                     $tmpa = dbFetchCell("SELECT sysContact FROM devices WHERE device_id = ?", array($result["device_id"]));
