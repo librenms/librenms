@@ -452,6 +452,10 @@ function dbHandleException(QueryException $exception)
 {
     $message = $exception->getMessage();
 
+    if ($exception->getCode() == 2002) {
+        $message = "Could not connect to database! " . $message;
+    }
+
     // ? bindings should already be replaced, just replace named bindings
     foreach ($exception->getBindings() as $key => $value) {
         if (is_string($key)) {
