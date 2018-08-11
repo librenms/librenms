@@ -27,6 +27,8 @@
         "ext-session": "*",
         "ext-xml": "*",
         "ext-gd": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
         "ezyang/htmlpurifier": "^4.8",
         "phpmailer/phpmailer": "^5.2.21",
         "slim/slim": "^2.6",
