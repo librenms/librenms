@@ -16,3 +16,4 @@ poller_modules:
     storage: false
 over:
     - { graph: device_bits, text: Traffic }
+    - { graph: device_wireless_rssi, text: 'Received Signal Strength Indicator (dBm)' }
