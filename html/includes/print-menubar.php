@@ -271,6 +271,9 @@ if (Auth::user()->hasGlobalAdmin()) {
             <li><a href="ports/"><i class="fa fa-link fa-fw fa-lg" aria-hidden="true"></i> All Ports</a></li>
 
 <?php
+if (array_key_exists('custom_aggregation', $config)) {
+    require 'includes/print-menubar-port-aggregations.inc.php';
+}
 $ports = new ObjectCache('ports');
 
 if ($ports['errored'] > 0) {
@@ -325,7 +328,13 @@ if (Auth::user()->hasGlobalRead()) {
     }
     foreach ($config['custom_descr'] as $custom_type) {
         if (!empty($custom_type)) {
-            echo '          <li><a href="iftype/type=' . urlencode(strtolower($custom_type)) . '"><i class="fa fa-connectdevelop fa-fw fa-lg" aria-hidden="true"></i> ' . ucfirst($custom_type) . '</a></li>';
+            $custom_types = explode(',', $custom_type);
+            $custom_name = ucfirst($custom_types[0]);
+            for ($i=1; $i<count($custom_types); $i++) {
+                $custom_name .= " + ";
+                $custom_name .= ucfirst($custom_types[$i]);
+            }
+            echo '          <li><a href="iftype/type=' . urlencode(strtolower($custom_type)) . '"><i class="fa fa-connectdevelop fa-fw fa-lg" aria-hidden="true"></i> ' . $custom_name . '</a></li>';
             $ifbreak = 1;
         }
     }
