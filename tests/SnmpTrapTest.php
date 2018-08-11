@@ -34,7 +34,6 @@ use LibreNMS\Snmptrap\Trap;
 
 class SnmpTrapTest extends LaravelTestCase
 {
-    use CreatesApplication;
     use DatabaseTransactions;
 
     public function testGarbage()
