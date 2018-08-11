@@ -3,8 +3,12 @@
 namespace App\Models;
 
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
+use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\IPv4;
+use LibreNMS\Util\IPv6;
 
 class Device extends BaseModel
 {
@@ -81,6 +85,44 @@ class Device extends BaseModel
     }
 
     // ---- Helper Functions ----
+
+    public static function findByHostname($hostname)
+    {
+        return static::where('hostname', $hostname)->first();
+    }
+
+    public static function findByIp($ip)
+    {
+        $device = static::where('hostname', $ip)->orWhere('ip', inet_pton($ip))->first();
+
+        if ($device) {
+            return $device;
+        }
+
+        try {
+            $ipv4 = new IPv4($ip);
+            return Ipv4Address::where('ipv4_address', $ipv4)
+                ->with('port', 'port.device')
+                ->firstOrFail()->port->device;
+        } catch (InvalidIpException $e) {
+            //
+        } catch (ModelNotFoundException $e) {
+            //
+        }
+
+        try {
+            $ipv6 = new IPv6($ip);
+            return Ipv6Address::where('ipv6_address', $ipv6->uncompressed())
+                ->with(['port', 'port.device'])
+                ->firstOrFail()->port->device;
+        } catch (InvalidIpException $e) {
+            //
+        } catch (ModelNotFoundException $e) {
+            //
+        }
+
+        return null;
+    }
 
     /**
      * @return string
