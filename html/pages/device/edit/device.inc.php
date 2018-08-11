@@ -202,7 +202,7 @@ if ($updated && $update_message) {
         </div>
     </div>
     <div class="form-group">
-        <label for="disabled" class="col-sm-2 control-label">Disable:</label>
+        <label for="disabled" class="col-sm-2 control-label">Disable Polling:</label>
         <div class="col-sm-6">
           <input name="disabled" type="checkbox" id="disabled" value="1"
                 <?php
@@ -213,7 +213,7 @@ if ($updated && $update_message) {
         </div>
     </div>
     <div class="form-group">
-        <label for="ignore" class="col-sm-2 control-label">Ignore</label>
+        <label for="ignore" class="col-sm-2 control-label">Ignore Alerts:</label>
         <div class="col-sm-6">
            <input name="ignore" type="checkbox" id="ignore" value="1"
                 <?php
