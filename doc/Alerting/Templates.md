@@ -2,7 +2,7 @@ source: Alerting/Templates.md
 
 # Templates
 
-> This page is for installs running version 1.41 or later. You can find the older docs [here](Old_Templates.md)
+> This page is for installs running version 1.42 or later. You can find the older docs [here](Old_Templates.md)
 
 Templates can be assigned to a single or a group of rules and can contain any kind of text. There is also a default template which is used for any rule that isn't associated with a template. This template can be found under `Alert Templates` page and can be edited. It also has an option revert it back to its default content. 
 
@@ -64,6 +64,43 @@ Placeholders are special variables that if used within the template will be repl
 Placeholders can be used within the subjects for templates as well although $faults is most likely going to be worthless.
 
 The Default Template is a 'one-size-fit-all'. We highly recommend defining your own templates for your rules to include more specific information.
+
+## Base Templates
+If you'd like to reuse a common template for your alerts follow below
+
+A default file is located in
+` resources/views/alerts/templates/default.blade.php`
+Displays the following:
+
+```
+<html>
+    <head>
+        <title>LibreNMS Alert</title>
+    </head>
+    <body>
+        <div class="container">
+            @yield('content')
+        </div>
+    </body>
+</html>
+```
+The important part being the `@yield('content')`
+
+You can use plain text or html as per Alert templates and this will form the basis of your common template, feel free to make as many templates in the directory as needed.
+
+In your alert template just use
+
+```
+@extends('alerts.templates.default');
+
+@section('content')
+  {{ $alert->title }}
+  Severity: {{ $alert->severity }}
+  ...
+@endsection
+```
+
+More info: https://laravel.com/docs/5.4/blade#extending-a-layout
 
 ## Examples
 
@@ -223,10 +260,10 @@ Service Alert:
 <b>Duration:</b> {{ $alert->elapsed }}<br>
 <br>
 
-@if ($alert->faults)                                                                                        
-@foreach ($alert->faults as $key => $value)<b>$value['service_desc'] - $value['service_type']</b><br>                                         
-$value['service_message']<br>
-<br>                                                                                         
+@if ($alert->faults)
+@foreach ($alert->faults as $key => $value) <b>{{ $value['service_desc'] }} - {{ $value['service_type'] }}</b><br>
+{{ $value['service_message'] }}<br>
+<br>
 @endforeach                                                                                                              
 @endif
 </div>

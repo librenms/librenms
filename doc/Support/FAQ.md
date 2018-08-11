@@ -267,7 +267,7 @@ Please see [Supporting a new OS](../Developing/Support-New-OS.md)
 #### <a name="faq20"> What information do you need to add a new OS?</a>
 
 Under the device, click the gear and select Capture. 
-Please provide the output of Discovery, Poller, and Snmpwalk as separate non-expiring https://p.libren.ms/ links.
+Please [open an issue on GitHub](https://github.com/librenms/librenms/issues/new) and provide the output of Discovery, Poller, and Snmpwalk as separate non-expiring https://p.libren.ms/ links.
 
 You can also use the command line to obtain the information.  Especially, if snmpwalk results in a large amount of data.
 Replace the relevant information in these commands such as HOSTNAME and COMMUNITY. Use `snmpwalk` instead of `snmpbulkwalk` for v1 devices.

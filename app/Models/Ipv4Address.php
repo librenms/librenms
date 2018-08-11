@@ -1,8 +1,8 @@
 <?php
 /**
- * cmts.inc.php
+ * Ipv4Address.php
  *
- * LibreNMS os sensor pre-cache module for Arris CMTS
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,16 +19,28 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2018 TheGreatDoc
- * @author     TheGreatDoc
- * Based on Neil Lathwood Cisco EPC files
+ * @copyright  2018 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
-echo 'ifName ';
-$pre_cache['cmts_ifName'] = snmpwalk_cache_oid($device, 'ifName', array(), 'DOCS-IF-MIB');
+namespace App\Models;
 
-echo 'ifAlias ';
-$pre_cache['cmts_ifAlias'] = snmpwalk_cache_oid($device, 'ifAlias', array(), 'DOCS-IF-MIB');
+class Ipv4Address extends BaseModel
+{
+    public $timestamps = false;
+    protected $primaryKey = 'ipv4_address_id';
 
-echo 'docsIfSignalQualityTable ';
-$pre_cache['cmts_docsIfSignalQualityTable'] = snmpwalk_cache_oid($device, 'docsIfSignalQualityTable', array(), 'DOCS-IF-MIB');
+    // ---- Query scopes ----
+
+    public function scopeHasAccess($query, User $user)
+    {
+        return $this->hasPortAccess($query, $user);
+    }
+
+    // ---- Define Relationships ----
+
+    public function port()
+    {
+        return $this->belongsTo('App\Models\Port', 'port_id', 'port_id');
+    }
+}

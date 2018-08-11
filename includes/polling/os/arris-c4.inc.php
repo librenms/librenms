@@ -1,6 +1,6 @@
 <?php
 /**
-* cmts.inc.php
+* arris-c4.inc.php
 *
 * LibreNMS os poller module for Arris CMTS
 *

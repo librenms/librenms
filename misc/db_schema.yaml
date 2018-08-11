@@ -472,6 +472,7 @@ devices:
     - { Field: override_sysLocation, Type: tinyint(1), 'Null': true, Extra: '', Default: '0' }
     - { Field: notes, Type: text, 'Null': true, Extra: '' }
     - { Field: port_association_mode, Type: int(11), 'Null': false, Extra: '', Default: '1' }
+    - { Field: max_depth, Type: int(11), 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [device_id], Unique: true, Type: BTREE }
     status: { Name: status, Columns: [status], Unique: false, Type: BTREE }
@@ -1163,30 +1164,30 @@ ports:
     - { Field: pagpEthcOperationMode, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: pagpDeviceId, Type: varchar(48), 'Null': true, Extra: '' }
     - { Field: pagpGroupIfIndex, Type: int(11), 'Null': true, Extra: '' }
-    - { Field: ifInUcastPkts, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInUcastPkts_prev, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInUcastPkts_delta, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInUcastPkts_rate, Type: int(11), 'Null': true, Extra: '' }
-    - { Field: ifOutUcastPkts, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutUcastPkts_prev, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutUcastPkts_delta, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutUcastPkts_rate, Type: int(11), 'Null': true, Extra: '' }
-    - { Field: ifInErrors, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInErrors_prev, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInErrors_delta, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInErrors_rate, Type: int(11), 'Null': true, Extra: '' }
-    - { Field: ifOutErrors, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutErrors_prev, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutErrors_delta, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutErrors_rate, Type: int(11), 'Null': true, Extra: '' }
-    - { Field: ifInOctets, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInOctets_prev, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInOctets_delta, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifInOctets_rate, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutOctets, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutOctets_prev, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutOctets_delta, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: ifOutOctets_rate, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: ifInUcastPkts, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInUcastPkts_prev, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInUcastPkts_delta, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInUcastPkts_rate, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutUcastPkts, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutUcastPkts_prev, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutUcastPkts_delta, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutUcastPkts_rate, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInErrors, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInErrors_prev, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInErrors_delta, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInErrors_rate, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutErrors, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutErrors_prev, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutErrors_delta, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutErrors_rate, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInOctets, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInOctets_prev, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInOctets_delta, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInOctets_rate, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutOctets, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutOctets_prev, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutOctets_delta, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutOctets_rate, Type: 'bigint(20) unsigned', 'Null': true, Extra: '' }
     - { Field: poll_time, Type: int(11), 'Null': true, Extra: '' }
     - { Field: poll_prev, Type: int(11), 'Null': true, Extra: '' }
     - { Field: poll_period, Type: int(11), 'Null': true, Extra: '' }
@@ -1315,12 +1316,6 @@ ports_vlans:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_vlan_id], Unique: true, Type: BTREE }
     unique: { Name: unique, Columns: [device_id, port_id, vlan], Unique: true, Type: BTREE }
-port_association_mode:
-  Columns:
-    - { Field: pom_id, Type: int(11), 'Null': false, Extra: auto_increment }
-    - { Field: name, Type: varchar(12), 'Null': false, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [pom_id], Unique: true, Type: BTREE }
 processes:
   Columns:
     - { Field: device_id, Type: int(11), 'Null': false, Extra: '' }

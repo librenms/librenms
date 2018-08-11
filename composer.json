@@ -27,6 +27,8 @@
         "ext-session": "*",
         "ext-xml": "*",
         "ext-gd": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
         "ezyang/htmlpurifier": "^4.8",
         "phpmailer/phpmailer": "^5.2.21",
         "slim/slim": "^2.6",
@@ -45,6 +47,7 @@
         "laravel/laravel": "5.4.*",
         "oriceon/toastr-5-laravel": "dev-master",
         "wpb/string-blade-compiler": "3.4.x-dev",
+        "fico7489/laravel-pivot": "*",
 
         "vlucas/phpdotenv": "2.4.0",
         "doctrine/inflector": "1.1.*",
@@ -64,7 +67,8 @@
         "fojuth/readmegen": "1.*",
         "barryvdh/laravel-ide-helper": "^2.4",
         "barryvdh/laravel-debugbar": "~2.4",
-        "justinrainbow/json-schema": "^5.2"
+        "justinrainbow/json-schema": "^5.2",
+        "fzaninotto/faker": "^1.8"
     },
     "suggest": {
         "ext-memcached": "Required if you utilize distributed polling",

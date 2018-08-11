@@ -202,6 +202,18 @@ logging librenms.ip
 logging server librenms.ip 5 use-vrf default facility local6
 ```
 
+#### Juniper Junos
+```config
+set system syslog host librenms.ip authorization any
+set system syslog host librenms.ip daemon any
+set system syslog host librenms.ip kernel any
+set system syslog host librenms.ip user any
+set system syslog host librenms.ip change-log any
+set system syslog host librenms.ip source-address <management ip>
+set system syslog host librenms.ip exclude-hostname
+set system syslog time-format
+```
+
 If you have permitted udp and tcp 514 through any firewall then that should be all you need. Logs should start appearing and displayed within the LibreNMS web UI.
 
 ### Windows
@@ -247,4 +259,9 @@ $config['os']['nxos']['syslog_hook'][] = Array('regex' => '/%VSHD-5-VSHD_SYSLOG_
 #### Cisco IOSXR
 ```ssh
 $config['os']['iosxr']['syslog_hook'][] = Array('regex' => '/%GBL-CONFIG-6-DB_COMMIT/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
+```
+
+#### Juniper Junos
+```ssh
+$config['os']['junos']['syslog_hook'][] = Array('regex' => '/%UI_COMMIT:/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
 ```

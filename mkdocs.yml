@@ -53,6 +53,7 @@ pages:
       - Extensions/Dashboards.md
   - 5. Advanced Setup:
       - Support/1-Minute-Polling.md
+      - Fast Ping Checking: Extensions/Fast-Ping-Check.md
       - Configuration docs: Support/Configuration.md
       - Authentication Options: Extensions/Authentication.md
       - Two-Factor Auth: Extensions/Two-Factor-Auth.md
