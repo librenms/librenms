@@ -94,7 +94,7 @@ function dbInsert($data, $table)
 {
     $time_start = microtime(true);
 
-    $sql = 'INSERT INTO `'.$table.'` (`'.implode('`,`', array_keys($data)).'`)  VALUES ('.implode(',', dbPlaceHolders($data)).')';
+    $sql = 'INSERT IGNORE INTO `'.$table.'` (`'.implode('`,`', array_keys($data)).'`)  VALUES ('.implode(',', dbPlaceHolders($data)).')';
 
     try {
         $result = Eloquent::DB()->insert($sql, $data);
