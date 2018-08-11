@@ -32,8 +32,10 @@ if (Config::get('enable_bgp')) {
             } elseif ($device['os_group'] === 'cisco') {
                 $peers_data = snmp_walk($device, 'cbgpPeer2RemoteAs', '-Oq', 'CISCO-BGP4-MIB');
                 $peer2 = !empty($peers_data);
+            } elseif ($device['os_group'] === 'brocade') {
+                $peers_data = snmp_walk($device, 'bgp4V2PeerRemoteAs', '-Oq', 'BGP4V2-MIB', 'brocade');
+                $peer2 = !empty($peers_data);
             }
-
             if (empty($peers_data)) {
                 $bgp4_mib = true;
                 $peers_data = snmp_walk($device, 'bgpPeerRemoteAs', '-Oq', 'BGP4-MIB');
@@ -47,7 +49,7 @@ if (Config::get('enable_bgp')) {
         }
 
         $peerlist = build_bgp_peers($device, $peers_data, $peer2);
-
+    
         // Process discovered peers
         if (!empty($peerlist)) {
             $af_data = array();
@@ -55,7 +57,7 @@ if (Config::get('enable_bgp')) {
 
             foreach ($peerlist as $peer) {
                 $peer['astext'] = get_astext($peer['as']);
-
+                
                 add_bgp_peer($device, $peer);
 
                 if (empty($af_data)) {
@@ -70,14 +72,16 @@ if (Config::get('enable_bgp')) {
                         }
                     } elseif ($device['os_group'] === 'arista') {
                         $af_data = snmpwalk_cache_oid($device, 'aristaBgp4V2PrefixInPrefixes', $af_data, 'ARISTA-BGP4V2-MIB');
+                    } elseif ($device['os_group'] === 'brocade') {
+                        $af_data = snmpwalk_cache_oid($device, 'bgp4V2PeerEntry', array(), 'BGP4V2-MIB');
                     }
                 }
-
+              
                 // build the list
                 if (!empty($af_data)) {
                     $af_list = build_cbgp_peers($device, $peer, $af_data, $peer2);
                 }
-
+         
                 if (!$bgp4_mib && $device['os'] == 'junos') {
                     $afis['ipv4'] = 'ipv4';
                     $afis['ipv6'] = 'ipv6';
@@ -92,7 +96,7 @@ if (Config::get('enable_bgp')) {
                     $safis[128]   = 'vpn';
                     $safis[132]   = 'rtfilter';
                     $safis[133]   = 'flow';
-
+                  
                     if (!isset($j_peerIndexes)) {
                         $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerEntry', $jbgp, 'BGP4-V2-MIB-JUNIPER', 'junos');
                         d_echo($j_bgp);
