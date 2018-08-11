@@ -103,7 +103,7 @@ if (empty($total)) {
 if (!isset($vars['sort']) || empty($vars['sort'])) {
     $sort = 'timestamp DESC';
 } else {
-    $sort = '`alert_rules`.`severity` DESC';
+    $sort = '`alert_rules`.`severity` DESC, timestamp DESC';
 }
 
 $sql .= " ORDER BY $sort";
