@@ -18,13 +18,11 @@ use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
-use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\LockException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
-use LibreNMS\Util\IP;
 use LibreNMS\Util\MemcacheLock;
-use Monolog\Logger;
+use Symfony\Component\Process\Process;
 
 /**
  * Set debugging output
@@ -777,51 +775,34 @@ function isSNMPable($device)
  * Check if the given host responds to ICMP echo requests ("pings").
  *
  * @param string $hostname The hostname or IP address to send ping requests to.
- * @param int $address_family The address family ('ipv4' or 'ipv6') to use. Defaults to IPv4. Will *not* be autodetected for IP addresses, so it has to be set to 'ipv6' when pinging an IPv6 address or an IPv6-only host.
+ * @param string $address_family The address family ('ipv4' or 'ipv6') to use. Defaults to IPv4.
+ * Will *not* be autodetected for IP addresses, so it has to be set to 'ipv6' when pinging an IPv6 address or an IPv6-only host.
  * @param array $attribs The device attributes
  *
  * @return array  'result' => bool pingable, 'last_ping_timetaken' => int time for last ping, 'db' => fping results
  */
-function isPingable($hostname, $address_family = 'ipv4', $attribs = array())
+function isPingable($hostname, $address_family = 'ipv4', $attribs = [])
 {
-    global $config;
-
-    $response = array();
-    if (can_ping_device($attribs) === true) {
-        $fping_params = '';
-        if (is_numeric($config['fping_options']['timeout'])) {
-            if ($config['fping_options']['timeout'] < 50) {
-                $config['fping_options']['timeout'] = 50;
-            }
-            if ($config['fping_options']['interval'] < $config['fping_options']['timeout']) {
-                $config['fping_options']['interval'] = $config['fping_options']['timeout'];
-            }
-            $fping_params .= ' -t ' . $config['fping_options']['timeout'];
-        }
-        if (is_numeric($config['fping_options']['count']) && $config['fping_options']['count'] > 0) {
-            $fping_params .= ' -c ' . $config['fping_options']['count'];
-        }
-        if (is_numeric($config['fping_options']['interval'])) {
-            if ($config['fping_options']['interval'] < 20) {
-                $config['fping_options']['interval'] = 20;
-            }
-            $fping_params .= ' -p ' . $config['fping_options']['interval'];
-        }
-        $status = fping($hostname, $fping_params, $address_family);
-        if ($status['exitcode'] > 0 || $status['loss'] == 100) {
-            $response['result'] = false;
-        } else {
-            $response['result'] = true;
-        }
-        if (is_numeric($status['avg'])) {
-            $response['last_ping_timetaken'] = $status['avg'];
-        }
-        $response['db'] = array_intersect_key($status, array_flip(array('xmt','rcv','loss','min','max','avg')));
-    } else {
-        $response['result'] = true;
-        $response['last_ping_timetaken'] = 0;
+    if (can_ping_device($attribs) !== true) {
+        return [
+            'result' => true,
+            'last_ping_timetaken' => 0
+        ];
     }
-    return($response);
+
+    $status = fping(
+        $hostname,
+        Config::get('fping_options.count', 3),
+        Config::get('fping_options.interval', 500),
+        Config::get('fping_options.timeout', 500),
+        $address_family
+    );
+
+    return [
+        'result' => ($status['exitcode'] == 0 && $status['loss'] < 100),
+        'last_ping_timetaken' => $status['avg'],
+        'db' => array_intersect_key($status, array_flip(['xmt','rcv','loss','min','max','avg']))
+    ];
 }
 
 function getpollergroup($poller_group = '0')
@@ -1536,55 +1517,58 @@ function ip_exists($ip)
     return false;
 }
 
-function fping($host, $params, $address_family = 'ipv4')
+/**
+ * Run fping against a hostname/ip in count mode and collect stats.
+ *
+ * @param string $host
+ * @param int $count (min 1)
+ * @param int $interval (min 20)
+ * @param int $timeout (not more than $interval)
+ * @param string $address_family ipv4 or ipv6
+ * @return array
+ */
+function fping($host, $count = 3, $interval = 1000, $timeout = 500, $address_family = 'ipv4')
 {
-
-    global $config;
-
-    $descriptorspec = array(
-        0 => array("pipe", "r"),
-        1 => array("pipe", "w"),
-        2 => array("pipe", "w")
-    );
-
     // Default to ipv4
-    $fping_path = $config['fping'];
-    if ($address_family == 'ipv6') {
-        $fping_path = $config['fping6'];
-    }
+    $fping_name = $address_family == 'ipv6' ? 'fping6' : 'fping';
+    $fping_path = Config::get($fping_name, $fping_name);
 
-    $process = proc_open($fping_path . ' -e -q ' .$params . ' ' .$host.' 2>&1', $descriptorspec, $pipes);
-    $read = '';
+    // build the parameters
+    $params = '-e -q -c ' . max($count, 1);
 
-    $proc_status = 0;
-    if (is_resource($process)) {
-        fclose($pipes[0]);
+    $interval = max($interval, 20);
+    $params .= ' -p ' . $interval;
 
-        while (!feof($pipes[1])) {
-            $read .= fgets($pipes[1], 1024);
-        }
-        fclose($pipes[1]);
-        $proc_status = proc_get_status($process);
-        proc_close($process);
-    }
+    $params .= ' -t ' . max($timeout, $interval);
 
-    preg_match('/[0-9]+\/[0-9]+\/[0-9]+%/', $read, $loss_tmp);
-    preg_match('/[0-9\.]+\/[0-9\.]+\/[0-9\.]*$/', $read, $latency);
-    $loss = preg_replace("/%/", "", $loss_tmp[0]);
-    list($xmt,$rcv,$loss) = preg_split("/\//", $loss);
-    list($min,$avg,$max) = preg_split("/\//", $latency[0]);
+    $cmd = "$fping_path $params $host";
+
+    d_echo("[FPING] $cmd\n");
+
+    $process = new Process($cmd);
+    $process->run();
+    $output = $process->getErrorOutput();
+
+    preg_match('#= (\d+)/(\d+)/(\d+)%, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+)$#', $output, $parsed);
+    list(, $xmt, $rcv, $loss, $min, $avg, $max) = $parsed;
+
     if ($loss < 0) {
         $xmt = 1;
         $rcv = 1;
         $loss = 100;
     }
-    $xmt      = set_numeric($xmt);
-    $rcv      = set_numeric($rcv);
-    $loss     = set_numeric($loss);
-    $min      = set_numeric($min);
-    $max      = set_numeric($max);
-    $avg      = set_numeric($avg);
-    $response = array('xmt'=>$xmt,'rcv'=>$rcv,'loss'=>$loss,'min'=>$min,'max'=>$max,'avg'=>$avg,'exitcode'=>$proc_status['exitcode']);
+
+    $response = [
+        'xmt'  => set_numeric($xmt),
+        'rcv'  => set_numeric($rcv),
+        'loss' => set_numeric($loss),
+        'min'  => set_numeric($min),
+        'max'  => set_numeric($max),
+        'avg'  => set_numeric($avg),
+        'exitcode' => $process->getExitCode(),
+    ];
+    d_echo($response);
+
     return $response;
 }
 
