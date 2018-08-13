@@ -50,6 +50,27 @@ class DeviceTest extends LaravelTestCase
         $this->assertNull($found);
     }
 
+    public function testFindByIpv4Fail()
+    {
+        $found = Device::findByIp('182.43.219.43');
+        $this->assertNull($found);
+    }
+
+    public function testFindByIpv6Fail()
+    {
+        $found = Device::findByIp('341a:234d:3429:9845:909f:fd32:1930:32dc');
+        $this->assertNull($found);
+    }
+
+    public function testFindIpButNoPort()
+    {
+        $ipv4 = factory(Ipv4Address::class)->create();
+        Port::destroy($ipv4->port_id);
+
+        $found = Device::findByIp($ipv4->ipv4_address);
+        $this->assertNull($found);
+    }
+
     public function testFindByIp()
     {
         $device = factory(Device::class)->create();
