@@ -77,11 +77,15 @@ if (preg_match("/(Linux).+(ntc)/", $device['sysDescr'])) {
     $descr = 'AC IN voltage';
     $index = '116.2';
     $value = snmp_get($device, $oid.$index, '-Oqv');
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid.$index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+    if (is_numeric($value)) {
+        discover_sensor($valid['sensor'], 'voltage', $device, $oid.$index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+    }
     $descr = 'VBUS voltage';
     $index = '116.4';
     $value = snmp_get($device, $oid.$index, '-Oqv');
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid.$index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+    if (is_numeric($value)) {
+        discover_sensor($valid['sensor'], 'voltage', $device, $oid.$index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+    }
     $lowlimit     = 2.75;
     $lowwarnlimit = 2.8;
     $warnlimit    = 4.2;
@@ -89,7 +93,9 @@ if (preg_match("/(Linux).+(ntc)/", $device['sysDescr'])) {
     $descr = 'Battery voltage';
     $index = '116.6';
     $value = snmp_get($device, $oid.$index, '-Oqv');
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid.$index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+    if (is_numeric($value)) {
+        discover_sensor($valid['sensor'], 'voltage', $device, $oid.$index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+    }
 }
 
 $oids = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.117.112.115.45.110.117.116.4';
