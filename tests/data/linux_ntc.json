@@ -1965,7 +1965,7 @@
                     "app_instance": ""
                 },
                 {
-                    "app_type": "os-updates",
+                    "app_type": "ntp-client",
                     "app_state": "UNKNOWN",
                     "discovered": "1",
                     "app_state_prev": null,
@@ -1973,7 +1973,7 @@
                     "app_instance": ""
                 },
                 {
-                    "app_type": "ntp-client",
+                    "app_type": "os-updates",
                     "app_state": "UNKNOWN",
                     "discovered": "1",
                     "app_state_prev": null,
@@ -1994,19 +1994,19 @@
                     "app_instance": ""
                 },
                 {
-                    "app_type": "os-updates",
-                    "app_state": "OK",
-                    "discovered": "1",
-                    "app_state_prev": "UNKNOWN",
-                    "app_status": "511",
-                    "app_instance": ""
-                },
-                {
                     "app_type": "ntp-client",
                     "app_state": "OK",
                     "discovered": "1",
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
+                    "app_instance": ""
+                },
+                {
+                    "app_type": "os-updates",
+                    "app_state": "OK",
+                    "discovered": "1",
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "511",
                     "app_instance": ""
                 }
             ],
