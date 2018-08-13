@@ -5,7 +5,7 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
-                    "sysDescr": "Linux server-montcherie 3.10.0-693.21.1.el7.x86_64 #1 SMP Wed Mar 7 19:03:37 UTC 2018 x86_64",
+                    "sysDescr": "Linux web01.1.novalocal 3.10.0-693.21.1.el7.x86_64 #1 SMP Wed Mar 7 19:03:37 UTC 2018 x86_64",
                     "sysContact": null,
                     "version": null,
                     "hardware": "",
@@ -23,7 +23,7 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
-                    "sysDescr": "Linux server-montcherie 3.10.0-693.21.1.el7.x86_64 #1 SMP Wed Mar 7 19:03:37 UTC 2018 x86_64",
+                    "sysDescr": "Linux web01.1.novalocal 3.10.0-693.21.1.el7.x86_64 #1 SMP Wed Mar 7 19:03:37 UTC 2018 x86_64",
                     "sysContact": "<private>",
                     "version": "3.10.0-693.21.1.el7.x86_64",
                     "hardware": "Generic x86 64-bit",
@@ -822,11 +822,11 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
-                    "ifInUcastPkts": "797321824",
+                    "ifInUcastPkts": "807165491",
                     "ifInUcastPkts_prev": "0",
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
-                    "ifOutUcastPkts": "797321824",
+                    "ifOutUcastPkts": "807165491",
                     "ifOutUcastPkts_prev": "0",
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
@@ -838,11 +838,11 @@
                     "ifOutErrors_prev": "0",
                     "ifOutErrors_delta": null,
                     "ifOutErrors_rate": null,
-                    "ifInOctets": "97234038506",
+                    "ifInOctets": "99146399848",
                     "ifInOctets_prev": "0",
                     "ifInOctets_delta": null,
                     "ifInOctets_rate": null,
-                    "ifOutOctets": "97234038506",
+                    "ifOutOctets": "99146399848",
                     "ifOutOctets_prev": "0",
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
@@ -927,11 +927,11 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
-                    "ifInUcastPkts": "385142273",
+                    "ifInUcastPkts": "393227062",
                     "ifInUcastPkts_prev": "0",
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
-                    "ifOutUcastPkts": "428610345",
+                    "ifOutUcastPkts": "437229589",
                     "ifOutUcastPkts_prev": "0",
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
@@ -943,11 +943,11 @@
                     "ifOutErrors_prev": "0",
                     "ifOutErrors_delta": null,
                     "ifOutErrors_rate": null,
-                    "ifInOctets": "233211484760",
+                    "ifInOctets": "237949448575",
                     "ifInOctets_prev": "0",
                     "ifInOctets_delta": null,
                     "ifInOctets_rate": null,
-                    "ifOutOctets": "193751427157",
+                    "ifOutOctets": "197490537682",
                     "ifOutOctets_prev": "0",
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
@@ -1513,514 +1513,6 @@
                     "ifOutMulticastPkts_prev": "0",
                     "ifOutMulticastPkts_delta": null,
                     "ifOutMulticastPkts_rate": null
-                }
-            ]
-        }
-    },
-    "processors": {
-        "discovery": {
-            "processors": [
-                {
-                    "entPhysicalIndex": "0",
-                    "hrDeviceIndex": "196608",
-                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196608",
-                    "processor_index": "196608",
-                    "processor_type": "hr",
-                    "processor_usage": "61",
-                    "processor_descr": "Intel Xeon E3-12xx v2 (Ivy Bridge)",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
-                },
-                {
-                    "entPhysicalIndex": "0",
-                    "hrDeviceIndex": "196609",
-                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196609",
-                    "processor_index": "196609",
-                    "processor_type": "hr",
-                    "processor_usage": "56",
-                    "processor_descr": "Intel Xeon E3-12xx v2 (Ivy Bridge)",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
-                }
-            ]
-        },
-        "poller": "matches discovery"
-    },
-    "mempools": {
-        "discovery": {
-            "mempools": [
-                {
-                    "mempool_index": "1",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": "1024",
-                    "mempool_descr": "Physical memory",
-                    "mempool_perc": "0",
-                    "mempool_used": "0",
-                    "mempool_free": "0",
-                    "mempool_total": "0",
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": "0",
-                    "mempool_perc_warn": "75"
-                },
-                {
-                    "mempool_index": "3",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": "1024",
-                    "mempool_descr": "Virtual memory",
-                    "mempool_perc": "0",
-                    "mempool_used": "0",
-                    "mempool_free": "0",
-                    "mempool_total": "0",
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": "0",
-                    "mempool_perc_warn": "75"
-                },
-                {
-                    "mempool_index": "10",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": "1024",
-                    "mempool_descr": "Swap space",
-                    "mempool_perc": "0",
-                    "mempool_used": "0",
-                    "mempool_free": "0",
-                    "mempool_total": "0",
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": "0",
-                    "mempool_perc_warn": "75"
-                }
-            ]
-        },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "1",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": "1024",
-                    "mempool_descr": "Physical memory",
-                    "mempool_perc": "78",
-                    "mempool_used": "3115909120",
-                    "mempool_free": "858857472",
-                    "mempool_total": "3974766592",
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": "0",
-                    "mempool_perc_warn": "75"
-                },
-                {
-                    "mempool_index": "3",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": "1024",
-                    "mempool_descr": "Virtual memory",
-                    "mempool_perc": "78",
-                    "mempool_used": "3115909120",
-                    "mempool_free": "858857472",
-                    "mempool_total": "3974766592",
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": "0",
-                    "mempool_perc_warn": "75"
-                },
-                {
-                    "mempool_index": "10",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": "1024",
-                    "mempool_descr": "Swap space",
-                    "mempool_perc": "0",
-                    "mempool_used": "0",
-                    "mempool_free": "0",
-                    "mempool_total": "0",
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": "0",
-                    "mempool_perc_warn": "75"
-                }
-            ]
-        }
-    },
-    "storage": {
-        "discovery": {
-            "storage": [
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "31",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/",
-                    "storage_size": "84159508480",
-                    "storage_units": "4096",
-                    "storage_used": "31741366272",
-                    "storage_free": "0",
-                    "storage_perc": "0",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "36",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/dev/shm",
-                    "storage_size": "1987383296",
-                    "storage_units": "4096",
-                    "storage_used": "0",
-                    "storage_free": "0",
-                    "storage_perc": "0",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "39",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/sys/fs/cgroup",
-                    "storage_size": "1987383296",
-                    "storage_units": "4096",
-                    "storage_used": "0",
-                    "storage_free": "0",
-                    "storage_perc": "0",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "57",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/boot",
-                    "storage_size": "251567104",
-                    "storage_units": "1024",
-                    "storage_used": "226315264",
-                    "storage_free": "0",
-                    "storage_perc": "0",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "59",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/var/lib/docker/containers/b23b03092c86b38d370c0dcf00589588ef818b45d2b973fb2fc215e623c43f20/mounts/shm",
-                    "storage_size": "67108864",
-                    "storage_units": "4096",
-                    "storage_used": "0",
-                    "storage_free": "0",
-                    "storage_perc": "0",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "62",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/var/lib/docker/containers/dfaab0b059a7d0187547c28e897724c896adf93dd16143bc8523ce89c19908ab/mounts/shm",
-                    "storage_size": "67108864",
-                    "storage_units": "4096",
-                    "storage_used": "0",
-                    "storage_free": "0",
-                    "storage_perc": "0",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "65",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/var/lib/docker/containers/76b85aa9edd582e8380679003292294bc877071f3d8761029330e7f79a621b1e/mounts/shm",
-                    "storage_size": "67108864",
-                    "storage_units": "4096",
-                    "storage_used": "0",
-                    "storage_free": "0",
-                    "storage_perc": "0",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "68",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/var/lib/docker/containers/371788f123906e5fdb94af9cd8e6feff3e1ec13821ea6baf2b523648f22bb98c/mounts/shm",
-                    "storage_size": "67108864",
-                    "storage_units": "4096",
-                    "storage_used": "0",
-                    "storage_free": "0",
-                    "storage_perc": "0",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "70",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/run/user/1000",
-                    "storage_size": "397479936",
-                    "storage_units": "4096",
-                    "storage_used": "0",
-                    "storage_free": "0",
-                    "storage_perc": "0",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "71",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/run/user/996",
-                    "storage_size": "397479936",
-                    "storage_units": "4096",
-                    "storage_used": "0",
-                    "storage_free": "0",
-                    "storage_perc": "0",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
-                }
-            ]
-        },
-        "poller": {
-            "storage": [
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "31",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/",
-                    "storage_size": "84159508480",
-                    "storage_units": "4096",
-                    "storage_used": "31741366272",
-                    "storage_free": "52418142208",
-                    "storage_perc": "38",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "36",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/dev/shm",
-                    "storage_size": "1987383296",
-                    "storage_units": "4096",
-                    "storage_used": "0",
-                    "storage_free": "1987383296",
-                    "storage_perc": "0",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "39",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/sys/fs/cgroup",
-                    "storage_size": "1987383296",
-                    "storage_units": "4096",
-                    "storage_used": "0",
-                    "storage_free": "1987383296",
-                    "storage_perc": "0",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "57",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/boot",
-                    "storage_size": "251567104",
-                    "storage_units": "1024",
-                    "storage_used": "226315264",
-                    "storage_free": "25251840",
-                    "storage_perc": "90",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "59",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/var/lib/docker/containers/b23b03092c86b38d370c0dcf00589588ef818b45d2b973fb2fc215e623c43f20/mounts/shm",
-                    "storage_size": "67108864",
-                    "storage_units": "4096",
-                    "storage_used": "0",
-                    "storage_free": "67108864",
-                    "storage_perc": "0",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "62",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/var/lib/docker/containers/dfaab0b059a7d0187547c28e897724c896adf93dd16143bc8523ce89c19908ab/mounts/shm",
-                    "storage_size": "67108864",
-                    "storage_units": "4096",
-                    "storage_used": "0",
-                    "storage_free": "67108864",
-                    "storage_perc": "0",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "65",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/var/lib/docker/containers/76b85aa9edd582e8380679003292294bc877071f3d8761029330e7f79a621b1e/mounts/shm",
-                    "storage_size": "67108864",
-                    "storage_units": "4096",
-                    "storage_used": "0",
-                    "storage_free": "67108864",
-                    "storage_perc": "0",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "68",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/var/lib/docker/containers/371788f123906e5fdb94af9cd8e6feff3e1ec13821ea6baf2b523648f22bb98c/mounts/shm",
-                    "storage_size": "67108864",
-                    "storage_units": "4096",
-                    "storage_used": "0",
-                    "storage_free": "67108864",
-                    "storage_perc": "0",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "70",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/run/user/1000",
-                    "storage_size": "397479936",
-                    "storage_units": "4096",
-                    "storage_used": "0",
-                    "storage_free": "397479936",
-                    "storage_perc": "0",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "71",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/run/user/996",
-                    "storage_size": "397479936",
-                    "storage_units": "4096",
-                    "storage_used": "0",
-                    "storage_free": "397479936",
-                    "storage_perc": "0",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
-                }
-            ]
-        }
-    },
-    "applications": {
-        "discovery": {
-            "applications": [
-                {
-                    "app_type": "entropy",
-                    "app_state": "UNKNOWN",
-                    "discovered": "1",
-                    "app_state_prev": null,
-                    "app_status": "",
-                    "app_instance": ""
-                },
-                {
-                    "app_type": "ntp-client",
-                    "app_state": "UNKNOWN",
-                    "discovered": "1",
-                    "app_state_prev": null,
-                    "app_status": "",
-                    "app_instance": ""
-                },
-                {
-                    "app_type": "os-updates",
-                    "app_state": "UNKNOWN",
-                    "discovered": "1",
-                    "app_state_prev": null,
-                    "app_status": "",
-                    "app_instance": ""
-                }
-            ],
-            "application_metrics": []
-        },
-        "poller": {
-            "applications": [
-                {
-                    "app_type": "entropy",
-                    "app_state": "OK",
-                    "discovered": "1",
-                    "app_state_prev": "UNKNOWN",
-                    "app_status": "3636",
-                    "app_instance": ""
-                },
-                {
-                    "app_type": "ntp-client",
-                    "app_state": "OK",
-                    "discovered": "1",
-                    "app_state_prev": "UNKNOWN",
-                    "app_status": "",
-                    "app_instance": ""
-                },
-                {
-                    "app_type": "os-updates",
-                    "app_state": "OK",
-                    "discovered": "1",
-                    "app_state_prev": "UNKNOWN",
-                    "app_status": "511",
-                    "app_instance": ""
-                }
-            ],
-            "application_metrics": [
-                {
-                    "metric": "entropy",
-                    "value": "3636",
-                    "value_prev": null,
-                    "app_type": "entropy"
-                },
-                {
-                    "metric": "frequency",
-                    "value": "0",
-                    "value_prev": null,
-                    "app_type": "ntp-client"
-                },
-                {
-                    "metric": "jitter",
-                    "value": "0",
-                    "value_prev": null,
-                    "app_type": "ntp-client"
-                },
-                {
-                    "metric": "noise",
-                    "value": "0",
-                    "value_prev": null,
-                    "app_type": "ntp-client"
-                },
-                {
-                    "metric": "offset",
-                    "value": "0",
-                    "value_prev": null,
-                    "app_type": "ntp-client"
-                },
-                {
-                    "metric": "stability",
-                    "value": "0",
-                    "value_prev": null,
-                    "app_type": "ntp-client"
-                },
-                {
-                    "metric": "packages",
-                    "value": "511",
-                    "value_prev": null,
-                    "app_type": "os-updates"
                 }
             ]
         }
