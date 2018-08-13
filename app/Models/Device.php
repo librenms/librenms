@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
 
@@ -93,6 +94,10 @@ class Device extends BaseModel
 
     public static function findByIp($ip)
     {
+        if (!IP::isValid($ip)) {
+            return null;
+        }
+
         $device = static::where('hostname', $ip)->orWhere('ip', inet_pton($ip))->first();
 
         if ($device) {
@@ -101,7 +106,7 @@ class Device extends BaseModel
 
         try {
             $ipv4 = new IPv4($ip);
-            return Ipv4Address::where('ipv4_address', $ipv4)
+            return Ipv4Address::where('ipv4_address', (string) $ipv4)
                 ->with('port', 'port.device')
                 ->firstOrFail()->port->device;
         } catch (InvalidIpException $e) {

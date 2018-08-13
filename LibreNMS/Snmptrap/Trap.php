@@ -27,7 +27,7 @@ namespace LibreNMS\Snmptrap;
 
 use App\Models\Device;
 use Illuminate\Support\Collection;
-use LibreNMS\Snmptrap\Handler\Fallback;
+use LibreNMS\Snmptrap\Handlers\Fallback;
 use LibreNMS\Util\IP;
 use Log;
 
@@ -68,27 +68,6 @@ class Trap
             list($oid, $data) = explode(' ', $line, 2);
             return [$oid => trim($data, '"')];
         });
-    }
-
-    /**
-     * Instantiate the correct handler for this trap and call it's handle method
-     *
-     */
-    public function handle()
-    {
-        $this->getDevice();
-
-        if (empty($this->device)) {
-            Log::warning("Could not find device for trap", ['trap_text' => $this->raw]);
-            return false;
-        }
-
-        // note, this doesn't clear the resolved SnpmtrapHandler so only one per run
-        /** @var \LibreNMS\Interfaces\SnmptrapHandler $handler */
-        $handler = app(\LibreNMS\Interfaces\SnmptrapHandler::class, [$this->getTrapOid()]);
-        $handler->handle($this->getDevice(), $this);
-
-        return !($handler instanceof Fallback);
     }
 
     /**

@@ -1,8 +1,8 @@
 <?php
 /**
- * Fallback.php
+ * Dispatcher.php
  *
- * -Description-
+ * Creates the correct handler for the trap and then sends it the trap.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,29 +23,29 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Snmptrap\Handler;
+namespace LibreNMS\Snmptrap;
 
-use App\Models\Device;
-use LibreNMS\Interfaces\SnmptrapHandler;
-use LibreNMS\Snmptrap\Trap;
+use LibreNMS\Snmptrap\Handlers\Fallback;
 use Log;
 
-class Fallback implements SnmptrapHandler
+class Dispatcher
 {
-
     /**
-     * Handle snmptrap.
-     * Data is pre-parsed and delivered as a Trap.
+     * Instantiate the correct handler for this trap and call it's handle method
      *
-     * @param Device $device
-     * @param Trap $trap
-     * @return void
      */
-    public function handle(Device $device, Trap $trap)
+    public static function handle(Trap $trap)
     {
-        Log::info("Unhandled trap snmptrap", [
-            'device' => $device->hostname,
-            'oid' => $trap->getTrapOid()
-        ]);
+        if (empty($trap->getDevice())) {
+            Log::warning("Could not find device for trap", ['trap_text' => $trap->getRaw()]);
+            return false;
+        }
+
+        // note, this doesn't clear the resolved SnpmtrapHandler so only one per run
+        /** @var \LibreNMS\Interfaces\SnmptrapHandler $handler */
+        $handler = app(\LibreNMS\Interfaces\SnmptrapHandler::class, [$trap->getTrapOid()]);
+        $handler->handle($trap->getDevice(), $trap);
+
+        return !($handler instanceof Fallback);
     }
 }

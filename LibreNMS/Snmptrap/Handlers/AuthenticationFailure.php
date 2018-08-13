@@ -23,7 +23,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Snmptrap\Handler;
+namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
