@@ -44,11 +44,17 @@ class DeviceTest extends LaravelTestCase
         $this->assertEquals($device->device_id, $found->device_id, "Did not find the correct device");
     }
 
+    public function testFindByIpFail()
+    {
+        $found = Device::findByIp('this is not an ip');
+        $this->assertNull($found);
+    }
+
     public function testFindByIp()
     {
         $device = factory(Device::class)->create();
 
-        $found = Device::findByHostname($device->hostname);
+        $found = Device::findByIp($device->ip);
         $this->assertNotNull($found);
         $this->assertEquals($device->device_id, $found->device_id, "Did not find the correct device");
     }
@@ -58,7 +64,7 @@ class DeviceTest extends LaravelTestCase
         $ip = '192.168.234.32';
         $device = factory(Device::class)->create(['hostname' => $ip]);
 
-        $found = Device::findByHostname($device->hostname);
+        $found = Device::findByIp($ip);
         $this->assertNotNull($found);
         $this->assertEquals($device->device_id, $found->device_id, "Did not find the correct device");
     }
@@ -71,7 +77,7 @@ class DeviceTest extends LaravelTestCase
         $ipv4 = factory(Ipv4Address::class)->make(); // test ipv4 lookup of device
         $port->ipv4()->save($ipv4);
 
-        $found = Device::findByHostname($device->hostname);
+        $found = Device::findByIp($ipv4->ipv4_address);
         $this->assertNotNull($found);
         $this->assertEquals($device->device_id, $found->device_id, "Did not find the correct device");
     }
