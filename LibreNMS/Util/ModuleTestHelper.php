@@ -515,7 +515,7 @@ class ModuleTestHelper
         $save_vedbug = $vdebug;
         if ($this->quiet) {
             $debug = true;
-            $vdebug = false;
+            $vdebug = true;
         }
         ob_start();
 
@@ -543,7 +543,7 @@ class ModuleTestHelper
         // Run the poller
         if ($this->quiet) {
             $debug = true;
-            $vdebug = false;
+            $vdebug = true;
         }
         ob_start();
 

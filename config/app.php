@@ -166,6 +166,7 @@ return [
          * Package Service Providers...
          */
         Laravel\Tinker\TinkerServiceProvider::class,
+        Kamaln7\Toastr\ToastrServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -179,9 +180,9 @@ return [
         App\Providers\ViewServiceProvider::class,
 
         /*
-         * Vendor Service Providers...
+         * LibreNMS Service Providers...
          */
-        Kamaln7\Toastr\ToastrServiceProvider::class,
+        App\Providers\SnmptrapProvider::class,
     ],
 
     /*

@@ -36,8 +36,9 @@ class CliColorFormatter extends \Monolog\Formatter\LineFormatter
         $this->console = \App::runningInConsole();
 
         parent::__construct(
-            "%message%\n",
+            "%message% %context% %extra%\n",
             null,
+            true,
             true
         );
     }
@@ -51,6 +52,7 @@ class CliColorFormatter extends \Monolog\Formatter\LineFormatter
             } else {
                 $record['message'] = $this->console_color->strip($record['message']);
             }
+            unset($record['context']['color']);
         }
 
         return parent::format($record);

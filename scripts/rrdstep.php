@@ -52,8 +52,8 @@ if (empty($hostname)) {
 }
 
 $system_step      = Config::get('rrd.step', 300);
-$icmp_step        = Config::get('ping_rrd_step', $step);
-$system_heartbeat = Config::get('rrd.heartbeat', $step * 2);
+$icmp_step        = Config::get('ping_rrd_step', $system_step);
+$system_heartbeat = Config::get('rrd.heartbeat', $system_step * 2);
 $rrdtool          = Config::get('rrdtool', 'rrdtool');
 $tmp_path         = Config::get('temp_dir', '/tmp');
 

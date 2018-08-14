@@ -79,6 +79,7 @@ if (getenv('DBTEST')) {
     exec($cmd, $schema);
 
     Config::load(); // reload the config including database config
+    load_all_os();
 
     register_shutdown_function(function () use ($empty_db, $sql_mode) {
         global $config;

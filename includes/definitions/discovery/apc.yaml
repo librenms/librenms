@@ -400,12 +400,6 @@ modules:
                     index: 'airIRRP100UnitStatusCompressorDriveSpeed.{{ $index }}'
                     descr: 'Drive Speed'
                     divisor: 10
-                -
-                    oid: airIRRP500UnitStatusCompressorDriveSpeed
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.35.
-                    index: 'airIRRP500UnitStatusCompressorDriveSpeed.{{ $index }}'
-                    descr: 'Drive Speed'
-                    divisor: 10
         power:
             data:
                 -
@@ -426,12 +420,6 @@ modules:
                     index: 'airIRRP100UnitStatusCoolOutput.{{ $index }}'
                     descr: 'Cooling Output'
                     multiplier: 100
-                -
-                    oid: airIRRP500UnitStatusCompressorDrivePower
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.35.
-                    index: 'airIRRP500UnitStatusCompressorDrivePower.{{ $index }}'
-                    descr: 'Drive Power'
-                    multiplier: 10
                 -
                     oid: airIRRP500UnitStatusCoolDemand
                     num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.13.
