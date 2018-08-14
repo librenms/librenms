@@ -1,5 +1,15 @@
 <?php
 
-$version  = trim(snmp_get($device, '.1.3.6.1.4.1.2011.2.235.1.1.11.50.1.4.11.65.99.116.105.118.101.32.105.66.77.67', '-OQv'), '"');
-$hardware = trim(snmp_get($device, '.1.3.6.1.4.1.2011.2.235.1.1.1.6.0', '-OQv'), '"');
-$serial   = trim(snmp_get($device, '.1.3.6.1.4.1.2011.2.235.1.1.1.7.0', '-OQv'), '"');
+$oids = array (
+    'version' => 'firmwareVersion.11.65.99.116.105.118.101.32.105.66.77.67',   // firmwareVersion."Active iBMC"
+    'hardware'   => 'deviceName.0',
+    'serial' => 'deviceSerialNo.0'
+);
+
+$data = snmp_get_multi_oid($device, $oids, '-OUQs', 'HUAWEI-SERVER-IBMC-MIB');
+
+foreach ($oids as $var => $oid) {
+    $$var = $data[$oid];
+}
+
+unset($data, $oids);
