@@ -1,6 +1,6 @@
 <?php
 /**
- * LinkUp.php
+ * AuthenticationFailure.php
  *
  * -Description-
  *
@@ -23,14 +23,13 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Snmptrap\Handler;
+namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
-class LinkUp implements SnmptrapHandler
+class AuthenticationFailure implements SnmptrapHandler
 {
 
     /**
@@ -43,30 +42,8 @@ class LinkUp implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $ifIndex = $trap->getOidData($trap->findOid('IF-MIB::ifIndex'));
-
-        $port = $device->ports()->where('ifIndex', $ifIndex)->first();
-
-        if (!$port) {
-            Log::warning("Snmptrap linkUp: Could not find port at ifIndex $ifIndex for device: " . $device->hostname);
-            return;
-        }
-
-        $port->ifOperStatus = $trap->getOidData("IF-MIB::ifAdminStatus.$ifIndex");
-        $port->ifAdminStatus = $trap->getOidData("IF-MIB::ifOperStatus.$ifIndex");
-
+        //FIXME added device hostname format helper in some branch, use that when merged
         $device_array = $device->toArray();
-
-        log_event("SNMP Trap: linkUp $port->ifAdminStatus/$port->ifOperStatus " . $port->ifDescr, $device_array, "interface", 1, $port->port_id);
-
-        if ($port->isDirty('ifAdminStatus')) {
-            log_event("Interface Enabled : $port->ifDescr (TRAP)", $device_array, "interface", 3, $port->port_id);
-        }
-
-        if ($port->isDirty('ifOperStatus')) {
-            log_event("Interface went Up : $port->ifDescr (TRAP)", $device_array, "interface", 1, $port->port_id);
-        }
-
-        $port->save();
+        log_event('SNMP Trap: Authentication Failure: ' . format_hostname($device_array), $device_array, 'auth', 3, $device->hostname);
     }
 }

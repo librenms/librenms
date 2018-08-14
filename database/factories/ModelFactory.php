@@ -68,9 +68,12 @@ $factory->define(\App\Models\Ipv4Address::class, function (Faker\Generator $fake
     return [
         'ipv4_address' => $ip->uncompressed(),
         'ipv4_prefixlen' => $prefix,
+        'port_id' => function () {
+            return factory(\App\Models\Port::class)->create()->port_id;
+        },
         'ipv4_network_id' => function () use ($ip) {
             return factory(\App\Models\Ipv4Network::class)->create(['ipv4_network' => $ip->getNetworkAddress() . '/' . $ip->cidr])->ipv4_network_id;
-        }
+        },
     ];
 });
 

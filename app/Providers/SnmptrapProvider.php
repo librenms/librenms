@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Interfaces\SnmptrapHandler;
-use LibreNMS\Snmptrap\Handler\Fallback;
+use LibreNMS\Snmptrap\Handlers\Fallback;
 
 class SnmptrapProvider extends ServiceProvider
 {

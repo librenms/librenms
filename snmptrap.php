@@ -23,6 +23,6 @@ if (set_debug(isset($options['d']))) {
 }
 
 $text = stream_get_contents(STDIN);
-$trap = new \LibreNMS\Snmptrap\Trap($text);
 
-$trap->handle(); // create handle and send it this trap
+// create handle and send it this trap
+\LibreNMS\Snmptrap\Dispatcher::handle(new \LibreNMS\Snmptrap\Trap($text));

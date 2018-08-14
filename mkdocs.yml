@@ -145,6 +145,7 @@ pages:
           - Developing/os/Custom-Graphs.md
           - Developing/os/Settings.md
           - Developing/Sensor-State-Support.md
+      - Developing/SNMP-Traps.md
       - Developing/Dynamic-Config.md
       - Developing/Merging-Pull-Requests.md
       - Developing/Creating-Release.md
