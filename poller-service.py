@@ -55,6 +55,7 @@ class DB:
     def __init__(self):
         self.in_use = threading.Lock()
         self.connect()
+        self.query("SET SQL_MODE = ''")
 
     def connect(self):
         self.in_use.acquire(True)

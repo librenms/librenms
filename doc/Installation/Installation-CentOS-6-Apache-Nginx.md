@@ -61,8 +61,6 @@ If you are deploying a separate database server, you also need to specify the `b
 
     bind-address = <ip>
 
-If you see a line that starts `sql-mode` then change this to `sql-mode=""`.
-
 Save, and restart MySQL/MariaDB to apply your changes:
 
     service mysqld restart
