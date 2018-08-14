@@ -105,12 +105,16 @@ class Eloquent
     public static function isConnected()
     {
         try {
-            self::DB()->getPdo();
-
-            return true;
-        } catch (\Exception $e) {
+            $conn = self::DB();
+            if ($conn) {
+                $conn->getPdo();
+                return true;
+            }
+        } catch (\PDOException $e) {
             return false;
         }
+
+        return false;
     }
 
     /**
