@@ -1,11 +1,4 @@
 <?php
-/**
- *
- * SmOs.php
- * SIAE Microelettronica SM-OS Wireless Sensors for LibreNMS
- * Author: C. Hill (cory@metavrs.com)
- *
- */
 
 namespace LibreNMS\OS;
 
@@ -26,19 +19,20 @@ class SmOs extends OS implements
         $sensors = array();
 
         foreach ($oids as $index => $entry) {
-            $sensors[] = new WirelessSensor('rssi', $this->getDeviceId(), '.1.3.6.1.4.1.3373.1103.80.12.1.3.' . $index, 'sm-os', $index, 'RSSI Radio ' . $index);
+            $sensors[] = new WirelessSensor('rssi', $this->getDeviceId(),
+                '.1.3.6.1.4.1.3373.1103.80.12.1.3.' . $index, 'sm-os', $index, 'RSSI Radio ' . $index);
         }
         return $sensors;
     }
 
     public function discoverWirelessFrequency()
     {
-
         $oids = snmpwalk_cache_oid($this->getDevice(), 'radioTxFrequency', array(), 'SIAE-RADIO-SYSTEM-MIB');
         $sensors = array();
 
         foreach ($oids as $index => $entry) {
-            $sensors[] = new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.3373.1103.80.9.1.4.' . $index, 'sm-os', $index, 'Tx Frequency ' . $index);
+            $sensors[] = new WirelessSensor('frequency', $this->getDeviceId(),
+                '.1.3.6.1.4.1.3373.1103.80.9.1.4.' . $index, 'sm-os', $index, 'Tx Frequency ' . $index);
         }
         return $sensors;
     }
@@ -49,7 +43,8 @@ class SmOs extends OS implements
         $sensors = array();
 
         foreach ($oids as $index => $entry) {
-            $sensors[] = new WirelessSensor('mse', $this->getDeviceId(), '.1.3.6.1.4.1.3373.1103.80.12.1.5.' . $index, 'sm-os', $index, 'MSE Radio ' . $index);
+            $sensors[] = new WirelessSensor('mse', $this->getDeviceId(),
+                '.1.3.6.1.4.1.3373.1103.80.12.1.5.' . $index, 'sm-os', $index, 'MSE Radio ' . $index);
         }
         return $sensors;
     }
