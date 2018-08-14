@@ -976,3 +976,6 @@ $config['api']['cors']['allowheaders'] = array('Origin', 'X-Requested-With', 'Co
 
 // Disk
 $config['bad_disk_regexp'] = [];
+
+// Snmptrap logging: none, unhandled, all
+$config['snmptraps']['eventlog'] = 'unhandled';

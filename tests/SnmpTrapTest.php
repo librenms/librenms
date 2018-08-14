@@ -30,6 +30,7 @@ use App\Models\Device;
 use App\Models\Ipv4Address;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 
 class SnmpTrapTest extends LaravelTestCase
@@ -41,7 +42,7 @@ class SnmpTrapTest extends LaravelTestCase
         $trapText = "Garbage\n";
 
         $trap = new Trap($trapText);
-        $this->assertFalse($trap->handle(), 'Found handler for trap with no snmpTrapOID');
+        $this->assertFalse(Dispatcher::handle($trap), 'Found handler for trap with no snmpTrapOID');
     }
 
     public function testFindByIp()
@@ -57,7 +58,7 @@ UDP: [$ipv4->ipv4_address]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91\n";
 
         $trap = new Trap($trapText);
-        $this->assertFalse($trap->handle(), 'Found handler for trap with no snmpTrapOID');
+        $this->assertFalse(Dispatcher::handle($trap), 'Found handler for trap with no snmpTrapOID');
 
         // check that the device was found
         $this->assertEquals($device->hostname, $trap->getDevice()->hostname);
@@ -73,7 +74,7 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
 SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::authenticationFailure\n";
 
         $trap = new Trap($trapText);
-        $this->assertTrue($trap->handle());
+        $this->assertTrue(Dispatcher::handle($trap));
 
         // check that the device was found
         $this->assertEquals($device->hostname, $trap->getDevice()->hostname);
@@ -97,7 +98,7 @@ BGP4-MIB::bgpPeerLastError.$bgppeer->bgpPeerIdentifier \"04 00 \"
 BGP4-MIB::bgpPeerState.$bgppeer->bgpPeerIdentifier established\n";
 
         $trap = new Trap($trapText);
-        $this->assertTrue($trap->handle(), 'Could not handle bgpEstablished');
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle bgpEstablished');
 
         $bgppeer = $bgppeer->fresh(); // refresh from database
         $this->assertEquals($bgppeer->bgpPeerState, 'established');
@@ -117,7 +118,7 @@ BGP4-MIB::bgpPeerLastError.$bgppeer->bgpPeerIdentifier \"04 00 \"
 BGP4-MIB::bgpPeerState.$bgppeer->bgpPeerIdentifier idle\n";
 
         $trap = new Trap($trapText);
-        $this->assertTrue($trap->handle(), 'Could not handle bgpBackwardTransition');
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle bgpBackwardTransition');
 
         $bgppeer = $bgppeer->fresh(); // refresh from database
         $this->assertEquals($bgppeer->bgpPeerState, 'idle');
@@ -142,7 +143,7 @@ IF-MIB::ifType.$port->ifIndex ethernetCsmacd
 OLD-CISCO-INTERFACES-MIB::locIfReason.$port->ifIndex \"down\"\n";
 
         $trap = new Trap($trapText);
-        $this->assertTrue($trap->handle(), 'Could not handle linkDown');
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle linkDown');
 
 
         $port = $port->fresh(); // refresh from database
@@ -169,7 +170,7 @@ IF-MIB::ifType.$port->ifIndex ethernetCsmacd
 OLD-CISCO-INTERFACES-MIB::locIfReason.$port->ifIndex \"up\"\n";
 
         $trap = new Trap($trapText);
-        $this->assertTrue($trap->handle(), 'Could not handle linkUp');
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle linkUp');
 
         $port = $port->fresh(); // refresh from database
         $this->assertEquals($port->ifAdminStatus, 'up');

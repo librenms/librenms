@@ -1,6 +1,6 @@
 <?php
 /**
- * BgpEstablished.php
+ * Fallback.php
  *
  * -Description-
  *
@@ -23,15 +23,16 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Snmptrap\Handler;
+namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 use Log;
 
-class BgpEstablished implements SnmptrapHandler
+class Fallback implements SnmptrapHandler
 {
+
     /**
      * Handle snmptrap.
      * Data is pre-parsed and delivered as a Trap.
@@ -42,22 +43,9 @@ class BgpEstablished implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $state_oid = $trap->findOid('BGP4-MIB::bgpPeerState');
-        $bgpPeerIp = substr($state_oid, 23);
-
-        $bgpPeer = $device->bgppeers()->where('bgpPeerIdentifier', $bgpPeerIp)->first();
-
-        if (!$bgpPeer) {
-            Log::error('Unknown bgp peer handling bgpEstablished trap: ' . $bgpPeerIp);
-            return;
-        }
-
-        $bgpPeer->bgpPeerState = $trap->getOidData($state_oid);
-
-        if ($bgpPeer->isDirty('bgpPeerState')) {
-            log_event('SNMP Trap: BGP Up ' . $bgpPeer->bgpPeerIdentifier . ' ' . get_astext($bgpPeer->bgpPeerRemoteAs) . ' is now ' . $bgpPeer->bgpPeerState, $device->toArray(), 'bgpPeer', 1, $bgpPeerIp);
-        }
-
-        $bgpPeer->save();
+        Log::info("Unhandled trap snmptrap", [
+            'device' => $device->hostname,
+            'oid' => $trap->getTrapOid()
+        ]);
     }
 }
