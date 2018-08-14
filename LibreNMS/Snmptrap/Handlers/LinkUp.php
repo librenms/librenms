@@ -1,6 +1,6 @@
 <?php
 /**
- * BgpBackwardTransition.php
+ * LinkUp.php
  *
  * -Description-
  *
@@ -23,15 +23,16 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Snmptrap\Handler;
+namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 use Log;
 
-class BgpBackwardTransition implements SnmptrapHandler
+class LinkUp implements SnmptrapHandler
 {
+
     /**
      * Handle snmptrap.
      * Data is pre-parsed and delivered as a Trap.
@@ -42,22 +43,30 @@ class BgpBackwardTransition implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $state_oid = $trap->findOid('BGP4-MIB::bgpPeerState');
-        $bgpPeerIp = substr($state_oid, 23);
+        $ifIndex = $trap->getOidData($trap->findOid('IF-MIB::ifIndex'));
 
-        $bgpPeer = $device->bgppeers()->where('bgpPeerIdentifier', $bgpPeerIp)->first();
+        $port = $device->ports()->where('ifIndex', $ifIndex)->first();
 
-        if (!$bgpPeer) {
-            Log::error('Unknown bgp peer handling bgpEstablished trap: ' . $bgpPeerIp);
+        if (!$port) {
+            Log::warning("Snmptrap linkUp: Could not find port at ifIndex $ifIndex for device: " . $device->hostname);
             return;
         }
 
-        $bgpPeer->bgpPeerState = $trap->getOidData($state_oid);
+        $port->ifOperStatus = $trap->getOidData("IF-MIB::ifAdminStatus.$ifIndex");
+        $port->ifAdminStatus = $trap->getOidData("IF-MIB::ifOperStatus.$ifIndex");
 
-        if ($bgpPeer->isDirty('bgpPeerState')) {
-            log_event('SNMP Trap: BGP Down ' . $bgpPeer->bgpPeerIdentifier . ' ' . get_astext($bgpPeer->bgpPeerRemoteAs) . ' is now ' . $bgpPeer->bgpPeerState, $device->toArray(), 'bgpPeer', 5, $bgpPeerIp);
+        $device_array = $device->toArray();
+
+        log_event("SNMP Trap: linkUp $port->ifAdminStatus/$port->ifOperStatus " . $port->ifDescr, $device_array, "interface", 1, $port->port_id);
+
+        if ($port->isDirty('ifAdminStatus')) {
+            log_event("Interface Enabled : $port->ifDescr (TRAP)", $device_array, "interface", 3, $port->port_id);
         }
 
-        $bgpPeer->save();
+        if ($port->isDirty('ifOperStatus')) {
+            log_event("Interface went Up : $port->ifDescr (TRAP)", $device_array, "interface", 1, $port->port_id);
+        }
+
+        $port->save();
     }
 }
