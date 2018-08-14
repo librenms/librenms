@@ -100,8 +100,10 @@ if (empty($total)) {
     $total = 0;
 }
 
-if (!isset($sort) || empty($sort)) {
+if (!isset($vars['sort']) || empty($vars['sort'])) {
     $sort = 'timestamp DESC';
+} else {
+    $sort = '`alert_rules`.`severity` DESC, timestamp DESC';
 }
 
 $sql .= " ORDER BY $sort";

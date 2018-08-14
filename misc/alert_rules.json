@@ -34,12 +34,12 @@
     "default": true
   },
   {
-    "rule": "sensors.sensor_current > sensors.sensor_limit && sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
+    "rule": "sensors.sensor_current > `sensors.sensor_limit` && sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
     "name": "Sensor over limit - Check Device Health Settings",
     "default": true
   },
   {
-    "rule": "sensors.sensor_current < sensors.sensor_limit_low && sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
+    "rule": "sensors.sensor_current < `sensors.sensor_limit_low` && sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
     "name": "Sensor under limit - Check Device Health Settings",
     "default": true
   },
@@ -49,12 +49,12 @@
     "default": true
   },
   {
-    "rule": "wireless_sensors.sensor_current >= wireless_sensors.sensor_limit && wireless_sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
+    "rule": "wireless_sensors.sensor_current >= `wireless_sensors.sensor_limit` && wireless_sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
     "name": "Wireless Sensor over limit",
     "default": true
   },
   {
-    "rule": "wireless_sensors.sensor_current <= wireless_sensors.sensor_limit_low && wireless_sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
+    "rule": "wireless_sensors.sensor_current <= `wireless_sensors.sensor_limit_low` && wireless_sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
     "name": "Wireless Sensor under limit",
     "default": true
   },
@@ -348,9 +348,21 @@
    "rule": "sensors.sensor_current ~ \"10\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.5.4.600.50.1.5\"",
    "name": "Dell iDRAC Battery Status Failed"
    },
-  {
+   {
    "rule": "sensors.sensor_current ~ \"[5|6]\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.2.2.1\"",
    "name": "Dell iDRAC Global System Status Critical/NonRecoverable"
+   },
+   {
+    "rule": "devices.os = \"Netscaler\" && sensors.sensor_type = \"sysHighAvailabilityMode\" && sensors.sensor_current != `sensors.sensor_prev` && sensors.lastupdate < \"DATE_SUB(NOW(),INTERVAL 5 MINUTE)\" && macros.device_up = \"1\"",
+    "name": "Netscaler HA node mode change"
+   },
+   {
+    "rule": "devices.os = \"Netscaler\" && sensors.sensor_type = \"haCurState\" && sensors.sensor_current ~ \"[1|8|9]\" && macros.device_up = \"1\"",
+    "name": "Netscaler HA node state Warning"
+   },
+   {
+    "rule": "devices.os = \"Netscaler\" && sensors.sensor_type = \"haCurState\" && sensors.sensor_current ~ \"[2|4|5|7|10|11]\" && macros.device_up = \"1\"",
+    "name": "Netscaler HA node state Critical"
    }
 
   ]

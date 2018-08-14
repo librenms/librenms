@@ -23,13 +23,23 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Dummy implements Transport
+class Dummy extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
         var_dump($obj);
         return true;
+    }
+
+    public function contactDummy()
+    {
+        return true;
+    }
+
+    public static function configTemplate()
+    {
+        return [];
     }
 }

@@ -164,6 +164,7 @@ Runs billing as well as polling for group 0.
 */5 * * * * librenms /opt/librenms/poller-wrapper.py 16 >> /opt/librenms/logs/wrapper.log
 */5 * * * * librenms /opt/librenms/poll-billing.php >> /dev/null 2>&1
 01  * * * * librenms /opt/librenms/billing-calculate.php >> /dev/null 2>&1
+15  0 * * * librenms    /opt/librenms/daily.sh >> /dev/null 2>&1
 ```
 
 Poller 3:
@@ -183,7 +184,9 @@ $config['update']                            = 0;
 `/etc/cron.d/librenms`
 Runs discovery and polling for groups 2 and 3.
 ```conf
-33   */6  * * *   librenms    /opt/librenms/cronic /opt/librenms/discovery-wrapper.py 1
-*/5  *    * * *   librenms    /opt/librenms/discovery.php -h new >> /dev/null 2>&1
-*/5  *    * * *   librenms    /opt/librenms/cronic /opt/librenms/poller-wrapper.py 16
+33  */6 * * *   librenms    /opt/librenms/cronic /opt/librenms/discovery-wrapper.py 1
+*/5 *   * * *   librenms    /opt/librenms/discovery.php -h new >> /dev/null 2>&1
+*/5 *   * * *   librenms    /opt/librenms/cronic /opt/librenms/poller-wrapper.py 16
+15  0   * * *   librenms    /opt/librenms/daily.sh >> /dev/null 2>&1
+
 ```

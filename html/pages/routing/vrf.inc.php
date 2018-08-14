@@ -1,94 +1,70 @@
 <?php
 
 use LibreNMS\Authentication\Auth;
+use LibreNMS\Exceptions\InvalidIpException;
 
-if (Auth::user()->hasGlobalRead()) {
-    if (!isset($_GET['optb'])) {
-        $_GET['optb'] = 'all';
-    }
-
-    if (!isset($_GET['optc'])) {
-        $_GET['optc'] = 'basic';
-    }
+if (!Auth::user()->hasGlobalRead()) {
+    include 'includes/error-no-perm.inc.php';
+} else {
+    $link_array = array(
+        'page'     => 'routing',
+        'protocol' => 'vrf',
+    );
 
     print_optionbar_start();
 
-    echo '<span style="font-weight: bold;">VRF</span> &#187; ';
+    echo "<span style='font-weight: bold;'>VRFs</span> &#187; ";
 
-    if ($_GET['opta'] == 'vrf' && $_GET['optb'] == 'all') {
-        echo "<span class='pagemenu-selected'>";
+    $menu_options = array('basic' => 'Basic',
+                );
+
+    if (!$vars['view']) {
+        $vars['view'] = 'basic';
     }
 
-    echo '<a href="routing/vrf/all/'.$_GET['optc'].'/">All</a>';
-    if ($_GET['opta'] == 'vrf' && $_GET['optb'] == 'all') {
-        echo '</span>';
+    $sep = '';
+    foreach ($menu_options as $option => $text) {
+        if ($vars['view'] == $option) {
+            echo "<span class='pagemenu-selected'>";
+        }
+
+        echo generate_link($text, $link_array, array('view' => $option));
+        if ($vars['view'] == $option) {
+            echo '</span>';
+        }
+
+        echo ' | ';
     }
 
-    echo ' | ';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'basic') {
-        echo "<span class='pagemenu-selected'>";
-    }
+    unset($sep);
 
-    echo '<a href="routing/vrf/'.$_GET['optb'].'/basic/">Basic</a>';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'basic') {
-        echo '</span>';
-    }
+    echo ' Graphs: ';
 
-    echo ' | ';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'details') {
-        echo "<span class='pagemenu-selected'>";
-    }
+    $graph_types = array(
+                'bits'      => 'Bits',
+                'upkts'     => 'Unicast Packets',
+                'nupkts'    => 'Non-Unicast Packets',
+                'errors'    => 'Errors',
+                'etherlike' => 'Etherlike',
+               );
 
-    echo '<a href="routing/vrf/'.$_GET['optb'].'/details/">Details</a>';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'details') {
-        echo '</span>';
+    foreach ($graph_types as $type => $descr) {
+        echo "$type_sep";
+        if ($vars['graph'] == $type) {
+            echo "<span class='pagemenu-selected'>";
+        }
+        
+        echo generate_link($descr, $link_array, array('view' => 'graphs', 'graph' => $type));
+        if ($vars['graph'] == $type) {
+            echo '</span>';
+        }
+        
+        $type_sep = ' | ';
     }
-
-    echo ' | Graphs: ( ';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'bits') {
-        echo "<span class='pagemenu-selected'>";
-    }
-
-    echo '<a href="routing/vrf/'.$_GET['optb'].'/bits/">Bits</a>';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'bits') {
-        echo '</span>';
-    }
-
-    echo ' | ';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'upkts') {
-        echo "<span class='pagemenu-selected'>";
-    }
-
-    echo '<a href="routing/vrf/'.$_GET['optb'].'/upkts/">Packets</a>';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'upkts') {
-        echo '</span>';
-    }
-
-    echo ' | ';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'nupkts') {
-        echo "<span class='pagemenu-selected'>";
-    }
-
-    echo '<a href="routing/vrf/'.$_GET['optb'].'/nupkts/">NU Packets</a>';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'nupkts') {
-        echo '</span>';
-    }
-
-    echo ' | ';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'errors') {
-        echo "<span class='pagemenu-selected'>";
-    }
-
-    echo '<a href="routing/vrf/'.$_GET['optb'].'/errors/">Errors</a>';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'errors') {
-        echo '</span>';
-    }
-
-    echo ' )';
 
     print_optionbar_end();
 
-    if ($_GET['optb'] == 'all') {
+    if ($vars['view'] == 'basic' || $vars['view'] == 'graphs') {
         // Pre-Cache in arrays
         // That's heavier on RAM, but much faster on CPU (1:40)
         // Specifying the fields reduces a lot the RAM used (1:4) .
@@ -123,7 +99,10 @@ if (Auth::user()->hasGlobalRead()) {
             }
 
             echo "<tr valign=top bgcolor='$bg_colour'>";
-            echo "<td width=240><a class=list-large href='routing/vrf/".$vrf['mplsVpnVrfRouteDistinguisher'].'/'.$_GET['optc']."/'>".$vrf['vrf_name'].'</a><br /><span class=box-desc>'.$vrf['mplsVpnVrfDescription'].'</span></td>';
+            echo "<td width=240>";
+            echo "<a class=list-large href=".generate_url($vars, array('view' => 'detail', 'vrf' => $vrf['vrf_name'] )).">";
+            echo $vrf['vrf_name'].'</a><br />';
+            echo "<span class=box-desc>".$vrf['mplsVpnVrfDescription'].'</span></td>';
             echo '<td width=100 class=box-desc>'.$vrf['mplsVpnVrfRouteDistinguisher'].'</td>';
             echo '<td><table border=0 cellspacing=0 cellpadding=5 width=100%>';
             $x = 1;
@@ -142,7 +121,12 @@ if (Auth::user()->hasGlobalRead()) {
                     }
                 }
 
-                echo "<tr bgcolor='$dev_colour'><td width=150>".generate_device_link($device, shorthost($device['hostname']));
+                echo "<tr bgcolor='$dev_colour'><td width=150><a href='";
+                echo generate_url(
+                    array('page' => 'device'),
+                    array('tab' => 'routing', 'view' => 'basic', 'proto' => 'vrf', 'device' => $device['device_id'])
+                );
+                echo "'>".$device['hostname']."</a> ";
 
                 if ($device['vrf_name'] != $vrf['vrf_name']) {
                     echo "<a href='#' onmouseover=\" return overlib('Expected Name : ".$vrf['vrf_name'].'<br />Configured : '.$device['vrf_name']."', CAPTION, '<span class=list-large>VRF Inconsistency</span>' ,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\"> <i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i></a>";
@@ -155,7 +139,7 @@ if (Auth::user()->hasGlobalRead()) {
                     $port = cleanPort($port);
                     $port = array_merge($device, $port);
 
-                    switch ($_GET['optc']) {
+                    switch ($vars['graph']) {
                         case 'bits':
                         case 'upkts':
                         case 'nupkts':
@@ -165,7 +149,7 @@ if (Auth::user()->hasGlobalRead()) {
                             $port['from']       = $config['time']['day'];
                             $port['to']         = $config['time']['now'];
                             $port['bg']         = '#'.$bg;
-                            $port['graph_type'] = 'port_'.$_GET['optc'];
+                            $port['graph_type'] = 'port_'.$vars['graph'];
                             echo "<div style='display: block; padding: 3px; margin: 3px; min-width: 135px; max-width:135px; min-height:75px; max-height:75px;
                             text-align: center; float: left; background-color: ".$config['list_colour']['odd_alt2'].";'>
                                 <div style='font-weight: bold;'>".makeshortif($port['ifDescr']).'</div>';
@@ -188,55 +172,8 @@ if (Auth::user()->hasGlobalRead()) {
             echo '</table></td>';
             $i++;
         }//end foreach
-
         echo '</table></div>';
-    } else {
-        echo "<div style='background: {$config['list_colour']['even']}; padding: 10px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>";
-        $vrf = dbFetchRow('SELECT * FROM `vrfs` WHERE mplsVpnVrfRouteDistinguisher = ?', array($_GET['optb']));
-        echo "<tr valign=top bgcolor='$bg_colour'>";
-        echo "<td width=200 class=list-large><a href='routing/vrf/".$vrf['mplsVpnVrfRouteDistinguisher'].'/'.$_GET['optc']."/'>".$vrf['vrf_name'].'</a></td>';
-        echo '<td width=100 class=box-desc>'.$vrf['mplsVpnVrfRouteDistinguisher'].'</td>';
-        echo '<td width=200 class=box-desc>'.$vrf['mplsVpnVrfDescription'].'</td>';
-        echo '</table></div>';
-
-        $x = 0;
-
-        $devices = dbFetchRows('SELECT * FROM `vrfs` AS V, `devices` AS D WHERE `mplsVpnVrfRouteDistinguisher` = ? AND D.device_id = V.device_id', array($vrf['mplsVpnVrfRouteDistinguisher']));
-        foreach ($devices as $device) {
-            $hostname = $device['hostname'];
-
-            echo '<div>';
-            include 'includes/device-header.inc.php';
-            echo '</div>';
-
-            unset($seperator);
-            echo '<div style="margin: 0 0 0 60px;"><table cellspacing=0 cellpadding=7>';
-            $i = 1;
-            foreach (dbFetchRows('SELECT * FROM `ports` WHERE `ifVrf` = ? AND `device_id` = ?', array($device['vrf_id'], $device['device_id'])) as $interface) {
-                if (($x % 2)) {
-                    if (($i % 2) === 0) {
-                        $int_colour = $config['list_colour']['even_alt2'];
-                    } else {
-                        $int_colour = $config['list_colour']['even_alt'];
-                    }
-                } else {
-                    if (($i % 2) === 0) {
-                        $int_colour = $config['list_colour']['odd_alt'];
-                    } else {
-                        $int_colour = $config['list_colour']['odd_alt2'];
-                    }
-                }
-
-                include 'includes/print-interface.inc.php';
-
-                $i++;
-            }//end foreach
-
-            $x++;
-            echo '</table></div>';
-            echo "<div style='height: 10px;'></div>";
-        }//end foreach
+    } elseif ($vars['view'] == 'detail') {
+        echo "Not Implemented";
     }//end if
-} else {
-    include 'includes/error-no-perm.inc.php';
 } //end if

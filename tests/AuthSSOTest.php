@@ -32,6 +32,7 @@ class AuthSSOTest extends DBTestCase
 {
     private $last_user = null;
     private $original_auth_mech = null;
+    private $server;
 
     public function setUp()
     {
@@ -40,6 +41,8 @@ class AuthSSOTest extends DBTestCase
 
         $this->original_auth_mech = $config['auth_mechanism'];
         $config['auth_mechanism'] = 'sso';
+
+        $this->server = $_SERVER;
     }
 
     // Set up an SSO config for tests
@@ -503,5 +506,7 @@ class AuthSSOTest extends DBTestCase
         $config['auth_mechanism'] = $this->original_auth_mech;
         unset($config['sso']);
         $this->breakUser();
+
+        $_SERVER = $this->server;
     }
 }

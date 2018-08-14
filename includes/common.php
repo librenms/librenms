@@ -610,7 +610,7 @@ function format_si($value, $round = '2', $sf = '3')
         $value = $value * -1;
     }
 
-        return number_format(round($value, $round), $sf, '.', '').$ext;
+    return number_format(round($value, $round), $sf, '.', '').$ext;
 }
 
 function format_bi($value, $round = '2', $sf = '3')
@@ -667,14 +667,15 @@ function is_valid_hostname($hostname)
  */
 function d_echo($text, $no_debug_text = null)
 {
-    global $debug, $php_debug;
-    if ($debug) {
-        if (isset($php_debug)) {
-            $php_debug[] = $text;
-        } else {
-            print_r($text);
-        }
-    } elseif ($no_debug_text) {
+    global $debug;
+
+    if (class_exists('\Log')) {
+        \Log::debug(is_string($text) ? rtrim($text) : $text);
+    } elseif ($debug) {
+        print_r($text);
+    }
+
+    if (!$debug && $no_debug_text) {
         echo "$no_debug_text";
     }
 } // d_echo
@@ -1025,11 +1026,10 @@ function object_is_cached($section, $obj)
  * attributes
  * @param array $attribs Device attributes
  * @return bool
-**/
+ **/
 function can_ping_device($attribs)
 {
-    global $config;
-    if ($config['icmp_check'] === true && $attribs['override_icmp_disable'] != "true") {
+    if (Config::get('icmp_check') && !(isset($attribs['override_icmp_disable']) && $attribs['override_icmp_disable'] == "true")) {
         return true;
     } else {
         return false;
@@ -1103,7 +1103,7 @@ Set <code>$config[\'poller_modules\'][\'mib\'] = 1;</code> in <code>config.php</
  * Constructs the path to an RRD for the Ceph application
  * @param string $gtype The type of rrd we're looking for
  * @return string
-**/
+ **/
 function ceph_rrd($gtype)
 {
     global $device;
@@ -1122,7 +1122,7 @@ function ceph_rrd($gtype)
  * Parse location field for coordinates
  * @param string location The location field to look for coords in.
  * @return array Containing the lat and lng coords
-**/
+ **/
 function parse_location($location)
 {
     preg_match('/(\[)(-?[0-9\. ]+),[ ]*(-?[0-9\. ]+)(\])/', $location, $tmp_loc);
@@ -1172,10 +1172,10 @@ function version_info($remote = false)
 }//end version_info()
 
 /**
-* Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.
-* @param string $ip A binary string containing an IP address, as returned from MySQL's INET6_ATON function
-* @return string Empty if not valid.
-*/
+ * Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.
+ * @param string $ip A binary string containing an IP address, as returned from MySQL's INET6_ATON function
+ * @return string Empty if not valid.
+ */
 // Fuction is from http://uk3.php.net/manual/en/function.inet-ntop.php
 function inet6_ntop($ip)
 {
@@ -1219,17 +1219,12 @@ function format_hostname($device, $hostname = null)
  */
 function get_port_assoc_modes()
 {
-    return dbFetchColumn("SELECT `name` FROM `port_association_mode` ORDER BY pom_id");
-}
-
-/**
- * Validate port_association_mode
- * @param string $port_assoc_mode
- * @return bool
- */
-function is_valid_port_assoc_mode($port_assoc_mode)
-{
-    return in_array($port_assoc_mode, get_port_assoc_modes());
+    return [
+        1 => 'ifIndex',
+        2 => 'ifName',
+        3 => 'ifDescr',
+        4 => 'ifAlias',
+    ];
 }
 
 /**
@@ -1239,7 +1234,9 @@ function is_valid_port_assoc_mode($port_assoc_mode)
  */
 function get_port_assoc_mode_id($port_assoc_mode)
 {
-    return (int)dbFetchCell("SELECT `pom_id` FROM `port_association_mode` WHERE name = ?", array ($port_assoc_mode));
+    $modes = array_flip(get_port_assoc_modes());
+
+    return isset($modes[$port_assoc_mode]) ? $modes[$port_assoc_mode] : false;
 }
 
 /**
@@ -1249,7 +1246,9 @@ function get_port_assoc_mode_id($port_assoc_mode)
  */
 function get_port_assoc_mode_name($port_assoc_mode_id)
 {
-    return dbFetchCell("SELECT `name` FROM `port_association_mode` WHERE pom_id = ?", array ($port_assoc_mode_id));
+    $modes = get_port_assoc_modes();
+
+    return isset($modes[$port_assoc_mode_id]) ? $modes[$port_assoc_mode_id] : false;
 }
 
 /**
@@ -1568,7 +1567,7 @@ function load_os(&$device)
     }
 
     // Set type to a predefined type for the OS if it's not already set
-    if ($device['attribs']['override_device_type'] != 1 && $config['os'][$device['os']]['type'] != $device['type']) {
+    if ((!isset($device['attribs']['override_device_type']) && $device['attribs']['override_device_type'] != 1) && $config['os'][$device['os']]['type'] != $device['type']) {
         log_event('Device type changed ' . $device['type'] . ' => ' . $config['os'][$device['os']]['type'], $device, 'system', 3);
         $device['type'] = $config['os'][$device['os']]['type'];
         dbUpdate(array('type' => $device['type']), 'devices', 'device_id=?', array($device['device_id']));
@@ -1684,11 +1683,11 @@ function uw_to_dbm($value)
  */
 function set_null($value, $default = null, $min = null)
 {
-    if (is_nan($value)) {
+    if (!is_numeric($value)) {
+        return $default;
+    } elseif (is_nan($value)) {
         return $default;
     } elseif (is_infinite($value)) {
-        return $default;
-    } elseif (!is_numeric($value)) {
         return $default;
     } elseif (isset($min) && $value < $min) {
         return $default;
@@ -1702,10 +1701,9 @@ function set_null($value, $default = null, $min = null)
  */
 function set_numeric($value, $default = 0)
 {
-    if (is_nan($value) ||
-        is_infinite($value) ||
-        !isset($value) ||
-        !is_numeric($value)
+    if (!is_numeric($value) ||
+        is_nan($value) ||
+        is_infinite($value)
     ) {
         $value = $default;
     }

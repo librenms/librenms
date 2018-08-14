@@ -11,19 +11,30 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Ciscospark implements Transport
+class Ciscospark extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        $token  = $opts['token'];
-        $roomId = $opts['roomid'];
-        $text   = strip_tags($obj['msg']);
-        $data   = array(
-            'roomId' => $roomId,
+        if (empty($this->config)) {
+            $room_id = $opts['roomid'];
+            $token = $opts['token'];
+        } else {
+            $room_id = $this->config['room-id'];
+            $token = $this->config['api-token'];
+        }
+        return $this->contactCiscospark($obj, $room_id, $token);
+    }
+
+    public function contactCiscospark($obj, $room_id, $token)
+    {
+        $text = strip_tags($obj['msg']);
+        $data = array (
+            'roomId' => $room_id,
             'text' => $text
         );
+
         $curl   = curl_init();
         set_curl_proxy($curl);
         curl_setopt($curl, CURLOPT_URL, 'https://api.ciscospark.com/v1/messages');
@@ -38,10 +49,33 @@ class Ciscospark implements Transport
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
         if ($code != 200) {
-            var_dump("Cisco Spark returned Error, retry later");
+            echo("Cisco Spark returned Error, retry later\r\n");
             return false;
         }
-
         return true;
+    }
+
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'API Token',
+                    'name' => 'api-token',
+                    'descr' => 'CiscoSpark API Token',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'RoomID',
+                    'name' => 'room-id',
+                    'descr' => 'CiscoSpark Room ID',
+                    'type' => 'text',
+                ]
+            ],
+            'validation' => [
+                'api-token' => 'required|string',
+                'room-id' => 'required|string'
+            ]
+        ];
     }
 }

@@ -44,8 +44,8 @@ $rule_id      = $_POST['rule_id'];
 $count        = mres($_POST['count']);
 $delay        = mres($_POST['delay']);
 $interval     = mres($_POST['interval']);
-$mute         = mres($_POST['mute']);
-$invert       = mres($_POST['invert']);
+$mute         = mres(isset($_POST['mute']) ? $_POST['mute'] : null);
+$invert       = mres(isset($_POST['invert']) ? $_POST['invert'] : null);
 $name         = mres($_POST['name']);
 $proc         = mres($_POST['proc']);
 $recovery     = ($vars['recovery']);
@@ -138,7 +138,7 @@ if (is_numeric($rule_id) && $rule_id > 0) {
 if (is_numeric($rule_id) && $rule_id > 0) {
     $devices = [];
     $groups = [];
-    foreach ((array)$_POST['maps'] as $item) {
+    foreach ((array)$vars['maps'] as $item) {
         if (starts_with($item, 'g')) {
             $groups[] = (int)substr($item, 1);
         } else {
@@ -148,9 +148,60 @@ if (is_numeric($rule_id) && $rule_id > 0) {
 
     dbSyncRelationship('alert_device_map', 'rule_id', $rule_id, 'device_id', $devices);
     dbSyncRelationship('alert_group_map', 'rule_id', $rule_id, 'group_id', $groups);
+
+    //Update transport groups and transports - can't use dbSyncRelationship
+    $transports = [];
+    $groups = [];
+    foreach ((array)$vars['transports'] as $item) {
+        if (starts_with($item, 'g')) {
+            $groups[] = (int)substr($item, 1);
+        } else {
+            $transports[] = (int)$item;
+        }
+    }
+    
+    // Fetch transport/group mappings already in db
+    $sql = "SELECT `transport_or_group_id` FROM `alert_transport_map` WHERE `target_type`='single' AND `rule_id`=?";
+    $db_transports = dbFetchColumn($sql, [$rule_id]);
+    $sql = "SELECT `transport_or_group_id` FROM `alert_transport_map` WHERE `target_type`='group' AND `rule_id`=?";
+    $db_groups = dbFetchColumn($sql, [$rule_id]);
+
+    // Compare arrays to get add and removed transports/groups
+    $t_add = array_diff($transports, $db_transports);
+    $t_del = array_diff($db_transports, $transports);
+    $g_add = array_diff($groups, $db_groups);
+    $g_del = array_diff($db_groups, $groups);
+
+    // Insert any new mappings
+    $insert = [];
+    foreach ($t_add as $transport_id) {
+        $insert[] = array (
+            'transport_or_group_id' => $transport_id,
+            'target_type' => 'single',
+            'rule_id' => $rule_id
+        );
+    }
+    foreach ($g_add as $group_id) {
+        $insert[] = array(
+            'transport_or_group_id' => $group_id,
+            'target_type' => 'group',
+            'rule_id' => $rule_id
+        );
+    }
+    if (!empty($insert)) {
+        $res = dbBulkInsert($insert, 'alert_transport_map');
+    }
+
+    // Remove old mappings
+    if (!empty($t_del)) {
+        dbDelete('alert_transport_map', 'target_type="single" AND transport_or_group_id IN (?)', array(array(implode(',', $t_del))));
+    }
+    if (!empty($g_del)) {
+        dbDelete('alert_transport_map', 'target_type="group" AND transport_or_group_id IN (?)', array(array(implode(',', $g_del))));
+    }
 }
 
 die(json_encode([
     'status'       => $status,
-    'message'      => $message,
+    'message'      => $message
 ]));

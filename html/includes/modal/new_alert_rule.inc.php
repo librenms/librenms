@@ -26,7 +26,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h5 class="modal-title" id="Create">Alert Rules :: <a href="https://docs.librenms.org/Alerting/">Docs <i class="fa fa-book fa-1x"></i></a> </h5>
+                    <h5 class="modal-title" id="Create">Alert Rule :: <a href="https://docs.librenms.org/Alerting/"><i class="fa fa-book fa-1x"></i> Docs</a> </h5>
                 </div>
                 <div class="modal-body">
 
@@ -78,7 +78,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                             <div class="col-sm-2" title="How many notifications to issue while active before stopping. -1 means no limit. If interval is 0, this has no effect.">
                                 <input type='text' id='count' name='count' class='form-control' size="4" value="123">
                             </div>
-                            <div class="col-sm-3" title="How log to wait before issuing a notification. If the alert clears before the delay, no notification will be issued. (s,m,h,d)">
+                            <div class="col-sm-3" title="How long to wait before issuing a notification. If the alert clears before the delay, no notification will be issued. (s,m,h,d)">
                                 <label for='delay' class='control-label' style="vertical-align: top;">Delay: </label>
                                 <input type='text' id='delay' name='delay' class='form-control' size="4">
                             </div>
@@ -109,6 +109,12 @@ if (Auth::user()->hasGlobalAdmin()) {
                                 <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
                             </div>
                         </div>
+                        <div class="form-group" title="Restricts this alert rule to specified transports.">
+                            <label for="transports" class="col-sm-3 col-md-2 control-label">Transports: </label>
+                            <div class="col-sm-9 col-md-10">
+                                <select id="transports" name="transports[]" class="form-control" multiple="multiple"></select>
+                            </div>
+                        </div>
                         <div class='form-group' title="A link to some documentation on how to handle this alert. This will be included in notifications.">
                             <label for='proc' class='col-sm-3 col-md-2 control-label'>Procedure URL: </label>
                             <div class='col-sm-9 col-md-10'>
@@ -123,8 +129,6 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                     </form>
-
-
                 </div>
             </div>
         </div>
@@ -274,6 +278,11 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $maps.empty();
                 $maps.val(null).trigger('change');
                 setRuleDevice() // pre-populate device in the maps if this is a per-device rule
+                
+                var $transports = $("#transports");
+                $transports.empty();
+                $transports.val(null).trigger('change');
+                $("#transport-choice").val("email");
             }
         });
 
@@ -293,6 +302,15 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $.each(rule.maps, function(index, value) {
                     var option = new Option(value.text, value.id, true, true);
                     $maps.append(option).trigger('change')
+                });
+            }
+            var $transports = $("#transports");
+            $transports.empty();
+            $transports.val(null).trigger('change');
+            if(rule.transports != null) {
+                $.each(rule.transports, function(index, value) {
+                    var option = new Option(value.text, value.id, true, true);
+                    $transports.append(option).trigger("change");
                 });
             }
 
@@ -351,6 +369,21 @@ if (Auth::user()->hasGlobalAdmin()) {
                         type: 'devices_groups',
                         search: params.term
                     };
+                }
+            }
+        });
+
+        $("#transports").select2({
+            width: "100%",
+            placeholder: "Transport/Group Name",
+            ajax: {
+                url: 'ajax_list.php',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        type: "transport_groups",
+                        search: params.term
+                    }
                 }
             }
         });

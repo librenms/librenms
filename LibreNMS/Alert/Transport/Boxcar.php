@@ -38,66 +38,110 @@
 
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
+use LibreNMS\Config;
 
-class Boxcar implements Transport
+class Boxcar extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        global $config;
+        if (empty($this->config)) {
+            return $this->deliverAlertOld($obj, $opts);
+        }
+        $boxcar_opts['access_token'] = $this->config['boxcar-token'];
+        foreach (explode(PHP_EOL, $this->config['options']) as $option) {
+            list($k,$v) = explode('=', $option);
+            $boxcar_opts[$k] = $v;
+        }
+        return $this->contactBoxcar($obj, $boxcar_opts);
+    }
+
+    public function deliverAlertOld($obj, $opts)
+    {
         foreach ($opts as $api) {
-            $data                              = array();
-            $data['user_credentials']          = $api['access_token'];
-            $data['notification[source_name]'] = $config['project_id'];
-            switch ($obj['severity']) {
-                case "critical":
-                    $severity = "Critical";
-                    if (!empty($api['sound_critical'])) {
-                        $data['notification[sound]'] = $api['sound_critical'];
-                    }
-                    break;
-                case "warning":
-                    $severity = "Warning";
-                    if (!empty($api['sound_warning'])) {
-                        $data['notification[sound]'] = $api['sound_warning'];
-                    }
-                    break;
-            }
-            switch ($obj['state']) {
-                case 0:
-                    $title_text = "OK";
-                    if (!empty($api['sound_ok'])) {
-                        $data['notification[sound]'] = $api['sound_ok'];
-                    }
-                    break;
-                case 1:
-                    $title_text = $severity;
-                    break;
-                case 2:
-                    $title_text = "Acknowledged";
-                    break;
-            }
-            $data['notification[title]'] = $title_text . " - " . $obj['hostname'] . " - " . $obj['name'];
-            $message_text                = "Timestamp: " . $obj['timestamp'];
-            if (!empty($obj['faults'])) {
-                $message_text .= "\n\nFaults:\n";
-                foreach ($obj['faults'] as $k => $faults) {
-                    $message_text .= "#" . $k . " " . $faults['string'] . "\n";
-                }
-            }
-            $data['notification[long_message]'] = $message_text;
-            $curl                               = curl_init();
-            set_curl_proxy($curl);
-            curl_setopt($curl, CURLOPT_URL, 'https://new.boxcar.io/api/notifications');
-            curl_setopt($curl, CURLOPT_SAFE_UPLOAD, true);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-            $ret  = curl_exec($curl);
-            $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            if ($code != 201) {
-                var_dump("Boxcar returned error"); //FIXME: proper debugging
-                return false;
-            }
+            $this->contactBoxcar($obj, $api);
         }
         return true;
+    }
+
+    public static function contactBoxcar($obj, $api)
+    {
+        $data                              = [];
+        $data['user_credentials']          = $api['access_token'];
+        $data['notification[source_name]'] = Config::get('project_id', 'librenms');
+        switch ($obj['severity']) {
+            case "critical":
+                $severity = "Critical";
+                if (!empty($api['sound_critical'])) {
+                    $data['notification[sound]'] = $api['sound_critical'];
+                }
+                break;
+            case "warning":
+                $severity = "Warning";
+                if (!empty($api['sound_warning'])) {
+                    $data['notification[sound]'] = $api['sound_warning'];
+                }
+                break;
+        }
+        switch ($obj['state']) {
+            case 0:
+                $title_text = "OK";
+                if (!empty($api['sound_ok'])) {
+                    $data['notification[sound]'] = $api['sound_ok'];
+                }
+                break;
+            case 1:
+                $title_text = $severity;
+                break;
+            case 2:
+                $title_text = "Acknowledged";
+                break;
+        }
+        $data['notification[title]'] = $title_text . " - " . $obj['hostname'] . " - " . $obj['name'];
+        $message_text                = "Timestamp: " . $obj['timestamp'];
+        if (!empty($obj['faults'])) {
+            $message_text .= "\n\nFaults:\n";
+            foreach ($obj['faults'] as $k => $faults) {
+                $message_text .= "#" . $k . " " . $faults['string'] . "\n";
+            }
+        }
+        $data['notification[long_message]'] = $message_text;
+        $curl                               = curl_init();
+        set_curl_proxy($curl);
+        curl_setopt($curl, CURLOPT_URL, 'https://new.boxcar.io/api/notifications');
+        curl_setopt($curl, CURLOPT_SAFE_UPLOAD, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_exec($curl);
+        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        if ($code != 201) {
+            var_dump("Boxcar returned error"); //FIXME: proper debugging
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'Access Token',
+                    'name' => 'boxcar-token',
+                    'descr' => 'Boxcar Access Token',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Boxcar Options',
+                    'name' => 'boxcar-options',
+                    'descr' => 'Boxcar Options',
+                    'type' => 'textarea',
+                ]
+            ],
+            'validation' => [
+                'boxcar-token' => 'required',
+            ]
+        ];
     }
 }

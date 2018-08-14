@@ -341,17 +341,33 @@ $config['graph_colours']['mega']=array_merge(
 
 // Map colors
 $config['network_map_legend'] = array(
-    '0'   => '#aeaeae',
-    '10'  => '#79847e',
-    '20'  => '#97ffca',
-    '30'  => '#a800ff',
-    '40'  => '#6c00ff',
-    '50'  => '#00d2ff',
-    '60'  => '#0090ff',
-    '70'  => '#ffe400',
-    '80'  => '#ffa200',
-    '90'  => '#ff6600',
-    '100' => '#ff0000',
+    '0'            => '#008dca',
+    '5'            => '#0092a6',
+    '10'           => '#009782',
+    '15'           => '#009c5f',
+    '20'           => '#00a13b',
+    '25'           => '#00a617',
+    '30'           => '#0bad00',
+    '35'           => '#2fb700',
+    '40'           => '#53c100',
+    '45'           => '#77cc00',
+    '50'           => '#9ad600',
+    '55'           => '#bee000',
+    '60'           => '#e2ea00',
+    '65'           => '#ead600',
+    '70'           => '#e5b200',
+    '75'           => '#e08e00',
+    '80'           => '#db6b00',
+    '85'           => '#d64700',
+    '90'           => '#d12300',
+    '95'           => '#cc0000',
+    '100'          => '#cc0000',
+    'di.edge'      => '#dddddd88',
+    'di.border'    => '#cccccc',
+    'di.node'      => '#eeeeee',
+    'dn.edge'      => '#ff777788',
+    'dn.border'    => '#ff5555',
+    'dn.node'      => '#ffdddd',
 );
 
 // Default mini graph time options:
@@ -631,6 +647,8 @@ $config['auth_ldap_groupmemberattr']            = 'memberUid';
 $config['auth_ldap_emailattr']                  = 'mail';
 $config['auth_ldap_cache_ttl'] = 300;
 // How long in seconds should ldap* module cache user information in $_SESSION
+$config['auth_ldap_userdn']                     = false;
+// Uses a users full DN as the value of the member attribute in a group (instead of member: username, it’s member: uid=username,ou=groups,dc=domain,dc=com).
 
 // Active Directory Authentication
 $config['auth_ad_user_filter'] = "(objectclass=user)";
@@ -769,7 +787,6 @@ $config['poller_modules']['applications']                = true;
 $config['poller_modules']['mib']                         = false;
 $config['poller_modules']['stp']                         = true;
 $config['poller_modules']['ntp']                         = true;
-$config['poller_modules']['services']                    = true;
 $config['poller_modules']['loadbalancers']               = false;
 $config['poller_modules']['mef']                         = false;
 
@@ -959,3 +976,6 @@ $config['api']['cors']['allowheaders'] = array('Origin', 'X-Requested-With', 'Co
 
 // Disk
 $config['bad_disk_regexp'] = [];
+
+// Snmptrap logging: none, unhandled, all
+$config['snmptraps']['eventlog'] = 'unhandled';
