@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Snmptrap;
 
+use LibreNMS\Config;
 use LibreNMS\Snmptrap\Handlers\Fallback;
 use Log;
 
@@ -46,6 +47,13 @@ class Dispatcher
         $handler = app(\LibreNMS\Interfaces\SnmptrapHandler::class, [$trap->getTrapOid()]);
         $handler->handle($trap->getDevice(), $trap);
 
-        return !($handler instanceof Fallback);
+        // log an event if appropriate
+        $fallback = $handler instanceof Fallback;
+        $logging = Config::get('snmptraps.eventlog', 'unhandled');
+        if ($logging == 'all' || ($fallback && $logging == 'unhandled')) {
+            log_event("SNMP trap received: " . $trap->getTrapOid(), $trap->getDevice()->toArray(), 'trap');
+        }
+
+        return !$fallback;
     }
 }

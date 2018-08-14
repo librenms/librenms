@@ -1,4 +1,4 @@
-source: Developing/Snmptraps.md
+source: Developing/SNMP-Traps.md
 
 # Creating snmp trap handlers
 
