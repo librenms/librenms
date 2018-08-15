@@ -794,6 +794,8 @@ Please note that each time /etc/snmp/postfixdetailed is ran, the cache file is u
 
 The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
 
+> NOTE: If using RHEL for your postfix server, qshape must be installed manually as it is not officially supported. CentOs 6 rpms seem to work without issues.
+
 ### Postgres
 #### SNMP Extend
 1: Copy the shell script, postgres, to the desired host. `wget https://github.com/librenms/librenms-agent/raw/master/snmp/postgres -O /etc/snmp/postgres`
