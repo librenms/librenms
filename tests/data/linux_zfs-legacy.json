@@ -402,7 +402,7 @@
                     "value": "45",
                     "value_prev": null,
                     "app_type": "zfs"
-                },
+                }
             ]
         }
     }
