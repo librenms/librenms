@@ -1,0 +1,274 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+    SIAE-HITLESS-AGGRL1-MIB  
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE,
+             Integer32
+        FROM SNMPv2-SMI
+             siaeMib
+        FROM SIAE-TREE-MIB
+             linkSettingsEntry, linkStatusEntry
+        FROM SIAE-RADIO-SYSTEM-MIB
+             aggrL1Entry
+        FROM SIAE-AGGRL1-MANAGEMENT-MIB;
+
+    hitlessAggregationL1 MODULE-IDENTITY
+        LAST-UPDATED "201602290000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: tbd@siaemic.com
+            "
+        DESCRIPTION
+            "This module contains the hitless extension for a Level 1
+             aggregations of SIAE equipments.
+
+             The Hitless L1 aggregation is a method to define radio link
+             degradation in order to remove it from aggregation in advance
+             (link status estimator).
+             Only ethernet traffic is affected.
+
+             The current TX profile of a link is used as extimator of the
+             link status. When ACM modulation goes under a predefined profile
+             (configurable by operator) the corresponding link is removed from
+             RLAG. A radio link is considered unavailable for ethernet traffic
+             during all the time that the current modulation remain under
+             the predefined HITLESS profile (modulation). 
+
+             Every radio link is considered working in three separate ZONEs
+             - GOOD ZONE: When it is working between the HITLESS profile
+                          (included) and the UPPER profile (included) 
+             - HITLESS ZONE: When it is working between the LOWER profile 
+                             (included) and the HITLESS profile (excluded)
+             - BAD ZONE: When the modem is unlocked
+
+             NE is in charge to select which of the links, that are working into
+             the HITLESS ZONE, participate in RLAG. The decision is taken 
+             according to three possible behaviors:
+             - ALL survive:  All links remain used by aggregator when working
+                             into the HITLESS ZONE
+             - ONE survive:  When NO link is working into the GOOD ZONE,
+                             the last link entered into the HITLESS ZONE
+                             continues to be used by the aggregator 
+             - NONE survive: Each link is removed from aggregation when working
+                             into the HITLESS ZONE
+
+             Note that when HITLESS profile is configured equal to the LOWER 
+             profile, the ONE survive and NONE survive behave like the ALL
+             survive. 
+            "
+        REVISION "201602290000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00.
+            "
+    ::= { siaeMib 98 }
+
+------ Beginning -------------------------------------------------------------
+
+    hlAggrL1MibVersion OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+    ::= {hitlessAggregationL1 1}
+
+-------  Begin of hlAggrL1Table
+--
+    hlAggrL1Table OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  HlAggrL1Entry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of hitless L1 aggregation (RLAG) entries.
+            "
+    ::= {hitlessAggregationL1 2}
+    
+    hlAggrL1Entry OBJECT-TYPE
+        SYNTAX      HlAggrL1Entry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing management information applicable to the  
+             hitless extension for L1 aggregation.
+            "
+        AUGMENTS    {aggrL1Entry}
+    ::= {hlAggrL1Table 1}
+
+    HlAggrL1Entry  ::=
+        SEQUENCE  {
+                   hlAggrL1Mode        INTEGER,
+                   hlAggrL1Behaviour   INTEGER 
+                  }
+            
+    hlAggrL1Mode OBJECT-TYPE
+        SYNTAX      INTEGER  {
+                               hlAggrL1Auto   (1),
+                               hlAggrL1Manual (2)
+                             }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "This object defines how the HITLESS profiles is choosen (HITLESS
+            profile is last profile that is considered good for L1 agrregation):
+
+            hlAggrL1Auto(1):   NE uses linkTxLowerProfile+1 as HITLESS profile
+            hlAggrL1Manual(2): NE uses the values set in hlLinkSettingsTable
+                               as HITLESS profile 
+           "
+        DEFVAL  {hlAggrL1Auto}
+    ::= {hlAggrL1Entry 1}
+    
+    hlAggrL1Behaviour    OBJECT-TYPE
+        SYNTAX      INTEGER  { hlAggrL1AllSurvive  (1),
+                               hlAggrL1OneSurvive  (2),
+                               hlAggrL1NoneSurvive (3)
+                             }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Every radio link is considered working in three separate ZONEs:
+             GOOD ZONE:    When it is working between the HITLESS profile
+                           (included) and the UPPER profile (included) 
+             HITLESS ZONE: When it is working between the LOWER profile 
+                           (included) and the HITLESS profile (excluded)
+             BAD ZONE:     When the modem is unlocked
+
+             HITLESS profile (one for each radio link) is last profile that
+             is considered good for L1 aggregation.
+
+             NE is in charge to select which of the links that are working
+             into the HITLESS ZONE participate in L1 aggregation. The decision
+             is taken according to three possible behaviors:
+
+             hlAggrL1AllSurvive(1):  All links remain used by aggregator when
+                                     working into the HITLESS ZONE.
+             hlAggrL1OneSurvive(2):  When NO link is working into the GOOD ZONE,
+                                     the last link entered into the HITLESS ZONE
+                                     continues to be used by the aggregator 
+             hlAggrL1NoneSurvive(3): Each link is removed from aggregation when
+                                     working into the HITLESS ZONE
+            "
+        DEFVAL  {hlAggrL1AllSurvive}
+    ::= {hlAggrL1Entry 2}
+    
+   -- 
+   -------  End of hlAggrL1Table
+
+   -------  Begin of hlLinkSettingsTable
+   --
+
+    hlLinkSettingsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  HlLinkSettingsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with the hitless L1 aggregation extension of 
+             linkSettingsEntry. The content of this table can be changed by a
+             manager if linkRowStatus is notInService(2).
+            "
+    ::= {hitlessAggregationL1 3}
+
+    hlLinkSettingsEntry OBJECT-TYPE
+        SYNTAX      HlLinkSettingsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing the hitless L1 aggregation extension of 
+             linkSettingsEntry.
+           ."
+        AUGMENTS    {linkSettingsEntry}
+    ::= {hlLinkSettingsTable 1}
+
+    HlLinkSettingsEntry  ::=
+        SEQUENCE {
+            linkHitlessProfile         Integer32
+        }
+
+    linkHitlessProfile OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+             "The object contains hitless profile that is used to remove the
+              radio link from the L1 aggregation.
+             "
+    ::= {hlLinkSettingsEntry 1}
+   
+   -- 
+   -------  End of hlLinkSettingsTable
+ 
+   -------  Begin of hlLinkStatusTable
+   --
+
+    hlLinkStatusTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  HlLinkStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with hitless L1 aggregation extension of linkStatusEntry.
+            "
+    ::= {hitlessAggregationL1 4}
+
+    hlLinkStatusEntry OBJECT-TYPE
+        SYNTAX      HlLinkStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing the hitless L1 aggregation extension of
+             linkStatusEntry.
+            "
+        AUGMENTS    {linkStatusEntry }
+    ::= {hlLinkStatusTable 1}
+
+    HlLinkStatusEntry  ::=
+        SEQUENCE{
+            linkHitlessZone         INTEGER
+        }
+
+    linkHitlessZone OBJECT-TYPE
+        SYNTAX      INTEGER  {
+                               goodZone    (1),
+                               hitlessZone (2),
+                               badZone     (3)
+                             }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The object shows the working zone of an aggregated radio
+             link.
+            "
+    ::= {hlLinkStatusEntry 1}
+
+   -- 
+   -------  End of hlLinkStatusTable
+
+------ End group -----------------------------------------------------------------
+
+---------------------------------- End  -------------------------------------
+
+
+END
+
+
+
