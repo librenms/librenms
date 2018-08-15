@@ -12455,6 +12455,8 @@
                 }
             ],
             "application_metrics": []
+        }
+    },
     "vlans": {
         "discovery": {
             "vlans": [
