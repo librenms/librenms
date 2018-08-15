@@ -902,7 +902,8 @@ snmp ALL=(ALL) NOPASSWD: /usr/local/bin/proxmox
 SNMP extend script to get your PI data into your host.
 
 ##### SNMP Extend
-1. Copy the [raspberry script](https://github.com/librenms/librenms-agent/blob/master/snmp/raspberry.sh) to `/etc/snmp/` (or any other suitable location) on your PI host.
+1. Download the script onto the desired host.
+`wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/raspberry.sh -O /etc/snmp/raspberry.sh`
 
 2. Make the script executable: `chmod +x /etc/snmp/raspberry.sh`
 
