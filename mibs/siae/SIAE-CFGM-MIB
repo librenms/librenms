@@ -1,0 +1,276 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-CFGM-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE,
+             Unsigned32, IpAddress
+        FROM SNMPv2-SMI
+             DisplayString
+        FROM SNMPv2-TC
+             siaeMib
+        FROM SIAE-TREE-MIB
+             alarmTrap
+        FROM SIAE-ALARM-MIB
+             equipIpSnmpAgentAddress
+        FROM SIAE-EQUIP-MIB;
+
+    configManagement MODULE-IDENTITY
+        LAST-UPDATED "201407250000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: tbd@siaemic.com
+            "
+        DESCRIPTION
+            "Backup and Restore (Configuration management) of the NE
+            "
+        REVISION "201407250000Z"
+        DESCRIPTION
+            "MIB version 01.00.01
+             Added value configUseAndSwitch(5) to configManagementAction
+            "
+        REVISION "201402030000Z"
+        DESCRIPTION
+            "Improved description of configManagementMibVersion
+            "
+        REVISION "201304160000Z"
+        DESCRIPTION
+            "Initial version 01.00.00
+            "
+      ::= { siaeMib 30 }
+
+----------------------------------------------------------------------------------
+--  configManagement Group
+----------------------------------------------------------------------------------
+--
+--  This group is used to manage the Configuration present in the equipment
+--
+--  Uploading operations:
+--    - Creation of the configuration file
+--    - FTP tranfer of the configuration file toward the manager
+--
+--  Downloading operations:
+--    - FTP tranfer of the configuration file toward the equipment
+--    - Check if the configuration file is suitable for the equipment
+--    - Save the current configuration to eventually return to it
+--    - Overwrite current configuration with the downloaded one
+--    - Restart the equipment
+--
+--  Return to previous configuration:
+--    - Check if the previously saved configuration file exists
+--    - Overwrite current configuration with the previously saved one
+--    - Restart the equipment or execute a bench switch
+--
+----------------------------------------------------------------------------------
+
+------ Beginning --------------------------------------------------------------
+
+    configManagementMibVersion  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+        DEFVAL {1}
+        ::= { configManagement 1 }
+
+    configManagementFileName OBJECT-TYPE
+        SYNTAX      DisplayString   (SIZE(0..255))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+             "Name of the file, containing the equipment configuration, to
+              upload or download according to the object configManagementAction"
+        ::= { configManagement 2 }
+
+    configManagementServerIpAddress  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Ip address of the SNMP manager connected from/to which the
+             configuration is downloaded/uploaded,
+             if this object is set '0.0.0.0', then the IP address of server
+             is read from incoming ethernet packet."
+        DEFVAL { 0 }
+        ::= { configManagement 3 }
+
+    configManagementAction OBJECT-TYPE
+        SYNTAX      INTEGER  {
+                              configNone          (0),
+                              configSave          (1),
+                              configUse           (2),
+                              configBack          (3),
+                              configAbort         (4),
+                              configUseAndSwitch  (5)
+                             }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Action requested to the equipment:
+             - configNone:   no action required;
+             - configSave:   the current equipment configuration will be saved
+                              in the file whose name is written in the leaf
+                              configurationFileName through FTP protocol;
+             - configUse:    the configuration file, whose name is written in
+                              the leaf configurationFileName, will be transfer-
+                              red on the target through FTP protocol and it will
+                              be used after an implicit restart of the equip-
+                              ment.
+                              A copy of the current equipment configuration will
+                              be saved on the equipment filesystem in order to
+                              return to it.
+             - configBack:   the equipment configuration, saved during a
+                              config-use action will be used after an implicit
+                              restart of the equipment.
+             - configAbort:  the action in progress will be interrupted.
+
+             - configBackAndSwich:  the equipment configuration, saved during a
+                              config-use action will be used after an implicit
+                              bench switch of the equipment.
+
+             The value of this object is self cleared (reset to the value
+             configNone) after its use.
+            "
+        DEFVAL {configNone}
+        ::= { configManagement 4 }
+
+    configManagementState OBJECT-TYPE
+        SYNTAX      INTEGER  {
+                              configCompleted       (1),
+                              configInterrupted     (2),
+                              configVerifying       (3),
+                              configSaving          (4),
+                              configDownloading     (5),
+                              configUploading       (6),
+                              configUsing           (7),
+                              configMakingCopy      (8),
+                              configAborting        (9),
+                              configRestarting      (10),
+                              configStarted         (11)
+                             }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Action in progess state:
+             - configCompleted:   the action required has been successfully
+                                  completed;
+             - configInterrupted: the action required has been abnormally
+                                  stopped;
+             - configVerifying:   the downloaded configuration is being checked
+                                  if it is suitable for the equipment;
+             - configSaving:      current configuration is being saved to be
+                                  tranferred to the manager;
+             - configUploading:   the current configuration is being transfer-
+                                  red to the manager;
+             - configDownloading: a configuration file is being transferred
+                                  from the manager to the equipment;
+             - configUsing:       the current configuration is being overwrit-
+                                  ten with the downloaded one or with the
+                                  previously saved one;
+             - configMaking-copy: a copy of the  current configuration is being
+                                  saved to eventually return to it;
+             - configAborting:    the current action is being aborted as requi-
+                                  red by the config-abort action.
+             - configRestarting:  the equipment is restarting.
+             - configStarted:     the action required has been started;
+
+             A trap is sent at every change of the object value. When the status
+             become configStarted, the sent trap notifies the start of the
+             required action.
+             When the status become configCompleted or config-interrupted, the
+             sent trap notifies a successfully or an abnormal end of the action
+             in progress."
+        DEFVAL {configCompleted}
+        ::= { configManagement 5 }
+
+    configManagementFailure OBJECT-TYPE
+        SYNTAX      INTEGER  {
+                              configNoFailure       (0),
+                              configVerifying       (3),
+                              configSaving          (4),
+                              configDownloading     (5),
+                              configUploading       (6),
+                              configUsing           (7),
+                              configMakingCopy      (8),
+                              configAborted         (9)
+                             }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The value of this object identifies the configuration upload/
+             download state in which errors have been detected. The value
+             config-aborted means interrupted by user."
+        DEFVAL {configNoFailure}
+        ::= { configManagement 6 }
+
+    configManagementBackupFileDate OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Date and time of the previous configuration file saved by the
+                config-use action. The value of this object is expressed as the
+                number of seconds since the midnight of 1/1/1970. A zero value
+                means no previous configuration file has been created."
+        DEFVAL {0}
+        ::= { configManagement 7 }
+
+    configManagementTrapNotification OBJECT-TYPE
+        SYNTAX            INTEGER  {
+                                    trapDisable       (1),
+                                    trapEnable        (2)
+                                   }
+        MAX-ACCESS    read-write
+        STATUS            current
+        DESCRIPTION
+            "Enable/disable the trap generation on configuration tranfer
+             operation"
+        DEFVAL {trapEnable}
+        ::= { configManagement 8 }
+
+-----------------------
+--
+--  The configManagement Group generates the following TRAP:
+--
+-----------------------
+
+    configManagementFtpStatusTrap  NOTIFICATION-TYPE
+        OBJECTS  {equipIpSnmpAgentAddress, configManagementState, configManagementFailure }
+        STATUS current
+        DESCRIPTION
+            "This event is generated by ALCP2E-NE when the status of configuration
+             transfer is changed.
+             The data passed with the event are:
+             1) equipIpSnmpAgentAddress
+             2) configurationState
+             3) configurationFailure"
+    ::= {alarmTrap 3001}
+
+------ End group -----------------------------------------------------------------
+
+END
+
+
+
+

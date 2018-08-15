@@ -1,0 +1,664 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-USER-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE,
+             IpAddress
+        FROM SNMPv2-SMI
+             DisplayString,
+             RowStatus,
+             StorageType
+        FROM SNMPv2-TC
+             SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+             siaeMib
+        FROM SIAE-TREE-MIB;
+
+    accessControl MODULE-IDENTITY
+        LAST-UPDATED "201609170000Z" 
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: tbd@siaemic.com
+            "
+        DESCRIPTION
+            "User privileges and credentials for SIAE equipment access
+             control.
+            "
+        REVISION "201609170000Z"
+        DESCRIPTION
+            "Added accessControlExtLoginTable.
+            "
+        REVISION "201404080000Z"
+        DESCRIPTION
+            "Introduced accessControlGroupTelnet leaf
+             Fixed IMPORTS clause
+            "
+        REVISION "201402030000Z"
+        DESCRIPTION
+            "Improved description of accessControlMibVersion
+            "
+        REVISION "201304160000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00
+            "
+    ::= { siaeMib 5 }
+
+------------------------------------------------------------------------------
+--  accessControl GROUP
+------------------------------------------------------------------------------
+--
+--  This MIB defines the objects to access the system: users and groups.
+--  Each user belongs to a group that identifies the access privileges to all
+--  available protocols. A login table shows the users logged in the system.
+--  AccessControlClientTable defines the client credentials to use a given 
+--  service.
+--  
+--
+------------------------------------------------------------------------------
+
+------ Beginning -------------------------------------------------------------
+
+    accessControlMibVersion OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+        DEFVAL {1}
+    ::= {accessControl 1}
+
+-------  Begin of accessControlGroupTable
+--
+    accessControlGroupTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     AccessControlGroupRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with Group records."
+    ::= {accessControl 2}
+
+    accessControlGroupRecord  OBJECT-TYPE
+        SYNTAX      AccessControlGroupRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Group record. At most 10 records can be present in 
+             accessControlGroupTable."
+        INDEX {accessControlGroupName}
+    ::= {accessControlGroupTable 1}
+
+    AccessControlGroupRecord  ::=
+        SEQUENCE {
+            accessControlGroupName      SnmpAdminString,
+            accessControlGroupProfile   INTEGER,
+            accessControlGroupHttp      INTEGER,
+            accessControlGroupHttps     INTEGER,
+            accessControlGroupSnmp      INTEGER,
+            accessControlGroupFtp       INTEGER,
+            accessControlGroupSftp      INTEGER,
+            accessControlGroupSsh       INTEGER,            
+            accessControlGroupRowStatus RowStatus,
+            accessControlGroupCli       INTEGER
+        }
+
+    accessControlGroupName  OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(1..31))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "ASCII string identifying the Group, used as index for the table."
+    ::= {accessControlGroupRecord 1}
+
+    accessControlGroupProfile  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             admin            (1),
+                             readwrite        (2),
+                             maintenance      (3),
+                             readonly         (4)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object defines the group access privileges. 'Admin' profile can 
+             read and write all MIB, 'readwrite' profile can write all MIB leaves 
+             but it can not manage users, 'maintenance' profile can do only manual 
+             operations, while 'readonly' can only perform get operations."
+    ::= {accessControlGroupRecord 2}
+
+    accessControlGroupHttp  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             deny        (1),
+                             allow       (2)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object allows or denies a given group using http protocol
+             for WebLct to access equipment."
+    ::= {accessControlGroupRecord 3}
+
+    accessControlGroupHttps  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             deny        (1),
+                             allow       (2)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "This object allows or denies a given group using https protocol
+            for WebLct to access equipment."
+    ::= {accessControlGroupRecord 4}
+
+    accessControlGroupSnmp  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             deny        (1),
+                             allowV1     (2),
+                             allowV2c    (3),
+                             allowV3     (4)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object allows or denies a given group using snmp 
+             protocol to access network equipment. If snmp protocol 
+             is enabled, it is possible to choose between V1, V2c 
+             and V3 versions of snmp."
+    ::= {accessControlGroupRecord 5}
+
+    accessControlGroupFtp  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             deny        (1),
+                             allow       (2)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object allows or denies a given group using ftp 
+             protocol."
+    ::= {accessControlGroupRecord 6}
+
+    accessControlGroupSftp  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             deny        (1),
+                             allow       (2)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+             "This object allows or denies a given group using sftp 
+              protocol."
+    ::= {accessControlGroupRecord 7}
+
+    accessControlGroupSsh OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             deny        (1),
+                             allow       (2)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+             "This object allows or denies a given group using ssh 
+              protocol."
+    ::= {accessControlGroupRecord 8}
+
+    accessControlGroupRowStatus  OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object is used to manage a row in accessControlGroupTable."
+    ::= {accessControlGroupRecord 9}
+    
+    accessControlGroupCli OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             deny        (1),
+                             allow       (2)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object allows or denies a given group using both cli through 
+             serial port and remote cli (telnet). Only 'admin' profile is
+             allowed to use cli and can execute all commands."
+    ::= {accessControlGroupRecord 10}
+
+--
+-------  End of accessControlGroupTable
+
+--
+------- The following table defines the users of the equipment,
+------- connected to the group table.
+
+-------  Begin of accessControlUserTable
+--
+    accessControlUserTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF    AccessControlUserRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with User records. At most 10 records can be present in 
+             accessControlUserTable."
+    ::= {accessControl 3}
+
+    accessControlUserRecord  OBJECT-TYPE
+        SYNTAX      AccessControlUserRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "User record."
+        INDEX {accessControlUserName}
+    ::= {accessControlUserTable 1}
+
+    AccessControlUserRecord  ::=
+        SEQUENCE {
+            accessControlUserName            SnmpAdminString,
+            accessControlUserGroupName       SnmpAdminString,
+            accessControlUserPwd             DisplayString,
+            accessControlUserSnmpAuthProt    INTEGER,
+            accessControlUserSnmpAuthKey     OCTET STRING,
+            accessControlUserSnmpPrivProt    INTEGER,
+            accessControlUserSnmpPrivKey     OCTET STRING,
+            accessControlUserTimeout         INTEGER,
+            accessControlUserRowStatus       RowStatus
+        }
+
+    accessControlUserName  OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(1..31))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "ASCII string identifying the user."
+    ::= {accessControlUserRecord 1}
+
+    accessControlUserGroupName  OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(1..31))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object specifies which group this user belongs to.
+             It must refers to an entry of accessControlGroupTable."
+    ::= {accessControlUserRecord 2}
+
+    accessControlUserPwd  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE(1..31))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object specifies the login password of the specified
+             user."
+    ::= {accessControlUserRecord 3}
+
+    accessControlUserSnmpAuthProt  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             noAuth       (1),
+                             md5          (2),
+                             sha          (3)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object is used to set the user authentication protocol
+             if the related group can use snmp protocol."
+    ::= {accessControlUserRecord 4}
+
+    accessControlUserSnmpAuthKey  OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object specifies the user authentication key if
+             the related group can use snmpv3 protocol."
+    ::= {accessControlUserRecord 5}
+
+    accessControlUserSnmpPrivProt  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             noPriv       (1),
+                             des          (2),
+                             aes          (3)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object is used to set the user cipher protocol if 
+             the related group can use snmp protocol."
+    ::= {accessControlUserRecord 6}
+
+    accessControlUserSnmpPrivKey  OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..127))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object specifies the user cipher key if the related 
+             group can use snmpv3 protocol."
+    ::= {accessControlUserRecord 7}
+
+    accessControlUserTimeout  OBJECT-TYPE
+        SYNTAX      INTEGER   (0..3600)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object defines the user timeout after login operation.
+             Zero timeout means no timeout."
+        DEFVAL {300}
+    ::= {accessControlUserRecord 8}
+
+    accessControlUserRowStatus  OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object is used to manage an instance in accessControlUserTable."
+    ::= {accessControlUserRecord 9}
+
+--
+-------  End of accessControlUserTable
+
+--
+------- The following table defines the users logged in the system.
+
+-------  Begin of accessControlLoginTable
+--
+    accessControlLoginTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF    AccessControlLoginRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with Login records. At most 4 users via WebLct,
+             10 users via snmp and 10 users via cli can be logged 
+             at the same time in the equipment."
+    ::= {accessControl 4}
+
+    accessControlLoginRecord  OBJECT-TYPE
+        SYNTAX      AccessControlLoginRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Login record. The create operation is performed by setting
+             accessControlLoginPwd object."
+        INDEX {accessControlLoginIpAddress,
+               accessControlLoginUserName,
+               accessControlLoginType}
+    ::= {accessControlLoginTable 1}
+
+    AccessControlLoginRecord  ::=
+        SEQUENCE {
+            accessControlLoginUserName       SnmpAdminString,
+            accessControlLoginIpAddress      IpAddress,
+            accessControlLoginRequest        INTEGER,
+            accessControlLoginTrapEnable     INTEGER,
+            accessControlLoginType           INTEGER,
+            accessControlLoginPwd            OCTET STRING,
+            accessControlLoginPolling        INTEGER
+        }
+
+    accessControlLoginUserName  OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(1..31))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object defines the name of the logged user."
+    ::= {accessControlLoginRecord 1}
+
+    accessControlLoginIpAddress  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object defines the IP address of the logged user."
+    ::= {accessControlLoginRecord 2}
+
+    accessControlLoginRequest  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             noAction     (1),
+                             logout       (2),
+                             forcelogout  (3)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to do logout or to force logout 
+             of other users. Only users with 'admin' profile can 
+             force logout."
+    ::= {accessControlLoginRecord 3}
+
+    accessControlLoginTrapEnable  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disable     (1),
+                             enable      (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object enables/disables trap receiver for a
+             given user."
+        DEFVAL {disable}
+    ::= {accessControlLoginRecord 4}
+
+    accessControlLoginType  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             web       (1),
+                             snmp      (2),
+                             cli       (3)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object identifies login type."
+    ::= {accessControlLoginRecord 5}
+
+    accessControlLoginPwd  OBJECT-TYPE
+        SYNTAX      OCTET STRING    (SIZE(1..31))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to create a row in the table. It
+             must correspond to the user password defined in 
+             accessControlUserTable."
+    ::= {accessControlLoginRecord 6}
+
+    accessControlLoginPolling  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             polling  (1)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is used to refresh the timeout of the related instance
+             of the table. To keep user logged in, manager must read this object 
+             before the end of accessControlUserTimeout. For cli users execution 
+             of cli commands refreshes timeout."
+    ::= {accessControlLoginRecord 7}
+
+--
+-------  End of accessControlLoginTable
+
+--
+------- The following table defines the user credentials required to access 
+------- FTP and SFTP services.
+
+-------  Begin of accessControlClientTable
+--
+    accessControlClientTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF    AccessControlClientRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with records that show client credentials to 
+             access FTP and SFTP services."
+    ::= {accessControl 5}
+
+    accessControlClientRecord  OBJECT-TYPE
+        SYNTAX      AccessControlClientRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Client credentials record for a given user."
+        INDEX {accessControlClientService}
+    ::= {accessControlClientTable 1}
+
+    AccessControlClientRecord  ::=
+        SEQUENCE {
+            accessControlClientService             INTEGER,
+            accessControlClientServiceStatus       INTEGER,
+            accessControlClientName                SnmpAdminString,
+            accessControlClientPwd                 SnmpAdminString,
+            accessControlClientStorageType         StorageType,            
+            accessControlClientRowStatus           RowStatus
+        }
+
+    accessControlClientService  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             ftp              (1),
+                             sftp             (2)                            
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object is used to identify the service that a given user
+             can access as client."
+    ::= {accessControlClientRecord 1}
+    
+     accessControlClientServiceStatus  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disable          (1),
+                             enable           (2)                            
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object is used to enable/disable the FTP/SFTP client
+             on the equipment. If both clients are enabled, SFTP client
+             is adopted."
+    ::= {accessControlClientRecord 2}
+    
+    accessControlClientName  OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(1..31))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "ASCII string identifying the client name."
+        DEFVAL  {""}        
+    ::= {accessControlClientRecord 3}
+    
+    accessControlClientPwd  OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(1..31))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "ASCII string identifying the client password."
+        DEFVAL  {""}        
+    ::= {accessControlClientRecord 4}
+    
+    accessControlClientStorageType OBJECT-TYPE
+    SYNTAX       StorageType
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION "The storage type for this conceptual row.
+                "
+    DEFVAL      {nonVolatile}
+    ::= {accessControlClientRecord 5}
+    
+    accessControlClientRowStatus  OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The status of this conceptual row."
+    ::= {accessControlClientRecord 6}
+
+--
+-------  End of accessControlClientTable
+
+
+--
+------- The following table augments accessControlLoginTable
+------- to show additional information about logged users.
+
+-------  Begin of accessControlExtLoginTable
+--
+
+    accessControlExtLoginTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AccessControlExtLoginRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table that contains additional information about
+            every user that is logged into the equipment."
+    ::= { accessControl 6 }
+
+    accessControlExtLoginRecord OBJECT-TYPE
+        SYNTAX      AccessControlExtLoginRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Additional information record for a given logged 
+            user."
+        AUGMENTS { accessControlLoginRecord }
+    ::= { accessControlExtLoginTable 1 }
+
+    AccessControlExtLoginRecord ::=
+        SEQUENCE{
+            accessControlExtLoginProfile         INTEGER,
+            accessControlExtLoginAuthMode        INTEGER
+                }
+
+    accessControlExtLoginProfile OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        admin            (1),
+                        readwrite        (2),
+                        maintenance      (3),
+                        readonly         (4)
+                        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object defines the access privileges associated to logged user. 
+            'Admin' profile can read and write all MIB, 'readwrite' profile can 
+            write all MIB leaves but it can not manage users, 'maintenance' can 
+            do only manual operations, while 'readonly' can only perform get 
+            operations. In case of local authentication, the user profile is found
+            in local database, while, if authentication is remote, the profile is 
+            assigned by remote server."
+    ::= { accessControlExtLoginRecord 1 }
+
+    accessControlExtLoginAuthMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        local            (1),
+                        remote           (2)
+                        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object shows if logged user has been authenticated locally or by remote 
+            server (i.e RADIUS, TACACS, etc...)."
+    ::= { accessControlExtLoginRecord 2 }
+
+--
+-------  End of accessControlExtLoginTable
+   
+   
+------ End group -------------------------------------------------------------
+
+END
+
