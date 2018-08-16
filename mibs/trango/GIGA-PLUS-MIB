@@ -1,0 +1,2682 @@
+GIGA-PLUS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	OBJECT-IDENTITY,
+        IpAddress,
+        Unsigned32,
+        Counter64,
+	NOTIFICATION-TYPE,
+	enterprises
+		FROM SNMPv2-SMI
+	MODULE-COMPLIANCE
+		FROM SNMPv2-CONF
+        DisplayString
+                FROM SNMPv2-TC;
+	
+-- *******************************************************************
+-- * Trango module
+-- *******************************************************************
+trango		OBJECT IDENTIFIER ::= { enterprises 5454 }
+tbw 		OBJECT IDENTIFIER ::= { trango 1 }
+ptp		OBJECT IDENTIFIER ::= { tbw 80 }
+
+sys		OBJECT IDENTIFIER ::= { ptp 1 }
+modem		OBJECT IDENTIFIER ::= { ptp 2 }
+rf		OBJECT IDENTIFIER ::= { ptp 3 }
+gige		OBJECT IDENTIFIER ::= { ptp 4 }
+tdm		OBJECT IDENTIFIER ::= { ptp 5 }
+trangotrap	OBJECT IDENTIFIER ::= { ptp 6 }
+
+-- *******************************************************************
+-- ** System Information ** trango.tbw.ptp.sys
+-- *******************************************************************
+
+ver             OBJECT IDENTIFIER ::= { sys 1  }
+
+sysFPGAVer      		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(0..80))
+    	MAX-ACCESS  		read-only
+	STATUS      		current
+    	DESCRIPTION 		"FPGA 1 Version"
+    	::= { ver 1 }
+
+sysOSVer      			OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(0..80))
+    	MAX-ACCESS  		read-only
+    	STATUS      		current
+    	DESCRIPTION 		"IDU OS Version"
+    	::= { ver 2 }
+
+sysFWVer      			OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(0..80))
+    	MAX-ACCESS  		read-only
+    	STATUS      		current
+    	DESCRIPTION 		"IDU FW Version"
+    	::= { ver 3 }
+
+sysPICVer      			OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(0..80))
+    	MAX-ACCESS  		read-only
+    	STATUS      		current
+    	DESCRIPTION 		"IDU PIC Version"
+    	::= { ver 4 }
+
+sysModemVer      		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(0..80))
+    	MAX-ACCESS  		read-only
+    	STATUS      		current
+    	DESCRIPTION 		"IDU Modem Version"
+    	::= { ver 5 }
+
+sysODUFWVer      		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(0..80))
+    	MAX-ACCESS  		read-only
+    	STATUS      		current
+    	DESCRIPTION 		"ODU 1 FW Version"
+    	::= { ver 6 }
+
+prever             OBJECT IDENTIFIER ::= { sys 2  }
+
+sysFPGAPreVer      		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(0..80))
+    	MAX-ACCESS  		read-only
+    	STATUS      		current
+    	DESCRIPTION 		"FPGA 1 PreVersion"
+    	::= { prever 1 }
+
+sysOSPreVer      		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(0..80))
+    	MAX-ACCESS  		read-only
+    	STATUS      		current
+    	DESCRIPTION 		"IDU OS PreVersion"
+    	::= { prever 2 }
+
+sysFWPreVer      		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(0..80))
+    	MAX-ACCESS  		read-only
+    	STATUS      		current
+    	DESCRIPTION 		"IDU FW PreVersion"
+    	::= { prever 3 }
+
+sysPICPreVer      		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(0..80))
+    	MAX-ACCESS  		read-only
+    	STATUS      		current
+    	DESCRIPTION 		"IDU PIC PreVersion"
+    	::= { prever 4 }
+
+sysModemPreVer      		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(0..80))
+    	MAX-ACCESS  		read-only
+    	STATUS      		current
+    	DESCRIPTION 		"IDU Modem PreVersion"
+    	::= { prever 5 }
+
+sysODUFWPreVer      		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(0..80))
+    	MAX-ACCESS  		read-only
+    	STATUS      		current
+    	DESCRIPTION 		"ODU 1 FW PreVersion"
+    	::= { prever 6 }
+
+model             		OBJECT IDENTIFIER ::= { sys 3  }
+
+sysIDUModel      		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(0..80))
+    	MAX-ACCESS  		read-only
+    	STATUS      		current
+    	DESCRIPTION 		"IDU Model"
+    	::= { model 1 }
+
+sysODUModel      		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(0..80))
+    	MAX-ACCESS  		read-only
+    	STATUS      		current
+    	DESCRIPTION 		"ODU 1 model"
+    	::= { model 2 }
+
+sysIDUSerialID      		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(0..80))
+    	MAX-ACCESS  		read-only
+    	STATUS      		current
+    	DESCRIPTION 		"IDU Serial ID"
+    	::= { model 3 }
+
+sysODUSerialID      		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(0..80))
+    	MAX-ACCESS  		read-only
+    	STATUS      		current
+    	DESCRIPTION 		"ODU 1 Serial ID"
+    	::= { model 4 }
+
+sysOMUProjectID      		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(0..80))
+    	MAX-ACCESS  		read-only
+    	STATUS      		current
+    	DESCRIPTION 		"ODU Project ID"
+    	::= { model 5 }
+
+mac 				OBJECT IDENTIFIER ::= { sys 4  }
+
+sysMACeth1      		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(12))
+    	MAX-ACCESS  		read-only
+    	STATUS      		current
+    	DESCRIPTION 		"MAC address of Ethernet 1"
+    	::= { mac 1 }
+
+ipconfig 			OBJECT IDENTIFIER ::= { sys 5  }
+
+sysIpAddressess      		OBJECT-TYPE
+    	SYNTAX      		IpAddress
+    	MAX-ACCESS  		read-write
+    	STATUS      		current
+    	DESCRIPTION 		"IP address"
+    	::= { ipconfig 1 }
+
+sysSubnetMask      		OBJECT-TYPE
+    	SYNTAX      		IpAddress
+    	MAX-ACCESS  		read-write
+    	STATUS      		current
+    	DESCRIPTION 		"Subnet mask"
+    	::= { ipconfig 2 }
+
+sysDefaultGateway      		OBJECT-TYPE
+    	SYNTAX      		IpAddress
+    	MAX-ACCESS  		read-write
+    	STATUS      		current
+    	DESCRIPTION 		"Default gateway"
+    	::= { ipconfig 3 }
+
+sysRemarkSystem      		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(1..100))
+    	MAX-ACCESS  		read-write
+    	STATUS      		current
+    	DESCRIPTION 		"System remarks"
+    	::= { sys 6 }
+
+ibm 				OBJECT IDENTIFIER ::= { sys 7  }
+
+sysIBMEnable                   	OBJECT-TYPE
+        SYNTAX                  INTEGER { disable(0), enable(1) }
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Enable/Disable Inband Management feature"
+        ::= { ibm 1 }
+
+sysIBMVlanID                    OBJECT-TYPE
+        SYNTAX                  INTEGER {0 - 4090}
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "IBM Vlan ID"
+        ::= { ibm 4 }
+
+sysIBMDataPort                  OBJECT-TYPE
+        SYNTAX                  INTEGER { GE1(1), GE2(2) }
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "IBM/Data Port"
+        ::= { ibm 5 }
+
+sysIBMTagging                	  OBJECT-TYPE
+        SYNTAX                  INTEGER { disable(0), enable(1) }
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Enable/Disable Inband Management tagging feature"
+        ::= { ibm 6 }
+
+sysRemoteManagement             OBJECT-TYPE
+        SYNTAX                  INTEGER { Off(0), On(1) }
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Enable/Disable Remote management through out of band"
+        ::= { ibm 7 }
+
+community       		OBJECT IDENTIFIER ::= { sys 8 }
+
+sysSNMPReadCommStr  		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(1..32))
+    	MAX-ACCESS  		read-write
+    	STATUS      		current
+    	DESCRIPTION 		"SNMP agent read community string"
+    	::= { community 1 }
+
+sysSNMPWriteCommStr 		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(1..32))
+    	MAX-ACCESS  		read-write
+    	STATUS      		current
+    	DESCRIPTION 		"SNMP agent Write community string"
+    	::= { community 2 }
+
+sysSNMPTrapCommStr 		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(1..32))
+    	MAX-ACCESS  		read-write
+    	STATUS      		current
+    	DESCRIPTION 		"SNMP trap community string"
+    	::= { community 3 }
+
+sysIDUTemp              	OBJECT-TYPE
+    	SYNTAX              	INTEGER
+    	MAX-ACCESS          	read-only
+    	STATUS              	current
+    	DESCRIPTION         	"PIC's current temperatur reading in Celsius"
+    	::= { sys 19 }
+
+daemon                  	OBJECT IDENTIFIER ::= { sys 20 }
+
+sysHTTPD                	OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+    	MAX-ACCESS          	read-write
+    	STATUS              	current
+    	DESCRIPTION         	"Enable or disable HTTPD"
+    	::= { daemon 1 }
+
+sysSNMPD                	OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+    	MAX-ACCESS          	read-write
+    	STATUS              	current
+    	DESCRIPTION         	"Enable or disable SNMPD"
+    	::= { daemon 2 }
+
+sysTFTPD                	OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+    	MAX-ACCESS          	read-write
+    	STATUS              	current
+    	DESCRIPTION         	"Enable or disable TFPTD"
+    	::= { daemon 3 }
+
+sysTelnetd                	OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+    	MAX-ACCESS          	read-write
+    	STATUS              	current
+    	DESCRIPTION         	"Enable or disable Telnetd"
+    	::= { daemon 4 }
+
+sysClearCounter              	OBJECT-TYPE
+    	SYNTAX              	INTEGER { na(0), clear(1) }
+    	MAX-ACCESS          	read-write
+    	STATUS              	current
+    	DESCRIPTION         	"Clear data port counters"
+    	::= { sys 22 }
+
+remote             		OBJECT IDENTIFIER ::= { sys 33  }
+
+sysRemoteLinkStatus            	OBJECT-TYPE
+    	SYNTAX      		INTEGER 
+    	MAX-ACCESS          	read-only
+    	STATUS              	current
+    	DESCRIPTION         	"Display remote link status"
+    	::= { remote 1 }
+
+sysRemoteLinkODUStatus          OBJECT-TYPE
+    	SYNTAX      		INTEGER 
+    	MAX-ACCESS          	read-only
+    	STATUS              	current
+    	DESCRIPTION         	"Display remote ODU status"
+    	::= { remote 2 }
+
+rssi_remote             		OBJECT IDENTIFIER ::= { remote 3  }
+
+sysRemoteLinkRSSI          	OBJECT-TYPE
+    	SYNTAX      		INTEGER 
+    	MAX-ACCESS          	read-only
+    	STATUS              	current
+    	DESCRIPTION         	"Display remote RSSI"
+    	::= { rssi_remote 1 }
+
+mse_remote             		OBJECT IDENTIFIER ::= { remote 4  }
+
+sysRemoteLinkMSE          	OBJECT-TYPE
+    	SYNTAX      		INTEGER 
+    	MAX-ACCESS          	read-only
+    	STATUS              	current
+    	DESCRIPTION         	"Display remote MSE"
+    	::= { mse_remote 1 }
+
+sysRemoteLinkRx          	OBJECT-TYPE
+    	SYNTAX      		INTEGER 
+    	MAX-ACCESS          	read-only
+    	STATUS              	current
+    	DESCRIPTION         	"Display remote Rx status"
+    	::= { remote 5 }
+
+threshold             		OBJECT IDENTIFIER ::= { sys 34  }
+
+th_rssi             		OBJECT IDENTIFIER ::= { threshold 1  }
+
+sysThresholdRSSIMin          	OBJECT-TYPE
+    	SYNTAX      		INTEGER 
+    	MAX-ACCESS          	read-write
+    	STATUS              	current
+    	DESCRIPTION         	"Display/Configure minimum threshold RSSI"
+    	::= { th_rssi 1 }
+
+sysThresholdRSSIMax          	OBJECT-TYPE
+    	SYNTAX      		INTEGER 
+    	MAX-ACCESS          	read-write
+    	STATUS              	current
+    	DESCRIPTION         	"Display/Configure maximum threshold RSSI"
+    	::= { th_rssi 2 }
+
+sysThresholdRSSIAction          OBJECT-TYPE
+    	SYNTAX      		INTEGER 
+    	MAX-ACCESS          	read-write
+    	STATUS              	current
+    	DESCRIPTION         	"Display/Configure threshold RSSI action"
+    	::= { th_rssi 3 }
+
+th_mse                          OBJECT IDENTIFIER ::= { threshold 2  }
+
+sysThresholdMSEMin             OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure minimum threshold MSE"
+        ::= { th_mse 1 }
+
+sysThresholdMSEMax             OBJECT-TYPE
+        SYNTAX                  INTEGER 
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure maximum threshold MSE"
+        ::= { th_mse 2 }
+
+sysThresholdMSEAction          OBJECT-TYPE
+        SYNTAX                  INTEGER 
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure threshold MSE action"
+        ::= { th_mse 3 }       
+
+th_ber                          OBJECT IDENTIFIER ::= { threshold 3  }
+
+sysThresholdBERMin              OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure minimum threshold BER"
+        ::= { th_ber 1 }
+
+sysThresholdBERMax              OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure maximum threshold BER"
+        ::= { th_ber 2 }
+
+sysThresholdBERAction          OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure threshold BER action"
+        ::= { th_ber 3 } 
+
+th_idu_temp                     OBJECT IDENTIFIER ::= { threshold 5  }
+
+sysThresholdIDUTempMin          OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure minimum IDU temp"
+        ::= { th_idu_temp 1 }
+
+sysThresholdIDUTempMax              OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure maximum IDU temp"
+        ::= { th_idu_temp 2 }
+
+sysThresholdIDUTempAction          OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure threshold IDU temp"
+        ::= { th_idu_temp 3 }
+
+th_odu_temp                     OBJECT IDENTIFIER ::= { threshold 6  }
+
+sysThresholdODUTempMin          OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure minimum ODU temp"
+        ::= { th_odu_temp 1 }
+
+sysThresholdODUTempMax              OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure maximum ODU temp"
+        ::= { th_odu_temp 2 }
+
+sysThresholdODUTempAction          OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure threshold ODU temp"
+        ::= { th_odu_temp 3 }
+
+th_in_port                     OBJECT IDENTIFIER ::= { threshold 7  }
+
+sysThresholdInPortUtilMin          OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure minimum In port util"
+        ::= { th_in_port 1 }
+
+sysThresholdInPortUtilMax       OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure maximum In port util"
+        ::= { th_in_port 2 }
+
+sysThresholdInPortUtilAction    OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure threshold In port util action"
+        ::= { th_in_port 3 }
+
+th_out_port                     OBJECT IDENTIFIER ::= { threshold 8  }
+
+sysThresholdOutPortUtilMin          OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure minimum Out port util"
+        ::= { th_out_port 1 }
+
+sysThresholdOutPortUtilMax       OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure maximum Out port util"
+        ::= { th_out_port 2 }
+
+sysThresholdOutPortUtilAction    OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure threshold Out port util action"
+        ::= { th_out_port 3 }
+
+th_link_down                     OBJECT IDENTIFIER ::= { threshold 9  }
+
+sysThresholdLinkDownAction    OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure threshold link down action"
+        ::= { th_link_down 1 }
+
+sysEgressMargin    		OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure Ethernet Egress margin"
+        ::= { sys 35 }
+
+sysQOSMode    			OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure QOS Mode"
+        ::= { sys 36 }
+
+sysSpeedLicense	 		OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure speed license"
+        ::= { sys 39 }
+
+gps	                        OBJECT IDENTIFIER ::= { sys 43  } 
+
+sysGPSFirst                     OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..100))
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure gps coordinate 1"
+        ::= { gps 1 }
+
+sysGPSSecond                    OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..100))
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure gps coordinate 2"
+        ::= { gps 2 }
+
+sysVoltage                      OBJECT-TYPE
+        SYNTAX                  Opaque
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display system voltage"
+        ::= { sys 44 }
+
+sysUptime                       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..100))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display system uptime"
+        ::= { sys 45 }	
+
+sysVoltage12                    OBJECT-TYPE
+        SYNTAX                  Opaque
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display power input(1.2V) "
+        ::= { sys 49 }
+
+sysVoltage25                    OBJECT-TYPE
+        SYNTAX                  Opaque
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display power input(2.5V)"
+        ::= { sys 50 }
+
+sysVoltage33                    OBJECT-TYPE
+        SYNTAX                  Opaque
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display power input(3.3V)"
+        ::= { sys 51 }
+
+loopback				OBJECT IDENTIFIER ::= { modem 1}
+
+modemLoopbackMode       	OBJECT-TYPE
+        SYNTAX          	INTEGER { off(0), digital(1), if(2) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display the Loopback Mode"
+        ::= { loopback 1 }
+
+modemLoopbackAuto       	OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Run loopback auto"
+        ::= { loopback 2 }
+
+acm             			OBJECT IDENTIFIER ::= { modem 3  }
+
+improve             		OBJECT IDENTIFIER ::= { acm 3  }
+
+qpsk_improve                    OBJECT IDENTIFIER ::= { improve 1  }
+
+modemACMQPSKMSEImporve      	OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display ACM MSE improve value for QPSK"
+        ::= { qpsk_improve 1 }
+
+modemACMQPSKMSEImporveInt       OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display ACM MSE improve value for QPSK in INTEGER"
+        ::= { qpsk_improve 2 }
+
+qam16_improve                   OBJECT IDENTIFIER ::= { improve 2 }
+
+modemACM16QMSEImprove      	OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display ACM MSE improve value for 16Q"
+        ::= { qam16_improve 1 }
+
+modemACM16QMSEImproveInt        OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display ACM MSE improve value for 16Q in INTEGER"
+        ::= { qam16_improve 2 }
+
+qam32_improve                   OBJECT IDENTIFIER ::= { improve 3 }
+
+modemACM32QMSEImprove      	OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display ACM MSE improve value for 32Q"
+        ::= { qam32_improve 1 }
+
+modemACM32QMSEImproveInt        OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display ACM MSE improve value for 32Q INTEGER"
+        ::= { qam32_improve 2 }
+
+qam64_improve                   OBJECT IDENTIFIER ::= { improve 4 }
+
+modemACM64QMSEImprove      	OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display ACM MSE improve value for 64Q"
+        ::= { qam64_improve 1 }
+
+modemACM64QMSEImproveInt        OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display ACM MSE improve value for 64Q in INTEGER"
+        ::= { qam64_improve 2 }
+
+qam128_improve                  OBJECT IDENTIFIER ::= { improve 5 }
+
+modemACM128QMSEImprove      	OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display ACM MSE improve value for 128Q"
+        ::= { qam128_improve 1 }
+
+modemACM128QMSEImproveInt       OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display ACM MSE improve value for 128Q in INTEGER"
+        ::= { qam128_improve 2 }
+
+qam256_improve                  OBJECT IDENTIFIER ::= { improve 6 }
+
+modemACM256QMSEImprove      	OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display ACM MSE improve value for 256Q"
+        ::= { qam256_improve 1 }
+
+modemACM256QMSEImproveInt       OBJECT-TYPE
+        SYNTAX                  Opaque
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display ACM MSE improve value for 256Q in INTEGER"
+        ::= { qam256_improve 2 }
+
+qam512_improve                  OBJECT IDENTIFIER ::= { improve 7 }
+
+modemACM512QMSEImprove      	OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display ACM MSE improve value for 512Q"
+        ::= { qam512_improve 1 }
+
+modemACM512QMSEImproveInt       OBJECT-TYPE
+        SYNTAX                  Opaque
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display ACM MSE improve value for 512Q in INTEGER"
+        ::= { qam512_improve 2 }
+
+qam1024_improve                  OBJECT IDENTIFIER ::= { improve 8 }
+
+modemACM1024QMSEImprove      	OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display ACM MSE improve value for 1024Q"
+        ::= { qam1024_improve 1 }
+
+modemACM1024QMSEImproveInt       OBJECT-TYPE
+        SYNTAX                  Opaque
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display ACM MSE improve value for 1024Q in INTEGER"
+        ::= { qam1024_improve 2 }
+
+q8psk_improve                    OBJECT IDENTIFIER ::= { improve 9  }
+
+modemACM8PSKMSEImporve      	OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display ACM MSE improve value for 8PSK"
+        ::= { q8psk_improve 1 }
+
+modemACM8PSKMSEImporveInt       OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display ACM MSE improve value for 8PSK in INTEGER"
+        ::= { q8psk_improve 2 }
+
+degrade             		OBJECT IDENTIFIER ::= { acm 4  }
+
+qpsk_degrade                    OBJECT IDENTIFIER ::= { degrade 1  }
+
+modemACMQPSKMSEDegrade      	OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display ACM MSE degrade value for QPSK"
+        ::= { qpsk_degrade 1 }
+
+modemACMQPSKMSEDegradeInt       OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display ACM MSE degrade value for QPSK in INTEGER"
+        ::= { qpsk_degrade 2 }
+
+qam16_degrade                   OBJECT IDENTIFIER ::= { degrade 2  }
+
+modemACM16QMSEDegrade      	OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display ACM MSE degrade value for 16Q"
+        ::= { qam16_degrade 1 }
+
+modemACM16QMSEDegradeInt        OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display ACM MSE degrade value for 16Q in INTEGER"
+        ::= { qam16_degrade 2 }
+
+qam32_degrade                   OBJECT IDENTIFIER ::= { degrade 3 }
+
+modemACM32QMSEDegrade      	OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display ACM MSE degrade value for 32Q"
+        ::= { qam32_degrade 1 }
+
+modemACM32QMSEDegradeInt        OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display ACM MSE degrade value for 32Q in INTEGER"
+        ::= { qam32_degrade 2 }
+
+qam64_degrade                   OBJECT IDENTIFIER ::= { degrade 4 }
+
+modemACM64QMSEDegrade      	OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display ACM MSE degrade value for 64Q"
+        ::= { qam64_degrade 1 }
+
+modemACM64QMSEDegradeInt        OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display ACM MSE degrade value for 64Q in INTEGER"
+        ::= { qam64_degrade 2 }
+
+qam128_degrade                  OBJECT IDENTIFIER ::= { degrade 5 }
+
+modemACM128QMSEDegrade      	OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display ACM MSE degrade value for 128Q"
+        ::= { qam128_degrade 1 }
+
+modemACM128QMSEDegradeInt       OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display ACM MSE degrade value for 128Q in INTEGER"
+        ::= { qam128_degrade 2 }
+
+qam256_degrade                  OBJECT IDENTIFIER ::= { degrade 6 }
+
+modemACM256QMSEDegrade      	OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display ACM MSE degrade value for 256Q"
+        ::= { qam256_degrade 1 }
+
+modemACM256QMSEDegradeInt       OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display ACM MSE degrade value for 256Q in INTEGER"
+        ::= { qam256_degrade 2 }
+
+qam512_degrade                  OBJECT IDENTIFIER ::= { degrade 7 }
+
+modemACM512QMSEDegrade      	OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display ACM MSE degrade value for 512Q"
+        ::= { qam512_degrade 1 }
+
+modemACM512QMSEDegradeInt       OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display ACM MSE degrade value for 512Q in INTEGER"
+        ::= { qam512_degrade 2 }
+
+qam1024_degrade                  OBJECT IDENTIFIER ::= { degrade 8 }
+
+modemACM1024QMSEDegrade      	OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display ACM MSE degrade value for 1024Q"
+        ::= { qam1024_degrade 1 }
+
+modemACM1024QMSEDegradeInt       OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display ACM MSE degrade value for 1024Q in INTEGER"
+        ::= { qam1024_degrade 2 }
+
+q8psk_degrade                    OBJECT IDENTIFIER ::= { degrade 9  }
+
+modemACM8PSKMSEDegrade      	OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display ACM MSE degrade value for 8PSK"
+        ::= { q8psk_degrade 1 }
+
+modemACM8PSKMSEDegradeInt       OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display ACM MSE degrade value for 8PSK in INTEGER"
+        ::= { q8psk_degrade 2 }
+
+profile_x			OBJECT IDENTIFIER ::= { acm 5}
+
+modemACMTxProfile		        OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display ACM transmitter profile"
+        ::= { profile_x 1 }
+
+modemACM256RxProfile            OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display ACM receiver profile"
+        ::= { profile_x 2 }
+
+link             		OBJECT IDENTIFIER ::= { modem 4  }
+
+link_ber			OBJECT IDENTIFIER ::= { link 1 }
+
+modemBER      			OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Set/Display BER value"
+        ::= { link_ber 1 }
+
+modemBERStr      			OBJECT-TYPE
+        SYNTAX          	DisplayString (SIZE(0..80))
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display BER value string"
+        ::= { link_ber 2 }
+
+mse             		OBJECT IDENTIFIER ::= { link 2  }
+
+modemMSE      			OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display MSE value"
+        ::= { mse 1 }
+
+modemMSEInt      		OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display MSE value"
+        ::= { mse 2 }
+
+lock             		OBJECT IDENTIFIER ::= { modem 5  }
+
+modemLockStatus      		OBJECT-TYPE
+        SYNTAX          	INTEGER { nolock(0), lock(1), NA(2) }
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Set/Display link lock statsu"
+        ::= { lock 1 }
+
+modemTimingLockStatus      	OBJECT-TYPE
+        SYNTAX          	INTEGER { nolock(0), lock(1), NA(2) }
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Set/Display timing lock statsu"
+        ::= { lock 2 }
+
+modemPreambleLockStatus      	OBJECT-TYPE
+        SYNTAX          	INTEGER { nolock(0), lock(1), NA(2) }
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Set/Display preamble lock statsu"
+        ::= { lock 3 }
+
+modemLDPCLocktatus      	OBJECT-TYPE
+        SYNTAX          	INTEGER { nolock(0), lock(1) , NA(2)}
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Set/Display LDPC lock statsu"
+        ::= { lock 4 }
+
+debug             		OBJECT IDENTIFIER ::= { modem 6  }
+
+modemLDPCStressDecoder      	OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display LDPC Stress Decoder"
+        ::= { debug 1 }
+
+modemRadioMSE      		OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Radio MSE"
+        ::= { debug 3 }
+
+hc                              OBJECT IDENTIFIER ::= { modem 8  }
+
+modemHCEnable		        OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure header compression enable option"
+        ::= { hc 1 }
+
+modemHCEng1Num		        OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display HC engine 1 flow number"
+        ::= { hc 2 }
+
+modemHCEng2Num                  OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display HC engine 2 flow number"
+        ::= { hc 3 }
+
+modemHCNetComp                  OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display HC net compression"
+        ::= { hc 4 }
+
+modemHCGrossComp                OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display HC gross compression"
+        ::= { hc 5 }
+
+modemXPICEnable                 OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure xpic enable option"
+        ::= { modem 9 }
+
+modemTxCapacity                 OBJECT-TYPE
+        SYNTAX                  OPAQUE(Float)
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display transmitter capacity"
+        ::= { modem 10 }
+
+modemSpeedCurrent               OBJECT-TYPE
+        SYNTAX                  OPAQUE(Float)
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display current speed"
+        ::= { modem 11 }
+
+freq             		OBJECT IDENTIFIER ::= { rf 1  }
+
+txfreq             		OBJECT IDENTIFIER ::= { freq 1  }
+
+rfTxFrequency      		OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display TX frequency"
+        ::= { txfreq 1 }
+
+rfTxFrequencyInt      		OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display TX frequency in integer value"
+        ::= { txfreq 2 }
+
+rxfreq             		OBJECT IDENTIFIER ::= { freq 2  }
+
+rfRxFrequency      		OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display RX frequency"
+        ::= { rxfreq 1 }
+
+rfRxFrequencyInt      		OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display RX frequency in integer value"
+        ::= { rxfreq 2 }
+
+duplex             		OBJECT IDENTIFIER ::= { freq 3  }
+
+rfFreqDuplex      		OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Display frequency duplex"
+        ::= { duplex 1 }
+
+rfFreqDuplexInt      		OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Display frequency duplex in integer value"
+        ::= { duplex 2 }
+
+freqmax            		OBJECT IDENTIFIER ::= { freq 4  }
+
+rfFreqMax      			OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display maximum TX frequency"
+        ::= { freqmax 1 }
+
+rfFreqMaxInt      		OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display maximum TX frequency in integer value"
+        ::= { freqmax 2 }
+
+freqmin           		OBJECT IDENTIFIER ::= { freq 5  }
+
+rfFreqMin      			OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display minimum TX frequency"
+        ::= { freqmin 1 }
+
+rfFreqMinInt      		OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display minimum TX frequency in integer value"
+        ::= { freqmin 2 }
+
+rfOpmode      			OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display current opmode setting  "
+        ::= { rf 3 }
+
+power             		OBJECT IDENTIFIER ::= { rf 4  }
+
+rfPower      			OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display TX power.  SNMPc does not support
+				setting and displaying float value."
+        ::= { power 1 }
+
+rfPowerInt      		OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display TX power 1/10 dB in step size "
+        ::= { power 2 }
+
+speed             		OBJECT IDENTIFIER ::= { rf 6  }
+
+chwidth				OBJECT IDENTIFIER ::= { speed 1 }
+
+rfChannelWidth      		OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display Speed channel width  "
+        ::= { chwidth 1 }
+
+rfmod					OBJECT IDENTIFIER ::= {speed 2}
+
+rfModulationMin      		OBJECT-TYPE
+	  SYNTAX          	INTEGER { qpsk(0), 8psk(1), qam16(2), qam32(3), qam64(4), qam128(5), qam256(6), qam512(7), qam1024(8) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display minimum speed modulation  "
+        ::= { rfmod 1 }
+
+rfModulationMax      		OBJECT-TYPE
+	  SYNTAX          	INTEGER { qpsk(0), 8psk(1), qam16(2), qam32(3), qam64(4), qam128(5), qam256(6), qam512(7), qam1024(8) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display maximum speed modulation  "
+        ::= { rfmod 2 }
+symrate                           OBJECT IDENTIFIER ::= { speed 3  }
+
+rfSymrate      			OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Speed symbol rate  "
+        ::= { symrate 1 }
+
+rfSymrateInt      		OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Speed symbol rate in INTEGER "
+        ::= { symrate 2 }
+
+sp                           	OBJECT IDENTIFIER ::= { speed 4  }
+
+rfSpeed      			OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Speed rate  "
+        ::= { sp 1 }
+
+rfSpeedInt      		OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Speed rate in INTEGER "
+        ::= { sp 2 }
+
+rfSpeedSmall     			OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display small packet capacity  "
+        ::= { sp 3 }
+
+rfSpeedSmallInt      		OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display small packet capacity in INTEGER "
+        ::= { sp 4 }
+
+rfSetSpeedL      			OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display set speed large packet capacity  "
+        ::= { sp 5 }
+
+rfSetSpeedS        		OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display set speed small packet capacity "
+        ::= { sp 6 }
+
+rfRxSpeedL      			OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Rx speed large packet capacity  "
+        ::= { sp 7 }
+
+rfRxSpeedS 		     		OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Rx speed small packet capacity "
+        ::= { sp 8 }
+
+rfODUPowerEnable      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display current status of ODU power  "
+        ::= { rf 11 }
+
+rfODUTemp      		OBJECT-TYPE
+    	SYNTAX              	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display current ODU temperature  "
+        ::= { rf 13 }
+
+rssi             		OBJECT IDENTIFIER ::= { rf 14  }
+
+rfRSSI      			OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display current RSSI value in float "
+        ::= { rssi 1 }
+
+rfRSSIInt      			OBJECT-TYPE
+    	SYNTAX              	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display current RSSI value  "
+        ::= { rssi 2 }
+
+pll             		OBJECT IDENTIFIER ::= { rf 15  }
+
+rfODUIFpll      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { nolock(0), lock(1), NA(2) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Display current status of ODU IF PLL  "
+        ::= { pll 2 }
+
+rfODUTxpll      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { nolock(0), lock(1), NA(2) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Display current status of ODU TX PLL  "
+        ::= { pll 3 }
+
+rfODURxpll      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { nolock(0), lock(1), NA(2) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Display current status of ODU RX PLL  "
+        ::= { pll 4 }
+
+rfIDUTxpll      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { nolock(0), lock(1), NA(2) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Display current status of IDU TX PLL  "
+        ::= { pll 5 }
+
+incounter             		OBJECT IDENTIFIER ::= { rf 16  }
+
+rfInDataOctets      		OBJECT-TYPE
+    	SYNTAX             	Counter32
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display RF IN data octets counter  "
+        ::= { incounter 1 }
+
+rfInDataPackets      		OBJECT-TYPE
+    	SYNTAX             	Counter32
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display RF IN data packets counter  "
+        ::= { incounter 2 }
+
+rfInDataDropPackets      	OBJECT-TYPE
+    	SYNTAX             	Counter32
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display RF IN data drop packets counter  "
+        ::= { incounter 3 }
+
+rfInPortRate      		OBJECT-TYPE
+    	SYNTAX             	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display RF IN port rate  "
+        ::= { incounter 4 }
+
+rfInPortUtil      		OBJECT-TYPE
+    	SYNTAX             	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display RF IN port utilization  "
+        ::= { incounter 5 }
+
+outcounter             		OBJECT IDENTIFIER ::= { rf 17  }
+
+rfOutDataOctets      		OBJECT-TYPE
+    	SYNTAX             	Counter32
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display RF OUT data octets counter  "
+        ::= { outcounter 1 }
+
+rfOutDataPackets      		OBJECT-TYPE
+    	SYNTAX             	Counter32
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display RF OUT data packets counter  "
+        ::= { outcounter 2 }
+
+rfOutPortRate      		OBJECT-TYPE
+    	SYNTAX             	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display RF OUT port rate  "
+        ::= { outcounter 3 }
+
+rfOutPortUtil      		OBJECT-TYPE
+    	SYNTAX             	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display RF OUT port utilization  "
+        ::= { outcounter 4 }
+
+rfOMUTemp                       OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display RF OUT port utilization  "
+        ::= { rf 19 }
+
+eth1             		OBJECT IDENTIFIER ::= { gige 1  }
+
+config1             		OBJECT IDENTIFIER ::= { eth1 1  }
+
+gigeEth1AutNegotiate      	OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display auto neogitate setting for ETH 1"
+        ::= { config1 1 }
+
+gigeEth1Duplex      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { half(0), full(1) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display duplex setting for ETH 1"
+        ::= { config1 2 }
+
+gigeEth1Enable      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display enable setting for ETH 1"
+        ::= { config1 3 }
+
+gigeEth1MaxRate      		OBJECT-TYPE
+    	SYNTAX              	INTEGER
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display max rate setting for ETH 1"
+        ::= { config1 4 }
+
+gigeEth1PauseFrame      	OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display pause frame setting for ETH 1"
+        ::= { config1 5 }
+
+gigeEth1Priority      		OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display priority setting for ETH 1"
+        ::= { config1 6 }
+
+gigeEth1Speed      		OBJECT-TYPE
+        SYNTAX          	INTEGER 
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display speed setting for ETH 1"
+        ::= { config1 7 }
+
+gigeEth1Status      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Set/Display port status for ETH 1"
+        ::= { config1 8 }
+
+counter1             		OBJECT IDENTIFIER ::= { eth1 2  }
+
+gigeEth1InOctets      		OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 IN octets counter"
+        ::= { counter1 1 }
+
+gigeEth1InUcastPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 IN unicast packet counter"
+        ::= { counter1 2 }
+
+gigeEth1InNUcastPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 IN non-unicast packet counter"
+        ::= { counter1 3 }
+
+gigeEth1InTotalPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 IN non-unicast packet counter"
+        ::= { counter1 4 }
+
+gigeEth1OutOctets      		OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 OUT octets counter"
+        ::= { counter1 5 }
+
+gigeEth1OutUcastPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 OUT unicast packet counter"
+        ::= { counter1 6 }
+
+gigeEth1OutNUcastPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 OUT non-unicast packet counter"
+        ::= { counter1 7 }
+
+gigeEth1OutTotalPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 OUT total packet counter"
+        ::= { counter1 8 }
+
+gigeEth1CRCError      		OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 CRC error counter"
+        ::= { counter1 9 }
+
+gigeEth1CollisionError      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 Collision error counter"
+        ::= { counter1 10 }
+
+gigeEth1InPortRate      	OBJECT-TYPE
+        SYNTAX          	Integer 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 In Port Rate"
+        ::= { counter1 11 }
+
+gigeEth1InPortUtil      	OBJECT-TYPE
+        SYNTAX          	Integer 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 In Port utilization"
+        ::= { counter1 12 }
+
+gigeEth1OutPortRate      	OBJECT-TYPE
+        SYNTAX          	Integer 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 Out Port Rate"
+        ::= { counter1 13 }
+
+gigeEth1OutPortUtil      	OBJECT-TYPE
+        SYNTAX          	Integer 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 Out Port utilization"
+        ::= { counter1 14 }
+
+gigeEth1InDiscard             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth1 In Discard"
+        ::= { counter1 15 }
+
+gigeEth1OutDiscard             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth1 Out Discard"
+        ::= { counter1 16 }
+
+gigeEth1InPkt64             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth1 InPkt64"
+        ::= { counter1 17 }
+
+gigeEth1InPkt64_127             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth1 InPkt64_127"
+        ::= { counter1 18 }
+
+gigeEth1InPkt128_255             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth1 InPkt128_255"
+        ::= { counter1 19 }
+
+gigeEth1InPkt256_511             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth1 InPkt256_511"
+        ::= { counter1 20 }
+
+gigeEth1InPkt512_1023             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth1 InPkt512_1023"
+        ::= { counter1 21 }
+
+gigeEth1InPkt1024_1518             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth1 InPkt1024_1518"
+        ::= { counter1 22 }
+
+gigeEth1InPkt1519over           OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth1 InPkt1519over"
+        ::= { counter1 23 }
+
+eth2             		OBJECT IDENTIFIER ::= { gige 2  }
+
+config2             		OBJECT IDENTIFIER ::= { eth2 1  }
+
+gigeEth2AutNegotiate      	OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display auto neogitate setting for ETH 2"
+        ::= { config2 1 }
+
+gigeEth2Duplex      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { half(0), full(1) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display duplex setting for ETH 2"
+        ::= { config2 2 }
+
+gigeEth2Enable      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display enable setting for ETH 2"
+        ::= { config2 3 }
+
+gigeEth2MaxRate      		OBJECT-TYPE
+    	SYNTAX              	INTEGER
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display max rate setting for ETH 2"
+        ::= { config2 4 }
+
+gigeEth2PauseFrame      	OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display pause frame setting for ETH 2"
+        ::= { config2 5 }
+
+gigeEth2Priority      		OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display priority setting for ETH 2"
+        ::= { config2 6 }
+
+gigeEth2Speed      		OBJECT-TYPE
+        SYNTAX          	INTEGER 
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display speed setting for ETH 2"
+        ::= { config2 7 }
+
+gigeEth2Status      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Set/Display port status for ETH 2"
+        ::= { config2 8 }
+
+counter2             		OBJECT IDENTIFIER ::= { eth2 2  }
+
+gigeEth2InOctets      		OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH2 IN octets counter"
+        ::= { counter2 1 }
+
+gigeEth2InUcastPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH2 IN unicast packet counter"
+        ::= { counter2 2 }
+
+gigeEth2InNUcastPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH2 IN non-unicast packet counter"
+        ::= { counter2 3 }
+
+gigeEth2InTotalPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH2 IN non-unicast packet counter"
+        ::= { counter2 4 }
+
+gigeEth2OutOctets      		OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH2 OUT octets counter"
+        ::= { counter2 5 }
+
+gigeEth2OutUcastPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH2 OUT unicast packet counter"
+        ::= { counter2 6 }
+
+gigeEth2OutNUcastPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH2 OUT non-unicast packet counter"
+        ::= { counter2 7 }
+
+gigeEth2OutTotalPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH2 OUT total packet counter"
+        ::= { counter2 8 }
+
+gigeEth2CRCError      		OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH2 CRC error counter"
+        ::= { counter2 9 }
+
+gigeEth2CollisionError      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH2 Collision error counter"
+        ::= { counter2 10 }
+
+gigeEth2InPortRate              OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display ETH2 In Port Rate"
+        ::= { counter2 11 }
+
+gigeEth2InPortUtil              OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display ETH2 In Port utilization"
+        ::= { counter2 12 }
+
+gigeEth2OutPortRate             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display ETH2 Out Port Rate"
+        ::= { counter2 13 }
+
+gigeEth2OutPortUtil             OBJECT-TYPE
+        SYNTAX                  Integer 
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display ETH2 Out Port utilization"
+        ::= { counter2 14 }
+
+gigeEth2InDiscard             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth2 In Discard"
+        ::= { counter2 15 }
+
+gigeEth2OutDiscard             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth2 Out Discard"
+        ::= { counter2 16 }
+
+gigeEth2InPkt64             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth2 InPkt64"
+        ::= { counter2 17 }
+
+gigeEth2InPkt64_127             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth2 InPkt64_127"
+        ::= { counter2 18 }
+
+gigeEth2InPkt128_255             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth2 InPkt128_255"
+        ::= { counter2 19 }
+
+gigeEth2InPkt256_511             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth2 InPkt256_511"
+        ::= { counter2 20 }
+
+gigeEth2InPkt512_1023             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth2 InPkt512_1023"
+        ::= { counter2 21 }
+
+gigeEth2InPkt1024_1518             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth2 InPkt1024_1518"
+        ::= { counter2 22 }
+
+gigeEth2InPkt1519over           OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth2 InPkt1519over"
+        ::= { counter2 23 }
+
+eth3             		OBJECT IDENTIFIER ::= { gige 3  }
+
+config3             		OBJECT IDENTIFIER ::= { eth3 1  }
+
+gigeEth3AutNegotiate      	OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display auto neogitate setting for ETH 3"
+        ::= { config3 1 }
+
+gigeEth3Duplex      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { half(0), full(1) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display duplex setting for ETH 3"
+        ::= { config3 2 }
+
+gigeEth3Enable      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display enable setting for ETH 3"
+        ::= { config3 3 }
+
+gigeEth3MaxRate      		OBJECT-TYPE
+    	SYNTAX              	INTEGER
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display max rate setting for ETH 3"
+        ::= { config3 4 }
+
+gigeEth3PauseFrame      	OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display pause frame setting for ETH 3"
+        ::= { config3 5 }
+
+gigeEth3Priority      		OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display priority setting for ETH 3"
+        ::= { config3 6 }
+
+gigeEth3Speed      		OBJECT-TYPE
+        SYNTAX          	INTEGER 
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display speed setting for ETH 3"
+        ::= { config3 7 }
+
+gigeEth3Status      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Set/Display port status for ETH 3"
+        ::= { config3 8 }
+
+counter3             		OBJECT IDENTIFIER ::= { eth3 2  }
+
+gigeEth3InOctets      		OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Eth3 IN octets counter"
+        ::= { counter3 1 }
+
+gigeEth3InUcastPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Eth3 IN unicast packet counter"
+        ::= { counter3 2 }
+
+gigeEth3InNUcastPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Eth3 IN non-unicast packet counter"
+        ::= { counter3 3 }
+
+gigeEth3InTotalPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Eth3 IN non-unicast packet counter"
+        ::= { counter3 4 }
+
+gigeEth3OutOctets      		OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Eth3 OUT octets counter"
+        ::= { counter3 5 }
+
+gigeEth3OutUcastPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Eth3 OUT unicast packet counter"
+        ::= { counter3 6 }
+
+gigeEth3OutNUcastPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Eth3 OUT non-unicast packet counter"
+        ::= { counter3 7 }
+
+gigeEth3OutTotalPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Eth3 OUT total packet counter"
+        ::= { counter3 8 }
+
+gigeEth3CRCError      		OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Eth3 CRC error counter"
+        ::= { counter3 9 }
+
+gigeEth3CollisionError      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Eth3 Collision error counter"
+        ::= { counter3 10 }
+
+gigeEth3InPortRate              OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth3 In Port Rate"
+        ::= { counter3 11 }
+
+gigeEth3InPortUtil              OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth3 In Port utilization"
+        ::= { counter3 12 }
+
+gigeEth3OutPortRate             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth3 Out Port Rate"
+        ::= { counter3 13 }
+
+gigeEth3OutPortUtil             OBJECT-TYPE
+        SYNTAX                  Integer 
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth3 Out Port utilization"
+        ::= { counter3 14 }
+
+gigeEth3InDiscard             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth3 In Discard"
+        ::= { counter3 15 }
+
+gigeEth3OutDiscard             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth3 Out Discard"
+        ::= { counter3 16 }
+
+gigeEth3InPkt64             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth3 InPkt64"
+        ::= { counter3 17 }
+
+gigeEth3InPkt64_127             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth3 InPkt64_127"
+        ::= { counter3 18 }
+
+gigeEth3InPkt128_255             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth3 InPkt128_255"
+        ::= { counter3 19 }
+
+gigeEth3InPkt256_511             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth3 InPkt256_511"
+        ::= { counter3 20 }
+
+gigeEth3InPkt512_1023             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth3 InPkt512_1023"
+        ::= { counter3 21 }
+
+gigeEth3InPkt1024_1518             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth3 InPkt1024_1518"
+        ::= { counter3 22 }
+
+gigeEth3InPkt1519over           OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth3 InPkt1519over"
+        ::= { counter3 23 }
+
+eth4             		OBJECT IDENTIFIER ::= { gige 4  }
+
+config4             		OBJECT IDENTIFIER ::= { eth4 1  }
+
+gigeEth4AutNegotiate      	OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display auto neogitate setting for ETH 4"
+        ::= { config4 1 }
+
+gigeEth4Duplex      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { half(0), full(1) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display duplex setting for ETH 4"
+        ::= { config4 2 }
+
+gigeEth4Enable      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display enable setting for ETH 4"
+        ::= { config4 3 }
+
+gigeEth4MaxRate      		OBJECT-TYPE
+    	SYNTAX              	INTEGER
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display max rate setting for ETH 4"
+        ::= { config4 4 }
+
+gigeEth4PauseFrame      	OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display pause frame setting for ETH 4"
+        ::= { config4 5 }
+
+gigeEth4Priority      		OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display priority setting for ETH 4"
+        ::= { config4 6 }
+
+gigeEth4Speed      		OBJECT-TYPE
+        SYNTAX          	INTEGER 
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display speed setting for ETH 4"
+        ::= { config4 7 }
+
+gigeEth4Status      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Set/Display port status for ETH 4"
+        ::= { config4 8 }
+
+counter4             		OBJECT IDENTIFIER ::= { eth4 2  }
+
+gigeEth4InOctets      		OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Eth4 IN octets counter"
+        ::= { counter4 1 }
+
+gigeEth4InUcastPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Eth4 IN unicast packet counter"
+        ::= { counter4 2 }
+
+gigeEth4InNUcastPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Eth4 IN non-unicast packet counter"
+        ::= { counter4 3 }
+
+gigeEth4InTotalPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Eth4 IN non-unicast packet counter"
+        ::= { counter4 4 }
+
+gigeEth4OutOctets      		OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Eth4 OUT octets counter"
+        ::= { counter4 5 }
+
+gigeEth4OutUcastPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Eth4 OUT unicast packet counter"
+        ::= { counter4 6 }
+
+gigeEth4OutNUcastPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Eth4 OUT non-unicast packet counter"
+        ::= { counter4 7 }
+
+gigeEth4OutTotalPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Eth4 OUT total packet counter"
+        ::= { counter4 8 }
+
+gigeEth4CRCError      		OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Eth4 CRC error counter"
+        ::= { counter4 9 }
+
+gigeEth4CollisionError      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display Eth4 Collision error counter"
+        ::= { counter4 10 }
+
+gigeEth4InPortRate              OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth4 In Port Rate"
+        ::= { counter4 11 }
+
+gigeEth4InPortUtil              OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth4 In Port utilization"
+        ::= { counter4 12 }
+
+gigeEth4OutPortRate             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth4 Out Port Rate"
+        ::= { counter4 13 }
+
+gigeEth4OutPortUtil             OBJECT-TYPE
+        SYNTAX                  Integer 
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth4 Out Port utilization"
+        ::= { counter4 14 }
+
+gigeEth4InDiscard             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth4 In Discard"
+        ::= { counter4 15 }
+
+gigeEth4OutDiscard             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth4 Out Discard"
+        ::= { counter4 16 }
+
+gigeEth4InPkt64             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth4 InPkt64"
+        ::= { counter4 17 }
+
+gigeEth4InPkt64_127             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth4 InPkt64_127"
+        ::= { counter4 18 }
+
+gigeEth4InPkt128_255             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth4 InPkt128_255"
+        ::= { counter4 19 }
+
+gigeEth4InPkt256_511             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth4 InPkt256_511"
+        ::= { counter4 20 }
+
+gigeEth4InPkt512_1023             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth4 InPkt512_1023"
+        ::= { counter4 21 }
+
+gigeEth4InPkt1024_1518             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth4 InPkt1024_1518"
+        ::= { counter4 22 }
+
+gigeEth4InPkt1519over           OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth4 InPkt1519over"
+        ::= { counter4 23 }
+
+PLAStatus		        OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display pla status"
+        ::= { gige 7 }
+
+PLAEnable                       OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Display/Configure pla enable option"
+        ::= { gige 8 }
+
+radio                            OBJECT IDENTIFIER ::= { gige 9 }
+
+modemconfig 			 OBJECT IDENTIFIER ::= { radio 1 }
+
+gigeModemAutNegotiate            OBJECT-TYPE
+        SYNTAX                  INTEGER { off(0), on(1) }
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display auto neogitate setting for radio"
+        ::= { modemconfig 1 }
+
+gigeModemDuplex                  OBJECT-TYPE
+        SYNTAX                  INTEGER { half(0), full(1) }
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display duplex setting for radio"
+        ::= { modemconfig 2 }
+
+gigeModemEnable                  OBJECT-TYPE
+        SYNTAX                  INTEGER { off(0), on(1) }
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display enable setting for radio"
+        ::= { modemconfig 3 }
+
+gigeModemMaxRate                 OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display max rate setting for radio"
+        ::= { modemconfig 4 }
+
+gigeModemPauseFrame              OBJECT-TYPE
+        SYNTAX                  INTEGER { off(0), on(1) }
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display pause frame setting for radio"
+        ::= { modemconfig 5 }
+
+gigeModemPriority                OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display priority setting for radio"
+        ::= { modemconfig 6 }
+
+gigeModemSpeed                   OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display speed setting for radio"
+        ::= { modemconfig 7 }
+
+gigeModemStatus                  OBJECT-TYPE
+        SYNTAX                  INTEGER { off(0), on(1) }
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Set/Display port status for radio"
+        ::= { modemconfig 8 }
+
+modemcounter                        OBJECT IDENTIFIER ::= { radio 2  }
+
+gigeModemInOctets                OBJECT-TYPE
+        SYNTAX                  Counter32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio IN octets counter"
+        ::= { modemcounter 1 }
+
+gigeModemInUcastPackets          OBJECT-TYPE
+        SYNTAX                  Counter32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio IN unicast packet counter"
+        ::= { modemcounter 2 }
+
+gigeModemInNUcastPackets         OBJECT-TYPE
+        SYNTAX                  Counter32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio IN non-unicast packet counter"
+        ::= { modemcounter 3 }
+
+gigeModemInTotalPackets          OBJECT-TYPE
+        SYNTAX                  Counter32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio IN non-unicast packet counter"
+        ::= { modemcounter 4 }
+
+gigeModemOutOctets               OBJECT-TYPE
+        SYNTAX                  Counter32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio OUT octets counter"
+        ::= { modemcounter 5 }
+
+gigeModemOutUcastPackets         OBJECT-TYPE
+        SYNTAX                  Counter32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio OUT unicast packet counter"
+        ::= { modemcounter 6 }
+
+gigeModemOutNUcastPackets        OBJECT-TYPE
+        SYNTAX                  Counter32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio OUT non-unicast packet counter"
+        ::= { modemcounter 7 }
+
+gigeModemOutTotalPackets         OBJECT-TYPE
+        SYNTAX                  Counter32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio OUT total packet counter"
+        ::= { modemcounter 8 }
+
+gigeModemCRCError                OBJECT-TYPE
+        SYNTAX                  Counter32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio CRC error counter"
+        ::= { modemcounter 9 }
+
+gigeModemCollisionError          OBJECT-TYPE
+        SYNTAX                  Counter32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio Collision error counter"
+        ::= { modemcounter 10 }
+
+gigeModemInPortRate              OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio In Port Rate"
+        ::= { modemcounter 11 }
+
+gigeModemInPortUtil              OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio In Port utilization"
+        ::= { modemcounter 12 }
+
+gigeModemOutPortRate             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio Out Port Rate"
+        ::= { modemcounter 13 }
+
+gigeModemOutPortUtil             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio Out Port utilization"
+        ::= { modemcounter 14 }
+
+gigeModemInDiscard             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio In Discard"
+        ::= { modemcounter 15 }
+
+gigeModemOutDiscard             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio Out Discard"
+        ::= { modemcounter 16 }
+
+gigeModemInPkt64             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio InPkt64"
+        ::= { modemcounter 17 }
+
+gigeModemInPkt64_127             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio InPkt64_127"
+        ::= { modemcounter 18 }
+
+gigeModemInPkt128_255             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio InPkt128_255"
+        ::= { modemcounter 19 }
+
+gigeModemInPkt256_511             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio InPkt256_511"
+        ::= { modemcounter 20 }
+
+gigeModemInPkt512_1023             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio InPkt512_1023"
+        ::= { modemcounter 21 }
+
+gigeModemInPkt1024_1518             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio InPkt1024_1518"
+        ::= { modemcounter 22 }
+
+gigeModemInPkt1519over          OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Radio InPkt1519over"
+        ::= { modemcounter 23 }
+
+gigeSynceSource                 OBJECT-TYPE
+        SYNTAX                  Integer { Copper(0), Fiber(1) }
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display Synce source"
+        ::= { gige 10 }
+
+gigeSynceMode                   OBJECT-TYPE
+        SYNTAX                  Integer { Off(0), Master(1), Slave(2) }
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION             "Set/Display Synce mode"
+        ::= { gige 11 }
+
+trapStartUp             	NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when the system starts up"
+        ::= { trangotrap 1 }
+
+reset 			OBJECT IDENTIFIER ::= { trangotrap 2 }	
+
+trapReboot              	NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when the system reboots"
+        ::= { reset 1 }
+
+trapIPReset              	NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when the IP resets"
+        ::= { reset 2 }
+
+trapConfigReset              	NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when the config is reset"
+        ::= { reset 3 }
+
+traprps         		OBJECT IDENTIFIER ::= { trangotrap 3 }
+
+trapRPSPortUp   		NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when the rapid port up occurs"
+        ::= { traprps 1 }
+
+trapRPSPortDown   		NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when the rapid port down occurs"
+        ::= { traprps 2 }
+
+trapeth         		OBJECT IDENTIFIER ::= { trangotrap 4 }
+
+trapEth1StatusUpdate    	NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when ethernet port 1 status changed"
+        ::= { trapeth 1 }
+
+trapEth2StatusUpdate    	NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when ethernet port 2 status changed"
+        ::= { trapeth 2 }
+
+acm_profile   		OBJECT IDENTIFIER ::= { trangotrap 5 }
+
+trapLinkLock          		NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when the system lose modem lock"
+        ::= { acm_profile 1 }
+
+trapACMTxProfileChange		NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when the ACM Tx profile changes"
+        ::= { acm_profile 2 }
+
+trapACMRxProfileChange		NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when the ACM Rx profile changes"
+        ::= { acm_profile 3 }
+
+trap_threshold         		OBJECT IDENTIFIER ::= { trangotrap 6 }
+
+trapIDUTempMin          	NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when the IDU temp below min"
+        ::= { trap_threshold 1 }
+
+trapIDUTempMax          	NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when the IDU temp above max"
+        ::= { trap_threshold 2 }
+
+trapODUTempMin          	NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when the ODU temp below min"
+        ::= { trap_threshold 3 }
+
+trapODUTempMax          	NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when the ODU temp above max"
+        ::= { trap_threshold 4 }
+
+trapMSEMin          		NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when the MSE below min"
+        ::= { trap_threshold 5 }
+
+trapMSEMax          		NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when the MSE above max"
+        ::= { trap_threshold 6 }
+
+trapBERMin          		NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when the BER below min"
+        ::= { trap_threshold 7 }
+
+trapBERMax          		NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when the BER above max"
+        ::= { trap_threshold 8 }
+
+trapFERMin          		NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when the FER below min"
+        ::= { trap_threshold 9 }
+
+trapFERMax          		NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when the FER above max"
+        ::= { trap_threshold 10 }
+
+trapRSSIMin          		NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when the RSSI below min"
+        ::= { trap_threshold 11 }
+
+trapRSSIMax          		NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when the RSSI above max"
+        ::= { trap_threshold 12 }
+
+trapInPortUtilMin         	NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when IN port utilization below min"
+        ::= { trap_threshold 13 }
+
+trapInPortUtilMax          		NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when IN port utilization above max"
+        ::= { trap_threshold 14 }
+
+trapOutPortUtilMin         	NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when OUT port utilization below min"
+        ::= { trap_threshold 15 }
+
+trapOutPortUtilMax          		NOTIFICATION-TYPE
+        STATUS          	current
+        DESCRIPTION     	"send traps when OUT port utilization above max"
+        ::= { trap_threshold 16 }
+
+END
+
