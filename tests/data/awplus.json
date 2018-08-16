@@ -12442,19 +12442,6 @@
             ]
         }
     },
-    "applications": {
-        "poller": {
-            "applications": [
-                {
-                    "app_type": "ntp",
-                    "app_state": "UNKNOWN",
-                    "discovered": "0",
-                    "app_state_prev": null,
-                    "app_status": "",
-                    "app_instance": ""
-                }
-            ],
-            "application_metrics": []
     "vlans": {
         "discovery": {
             "vlans": [
