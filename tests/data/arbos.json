@@ -2888,7 +2888,7 @@
             "processors": []
         },
         "poller": "matches discovery"
-    }
+    },
     "storage": {
         "discovery": {
             "storage": [
