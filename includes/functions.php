@@ -986,7 +986,7 @@ function get_astext($asn)
         return $result;
     }
 
-    return $asn;
+    return '';
 }
 
 /**
