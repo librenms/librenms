@@ -24,32 +24,37 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use LibreNMS\Exceptions\DatabaseConnectException;
+
 if (!isset($init_modules)) {
+    $init_modules = array('nodb');
+    require __DIR__ . '/includes/init.php';
+
     $opts = getopt('ldh:u:p:n:t:s:');
 
-    $db_vars = array(
-        'db_host' => 'h',
-        'db_user' => 'u',
-        'db_pass' => 'p',
-        'db_name' => 'n',
-        'db_port' => 't',
-        'db_socket' => 's',
-    );
-
-    $config = array();
-    foreach ($db_vars as $setting => $opt) {
-        if (isset($opts[$opt])) {
-            $config[$setting] = $opts[$opt];
+    try {
+        if (isset($opts['h'])) {
+            dbConnect(
+                isset($opts['h']) ? $opts['h'] : null,
+                isset($opts['u']) ? $opts['u'] : '',
+                isset($opts['p']) ? $opts['p'] : '',
+                isset($opts['n']) ? $opts['n'] : '',
+                isset($opts['t']) ? $opts['t'] : null,
+                isset($opts['s']) ? $opts['s'] : null
+            );
+        } else {
+            // use configured database credentials
+            dbConnect();
         }
+    } catch (DatabaseConnectException $e) {
+        echo $e->getMessage() . PHP_EOL;
+        exit;
     }
-
-    $init_modules = array();
-    require __DIR__  . '/includes/init.php';
 
     $debug = isset($opts['d']);
     $skip_schema_lock = isset($opts['l']);
 }
 
-require 'includes/sql-schema/update.php';
+require __DIR__ . '/includes/sql-schema/update.php';
 
 exit($return);

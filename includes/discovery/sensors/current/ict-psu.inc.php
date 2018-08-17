@@ -26,7 +26,7 @@
 // Output Current
 // SNMPv2-SMI::enterprises.39145.11.8.0 = STRING: "0.4" -- outputCurrent
 
-$outputCurrent = trim(snmp_get($device, 'outputCurrent.0', '-Oqv', 'ICT-MIB'), '" ');
+$outputCurrent = trim(snmp_get($device, 'outputCurrent.0', '-Oqv', 'ICT-DIGITAL-SERIES-MIB'), '" ');
 if (!empty($outputCurrent)) {
     $divisor = 1;
     $index = 0;

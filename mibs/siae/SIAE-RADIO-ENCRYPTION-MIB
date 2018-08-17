@@ -1,0 +1,277 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-RADIO-ENCRYPTION-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE,
+             Integer32
+        FROM SNMPv2-SMI
+             RowStatus
+        FROM SNMPv2-TC
+             InterfaceIndex
+        FROM IF-MIB
+             siaeMib
+        FROM SIAE-TREE-MIB
+             AlarmStatus, AlarmSeverityCode
+        FROM SIAE-ALARM-MIB;
+
+    radioEncrypt MODULE-IDENTITY
+        LAST-UPDATED "201507200000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: tbd@siaemic.com
+            "
+        DESCRIPTION
+            "SIAE's radio encryption MIB.
+            "
+        REVISION "201507200000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00
+            "
+    ::= { siaeMib 96 }
+
+--------------------------------------------------------------------------------
+--  RADIO ECRYPTION GROUP
+--------------------------------------------------------------------------------
+--
+-- This group is used to manage SIAE's proprietary radio encryption MIB.
+-- Below the denomination 'radio encryption' will be abbreviated as ENCRYPT
+--
+--------------------------------------------------------------------------------
+
+------ Beginning --------------------------------------------------------------
+
+    rdEncryptMibVersion  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+        DEFVAL { 1 }
+    ::= {radioEncrypt 1}
+
+------  Begin of rdEncryptTable
+--
+    rdEncryptTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EncryptEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with SIAE's ENCRYPT entries."
+    ::= {radioEncrypt 2}
+
+    rdEncryptTableEntry  OBJECT-TYPE
+        SYNTAX      EncryptEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "SIAE's ENCRYPT entry. An ENCRYPT instance have the same index of
+             the relative radio link index. A row in this table is created by
+             the SNMP agent for each instance of radio link."
+        INDEX {rdEncryptIfIndex}
+    ::= {rdEncryptTable 1}
+
+    EncryptEntry  ::=
+        SEQUENCE {
+            rdEncryptIfIndex          InterfaceIndex,
+            rdEncryptRowStatus        RowStatus,
+            rdEncryptAdminStatus      INTEGER,
+            rdEncryptAlgo             INTEGER,
+            rdEncryptAlgoMode         INTEGER,
+            rdEncryptKeyMode          INTEGER,
+            rdEncryptKey              OCTET STRING,
+            rdEncryptKeyLifeTime      Integer32,
+            rdEncryptMismatchAlarm    AlarmStatus
+         }
+
+    rdEncryptIfIndex  OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A unique value, greater than zero, for each ENCRYPT interface.
+             This object is identical to the ifIndex of the standard MIB-2
+             ifTable.
+             SNMP agent accepts the value of this objects only if the
+             capability ifextCapabilityEncrypt is shown in ifextCapabilities
+             for the same ifIndex.
+           "
+    ::= {rdEncryptTableEntry 1}
+
+    rdEncryptRowStatus  OBJECT-TYPE 
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this row of rdEncryptTable. A manager must set
+             this object in order to create an instance of ENCRYPT.
+            "
+    ::= {rdEncryptTableEntry 2}
+
+    rdEncryptAdminStatus  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                              disable (1),
+                              enable  (2)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The desired state of the ENCRYPT. This object can be set only
+             when the rdEncryptRowStatus of the ENCRYPT is active.
+            
+             When a managed system initializes, all ENCRYPT instance start with
+             rdEncryptAdminStatus in the disable(2) state, it's a default
+             state also. As a result of either explicit management
+             action or per configuration information retained by the
+             managed system, rdEncryptAdminStatus is then changed to the 
+             enable (1) state (or remains in the disable(2) state).
+
+             In order to use ENCRYPT, also rdEncryptSystemControl must be set to
+             start.
+            "
+         DEFVAL { disable } 
+    ::= {rdEncryptTableEntry 3}
+
+    rdEncryptAlgo  OBJECT-TYPE
+        SYNTAX     INTEGER {
+                             aes128 (1),
+                             aes256 (2)
+                  }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The encryption algorithm. The key length depends on the choosen 
+             algorithm.
+            "
+         DEFVAL { aes256 } 
+    ::= {rdEncryptTableEntry 4}
+
+    rdEncryptAlgoMode  OBJECT-TYPE
+        SYNTAX     INTEGER {
+                             aesModeElectronicCodebook  (1),
+                             aesModeCipherBlockChaining (2),
+                             aesModeCipherFeedback      (3),
+                             aesModeOutputFeedback      (4),
+                             aesModeCounter             (5)
+                  }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "AES encryption/decryption algorithm can be implemented in
+             five modes. The modes may be used in conjunction with any
+             symmetric key block cipher algorithm that is approved by a
+             Federal Information Processing Standard (FIPS). 
+             The five modes are:
+               - Electronic Codebook (ECB)
+               - Cipher Block Chaining (CBC)
+               - Cipher Feedback (CFB),
+               - Output Feedback (OFB),
+               - and Counter (CTR)
+             Agents can accept only a subset of AES modes.
+            "
+         DEFVAL { aesModeCounter } 
+    ::= {rdEncryptTableEntry 5}
+
+    rdEncryptKeyMode  OBJECT-TYPE
+        SYNTAX     INTEGER {
+                             manualEnteredKey       (1),
+                             automaticKeyGeneration (2)
+                   }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object select between the Manually-entered key mode and
+             auto-generated key mode. Agent could not accept the value
+             automaticKeyGeneration if it don't support the automatic key
+             generation.
+            "
+         DEFVAL { manualEnteredKey } 
+    ::= {rdEncryptTableEntry 6}
+
+    rdEncryptKey  OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(16|32))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The key used for encryption. The length of the key depends on  
+             rdEncryptAlgo.
+            "
+         DEFVAL { '00'H } 
+    ::= {rdEncryptTableEntry 7}
+
+    rdEncryptKeyLifeTime  OBJECT-TYPE
+        SYNTAX      Integer32 (1..1096)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The life time in day of the automatically generated key.
+             The range goes from one day to three years (considering one
+             leap year).
+            "
+         DEFVAL { 7 } 
+    ::= {rdEncryptTableEntry 8}
+
+    rdEncryptMismatchAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This alarm is raised when local and remote configuration does not
+             match."
+    ::= {rdEncryptTableEntry 9}
+
+--
+------  End of rdEncryptTable
+
+    rdEncryptSystemControl OBJECT-TYPE
+        SYNTAX      INTEGER {
+                              start(1),
+                              shutdown(2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The administrative system control status requested by management
+             for the ENCRYPT feature. The value 'start'(1) indicates that all
+             resources required by ENCRYPT should be allocated and ENCRYPT 
+             should be supported in the device on ports which shown the 
+             specific capability. The value shutdown(2) indicates that ENCRYPT
+             should be shutdown in the device on all ports and all allocated
+             memory must be released."
+    ::= { radioEncrypt 3 }
+
+    rdEncryptMismatchAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the rdEncryptMismatchAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= { radioEncrypt 4 }
+
+END
+
+
+
+

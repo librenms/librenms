@@ -18,9 +18,9 @@ if (bill_permitted($bill_id)) {
     $tomorrow   = str_replace('-', '', dbFetchCell('SELECT DATE_ADD(CURDATE(), INTERVAL 1 DAY)'));
     $last_month = str_replace('-', '', dbFetchCell('SELECT DATE_SUB(CURDATE(), INTERVAL 1 MONTH)'));
 
-    $rightnow  = $today.date(His);
-    $before    = $yesterday.date(His);
-    $lastmonth = $last_month.date(His);
+    $rightnow  = $today.date('His');
+    $before    = $yesterday.date('His');
+    $lastmonth = $last_month.date('His');
 
     $bill_name  = $bill_data['bill_name'];
     $dayofmonth = $bill_data['bill_day'];
@@ -66,9 +66,8 @@ if (bill_permitted($bill_id)) {
         $vars['view'] = 'quick';
     }
 
-    function print_port_list()
+    function print_port_list($ports)
     {
-        global $ports;
         echo '<div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Billed Ports</h3>
@@ -150,7 +149,7 @@ if ($vars['view'] == 'edit' && Auth::user()->hasGlobalAdmin()) {
 
 <div class="row">
 <div class="col-lg-6 col-lg-push-6">
-    <?php print_port_list() ?>
+    <?php print_port_list($ports) ?>
 </div>
 <div class="col-lg-6 col-lg-pull-6">
 <div class="panel panel-default">
@@ -216,7 +215,7 @@ if ($vars['view'] == 'edit' && Auth::user()->hasGlobalAdmin()) {
 
     $lastmonth = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 MONTH))');
     $yesterday = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY))');
-    $rightnow  = date(U);
+    $rightnow  = date('U');
 
 if ($vars['view'] == 'accurate') {
     $bi  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];

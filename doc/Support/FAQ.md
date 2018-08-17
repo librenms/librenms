@@ -98,11 +98,11 @@ You will then have a two options in the footer of the website - Show SQL Debug a
 
 #### <a name="faq11"> How do I debug the discovery process?</a>
 
-Please see the [Discovery Support](http://docs.librenms.org/Support/Discovery Support) document for further details.
+Please see the [Discovery Support](http://docs.librenms.org/Support/Discovery Support/) document for further details.
 
 #### <a name="faq12"> How do I debug the poller process?</a>
 
-Please see the [Poller Support](http://docs.librenms.org/Support/Poller Support) document for further details.
+Please see the [Poller Support](http://docs.librenms.org/Support/Poller Support/) document for further details.
 
 #### <a name="faq14"> Why do I get a lot apache or rrdtool zombies in my process list?</a>
 
@@ -267,7 +267,7 @@ Please see [Supporting a new OS](../Developing/Support-New-OS.md)
 #### <a name="faq20"> What information do you need to add a new OS?</a>
 
 Under the device, click the gear and select Capture. 
-Please provide the output of Discovery, Poller, and Snmpwalk as separate non-expiring https://p.libren.ms/ links.
+Please [open an issue on GitHub](https://github.com/librenms/librenms/issues/new) and provide the output of Discovery, Poller, and Snmpwalk as separate non-expiring https://p.libren.ms/ links.
 
 You can also use the command line to obtain the information.  Especially, if snmpwalk results in a large amount of data.
 Replace the relevant information in these commands such as HOSTNAME and COMMUNITY. Use `snmpwalk` instead of `snmpbulkwalk` for v1 devices.

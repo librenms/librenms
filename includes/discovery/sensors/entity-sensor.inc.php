@@ -12,21 +12,20 @@ if (empty($entity_array)) {
 }
 
 if (!empty($entity_array)) {
-    $oids = array();
     echo ' entPhySensorType';
-    $oids = snmpwalk_cache_multi_oid($device, 'entPhySensorType', $oids, 'ENTITY-SENSOR-MIB');
+    $entity_oids = snmpwalk_cache_multi_oid($device, 'entPhySensorType', [], 'ENTITY-SENSOR-MIB');
     echo ' entPhySensorScale';
-    $oids = snmpwalk_cache_multi_oid($device, 'entPhySensorScale', $oids, 'ENTITY-SENSOR-MIB');
+    $entity_oids = snmpwalk_cache_multi_oid($device, 'entPhySensorScale', $entity_oids, 'ENTITY-SENSOR-MIB');
     echo ' entPhySensorPrecision';
-    $oids = snmpwalk_cache_multi_oid($device, 'entPhySensorPrecision', $oids, 'ENTITY-SENSOR-MIB');
+    $entity_oids = snmpwalk_cache_multi_oid($device, 'entPhySensorPrecision', $entity_oids, 'ENTITY-SENSOR-MIB');
     echo ' entPhySensorValue';
-    $oids = snmpwalk_cache_multi_oid($device, 'entPhySensorValue', $oids, 'ENTITY-SENSOR-MIB');
+    $entity_oids = snmpwalk_cache_multi_oid($device, 'entPhySensorValue', $entity_oids, 'ENTITY-SENSOR-MIB');
     if ($device['os'] === 'arista_eos') {
-        require 'includes/discovery/sensors/misc/arista-eos-limits.inc.php';
+        $entity_oids = snmpwalk_cache_oid($device, 'aristaEntSensorThresholdTable', $entity_oids, 'ARISTA-ENTITY-SENSOR-MIB');
     }
 }
 
-if (!empty($oids)) {
+if (!empty($entity_oids)) {
     $entitysensor = array(
         'voltsDC'   => 'voltage',
         'voltsAC'   => 'voltage',
@@ -39,7 +38,7 @@ if (!empty($oids)) {
         'dBm'       => 'dbm',
     );
 
-    foreach ($oids as $index => $entry) {
+    foreach ($entity_oids as $index => $entry) {
         $low_limit      = null;
         $low_warn_limit = null;
         $warn_limit     = null;

@@ -4,4 +4,4 @@ text: 'Novell Netware'
 icon: novell
 discovery:
     - sysDescr:
-        - Novell NetWare
+        - 'Novell NetWare'

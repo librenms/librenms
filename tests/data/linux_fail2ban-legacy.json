@@ -1,0 +1,49 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "fail2ban",
+                    "app_state": "UNKNOWN",
+                    "discovered": "1",
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": []
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "fail2ban",
+                    "app_state": "OK",
+                    "discovered": "1",
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "jail_dovecot_banned",
+                    "value": "6",
+                    "value_prev": null,
+                    "app_type": "fail2ban"
+                },
+                {
+                    "metric": "jail_sshd_banned",
+                    "value": "4",
+                    "value_prev": null,
+                    "app_type": "fail2ban"
+                },
+                {
+                    "metric": "total_banned",
+                    "value": "10",
+                    "value_prev": null,
+                    "app_type": "fail2ban"
+                }
+            ]
+        }
+    }
+}

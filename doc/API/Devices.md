@@ -396,6 +396,7 @@ Input:
   - to: This is the date you would like the graph to end - See http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html for more information.
   - width: The graph width, defaults to 1075.
   - height: The graph height, defaults to 300.
+  - output: Set how the graph should be outputted (base64, display), defaults to display.
 
 Example:
 ```curl
@@ -874,6 +875,8 @@ Output:
 ### `list_oxidized`
 
 List devices for use with Oxidized. If you have group support enabled then a group will also be returned based on your config.
+
+> LibreNMS will automatically map the OS to the Oxidized model name if they don't match.
 
 Route: `/api/v0/oxidized(/:hostname)`
 

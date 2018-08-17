@@ -30,12 +30,13 @@
 use LibreNMS\Authentication\Auth;
 use LibreNMS\Config;
 
-global $config;
+global $config, $permissions, $vars;
 
 error_reporting(E_ERROR|E_PARSE|E_CORE_ERROR|E_COMPILE_ERROR);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
 
 $install_dir = realpath(__DIR__ . '/..');
-$config['install_dir'] = $install_dir;
 chdir($install_dir);
 
 require_once $install_dir . '/includes/common.php';
@@ -57,6 +58,7 @@ if (!function_exists('module_selected')) {
 require_once $install_dir . '/includes/dbFacile.php';
 require_once $install_dir . '/includes/rrdtool.inc.php';
 require_once $install_dir . '/includes/influxdb.inc.php';
+require_once $install_dir . '/includes/prometheus.inc.php';
 require_once $install_dir . '/includes/opentsdb.inc.php';
 require_once $install_dir . '/includes/graphite.inc.php';
 require_once $install_dir . '/includes/datastore.inc.php';
@@ -93,38 +95,41 @@ if (module_selected('alerts', $init_modules)) {
 // Display config.php errors instead of http 500
 $display_bak = ini_get('display_errors');
 ini_set('display_errors', 1);
-Config::load($install_dir);
-// set display_errors back
-ini_set('display_errors', $display_bak);
 
 if (!module_selected('nodb', $init_modules)) {
-    // Check for testing database
-    if (getenv('DBTEST')) {
-        if (isset($config['test_db_name'])) {
-            $config['db_name'] = $config['test_db_name'];
-        }
-        if (isset($config['test_db_user'])) {
-            $config['db_user'] = $config['test_db_user'];
-        }
-        if (isset($config['test_db_pass'])) {
-            $config['db_pass'] = $config['test_db_pass'];
-        }
-    }
-
     // Connect to database
     try {
         dbConnect();
-
-        Config::loadFromDatabase();
     } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
         if (isCli()) {
             echo 'MySQL Error: ' . $e->getMessage() . PHP_EOL;
+            exit(2);
         } else {
-            echo "<h2>MySQL Error</h2><p>" . $e->getMessage() . "</p>";
+            // punt to the Laravel error handler
+            throw $e;
         }
-        exit(2);
     }
 }
+
+if (module_selected('laravel', $init_modules)) {
+    // make sure Laravel isn't already booted
+    if (!class_exists('App') || !App::isBooted()) {
+        $app = require_once $install_dir . '/bootstrap/app.php';
+        $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+        $kernel->bootstrap();
+    }
+} elseif (module_selected('eloquent', $init_modules)) {
+    \LibreNMS\DB\Eloquent::boot();
+}
+
+// Load config if not already loaded (which is the case if inside Laravel)
+if (!Config::has('install_dir')) {
+    Config::load();
+}
+
+// set display_errors back
+ini_set('display_errors', $display_bak);
+
 
 if (isset($config['php_memory_limit']) && is_numeric($config['php_memory_limit']) && $config['php_memory_limit'] > 128) {
     ini_set('memory_limit', $config['php_memory_limit'].'M');

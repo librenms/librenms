@@ -41,6 +41,7 @@ $ptp = array(
 
 // PMP 100 is defaulted to
 $pmp = array(
+    'MU-MIMO OFDM'  => 'PMP 450m',
     'MIMO OFDM'     => 'PMP 450',
     'OFDM'          => 'PMP 430'
 );
@@ -75,6 +76,7 @@ if (!isset($hardware)) {
     }
 }
 
+// Migrated to Wireless Sensor
 $fecInErrorsCount = snmp_get($device, "fecInErrorsCount.0", "-Ovqn", "WHISP-BOX-MIBV2-MIB");
 $fecOutErrorsCount = snmp_get($device, "fecOutErrorsCount.0", "-Ovqn", "WHISP-BOX-MIBV2-MIB");
 if (is_numeric($fecInErrorsCount) && is_numeric($fecOutErrorsCount)) {
@@ -92,6 +94,7 @@ if (is_numeric($fecInErrorsCount) && is_numeric($fecOutErrorsCount)) {
     unset($rrd_filename, $fecInErrorsCount, $fecOutErrorsCount);
 }
 
+// Migrated to Wireless Sensor
 $crcErrors = snmp_get($device, "fecCRCError.0", "-Ovqn", "WHISP-BOX-MIBV2-MIB");
 if (is_numeric($crcErrors)) {
     $rrd_def = RrdDefinition::make()->addDataset('crcErrors', 'GAUGE', 0, 100000);

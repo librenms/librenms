@@ -284,6 +284,10 @@ Enable or disable the sysDescr output for a device.
 $config['force_ip_to_sysname'] = false;
 ```
 When using IP addresses as a hostname you can instead represent the devices on the WebUI by its SNMP sysName resulting in an easier to read overview of your network. This would apply on networks where you don't have DNS records for most of your devices.
+```php
+$config['force_hostname_to_sysname'] = false;
+```
+When using a dynamic DNS hostname or one that does not resolve, this option would allow you to make use of the SNMP sysName instead as the preferred reference to the device.
 
 ```php
 $config['device_traffic_iftype'][] = '/loopback/';
@@ -340,8 +344,8 @@ $config['allow_duplicate_sysName'] = false;
 Generally, it is a better to set these [per OS](../Developing/os/Settings.md#poller-and-discovery-modules) or device.
 
 ```php
-$config['discovery_modules]['arp-table'] = 1;
-$config['poller_modules']['bgp-peers'] = 0;
+$config['discovery_modules]['arp-table'] = true;
+$config['poller_modules']['bgp-peers'] = false;
 ```
 
 ### SNMP Settings
@@ -350,7 +354,7 @@ $config['poller_modules']['bgp-peers'] = 0;
 $config['snmp']['timeout'] = 1;            # timeout in seconds
 $config['snmp']['retries'] = 5;            # how many times to retry the query
 $config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');
-$config['snmp']['version'] = "v2c";         # Default version to use
+$config['snmp']['version'] = ['v2c', 'v3', 'v1'];         # Default versions to use
 $config['snmp']['port'] = 161;
 ```
 Default SNMP options including retry and timeout settings and also default version and port.

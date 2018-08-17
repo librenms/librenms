@@ -140,6 +140,7 @@ function get_graph_by_port_hostname()
     $vars         = array();
     $vars['port'] = urldecode($router['ifname']);
     $vars['type'] = $router['type'] ?: 'port_bits';
+    $vars['output'] = $_GET['output'] ?: 'display';
     if (!empty($_GET['from'])) {
         $vars['from'] = $_GET['from'];
     }
@@ -164,6 +165,9 @@ function get_graph_by_port_hostname()
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
     rrdtool_close();
+    if ($vars['output'] === 'base64') {
+        api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
+    }
 }
 
 
@@ -212,6 +216,7 @@ function get_graph_generic_by_hostname()
     $sensor_id    = $router['sensor_id'] ?: null;
     $vars         = array();
     $vars['type'] = $router['type'] ?: 'device_uptime';
+    $vars['output'] = $_GET['output'] ?: 'display';
     if (isset($sensor_id)) {
         $vars['id']   = $sensor_id;
         if (str_contains($vars['type'], '_wireless')) {
@@ -244,6 +249,10 @@ function get_graph_generic_by_hostname()
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
     rrdtool_close();
+
+    if ($vars['output'] === 'base64') {
+        api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
+    }
 }
 
 
@@ -343,7 +352,7 @@ function list_devices()
 
 
     if (!Auth::user()->hasGlobalRead()) {
-        $sql .= " AND `device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
+        $sql .= " AND `d`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
         $param[] = Auth::id();
     }
     $devices = array();
@@ -446,7 +455,7 @@ function del_device()
         $device = device_by_id_cache($device_id);
     }
 
-    if (!device) {
+    if (!$device) {
         api_error(404, "Device $hostname not found");
     }
 
@@ -628,6 +637,7 @@ function get_graph_by_portgroup()
     $group  = $router['group'] ?: '';
     $id     = $router['id'] ?: '';
     $vars   = array();
+    $vars['output'] = $_GET['output'] ?: 'display';
     if (!empty($_GET['from'])) {
         $vars['from'] = $_GET['from'];
     }
@@ -662,6 +672,9 @@ function get_graph_by_portgroup()
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
     rrdtool_close();
+    if ($vars['output'] === 'base64') {
+        api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
+    }
 }
 
 
@@ -811,6 +824,30 @@ function list_available_health_graphs()
                 'desc' => ucfirst($graph['sensor_class']),
                 'name' => 'device_'.$graph['sensor_class'],
             );
+        }
+        $device = \App\Models\Device::find($device_id);
+
+        if ($device) {
+            if ($device->processors()->count() > 0) {
+                array_push($graphs, array(
+                    'desc' => 'Processors',
+                    'name' => 'device_processor'
+                ));
+            }
+
+            if ($device->storage()->count() > 0) {
+                array_push($graphs, array(
+                    'desc' => 'Storage',
+                    'name' => 'device_storage'
+                ));
+            }
+
+            if ($device->mempools()->count() > 0) {
+                array_push($graphs, array(
+                    'desc' => 'Memory Pools',
+                    'name' => 'device_mempool'
+                ));
+            }
         }
     }
 
@@ -1001,7 +1038,7 @@ function list_alerts()
     $sql = '';
     if (isset($router['id']) && $router['id'] > 0) {
         $alert_id = mres($router['id']);
-        $sql      = 'AND id=?';
+        $sql      = 'AND `A`.id=?';
         array_push($param, $alert_id);
     }
 
@@ -1200,44 +1237,45 @@ function list_oxidized()
         $params = array($hostname);
     }
 
-    foreach (dbFetchRows("SELECT hostname,sysname,os,location FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `disabled`='0' AND `ignore` = 0 AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os)) $sql", $params) as $device) {
-        if ($config['oxidized']['group_support'] == "true") {
-            foreach ($config['oxidized']['group']['hostname'] as $host_group) {
-                if (preg_match($host_group['regex'].'i', $device['hostname'])) {
-                    $device['group'] = $host_group['group'];
-                    break;
-                }
+    foreach (dbFetchRows("SELECT hostname,sysname,sysDescr,hardware,os,location,ip AS ip FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `disabled`='0' AND `ignore` = 0 AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os)) $sql", $params) as $device) {
+        // Convert from packed value to human value
+        $device['ip'] = inet6_ntop($device['ip']);
+
+        // Pre-populate the group with the default
+        if ($config['oxidized']['group_support'] === true && !empty($config['oxidized']['default_group'])) {
+            $device['group'] = $config['oxidized']['default_group'];
+        }
+        foreach ($config['oxidized']['maps'] as $maps_column => $maps) {
+            // Based on Oxidized group support we can apply groups by setting group_support to true
+            if ($maps_column == "group" && (!isset($config['oxidized']['group_support']) or $config['oxidized']['group_support'] !== true)) {
+                continue;
             }
-            if (empty($device['group'])) {
-                foreach ($config['oxidized']['group']['sysname'] as $host_group) {
-                    if (preg_match($host_group['regex'].'i', $device['sysname'])) {
-                        $device['group'] = $host_group['group'];
+
+            foreach ($maps as $field_type => $fields) {
+                foreach ($fields as $field) {
+                    if (isset($field['regex']) && preg_match($field['regex'].'i', $device[$field_type])) {
+                        $device[$maps_column] = $field[$maps_column];
+                        break;
+                    } elseif (isset($field['match']) && $field['match'] == $device[$field_type]) {
+                        $device[$maps_column] = $field[$maps_column];
                         break;
                     }
                 }
-            }
-            if (empty($device['group'])) {
-                foreach ($config['oxidized']['group']['os'] as $host_group) {
-                    if ($host_group['match'] === $device['os']) {
-                        $device['group'] = $host_group['group'];
-                        break;
-                    }
-                }
-            }
-            if (empty($device['group'])) {
-                foreach ($config['oxidized']['group']['location'] as $host_group) {
-                    if (preg_match($host_group['regex'].'i', $device['location'])) {
-                        $device['group'] = $host_group['group'];
-                        break;
-                    }
-                }
-            }
-            if (empty($device['group']) && !empty($config['oxidized']['default_group'])) {
-                $device['group'] = $config['oxidized']['default_group'];
             }
         }
+
+        // We remap certain device OS' that have different names with Oxidized models
+        $models = [
+            'arista_eos' => 'eos',
+            'vyos'       => 'vyatta',
+        ];
+
+        $device['os'] = str_replace(array_keys($models), array_values($models), $device['os']);
+
         unset($device['location']);
         unset($device['sysname']);
+        unset($device['sysDescr']);
+        unset($device['hardware']);
         $devices[] = $device;
     }
 
@@ -2122,4 +2160,15 @@ function add_service_for_host()
     } else {
         api_error(500, 'Failed to add the service');
     }
+}
+
+/**
+ * Display Librenms Instance Info
+ */
+function server_info()
+{
+    $versions = version_info();
+    api_success([
+        $versions
+    ], 'system');
 }

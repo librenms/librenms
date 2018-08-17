@@ -1,0 +1,4692 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-RADIO-SYSTEM-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE,
+             NOTIFICATION-TYPE,
+             Integer32, Counter32
+        FROM SNMPv2-SMI
+             InterfaceIndexOrZero
+        FROM IF-MIB
+             TEXTUAL-CONVENTION,
+             DisplayString, RowStatus, StorageType
+        FROM SNMPv2-TC
+             siaeMib
+        FROM SIAE-TREE-MIB
+             AlarmStatus, AlarmSeverityCode, alarmTrap
+        FROM SIAE-ALARM-MIB
+             equipIpSnmpAgentAddress
+        FROM SIAE-EQUIP-MIB;
+
+    radioSystem MODULE-IDENTITY
+        LAST-UPDATED "201607140000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: help@siaemic.com
+            "
+        DESCRIPTION
+            "Radio System MIB.
+            "
+        REVISION "201607140000Z"
+        DESCRIPTION
+            "MIB version 01.00.05
+             - added radioXpd in radioStatusTable
+             - deprecated linkXpd in linkStatusTable
+            "
+        REVISION "201602290000Z"
+        DESCRIPTION
+            "MIB version 01.00.04
+             - Added linkXpd to linkStatusTable
+             - changed MAX-ACCESS clause of linkChRadioSettingsIdx from
+               read-only to read-create 
+             - Fixed DESCRIPTION of linkSettingsTable
+            "
+        REVISION "201509150000Z"
+        DESCRIPTION
+            "Fixed DESCRIPTION of radioTxChannelSpacing
+            "
+        REVISION "201506180000Z"
+        DESCRIPTION
+            "MIB version 01.00.03
+             - Added linkConfigurationInProgress and 
+               linkConfigurationInProgressTrapNotification
+             - Added radio radioRxBerThresholdTable
+             - Added fadeMarginMeasure
+             - Deprecated linkFadeMarginMeasure
+             - Added table radioLoopCapabilityTable
+             - Added table sspTable
+             - Added table stm1BulkSettingsTable
+             - Added table linkE1vsSTM1CapacityTable
+             - Deprecated linkAcmMaxTDMCapacity
+             - Deprecated linkTfcTable, linkProTable and linkProMaintTable.
+             - Added linkTfcV2Table, linkProV2Table and linkProMaintV2Table
+               in order to replace deprecated tables.
+             - Added channelSpacingSelection
+            "
+        REVISION "201503230000Z"
+        DESCRIPTION
+            "Removed alarmTrapNumber from TRAPs and IMPORTS.
+            "
+        REVISION "201411050000Z"
+        DESCRIPTION 
+            "MIB version 01.00.02
+             Changes for support of modulation 4096QAM:
+             - DESCRIPTION of linkBandwidthAndModulation
+             - ModulationMap TEXTUAL-CONVENTION
+             - BitsPerSymbol TEXTUAL-CONVENTION
+             Changes for support of channel spacing 60MHz and 80MHz:
+             - DESCRIPTION of linkBandwidthAndModulation
+             - ChannelSpacing TEXTUAL-CONVENTION
+            "
+        REVISION "201409160000Z"
+        DESCRIPTION 
+            "MIB version 01.00.01
+             - Added combinedRadioCapabilitiesTable, combinedRadioFrequencyTable,
+               combinedRadioDuplexFrequencyTable and combinedRadioPowerScalingTable
+             - Declared deprecated linkCapabilitiesTable, linkFrequencyTable,
+               linkDuplexFrequencyTable, linkAcmPowerScaling,
+               linkAcmAtpcRxPowerScaling and linkAcmPowerRange.
+             - Added linkNotMatchingRadiosAlarm and
+               linkNotMatchingRadiosAlarmSeverityCode
+            "
+        REVISION "201404010000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00.
+            "
+      ::= { siaeMib 80 }
+
+----------------------------------------------------------------------------------
+--  Textual Conventions
+----------------------------------------------------------------------------------
+
+    ChannelSpacing ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+         "This TC describes a data type which identifies a RF channel spacing.
+         "
+       SYNTAX INTEGER {
+              -- ETSI
+              bw3M5Hz   (0),
+              bw7Mhz    (1),
+              bw14MHz   (2),
+              bw28MHz   (3),
+              bw40MHz   (5),
+              bw56MHz   (4),
+              bw112MHz  (6),
+              bw250Mhz  (7),
+              bw500Mhz  (8),
+              bw750Mhz  (9),
+              bw1000Mhz (10),
+              -- FCC
+              bw10Mhz   (11),
+              bw20Mhz   (12),
+              bw30Mhz   (13),
+              bw50Mhz   (14),
+              bw60Mhz   (15),
+              bw80Mhz   (16)
+         }
+
+
+     ModulationMap ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+         "This data type is used as the syntax of the radioBranchModulationMap
+          and radioBranchRefModulationMap objects.
+         "
+       SYNTAX BITS {
+              modBPSK    (0),
+              mod4QAM    (1),
+              mod8PSK    (2),
+              mod16QAM   (3),
+              mod32QAM   (4),
+              mod64QAM   (5),
+              mod128QAM  (6),
+              mod256QAM  (7),
+              mod512QAM  (8),
+              mod1024QAM (9),
+              mod2048QAM (10),
+              mod4096QAM (11)
+         }
+
+ 
+     ConfigMismatchReason ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+         "This data type is used to specify the cause of Config Mismatch Alarm,
+          that is the mismatch between the radio link capability and the current
+          local and remote configuration.
+            - securityMismatch(0)
+                Copyright violation
+            - frequencyFailMismatch(1)
+                Configured frequency is out of  Filter-Bandwidth
+            - frequencyAlertMismatch(2)
+                  Configured frequency across Filter-Bandwidth
+            - ptxMismatch(3) 
+                  Tx power configured incongruent with RF Tx power limits
+            - channelSpacingAndModulationMismatch(4)
+                  Bandwidth and/or modulation configured is invalid
+                  (RF doesn't support it) 
+            - remoteConfigurationMismatch(5)
+                  Incongruence between the couple of Terminal Radio Unit (TRU)
+                  in the link:
+                  - Frequency Incongruent (Freq)
+                  - Reference Bandwidth and Modulation incongruent
+                  - Acm-Tx map in congruent with remote Acm-Rx map
+            - acmMismatch(6) 
+                  Obsolete (no longer used)
+            - profileSetMismatch(7)
+                  The selected profile set is not supported by the TRU
+         "
+       SYNTAX BITS {
+              securityMismatch(0),
+              frequencyFailMismatch(1),
+              frequencyAlertMismatch(2),
+              ptxMismatch(3),
+              channelSpacingAndModulationMismatch(4),
+              remoteConfigurationMismatch(5),
+              acmMismatch(6),
+              profileSetMismatch(7)
+         }
+
+     RadioCapability ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+         "This data type is used as the syntax of the radioBranchKeyFeatures
+          objects.
+         "
+       SYNTAX BITS {
+              reserved         (0),
+              trafficSquelch   (1),
+              baseBandLoop     (2),
+              maxPower         (3),
+              carrierOnly      (4),
+              iQLoop           (5),
+              rfLoopGivenMod   (6),  -- only at a given modulation
+              rfLoopAnyMod     (7)   -- at any modulation
+         }
+
+    BitsPerSymbol ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+         "his TC describes a data type which identifies a RF channel spacing.
+         "
+       SYNTAX INTEGER {
+            bpsBPSK    (1),
+            bps4QAM    (2),
+            bps8PSK    (3),
+            bps16QAM   (4),
+            bps32QAM   (5),
+            bps64QAM   (6),
+            bps128QAM  (7),
+            bps256QAM  (8),
+            bps512QAM  (9),
+            bps1024QAM (10),
+            bps2048QAM (11),
+            bps4096QAM (12)
+         }
+
+    Stm1IndexOrZero ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d"
+       STATUS       current
+       DESCRIPTION
+         "This textual convention permits the
+          additional value of zero to an stm1Index in stm1Table.
+          The value zero is object-specific and must therefore be 
+          defined as part of the description of any object which
+          uses this syntax.  Examples of the usage of zero might
+          include situations where stm-1 was unknown, or when none
+          or all stm-1s need to be referenced."
+       SYNTAX  Integer32 (0..2147483647)
+
+----------------------------------------------------------------------------------
+--  radioSystem GROUP
+----------------------------------------------------------------------------------
+--
+--  This group contains all the objects that are specific of the radio system  
+--
+----------------------------------------------------------------------------------
+
+------ Beginning --------------------------------------------------------------
+
+    radioSystemMibVersion  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+    ::= {radioSystem 1}
+
+-------  Begin of radioTable
+--
+    radioTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RadioEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of radio interface entries. This table is useful 
+             to show the manager all the available radio interfaces 
+             on the equipment. Moreover it is a reference for 
+             Performance Monitoring (PWR and G828).
+            "
+    ::= {radioSystem 2}
+
+    radioEntry OBJECT-TYPE
+        SYNTAX      RadioEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing management information applicable to a
+             particular radio interface.
+            "
+        INDEX       {radioIndex}
+    ::= {radioTable 1}
+
+    RadioEntry  ::=
+        SEQUENCE  {
+            radioIndex                  Integer32,
+            radioLabel                  DisplayString,
+            radioType                   INTEGER,
+            radioIfIndex                InterfaceIndexOrZero,
+            radioStorageType            StorageType
+            }
+
+    radioIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique value, greater than zero, for each radio 
+            interface.  It is recommended that values are assigned
+            contiguously starting from 1.
+            "
+    ::= {radioEntry 1}
+    
+    radioLabel OBJECT-TYPE
+        SYNTAX      DisplayString   (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A textual string containing information about the radio
+            interface.  This string should include the name of the
+            manufacturer, the product name and the version of the
+            interface hardware/software.
+            "
+    ::= {radioEntry 2}
+    
+    radioType OBJECT-TYPE
+        SYNTAX      INTEGER  {
+                              other(1),
+                              analogRadio(2),   -- analogic radio --    
+                              digitalRadio(3),  -- digital radio --
+                              xpicRadio(4)      -- xpic radio  --                        
+                              }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of interface.
+            "
+    ::= {radioEntry 3}
+    
+    radioIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndexOrZero
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "This object defines a greater than zero value 
+            to identify an interface in ifTable or a zero 
+            value if ifTable is not supported.           
+           "
+    ::= {radioEntry 4}
+    
+    radioStorageType OBJECT-TYPE
+       SYNTAX      StorageType
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "The storage type of this conceptual row. Conceptual 
+            rows having the value 'permanent' need not allow 
+            write-access to any columnar objects in the row.
+           "
+    ::= {radioEntry 5}
+            
+--
+-------  End of radioTable
+
+-------  Begin of xpicTable
+--
+    xpicTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF XpicEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of xpic radio interface entries. If a manager 
+             wants to make an xpic link, it should only add a 
+             particular xpic radio interface to an xpic link.
+            "
+    ::= {radioSystem 3}
+
+    xpicEntry OBJECT-TYPE
+        SYNTAX      XpicEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing management information applicable to a
+             particular xpic radio interface.
+            "
+        INDEX       {xpicIndex}
+    ::= {xpicTable 1}
+
+    XpicEntry  ::=
+        SEQUENCE  {
+            xpicIndex                   Integer32,
+            xpicRadioIdx                Integer32,
+            xpicRowstatus               RowStatus
+            }
+
+    xpicIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique value, greater than zero, for each xpic radio 
+            interface.  It is recommended that values are assigned
+            contiguously starting from 1.
+            "
+    ::= {xpicEntry 1}
+    
+     xpicRadioIdx OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Index of xpic radio interface, corresponding 
+             to an available xpic radio interface in radioTable.
+            "
+    ::= {xpicEntry 2}
+           
+    xpicRowstatus   OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this conceptual row in xpicTable.
+            "
+    ::= {xpicEntry 3}
+        
+--
+-------  End of xpicTable
+
+-------  Begin of xpicChTable
+--
+    xpicChTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF XpicChEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of xpic channel entries. This table maps
+             each xpic radio in respective xpic radio interface.
+            "
+    ::= {radioSystem 4}
+
+    xpicChEntry OBJECT-TYPE
+        SYNTAX      XpicChEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing management information applicable to a
+             particular xpic channel. It defines radio interface and 
+             polarization for a given xpic channel.
+            "
+        INDEX       {xpicIndex,
+                     xpicChPolIndex}
+    ::= {xpicChTable 1}
+
+    XpicChEntry  ::=
+        SEQUENCE  {
+            xpicChPolIndex                Integer32,
+            xpicChRadioIdx                Integer32,
+            xpicChRowstatus               RowStatus
+            }
+      
+    xpicChPolIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the xpic radio polarization.
+            "         
+    ::= {xpicChEntry 1}
+    
+    xpicChRadioIdx OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Xpic radio interface, corresponding to a radio interface 
+             in radioTable, used to make up the given xpic radio interface.
+            "           
+    ::= {xpicChEntry 2}
+          
+    xpicChRowstatus   OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this conceptual row in xpicChTable.
+            "
+    ::= {xpicChEntry 3}
+        
+--
+-------  End of xpicChTable
+
+     linkAvailableIndex     OBJECT-TYPE
+         SYNTAX             Integer32
+         MAX-ACCESS         read-only
+         STATUS             current
+         DESCRIPTION
+            "Shows an index which is available for creation of a new link
+             in the system. It shows the smallest available index.
+             Any attempt to create a link with a different index results
+             in a failure.
+            "
+     ::= {radioSystem 5}
+
+-------  Begin of linkTable
+--
+    linkTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF LinkEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of link entries. 
+            "
+    ::= {radioSystem 6}
+
+    linkEntry OBJECT-TYPE
+        SYNTAX      LinkEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing management information applicable to a
+             particular link.
+            "
+        INDEX       {linkIndex}
+    ::= {linkTable 1}
+
+    LinkEntry  ::=
+        SEQUENCE  {
+            linkIndex                   Integer32,
+            linkType                    INTEGER,
+            linkLabel                   DisplayString,
+            linkIfIndex                 InterfaceIndexOrZero,
+            linkRowstatus               RowStatus
+            }
+
+    linkIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique value, greater than zero, for each link.
+             Manager must use the first available index, 
+             suggested by linkAvailableIndex.
+            "
+    ::= {linkEntry 1}
+    
+    linkType OBJECT-TYPE
+        SYNTAX      INTEGER   {
+                              radio1p0(1),         -- 1+0
+                              radio1p1HS(2),       -- 1+1 Hot Standby
+                              radio1p1FD(3),       -- 1+1 Frequency Diversity
+                              radio2p0Xpic(4),     -- 2+0 XPIC
+                              radio2p2XpicHS(5),   -- 2+2 XPIC Hot Standby
+                              radio2p2XpicFD(6),   -- 2+2 XPIC Frequency Diversity
+                              radioNp1(7)          -- N+1
+                              }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object identifies link type. Supported link types are:
+             single link, 1+1 Hot Standby, 1+1 Frequency Diversity, 2+0 XPIC,
+             2+2 XPIC Hot Standby, 2+2 XPIC Frequency Diversity and N+1.
+            "
+        DEFVAL  {radio1p0}    
+    ::= {linkEntry 2}
+
+    linkLabel OBJECT-TYPE
+        SYNTAX      DisplayString   (SIZE(0..32))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "A textual string containing information about the link.
+             This string should give more details about link specific
+             parameters.
+            "
+        DEFVAL  {""}
+    ::= {linkEntry 3}
+    
+    linkIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndexOrZero
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object defines a greater than zero value 
+             to identify a link in ifTable or a zero 
+             value if ifTable is not supported.           
+            "
+        DEFVAL  {0}
+     ::= {linkEntry 4}
+        
+     linkRowstatus   OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this row of linkTable. This object is used to manage the
+             creation and deletion of conceptual rows in linkTable.
+             To create a row in this table, a manager should set rowstatus to 
+             createAndWait(5) and choose a link type. Respective entries in 
+             linkSettingsTable, linkStatusTable and tdmSettingsTable will be 
+             created by agent.In case of protection links proper entries in 
+             linkProtectionTable will be also created. 
+             Until instances of all corresponding columns are appropriately 
+             configured, the value of the corresponding instance of rowstatus
+             is notReady(3).
+             When there is sufficient information to (attempt to) make the 
+             conceptual row available for use by the managed device, 
+             then the rowstatus column turns into notInService(2); manager 
+             must set rowstatus to active(1) to make the conceptual row
+             active.
+             The contents of linkSettingsTable and radioSettingsTable can be
+             changed only if this object is notInService(2).
+            "
+     ::= {linkEntry 5}
+        
+--
+-------  End of linkTable
+
+-------  Begin of linkChTable
+--
+    linkChTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF LinkChEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of link channel entries.
+            "
+    ::= {radioSystem 7}
+    
+     linkChEntry OBJECT-TYPE
+        SYNTAX      LinkChEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing management information applicable to a
+             particular link channel. 
+            "           
+        INDEX       {linkIndex,
+                     linkChIndex}
+    ::= {linkChTable 1}
+
+    LinkChEntry  ::=
+        SEQUENCE  {
+            linkChIndex               Integer32,
+            linkChRadioIdx            Integer32,
+            linkChRadioSettingsIdx    Integer32,
+            linkChRowstatus           RowStatus
+            }
+     
+     linkChIndex    OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Link Channel Index.
+            "
+    ::= {linkChEntry 1}
+    
+    linkChRadioIdx  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Radio channel index that corresponds to an
+             available radio interface in radioTable.
+            "
+    ::= {linkChEntry 2}
+    
+     linkChRadioSettingsIdx  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Radio Settings Index. This object is a foreign
+             key for a corresponding radioSettingsTable entry, 
+             which is automatically created by agent.
+            "
+       DEFVAL  {0}
+    ::= {linkChEntry 3}
+     
+     linkChRowstatus   OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION
+             "Status of this row of linkChTable. This object is used 
+             to manage the creation and deletion of conceptual rows in 
+             linkChTable.
+             To create a row in this table, a manager should set rowstatus to 
+             createAndWait(5). Until instances of all corresponding columns 
+             are appropriately configured, the value of the corresponding 
+             instance of rowstatus is notReady(3).
+             When there is sufficient information to (attempt to) make the 
+             conceptual row available for use by the managed device, 
+             then the rowstatus column turns into notInService(2); manager 
+             must set rowstatus to active(1) to make the conceptual row
+             active.
+             The content of radioSettingsTable can be changed only if this
+             object is notInService(2).
+             "
+     ::= {linkChEntry 4}
+--
+-------  End of linkChTable
+
+-------  Begin of linkSettingsTable
+--
+    linkSettingsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  LinkSettingsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with link settings entries. This table contains all
+             parameters of a radio frequency link. The content of this
+             table can be changed by a manager if linkRowStatus is 
+             notInService(2)."
+    ::= {radioSystem 8}
+
+    linkSettingsEntry OBJECT-TYPE
+        SYNTAX      LinkSettingsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Radio link entry"
+        INDEX       {linkIndex}
+    ::= {linkSettingsTable 1}
+
+    LinkSettingsEntry  ::=
+        SEQUENCE {
+            linkBandwidthAndModulation     Integer32,
+            linkAcmEngineEnable            INTEGER,
+            linkTxUpperProfile             INTEGER,
+            linkTxLowerProfile             INTEGER,
+            linkId                         INTEGER,
+            linkTxPwrThresh                INTEGER,
+            linkRxPwrThresh                INTEGER,
+            linkSynchSetupProtocolEnable   INTEGER,
+            linkProfilesSetSelection       INTEGER,
+            linkXpicControlProcedure       INTEGER
+        }
+
+    linkBandwidthAndModulation OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+             "Link Modulation and Bandwidth (channel spacing).
+              The value of this object value is computed by:
+                 65536*modulation+bandwidth
+               where bandwidth selection is:
+                 0 = 3.5Mhz
+                 1 = 7MHz
+                 2 = 14MHz
+                 3 = 28MHz
+                 4 = 56MHz
+                 5 = 10MHz
+                 6 = 20MHz
+                 7 = 30MHz
+                 8 = 40MHz
+                 9 = 50MHz
+                10 = 112Mhz
+                11 = 250Mhz
+                12 = 500Mhz
+                13 = 750Mhz
+                14 = 1Ghz
+                15 = 60MHz
+                16 = 80MHz
+               and modulation is in bit-per-symbol:
+                 1 = BPSK
+                 2 = 4QAM
+                 3 = 8PSK
+                 4 = 16QAM
+                 5 = 32QAM
+                 6 = 64QAM
+                 7 = 128QAM
+                 8 = 256QAM
+                 9 = 512QAM
+                10 = 1024QAM
+                11 = 2048QAM.
+                12 = 4096QAM.
+
+               Examples:
+               250Mhz-4QAM  (131083),
+               500Mhz-4QAM  (131084),
+               250Mhz-16QAM (262155),
+               500Mhz-64QAM (393228).
+
+               Note: 0 bit-per-symbol is not possible,
+               so value 0 is used for
+               BandwidthAndModulation unassigned."
+    ::= {linkSettingsEntry 1}
+
+    linkAcmEngineEnable OBJECT-TYPE
+        SYNTAX      INTEGER  {
+                              disable (1),
+                              enable  (2)
+                             }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object is used to enable/disable the ACM engine"
+        DEFVAL  { disable }
+    ::=  {linkSettingsEntry 2}
+
+    linkTxUpperProfile OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+             "The object (and linkTxLowerProfile object) is used to 
+              restrict the TX profile range when ACM is enabled."
+    ::= {linkSettingsEntry 3}
+
+    linkTxLowerProfile OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+             "The object (and linkTxUpperProfile object) is used to
+              restrict the TX profile range when ACM is enabled."
+    ::= {linkSettingsEntry 4}
+
+    linkId OBJECT-TYPE
+        SYNTAX      INTEGER       (0..255)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Link Identification (value 0..255)"
+        DEFVAL {0}
+    ::= {linkSettingsEntry 5}
+
+    linkTxPwrThresh OBJECT-TYPE
+        SYNTAX      INTEGER     (3..15)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "Threshold (value +3 , +15 dB) relative to nominal value of the TX power
+            below wich the related alarm is set."
+        DEFVAL {3}
+    ::= {linkSettingsEntry 6}
+
+    linkRxPwrThresh OBJECT-TYPE
+        SYNTAX      INTEGER     (-99..-40)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "Threshold (value -40 , -99 dBm) for RX power below wich the related
+            alarm is set."
+        DEFVAL {-70}
+    ::= {linkSettingsEntry 7}
+
+    linkSynchSetupProtocolEnable OBJECT-TYPE
+        SYNTAX      INTEGER   {
+                               disable (1),
+                               enable  (2)
+                              }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Synchronization Setup Protocol (SSP) control"
+        DEFVAL {disable}
+    ::= {linkSettingsEntry 8}
+
+    linkProfilesSetSelection OBJECT-TYPE
+        SYNTAX      INTEGER  {
+                              highThroughput (1),
+                              highGain       (2)
+                             }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Selection of the working profile set between high gain
+             (max robustness) profile set and high throughput (max
+             capacity) profile set. The set of profiles high gain
+             features a greater robustness against to the set of
+             profiles high throughput.
+             For radio systems that do not have more sets of profiles,
+             this object becomes read only and its reading shows the 
+             only one set of profiles supported.
+            "
+        DEFVAL {highThroughput}
+    ::= {linkSettingsEntry 9}
+
+    linkXpicControlProcedure  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disable       (1),
+                             enable        (2)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Set by manager to enable\disable XPIC alarm control procedure.
+             Only for XPIC configurations."
+        DEFVAL  { enable }
+    ::= {linkSettingsEntry 10}
+
+--
+-------  End of linkSettingsTable
+
+-------  Begin of radioSettingsTable
+--
+    radioSettingsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  RadioSettingsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with radio settings entries. This table contains all
+             parameters of a radio terminal. The content of this table
+             can be changed only linkRowStatus is notInService(2)"
+    ::= {radioSystem 9}
+
+    radioSettingsEntry OBJECT-TYPE
+        SYNTAX      RadioSettingsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Radio terminal entry"
+        INDEX       {radioSettingsIndex}
+    ::= {radioSettingsTable 1}
+
+    RadioSettingsEntry  ::=
+        SEQUENCE {
+          radioSettingsIndex          Integer32,
+          radioSettingsRowStatus      RowStatus,
+          radioSettingsLabel          DisplayString,
+          radioTxFrequency            INTEGER,
+          radioDuplexFrequency        INTEGER,
+          radioTxAttenuation          INTEGER,
+          radioAtpcManual             INTEGER,
+          radioAtpcPwrHigh            Integer32,
+          radioAtpcPwrLow             Integer32,
+          radioAtpcRange              Integer32,
+          radioFreqTableSelection     ChannelSpacing
+        }
+
+    radioSettingsIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Radio settings index.
+            "
+    ::= {radioSettingsEntry 1}
+
+    radioSettingsRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this row.
+            "
+    ::= {radioSettingsEntry 2}
+    
+    radioSettingsLabel OBJECT-TYPE
+        SYNTAX      DisplayString   (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A textual string containing information about the radio
+            interface.  
+            "
+    ::= {radioSettingsEntry 3}
+
+    radioTxFrequency  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Transmitted frequency in KHz. Null value means invalid frequency."
+        DEFVAL {0}
+    ::= {radioSettingsEntry 4}
+
+    radioDuplexFrequency  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Value of duplex frequency in KHz. -2 means not set."
+        DEFVAL {-2}
+    ::= {radioSettingsEntry 5}
+
+    radioTxAttenuation  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Transmitter attenuation relative to nominal power (dBm)."
+    ::= {radioSettingsEntry 6}
+
+    radioAtpcManual  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disable  (1),
+                             enable   (2)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Enables/disables Atpc Manual operation."
+        DEFVAL {disable}
+    ::= {radioSettingsEntry 7}
+
+    radioAtpcPwrHigh  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "ATPC Control - Local Rx Power High (dBm range -30 to -80) -."
+        DEFVAL {-40}
+    ::= {radioSettingsEntry 8}
+
+    radioAtpcPwrLow  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "ATPC Control - Local Rx Power Low (dBm range -30 to -80) -."
+        DEFVAL {-60}
+    ::= {radioSettingsEntry 9}
+
+    radioAtpcRange  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Defines the range of the ATPC regulation (expressed in dB) with respect
+             to the current value of maximum Tx output, that is intended as the upper
+             limit of the range. A null value means no limit: the lower limit
+             of the range is equal to minimum Ptx."
+        DEFVAL {0}
+    ::= {radioSettingsEntry 10}
+
+    radioFreqTableSelection  OBJECT-TYPE
+        SYNTAX      ChannelSpacing
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "RadioFrequencyTable key (channel spacing & modulation) selection."
+    ::= {radioSettingsEntry 11}
+
+--
+-------  End of radioSettingsTable
+
+-------  Begin of tdmSettingsTable
+--
+    tdmSettingsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  TdmSettingsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with tdm settings entries.
+           "
+    ::= {radioSystem 10}
+
+    tdmSettingsEntry OBJECT-TYPE
+        SYNTAX      TdmSettingsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing tdm parameters for a particular link.
+            "
+        INDEX       {linkIndex,
+                    tdmPolIndex}
+    ::= {tdmSettingsTable 1}
+
+    TdmSettingsEntry  ::=
+      SEQUENCE {
+                tdmPolIndex                Integer32,
+                tdmE1Channel               Integer32,
+                tdmE1Framer                INTEGER
+        }
+
+    tdmPolIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+       DESCRIPTION
+            "Polarization index.
+            "
+    ::= {tdmSettingsEntry 1}
+
+    tdmE1Channel OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Number of E1 channels. This object is used to define the capacity
+             of E1 tributaries assigned to a given radio link. The capacity is
+             changed in steps of E1 (2Mbit/s).    
+            "
+         DEFVAL      {0}
+    ::= {tdmSettingsEntry 2}
+    
+     tdmE1Framer OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disable  (1),
+                             enable   (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to attach the framer to a given E1. 
+            "
+        DEFVAL      {disable}
+     ::=  {tdmSettingsEntry 3}
+    
+--
+-------  End of tdmSettingsTable
+
+-------  Begin of radioCapabilitiesTable
+--
+    radioCapabilitiesTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RadioCapabilitiesEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with RadioCapabilities entries: there is an entry for each 
+             radioTable rows."
+    ::= {radioSystem 11}
+
+    radioCapabilitiesEntry  OBJECT-TYPE
+        SYNTAX      RadioCapabilitiesEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "RadioCapabilities entry."
+        INDEX       {radioIndex}
+    ::= {radioCapabilitiesTable 1}
+
+    RadioCapabilitiesEntry  ::=
+        SEQUENCE {
+            radioCapabilitiesCapability           RadioCapability,
+            radioCapabilitiesTxMinFrequency       Integer32,
+            radioCapabilitiesTxMaxFrequency       Integer32,
+            radioCapabilitiesStepFrequency        Integer32,
+            radioCapabilitiesMinPtxNominalValue   Integer32,
+            radioCapabilitiesMaxPtxNominalValue   Integer32,
+            radioCapabilitiesExtendedMinPwr       Integer32
+        }
+
+    radioCapabilitiesCapability  OBJECT-TYPE
+        SYNTAX      RadioCapability
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Bit map to describe the radio features."
+    ::= {radioCapabilitiesEntry 1}
+
+    radioCapabilitiesTxMinFrequency  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Minimum of available channel frequency in KHz."
+    ::= {radioCapabilitiesEntry 2}
+
+    radioCapabilitiesTxMaxFrequency  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Maximum of available channel frequency in KHz."
+    ::= {radioCapabilitiesEntry 3}
+
+    radioCapabilitiesStepFrequency  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Minimum frequency step in KHz."
+    ::= {radioCapabilitiesEntry 4}
+
+    radioCapabilitiesMinPtxNominalValue  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Minimum nominal Ptx in dBm."
+    ::= {radioCapabilitiesEntry 5}
+
+    radioCapabilitiesMaxPtxNominalValue  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Maximum nominal Ptx in dBm."
+    ::= {radioCapabilitiesEntry 6}
+
+    radioCapabilitiesExtendedMinPwr  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Minimum extended Ptx power for fade margin."
+    ::= {radioCapabilitiesEntry 7}
+--
+-------  End of radioCapabilitiesTable
+
+-------  Begin of radioStatusTable
+--
+    radioStatusTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     RadioStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with RadioStatus records: one record for 1+0 configuration and
+             two record for 1+1 configuration."
+    ::= {radioSystem 12}
+
+    radioStatusEntry  OBJECT-TYPE
+        SYNTAX      RadioStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "RadioStatus record."
+        INDEX       {radioIndex}
+    ::= {radioStatusTable 1}
+
+    RadioStatusEntry  ::=
+        SEQUENCE {
+            radioCurrentDuplexFrequency     Integer32,
+            radioTxChannelSpacing           Integer32,
+            radioPrx                        Integer32,
+            radioPtx                        Integer32,
+            radioNormalizedMse              Integer32,
+            radioRxActiveStatus             INTEGER,
+            radioTxActiveStatus             INTEGER,
+            radioCableOpenAlarm             AlarmStatus,
+            radioCableShortAlarm            AlarmStatus,
+            radioInvalidFrequencyAlarm      AlarmStatus,
+            radioBaseBandRxAlarm            AlarmStatus,
+            radioModulatorFailAlarm         AlarmStatus,
+            radioDemodulatorFailAlarm       AlarmStatus,
+            radioRxPowerLowAlarm            AlarmStatus,
+            radioTxPowerLowAlarm            AlarmStatus,
+            radioRemDemodulatorFailAlarm    AlarmStatus,
+            radioVcoFailAlarm               AlarmStatus,
+            radioRxIFAgcAlarm               AlarmStatus,
+            radioTxIFAgcAlarm               AlarmStatus,
+            radioIduOduCommunicationAlarm   AlarmStatus,
+            radioOduIduCommunicationAlarm   AlarmStatus,
+            radioLocalOduAlarmSynthesis     AlarmStatus,
+            radioRemoteOduAlarmSynthesis    AlarmStatus,
+            radioConfigMismatchAlarm        AlarmStatus,
+            radioConfigAlarmReason          ConfigMismatchReason,
+            radioRxQualityLowAlarm          AlarmStatus,
+            radioRxQualityWarningAlarm      AlarmStatus,
+            radioXpd                        Integer32
+      }
+
+    radioCurrentDuplexFrequency  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Spacing between transmitted and received frequency in KHz."
+    ::= {radioStatusEntry 1}
+
+    radioTxChannelSpacing OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Half of transmitted signal channel spacing in KHz."
+    ::= {radioStatusEntry 2}
+
+    radioPrx  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Received power level (dBm)."
+    ::= {radioStatusEntry 3}
+
+    radioPtx  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Transmitted power level (dBm)."
+    ::= {radioStatusEntry 4}
+
+    radioNormalizedMse OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Normalized MSE (Mean Squared Error) is an indicator of the Signal
+             to Noise (S/N) ratio. It's in 0.1 dB steps"
+    ::= {radioStatusEntry 5}
+
+    radioRxActiveStatus OBJECT-TYPE
+        SYNTAX      INTEGER   {
+                               cleared (1),
+                               active  (2)
+                              }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Receiver Active status with associated Severity
+             In 1+1 Hot Standby radio system, only one RX is active.
+             RXs are active in other configurations of the radio system.
+            "
+    ::= {radioStatusEntry 6}
+
+    radioTxActiveStatus OBJECT-TYPE
+        SYNTAX      INTEGER   {
+                               cleared (1),
+                               active  (2)
+                              }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Transmitter Active status with associated Severity.
+             In 1+1 Hot Standby radio system, only one TX is active.
+             TXs are active in other configurations of the radio system.
+            "
+    ::= {radioStatusEntry 7}
+
+    radioCableOpenAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Cable connnecting ODU is open: alarm status with associated
+             severity.
+            "
+    ::= {radioStatusEntry 8}
+
+    radioCableShortAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Cable connnecting ODU is in short-circuit: alarm status
+             with associated severity.
+            "
+    ::= {radioStatusEntry 9}
+
+    radioInvalidFrequencyAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Invalid frequency alarm with associated severity."
+    ::= {radioStatusEntry 10}
+
+    radioBaseBandRxAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Base Band Rx alarm status with associated severity."
+    ::= {radioStatusEntry 11}
+
+    radioModulatorFailAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Modulator Fail Alarm status with associated severity."
+    ::= {radioStatusEntry 12}
+
+    radioDemodulatorFailAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Demodulator Fail Alarm status with associated severity."
+    ::= {radioStatusEntry 13}
+
+    radioRxPowerLowAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Receiver power low alarm status with associated severity."
+    ::= {radioStatusEntry 14}
+
+    radioTxPowerLowAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Transmitter power low alarm status with associated severity."
+    ::= {radioStatusEntry 15}
+
+    radioRemDemodulatorFailAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Remote Demodulator Fail Alarm status with associated severity."
+    ::= {radioStatusEntry 16}
+
+    radioVcoFailAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "RT VCO fail alarm status with associated severity."
+    ::= {radioStatusEntry 17}
+
+    radioRxIFAgcAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "RT Rx IF AGC fail alarm status with associated severity."
+    ::= {radioStatusEntry 18}
+
+    radioTxIFAgcAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "RT Tx IF AGC fail alarm status with associated severity."
+    ::= {radioStatusEntry 19}
+
+    radioIduOduCommunicationAlarm OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Communication from IDU towards ODU is down"
+    ::= {radioStatusEntry 20}
+
+    radioOduIduCommunicationAlarm OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Communication from ODU towards IDU is down"
+    ::= {radioStatusEntry 21}
+
+    radioLocalOduAlarmSynthesis  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Local ODU alarm synthesis with associated severity."
+    ::= {radioStatusEntry 22}
+
+    radioRemoteOduAlarmSynthesis  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Local ODU alarm synthesis alarm status with associated severity."
+    ::= {radioStatusEntry 23}
+
+    radioConfigMismatchAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Config Mismatch alarm status with associated severity and related map."
+    ::= {radioStatusEntry 24}
+
+    radioConfigAlarmReason  OBJECT-TYPE
+        SYNTAX      ConfigMismatchReason
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "Bit map to describe the Config Mismatch Alarm"
+--      DEFVAL { { } }
+    ::= {radioStatusEntry 25}
+
+    radioRxQualityLowAlarm OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "High BER Alarm status with associated severity."
+    ::= {radioStatusEntry 26}
+
+    radioRxQualityWarningAlarm OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The RX signal is close to cause errors on payload."
+    ::= {radioStatusEntry 27}
+
+    radioXpd  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Cross-Polarization Discrimination, in tenths of dB, is the
+             difference between the received signal power of the
+             co-polarized main beam, and it componemt received on the
+             cross-polarized signal.
+             This object shows an extimated value of the XPD performed by 
+             the cross-polarization interference canceller (XPIC).
+             This means that the measure is reliable if:
+             - XPIC is on (linkType is radio2p0Xpic(4), or radio2p2XpicHS(5),
+                           or radio2p2XpicFD(6))
+             - Alarm radioDemodulatorFailAlarm is cleared.
+             - XPD is not too high, since without cross-polar interference
+               the canceller is not able to works well. Basically, in this
+               condition, the extimated XPD is greater than the real one.
+            "
+    ::= {radioStatusEntry 28}
+--
+-------  End of radioStatusTable
+
+--
+--  MAINTENANCE TABLE
+--
+
+-------  Begin of radioMaintTable
+--
+    radioMaintTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     RadioMaintEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with Command for maintenance of radio branch.
+             Objects in this table is not persistent. An Instance of this
+             table is created on creation of radioBranchEntry"
+    ::= {radioSystem 13}
+
+    radioMaintEntry  OBJECT-TYPE
+        SYNTAX      RadioMaintEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Radio branch Maintenance record."
+        INDEX       {radioIndex}
+    ::= {radioMaintTable 1}
+
+    RadioMaintEntry  ::=
+        SEQUENCE {
+            radioTxStatus             INTEGER,
+            radioCarrierOnly          INTEGER,
+            radioLoop                 INTEGER,
+            radioRFLoopTestResult     INTEGER,
+            radioRFLoopTestPercTime   INTEGER,
+            radioRtPsuOff             INTEGER,
+            radioLom                  INTEGER,
+            radioXpic                 INTEGER
+        }
+
+    radioTxStatus  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             transmitterOff  (1),
+                             transmitterOn   (2),
+                             permanentOff    (3)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Transmitter status control.
+             The value transmitterOff(1) is related to a manual operation.
+             The value permanentOff(3) is persistent across restart.
+             "
+        DEFVAL {transmitterOn}
+    ::= {radioMaintEntry 1}
+
+    radioCarrierOnly  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             carrierOnlyOff  (1),
+                             carrierOnlyOn   (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Carrier only transmission control."
+        DEFVAL      {carrierOnlyOff}
+    ::= {radioMaintEntry 2}
+
+    radioLoop  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             loopOff                   (1),
+                             rfLoop                    (2),
+                             iqLoop                    (3),
+                             baseBandLoop              (4),
+                             rfLoopAtFixedMod          (6),
+                             baseBandLoopEthSquelch    (7),
+                             rfLoopAtFixedModEthSquelch(8),
+                             iqloopEthSquelch          (9)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enables/disables the Radio Branch loops."
+        DEFVAL      {loopOff}
+    ::= {radioMaintEntry 3}
+
+    radioRFLoopTestResult OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             testNone          (0),
+                             testRunning       (1),
+                             testNotPossible   (2),
+                             testPassed        (3),
+                             testFail          (4),
+                             testInterrupted   (5)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Radio branch RT loop test result."
+        DEFVAL      {testNone}
+    ::= {radioMaintEntry 4}
+
+    radioRFLoopTestPercTime OBJECT-TYPE
+        SYNTAX      INTEGER   (0..100)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Radio branch RT loop test time percentage"
+    ::= {radioMaintEntry 5}
+
+    radioRtPsuOff OBJECT-TYPE
+        SYNTAX      INTEGER   {
+                               rtPsuOff       (1),
+                               rtPsuOn        (2)
+                              }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "It switches on/off the Rt power supply"
+        DEFVAL      {rtPsuOn}
+    ::= {radioMaintEntry 6}
+
+    radioLom OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disable  (1),
+                             enable   (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "It is used to enable the IP packet forwarding towards Radio."
+        DEFVAL      {disable}
+    ::= {radioMaintEntry 7}
+
+    radioXpic  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disable (1),
+                             enable  (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enable of the cross polarization interference cancellation of this
+             radio.  The value disable is tied to a manual operation
+             (ManOpRecord). This object is applicable only if thiis radio
+             belongs to a 2+0 XPIC or 2+2 XPIC link."
+    ::= {radioMaintEntry 8}
+ 
+--
+-------  End of radioMaintTable
+
+-------  Begin of radioFrequencyTable
+--
+    radioFrequencyTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     RadioFreqEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Availables channels for selected channel spacing and modulation 
+             (see leaf radioFreqTableSelection)."
+    ::= {radioSystem 14}
+
+    radioFreqTabEntry  OBJECT-TYPE
+        SYNTAX      RadioFreqEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "RadioFreqTab record."
+        INDEX {radioIndex, radioFreqChannelId}
+    ::= {radioFrequencyTable 1}
+
+    RadioFreqEntry  ::=
+        SEQUENCE {
+            radioFreqChannelId   Integer32,
+            radioFreqChannelNum  Integer32,
+            radioFreqValue       Integer32
+        }
+
+    radioFreqChannelId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Index of the table"
+    ::= {radioFreqTabEntry 1}
+
+    radioFreqChannelNum  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Available channel number."
+    ::= {radioFreqTabEntry 2}
+
+    radioFreqValue  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Frequency related to radioFreqChannelNum."
+    ::= {radioFreqTabEntry 3}
+--
+-------  End of radioFrequencyTable
+
+-------  Begin of radioDuplexFrequencyTable
+--
+    radioDuplexFrequencyTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     RadioDuplexFreqEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with available duplex frequencies. Duplex frequency is
+             the absolute value of difference between RX and TX frequency." 
+    ::= {radioSystem 15}
+
+    radioDuplexFreqEntry  OBJECT-TYPE
+        SYNTAX      RadioDuplexFreqEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Duplex Frequency entry. There is an entry for each available
+             duplex frequency."
+        INDEX {radioIndex, radioDuplexFreqId}
+    ::= {radioDuplexFrequencyTable 1}
+
+    RadioDuplexFreqEntry  ::=
+        SEQUENCE {
+            radioDuplexFreqId     Integer32,
+            radioDuplexFreqValue  Integer32
+        }
+
+    radioDuplexFreqId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Index of the table."
+    ::= {radioDuplexFreqEntry 1}
+
+    radioDuplexFreqValue  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Duplex frequency in KHz."
+    ::= {radioDuplexFreqEntry 2}
+--
+-------  End of radioDuplexFrequencyTable
+
+-------  Begin of radioModulationTable
+--
+    radioModulationTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     RadioModulationEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "List of modulations related to channel spacing."
+    ::= {radioSystem 16}
+
+    radioModulationEntry  OBJECT-TYPE
+        SYNTAX      RadioModulationEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "radioModulation record."
+        INDEX {radioIndex, radioChannelSpacing}
+    ::= {radioModulationTable 1}
+
+    RadioModulationEntry  ::=
+        SEQUENCE {
+            radioChannelSpacing    ChannelSpacing,
+            radioModulationMap     ModulationMap,
+            radioRefModulationMap  ModulationMap
+        }
+
+    radioChannelSpacing  OBJECT-TYPE
+        SYNTAX      ChannelSpacing
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the channel spacing."
+    ::= {radioModulationEntry 1}
+
+    radioModulationMap  OBJECT-TYPE
+        SYNTAX      ModulationMap
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "List of modulations in the radioChanSpacing"
+    ::= {radioModulationEntry 2}
+
+    radioRefModulationMap  OBJECT-TYPE
+        SYNTAX      ModulationMap
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "List of modulations that can be selected as reference
+             in the radioChanSpacingId"
+    ::= {radioModulationEntry 3}
+--
+-------  End of radioModulationTable
+
+-------  Begin of linkStatusTable
+--
+    linkStatusTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  LinkStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with LinkStatusEntry."
+    ::= {radioSystem 17}
+
+    linkStatusEntry OBJECT-TYPE
+        SYNTAX      LinkStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Link status entry"
+        INDEX       {linkIndex,
+                     linkPolIndex }
+    ::= {linkStatusTable 1}
+
+    LinkStatusEntry  ::=
+        SEQUENCE{
+            linkPolIndex                INTEGER,
+            linkAcmRxProfile            Integer32,
+            linkAcmTxProfile            Integer32,
+            linkAcmRxProfileLabel       DisplayString,
+            linkAcmTxProfileLabel       DisplayString,
+            linkAcmRxModulation         BitsPerSymbol,
+            linkAcmTxModulation         BitsPerSymbol,
+            linkAcmRxCode               INTEGER,
+            linkAcmTxCode               INTEGER,
+            linkTxETHCapacity           Integer32,
+            linkRxETHCapacity           Integer32,
+            linkTxTDMCapacity           Integer32,
+            linkRxTDMCapacity           Integer32,
+            linkRescueModulation        BitsPerSymbol,
+            linkReducedCapacityAlarm    AlarmStatus,
+            linkLinkTelemetryFailAlarm  AlarmStatus,
+            linkIdMismatchAlarm         AlarmStatus,
+            linkRadioEocAlarm           AlarmStatus,
+            linkSetupMismatchAlarm      AlarmStatus,
+            linkRescueSetupAlarm        AlarmStatus,
+            linkXpicProcedureBlockAlarm AlarmStatus,
+            linkXpicRemTxOffAlarm       AlarmStatus,
+            linkRemoteIduAlarmSynthesis AlarmStatus,
+            linkNotMatchingRadiosAlarm  AlarmStatus,
+            linkConfigurationInProgress INTEGER,
+            linkXpd                     Integer32
+        }
+
+    linkPolIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..2)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the radio polarization. In XPIC radio link
+             identifies one of the polarizations."
+    ::= {linkStatusEntry 1}
+
+    linkAcmRxProfile OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object reports the ACM profile number in use in the radio Rx.
+             It is the linkAcmProfileId of linkAcmTable.
+             Label is linkAcmProfileLabel from linkAcmTable"
+    ::= {linkStatusEntry 2}
+
+    linkAcmTxProfile OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object reports the ACM profile number in use in the radio Tx.
+             It is the linkAcmProfileId of linkAcmTable.
+             Label is linkAcmProfileLabel from linkAcmTable"
+    ::= {linkStatusEntry 3}
+
+    linkAcmRxProfileLabel OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ASCII string used to describe current acm rx profile"
+    ::= {linkStatusEntry 4}
+
+    linkAcmTxProfileLabel OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ASCII string used to describe current acm tx profile"
+    ::= {linkStatusEntry 5}
+
+    linkAcmRxModulation OBJECT-TYPE
+        SYNTAX      BitsPerSymbol
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is the type of modulation of the Rx profile in use."
+    ::= {linkStatusEntry 6}
+
+    linkAcmTxModulation OBJECT-TYPE
+        SYNTAX      BitsPerSymbol
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is the type of modulation of the Tx profile in use."
+    ::= {linkStatusEntry 7}
+
+    linkAcmRxCode OBJECT-TYPE
+        SYNTAX      INTEGER   {
+                               unknown (0),
+                               normal  (1),
+                               strong  (2)
+                              }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is the type of codificator of the Rx profile in use."
+    ::= {linkStatusEntry 8}
+
+    linkAcmTxCode OBJECT-TYPE
+        SYNTAX      INTEGER   {
+                               unknown (0),
+                               normal  (1),
+                               strong  (2)
+                              }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is the type of codificator of the Tx profile in use."
+    ::= {linkStatusEntry 9}
+
+    linkTxETHCapacity OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object reports (in Kbits/sec) the transmitted payload 
+             capacity used by the Ethernet"
+        DEFVAL  { 0 }
+    ::= {linkStatusEntry 10}
+
+    linkRxETHCapacity OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object reports (in Kbits/sec) the received payload capacity
+             used by the Ethernet"
+        DEFVAL  { 0 }
+    ::= {linkStatusEntry 11}
+
+    linkTxTDMCapacity OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object reports the capacity in kbit/sec reserved to TDM 
+             tributaries in tx ACM profile."
+        DEFVAL  { 0 }
+    ::= {linkStatusEntry 12}
+
+    linkRxTDMCapacity OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object reports the capacity in kbit/sec reserved to TDM
+             tributaries in rx ACM profile."
+        DEFVAL  { 0 }
+    ::= {linkStatusEntry 13}
+
+    linkRescueModulation OBJECT-TYPE
+        SYNTAX      BitsPerSymbol
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is the modulation used when the remote terminal is
+             unreachable, ie traffic on radio link is down."
+        DEFVAL  { bps4QAM }
+    ::= {linkStatusEntry 14}
+
+    linkReducedCapacityAlarm OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The equipment works in reduced capacity"
+    ::= {linkStatusEntry 15}
+
+    linkLinkTelemetryFailAlarm OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Fail of link telemetry communication channel with associated
+             Severity"
+    ::= {linkStatusEntry 16}
+
+    linkIdMismatchAlarm OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Link Identification Alarm with associated Severity"
+    ::= {linkStatusEntry 17}
+
+    linkRadioEocAlarm OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Fail of Radio Eoc link communication channel with associated
+             Severity"
+    ::= {linkStatusEntry 18}
+
+    linkSetupMismatchAlarm OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The local setup doesn't match the setup of remote terminal"
+    ::= {linkStatusEntry 19}
+
+    linkRescueSetupAlarm OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The equipment is using the setup relative to the rescue modulation"
+    ::= {linkStatusEntry 20}
+
+    linkXpicProcedureBlockAlarm OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Only for XPIC equipment configurations.
+             Equipment Controller XPIC procedure Alarm control with associated
+             Severity"
+    ::= {linkStatusEntry 21}
+
+    linkXpicRemTxOffAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Only for XPIC equipment configurations.
+             Remote TX OFF command with associated Severity"
+    ::= {linkStatusEntry 22}
+
+    linkRemoteIduAlarmSynthesis  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Synthesis of the remote IDU alarms"
+    ::= {linkStatusEntry 23}
+
+    linkNotMatchingRadiosAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Radios of the link does not have matched parameters."
+    ::= {linkStatusEntry 24}
+
+    linkConfigurationInProgress  OBJECT-TYPE
+        SYNTAX      INTEGER   {
+                               cleared (1),
+                               active  (2)
+                              }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The link is being configured and the table linkSettingsTable is
+             not available for modifying parameters.
+            "
+    ::= {linkStatusEntry 25}
+
+    linkXpd  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "Cross-Polarization Discrimination, in tenths of dB, is the
+             difference between the received signal power of the
+             co-polarized main beam, and it componemt received on the
+             cross-polarized signal.
+             This object shows an extimated value of the XPD performed by 
+             the cross-polarization interference canceller (XPIC).
+             This means that the measure is reliable if:
+             - XPIC is on (linkType is radio2p0Xpic(4), or radio2p2XpicHS(5),
+                           or radio2p2XpicFD(6))
+             - Alarm radioDemodulatorFailAlarm is cleared.
+             - XPD is not too high, since without cross-polar interference
+               the canceller is not able to works well. Basically, in this
+               condition, the extimated XPD is greater than the real one.
+            "
+    ::= {linkStatusEntry 26}
+
+--
+-------  End of linkStatusTable
+
+-------  Begin of linkTfcTable
+--
+    linkTfcTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  LinkTfcEntry
+        MAX-ACCESS  not-accessible
+        STATUS      deprecated
+        DESCRIPTION
+            "Transmitter Fail Check feature. In 1+1 HS configuration, the
+             radio terminal that doesn't receive signals on both receivers,
+             requests the remote transmitter switch.
+
+             This table was deprecated and replaced by linkTfcV2Table.
+             It is a view of the rows of the linkTfcV2Table with the same
+             linkIndex and linkPolIndex equal to 1, in order to ensure
+             compatibility with old SNMP managers.
+            "
+    ::= {radioSystem 18}
+
+    linkTfcEntry OBJECT-TYPE
+        SYNTAX      LinkTfcEntry
+        MAX-ACCESS  not-accessible
+        STATUS      deprecated
+        DESCRIPTION
+            "Radio link TFC entry."
+        INDEX       {linkIndex}
+    ::= {linkTfcTable 1}
+
+     LinkTfcEntry  ::=
+        SEQUENCE {
+            linkTfcAction          INTEGER,
+            linkTfcControl         INTEGER,
+            linkTfcWatchWindow     INTEGER,
+            linkTfcAlarmThreshold  INTEGER,
+            linkTfcAlarm           AlarmStatus,
+            linkTfcRowStatus       RowStatus                       
+        }
+
+    linkTfcAction OBJECT-TYPE
+        SYNTAX    INTEGER   {
+                             notActive (0),
+                             reset     (1)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      deprecated
+        DESCRIPTION
+          "reset: to clear the forced switch generated by Trasmission Fail
+           Check algorithm (only if 1+1 configuration and ISO system)."
+    ::= {linkTfcEntry 1}
+
+    linkTfcControl OBJECT-TYPE
+        SYNTAX    INTEGER   {
+                             disable  (1),
+                             enable   (2)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      deprecated
+        DESCRIPTION
+            "It enables the Tx switch from remote equipment (only if 1+1
+             configuration and ISO system)."
+        DEFVAL      {disable}
+    ::= {linkTfcEntry 2}
+
+    linkTfcWatchWindow OBJECT-TYPE
+        SYNTAX      INTEGER   (1..300)
+        MAX-ACCESS  read-create
+        STATUS      deprecated
+        DESCRIPTION
+            "Watch Window (in seconds) related to Trasmission Fail Check
+             algorithm (only if 1+1 configuration and ISO system)."
+        DEFVAL      { 60 }
+    ::= {linkTfcEntry 3}
+
+    linkTfcAlarmThreshold OBJECT-TYPE
+        SYNTAX      INTEGER   (1..60)
+        MAX-ACCESS  read-create
+        STATUS      deprecated
+        DESCRIPTION
+            "Alarm Threshold (number of seconds with both remote RX in fail)
+             related to Trasmission Fail Check algorithm (only if 1+1
+             configuration and ISO system)."
+        DEFVAL      { 10 }
+    ::= {linkTfcEntry 4}
+
+    linkTfcAlarm OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "Transmission switch alarm generated by Trasmission Fail Check
+             algorithm (only if 1+1 configuration and ISO system)."
+    ::= {linkTfcEntry 5}
+
+    linkTfcRowStatus   OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      deprecated
+        DESCRIPTION
+            "Status of this conceptual row in linkTfcTable."
+    ::= {linkTfcEntry 6}
+
+--
+-------  End of linkTfcTable
+
+-------  Begin of linkMaintTable
+--
+    linkMaintTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  LinkMaintEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with commands for maintenance of radio link.
+             Objects in this table is not persistent. An Instance of this
+             table is created on creation of linkStatusEntry"
+    ::= {radioSystem 19}
+
+    linkMaintEntry OBJECT-TYPE
+        SYNTAX      LinkMaintEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Radio link maintenance entry."
+        INDEX       {linkIndex,
+                     linkPolIndex}
+    ::= {linkMaintTable 1}
+
+    LinkMaintEntry  ::=
+        SEQUENCE {
+            linkBerStart                  INTEGER,
+            linkBaseBandLom               INTEGER,
+            linkFadeMarginMeasure         INTEGER,
+            linkXpicControlProcedureReset INTEGER
+        }
+
+    linkBerStart OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             restart  (1),
+                             stop     (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Stop, Start (resetting errors and counters) the pattern.
+             This item is linked to a manual operation (ManOpRecord) instance."
+        DEFVAL {stop}
+    ::= {linkMaintEntry 1}
+
+    linkBaseBandLom OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disable  (1),
+                             enable   (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "It is used to enable the IP packet forwarding towards modems.
+           This item is linked to a manual operation (ManOpRecord) instance."
+        DEFVAL      {disable}
+    ::= {linkMaintEntry 2}
+
+    linkFadeMarginMeasure OBJECT-TYPE
+        SYNTAX    INTEGER   {
+                             disable (1),
+                             enable  (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      deprecated
+        DESCRIPTION
+          "Set by manager to start/stop fade margin measure.
+           This item is linked to a manual operation (ManOpRecord) instance.
+           This object is deprecated and replaced by fadeMarginMeasure.
+          "
+        DEFVAL      { disable }
+    ::= {linkMaintEntry 3}
+
+    linkXpicControlProcedureReset  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             notActive (0),
+                             reset     (1)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Set by manager to reset the XPIC control procedure after a
+             blocking action."
+        DEFVAL      {notActive}
+    ::= {linkMaintEntry 4}
+
+--
+-------  End of linkMaintTable
+
+-------  Begin of linkBerTable
+--
+    linkBerTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  LinkBerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with Command to estimate BER  of radio equipment.
+             Every objects in this table is not persistent. An Instance of this
+             table is created on creation of linkStatusEntry"
+    ::= {radioSystem 20}
+
+    linkBerEntry OBJECT-TYPE
+        SYNTAX      LinkBerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Radio equipment BER estimate record."
+        INDEX       {linkIndex,
+                     linkPolIndex}
+    ::= {linkBerTable 1}
+
+    LinkBerEntry  ::=
+        SEQUENCE {
+            linkBerErrorCounterH           Counter32,
+            linkBerErrorCounterL           Counter32,
+            linkBerDataCounterH            Counter32,
+            linkBerDataCounterL            Counter32,
+            linkBerSyncLossAlarm           AlarmStatus,
+            linkBerSyncLossAlarmCounter    Integer32,
+            linkBerElapsedTime             Integer32
+        }
+
+    linkBerErrorCounterH OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "High 32 bit part of the 64 bit error counter. Bit 32-63."
+    ::= {linkBerEntry 1}
+
+    linkBerErrorCounterL OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Low 32 bit part of the 64 bit error counter. Bit 0-31."
+    ::= {linkBerEntry 2}
+
+    linkBerDataCounterH OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "High 32 bit part of the 64 bit data counter. Bit 32-63."
+    ::= {linkBerEntry 3}
+
+    linkBerDataCounterL OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Low 32 bit part of the 64 bit data counter. Bit 0-31."
+    ::= {linkBerEntry 4}
+
+    linkBerSyncLossAlarm OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "BER sync loss alarm."
+    ::= {linkBerEntry 5}
+
+    linkBerSyncLossAlarmCounter OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "BER sync loss events counter."
+    ::= {linkBerEntry 6}
+
+    linkBerElapsedTime OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "BER measure elapsed time."
+    ::= {linkBerEntry 7}
+
+--
+-------  End of linkBerTable
+
+-------  Begin of linkAcmTable
+--
+    linkAcmTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  LinkAcmEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with link records."
+    ::= {radioSystem 21}
+
+    linkAcmEntry OBJECT-TYPE
+        SYNTAX      LinkAcmEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "ACM entries."
+        INDEX       {linkIndex, linkPolIndex, linkAcmProfileId}
+    ::= {linkAcmTable 1}
+
+    LinkAcmEntry  ::=
+        SEQUENCE {
+            linkAcmProfileId             Integer32,
+            linkAcmProfileModulation     BitsPerSymbol,
+            linkAcmProfileCode           INTEGER,
+            linkAcmProfileCapacity       Integer32,
+            linkAcmProfileLabel          DisplayString,
+            linkAcmMaxTDMCapacity        Integer32,
+            linkAcmPowerScaling          Integer32,
+            linkAcmProfileEnable         INTEGER,
+            linkAcmDownshiftThreshold    Integer32,
+            linkAcmUpshiftThreshold      Integer32,
+            linkAcmActiveProfile         INTEGER,
+            linkAcmTDMCapacity           Integer32,
+            linkAcmETHCapacity           Integer32,
+            linkAcmAtpcRxPowerScaling    Integer32,
+            linkAcmPowerRange            Integer32
+         }
+
+    linkAcmProfileId OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the profile number for the radio selected
+             by the object linkAcmId."
+    ::= {linkAcmEntry 1}
+
+    linkAcmProfileModulation OBJECT-TYPE
+        SYNTAX      BitsPerSymbol
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is the modulation of the profile."
+    ::= {linkAcmEntry 2}
+
+    linkAcmProfileCode OBJECT-TYPE
+        SYNTAX      INTEGER   {
+                               normal (1),
+                               strong (2)
+                              }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is the type of codificator of the profile."
+    ::= {linkAcmEntry 3}
+
+    linkAcmProfileCapacity OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is used to contain total capacity of profile
+             (in kbits/sec)."
+    ::= {linkAcmEntry 4}
+
+    linkAcmProfileLabel OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..32))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "ASCII string used to assign a name to profile."
+    ::= {linkAcmEntry 5}
+
+    linkAcmProfileEnable OBJECT-TYPE
+        SYNTAX      INTEGER   {
+                               disable (1),
+                               enable  (2)
+                              }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The object is used to contain if the use of this profile is
+             enabled or disabled"
+        DEFVAL      {enable}
+    ::= {linkAcmEntry 6}
+
+    linkAcmMaxTDMCapacity OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "This object reports the maximum capacity that can
+             be assigned to the TDM traffic.
+             The capacity is specified in number of E1 (2Mbit/s).
+
+             This object has been superseded by linkE1vsSTM1CapacityTable.
+            "
+        DEFVAL      {0}
+    ::= {linkAcmEntry 7}
+
+    linkAcmPowerScaling OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "This object contains the difference (in eighth of dB) between the
+             TX power at this profile modulation and the TX power at the
+             reference modulation. The power scaling value is achieved from the
+             table linkPtxProfileTable.
+             This object is deprecated: see combinedRadioPowerScalingTable."
+    ::= {linkAcmEntry 8}
+
+    linkAcmDownshiftThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The object is used to contain the downshift threshold in dB/10."
+    ::= {linkAcmEntry 9}
+
+    linkAcmUpshiftThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The object is used to contain the upshift threshold in dB/10."
+    ::= {linkAcmEntry 10}
+
+    linkAcmActiveProfile OBJECT-TYPE
+        SYNTAX    INTEGER   {
+                             cleared    (1),
+                             activeRx   (2),
+                             activeTx   (3),
+                             activeBoth (4)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is used to contain the active status of this profile.
+             The value of the object is related to linkAcmRxProfile
+             and linkAcmTxProfile of the LinkStatusEntry."
+        DEFVAL      {cleared}
+    ::= {linkAcmEntry 11}
+
+    linkAcmTDMCapacity OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object reports current TDM capacity (in kbits/sec)
+             of the profile."
+    ::= {linkAcmEntry 12}
+
+    linkAcmETHCapacity OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object reports current ETH capacity (in Kbits/sec) of
+             the profile."
+    ::= {linkAcmEntry 13}
+
+    linkAcmAtpcRxPowerScaling OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "This object contains the difference (in eighth of dB) between the
+             ATPC RX level thresholds at this profile modulation and the ATPC
+             RX level thresholds at the upper modulation.
+             This object is deprecated: see combinedRadioPowerScalingTable."
+    ::= {linkAcmEntry 14}
+
+    linkAcmPowerRange OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "This object contains (in dB) the current value of ATPC range.
+             This object is deprecated: see combinedRadioPowerScalingTable."
+    ::= {linkAcmEntry 15}
+
+--
+-------  End of linkAcmTable
+
+-------  Begin of linkProTable
+--
+    linkProTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  LinkProEntry
+        MAX-ACCESS  not-accessible
+        STATUS      deprecated
+        DESCRIPTION
+            "A list of protection link entries.
+
+             This table was deprecated and replaced by linkProV2Table.
+             It is a view of the rows of the linkProV2Table with the same
+             linkIndex and linkPolIndex equal to 1, in order to ensure
+             compatibility with old SNMP managers
+            "
+    ::= {radioSystem 22}
+
+    linkProEntry OBJECT-TYPE
+        SYNTAX      LinkProEntry
+        MAX-ACCESS  not-accessible
+        STATUS      deprecated
+        DESCRIPTION
+            "An entry containing management information applicable to a
+             protected link.
+            "
+        INDEX       {linkIndex}
+    ::= {linkProTable 1}
+
+    LinkProEntry  ::=
+        SEQUENCE {          
+            linkProProtectionTxChIdx         Integer32,
+            linkProProtectionRxChIdx         Integer32,
+            linkProTxWtrTime                 INTEGER,
+            linkProRxWtrTime                 INTEGER,
+            linkProTxSwitchedChIdx           Integer32,
+            linkProRxSwitchedChIdx           Integer32,
+            linkProTxRevertive               INTEGER,
+            linkProRxRevertive               INTEGER,
+            linkProExtraTraffic              INTEGER,
+            linkProRowStatus                 RowStatus                       
+         }
+         
+    linkProProtectionTxChIdx     OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      deprecated
+        DESCRIPTION
+            "This object identifies the tx protection channel 
+             of a protected link. This object is not applicable 
+             in case of not-revertive protection. For N+1 links 
+             a value different from zero must be set.
+            "
+        DEFVAL {0}
+    ::= {linkProEntry 1}
+    
+     linkProProtectionRxChIdx     OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      deprecated
+        DESCRIPTION
+            "This object identifies the rx protection channel 
+             of a protected link. This object is not applicable 
+             in case of not-revertive protection. For N+1 links 
+             a value different from zero must be set.
+            "
+        DEFVAL {0}
+    ::= {linkProEntry 2}
+     
+    linkProTxWtrTime OBJECT-TYPE
+        SYNTAX      INTEGER     (0..12)
+        MAX-ACCESS  read-create
+        STATUS      deprecated
+        DESCRIPTION
+            "It defines the Wait Time (in minutes) to Restore in transmission
+             when revertive protection is enabled. Zero value means no switch. 
+             If switch is not supported or protection is not revertive, 
+             a value different from zero cannot be set. 
+            "
+        DEFVAL {0}
+    ::= {linkProEntry 3}
+           
+    linkProRxWtrTime OBJECT-TYPE
+        SYNTAX      INTEGER     (0..12)
+        MAX-ACCESS  read-create
+        STATUS      deprecated
+        DESCRIPTION
+            "It defines the Wait Time (in minutes) to Restore in reception when
+             revertive protection is enabled. Zero value means no switch. 
+             If switch is not supported or protection is not revertive, 
+             a value different from zero cannot be set. 
+            "
+        DEFVAL {0}
+    ::= {linkProEntry 4}
+        
+    linkProTxSwitchedChIdx  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "This object reports the index of tx channel switched to protection.
+             This object is applicable only for N+1 protection schema.
+            "
+        DEFVAL {0}
+    ::= {linkProEntry 5}
+    
+    linkProRxSwitchedChIdx  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "This object reports the index of rx channel switched to protection.
+             This object is applicable only for N+1 protection schema.
+            "
+        DEFVAL {0}
+    ::= {linkProEntry 6}
+     
+    linkProTxRevertive OBJECT-TYPE
+        SYNTAX      INTEGER {
+                      disable (1),
+                      enable  (2)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      deprecated
+        DESCRIPTION
+            "It defines if tx protection is revertive or not revertive.
+             In case of N+1 protection, protection is always revertive.
+            "
+        DEFVAL {disable}
+    ::= {linkProEntry 7}
+
+    linkProRxRevertive OBJECT-TYPE
+        SYNTAX      INTEGER {
+                      disable (1),
+                      enable  (2)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      deprecated
+        DESCRIPTION
+            "It defines if rx protection is revertive or not revertive.
+             In case of N+1 protection, protection is always revertive.
+            "
+        DEFVAL {disable}
+    ::= {linkProEntry 8}
+    
+     linkProExtraTraffic OBJECT-TYPE
+        SYNTAX       INTEGER { 
+                        disable (1), 
+                        enable  (2) 
+                     }
+        MAX-ACCESS read-create
+        STATUS     deprecated
+        DESCRIPTION
+        "This object enables or disables the transfer of extra traffic
+         on the protection channel in a N+1 link. This object must be 
+         set to disabled in case of architectures different for N+1.
+         "
+        DEFVAL {disable}
+   ::= {linkProEntry 9}
+   
+    linkProRowStatus   OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      deprecated
+        DESCRIPTION
+            "Status of this conceptual row in linkProTable.
+            "
+    ::= {linkProEntry 10}
+
+--
+-------  End of linkProTable
+
+-------  Begin of linkProMaintTable
+--
+    linkProMaintTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  LinkProMaintEntry
+        MAX-ACCESS  not-accessible
+        STATUS      deprecated
+        DESCRIPTION
+            "A list of maintenance commands for protected links.
+             A row in this table is added on creation of a row
+             in linkProTable.
+
+             This table was deprecated and replaced by linkProMaintV2Table.
+             It is a view of the rows of the linkProMaintV2Table with the same
+             linkIndex and linkPolIndex equal to 1, in order to ensure
+             compatibility with old SNMP managers
+            "
+    ::= {radioSystem 23}
+
+    linkProMaintEntry OBJECT-TYPE
+        SYNTAX      LinkProMaintEntry
+        MAX-ACCESS  not-accessible
+        STATUS      deprecated
+        DESCRIPTION
+            "An entry containing maintenance commands applicable to a
+             protected link.
+            "
+        INDEX       {linkIndex}
+    ::= {linkProMaintTable 1}
+
+    LinkProMaintEntry  ::=
+        SEQUENCE {
+            linkProMaintTxLockout      INTEGER,
+            linkProMaintRxLockout      INTEGER,
+            linkProMaintTxForced       Integer32,
+            linkProMaintRxForced       Integer32,
+            linkProMaintTxWtrReset     INTEGER,
+            linkProMaintRxWtrReset     INTEGER
+         }
+              
+      linkProMaintTxLockout OBJECT-TYPE
+      SYNTAX      INTEGER   {
+                             disable     (1), 
+                             enable      (2)
+                            }
+      MAX-ACCESS  read-write
+      STATUS      deprecated
+      DESCRIPTION
+          "Command to enable/disable tx lockout. This object
+           is applicable only in case of N+1 protections.
+          "
+      DEFVAL {disable}
+      ::= {linkProMaintEntry 1}
+      
+      linkProMaintRxLockout OBJECT-TYPE
+      SYNTAX      INTEGER   {
+                             disable     (1), 
+                             enable      (2)
+                            }
+      MAX-ACCESS  read-write
+      STATUS      deprecated
+      DESCRIPTION
+          "Command to enable/disable rx lockout. This object
+           is applicable only in case of N+1 protections.
+          "
+      DEFVAL {disable}
+      ::= {linkProMaintEntry 2}
+      
+      linkProMaintTxForced OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-write
+      STATUS      deprecated
+      DESCRIPTION
+          "Command to force switch to a given 
+           transmission channel. Zero value means no 
+           switch.
+          "
+      DEFVAL {0}
+      ::= {linkProMaintEntry 3}
+      
+      linkProMaintRxForced OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-write
+      STATUS      deprecated
+      DESCRIPTION
+          "Command to force switch to a given 
+           receiving channel. Zero value means no 
+           switch.
+          "
+      DEFVAL {0}
+      ::= {linkProMaintEntry 4}
+      
+      linkProMaintTxWtrReset OBJECT-TYPE
+      SYNTAX      INTEGER  {
+                            notActive  (1), 
+                            on         (2)
+                           }
+      MAX-ACCESS  read-write
+      STATUS      deprecated
+      DESCRIPTION
+          "Clear wait time to restore making the revertive 
+           path immediately available.
+          "
+     DEFVAL {notActive}
+    ::= {linkProMaintEntry 5}
+    
+    linkProMaintRxWtrReset OBJECT-TYPE
+      SYNTAX      INTEGER  {
+                            notActive  (1), 
+                            on         (2)
+                           }
+      MAX-ACCESS  read-write
+      STATUS      deprecated
+      DESCRIPTION
+          "Clear wait time to restore making the revertive 
+           path immediately available.
+          "
+     DEFVAL {notActive}
+    ::= {linkProMaintEntry 6}
+      
+             
+--
+-------  End of linkProMaintTable
+
+-------  Begin of linkCapabilitiesTable
+--
+    linkCapabilitiesTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF LinkCapabilitiesEntry
+        MAX-ACCESS  not-accessible
+        STATUS      deprecated
+        DESCRIPTION
+            "Table with RadioCapabilities entries: there is an entry for each 
+             linkTable row.
+             In 1+1 HS and XPIC radio links, this table contains only values
+             supported by both radios.
+             In 1+1 FD radio link, managers have to know the capabilities 
+             of each channel. As such, this table is declared deprecated and
+             replaced by combinedRadioCapabilitiesTable."
+    ::= {radioSystem 24}
+
+    linkCapabilitiesEntry  OBJECT-TYPE
+        SYNTAX      LinkCapabilitiesEntry
+        MAX-ACCESS  not-accessible
+        STATUS      deprecated
+        DESCRIPTION
+            "LinkCapabilities entry."
+        INDEX       {linkIndex}
+    ::= {linkCapabilitiesTable 1}
+
+    LinkCapabilitiesEntry  ::=
+        SEQUENCE {
+            linkCapabilitiesCapability           RadioCapability,
+            linkCapabilitiesTxMinFrequency       Integer32,
+            linkCapabilitiesTxMaxFrequency       Integer32,
+            linkCapabilitiesStepFrequency        Integer32,
+            linkCapabilitiesMinPtxNominalValue   Integer32,
+            linkCapabilitiesMaxPtxNominalValue   Integer32,
+            linkCapabilitiesExtendedMinPwr       Integer32
+        }
+
+    linkCapabilitiesCapability  OBJECT-TYPE
+        SYNTAX      RadioCapability
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "Bit map to describe the radio features."
+    ::= {linkCapabilitiesEntry 1}
+
+    linkCapabilitiesTxMinFrequency  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "Minimum of available channel frequency in KHz."
+    ::= {linkCapabilitiesEntry 2}
+
+    linkCapabilitiesTxMaxFrequency  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "Maximum of available channel frequency in KHz."
+    ::= {linkCapabilitiesEntry 3}
+
+    linkCapabilitiesStepFrequency  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "Minimum frequency step in KHz."
+    ::= {linkCapabilitiesEntry 4}
+
+    linkCapabilitiesMinPtxNominalValue  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "Minimum nominal Ptx in dBm."
+    ::= {linkCapabilitiesEntry 5}
+
+    linkCapabilitiesMaxPtxNominalValue  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "Maximum nominal Ptx in dBm."
+    ::= {linkCapabilitiesEntry 6}
+
+    linkCapabilitiesExtendedMinPwr  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "Minimum extended Ptx power for fade margin."
+    ::= {linkCapabilitiesEntry 7}
+--
+-------  End of linkCapabilitiesTable
+
+-------  Begin of linkFrequencyTable
+--
+    linkFrequencyTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     LinkFreqEntry
+        MAX-ACCESS  not-accessible
+        STATUS      deprecated
+        DESCRIPTION
+            "Availables channels for selected channel spacing and modulation 
+             In 1+1 HS and XPIC radio links, this table contains only values
+             supported by both radios.
+             In 1+1 FD radio link, managers have to know the allowable 
+             frequencies of each channel. As such, this table is declared
+             deprecated and replaced by combinedRadioFrequencyTable."
+    ::= {radioSystem 25}
+
+    linkFreqTabEntry  OBJECT-TYPE
+        SYNTAX      LinkFreqEntry
+        MAX-ACCESS  not-accessible
+        STATUS      deprecated
+        DESCRIPTION
+            "LinkFreqTab record."
+        INDEX {linkIndex, linkFreqChannelId}
+    ::= {linkFrequencyTable 1}
+
+    LinkFreqEntry  ::=
+        SEQUENCE {
+            linkFreqChannelId   Integer32,
+            linkFreqChannelNum  Integer32,
+            linkFreqValue       Integer32
+        }
+
+    linkFreqChannelId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "Index of the table"
+    ::= {linkFreqTabEntry 1}
+
+    linkFreqChannelNum  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "Available channel number."
+    ::= {linkFreqTabEntry 2}
+
+    linkFreqValue  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "Frequency related to linkFreqChannelNum."
+    ::= {linkFreqTabEntry 3}
+--
+-------  End of linkFrequencyTable
+
+-------  Begin of linkDuplexFrequencyTable
+--
+    linkDuplexFrequencyTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     LinkDuplexFreqEntry
+        MAX-ACCESS  not-accessible
+        STATUS      deprecated
+        DESCRIPTION
+            "Table with available duplex frequencies. Duplex frequency is
+             the absolute value of difference between RX and TX frequency.
+             In 1+1 HS and XPIC radio links, this table contains only values
+             supported by both radios.
+             In 1+1 FD radio link, managers have to know the allowable 
+             duplex frequencies of each channel. As such, this table is declared
+             deprecated and replaced by combinedRadioDuplexFrequencyTable."
+    ::= {radioSystem 26}
+
+    linkDuplexFreqEntry  OBJECT-TYPE
+        SYNTAX      LinkDuplexFreqEntry
+        MAX-ACCESS  not-accessible
+        STATUS      deprecated
+        DESCRIPTION
+            "Duplex Frequency entry. For each available duplex frequency"
+        INDEX {linkIndex, linkDuplexFreqId}
+    ::= {linkDuplexFrequencyTable 1}
+
+    LinkDuplexFreqEntry  ::=
+        SEQUENCE {
+            linkDuplexFreqId     Integer32,
+            linkDuplexFreqValue  Integer32
+        }
+
+    linkDuplexFreqId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "Index of the table."
+    ::= {linkDuplexFreqEntry 1}
+
+    linkDuplexFreqValue  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "Duplex frequency in KHz."
+    ::= {linkDuplexFreqEntry 2}
+--
+-------  End of linkDuplexFrequencyTable
+
+-------  Begin of linkModulationTable
+--
+    linkModulationTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     LinkModulationEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "List of modulation related to channel spacing.
+             In 1+1 HS and XPIC radio links, this table contains only values
+             supported by both radios.
+            "
+    ::= {radioSystem 27}
+
+    linkModulationEntry  OBJECT-TYPE
+        SYNTAX      LinkModulationEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "linkModulation record."
+        INDEX {linkIndex, linkChannelSpacing}
+    ::= {linkModulationTable 1}
+
+    LinkModulationEntry  ::=
+        SEQUENCE {
+            linkChannelSpacing    ChannelSpacing,
+            linkModulationMap     ModulationMap,
+            linkRefModulationMap  ModulationMap
+        }
+
+    linkChannelSpacing  OBJECT-TYPE
+        SYNTAX      ChannelSpacing
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the channel spacing."
+    ::= {linkModulationEntry 1}
+
+    linkModulationMap  OBJECT-TYPE
+        SYNTAX      ModulationMap
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "List of modulation in the linkChanSpacing"
+    ::= {linkModulationEntry 2}
+
+    linkRefModulationMap  OBJECT-TYPE
+        SYNTAX      ModulationMap
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "List of modulations that can be selected as reference
+             in the linkChanSpacingId"
+    ::= {linkModulationEntry 3}
+--
+-------  End of linkModulationTable
+
+-------  Begin of linkChCapabilitiesTable
+--
+    combinedRadioCapabilitiesTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF CombinedRadioCapabilitiesEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with RadioCapabilities entries: there is an entry for each 
+             radioSettingTable row.
+             In 1+1 HS and XPIC radio links, this table contains only values
+             supported by both radios belonging to the link.
+             In 1+1 FD radio link, managers have to know the allowable 
+             duplex frequencies of each channel. As such, this table is declared
+             deprecated and replaced by combinedRadioCapabilitiesTable."
+    ::= {radioSystem 28}
+
+    combinedRadioCapabilitiesEntry  OBJECT-TYPE
+        SYNTAX      CombinedRadioCapabilitiesEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "combinedRadioCapabilities entry."
+        INDEX       {radioSettingsIndex}
+    ::= {combinedRadioCapabilitiesTable 1}
+
+    CombinedRadioCapabilitiesEntry  ::=
+        SEQUENCE {
+            combinedRadioCapabilitiesCapability           RadioCapability,
+            combinedRadioCapabilitiesTxMinFrequency       Integer32,
+            combinedRadioCapabilitiesTxMaxFrequency       Integer32,
+            combinedRadioCapabilitiesStepFrequency        Integer32,
+            combinedRadioCapabilitiesMinPtxNominalValue   Integer32,
+            combinedRadioCapabilitiesMaxPtxNominalValue   Integer32,
+            combinedRadioCapabilitiesExtendedMinPwr       Integer32
+        }
+
+    combinedRadioCapabilitiesCapability  OBJECT-TYPE
+        SYNTAX      RadioCapability
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Bit map to describe the radio features."
+    ::= {combinedRadioCapabilitiesEntry 1}
+
+    combinedRadioCapabilitiesTxMinFrequency  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Minimum of available channel frequency in KHz."
+    ::= {combinedRadioCapabilitiesEntry 2}
+
+    combinedRadioCapabilitiesTxMaxFrequency  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Maximum of available channel frequency in KHz."
+    ::= {combinedRadioCapabilitiesEntry 3}
+
+    combinedRadioCapabilitiesStepFrequency  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Minimum frequency step in KHz."
+    ::= {combinedRadioCapabilitiesEntry 4}
+
+    combinedRadioCapabilitiesMinPtxNominalValue  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Minimum nominal Ptx in dBm."
+    ::= {combinedRadioCapabilitiesEntry 5}
+
+    combinedRadioCapabilitiesMaxPtxNominalValue  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Maximum nominal Ptx in dBm."
+    ::= {combinedRadioCapabilitiesEntry 6}
+
+    combinedRadioCapabilitiesExtendedMinPwr  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Minimum extended Ptx power for fade margin."
+    ::= {combinedRadioCapabilitiesEntry 7}
+--
+-------  End of combinedRadioCapabilitiesTable
+
+-------  Begin of combinedRadioFrequencyTable
+--
+    combinedRadioFrequencyTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF CombinedRadioFreqEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Availables channels for selected channel spacing and modulation 
+             In 1+1 HS and XPIC radio links, this table contains only values
+             supported by both radios."
+    ::= {radioSystem 29}
+
+    combinedRadioFreqTabEntry  OBJECT-TYPE
+        SYNTAX      CombinedRadioFreqEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "combinedRadioFreqTab record."
+        INDEX {radioSettingsIndex, combinedRadioFreqChannelId}
+    ::= {combinedRadioFrequencyTable 1}
+
+    CombinedRadioFreqEntry  ::=
+        SEQUENCE {
+            combinedRadioFreqChannelId   Integer32,
+            combinedRadioFreqChannelNum  Integer32,
+            combinedRadioFreqValue       Integer32
+        }
+
+    combinedRadioFreqChannelId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Index of the table"
+    ::= {combinedRadioFreqTabEntry 1}
+
+    combinedRadioFreqChannelNum  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Available channel number."
+    ::= {combinedRadioFreqTabEntry 2}
+
+    combinedRadioFreqValue  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Frequency related to combinedRadioFreqChannelNum."
+    ::= {combinedRadioFreqTabEntry 3}
+--
+-------  End of combinedRadioFrequencyTable
+
+-------  Begin of combinedRadioDuplexFrequencyTable
+--
+    combinedRadioDuplexFrequencyTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     CombinedRadioDuplexFreqEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with available duplex frequencies. Duplex frequency is
+             the absolute value of difference between RX and TX frequency.
+             In 1+1 HS and XPIC radio links, this table contains only values
+             supported by both radios."
+    ::= {radioSystem 30}
+
+    combinedRadioDuplexFreqEntry  OBJECT-TYPE
+        SYNTAX      CombinedRadioDuplexFreqEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Duplex Frequency entry. There is an entry for each available
+             duplex frequency."
+        INDEX {radioSettingsIndex, combinedRadioDuplexFreqId}
+    ::= {combinedRadioDuplexFrequencyTable 1}
+
+    CombinedRadioDuplexFreqEntry  ::=
+        SEQUENCE {
+            combinedRadioDuplexFreqId     Integer32,
+            combinedRadioDuplexFreqValue  Integer32
+        }
+
+    combinedRadioDuplexFreqId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Index of the table."
+    ::= {combinedRadioDuplexFreqEntry 1}
+
+    combinedRadioDuplexFreqValue  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Duplex frequency in KHz."
+    ::= {combinedRadioDuplexFreqEntry 2}
+--
+-------  End of combinedRadioDuplexFrequencyTable
+
+-------  Begin of combinedRadioPowerScalingTable
+--
+    combinedRadioPowerScalingTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     CombinedRadioPowerScalingEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "List of modulation related to channel spacing.
+             In 1+1 HS and XPIC radio links, this table contains only values
+             supported by both radios."
+    ::= {radioSystem 31}
+
+    combinedRadioPowerScalingEntry  OBJECT-TYPE
+        SYNTAX      CombinedRadioPowerScalingEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "radioPowerScaling record."
+        INDEX {radioSettingsIndex, linkAcmProfileId}
+    ::= {combinedRadioPowerScalingTable 1}
+
+    CombinedRadioPowerScalingEntry  ::=
+        SEQUENCE {
+            combinedRadioPowerScaling        Integer32,
+            combinedRadioAtpcRxPowerScaling  Integer32,
+            combinedRadioPowerRange          Integer32
+        }
+
+    combinedRadioPowerScaling OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object contains the difference (in eighth of dB) between the
+             TX power at this profile modulation and the TX power at the
+             reference modulation. The power scaling value is achieved from the
+             table linkPtxProfileTable."
+    ::= {combinedRadioPowerScalingEntry 1}
+
+    combinedRadioAtpcRxPowerScaling OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object contains the difference (in eighth of dB) between the
+             ATPC RX level thresholds at this profile modulation and the ATPC
+             RX level thresholds at the upper modulation."
+    ::= {combinedRadioPowerScalingEntry 2}
+
+    combinedRadioPowerRange OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object contains (in dB) the current value of ATPC range."
+    ::= {combinedRadioPowerScalingEntry 3}
+--
+-------  End of radioPowerScalingTable
+
+-------  Begin of stm1BulkSettingsTable
+--
+    stm1BulkMappingTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  Stm1BulkMappingEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with entries containing stm-1 bulk transport parameters 
+             for a particular link.
+             For each link are present as many rows as the STM-1 that the link
+             can carry in bulk mode.
+           "
+    ::= {radioSystem 32}
+
+    stm1BulkMappingEntry OBJECT-TYPE
+        SYNTAX      Stm1BulkMappingEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An row in stm1BulkSettingsTable.
+            "
+        INDEX       {linkIndex, stm1BulkPolIndex, stm1BulkChanIndex}
+    ::= {stm1BulkMappingTable 1}
+
+    Stm1BulkMappingEntry  ::=
+      SEQUENCE {
+                stm1BulkPolIndex           Integer32,
+                stm1BulkChanIndex          Integer32,
+                stm1BulkChannel            Stm1IndexOrZero
+        }
+
+    stm1BulkPolIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+       DESCRIPTION
+            "Polarization index.
+            "
+    ::= {stm1BulkMappingEntry 1}
+
+    stm1BulkChanIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+       DESCRIPTION
+            "STM-1 channel index.
+             The range of this object is from 1 to N, where N is the number
+             of STM-1 that a link can carry in bulk mode.
+            "
+    ::= {stm1BulkMappingEntry 2}
+
+    stm1BulkChannel OBJECT-TYPE
+        SYNTAX      Stm1IndexOrZero
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Index of the stm-1 in stm1Table.
+             The SNMP agent will accept only index of a STM-1 present in
+             stm1Table with stm1Structure set to opaque(4).
+            "
+         DEFVAL     {0}
+    ::= {stm1BulkMappingEntry 3}
+
+--
+-------  End of stm1BulkSettingsTable
+
+-------  Begin of linkE1vsSTM1CapacityTable
+--
+
+    linkE1vsSTM1CapacityTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  LinkE1vsSTM1CapacityEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with entries containing the E1 cpacity according to the
+             tributaries STM-1 configured to be carried in bulk mode.
+            "
+    ::= {radioSystem 33}
+
+    linkE1vsSTM1CapacityEntry OBJECT-TYPE
+        SYNTAX      LinkE1vsSTM1CapacityEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An row in linkE1vsSTM1CapacityTable.
+            "
+        INDEX       {linkIndex, linkAcmProfileId, linkE1vsSTM1CapacityStm1}
+    ::= {linkE1vsSTM1CapacityTable 1}
+
+    LinkE1vsSTM1CapacityEntry  ::=
+      SEQUENCE {
+                linkE1vsSTM1CapacityStm1      Integer32,
+                linkE1vsSTM1CapacityE1        Integer32
+               }
+
+    linkE1vsSTM1CapacityStm1 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Number of tributaries STM-1 configured to be transported in
+             bulk mode.
+            "
+    ::= {linkE1vsSTM1CapacityEntry 1 }
+
+    linkE1vsSTM1CapacityE1 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+       DESCRIPTION
+            "Number of E1 that can be carried by this profile according to the
+             the tributaries STM-1 carried in bulk mode.
+            "
+    ::= {linkE1vsSTM1CapacityEntry 2}
+
+--
+-------  End of linkE1vsSTM1CapacityTable
+
+-------  Begin of linkTfcV2Table
+--
+    linkTfcV2Table OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  LinkTfcV2Entry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Transmitter Fail Check feature. In 1+1 HS configuration, the
+             radio terminal that doesn't receive signals on both receivers,
+             requests the remote transmitter switch."
+    ::= {radioSystem 34}
+
+    linkTfcV2Entry OBJECT-TYPE
+        SYNTAX      LinkTfcV2Entry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Radio link TFC entry."
+        INDEX       {linkIndex, linkPolIndex}
+    ::= {linkTfcV2Table 1}
+
+     LinkTfcV2Entry  ::=
+        SEQUENCE {
+            linkTfcV2Action          INTEGER,
+            linkTfcV2Control         INTEGER,
+            linkTfcV2WatchWindow     INTEGER,
+            linkTfcV2AlarmThreshold  INTEGER,
+            linkTfcV2Alarm           AlarmStatus,
+            linkTfcV2RowStatus       RowStatus                       
+        }
+
+    linkTfcV2Action OBJECT-TYPE
+        SYNTAX    INTEGER   {
+                             notActive (0),
+                             reset     (1)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "reset: to clear the forced switch generated by Trasmission Fail
+           Check algorithm (only if 1+1 configuration and ISO system)."
+    ::= {linkTfcV2Entry 1}
+
+    linkTfcV2Control OBJECT-TYPE
+        SYNTAX    INTEGER   {
+                             disable  (1),
+                             enable   (2)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "It enables the Tx switch from remote equipment (only if 1+1
+             configuration and ISO system)."
+        DEFVAL      {disable}
+    ::= {linkTfcV2Entry 2}
+
+    linkTfcV2WatchWindow OBJECT-TYPE
+        SYNTAX      INTEGER   (1..300)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Watch Window (in seconds) related to Trasmission Fail Check
+             algorithm (only if 1+1 configuration and ISO system)."
+        DEFVAL      { 60 }
+    ::= {linkTfcV2Entry 3}
+
+    linkTfcV2AlarmThreshold OBJECT-TYPE
+        SYNTAX      INTEGER   (1..60)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Alarm Threshold (number of seconds with both remote RX in fail)
+             related to Trasmission Fail Check algorithm (only if 1+1
+             configuration and ISO system)."
+        DEFVAL      { 10 }
+    ::= {linkTfcV2Entry 4}
+
+    linkTfcV2Alarm OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Transmission switch alarm generated by Trasmission Fail Check
+             algorithm (only if 1+1 configuration and ISO system)."
+    ::= {linkTfcV2Entry 5}
+
+    linkTfcV2RowStatus   OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this conceptual row in linkTfcV2Table."
+    ::= {linkTfcV2Entry 6}
+
+--
+-------  End of linkTfcV2Table
+
+-------  Begin of linkProV2Table
+--
+    linkProV2Table OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  LinkProV2Entry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of protection link entries.
+            "
+    ::= {radioSystem 35}
+
+    linkProV2Entry OBJECT-TYPE
+        SYNTAX      LinkProV2Entry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing management information applicable to a
+             protected link.
+            "
+        INDEX       {linkIndex, linkPolIndex}
+    ::= {linkProV2Table 1}
+
+    LinkProV2Entry  ::=
+        SEQUENCE {          
+            linkProV2ProtectionTxChIdx         Integer32,
+            linkProV2ProtectionRxChIdx         Integer32,
+            linkProV2TxWtrTime                 INTEGER,
+            linkProV2RxWtrTime                 INTEGER,
+            linkProV2TxSwitchedChIdx           Integer32,
+            linkProV2RxSwitchedChIdx           Integer32,
+            linkProV2TxRevertive               INTEGER,
+            linkProV2RxRevertive               INTEGER,
+            linkProV2ExtraTraffic              INTEGER,
+            linkProV2RowStatus                 RowStatus                       
+         }
+         
+    linkProV2ProtectionTxChIdx     OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the tx protection channel 
+             of a protected link. This object is not applicable 
+             in case of not-revertive protection. For N+1 links 
+             a value different from zero must be set.
+            "
+        DEFVAL {0}
+    ::= {linkProV2Entry 1}
+    
+     linkProV2ProtectionRxChIdx     OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the rx protection channel 
+             of a protected link. This object is not applicable 
+             in case of not-revertive protection. For N+1 links 
+             a value different from zero must be set.
+            "
+        DEFVAL {0}
+    ::= {linkProV2Entry 2}
+     
+    linkProV2TxWtrTime OBJECT-TYPE
+        SYNTAX      INTEGER     (0..12)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "It defines the Wait Time (in minutes) to Restore in transmission
+             when revertive protection is enabled. Zero value means no switch. 
+             If switch is not supported or protection is not revertive, 
+             a value different from zero cannot be set. 
+            "
+        DEFVAL {0}
+    ::= {linkProV2Entry 3}
+           
+    linkProV2RxWtrTime OBJECT-TYPE
+        SYNTAX      INTEGER     (0..12)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "It defines the Wait Time (in minutes) to Restore in reception when
+             revertive protection is enabled. Zero value means no switch. 
+             If switch is not supported or protection is not revertive, 
+             a value different from zero cannot be set. 
+            "
+        DEFVAL {0}
+    ::= {linkProV2Entry 4}
+        
+    linkProV2TxSwitchedChIdx  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object reports the index of tx channel switched to protection.
+             This object is applicable only for N+1 protection schema.
+            "
+        DEFVAL {0}
+    ::= {linkProV2Entry 5}
+    
+    linkProV2RxSwitchedChIdx  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object reports the index of rx channel switched to protection.
+             This object is applicable only for N+1 protection schema.
+            "
+        DEFVAL {0}
+    ::= {linkProV2Entry 6}
+     
+    linkProV2TxRevertive OBJECT-TYPE
+        SYNTAX      INTEGER {
+                      disable (1),
+                      enable  (2)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "It defines if tx protection is revertive or not revertive.
+             In case of N+1 protection, protection is always revertive.
+            "
+        DEFVAL {disable}
+    ::= {linkProV2Entry 7}
+
+    linkProV2RxRevertive OBJECT-TYPE
+        SYNTAX      INTEGER {
+                      disable (1),
+                      enable  (2)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "It defines if rx protection is revertive or not revertive.
+             In case of N+1 protection, protection is always revertive.
+            "
+        DEFVAL {disable}
+    ::= {linkProV2Entry 8}
+    
+     linkProV2ExtraTraffic OBJECT-TYPE
+        SYNTAX       INTEGER { 
+                        disable (1), 
+                        enable  (2) 
+                     }
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+        "This object enables or disables the transfer of extra traffic
+         on the protection channel in a N+1 link. This object must be 
+         set to disabled in case of architectures different for N+1.
+         "
+        DEFVAL {disable}
+    ::= {linkProV2Entry 9}
+   
+    linkProV2RowStatus   OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this conceptual row in linkProV2Table.
+            "
+    ::= {linkProV2Entry 10}
+
+--
+-------  End of linkProV2Table
+
+-------  Begin of linkProMaintV2Table
+--
+    linkProMaintV2Table OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  LinkProMaintV2Entry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of maintenance commands for protected links.
+             A row in this table is added on creation of a row
+             in linkProV2Table.
+            "
+    ::= {radioSystem 36}
+
+    linkProMaintV2Entry OBJECT-TYPE
+        SYNTAX      LinkProMaintV2Entry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing maintenance commands applicable to a
+             protected link.
+            "
+        INDEX       {linkIndex, linkPolIndex}
+    ::= {linkProMaintV2Table 1}
+
+    LinkProMaintV2Entry  ::=
+        SEQUENCE {
+            linkProMaintV2TxLockout      INTEGER,
+            linkProMaintV2RxLockout      INTEGER,
+            linkProMaintV2TxForced       Integer32,
+            linkProMaintV2RxForced       Integer32,
+            linkProMaintV2TxWtrReset     INTEGER,
+            linkProMaintV2RxWtrReset     INTEGER
+         }
+              
+      linkProMaintV2TxLockout OBJECT-TYPE
+      SYNTAX      INTEGER   {
+                             disable     (1), 
+                             enable      (2)
+                            }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "Command to enable/disable tx lockout. This object
+           is applicable only in case of N+1 protections.
+          "
+      DEFVAL {disable}
+      ::= {linkProMaintV2Entry 1}
+      
+      linkProMaintV2RxLockout OBJECT-TYPE
+      SYNTAX      INTEGER   {
+                             disable     (1), 
+                             enable      (2)
+                            }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "Command to enable/disable rx lockout. This object
+           is applicable only in case of N+1 protections.
+          "
+      DEFVAL {disable}
+      ::= {linkProMaintV2Entry 2}
+      
+      linkProMaintV2TxForced OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "Command to force switch to a given 
+           transmission channel. Zero value means no 
+           switch.
+          "
+      DEFVAL {0}
+      ::= {linkProMaintV2Entry 3}
+      
+      linkProMaintV2RxForced OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "Command to force switch to a given 
+           receiving channel. Zero value means no 
+           switch.
+          "
+      DEFVAL {0}
+      ::= {linkProMaintV2Entry 4}
+      
+      linkProMaintV2TxWtrReset OBJECT-TYPE
+      SYNTAX      INTEGER  {
+                            notActive  (1), 
+                            on         (2)
+                           }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "Clear wait time to restore making the revertive 
+           path immediately available.
+          "
+     DEFVAL {notActive}
+    ::= {linkProMaintV2Entry 5}
+    
+    linkProMaintV2RxWtrReset OBJECT-TYPE
+      SYNTAX      INTEGER  {
+                            notActive  (1), 
+                            on         (2)
+                           }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "Clear wait time to restore making the revertive 
+           path immediately available.
+          "
+     DEFVAL {notActive}
+    ::= {linkProMaintV2Entry 6}
+                   
+--
+-------  End of linkProMaintV2Table
+
+-------  Begin of sspTable
+--
+    sspTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF SspEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of operative and administrative set of parameters.
+             This table holds three row for every link (and its polarizations)
+             configured in the NE:
+              1) administative parameters of local NE
+              2) operative parameters of local NE
+              3) administative parameters of remote NE
+            "
+    ::= {radioSystem 37}
+
+    sspEntry OBJECT-TYPE
+        SYNTAX      SspEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing SSP relevant parameters.
+            "
+        INDEX       {linkIndex, linkPolIndex, sspParameterType}
+    ::= {sspTable 1}
+
+    SspEntry  ::=
+        SEQUENCE  {
+            sspParameterType                  INTEGER,
+            sspLinkBandwidth                  INTEGER,
+            sspLinkModulation                 INTEGER,
+            sspLinkAcmEngineEnable            INTEGER,
+            sspLinkTxUpperProfile             INTEGER,
+            sspLinkTxLowerProfile             INTEGER,
+            sspLinkSynchSetupProtocolEnable   INTEGER,
+            sspLinkProfilesSetSelection       INTEGER,
+            sspTdmE1Channel                   Integer32,
+            sspTdmStm1Channel                 Integer32
+         }
+
+    sspParameterType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                              localAdminStatus  (1),
+                              localOperStatus   (2),
+                              remoteAdminStatus (3)
+                            }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object identifies what parameters are for.
+            "
+    ::= {sspEntry 1}
+
+    sspLinkBandwidth OBJECT-TYPE
+        SYNTAX      INTEGER {
+                              sspBw3p5Mhz          (0),
+                              sspBw7MHz            (1),
+                              sspBw14MHz           (2),
+                              sspBw28MHz           (3),
+                              sspBw56MHz           (4),
+                              sspBw10MHz           (5),
+                              sspBw20MHz           (6),
+                              sspBw30MHz           (7),
+                              sspBw40MHz           (8),
+                              sspBw50MHz           (9),
+                              sspBw112Mhz          (10),
+                              sspBw250Mhz          (11),
+                              sspBw500Mhz          (12),
+                              sspBw750Mhz          (13),
+                              sspBw1Ghz            (14),
+                              sspBw60MHz           (15),
+                              sspBw80MHz           (16)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Link Bandwidth (channel spacing).
+            "
+    ::= {sspEntry 2}
+
+    sspLinkModulation OBJECT-TYPE
+        SYNTAX      INTEGER{
+                              sspModBPSK          (1),
+                              sspMod4QAM          (2),
+                              sspMod8PSK          (3),
+                              sspMod16QAM         (4),
+                              sspMod32QAM         (5),
+                              sspMod64QAM         (6),
+                              sspMod128QAM        (7),
+                              sspMod256QAM        (8),
+                              sspMod512QAM        (9),
+                              sspMod1024QAM       (10),
+                              sspMod2048QAM       (11),
+                              sspMod4096QAM       (12)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Link reference modulation.
+            "
+    ::= {sspEntry 3}
+
+    sspLinkAcmEngineEnable OBJECT-TYPE
+        SYNTAX      INTEGER  {
+                              disable (1),
+                              enable  (2)
+                             }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is used to enable/disable the ACM engine.
+            "
+        DEFVAL  { disable }
+    ::=  {sspEntry 4}
+
+    sspLinkTxUpperProfile OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The object (and linkTxLowerProfile object) is used to
+             restrict the TX profile range when ACM is enabled.
+            "
+    ::= {sspEntry 5}
+
+    sspLinkTxLowerProfile OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The object (and linkTxUpperProfile object) is used to
+             restrict the TX profile range when ACM is enabled.
+            "
+    ::= {sspEntry 6}
+
+    sspLinkSynchSetupProtocolEnable OBJECT-TYPE
+        SYNTAX      INTEGER   {
+                               disable (1),
+                               enable  (2)
+                              }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Synchronization Setup Protocol (SSP) control.
+            "
+    ::= {sspEntry 7}
+
+    sspLinkProfilesSetSelection OBJECT-TYPE
+        SYNTAX      INTEGER  {
+                              highThroughput (1),
+                              highGain       (2)
+                             }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Selection of the working profile set between high gain
+             (max robustness) profile set and high throughput (max
+             capacity) profile set. The set of profiles high gain
+             features a greater robustness against to the set of
+             profiles high throughput.
+             For radio systems that do not have more sets of profiles,
+             this object becomes read only and its reading shows the
+             only one set of profiles supported.
+            "
+    ::= {sspEntry 8}
+
+    sspTdmE1Channel OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of E1 channels. This object is used to define the capacity
+             of E1 tributaries assigned to a given radio link. The capacity is
+             changed in steps of E1 (2Mbit/s).
+            "
+    ::= {sspEntry 9}
+
+    sspTdmStm1Channel OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of STM-1 channels transported in bulk mode.
+            "
+    ::= {sspEntry 10}
+
+--
+-------  End of sspTable
+
+-------  Begin of radioLoopCapabilityTable
+--
+    radioLoopCapabilityTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RadioLoopCapabilityEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table shows which group a radio loop belongs to.
+             Radios with the same group number (identifier) close loop
+             simultaneously.
+            "
+    ::= {radioSystem 38}
+
+    radioLoopCapabilityEntry OBJECT-TYPE
+        SYNTAX      RadioLoopCapabilityEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing a group identifier for each radio loop type.
+            "
+        INDEX       {radioIndex}
+    ::= {radioLoopCapabilityTable 1}
+
+    RadioLoopCapabilityEntry  ::=
+        SEQUENCE  {
+            radioLoopRfGroup                  Integer32,
+            radioLoopIqGroup                  Integer32,
+            radioLoopBaseBandGroup            Integer32
+         }
+
+    radioLoopRfGroup OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The group to which the radio RF loop belong to.
+            "
+    ::= {radioLoopCapabilityEntry 1}
+
+
+    radioLoopIqGroup OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The group to which the radio IQ loop belong to.
+            "
+    ::= {radioLoopCapabilityEntry 2}
+
+    radioLoopBaseBandGroup OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The group to which the radio base loop belong to.
+            "
+    ::= {radioLoopCapabilityEntry 3}
+
+--
+-------  End of radioLoopCapabilityTable
+
+-------  Begin of radioRxThresholdTable
+--
+    radioRxBerThresholdTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RadioRxBerThresholdEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table shows the nominal and measured values of RX power 
+             at a bit error rate (BER) equal to 10e-6.
+            "
+    ::= {radioSystem 39}
+
+    radioRxBerThresholdEntry OBJECT-TYPE
+        SYNTAX      RadioRxBerThresholdEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing the RX power thresholds.
+            "
+        INDEX       {radioIndex}
+    ::= {radioRxBerThresholdTable 1}
+
+    RadioRxBerThresholdEntry  ::=
+        SEQUENCE  {
+            radioRxBerThresholdStatus     INTEGER,
+            radioNominalRxBerThreshold    Integer32,
+            radioMeasuredRxBerThreshold   Integer32
+         }
+
+    radioRxBerThresholdStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                              nonValid (1),
+                              valid(2)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object shows whether the following objects are significant.
+            "
+    ::= {radioRxBerThresholdEntry 1}
+
+    radioNominalRxBerThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The nominal value of RX power @ BER equal to 10e-6
+            "
+    ::= {radioRxBerThresholdEntry 2}
+
+    radioMeasuredRxBerThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured value of RX power @ BER equal to 10e-6.
+            "
+    ::= {radioRxBerThresholdEntry 3}
+
+--
+-------  End of radioRxThresholdTable
+
+
+    radioRemDemodulatorFailAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the radioRemDemodulatorFailAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 50}
+
+    radioRxActiveStatusTrapNotification OBJECT-TYPE
+        SYNTAX      INTEGER   {
+                               trapDisable       (1),
+                               trapEnable        (2)
+                              }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enable/disables (statusTrapEnable or statusTrapDisable) the trap
+             generation on status change event for radioRxActivestatus"
+        DEFVAL{ trapEnable }
+    ::=  {radioSystem 51}
+
+    radioTxActiveStatusTrapNotification OBJECT-TYPE
+        SYNTAX      INTEGER   {
+                               trapDisable       (1),
+                               trapEnable        (2)
+                              }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Define the severity associated to the radioTxActivestatus and
+             enable/disable the trap generation on status change event."
+        DEFVAL{ trapEnable }
+    ::=  {radioSystem 52}
+
+    radioCableOpenAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the  radioCableOpen
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 53}
+
+    radioCableShortAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the  radioCableShort
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 54}
+
+    radioInvalidFrequencyAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the radioInvalidFrequencyAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 55}
+
+    radioBaseBandRxAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the radioBaseBandRxAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 56}
+
+    radioModulatorFailAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the radioModulatorFailAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 57}
+
+    radioDemodulatorFailAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the radioDemodulatorFailAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 58}
+
+    radioRxPowerLowAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the radioRxPowerLowAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 59}
+
+    radioTxPowerLowAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the radioTxPowerLowAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 60}
+
+    radioVcoFailAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the radioVcoFailAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 61}
+
+    radioRxIFAgcAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the radioRxIFAgcAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 62}
+
+    radioTxIFAgcAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the radioTxIFAgcAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 63}
+
+    radioIduOduCommunicationAlarmSeverityCode OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Define the severity associated to the radioIduOduCommunicationAlarm
+             and enable/disable the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 64}
+
+    radioOduIduCommunicationAlarmSeverityCode OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Define the severity associated to the radioOduIduCommunicationAlarm
+             and enable/disable the trap generation on status change event."
+        DEFVAL {warningTrapEnable}
+    ::= {radioSystem 65}
+
+    radioLocalOduAlarmSynthesisSeverityCode OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Define the severity associated to the radioLocalOduAlarmSynthesis
+             and enable/disable the trap generation on status change event."
+        DEFVAL {statusTrapDisable}
+    ::= {radioSystem 66}
+
+    radioRemoteOduAlarmSynthesisSeverityCode OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Define the severity associated to the radioRemoteOduAlarmSynthesis
+             and enable/disable the trap generation on status change event."
+        DEFVAL {statusTrapDisable}
+    ::= {radioSystem 67}
+
+    radioConfigMismatchAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the radioConfigMismatchAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 68}
+
+    radioPrxHysteresisValue  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the delta value associated to the radioPrx before
+             having a new trap generation (radioPtxChange TRAP).
+             The zero value is not allowed."
+        DEFVAL {3}
+    ::= {radioSystem 69}
+
+    radioPtxHysteresisValue  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the delta value associated to the radioPtx before
+             having a new trap generation (radioPtxChange TRAP).
+             The zero value is not allowed."
+        DEFVAL {3}
+    ::= {radioSystem 70}
+
+    radioPrxHysteresisValueTrapNotification  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             trapDisable  (1),
+                             trapEnable   (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enables/disables the Rx change trap generation on status change
+             event."
+        DEFVAL {trapEnable}
+    ::= {radioSystem 71}
+
+    radioPtxHysteresisValueTrapNotification  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             trapDisable  (1),
+                             trapEnable   (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enables/disables the Tx change trap generation on status change
+             event."
+        DEFVAL {trapEnable}
+    ::= {radioSystem 72}
+
+    radioRxQualityLowAlarmSeverityCode OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Define the severity associated to the radioRxQualityLowAlarm
+             and enable/disable the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 73}
+
+    radioRxQualityWarningAlarmSeverityCode OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Define the severity associated to the radioRxQualityWarningAlarm
+             and enable/disable the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 74}
+
+    linkReducedCapacityAlarmSeverityCode OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "Define the severity associated to the linkReducedCapacityAlarm
+            and enable/disable the trap generation on status change event."
+        DEFVAL {warningTrapEnable}
+    ::= {radioSystem 75}
+
+    linkLinkTelemetryFailAlarmSeverityCode OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "Define the severity associated to the linkLinkTelemetryFailAlarm
+            and enable/disable the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 76}
+
+    linkIdMismatchAlarmSeverityCode OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "Define the severity associated to the linkIdMismatchAlarm
+            and enable/disable the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 77}
+
+    linkRadioEocAlarmSeverityCode OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "Define the severity associated to the linkRadioEocAlarm
+            and enable/disable the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 78}
+
+    linkSetupMismatchAlarmSeverityCode OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "Define the severity associated to the linkSetupMismatchAlarm
+            and enable/disable the trap generation on status change event."
+        DEFVAL {warningTrapEnable}
+    ::= {radioSystem 79}
+
+    linkRescueSetupAlarmSeverityCode OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "Define the severity associated to the linkRescueSetupAlarm
+            and enable/disable the trap generation on status change event."
+        DEFVAL {criticalTrapEnable}
+    ::= {radioSystem 80}
+
+    linkXpicProcedureBlockAlarmSeverityCode OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "Define the severity associated to the linkXpicProcedureBlockAlarm
+            and enable/disable the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 81}
+
+    linkXpicRemTxOffAlarmAlarmSeverityCode OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "Define the severity associated to the linkXpicRemTxOffAlarm
+            and enable/disable the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 82}
+
+    linkLocalIduAlarmSynthesis  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Synthesis of the local IDU alarms"
+    ::= {radioSystem 83}
+
+    linkLocalIduAlarmSynthesisSeverityCode OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "Define the severity associated to the linkLocalIduAlarmSynthesis
+            and enable/disable the trap generation on status change event."
+        DEFVAL{ statusTrapDisable }
+    ::=  {radioSystem 84}
+
+    linkRemoteIduAlarmSynthesisSeverityCode OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "Define the severity associated to the linkLocalIduAlarmSynthesis
+            and enable/disable the trap generation on status change event."
+        DEFVAL{ statusTrapDisable }
+    ::=  {radioSystem 85}
+
+    linkTfcAlarmSeverityCode OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "Define the severity associated to the linkTfcV2Alarm (linkTfcAlarm)
+            and enable/disable the trap generation on status change event."
+        DEFVAL      { minorTrapEnable }
+    ::= {radioSystem 86}
+
+    linkBerSyncLossAlarmSeverityCode OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Define the severity associated to the linkBerSyncLossAlarm
+             and enable/disable the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 87}
+
+    linkNotMatchingRadiosAlarmSeverityCode OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Define the severity associated to the linkNotMatchingRadiosAlarm
+             and enable/disable the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 88} 
+
+    channelSpacingSelection OBJECT-TYPE
+        SYNTAX      BITS {
+                           etsi (0),
+                           fcc  (1)
+                         }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "his object selects which channel spacings the radio link has to
+             support:
+             - etsi: Compliant with European Telecommunication Standards
+                     Institute
+             - fcc:  Compliant with Federal Communications Commission
+            "
+        DEFVAL { { etsi, fcc } }
+    ::= {radioSystem 89} 
+
+    fadeMarginMeasure OBJECT-TYPE
+        SYNTAX    INTEGER   {
+                             disable (1),
+                             enable  (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Set by manager to start/stop fade margin measure.
+           This item is linked to a manual operation (ManOpRecord) instance."
+        DEFVAL      { disable }
+    ::= {radioSystem 90}
+
+    linkConfigurationInProgressTrapNotification OBJECT-TYPE
+        SYNTAX      INTEGER   {
+                               trapDisable       (1),
+                               trapEnable        (2)
+                              }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enable/disables (statusTrapEnable or statusTrapDisable) the trap
+             generation on status change event for linkConfigurationInProgress"
+        DEFVAL{ trapEnable }
+    ::=  {radioSystem 91}
+
+-----------------------
+--  This MIB module generates the following TRAPs:
+-----------------------
+    radioPrxChange  NOTIFICATION-TYPE
+        OBJECTS  {equipIpSnmpAgentAddress, radioIndex, radioSettingsLabel, radioPrx}
+        STATUS current
+        DESCRIPTION
+           "This event is generated when radioPrx is changed, in
+            modulus, more than radioPtxHysteresisValue from last TRAP.
+            The data passed with the event are:
+            1) equipIpSnmpAgentAddress     - agent IP address
+            2) radioIndex                  - branch index
+            3) radioName                   - user assinged name
+            4) radioPrx                    - PRX value"
+    ::= { alarmTrap 8001 }
+
+    radioPtxChange  NOTIFICATION-TYPE
+        OBJECTS  {equipIpSnmpAgentAddress, radioIndex, radioSettingsLabel, radioPtx}
+        STATUS current
+        DESCRIPTION
+           "This event is generated when radioPtx is changed, in
+            modulus, more than radioPtxHysteresisValue from last TRAP.
+            The data passed with the event are:
+            1) equipIpSnmpAgentAddress     - agent IP address
+            2) radioIndex                  - branch index
+            3) radioName                   - user assigned name
+            4) radioPtx                    - PTX value"
+    ::= { alarmTrap 8002 }
+
+------ End group -----------------------------------------------------------------
+
+---------------------------------- End  -------------------------------------
+
+
+END
+

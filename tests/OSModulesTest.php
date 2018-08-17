@@ -76,7 +76,7 @@ class OSModulesTest extends DBTestCase
                 "OS $os: Discovered $module data does not match that found in $filename\n"
                 . print_r(array_diff($expected, $actual), true)
                 . $helper->getDiscoveryOutput($debug ? null : $module)
-                . "\nOS $os: Polled $module data does not match that found in $filename"
+                . "\nOS $os: Discovered $module data does not match that found in $filename"
             );
 
             if ($expected_data[$module]['poller'] == 'matches discovery') {

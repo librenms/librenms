@@ -1,0 +1,582 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-MAB-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE,
+             Integer32
+        FROM SNMPv2-SMI
+             RowStatus, MacAddress,
+             TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+             InterfaceIndex
+        FROM IF-MIB
+             siaeMib
+        FROM SIAE-TREE-MIB;
+
+    mabMib MODULE-IDENTITY
+        LAST-UPDATED "201502170000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail:  help@siaemic.com
+            "
+        DESCRIPTION
+            "Microwave Adaptive Bandwidth (MAB)
+
+             This management information module supports the configuration of  
+             the MW Capacity Management (MCM) feature developed by
+             SIAE MICROELETTRONICA and Cisco that offers reliable QoS and
+             optimized performances even under worst radio propagation
+             conditions. 
+
+             The extension to the original functionality, consisting of the
+             Link ID TLV, is considered by this MIB.
+            "
+        REVISION "201502170000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00.
+            "
+    ::= { siaeMib 93 }
+
+----------------------------------------------------------------------------------
+--  Textual Conventions
+----------------------------------------------------------------------------------
+
+
+    MabBwCalculationMethod ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "This Textual Convention describes the method of calculation of the 
+             radio bandwitdh (or the throughput of an interface):
+              - average:  Average Tx BW value across the observation interval
+              - min:      Minimum Tx BW value across the observation interval
+              - max:      Maximum Tx BW value across the observation interval
+            "
+        SYNTAX INTEGER {
+                         average    (1),
+                         min        (2),
+                         max        (3)
+                       }
+
+    MabPduCompliance ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "This Textual Convention describes the compliance of the MAB PDU 
+             sent by a MAB PDU sender:
+              - stdMcmCompliant:   PDU format is compliant with [1]
+              - extMcmCompliant:   PDU format is compliant with [2]
+              - ituG8013Compliant: PDU format is compliant with [4]
+
+             Since [3] and [4] are a draft edition at the time when this MIB
+             is being written, the value ituG8013Compliant(3) is defined for
+             future use.
+            "
+        REFERENCE
+            "[1] - MW CAPACITY MANAGEMENT (MCM) - FUNCTIONAL DESCRIPTION
+                   This document provides a description of the MW Capacity
+                   Management (MCM) feature developed by SIAE MICROELETTRONICA
+                   and Cisco.
+             [2] - E-OAM Extensions for Microwave Adaptive Modulation
+                   Cisco Document Number EDCS-997459
+             [3] - Draft revised Recommendation ITU-T G.8021/Y.1341
+                   (for Consent, 5 December 2014)
+             [4] - Draft Amendment 1 to Recommendation ITU-T G.8013/Y.1731(2013)
+                   (for Consent, 5 December 2014) 
+            "
+        SYNTAX INTEGER {
+                         stdMcmCompliant   (1),
+                         extMcmCompliant   (2),
+                         ituG8013Compliant (3)
+                       }
+
+    MabSenderOption ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "This Textual Convention describes the supported option of a 
+             MAB PDU sender:
+              - enableAlways:     Enable periodic PDU sending even if the
+                                  current bandwidth is equal to the nominal
+                                  bandwidth.
+              - enableSignalFail: PDU are transmitted periodically when the
+                                  link fails in the tranmit direction. If the
+                                  NE usually sends PDUs also when the radio 
+                                  bandwitdh (or the throughput of an interface)
+                                  is null, this option has no effect.
+            "
+        REFERENCE
+            "[3] - Draft revised Recommendation ITU-T G.8021/Y.1341
+                   (for Consent, 5 December 2014)
+            "
+        SYNTAX BITS {
+                      enableAlways     (0),
+                      enableSignalFail (1)
+                    }
+
+----------------------------------------------------------------------------------
+--  MSP GROUP
+----------------------------------------------------------------------------------
+
+------ Beginning --------------------------------------------------------------
+
+    mabMibVersion OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01.
+            "
+        ::= { mabMib 1}
+
+-------  Begin of mabSensorTable
+--
+    mabSensorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MabSensorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with MAB sensors entries. Each sensor is associated to a
+             interface, usually an interface with the physical layer
+             consisting of a radio link, and comapares the current bandwidth
+             (throughput) with the nominal one. When nominal and current
+             bandwidth doesn't match to PDU senders associated with a sensor
+             is required to send a MAB PDU every observation time.
+            "
+        ::= { mabMib 2 }
+
+    mabSensorEntry OBJECT-TYPE
+        SYNTAX      MabSensorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A row in the mabSensorTable.
+            "
+        INDEX       { mabSensorIndex }
+        ::= { mabSensorTable 1 }
+
+    MabSensorEntry  ::=
+        SEQUENCE
+        {
+            mabSensorIndex                 Integer32,
+            mabSensorRowStatus             RowStatus,
+            mabSensorAdminStatus           INTEGER,
+            mabSensorIfIndex               InterfaceIndex,
+            mabSensorLinkId                Integer32,
+            mabSensorBwMode                MabBwCalculationMethod,
+            mabSensorHoldoffTime           Integer32,
+            mabSensorObservationTime       Integer32,
+            mabSensorFastTime              Integer32,
+            mabSensorFastCount             Integer32
+        }
+
+    mabSensorIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the MAB sensor inside the Network Element.
+            "
+        ::= { mabSensorEntry 1 }
+
+    mabSensorRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The status of this MAB sensor entry.
+
+             An entry may not exist in the active state unless all
+             objects in the entry have an appropriate value: mabSensorIfIndex
+             must be set to a valid ifIndex number. Otherwise, the error
+             inconsistentValue is returned on the attempt to set active this 
+             row.
+
+             When set to notInService changes may be made to mabSensorIfIndex.
+             Other objects can be changed when mabSensorRowStatus is set to
+             active.
+
+             A sensor can not be deleted if there is any MAB PDU sender
+             associated with it.
+            "
+        ::= { mabSensorEntry 2 }
+
+    mabSensorAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER  {
+                              down (1),
+                              up   (2)
+                             }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Administative status of the MAB sensor.
+             The value down(1) turn off all MAB advisers associated with
+             this sensor.
+            "
+        DEFVAL      { down }
+        ::= { mabSensorEntry 3 }
+
+    mabSensorIfIndex  OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object accepts a greater than zero value to identify an
+             interface in ifTable. The throughput of the selected interface
+             is monitored and notified to all MAB PDU sender associated with
+             this sensor.
+            "
+        ::= { mabSensorEntry 4 }
+
+    mabSensorLinkId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object set the (radio) link identifier that will be inserted 
+             in the Link ID TLV of the MAB PDU.
+            "
+        ::= { mabSensorEntry 5 }
+
+    mabSensorBwMode  OBJECT-TYPE
+        SYNTAX      MabBwCalculationMethod
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object defines the method of calculation of the current 
+             bandwidth. The value of this parameter is sent inside MAB PDUs.
+            "
+        DEFVAL      { average }
+        ::= { mabSensorEntry 6 }
+
+    mabSensorHoldoffTime  OBJECT-TYPE
+        SYNTAX      Integer32(10..60)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object defines the wait time (in seconds) for MAB protocol
+             before sending packets if the current bandwidth (throughput)
+             is lower than the nominal.
+            "
+        DEFVAL { 10 }
+        ::= { mabSensorEntry 7 }
+
+    mabSensorObservationTime  OBJECT-TYPE
+        SYNTAX      Integer32(1|10|60)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object defines the observation time (in seconds) for MAB
+             protocol during which calculate the minimum, maximum and average
+             value of the current bandwidth (throughput). At the end of each
+             period, a MAB PDU is sent by every MAB PDU sender associated with
+             this sensor.
+            "
+        DEFVAL { 10 }
+        ::= { mabSensorEntry 8 }
+
+    mabSensorFastTime OBJECT-TYPE
+        SYNTAX      Integer32(1..59)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This value is used in place of mabSensorObservationTime for the
+             first mabSensorFastCount PDU packets sent by a MAB PDU sender.
+             The value of mabSensorFastTime must be less than or equal to
+             mabSensorObservationTime.
+            "
+        REFERENCE
+            "Draft revised Recommendation ITU-T G.8021/Y.1341 (for Consent,
+             5 December 2014) - 8.1.18 BNM insert process
+            "
+        DEFVAL { 10 }
+        ::= { mabSensorEntry 9 }
+
+    mabSensorFastCount OBJECT-TYPE
+        SYNTAX      Integer32(0..60)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This value specifies how many MAB PDU packets are sent every
+             mabSensorFastTime before to use the standard observation time
+             (mabSensorObservationTime).
+             Zero means which quick sending of packets is disabled.
+            "
+        REFERENCE
+            "Draft revised Recommendation ITU-T G.8021/Y.1341 (for Consent,
+             5 December 2014) - 8.1.18 BNM insert process
+            "
+        DEFVAL { 0 }
+        ::= { mabSensorEntry 10 }
+
+--
+-------  End of mabSensorTable
+
+-------  Begin of mabSensorStatusTable
+--
+    mabSensorStatusTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MabSensorStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with the status of MAB sensor entries. For each row in
+             mabSensorTable a row is created in this table.
+            "
+        ::= { mabMib 3 }
+
+    mabSensorStatusEntry OBJECT-TYPE
+        SYNTAX      MabSensorStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A row in the mabSensorTable.
+            "
+        INDEX       { mabSensorIndex }
+        ::= { mabSensorStatusTable 1 }
+
+    MabSensorStatusEntry  ::=
+        SEQUENCE
+        {
+            mabSensorNominalBw         Integer32,
+            mabSensorCurrentBw         Integer32
+        }
+
+    mabSensorNominalBw OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object reports the nominal bandwidth (throughput) of the 
+             interface selected by mabSensorIfIndex.
+            "
+        ::= { mabSensorStatusEntry 1 }
+
+    mabSensorCurrentBw OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object reports the current bandwidth (throughput) of the 
+             interface selected by mabSensorIfIndex and calculated according 
+             to the method set in mabSensorBwMode.
+            "
+        ::= { mabSensorStatusEntry 2 }
+--
+-------  End of mabSensorStatusTable
+
+-------  Begin of mabPduSenderTable
+--
+    mabPduSenderTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MabPduSenderEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with MAB PDU sender entries. Each PDU sender refers to an
+             ifIndex in ifTable on which to send a PDU MAB and a sensor that
+             triggers the sending.
+            "
+        ::= { mabMib 4 }
+
+    mabPduSenderEntry OBJECT-TYPE
+        SYNTAX      MabPduSenderEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A row in the mabPduSenderTable.
+            "
+        INDEX       { mabPduSenderIndex }
+        ::= { mabPduSenderTable 1 }
+
+    MabPduSenderEntry  ::=
+        SEQUENCE
+        {
+            mabPduSenderIndex                 Integer32,
+            mabPduSenderRowStatus             RowStatus,
+            mabPduSenderAdminStatus           INTEGER,
+            mabPduSenderIfIndex               InterfaceIndex,
+            mabPduSenderSensorIndex           Integer32,
+            mabPduSenderVlanId                Integer32,
+            mabPduSenderPcp                   Integer32,
+            mabPduSenderOamMaintLevel         Integer32,
+            mabPduSenderDAType                INTEGER,
+            mabPduSenderUnicastDA             MacAddress,
+            mabPduSenderOption                MabSenderOption,
+            mabPduSenderPduCompliance         MabPduCompliance
+        }
+
+    mabPduSenderIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the MAB PDU sender inside the Network 
+             Element.
+            "
+        ::= { mabPduSenderEntry 1 }
+
+    mabPduSenderRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The status of this mabPduSender entry.
+
+             An entry may not exist in the active state unless all objects in
+             the entry have an appropriate value: mabPduSenderIfIndex must be
+             set to a valid ifIndex number and mabPduSenderSensorIndex must be
+             set to a valid MAB sensor, Otherwise, the error inconsistentValue
+             is returned on the attempt to set active this row.
+
+             When set to notInService changes may be made to mabPduSenderIfIndex,
+             mabPduSenderSensorIndex. Other objects can be changed when
+             mabPduSenderRowStatus is set to active.
+            "
+        ::= { mabPduSenderEntry 2 }
+
+    mabPduSenderAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER  {
+                              down (1),
+                              up   (2)
+                             }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Administative status of the MAB PDU sender.
+            "
+        DEFVAL      { down }
+        ::= { mabPduSenderEntry 3 }
+
+    mabPduSenderIfIndex  OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object accepts a greater than zero value to identify an
+             interface in ifTable. MAB PDU is sent over this interface.
+            "
+        ::= { mabPduSenderEntry 4 }
+
+    mabPduSenderSensorIndex  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object associates a MAB sensor to this PDU sender.
+            "
+        ::= { mabPduSenderEntry 5 }
+
+    mabPduSenderVlanId  OBJECT-TYPE
+        SYNTAX      Integer32(0|1..4094)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object defines the VLAN identifier used to tag the MAB PDU.
+             Zero means the PDU is not tagged.
+            "
+        DEFVAL      { 0 }
+        ::= { mabPduSenderEntry 6 }
+
+    mabPduSenderPcp  OBJECT-TYPE
+        SYNTAX      Integer32(0..7)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object defines packet priority written into the tag of
+             the MAB PDU.
+            "
+        DEFVAL      { 7 }
+        ::= { mabPduSenderEntry 7 }
+
+    mabPduSenderOamMaintLevel  OBJECT-TYPE
+        SYNTAX      Integer32(0..7)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object defines the OAM maintenance level of the MAB PDU.
+             The multicast destination address of the PDU is according to 
+             the selected maintenance level:
+                01-80-C2-00-00-3x
+             where x = Maintenance Level
+            "
+        DEFVAL { 0 }
+        ::= { mabPduSenderEntry 8 }
+
+    mabPduSenderDAType  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                              multicastDA(1),
+                              unicastDA  (2)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object defines the destination MAC address type of the PDU:
+              - multicastDA(1): Multicast Class 1 Destination Address (DA)
+              - unicastDA(2):   Unicast Destination Address (DA)
+            "
+        DEFVAL { multicastDA }
+        ::= { mabPduSenderEntry 9 }
+
+    mabPduSenderUnicastDA  OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object defines the unuicast destination address of the PDU
+             when mabPduSenderDAType is set to unicastDA(2).
+            "
+        DEFVAL { '000000000000'H }
+        ::= { mabPduSenderEntry 10 }
+
+    mabPduSenderOption  OBJECT-TYPE
+        SYNTAX      MabSenderOption
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object enable the option supported by the MAB PDU sender:
+              - enableAlways:     Enable periodic PDU sending even if the
+                                  current bandwidth is equal to the nominal
+                                  bandwidth.
+              - enableSignalFail: PDU are transmitted periodically when the
+                                  link fails in the tranmit direction. If the
+                                  NE usually sends PDUs also when the radio 
+                                  bandwitdh (or the throughput of an interface)
+                                  is null, this option has no effect.
+            "
+--      DEFVAL { { } }
+        ::= { mabPduSenderEntry 11 }
+
+    mabPduSenderPduCompliance  OBJECT-TYPE
+        SYNTAX      MabPduCompliance
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object defines the compliance of the MAB PDU format.
+            "
+        DEFVAL  { stdMcmCompliant }
+        ::= { mabPduSenderEntry 12 }
+
+--
+-------  End of mabPduSenderTable
+
+
+------ End group -------------------------------------------------------------
+
+END

@@ -64,10 +64,10 @@ function CollectData($bill_id)
 
         $last_counters = getLastPortCounter($port_id, $bill_id);
         if ($last_counters['state'] == 'ok') {
-            $port_data['last_in_measurement']  = $last_counters[in_counter];
-            $port_data['last_in_delta']        = $last_counters[in_delta];
-            $port_data['last_out_measurement'] = $last_counters[out_counter];
-            $port_data['last_out_delta']       = $last_counters[out_delta];
+            $port_data['last_in_measurement']  = $last_counters['in_counter'];
+            $port_data['last_in_delta']        = $last_counters['in_delta'];
+            $port_data['last_out_measurement'] = $last_counters['out_counter'];
+            $port_data['last_out_delta']       = $last_counters['out_delta'];
 
             $tmp_period = dbFetchCell("SELECT UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP('".mres($last_counters['timestamp'])."')");
 
@@ -78,7 +78,7 @@ function CollectData($bill_id)
             } else {
                 $port_data['in_delta'] = $port_data['last_in_delta'];
             }
-            
+
             if ($port_data['ifSpeed'] > 0 && (delta_to_bits($port_data['out_measurement'], $tmp_period)-delta_to_bits($port_data['last_out_measurement'], $tmp_period)) > $port_data['ifSpeed']) {
                 $port_data['out_delta'] = $port_data['last_out_delta'];
             } elseif ($port_data['out_measurement'] >= $port_data['last_out_measurement']) {
@@ -105,11 +105,11 @@ function CollectData($bill_id)
 
     $last_data = getLastMeasurement($bill_id);
 
-    if ($last_data[state] == 'ok') {
-        $prev_delta     = $last_data[delta];
-        $prev_in_delta  = $last_data[in_delta];
-        $prev_out_delta = $last_data[out_delta];
-        $prev_timestamp = $last_data[timestamp];
+    if ($last_data['state'] == 'ok') {
+        $prev_delta     = $last_data['delta'];
+        $prev_in_delta  = $last_data['in_delta'];
+        $prev_out_delta = $last_data['out_delta'];
+        $prev_timestamp = $last_data['timestamp'];
         $period         = dbFetchCell("SELECT UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP('".mres($prev_timestamp)."')");
     } else {
         $prev_delta     = '0';

@@ -1,0 +1,40 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": ".0.0.0.0.0.0.0.0.0.0",
+                    "sysDescr": "CMM4 3.0",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": "",
+                    "features": null,
+                    "location": null,
+                    "os": "cmm4",
+                    "type": "wireless",
+                    "serial": null,
+                    "icon": "cambium.svg"
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": ".0.0.0.0.0.0.0.0.0.0",
+                    "sysDescr": "CMM4 3.0",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": "",
+                    "features": null,
+                    "location": null,
+                    "os": "cmm4",
+                    "type": "wireless",
+                    "serial": null,
+                    "icon": "cambium.svg"
+                }
+            ]
+        }
+    }
+}

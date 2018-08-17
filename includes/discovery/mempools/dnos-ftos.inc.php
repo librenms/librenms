@@ -15,6 +15,11 @@ if ($device['os'] == 'dnos' || $device['os'] == 'ftos') {
         if (is_numeric($total)) {
             discover_mempool($valid_mempool, $device, 0, $device['os'], 'Memory Utilization', '1', null, null);
         }
+    } elseif (preg_match('/.6027.1.4.[0-9]+$/', $device['sysObjectID'])) {
+        $total = str_replace(' percent', '', snmp_get($device, 'dellNetCpuUtilMemUsage.stack.1.1', '-OvQ', 'DELL-NETWORKING-CHASSIS-MIB'));
+        if (is_numeric($total)) {
+            discover_mempool($valid_mempool, $device, 0, $device['os'], 'Memory Utilization', '1', null, null);
+        }
     } else {
         $free = snmp_get($device, '.1.3.6.1.4.1.674.10895.5000.2.6132.1.1.1.1.4.1.0', '-OvQ');
         if (is_numeric($free)) {

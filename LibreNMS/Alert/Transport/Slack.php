@@ -23,49 +23,89 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Slack implements Transport
+class Slack extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        foreach ($opts as $tmp_api) {
-            $host          = $tmp_api['url'];
-            $curl          = curl_init();
-            $slack_msg     = strip_tags($obj['msg']);
-            $color         = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
-            $data          = array(
-                'attachments' => array(
-                    0 => array(
-                        'fallback' => $slack_msg,
-                        'color' => $color,
-                        'title' => $obj['title'],
-                        'text' => $slack_msg,
-                        'mrkdwn_in' => array('text', 'fallback')
-                    )
-                ),
-                'channel' => $tmp_api['channel'],
-                'username' => $tmp_api['username'],
-                'icon_url' => $tmp_api['icon_url'],
-                'icon_emoji' => $tmp_api['icon_emoji'],
-            );
-            $alert_message = json_encode($data);
-            curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-            set_curl_proxy($curl);
-            curl_setopt($curl, CURLOPT_URL, $host);
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($curl, CURLOPT_POST, true);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $alert_message);
+        if (empty($this->config)) {
+            return $this->deliverAlertOld($obj, $opts);
+        }
+        $slack_opts['url'] = $this->config['slack-url'];
+        foreach (explode(PHP_EOL, $this->config['options']) as $option) {
+            list($k,$v) = explode('=', $option);
+            $slack_opts[$k] = $v;
+        }
+        return $this->contactSlack($obj, $slack_opts);
+    }
 
-            $ret  = curl_exec($curl);
-            $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            if ($code != 200) {
-                var_dump("API '$host' returned Error"); //FIXME: propper debuging
-                var_dump("Params: " . $alert_message); //FIXME: propper debuging
-                var_dump("Return: " . $ret); //FIXME: propper debuging
-                return 'HTTP Status code ' . $code;
-            }
+    public function deliverAlertOld($obj, $opts)
+    {
+        foreach ($opts as $tmp_api) {
+            $this->contactSlack($obj, $tmp_api);
         }
         return true;
+    }
+
+    public static function contactSlack($obj, $api)
+    {
+        $host          = $api['url'];
+        $curl          = curl_init();
+        $slack_msg     = strip_tags($obj['msg']);
+        $color         = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
+        $data          = [
+            'attachments' => [
+                0 => [
+                    'fallback' => $slack_msg,
+                    'color' => $color,
+                    'title' => $obj['title'],
+                    'text' => $slack_msg,
+                    'mrkdwn_in' => ['text', 'fallback'],
+                    'author_name' => $api['author_name'],
+                ],
+            ],
+            'channel' => $api['channel'],
+        ];
+        $alert_message = json_encode($data);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        set_curl_proxy($curl);
+        curl_setopt($curl, CURLOPT_URL, $host);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $alert_message);
+
+        $ret  = curl_exec($curl);
+        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        if ($code != 200) {
+            var_dump("API '$host' returned Error"); //FIXME: propper debuging
+            var_dump("Params: " . $alert_message); //FIXME: propper debuging
+            var_dump("Return: " . $ret); //FIXME: propper debuging
+            return 'HTTP Status code ' . $code;
+        }
+        return true;
+    }
+
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'Webhook URL',
+                    'name' => 'slack-url',
+                    'descr' => 'Slack Webhook URL',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Slack Options',
+                    'name' => 'options',
+                    'descr' => 'Slack Options',
+                    'type' => 'textarea',
+                ]
+            ],
+            'validation' => [
+                'slack-url' => 'required|url',
+            ]
+        ];
     }
 }
