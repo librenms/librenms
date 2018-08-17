@@ -122,12 +122,7 @@ class ConfigTest extends TestCase
 
     public function testSetPersist()
     {
-        if (getenv('DBTEST')) {
-            Eloquent::boot();
-            Eloquent::DB()->beginTransaction();
-        } else {
-            $this->markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
-        }
+        $this->dbSetUp();
 
         $key = 'testing.persist';
 
@@ -140,9 +135,7 @@ class ConfigTest extends TestCase
         Config::set($key, 'two', true);
         $this->assertEquals('two', $query->value('config_value'));
 
-        if (getenv('DBTEST')) {
-            Eloquent::DB()->rollBack();
-        }
+        $this->dbTearDown();
     }
 
     public function testHas()
