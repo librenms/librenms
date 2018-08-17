@@ -1,4 +1,4 @@
-os: ibm-as400
+os: ibm-i
 text: 'IBM OS/400'
 type: server
 icon: ibmos
