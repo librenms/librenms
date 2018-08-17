@@ -73,7 +73,7 @@ class ApexLynx extends OS implements
         $oid = '.1.3.6.1.4.1.5454.1.80.2.4.2.2.0';
         $sensors = array();
 
-        $sensos[] = new WirelessSensor(
+        $sensors[] = new WirelessSensor(
             'mse',
             $this->getDeviceId(),
             $oid,
