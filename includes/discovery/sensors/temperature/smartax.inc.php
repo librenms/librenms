@@ -33,8 +33,10 @@ $data = reset($data);
 $descr_data = reset($descr_data);
 
 foreach ($data as $index => $value) {
-    $tempCurr = $value;
-    $temperature_oid  = $temp_oid.'.'.$index;
-    $descr = $descr_data[$index];
-    discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $index, 'smartax', $descr, null, '1', null, null, null, null, $tempCurr);
+    if ($value < "999") {
+        $tempCurr = $value;
+        $temperature_oid = '.' . $temp_oid . '.' . $index;
+        $descr = $descr_data[$index];
+        discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $index, 'smartax', $descr, '1', '1', null, null, null, null, $tempCurr);
+    }
 }
