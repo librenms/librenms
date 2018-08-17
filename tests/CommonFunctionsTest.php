@@ -140,12 +140,7 @@ class CommonFunctionsTest extends TestCase
 
     public function testResolveGlues()
     {
-        if (getenv('DBTEST')) {
-            dbConnect();
-            dbBeginTransaction();
-        } else {
-            $this->markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
-        }
+        $this->dbSetUp();
 
         $this->assertFalse(ResolveGlues(array('dbSchema'), 'device_id'));
 
@@ -166,9 +161,7 @@ class CommonFunctionsTest extends TestCase
         $expected = array('ipv4_addresses.port_id', 'ports.device_id');
         $this->assertSame($expected, ResolveGlues(array('ipv4_addresses'), 'device_id'));
 
-        if (getenv('DBTEST')) {
-            dbRollbackTransaction();
-        }
+        $this->dbTearDown();
     }
 
     public function testFormatHostname()

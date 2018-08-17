@@ -2494,7 +2494,14 @@ function get_schema_list()
  */
 function get_db_schema()
 {
-    return (int)@dbFetchCell('SELECT version FROM `dbSchema` ORDER BY version DESC LIMIT 1');
+    try {
+        return \LibreNMS\DB\Eloquent::DB()
+            ->table('dbSchema')
+            ->orderBy('version', 'DESC')
+            ->value('version');
+    } catch (PDOException $e) {
+        return 0;
+    }
 }
 
 /**
