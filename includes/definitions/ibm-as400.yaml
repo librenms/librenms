@@ -1,5 +1,4 @@
 os: ibm-as400
-text: 'IBM iSeries'
 type: server
 icon: ibmos
 over:
