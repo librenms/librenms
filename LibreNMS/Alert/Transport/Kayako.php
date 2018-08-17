@@ -100,7 +100,7 @@ class Kayako extends Transport
                 [
                     'title' => 'Kayako Department',
                     'name' => 'kayako-department',
-                    'descr' => 'Department to post a ticket',
+                    'descr' => 'Department ID to post a ticket',
                     'type' => 'text'
                 ]
             ],
