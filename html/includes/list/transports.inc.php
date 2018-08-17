@@ -32,17 +32,17 @@ if (!Auth::user()->hasGlobalRead()) {
 $query = '';
 $params = [];
 
-if (!empty($_REQUEST['search'])) {
+if (!empty($vars['search'])) {
     $query .= ' WHERE `transport_name` LIKE ?';
-    $params[] = '%' . mres($_REQUEST['search']) . '%';
+    $params[] = '%' . $vars['search'] . '%';
 }
 
 $total = dbFetchCell("SELECT COUNT(*) FROM `alert_transports` $query", $params);
 $more = false;
 
 if (!empty($_REQUEST['limit'])) {
-    $limit = (int) $_REQUEST['limit'];
-    $page = isset($_REQUEST['page']) ? (int) $_REQUEST['page'] : 1;
+    $limit = (int) $vars['limit'];
+    $page = isset($vars['page']) ? (int) $vars['page'] : 1;
     $offset = ($page - 1) * $limit;
 
     $query .= " LIMIT $offset, $limit";
