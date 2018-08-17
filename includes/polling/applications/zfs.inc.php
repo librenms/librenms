@@ -152,9 +152,8 @@ $pool_rrd_def = RrdDefinition::make()
     ->addDataset('cap', 'GAUGE', 0)
     ->addDataset('dedup', 'GAUGE', 0);
 
-// used later for replacing pools when inserting into the metrics table
-$metrics = $zfs;
-unset($metrics['pools']);
+$metrics = $zfs; // copy $zfs data to $metrics
+unset($metrics['pools']); // remove pools it is an array, re-add data below
 
 foreach ($zfs['pools'] as $pool) {
     $pools[] = $pool['name'];
