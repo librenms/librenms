@@ -50,6 +50,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <option value="hipchat-form">Hipchat</option>
                                     <option value="irc-form">IRC</option>
                                     <option value="jira-form">Jira</option>
+                                    <option value="kayako-form">Kayako Classic</option>
                                     <option value="mail-form" selected>Mail</option>
                                     <option value="msteams-form">Microsoft Teams</option>
                                     <option value="nagios-form">Nagios</option>
