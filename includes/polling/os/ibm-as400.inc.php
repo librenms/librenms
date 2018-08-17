@@ -1,2 +1,3 @@
 <?php
-$version = $device['sysDescr'];
+$output = preg_split('/\s+/', $device['sysDescr']);
+$version = $output[2];
