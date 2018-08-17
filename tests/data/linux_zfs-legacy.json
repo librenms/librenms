@@ -28,7 +28,7 @@
                 {
                     "metric": "actual_hit_per",
                     "value": "91.264716658306",
-                    "value_prev": "91.264716658306",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
@@ -40,7 +40,7 @@
                 {
                     "metric": "anon_hits_per",
                     "value": "0.87447363662197",
-                    "value_prev": "0.87447363662197",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
@@ -70,31 +70,31 @@
                 {
                     "metric": "arc_size_per",
                     "value": "14.893344946427",
-                    "value_prev": "14.893344946427",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "cache_hits_per",
                     "value": "92.836561233484",
-                    "value_prev": "92.836561233484",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "cache_miss_per",
                     "value": "7.1634387665162",
-                    "value_prev": "7.1634387665162",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "data_demand_per",
                     "value": "98.185847580587",
-                    "value_prev": "98.185847580587",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "data_pre_per",
                     "value": "76.243415839277",
-                    "value_prev": "76.243415839277",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
@@ -124,7 +124,7 @@
                 {
                     "metric": "demand_hits_per",
                     "value": "0.65310238715366",
-                    "value_prev": "0.65310238715366",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
@@ -142,7 +142,7 @@
                 {
                     "metric": "demand_misses_per",
                     "value": "0.15638807808692",
-                    "value_prev": "0.15638807808692",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
@@ -154,19 +154,19 @@
                 {
                     "metric": "freq_used_per",
                     "value": "30.42081926587",
-                    "value_prev": "30.42081926587",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "meta_hits_per",
                     "value": "95.333874562729",
-                    "value_prev": "95.333874562729",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "meta_misses_per",
                     "value": "93.718187951769",
-                    "value_prev": "93.718187951769",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
@@ -178,7 +178,7 @@
                 {
                     "metric": "mfu_ghost_per",
                     "value": "0.5201108056717",
-                    "value_prev": "0.5201108056717",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
@@ -190,7 +190,7 @@
                 {
                     "metric": "mfu_per",
                     "value": "80.231398749699",
-                    "value_prev": "80.231398749699",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
@@ -214,7 +214,7 @@
                 {
                     "metric": "mru_ghost_per",
                     "value": "0.29854653357721",
-                    "value_prev": "0.29854653357721",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
@@ -226,7 +226,7 @@
                 {
                     "metric": "mru_per",
                     "value": "18.07547027443",
-                    "value_prev": "18.07547027443",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
@@ -304,7 +304,7 @@
                 {
                     "metric": "pre_hits_per",
                     "value": "0.016486551357671",
-                    "value_prev": "0.016486551357671",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
@@ -316,7 +316,7 @@
                 {
                     "metric": "pre_meta_hits_per",
                     "value": "3.9965364987593",
-                    "value_prev": "3.9965364987593",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
@@ -328,13 +328,13 @@
                 {
                     "metric": "pre_meta_misses_per",
                     "value": "6.0588493092707",
-                    "value_prev": "6.0588493092707",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "pre_misses_per",
                     "value": "0.066574660872871",
-                    "value_prev": "0.066574660872871",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
@@ -346,7 +346,7 @@
                 {
                     "metric": "rec_used_per",
                     "value": "69.579180734129",
-                    "value_prev": "69.579180734129",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
@@ -364,7 +364,7 @@
                 {
                     "metric": "target_size_arat",
                     "value": "0.16047865661247",
-                    "value_prev": "0.16047865661247",
+                    "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
@@ -382,7 +382,7 @@
                 {
                     "metric": "target_size_per",
                     "value": "16.047865661247",
-                    "value_prev": "16.047865661247",
+                    "value_prev": null,
                     "app_type": "zfs"
                 }
             ]
