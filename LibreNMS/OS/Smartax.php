@@ -39,26 +39,31 @@ class Smartax extends OS implements ProcessorDiscovery
      */
     public function discoverProcessors()
     {
-        $data = snmpwalk_group($this->getDevice(), 'enterprises.2011.2.6.7.1.1.2.1.5.0', 'SNMPv2-SMI');
-        //$proc_descr = snmpwalk_group($this->getDevice(), '1.3.6.1.4.1.2011.2.6.7.1.1.2.1.7.0');
+        $proc_oid = '1.3.6.1.4.1.2011.2.6.7.1.1.2.1.5.0';
+        $descr_oid = '1.3.6.1.4.1.2011.2.6.7.1.1.2.1.7.0';
 
-        $processors = array();
-        foreach ($data as $index => $entry) {
-            if ($entry != -1) {
-                $index = substr(strrchr($index, '.'), 1);
-                $proc_desc = snmp_get($this->getDevice(), 'enterprises.2011.2.6.7.1.1.2.1.7.0.' . $index, '-Oqv');
+        $data = snmpwalk_array_num($this->getDevice(), $proc_oid);
+        $descr_data = snmpwalk_array_num($this->getDevice(), $descr_oid);
+
+        // remove first array
+        $data = reset($data);
+        $descr_data = reset($descr_data);
+
+        $processors = [];
+        foreach ($data as $index => $value) {
+            if ($value != -1) {
+                $proc_desc = $descr_data[$index];
                 $processors[] = Processor::discover(
                     "smartax",
                     $this->getDeviceId(),
-                    "enterprises.2011.2.6.7.1.1.2.1.5.0.$index",
+                    "$proc_oid.$index",
                     $index,
                     "$proc_desc processor",
                     1,
-                    $entry
+                    $value
                 );
             }
         }
-
 
         return $processors;
     }

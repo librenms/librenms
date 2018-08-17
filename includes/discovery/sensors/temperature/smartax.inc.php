@@ -23,12 +23,18 @@
  * @author     TheGreatDoc
  */
 
-$data = snmpwalk_group($device, 'enterprises.2011.2.6.7.1.1.2.1.10.0', 'SNMPv2-SMI');
+$temp_oid = '1.3.6.1.4.1.2011.2.6.7.1.1.2.1.10.0';
+$descr_oid = '1.3.6.1.4.1.2011.2.6.7.1.1.2.1.7.0';
 
-foreach ($data as $index => $entry) {
-    $tempCurr = $entry;
-    $index = substr(strrchr($index, '.'), 1);
-    $temperature_oid  = "enterprises.2011.2.6.7.1.1.2.1.10.0.$index";
-    $descr = snmp_get($device, '1.3.6.1.4.1.2011.2.6.7.1.1.2.1.7.0.' . $index, '-Oqv');
-    discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $index, 'smartax', $descr, '1', '1', null, null, null, null, $tempCurr);
+$data = snmpwalk_array_num($device, $temp_oid);
+$descr_data = snmpwalk_array_num($device, $descr_oid);
+
+$data = reset($data);
+$descr_data = reset($descr_data);
+
+foreach ($data as $index => $value) {
+    $tempCurr = $value;
+    $temperature_oid  = $temp_oid.'.'.$index;
+    $descr = $descr_data[$index];
+    discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $index, 'smartax', $descr, null, '1', null, null, null, null, $tempCurr);
 }
