@@ -125,7 +125,7 @@ class Eloquent
     public static function DB()
     {
         // check if Laravel is booted
-        if (class_exists('DB')) {
+        if (defined('LARAVEL_START') && class_exists('DB')) {
             return \DB::connection();
         }
 
