@@ -30,7 +30,7 @@ class ApexLynx extends OS implements
         $oid = '.1.3.6.1.4.1.5454.1.80.3.14.2.0';
         $sensors = array();
 
-        $sensor[] = new WirelessSensor(
+        $sensors[] = new WirelessSensor(
             'rssi',
             $this->getDeviceId(),
             $oid,
@@ -38,7 +38,7 @@ class ApexLynx extends OS implements
             1,
             'RSSI'
         );
-        return $sensor;
+        return $sensors;
     }
 
     public function discoverWirelessFrequency()
@@ -73,7 +73,7 @@ class ApexLynx extends OS implements
         $oid = '.1.3.6.1.4.1.5454.1.80.2.4.2.2.0';
         $sensors = array();
 
-        $sensor[] = new WirelessSensor(
+        $sensos[] = new WirelessSensor(
             'mse',
             $this->getDeviceId(),
             $oid,
@@ -81,7 +81,7 @@ class ApexLynx extends OS implements
             1,
             'MSE'
         );
-        return $sensor;
+        return $sensors;
     }
 
     public function discoverWirelessRate()
@@ -90,7 +90,7 @@ class ApexLynx extends OS implements
         $oid = '.1.3.6.1.4.1.5454.1.80.3.6.4.2.0';
         $sensors = array();
 
-        $sensor[] = new WirelessSensor(
+        $sensors[] = new WirelessSensor(
             'rate',
             $this->getDeviceId(),
             $oid,
@@ -98,7 +98,7 @@ class ApexLynx extends OS implements
             1,
             'Rate'
         );
-        return $sensor;
+        return $sensors;
     }
 
     public function discoverWirelessErrorRate()
@@ -107,7 +107,7 @@ class ApexLynx extends OS implements
         $oid = '.1.3.6.1.4.1.5454.1.80.2.4.1.1.0';
         $sensors = array();
 
-        $sensor[] = new WirelessSensor(
+        $sensors[] = new WirelessSensor(
             'error-rate',
             $this->getDeviceId(),
             $oid,
@@ -115,6 +115,6 @@ class ApexLynx extends OS implements
             1,
             'BER'
         );
-        return $sensor;
+        return $sensors;
     }
 }
