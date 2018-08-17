@@ -6,6 +6,7 @@ applications:
         joins:
             - { custom: 'INNER JOIN (SELECT app_id, app_type FROM applications WHERE `device_id`=?) I USING (app_id)', select: ['app_type'] }
         custom_where: ''
+        order_by: metric
 arp-table:
     ipv4_mac:
         excluded_fields: [device_id, port_id]
