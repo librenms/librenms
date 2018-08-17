@@ -404,6 +404,7 @@ function truncate($substring, $max = 50, $rep = '...')
 
 function mres($string)
 {
+    return $string; // FIXME bleh
     // short function wrapper because the real one is stupidly long and ugly. aesthetics.
     global $database_link;
     return mysqli_real_escape_string($database_link, $string);

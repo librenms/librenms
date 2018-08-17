@@ -39,13 +39,10 @@ exit
 
     vi /etc/my.cnf
 
-> NOTE: Whilst we are working on ensuring LibreNMS is compatible with MySQL strict mode, for now, please disable this after mysql is installed.
-
 Within the `[mysqld]` section please add:
 
 ```bash
 innodb_file_per_table=1
-sql-mode=""
 lower_case_table_names=0
 ```
     systemctl enable mariadb
