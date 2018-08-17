@@ -160,8 +160,8 @@ $pool_rrd_def = RrdDefinition::make()
 $pools_int=0;
 $pools_for_metrics = []; // used later for replacing pools when inserting into the metrics table
 while (isset($zfs['pools'][$pools_int])) {
-    $pools[]=$zfs['pools'][$pools_int]['name'];
-    $pools_for_mertrics[$zfs['pools'][$pools_int]['name']]=$zfs['pools'][$pools_int]; // copy the pool over later
+    $pools[] = $zfs['pools'][$pools_int]['name'];
+    $pools_for_mertrics[$zfs['pools'][$pools_int]['name']] = $zfs['pools'][$pools_int]; // copy the pool over later
     $rrd_name = ['app', $name, $app_id, $zfs['pools'][$pools_int]['name']];
     $fields = [
         'size' => $zfs['pools'][$pools_int]['size'],
@@ -214,5 +214,5 @@ if (empty($pools)) {
 }
 
 //replace $zfs['pools'] with a array where the keys are the pool names and update metrics
-$zfs['pools']=$pools_for_mertrics;
+$zfs['pools'] = $pools_for_mertrics;
 update_application($app, $fetched_zfs, $zfs);
