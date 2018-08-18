@@ -176,6 +176,7 @@ var greenMarker = L.AwesomeMarkers.icon({
                     WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`devices`.`location` REGEXP '\[[0-9\.\, ]+\]'))
                       AND `status` IN (".$widget_settings['status'].")
                     ORDER BY `status` ASC, `hostname`";
+            $param = [];
         } else {
         // Normal user - grab devices that user has permissions to
             $sql = "SELECT DISTINCT(`devices`.`device_id`) as `device_id`,`devices`.`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng`
@@ -187,6 +188,7 @@ var greenMarker = L.AwesomeMarkers.icon({
                     ORDER BY `status` ASC, `hostname`";
             $param[] = Auth::id();
         }
+
         foreach (dbFetchRows($sql, $param) as $map_devices) {
             $icon = 'greenMarker';
             $z_offset = 0;
