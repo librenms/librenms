@@ -25,13 +25,13 @@
                     "sysObjectID": ".1.3.6.1.4.1.2011.2.169",
                     "sysDescr": "Huawei Integrated Access Software",
                     "sysContact": "<private>",
-                    "version": null,
+                    "version": "MA5600V800R015C00B058",
                     "hardware": "SmartAX MA5600T",
                     "features": null,
                     "location": "<private>",
                     "os": "smartax",
                     "type": "network",
-                    "serial": null,
+                    "serial": "020ANHT0F1028887",
                     "icon": "huawei.svg"
                 }
             ]
