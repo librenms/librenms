@@ -77,7 +77,7 @@ function dbQuery($sql, $parameters = [])
             return Eloquent::DB()->getPdo()->exec($sql) !== false;
         }
 
-        return Eloquent::DB()->statement($sql, $parameters);
+        return Eloquent::DB()->statement($sql, (array)$parameters);
     } catch (PDOException $pdoe) {
         dbHandleException(new QueryException($sql, $parameters, $pdoe));
         return false;
@@ -97,9 +97,9 @@ function dbInsert($data, $table)
     $sql = 'INSERT IGNORE INTO `'.$table.'` (`'.implode('`,`', array_keys($data)).'`)  VALUES ('.implode(',', dbPlaceHolders($data)).')';
 
     try {
-        $result = Eloquent::DB()->insert($sql, $data);
+        $result = Eloquent::DB()->insert($sql, (array)$data);
     } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException($sql, $data, $pdoe));
+        dbHandleException(new QueryException($sql, (array)$data, $pdoe));
     }
 
     recordDbStatistic('insert', $time_start);
@@ -136,7 +136,7 @@ function dbBulkInsert($data, $table)
 
     try {
         //        $result = Eloquent::DB()->insert($sql.$values);
-        $result = Eloquent::DB()->table($table)->insert($data);
+        $result = Eloquent::DB()->table($table)->insert((array)$data);
 
         recordDbStatistic('insert', $time_start);
         return $result;
@@ -188,7 +188,7 @@ function dbUpdate($data, $table, $where = null, $parameters = [])
     }
 
     try {
-        $result = Eloquent::DB()->update($sql, $data);
+        $result = Eloquent::DB()->update($sql, (array)$data);
 
         recordDbStatistic('update', $time_start);
         return $result;
@@ -210,7 +210,7 @@ function dbDelete($table, $where = null, $parameters = array())
     }
 
     try {
-        $result = Eloquent::DB()->delete($sql, $parameters);
+        $result = Eloquent::DB()->delete($sql, (array)$parameters);
     } catch (PDOException $pdoe) {
         dbHandleException(new QueryException($sql, $parameters, $pdoe));
     }
@@ -282,7 +282,7 @@ function dbFetchRows($sql, $parameters = [])
 
     try {
         $PDO_FETCH_ASSOC = true;
-        $rows = Eloquent::DB()->select($sql, $parameters);
+        $rows = Eloquent::DB()->select($sql, (array)$parameters);
 
         recordDbStatistic('fetchrows', $time_start);
         return $rows;
@@ -331,7 +331,7 @@ function dbFetchRow($sql = null, $parameters = [])
 
     try {
         $PDO_FETCH_ASSOC = true;
-        $row = Eloquent::DB()->selectOne($sql, $parameters);
+        $row = Eloquent::DB()->selectOne($sql, (array)$parameters);
 
         recordDbStatistic('fetchrow', $time_start);
         return $row;
@@ -357,7 +357,7 @@ function dbFetchCell($sql, $parameters = [])
 
     try {
         $PDO_FETCH_ASSOC = true;
-        $row = Eloquent::DB()->selectOne($sql, $parameters);
+        $row = Eloquent::DB()->selectOne($sql, (array)$parameters);
         recordDbStatistic('fetchcell', $time_start);
         if ($row) {
             return reset($row);
@@ -388,7 +388,7 @@ function dbFetchColumn($sql, $parameters = [])
 
     try {
         $PDO_FETCH_ASSOC = true;
-        foreach (Eloquent::DB()->select($sql, $parameters) as $row) {
+        foreach (Eloquent::DB()->select($sql, (array)$parameters) as $row) {
             $cells[] = reset($row);
         }
         $PDO_FETCH_ASSOC = false;
