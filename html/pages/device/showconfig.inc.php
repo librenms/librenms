@@ -41,7 +41,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             echo generate_link('Latest', array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig'));
         }
 
-        if (function_exists('svn_log')) {
+        if ($config['rancid_repo_type'] == 'svn' && function_exists('svn_log')) {
             $sep     = ' | ';
             $svnlogs = svn_log($file, SVN_REVISION_HEAD, null, 8);
             $revlist = array();
@@ -64,26 +64,75 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $sep = ' | ';
             }
         }//end if
+        if ($config['rancid_repo_type'] == 'git') {
+            $sep     = ' | ';
+
+            chdir($configs);
+            $gitlogs_raw = external_exec('git log -n 8 --pretty=format:"%h;%ct" ' . $file);
+            $gitlogs_raw = explode(PHP_EOL, $gitlogs_raw);
+            $gitlogs = array();
+
+            foreach ($gitlogs_raw as $gl) {
+                list($rev, $ts) = explode(";", $gl);
+                $gitlogs[] = array("rev" => $rev, "date" => $ts);
+            }
+
+            $revlist = array();
+
+            foreach ($gitlogs as $gitlog) {
+                echo $sep;
+                $revlist[] = $gitlog['rev'];
+
+                if ($vars['rev'] == $gitlog['rev']) {
+                    echo '<span class="pagemenu-selected">';
+                }
+
+                $linktext = 'r'.$gitlog['rev'].' <small>'.date($config['dateformat']['byminute'], $gitlog['date']).'</small>';
+                echo generate_link($linktext, array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig', 'rev' => $gitlog['rev']));
+
+                if ($vars['rev'] == $gitlog['rev']) {
+                    echo '</span>';
+                }
+
+                $sep = ' | ';
+            }
+        }
 
         print_optionbar_end();
 
-        if (function_exists('svn_log') && in_array($vars['rev'], $revlist)) {
-            list($diff, $errors) = svn_diff($file, ($vars['rev'] - 1), $file, $vars['rev']);
-            if (!$diff) {
-                $text = 'No Difference';
-            } else {
-                $text = '';
-                while (!feof($diff)) {
-                    $text .= fread($diff, 8192);
-                }
+        if ($config['rancid_repo_type'] == 'svn') {
+            if (function_exists('svn_log') && in_array($vars['rev'], $revlist)) {
+                list($diff, $errors) = svn_diff($file, ($vars['rev'] - 1), $file, $vars['rev']);
+                if (!$diff) {
+                    $text = 'No Difference';
+                } else {
+                    $text = '';
+                    while (!feof($diff)) {
+                        $text .= fread($diff, 8192);
+                    }
 
-                fclose($diff);
-                fclose($errors);
+                    fclose($diff);
+                    fclose($errors);
+                }
+            } else {
+                $fh   = fopen($file, 'r') or die("Can't open file");
+                $text = fread($fh, filesize($file));
+                fclose($fh);
             }
-        } else {
-            $fh   = fopen($file, 'r') or die("Can't open file");
-            $text = fread($fh, filesize($file));
-            fclose($fh);
+        } elseif ($config['rancid_repo_type'] == 'git') {
+            if (in_array($vars['rev'], $revlist)) {
+                chdir($configs);
+                $diff = external_exec('git diff ' . $vars['rev'] . '^ ' . $vars['rev'] . ' ' . $file);
+                if (!$diff) {
+                    $text = 'No Difference';
+                } else {
+                    $text = $diff;
+                }
+            } else {
+                $fh   = fopen($file, 'r') or die("Can't open file");
+                $text = fread($fh, filesize($file));
+                fclose($fh);
+            }
         }
 
         if ($config['rancid_ignorecomments']) {
