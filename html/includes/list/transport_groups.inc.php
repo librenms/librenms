@@ -36,7 +36,7 @@ $params = [];
 
 if (!empty($_REQUEST['search'])) {
     $query .= ' WHERE `transport_group_name` LIKE ?';
-    $params[] = '%' . mres($_REQUEST['search']) . '%';
+    $params[] = '%' . $vars['search'] . '%';
 }
 
 $total = dbFetchCell("SELECT COUNT(*) FROM `alert_transport_groups` $query", $params);

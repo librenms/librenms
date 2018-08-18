@@ -437,5 +437,5 @@
             "state_indexes": []
         },
         "poller": "matches discovery"
-    },
+    }
 }

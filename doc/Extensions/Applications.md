@@ -794,6 +794,8 @@ Please note that each time /etc/snmp/postfixdetailed is ran, the cache file is u
 
 The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
 
+> NOTE: If using RHEL for your postfix server, qshape must be installed manually as it is not officially supported. CentOs 6 rpms seem to work without issues.
+
 ### Postgres
 #### SNMP Extend
 1: Copy the shell script, postgres, to the desired host. `wget https://github.com/librenms/librenms-agent/raw/master/snmp/postgres -O /etc/snmp/postgres`
@@ -902,7 +904,8 @@ snmp ALL=(ALL) NOPASSWD: /usr/local/bin/proxmox
 SNMP extend script to get your PI data into your host.
 
 ##### SNMP Extend
-1. Copy the [raspberry script](https://github.com/librenms/librenms-agent/blob/master/snmp/raspberry.sh) to `/etc/snmp/` (or any other suitable location) on your PI host.
+1. Download the script onto the desired host.
+`wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/raspberry.sh -O /etc/snmp/raspberry.sh`
 
 2. Make the script executable: `chmod +x /etc/snmp/raspberry.sh`
 
