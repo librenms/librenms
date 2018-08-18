@@ -99,7 +99,7 @@ function dbInsert($data, $table)
     try {
         $result = Eloquent::DB()->insert($sql, (array)$data);
     } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException($sql, (array)$data, $pdoe));
+        dbHandleException(new QueryException($sql, $data, $pdoe));
     }
 
     recordDbStatistic('insert', $time_start);
