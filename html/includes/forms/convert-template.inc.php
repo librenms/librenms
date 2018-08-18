@@ -48,7 +48,8 @@ foreach (explode(PHP_EOL, $vars['template']) as $line) {
 }
 $new_title = convert_template($vars['title']);
 
-function convert_template($line) {
+function convert_template($line)
+{
     if (str_contains($line, '{calc')) {
         return preg_replace(
             [
