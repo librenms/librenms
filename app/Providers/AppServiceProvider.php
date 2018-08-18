@@ -20,19 +20,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // connect legacy db, only if configured
-        //FIXME this is for auth right now, remove later
-        $db_config = config('database.connections')[config('database.default')];
-        if (!empty($db_config['database'])) {
-            dbConnect(
-                $db_config['host'],
-                $db_config['username'],
-                $db_config['password'],
-                $db_config['database'],
-                $db_config['port'],
-                $db_config['unix_socket']
-            );
-        }
+        // Install legacy dbFacile fetch mode listener
+        \LibreNMS\DB\Eloquent::initLegacyListeners();
 
         // load config
         Config::load();

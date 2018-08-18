@@ -8,7 +8,10 @@ abstract class Transport implements TransportInterface
 {
     protected $config;
 
-    // Sets config field to an associative array of transport config values
+    /**
+     * Transport constructor.
+     * @param null $transport_id
+     */
     public function __construct($transport_id = null)
     {
         if (!empty($transport_id)) {

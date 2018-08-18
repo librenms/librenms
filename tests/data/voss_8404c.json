@@ -91,7 +91,7 @@
                     "ifOutUcastPkts_prev": null,
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
-                    "ifInErrors": null,extreme
+                    "ifInErrors": null,
                     "ifInErrors_prev": null,
                     "ifInErrors_delta": null,
                     "ifInErrors_rate": null,

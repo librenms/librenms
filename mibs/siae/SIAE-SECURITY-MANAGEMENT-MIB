@@ -1,0 +1,170 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+    SIAE-SECURITY-MANAGEMENT-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE,
+             Integer32
+        FROM SNMPv2-SMI
+             DisplayString,
+             RowStatus
+        FROM SNMPv2-TC
+             siaeMib
+        FROM SIAE-TREE-MIB;
+
+    securityManagement MODULE-IDENTITY
+        LAST-UPDATED "201404170000Z" 
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: tbd@siaemic.com
+            "
+        DESCRIPTION
+            "Security protocols management for SIAE equipments.
+            "
+        REVISION "201404170000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00.
+            "
+    ::= { siaeMib 82 }
+
+------------------------------------------------------------------------------
+--  securityManagement GROUP
+------------------------------------------------------------------------------
+
+------ Beginning -------------------------------------------------------------
+
+    securityManagementMibVersion OBJECT-TYPE
+            SYNTAX      INTEGER
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Numerical version of this module.
+                 The string version of this MIB have the following format:
+                    XX.YY.ZZ
+                 so, for example, the value 1 should be interpreted as 00.00.01
+                 and the value 10001 should be interpreted as 01.00.01."
+    ::= {securityManagement 1}
+    
+    
+   -------  Begin of servicesTable
+   --
+    servicesTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ServiceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of services entries. This table is useful 
+             to show the manager the administrative and operative
+             status of all services on the equipment."
+    ::= {securityManagement 2}
+
+    serviceEntry OBJECT-TYPE
+        SYNTAX      ServiceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing management information applicable 
+             to a given service on the equipment."
+        INDEX       {serviceIndex}
+    ::= {servicesTable 1}
+
+    ServiceEntry  ::=
+        SEQUENCE  {
+            serviceIndex                       Integer32,
+            serviceName                        DisplayString,
+            serviceProtocolVersion             DisplayString,
+            serviceAdminStatus                 INTEGER,
+            serviceOperStatus                  INTEGER,
+            serviceRowStatus                   RowStatus
+         }
+    
+    serviceIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique value, greater than zero, for each service.
+             It is recommended that values are assigned contiguously 
+             starting from 1."
+    ::= {serviceEntry 1}
+   
+    serviceName OBJECT-TYPE
+        SYNTAX      DisplayString   (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ASCII string to identify the service. 
+            "
+        DEFVAL  {""}
+    ::= {serviceEntry 2}
+    
+    serviceProtocolVersion OBJECT-TYPE
+        SYNTAX      DisplayString   (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "An indication of the service protocol version 
+             supported or enabled on the device. 
+            "
+         DEFVAL  {""}
+    ::= {serviceEntry 3}
+    
+    serviceAdminStatus  OBJECT-TYPE
+        SYNTAX              INTEGER {                   
+                            disable(0),
+                            enable (1)
+                            }
+        MAX-ACCESS          read-create
+        STATUS              current
+        DESCRIPTION   
+             "This object enables/ disables service on the 
+              equipment. The value of this object depends on
+              effective protocol administrative status."
+    ::= {serviceEntry 4} 
+    
+    serviceOperStatus  OBJECT-TYPE
+        SYNTAX              INTEGER {                   
+                            notAvailable(0),
+                            running (1),
+                            stopped (2)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION   
+              "This object shows service operative status on the
+               equipment."
+        DEFVAL  {notAvailable}
+    ::= {serviceEntry 5} 
+    
+    serviceRowStatus   OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this conceptual row in servicesTable.
+            "
+    ::= {serviceEntry 6}
+    
+--
+-------  End of servicesTable   
+
+
+------ End group -------------------------------------------------------------
+
+END

@@ -35,4 +35,9 @@ interface Transport
      * @return mixed Returns if the call was successful
      */
     public function deliverAlert($alert_data, $opts);
+
+    /**
+     * @return array
+     */
+    public static function configTemplate();
 }
