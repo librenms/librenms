@@ -40,11 +40,8 @@ $data = reset($data);
 $descr_data = reset($descr_data);
 
 foreach ($data as $index => $value) {
-
         $powerCurr = $value;
         $pow_oid = '.' . $power_oid . '.' . $index;
         $descr = $descr_data[$index];
         discover_sensor($valid['sensor'], 'power', $device, $pow_oid, $index, 'smartax', $descr, '1', '1', null, null, null, null, $powerCurr);
-
 }
-
