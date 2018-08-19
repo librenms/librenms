@@ -1072,9 +1072,8 @@ function clean_bootgrid($string)
 
 function get_config_by_group($group)
 {
-    $group = array($group);
     $items = array();
-    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_group` = '?'", array($group)) as $config_item) {
+    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_group` = ?", array($group)) as $config_item) {
         $val = $config_item['config_value'];
         if (filter_var($val, FILTER_VALIDATE_INT)) {
             $val = (int)$val;
