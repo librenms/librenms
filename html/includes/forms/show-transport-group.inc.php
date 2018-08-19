@@ -17,7 +17,7 @@ header('Content-type: application/json');
 if (!Auth::user()->hasGlobalAdmin()) {
     die(json_encode([
         'status' => 'error',
-        'message' => 'ERROR: You need to be admin'
+        'message' => 'You need to be admin'
     ]));
 }
 
@@ -45,6 +45,6 @@ if (is_array($members)) {
 } else {
     die(json_encode([
         'status' => 'error',
-        'message' => 'ERROR: No transport group found'
+        'message' => 'No transport group found'
     ]));
 }

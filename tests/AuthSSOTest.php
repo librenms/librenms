@@ -164,7 +164,7 @@ class AuthSSOTest extends DBTestCase
         // Retrieve it and validate
         $dbuser = $a->getUser($a->getUserid($user));
         $this->assertTrue($a->authSSOGetAttr($config['sso']['realname_attr']) === $dbuser['realname']);
-        $this->assertTrue($dbuser['level'] === "-1");
+        $this->assertTrue($dbuser['level'] == -1);
         $this->assertTrue($a->authSSOGetAttr($config['sso']['email_attr']) === $dbuser['email']);
 
         // Change a few things and reauth
@@ -202,7 +202,7 @@ class AuthSSOTest extends DBTestCase
         // Retrieve it and validate the update persisted
         $dbuser = $a->getUser($a->getUserid($user));
         $this->assertTrue($a->authSSOGetAttr($config['sso']['realname_attr']) === $dbuser['realname']);
-        $this->assertTrue($dbuser['level'] === "10");
+        $this->assertTrue($dbuser['level'] == 10);
         $this->assertTrue($a->authSSOGetAttr($config['sso']['email_attr']) === $dbuser['email']);
     }
 

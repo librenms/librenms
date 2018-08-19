@@ -968,21 +968,25 @@ function snmp2ipv6($ipv6_snmp)
 
 function get_astext($asn)
 {
-    global $config,$cache;
+    global $cache;
 
-    if (isset($config['astext'][$asn])) {
-        return $config['astext'][$asn];
-    } else {
-        if (isset($cache['astext'][$asn])) {
-            return $cache['astext'][$asn];
-        } else {
-            $result = dns_get_record("AS$asn.asn.cymru.com", DNS_TXT);
-            $txt = explode('|', $result[0]['txt']);
-            $result = trim(str_replace('"', '', $txt[4]));
-            $cache['astext'][$asn] = $result;
-            return $result;
-        }
+    if (Config::has("astext.$asn")) {
+        return Config::get("astext.$asn");
     }
+
+    if (isset($cache['astext'][$asn])) {
+        return $cache['astext'][$asn];
+    }
+
+    $result = dns_get_record("AS$asn.asn.cymru.com", DNS_TXT);
+    if (!empty($result[0]['txt'])) {
+        $txt = explode('|', $result[0]['txt']);
+        $result = trim($txt[4], ' "');
+        $cache['astext'][$asn] = $result;
+        return $result;
+    }
+
+    return '';
 }
 
 /**
@@ -2490,7 +2494,14 @@ function get_schema_list()
  */
 function get_db_schema()
 {
-    return (int)@dbFetchCell('SELECT version FROM `dbSchema` ORDER BY version DESC LIMIT 1');
+    try {
+        return \LibreNMS\DB\Eloquent::DB()
+            ->table('dbSchema')
+            ->orderBy('version', 'DESC')
+            ->value('version');
+    } catch (PDOException $e) {
+        return 0;
+    }
 }
 
 /**
