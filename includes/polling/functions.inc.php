@@ -657,15 +657,15 @@ function update_application($app, $response, $metrics = array(), $status = '')
                     array(
                         'app_id' => $app['app_id'],
                         'metric' => $metric_name,
-                        'value' => (int)$value,
+                        'value' => $value,
                     ),
                     'application_metrics'
                 );
                 echo '+';
-            } elseif ((int)$value != (int)$db_metrics[$metric_name]['value']) {
+            } elseif ($value != $db_metrics[$metric_name]['value']) {
                 dbUpdate(
                     array(
-                        'value' => (int)$value,
+                        'value' => $value,
                         'value_prev' => $db_metrics[$metric_name]['value'],
                     ),
                     'application_metrics',
@@ -742,7 +742,12 @@ function convert_to_celsius($value)
  * @param integer $min_version the minimum version to accept for the returned JSON. default: 1
  *
  * @return array The json output data parsed into an array
+ * @throws JsonAppBlankJsonException
+ * @throws JsonAppExtendErroredException
+ * @throws JsonAppMissingKeysException
+ * @throws JsonAppParsingFailedException
  * @throws JsonAppPollingFailedException
+ * @throws JsonAppWrongVersionException
  */
 function json_app_get($device, $extend, $min_version = 1)
 {
