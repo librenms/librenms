@@ -7,20 +7,15 @@ $app_id = $app['app_id'];
 
 echo $name;
 
-$ports=json_app_get($device, 'portactivity', 1);
-if ($ports['error'] != '0') {
-    print "\nJSON returned with error '".$ports['error']."'\nerrorString: ".$ports['errorString']."\n";
+try {
+    $returned=json_app_get($device, 'portactivity', 1);
+} catch (JsonAppException $e) { // Only doing the generic one as this has no non-JSON return
+    echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
+    update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message
     return;
 }
 
-// remove these at this point as we don't want them
-unset($ports['error']);
-unset($ports['errorString']);
-unset($ports['version']);
-
-//
-// each port
-//
+$ports=$returned['data'];
 
 $ports_rrd_def = RrdDefinition::make()
     ->addDataset('total_conns', 'GAUGE', 0)
@@ -65,6 +60,10 @@ $ports_rrd_def = RrdDefinition::make()
     ->addDataset('fromTIME_WAIT', 'GAUGE', 0)
     ->addDataset('fromUNKNOWN', 'GAUGE', 0)
     ->addDataset('fromother', 'GAUGE', 0);
+
+//
+// update the RRD files for each port
+//
 
 $ports_keys=array_keys($ports);
 $ports_keys_int=0;
@@ -156,4 +155,4 @@ if (empty($ports_keys)) {
     $component->setComponentPrefs($device_id, $portsc);
 }
 
-update_application($app, $json, $ports);
+update_application($app, $returned, $ports);
