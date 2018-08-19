@@ -120,7 +120,7 @@ return [
     |
     */
 
-    'log' => env('APP_LOG', 'errorlog'), // use error log until we are booted
+    'log' => env('APP_LOG', 'logs/librenms.log'),  // log to the default file, until boot
 
     'log_level' => env('APP_LOG_LEVEL', 'debug'),
 
@@ -161,12 +161,12 @@ return [
         Illuminate\Session\SessionServiceProvider::class,
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
-        Illuminate\View\ViewServiceProvider::class,
 
         /*
          * Package Service Providers...
          */
         Laravel\Tinker\TinkerServiceProvider::class,
+        Kamaln7\Toastr\ToastrServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -177,12 +177,12 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\ComposerServiceProvider::class,
+        App\Providers\ViewServiceProvider::class,
 
         /*
-         * Vendor Service Providers...
+         * LibreNMS Service Providers...
          */
-        Kamaln7\Toastr\ToastrServiceProvider::class,
-
+        App\Providers\SnmptrapProvider::class,
     ],
 
     /*

@@ -84,7 +84,14 @@ $config['oxidized']['reload_nodes'] = true;
 
 To return an override to Oxidized you can do this by providing the override key, followed by matching a lookup for a host (or hosts), and finally by defining the overriding value itself. LibreNMS does not check for the validity of these attributes but will deliver them to Oxidized as defined.
 
-Matching of hosts can be done using `hostname`, `sysname`, `os` or `location` and including either a 'match' key and value, or a 'regex' key and value. The order is `hostname` is matched first, if nothing is found then `sysname` is tried, then `os`, and finally `location` is attempted.
+Matching of hosts can be done using `hostname`, `sysname`, `os`, `location`, `sysDescr` or `hardware` and including either a 'match' key and value, or a 'regex' key and value. The order of matching is:
+* `hostname` 
+* `sysname`
+* `sysDescr`
+* `hardware`
+* `os`
+* `location`
+* `ip`
 
 To match on the device hostnames or sysnames that contain 'lon-sw' or if the location contains 'London' then you would place the following within config.php:
 

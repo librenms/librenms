@@ -22,44 +22,20 @@ if (empty($_SERVER['PATH_INFO'])) {
     }
 }
 
-if (strpos($_SERVER['REQUEST_URI'], "debug")) {
-    $debug = true;
-    ini_set('display_errors', 0);
-    ini_set('display_startup_errors', 1);
-    ini_set('log_errors', 1);
-    ini_set('error_reporting', E_ALL);
-    set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-        global $php_debug;
-        $php_debug[] = array('errno' => $errno, 'errstr' => $errstr, 'errfile' => $errfile, 'errline' => $errline);
-    });
-    register_shutdown_function(function () {
-        $last_error = error_get_last();
-        if ($last_error['type'] == 1) {
-            $log_error = array($last_error['type'], $last_error['message'], $last_error['file'], $last_error['line']);
-            print_r($log_error);
-        }
-    });
-    $sql_debug = array();
-    $php_debug = array();
-} else {
-    $debug = false;
-    ini_set('display_errors', 0);
-    ini_set('display_startup_errors', 0);
-    ini_set('log_errors', 0);
-    ini_set('error_reporting', 0);
-}
 
 // Set variables
 $msg_box = array();
 // Check for install.inc.php
 if (!file_exists('../config.php') && $_SERVER['PATH_INFO'] != '/install.php') {
     // no config.php does so let's redirect to the install
-    header("Location: {$config['base_url']}/install.php");
+    header("Location: " . rtrim(Config::get('base_url'), '/') . "/install.php");
     exit;
 }
 
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
+
+set_debug(str_contains($_SERVER['REQUEST_URI'], 'debug'));
 
 LibreNMS\Plugins::start();
 
@@ -68,7 +44,6 @@ $runtime_start = microtime(true);
 ob_start();
 
 ini_set('allow_url_fopen', 0);
-ini_set('display_errors', 0);
 
 if (strstr($_SERVER['REQUEST_URI'], 'widescreen=yes')) {
     $_SESSION['widescreen'] = 1;
@@ -328,21 +303,17 @@ foreach (dbFetchRows('SELECT `notifications`.* FROM `notifications` WHERE NOT ex
 }
 
 if (is_array($msg_box)) {
-    echo("<script>
+    echo "<script>
         toastr.options.timeout = 10;
         toastr.options.extendedTimeOut = 20;
-    ");
-    foreach ($msg_box as $message) {
-        $message['type'] = mres($message['type']);
-        $message['message'] = mres($message['message']);
-        $message['title'] = mres($message['title']);
-        echo "toastr.".$message['type']."('".$message['message']."','".$message['title']."');\n";
-    }
-    echo("</script>");
-}
+        </script>
+    ";
 
-if (is_array($sql_debug) && is_array($php_debug) && Auth::check()) {
-    require_once "includes/print-debug.php";
+    foreach ($msg_box as $message) {
+        Toastr::add($message['type'], $message['message'], $message['title']);
+    }
+
+    echo Toastr::render();
 }
 
 if ($no_refresh !== true && $config['page_refresh'] != 0) {

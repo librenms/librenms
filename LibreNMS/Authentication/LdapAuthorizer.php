@@ -21,12 +21,21 @@ class LdapAuthorizer extends AuthorizerBase
                     return true;
                 } else {
                     foreach ($ldap_groups as $ldap_group) {
-                        $ldap_comparison = ldap_compare(
-                            $connection,
-                            $ldap_group,
-                            Config::get('auth_ldap_groupmemberattr', 'memberUid'),
-                            $this->getMembername($username)
-                        );
+                        if (Config::get('auth_ldap_userdn') === true) {
+                            $ldap_comparison = ldap_compare(
+                                $connection,
+                                $ldap_group,
+                                Config::get('auth_ldap_groupmemberattr', 'memberUid'),
+                                $this->getFullDn($username)
+                            );
+                        } else {
+                            $ldap_comparison = ldap_compare(
+                                $connection,
+                                $ldap_group,
+                                Config::get('auth_ldap_groupmemberattr', 'memberUid'),
+                                $this->getMembername($username)
+                            );
+                        }
                         if ($ldap_comparison === true) {
                             return true;
                         }
@@ -99,7 +108,11 @@ class LdapAuthorizer extends AuthorizerBase
             if (count($group_names) > 1) {
                 $ldap_group_filter = "(|{$ldap_group_filter})";
             }
-            $filter = "(&{$ldap_group_filter}(" . trim(Config::get('auth_ldap_groupmemberattr', 'memberUid')) . "=" . $this->getMembername($username) . "))";
+            if (Config::get('auth_ldap_userdn') === true) {
+                $filter = "(&{$ldap_group_filter}(" . trim(Config::get('auth_ldap_groupmemberattr', 'memberUid')) . "=" . $this->getFullDn($username) . "))";
+            } else {
+                $filter = "(&{$ldap_group_filter}(" . trim(Config::get('auth_ldap_groupmemberattr', 'memberUid')) . "=" . $this->getMembername($username) . "))";
+            }
             $search = ldap_search($connection, Config::get('auth_ldap_groupbase'), $filter);
             $entries = ldap_get_entries($connection, $search);
 

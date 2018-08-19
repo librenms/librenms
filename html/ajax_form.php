@@ -16,10 +16,10 @@
 
 use LibreNMS\Authentication\Auth;
 
-$init_modules = array('web', 'auth', 'alerts');
+$init_modules = array('web', 'auth', 'alerts', 'laravel');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-set_debug($_REQUEST['debug']);
+set_debug(isset($_REQUEST['debug']) ? $_REQUEST['debug'] : false);
 
 if (!Auth::check()) {
     echo 'unauthenticated';

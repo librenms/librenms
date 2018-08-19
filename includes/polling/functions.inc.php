@@ -218,9 +218,16 @@ function record_sensor_data($device, $all_sensors)
     }
 }
 
-function poll_device($device, $options)
+/**
+ * @param array $device The device to poll
+ * @param bool $force_module Ignore device module overrides
+ * @return bool
+ */
+function poll_device($device, $force_module = false)
 {
     global $config, $device;
+
+    $device_start = microtime(true);
 
     $attribs = get_dev_attribs($device['device_id']);
     $device['attribs'] = $attribs;
@@ -231,13 +238,14 @@ function poll_device($device, $options)
     $device['snmp_max_oid'] = $attribs['snmp_max_oid'];
 
     unset($array);
-    $device_start = microtime(true);
+
     // Start counting device poll time
     echo 'Hostname: ' . $device['hostname'] . PHP_EOL;
     echo 'Device ID: ' . $device['device_id'] . PHP_EOL;
     echo 'OS: ' . $device['os'];
     $ip = dnslookup($device);
-    $db_ip = inet_pton($ip);
+
+    $db_ip = isset($ip) ? inet_pton($ip) : null;
 
     if (!empty($db_ip) && inet6_ntop($db_ip) != inet6_ntop($device['ip'])) {
         log_event('Device IP changed to ' . $ip, $device, 'system', 3);
@@ -269,20 +277,9 @@ function poll_device($device, $options)
         $graphs    = array();
         $oldgraphs = array();
 
-        $force_module = false;
         if ($device['snmp_disable']) {
             $config['poller_modules'] = array();
         } else {
-            if ($options['m']) {
-                $config['poller_modules'] = array();
-                foreach (explode(',', $options['m']) as $module) {
-                    if (is_file('includes/polling/' . $module . '.inc.php')) {
-                        $config['poller_modules'][$module] = 1;
-                        $force_module = true;
-                    }
-                }
-            }
-
             // we always want the core module to be included, prepend it
             $config['poller_modules'] = array('core' => true) + $config['poller_modules'];
         }
@@ -336,7 +333,8 @@ function poll_device($device, $options)
         // Update device_groups
         UpdateGroupsForDevice($device['device_id']);
 
-        if (!isset($options['m'])) {
+        if (!$force_module && !empty($graphs)) {
+            echo "Enabling graphs: ";
             // FIXME EVENTLOGGING -- MAKE IT SO WE DO THIS PER-MODULE?
             // This code cycles through the graphs already known in the database and the ones we've defined as being polled here
             // If there any don't match, they're added/deleted from the database.
@@ -390,11 +388,18 @@ function poll_device($device, $options)
             data_update($device, 'poller-perf', $tags, $fields);
         }
 
-        $update_array['last_polled']           = array('NOW()');
-        $update_array['last_polled_timetaken'] = $device_time;
+        if (!$force_module) {
+            // don't update last_polled time if we are forcing a specific module to be polled
+            $update_array['last_polled']           = array('NOW()');
+            $update_array['last_polled_timetaken'] = $device_time;
+        }
 
-        // echo("$device_end - $device_start; $device_time $device_run");
-        echo "Polled in $device_time seconds\n";
+        $updated = dbUpdate($update_array, 'devices', '`device_id` = ?', array($device['device_id']));
+        if ($updated) {
+            d_echo('Updating ' . $device['hostname'] . PHP_EOL);
+        }
+
+        echo "\nPolled in $device_time seconds\n";
 
         // check if the poll took to long and log an event
         if ($device_time > $config['rrd']['step']) {
@@ -402,18 +407,15 @@ function poll_device($device, $options)
                 ' minutes!  This will cause gaps in graphs.', $device, 'system', 5);
         }
 
-        d_echo('Updating '.$device['hostname']."\n");
-
-        $updated = dbUpdate($update_array, 'devices', '`device_id` = ?', array($device['device_id']));
-        if ($updated) {
-            echo "UPDATED!\n";
-        }
-
         unset($storage_cache);
         // Clear cache of hrStorage ** MAYBE FIXME? **
         unset($cache);
         // Clear cache (unify all things here?)
-    }//end if
+
+        return true; // device was polled
+    }
+
+    return false; // device not polled
 }//end poll_device()
 
 /**

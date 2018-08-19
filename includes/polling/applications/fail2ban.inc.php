@@ -33,7 +33,7 @@ try {
     return;
 }
 
-$f2b = $f2b[data];
+$f2b = $f2b['data'];
 
 $metrics = [];
 
@@ -43,11 +43,9 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('firewalled', 'GAUGE', 0);
 
 
-$fields = array(
-    'banned' => $f2b['total'],
-    'firewalled'=>'U', // legacy ds
-);
-$metrics['total'] = $fields;
+$fields = ['banned' => $f2b['total']];
+$metrics['total'] = $fields; // don't include legacy ds in db
+$fields['firewalled'] = 'U'; // legacy ds
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);

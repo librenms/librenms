@@ -141,6 +141,9 @@ function nicecase($item)
         case 'zfs':
             return 'ZFS';
 
+        case 'asterisk':
+            return 'Asterisk';
+
         default:
             return ucfirst($item);
     }
@@ -848,30 +851,30 @@ function getlocations()
 }//end getlocations()
 
 
+/**
+ * Get the recursive file size and count for a directory
+ *
+ * @param string $path
+ * @return array [size, file count]
+ */
 function foldersize($path)
 {
     $total_size = 0;
-    $files = scandir($path);
     $total_files = 0;
 
-    foreach ($files as $t) {
-        if (is_dir(rtrim($path, '/') . '/' . $t)) {
-            if ($t <> '.' && $t <> '..') {
-                $size = foldersize(rtrim($path, '/') . '/' . $t);
-                $total_size += $size;
-            }
+    foreach (glob(rtrim($path, '/').'/*', GLOB_NOSORT) as $item) {
+        if (is_dir($item)) {
+            list($folder_size, $file_count) = foldersize($item);
+            $total_size += $folder_size;
+            $total_files += $file_count;
         } else {
-            $size = filesize(rtrim($path, '/') . '/' . $t);
-            $total_size += $size;
+            $total_size += filesize($item);
             $total_files++;
         }
     }
 
-    return array(
-        $total_size,
-        $total_files,
-    );
-}//end foldersize()
+    return [$total_size, $total_files];
+}
 
 
 function generate_ap_link($args, $text = null, $type = null)

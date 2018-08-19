@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Device;
 use LibreNMS\Authentication\Auth;
 
 if ($_POST['editing']) {
@@ -7,13 +8,9 @@ if ($_POST['editing']) {
         $updated = 0;
 
         if (isset($_POST['parent_id'])) {
-            $parent_id = array_diff((array)$_POST['parent_id'], ['0']);
-            $res = dbDelete('device_relationships', '`child_device_id` = ?', array($device['device_id']));
-            if (!in_array('0', $pr)) {
-                foreach ($parent_id as $pr) {
-                    dbInsert(array('parent_device_id' => $pr, 'child_device_id' => $device['device_id']), 'device_relationships');
-                }
-            }
+            $parents = array_diff((array)$_POST['parent_id'], ['0']);
+            // TODO avoid loops!
+            Device::find($device['device_id'])->parents()->sync($parents);
         }
 
         $override_sysLocation_bool = mres($_POST['override_sysLocation']);
@@ -263,8 +260,7 @@ if ($updated && $update_message) {
         }
     });
     $('#parent_id').select2({
-        width: 'resolve',
-        tags: true,
+        width: 'resolve'
     });
 </script>
 <?php

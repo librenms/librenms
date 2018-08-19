@@ -64,30 +64,30 @@ if (getenv('SNMPSIM')) {
 if (getenv('DBTEST')) {
     global $schema, $sql_mode;
 
-    try {
-        dbConnect();
-    } catch (DatabaseConnectException $e) {
-        echo $e->getMessage() . PHP_EOL;
-    }
+    // create testing table if needed
+    $db_config = Config::getDatabaseSettings();
+    $db_name = $db_config['db_name'];
 
-    $sql_mode = dbFetchCell("SELECT @@global.sql_mode");
-    $db_name = dbFetchCell("SELECT DATABASE()");
+    $connection = new PDO("mysql:host={$db_config['db_host']}", $db_config['db_user'], $db_config['db_pass']);
+    $connection->query("CREATE DATABASE IF NOT EXISTS $db_name");
+    unset($connection); // close connection
+
+    \LibreNMS\DB\Eloquent::boot();
+    \LibreNMS\DB\Eloquent::setStrictMode();
+
     $empty_db = (dbFetchCell("SELECT count(*) FROM `information_schema`.`tables` WHERE `table_type` = 'BASE TABLE' AND `table_schema` = ?", [$db_name]) == 0);
-    dbQuery("SET GLOBAL sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
 
     $cmd = $config['install_dir'] . '/build-base.php';
     exec($cmd, $schema);
 
     Config::load(); // reload the config including database config
+    load_all_os();
 
     register_shutdown_function(function () use ($empty_db, $sql_mode) {
         global $config;
-        dbConnect();
+        \LibreNMS\DB\Eloquent::boot();
 
         echo "Cleaning database...\n";
-
-        // restore sql_mode
-        dbQuery("SET GLOBAL sql_mode='$sql_mode'");
 
         $db_name = dbFetchCell('SELECT DATABASE()');
         if ($empty_db) {

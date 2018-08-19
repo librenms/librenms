@@ -24,9 +24,6 @@ if (file_exists('../config.php') && $stage != 6) {
 
 // do not use the DB in init, we'll bring it up ourselves
 $init_modules = array('web', 'nodb');
-if ($stage > 3) {
-    $init_modules[] = 'auth';
-}
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 // List of php modules we expect to see

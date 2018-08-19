@@ -26,13 +26,14 @@ if (Auth::user()->hasGlobalAdmin()) {
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h5 class="modal-title" id="Create">Alert Rules :: <a href="https://docs.librenms.org/Alerting/">Docs <i class="fa fa-book fa-1x"></i></a> </h5>
+                    <h5 class="modal-title" id="Create">Alert Rule :: <a href="https://docs.librenms.org/Alerting/"><i class="fa fa-book fa-1x"></i> Docs</a> </h5>
                 </div>
                 <div class="modal-body">
                     <ul class="nav nav-tabs" role="tablist">
                         <li role="presentation" class="active"><a href="#main" aria-controls="main" role="tab" data-toggle="tab">Main </a></li>
                         <li role="presentation"><a href="#advanced" aria-controls="advanced" role="tab" data-toggle="tab">Advanced</a></li>
                     </ul>
+                    <br />
                     <form method="post" role="form" id="rules" class="form-horizontal alerts-form">
                         <input type="hidden" name="device_id" id="device_id" value="<?php echo isset($device['device_id']) ? $device['device_id'] : -1; ?>">
                         <input type="hidden" name="device_name" id="device_name" value="<?php echo format_hostname($device); ?>">
@@ -150,8 +151,6 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                     </form>
-
-
                 </div>
             </div>
         </div>
@@ -303,6 +302,11 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $maps.empty();
                 $maps.val(null).trigger('change');
                 setRuleDevice() // pre-populate device in the maps if this is a per-device rule
+                
+                var $transports = $("#transports");
+                $transports.empty();
+                $transports.val(null).trigger('change');
+                $("#transport-choice").val("email");
             }
         });
 
@@ -322,6 +326,15 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $.each(rule.maps, function(index, value) {
                     var option = new Option(value.text, value.id, true, true);
                     $maps.append(option).trigger('change')
+                });
+            }
+            var $transports = $("#transports");
+            $transports.empty();
+            $transports.val(null).trigger('change');
+            if(rule.transports != null) {
+                $.each(rule.transports, function(index, value) {
+                    var option = new Option(value.text, value.id, true, true);
+                    $transports.append(option).trigger("change");
                 });
             }
 
@@ -405,6 +418,20 @@ if (Auth::user()->hasGlobalAdmin()) {
                         type: 'table_columns',
                         search: params.term
                     };
+                }
+            }
+        });
+        $("#transports").select2({
+            width: "100%",
+            placeholder: "Transport/Group Name",
+            ajax: {
+                url: 'ajax_list.php',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        type: "transport_groups",
+                        search: params.term
+                    }
                 }
             }
         });

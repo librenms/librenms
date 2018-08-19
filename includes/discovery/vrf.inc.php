@@ -3,7 +3,8 @@
 use LibreNMS\Config;
 
 if (Config::get('enable_vrfs')) {
-    if ($device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os'] == 'ironware') {
+    if (in_array($device['os_group'], ['vrp', 'cisco']) ||
+        in_array($device['os'], ['junos', 'ironware'])) {
         unset($vrf_count);
 
         /*
@@ -91,8 +92,18 @@ if (Config::get('enable_vrfs')) {
                     $vrf_name .= chr($oid_values[$i]);
                 }
 
-                // Brocade Ironware outputs VRF RD values as Hex-STRING rather than string. This has to be converted to decimal
+                // Some VRP versions output VRF RD values as Null terminated Hex-STRING rather than string.
+                // This has to be converted to decimal
+                if ($device['os'] == 'vrp'  && preg_match('/^([^ ]+) +(([^ ]+) +.*) 00/', $oid, $matches)) {
+                    //.1.3.6.1.2.1.10.166.11.1.2.2.1.4.5.116.101.115.116.49 36 35 33 30 31 3A 31 00
+                    // regexp result => 5.116.101.115.116.49 -- 36 35 33 30 31 3A 31 -- 00
+                    d_echo("  [DEBUG] VRP: RD HexString handling: $matches[2]");
+                    $hex_vrf_rd = str_replace(' ', '', $matches[2]);
+                    $vrf_rd = hex2str($hex_vrf_rd);
+                    d_echo("\n  [DEBUG] VRP: RD : $hex_vrf_rd -> $vrf_rd");
+                }
 
+                // Brocade Ironware outputs VRF RD values as Hex-STRING rather than string. This has to be converted to decimal
                 if ($device['os'] == 'ironware') {
                     $vrf_rd = substr($oid, -24);  // Grab last 24 characters from $oid, which is the RD hex value
                     $vrf_rd = str_replace(' ', '', $vrf_rd); // Remove whitespace

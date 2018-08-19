@@ -21,7 +21,7 @@
 namespace LibreNMS;
 
 use LibreNMS\Authentication\Auth;
-use LibreNMS\Exceptions\DatabaseConnectException;
+use LibreNMS\DB\Eloquent;
 
 class IRCBot
 {
@@ -68,11 +68,8 @@ class IRCBot
 
     public function __construct()
     {
-        global $config, $database_link;
+        global $config;
         $this->log('Setting up IRC-Bot..');
-        if (is_resource($database_link)) {
-            $this->sql = $database_link;
-        }
 
         $this->config = $config;
         $this->debug  = $this->config['irc_debug'];
@@ -507,10 +504,10 @@ class IRCBot
 
     private function chkdb()
     {
-        if (!is_resource($this->sql)) {
+        if (!Eloquent::isConnected()) {
             try {
-                $this->sql = dbConnect();
-            } catch (DatabaseConnectException $e) {
+                Eloquent::boot();
+            } catch (\PDOException $e) {
                 $this->log('Cannot connect to MySQL: ' . $e->getMessage());
                 return die();
             }

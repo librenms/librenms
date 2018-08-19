@@ -23,11 +23,26 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Clickatell implements Transport
+class Clickatell extends Transport
 {
     public function deliverAlert($obj, $opts)
+    {
+        if (empty($this->config)) {
+            return $this->deliverAlertOld($obj, $opts);
+        }
+        $clickatell_opts['token'] = $this->config['clickatell-token'];
+        $clickatell_opts['to'] = preg_split('/([,\r\n]+)/', $this->config['clickatell-numbers']);
+        return $this->contactClickatell($obj, $clickatell_opts);
+    }
+
+    public function deliverAlertOld($obj, $opts)
+    {
+        return $this->contactClickatell($obj, $opts);
+    }
+
+    public static function contactClickatell($obj, $opts)
     {
         $url = 'https://platform.clickatell.com/messages/http/send?apiKey=' . $opts['token'] . '&to=' . implode(',', $opts['to']) . '&content=' . urlencode($obj['title']);
 
@@ -39,11 +54,32 @@ class Clickatell implements Transport
         $ret  = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code > 200) {
-            if ($debug) {
-                var_dump($ret);
-            }
-            return false;
+            return var_dump($ret);
         }
         return true;
+    }
+
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'Token',
+                    'name'  => 'clickatell-token',
+                    'descr' => 'Clickatell Token',
+                    'type'  => 'text',
+                ],
+                [
+                    'title' => 'Mobile Numbers',
+                    'name'  => 'clickatell-numbers',
+                    'descr' => 'Enter mobile numbers, can be new line or comma separated',
+                    'type'  => 'textarea',
+                ]
+            ],
+            'validation' => [
+                'clickatell-token'   => 'required|string',
+                'clickatell-numbers' => 'required|string',
+            ]
+        ];
     }
 }

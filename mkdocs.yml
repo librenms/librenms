@@ -53,6 +53,7 @@ pages:
       - Extensions/Dashboards.md
   - 5. Advanced Setup:
       - Support/1-Minute-Polling.md
+      - Fast Ping Checking: Extensions/Fast-Ping-Check.md
       - Configuration docs: Support/Configuration.md
       - Authentication Options: Extensions/Authentication.md
       - Two-Factor Auth: Extensions/Two-Factor-Auth.md
@@ -105,6 +106,7 @@ pages:
       - Alerting/Rules.md
       - Alerting/Templates.md
       - Alerting/Transports.md
+      - Alerting/Creating-Transport.md
       - Alerting/Entities.md
       - Alerting/Macros.md
       - Alerting/Testing.md
@@ -143,6 +145,7 @@ pages:
           - Developing/os/Custom-Graphs.md
           - Developing/os/Settings.md
           - Developing/Sensor-State-Support.md
+      - Developing/SNMP-Traps.md
       - Developing/Dynamic-Config.md
       - Developing/Merging-Pull-Requests.md
       - Developing/Creating-Release.md
@@ -154,6 +157,7 @@ pages:
           - Intro: Support/Device-Notes/index.md
           - Carel pCOweb: Support/Device-Notes/Carel-pCOweb-Devices.md
   - hidden:
+      - Alerting/Old_Templates.md
       - API/API-Docs.md
       - Installation/Installing-LibreNMS.md
       - Extensions/Alerting.md

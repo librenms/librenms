@@ -255,6 +255,7 @@ main () {
                 # Cleanups
                 local options=("refresh_alert_rules"
                                "refresh_os_cache"
+                               "recalculate_device_dependencies"
                                "syslog"
                                "eventlog"
                                "authlog"
@@ -264,7 +265,8 @@ main () {
                                "purgeusers"
                                "bill_data"
                                "alert_log"
-                               "rrd_purge");
+                               "rrd_purge"
+                               "ports_purge");
                 call_daily_php "${options[@]}";
             ;;
             submodules)

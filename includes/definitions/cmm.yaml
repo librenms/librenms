@@ -5,6 +5,11 @@ icon: cambium
 group: cambium
 over:
     - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_state, text: 'Power Status' }
+poller_modules:
+    processors: false
+discovery_modules:
+    processors: false
 discovery:
     -
         sysObjectID:
