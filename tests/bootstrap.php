@@ -68,7 +68,7 @@ if (getenv('DBTEST')) {
     $db_config = Config::getDatabaseSettings();
     $db_name = $db_config['db_name'];
 
-    $connection = new PDO("mysql:", $db_config['db_user'], $db_config['db_pass']);
+    $connection = new PDO("mysql:host={$db_config['db_host']}", $db_config['db_user'], $db_config['db_pass']);
     $connection->query("CREATE DATABASE IF NOT EXISTS $db_name");
     unset($connection); // close connection
 
