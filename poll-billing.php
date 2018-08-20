@@ -91,6 +91,7 @@ function CollectData($bill_id)
             $port_data['out_delta'] = '0';
         }
 
+        // NOTE: casting to string for mysqli bug (fixed by mysqlnd)
         $fields = array('timestamp' => $now, 'in_counter' => (string)set_numeric($port_data['in_measurement']), 'out_counter' => (string)set_numeric($port_data['out_measurement']), 'in_delta' => (string)set_numeric($port_data['in_delta']), 'out_delta' => (string)set_numeric($port_data['out_delta']));
         if (dbUpdate($fields, 'bill_port_counters', "`port_id`='" . mres($port_id) . "' AND `bill_id`='$bill_id'") == 0) {
             $fields['bill_id'] = $bill_id;
