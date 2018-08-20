@@ -260,6 +260,24 @@
                     "value": "0",
                     "value_prev": null,
                     "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_from",
+                    "value": "1.0",
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_to",
+                    "value": "1.0",
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_total",
+                    "value": "1.0",
+                    "value_prev": null,
+                    "app_type": "portactivity"
                 }
             ]
         }
