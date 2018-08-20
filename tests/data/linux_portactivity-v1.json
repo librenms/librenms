@@ -50,8 +50,8 @@
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_total_SYN_RECEIVED",
-                    "value": "0",
+                    "metric": "ssh_total_from",
+                    "value": "0.0",
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
