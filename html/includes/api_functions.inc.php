@@ -1044,7 +1044,7 @@ function list_alerts()
 
     if (isset($_GET['severity'])) {
         $severity = mres($_GET['severity']);
-        if ($severity == 'ok' OR $severity == 'warning' OR $severity == 'critical') {
+        if ($severity == 'ok' || $severity == 'warning' || $severity == 'critical') {
             $sql = ' AND `R`.severity=?';
             array_push($param, $severity);
         }
