@@ -3,9 +3,7 @@ plugins:
   markdownlint:
     enabled: true
   phan:
-    enabled: true
-    config:
-      file_extensions: "php"
+    enabled: false
   phpcodesniffer:
     enabled: true
     config:
