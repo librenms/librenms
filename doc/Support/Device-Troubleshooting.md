@@ -6,7 +6,7 @@ This output information could be helpful for you in troubleshooting a device or 
 
 This feature can be found by going to the device that you are troubleshooting in the webui, clicking on the settings icon menu on far right and selecting 
 Capture.
-![Capture-Debug-Icon](/img/capture-debug-icon.png)
+![Capture-Debug-Icon](/doc/img/capture-debug-icon.png)
 
 ### Discovery
 Discovery will run and output debug infomation.
@@ -21,5 +21,5 @@ Poller will run and output debug information.
 Alerts Capture is handy when you are creating alerts and need to see if your alert rule matches.
 
 
-![device-troubleshooting](/img/device-troubleshooting.png)
+![device-troubleshooting](/doc/img/device-troubleshooting.png)
 

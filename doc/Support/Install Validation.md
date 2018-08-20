@@ -34,8 +34,8 @@ The output will provide you either a clean bill of health or a list of things yo
 
 ### Validate from the WebUI
 You can validate your LibreNMS install from the WebUI, using the nav bar and clicking on the little Gear Icon -> Validate Config.
-![Validate Config Icon](/img/validate-config-icon.png)
+![Validate Config Icon](/doc/img/validate-config-icon.png)
 Then You should see the results of validate. 
 Below is just example of the results.
 
-![Validate results](/img/validate-results.png)
+![Validate results](/doc/img/validate-results.png)

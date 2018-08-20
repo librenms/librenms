@@ -38,7 +38,7 @@ We have two current mapping engines available:
 
 Example Settings:
 
-![Example World Map Settings](/img/world-map-widget-settings.png)
+![Example World Map Settings](/doc/img/world-map-widget-settings.png)
 
 
 ### Offline OpenStreet Map
