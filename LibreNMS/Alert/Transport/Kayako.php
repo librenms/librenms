@@ -24,13 +24,11 @@ class Kayako extends Transport
             $opts['user'] = $this->config['kayako-user'];
             $opts['department'] = $this->config['kayako-department'];
         }
-        return $this->contactOsticket($obj, $opts);
+        return $this->contactKayako($obj, $opts);
     }
 
-    public function contactOsticket($obj, $opts)
+    public function contactKayako($obj, $opts)
     {
-        global $config;
-
         $url   = $opts['url']."/Tickets/Ticket";
         $key = $opts['key'];
         $secret = $opts['secret'];
@@ -40,7 +38,7 @@ class Kayako extends Transport
         $ticket_status = 1;
         $ticket_prio = 1;
         $salt = mt_rand();
-        $signature = base64_encode(hash_hmac('sha256',$salt,$secret,true));
+        $signature = base64_encode(hash_hmac('sha256', $salt, $secret, true));
 
         $protocol = array(
             'subject' => ($obj['name'] ? $obj['name'] . ' on ' . $obj['hostname'] : $obj['title']),
@@ -65,7 +63,15 @@ class Kayako extends Transport
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $post_data);
         $ret  = curl_exec($curl);
+        
+        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        var_dump($code);
 
+	if ($code != 200) {
+	var_dump("Kayako returned Error, retry later");
+	return false;
+        }
+        
         return true;
     }
     
@@ -100,7 +106,7 @@ class Kayako extends Transport
                 [
                     'title' => 'Kayako Department',
                     'name' => 'kayako-department',
-                    'descr' => 'Department ID to post a ticket',
+                    'descr' => 'Department to post a ticket',
                     'type' => 'text'
                 ]
             ],

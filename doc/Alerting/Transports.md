@@ -440,3 +440,31 @@ sending the alerts such as librenms. I.e:
 | Config | Example |
 | ------ | ------- |
 | Post URL | https://alert.victorops.com/integrations/generic/20132414/alert/2f974ce1-08fc-4dg8-a4f4-9aee6cf35c98/librenms |
+
+
+## Kayako Classic
+LibreNMS can send alerts to Kayako Classic API which are then converted to tickets. To use this module, you need REST API feature enabled in Kayako Classic. To enable this, do this:
+
+AdminCP -> REST API -> Settings -> Enable API (Yes)
+
+Also you need to know the department id to provide tickets to appropriate department and a user email to provide, which is used as ticket author. 
+To get department id: navigate to appropriate department name at the departments list page in Admin CP and watch the number at the end of url. 
+Example: http://servicedesk.example.com/admin/Base/Department/Edit/17. Department ID is 17
+
+As a requirement, you have to know API Url, API Key and API Secret to connect to servicedesk
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Kayako URL | http://servicedesk.example.com/api/ |
+| Kayako API Key | 8cc02f38-7465-4a0c-8730-bb3af122167b |
+| Kayako API Secret | Y2NhZDIxNDMtNjVkMi0wYzE0LWExYTUtZGUwMjJiZDI0ZWEzMmRhOGNiYWMtNTU2YS0yODk0LTA1MTEtN2VhN2YzYzgzZjk5 |
+| Kayako User | librenms@example.com |
+| Kayako Department | 1 |
+
+
+
+[Kayako Classic] (https://classic.kayako.com/article/1502-kayako-rest-api)
+You can post tickets via REST API to Kayako Classic.
+Please 
