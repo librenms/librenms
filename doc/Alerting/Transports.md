@@ -453,6 +453,8 @@ Example: http://servicedesk.example.com/admin/Base/Department/Edit/17. Departmen
 
 As a requirement, you have to know API Url, API Key and API Secret to connect to servicedesk
 
+[Kayako REST API Docs] (https://classic.kayako.com/article/1502-kayako-rest-api)
+
 **Example:**
 
 | Config | Example |
@@ -462,9 +464,3 @@ As a requirement, you have to know API Url, API Key and API Secret to connect to
 | Kayako API Secret | Y2NhZDIxNDMtNjVkMi0wYzE0LWExYTUtZGUwMjJiZDI0ZWEzMmRhOGNiYWMtNTU2YS0yODk0LTA1MTEtN2VhN2YzYzgzZjk5 |
 | Kayako User | librenms@example.com |
 | Kayako Department | 1 |
-
-
-
-[Kayako Classic] (https://classic.kayako.com/article/1502-kayako-rest-api)
-You can post tickets via REST API to Kayako Classic.
-Please 
