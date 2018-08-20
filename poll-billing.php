@@ -14,7 +14,13 @@
 $init_modules = array();
 require __DIR__ . '/includes/init.php';
 
-$options = getopt('db:');
+if (isset($argv[1]) && is_numeric($argv[1])) {
+    // allow old cli style
+    $options = ['b' => $argv[1]];
+} else {
+    $options = getopt('db:');
+}
+
 set_debug(isset($options['d']));
 
 rrdtool_initialize();
