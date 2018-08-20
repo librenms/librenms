@@ -103,7 +103,8 @@ $(function() {
     (integer) $interface_count = $widget_settings['interface_count'] ?: 5;
     $params = ['lastpoll' => $lastpoll_seconds, 'count' => $interface_count, 'filter1' => ($widget_settings['interface_filter']?:(int)1), 'filter2' => ($widget_settings['interface_filter']?:(int)1)];
     if (!Auth::user()->hasGlobalRead()) {
-        $params['user'] = Auth::id();
+        $params['user1'] = Auth::id();
+        $params['user2'] = Auth::id();
     }
     if (Auth::user()->hasGlobalRead()) {
         $query = '
@@ -123,7 +124,7 @@ $(function() {
             INNER JOIN devices ON ports.device_id = devices.device_id
             LEFT JOIN ports_perms ON ports.port_id = ports_perms.port_id
             LEFT JOIN devices_perms ON devices.device_id = devices_perms.device_id
-            WHERE ( ports_perms.user_id = :user || devices_perms.user_id = :user )
+            WHERE ( ports_perms.user_id = :user1 || devices_perms.user_id = :user2 )
             AND unix_timestamp() - ports.poll_time <= :lastpoll
             AND ( ports.ifType = :filter1 || 1 = :filter2 )
             AND ( ports.ifInOctets_rate > 0 || ports.ifOutOctets_rate > 0 )
