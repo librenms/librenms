@@ -26,20 +26,26 @@
             ],
             "application_metrics": [
                 {
-                    "metric": "ssh_total_to",
-                    "value": "1",
+                    "metric": "ssh_total_from",
+                    "value": "0.0",
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_total_from",
-                    "value": "0",
+                    "metric": "ssh_total_to",
+                    "value": "1.0",
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_total",
+                    "value": "1.0",
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
                     "metric": "ssh_total_conns",
-                    "value": "1",
+                    "value": "1.0",
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
@@ -273,12 +279,6 @@
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
-                {
-                    "metric": "ssh_total",
-                    "value": "1.0",
-                    "value_prev": null,
-                    "app_type": "portactivity"
-                }
             ]
         }
     }
