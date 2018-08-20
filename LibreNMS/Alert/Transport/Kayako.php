@@ -67,9 +67,9 @@ class Kayako extends Transport
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         var_dump($code);
 
-	if ($code != 200) {
-	var_dump("Kayako returned Error, retry later");
-	return false;
+        if ($code != 200) {
+            var_dump("Kayako returned Error, retry later");
+            return false;
         }
         
         return true;
