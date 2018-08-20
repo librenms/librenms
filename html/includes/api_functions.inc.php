@@ -1038,8 +1038,16 @@ function list_alerts()
     $sql = '';
     if (isset($router['id']) && $router['id'] > 0) {
         $alert_id = mres($router['id']);
-        $sql      = 'AND `A`.id=?';
+        $sql      = ' AND `A`.id=?';
         array_push($param, $alert_id);
+    }
+
+    if (isset($_GET['severity'])) {
+        $severity = mres($_GET['severity']);
+        if ($severity == 'ok' OR $severity == 'warning' OR $severity == 'critical') {
+            $sql = ' AND `R`.severity=?';
+            array_push($param, $severity);
+        }
     }
 
     $alerts       = dbFetchRows("SELECT `D`.`hostname`, `A`.*, `R`.`severity` FROM `alerts` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` AND `A`.`state` IN (?) $sql", $param);
