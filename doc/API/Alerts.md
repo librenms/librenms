@@ -99,6 +99,7 @@ Route: `/api/v0/alerts`
 Input:
 
   - state: Filter the alerts by state, 0 = ok, 1 = alert, 2 = ack
+  - severity: Filter the alerts by severity. Valid values are `ok`, `warning`, `critical`.
 
 Example:
 ```curl
