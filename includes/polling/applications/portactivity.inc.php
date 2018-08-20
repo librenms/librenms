@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Exceptions\JsonAppException;
 
 $name = 'portactivity';
 $app_id = $app['app_id'];
