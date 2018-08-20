@@ -348,7 +348,6 @@
    "rule": "sensors.sensor_current ~ \"10\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.5.4.600.50.1.5\"",
    "name": "Dell iDRAC Battery Status Failed"
    },
-<<<<<<< HEAD
    {
    "rule": "sensors.sensor_current ~ \"[5|6]\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.2.2.1\"",
    "name": "Dell iDRAC Global System Status Critical/NonRecoverable"
@@ -365,12 +364,6 @@
     "rule": "devices.os = \"Netscaler\" && sensors.sensor_type = \"haCurState\" && sensors.sensor_current ~ \"[2|4|5|7|10|11]\" && macros.device_up = \"1\"",
     "name": "Netscaler HA node state Critical"
    }
-=======
->>>>>>> cde5bfcec52a1491655b87881414dea6d8ed4894
-  {
-   "rule": "%sensors.sensor_current ~ \"[5|6]\" && %sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.2.2.1\"",
-   "name": "Dell iDRAC Global System Status Critical/NonRecoverable"  
-  },
   {
    "rule": "%applications.app_type='portactivity' && %applications_metrics.ssh_total_to>'5'",
    "name": "SSH Connections To"
@@ -407,8 +400,4 @@
    "rule": "%applications.app_type='portactivity' && %applications_metrics.imaps_total_from>'0'",
    "name": "IRCD Connections From"
   }
-<<<<<<< HEAD
-=======
-
->>>>>>> cde5bfcec52a1491655b87881414dea6d8ed4894
   ]
