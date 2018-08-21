@@ -20,7 +20,7 @@
 
 use LibreNMS\Authentication\Auth;
 
-$top_query = $widget_settings['top_query'];
+$top_query = $widget_settings['top_query'] ?: 'traffic';
 $sort_order = $widget_settings['sort_order'];
 
 $selected_sort_asc = '';
@@ -155,8 +155,10 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
 
     $common_output[] = '<h4>Top ' . $device_count . ' devices (last ' . $interval . ' minutes)</h4>';
 
-    $params = array('user' => Auth::id(), 'interval' => array($interval_seconds), 'count' => array($device_count));
-
+    $params = ['interval' => $interval_seconds, 'count' => $device_count];
+    if (!Auth::user()->hasGlobalRead()) {
+        $params['user'] = Auth::id();
+    }
     if ($top_query === 'traffic') {
         if (Auth::user()->hasGlobalRead()) {
             $query = '

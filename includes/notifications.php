@@ -60,7 +60,7 @@ function post_notifications()
     $notifs = get_notifications();
     echo '[ '.date('r').' ] Updating DB ';
     foreach ($notifs as $notif) {
-        if (dbFetchCell('select 1 from notifications where checksum = ?', array($notif['checksum'])) != 1 && dbInsert('notifications', $notif) > 0) {
+        if (dbFetchCell('select 1 from notifications where checksum = ?', array($notif['checksum'])) != 1 && dbInsert($notif, 'notifications') > 0) {
             echo '.';
         }
     }
@@ -134,7 +134,7 @@ function new_notification($title, $message, $severity = 0, $source = 'adhoc', $d
     );
 
     if (dbFetchCell('SELECT 1 FROM `notifications` WHERE `checksum` = ?', array($notif['checksum'])) != 1) {
-        return dbInsert('notifications', $notif) > 0;
+        return dbInsert($notif, 'notifications') > 0;
     }
 
     return false;

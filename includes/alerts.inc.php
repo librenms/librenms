@@ -820,7 +820,9 @@ function ExtTransports($obj)
 
     if (!$transport_maps) {
         $transport_maps = AlertUtil::getDefaultAlertTransports();
-        $legacy_transports  = AlertUtil::getDefaultTransportList();
+        $legacy_transports = array_unique(array_map(function ($transports) {
+            return $transports['transport_type'];
+        }, $transport_maps));
         foreach ($config['alert']['transports'] as $transport => $opts) {
             if (in_array($transport, $legacy_transports)) {
                 // If it is a default transport type, then the alert has already been sent out, so skip

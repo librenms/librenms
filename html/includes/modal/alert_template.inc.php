@@ -112,17 +112,18 @@ $('#create-template').click('', function(e) {
 $('#convert-template').click('', function(e) {
     e.preventDefault();
     var template = $("#template").val();
+    var title    = $("#title").val();
     $.ajax({
         type: "POST",
         url: "ajax_form.php",
-        data: {type: "convert-template", template: template},
+        data: {type: "convert-template", template: template, title: title},
         dataType: "json",
         success: function(output) {
-            console.log(output);
             if(output.status === 'ok') {
                 toastr.success(output.message);
                 $("#convert-template").hide();
-                $("#template").val(output.template)
+                $("#template").val(output.template);
+                $("#title").val(output.title);
             } else {
                 toastr.error(output.message);
             }

@@ -92,35 +92,28 @@ if (module_selected('alerts', $init_modules)) {
     require_once $install_dir . '/includes/alerts.inc.php';
 }
 
-// Display config.php errors instead of http 500
-$display_bak = ini_get('display_errors');
-ini_set('display_errors', 1);
-
-if (!module_selected('nodb', $init_modules)) {
-    // Connect to database
-    try {
-        dbConnect();
-    } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
-        if (isCli()) {
-            echo 'MySQL Error: ' . $e->getMessage() . PHP_EOL;
-            exit(2);
-        } else {
-            // punt to the Laravel error handler
-            throw $e;
-        }
-    }
-}
-
 if (module_selected('laravel', $init_modules)) {
     // make sure Laravel isn't already booted
     if (!class_exists('App') || !App::isBooted()) {
+        define(LARAVEL_START, microtime(true));
         $app = require_once $install_dir . '/bootstrap/app.php';
         $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
         $kernel->bootstrap();
     }
-} elseif (module_selected('eloquent', $init_modules)) {
-    \LibreNMS\DB\Eloquent::boot();
 }
+
+if (!module_selected('nodb', $init_modules)) {
+    \LibreNMS\DB\Eloquent::boot();
+
+    if (!\LibreNMS\DB\Eloquent::isConnected()) {
+        echo "Could not connect to database, check logs/librenms.log.\n";
+        exit;
+    }
+}
+
+// Display config.php errors instead of http 500
+$display_bak = ini_get('display_errors');
+ini_set('display_errors', 1);
 
 // Load config if not already loaded (which is the case if inside Laravel)
 if (!Config::has('install_dir')) {
