@@ -1,22 +1,25 @@
 <?php
 
+use LibreNMS\Config;
+
 // Generate a list of ports and then call the multi_bits grapher to generate from the list
-$i = 0;
 
-if (!is_array($config['customers_descr'])) {
-    $config['customers_descr'] = array($config['customers_descr']);
-}
+$cust_descrs = (array)Config::get('customers_descr', ['cust']);
 
-$descr_type = "'".implode("', '", $config['customers_descr'])."'";
+$sql = 'SELECT * FROM `ports` AS I, `devices` AS D WHERE `port_descr_descr` = ? AND D.device_id = I.device_id AND `port_descr_type` IN ' . dbGenPlaceholders(count($cust_descrs));
+$param = $cust_descrs;
+array_unshift($param, $vars['id']);
 
-foreach (dbFetchRows('SELECT * FROM `ports` AS I, `devices` AS D WHERE `port_descr_type` IN (?) AND `port_descr_descr` = ? AND D.device_id = I.device_id', array(array($descr_type), $vars['id'])) as $port) {
+$rrd_list = [];
+foreach (dbFetchRows($sql, $param) as $port) {
     $rrd_filename = get_port_rrdfile_path($port['hostname'], $port['port_id']); // FIXME: Unification OK?
     if (rrdtool_check_rrd_exists($rrd_filename)) {
-        $rrd_list[$i]['filename']  = $rrd_filename;
-        $rrd_list[$i]['descr']     = $port['hostname'].'-'.$port['ifDescr'];
-        $rrd_list[$i]['descr_in']  = shorthost($port['hostname']);
-        $rrd_list[$i]['descr_out'] = makeshortif($port['ifDescr']);
-        $i++;
+        $rrd_list[] = [
+            'filename'  => $rrd_filename,
+            'descr'     => $port['hostname'] . '-' . $port['ifDescr'],
+            'descr_in'  => shorthost($port['hostname']),
+            'descr_out' => makeshortif($port['ifDescr']),
+        ];
     }
 }
 
