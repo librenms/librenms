@@ -318,6 +318,8 @@ function list_devices()
 
     if ($type == 'all' || empty($type)) {
         $sql = '1';
+    } elseif ($type == 'active') {
+        $sql = "`d`.`ignore`='0' AND `d`.`disabled`='0'";
     } elseif ($type == 'location') {
         $sql = "`d`.`location` LIKE '%".$query."%'";
     } elseif ($type == 'ignored') {
