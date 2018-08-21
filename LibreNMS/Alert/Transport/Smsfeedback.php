@@ -66,7 +66,7 @@ class Smsfeedback extends Transport
             return true;
         } else {
             return false;
-        } 
+        }
     }
 
     public static function configTemplate()
