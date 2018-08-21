@@ -805,7 +805,7 @@ function data_flatten($array, $prefix = '', $joiner = '_')
             if (strcmp($prefix, '')) {
                 $key=$prefix.$joiner.$key;
             }
-            $return = array_merge($return, array_flatten($value, $key, $joiner));
+            $return = array_merge($return, data_flatten($value, $key, $joiner));
         } else {
             if (strcmp($prefix, '')) {
                 $key=$prefix.$joiner.$key;
