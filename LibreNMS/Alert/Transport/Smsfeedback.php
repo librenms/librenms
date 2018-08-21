@@ -32,7 +32,6 @@ class Smsfeedback extends Transport
         if (empty($this->config)) {
             return $this->deliverAlertOld($obj, $opts);
         }
-        $smsfeedback_opts['url']   = $this->config['smsfeedback-url'];
         $smsfeedback_opts['user']  = $this->config['smsfeedback-user'];
         $smsfeedback_opts['token'] = $this->config['smsfeedback-pass'];
         $smsfeedback_opts['sender'] = $this->config['smsfeedback-sender'];
@@ -54,7 +53,7 @@ class Smsfeedback extends Transport
             'text' => $obj['title'],
             'sender' => $opts['sender'],
         ];
-        $url    = 'http://' . $opts['user'] . ':' . $opts['token'] . '@' . $opts['url'] . '/messages/v2/send/?' . http_build_query($params);
+        $url    = 'http://' . $opts['user'] . ':' . $opts['token'] . '@' . 'api.smsfeedback.ru/messages/v2/send/?' . http_build_query($params);
         $curl   = curl_init($url);
 
         set_curl_proxy($curl);
@@ -71,12 +70,6 @@ class Smsfeedback extends Transport
     {
         return [
             'config' => [
-                [
-                    'title' => 'smsfeedback URL',
-                    'name' => 'smsfeedback-url',
-                    'descr' => 'smsfeedback URL',
-                    'type' => 'text',
-                ],
                 [
                     'title' => 'User',
                     'name' => 'smsfeedback-user',
@@ -103,7 +96,6 @@ class Smsfeedback extends Transport
                 ],
             ],
             'validation' => [
-                'smsfeedback-url'     => 'required|string',
                 'smsfeedback-user'    => 'required|string',
                 'smsfeedback-pass'    => 'required|string',
                 'smsfeedback-mobiles' => 'required',
