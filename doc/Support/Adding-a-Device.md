@@ -27,7 +27,7 @@ Using the web interface, go to Devices and click Add Device. Enter the details r
 As an example, if your device is configured to use the community `my_company` using snmp `v2c` then you would enter:
 SNMP Port defaults to 161
 
-![Add device](/img/webui_add_device.png)
+![Add device](/doc/img/webui_add_device.png)
 
 ### Ping Only Device
 
@@ -40,8 +40,8 @@ Device will be added into LibreNMS as Ping Only Device and will show ICMP Respon
 
 [How to add ping only devices](https://youtu.be/cjuByubg-uk)
 
-![Ping Only](/img/add-ping-only.png)
+![Ping Only](/doc/img/add-ping-only.png)
 
-If you would like to add devices automatically then you will probably want to read the [Auto-discovery Setup](/Extensions/Auto-Discovery.md) guide.
+If you would like to add devices automatically then you will probably want to read the [Auto-discovery Setup](/doc/Extensions/Auto-Discovery.md) guide.
 
-You may also want to add devices programatically, if so, take a look at our [API documentation](/API/index.md)
+You may also want to add devices programatically, if so, take a look at our [API documentation](/doc/API/index.md)

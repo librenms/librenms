@@ -36,7 +36,7 @@ $config['distributed_poller_memcached_port']             = '11211';
 ## Example Setup
 Below is an example setup based on a real deployment which at the time of writing covers over 2,500 devices and 50,000 ports. The setup is running within an OpenStack environment with some commodity hardware for remote pollers. Here's a diagram of how you can scale LibreNMS out:
 
-![Example Setup](http://docs.librenms.org/img/librenms-distributed-diagram.png)
+![Example Setup](/doc/img/librenms-distributed-diagram.png)
 
 ### Architecture
 How you setup the distribution is entirely up to you, you can choose to host the majority of the required services on a single virtual machine or server and then a poller to actually query the devices being monitored all the way through to having a dedicated server for each of the individual roles. Below are notes on what you need to consider both from the software layer but also connectivity.

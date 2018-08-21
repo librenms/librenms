@@ -5,7 +5,7 @@ Create customised dashboards in LibreNMS per user. You can share dashboards with
 default it for all users in LibreNMS.
 
 Example Dashboard
-![Example Dashboard](/img/example-dashboard.png)
+![Example Dashboard](/doc/img/example-dashboard.png)
 
 ### Widgets
 LibreNMS has a whole list of Widgets to select from. 
@@ -30,7 +30,7 @@ LibreNMS has a whole list of Widgets to select from.
 List of Widgets: 
 ![List of Widgets][image of widgets]
 
-[image of widgets]: /img/list-widgets.png "List of the widgets"
+[image of widgets]: /doc/img/list-widgets.png "List of the widgets"
 
 
 ### Dashboard Permissions
@@ -55,18 +55,18 @@ Using the Notes Widget.
 Note you may need to play with the width and height and also size your widget properly.
 ``` src="url" ``` needs to be URL to webpage your linking to.
 Also some web pages may not support html embeded or iframe.
-![Example embed webpage](/img/example-embed-website.png)
+![Example embed webpage](/doc/img/example-embed-website.png)
 
 ### How to create ports graph
 
 In the dashboard, you want to create an interface graph select the widget called
 
 * Graph:  then select "Port" "Bits"
-![port-bits-graph](/img/port-bits-graph.png)
+![port-bits-graph](/doc/img/port-bits-graph.png)
 
 * Note: you can map the port by description or the alias or by port id. You will need to know this in order to map the port to the graph. 
 
-![port-bits-graph](/img/port-bits-port.png)
+![port-bits-graph](/doc/img/port-bits-port.png)
 
 ### Dimension parameter replacement for Generic-image widget
 

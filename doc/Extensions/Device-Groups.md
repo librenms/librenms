@@ -15,11 +15,11 @@ As a working example and a common question, let's assume you want to group devic
 
 As with alerts, the `Like` operation allows MySQL Regular expressions.
 
-A list of common entities is maintained in our [Alerting docs](/Alerting/Entities/).
+A list of common entities is maintained in our [Alerting docs](/doc/Alerting/Entities/).
 
 ### Conditions
 
-Please see our [Alerting docs](/Alerting/Rules/#syntax) for explanations.
+Please see our [Alerting docs](/doc/Alerting/Rules/#syntax) for explanations.
 
 ### Connection
 
@@ -30,7 +30,7 @@ As an example, we want to base our group on the devices hostname AND it's type. 
 the condition which in this case would be `Like` and then enter `dc1.@.example.com` then click And. Now enter `devices.type` in the pattern, select `Equals` 
 and enter `firewall`. This would then match dc1.fw01.example.com but not dc1.sw01.example.com as that is a network type.
 
-![Device Groups](/img/device_groups.png)
+![Device Groups](/doc/img/device_groups.png)
 
 You can now select this group from the Devices -> All Devices link in the navigation at the top. You can also use the group to map alert rules to by creating an alert mapping
 `Overview -> Alerts -> Rule Mapping`.

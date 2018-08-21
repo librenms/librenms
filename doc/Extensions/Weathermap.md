@@ -36,7 +36,7 @@ Optional: If your install is in another directory than standard, set `$basehref`
 ### WeatherMapper
 Automatically generate weathermaps from a LibreNMS database using WeatherMapper [Link](https://github.com/pblasquez/weathermapper)
 
-![Example Network Weather Map](/img/network-weather-map.PNG)
+![Example Network Weather Map](/doc/img/network-weather-map.PNG)
 
 ### Adding your Network Weathermaps to the Dashboards
 
@@ -67,4 +67,4 @@ Then Click on Set
 
 You should now be able to see the Weathermap you have created in your list of dashboards. You could also add this to existing dashboards. 
 
-![Example Network Weathermap Dashboard](/img/network-weathermap-dashboard.png)
+![Example Network Weathermap Dashboard](/doc/img/network-weathermap-dashboard.png)
