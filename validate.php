@@ -162,6 +162,9 @@ if (isset($options['g'])) {
 // run checks
 $validator->validate($modules, isset($options['s'])||!empty($modules));
 
+if ($validator->hasFailed()) {
+    echo "\n If you need help check the community site (https://community.librenms.org) or Discord (https://t.libren.ms/discord).\n";
+}
 
 function print_header($versions)
 {

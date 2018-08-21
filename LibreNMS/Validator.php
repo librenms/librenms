@@ -145,6 +145,26 @@ class Validator
     }
 
     /**
+     * Check if any of the reported results are of the FAILURE status.
+     *
+     * @return bool
+     */
+    public function hasFailed()
+    {
+        foreach ($this->getAllResults() as $group_results) {
+            foreach ($group_results as $result) {
+                /** @var ValidationResult $result */
+                if ($result->getStatus() == ValidationResult::FAILURE) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
      * Print all ValidationResults or a group of them.
      *
      * @param string $validation_group

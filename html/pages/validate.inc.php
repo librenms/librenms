@@ -40,13 +40,25 @@ $no_refresh = true;
 
 <div class="container-fluid">
     <div class="row">
+        <div class="col-xs-offset-1 col-xs-10 text-center">
+<?php
+
+$validator = new Validator();
+$validator->validate();
+
+if ($validator->hasFailed()) {
+    echo '<h4><i class="fa fa-exclamation-triangle"></i> If you need help check <a href="https://community.librenms.org">the community site</a> or <a href="https://t.libren.ms/discord">Discord</a>.</h4>';
+}
+
+?>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-xs-12">
 
 <?php
 
 
-$validator = new Validator();
-$validator->validate();
 
 foreach ($validator->getAllResults() as $group => $results) {
     echo '<div class="panel-group"><div class="panel panel-default"><div class="panel-heading"> ';
