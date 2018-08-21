@@ -797,7 +797,7 @@ function json_app_get($device, $extend, $min_version = 1)
  *
  * @return array The flattened array.
  */
-function array_flatten($array, $prefix = '', $joiner = '_')
+function data_flatten($array, $prefix = '', $joiner = '_')
 {
     $return = array();
     foreach ($array as $key => $value) {
