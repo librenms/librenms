@@ -52,7 +52,6 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
 
     $ospf_areas = collect();
     foreach ($ospf_areas_poll as $ospf_area_id => $ospf_area) {
-
         $area = OspfArea::updateOrCreate([
             'device_id' => $device['device_id'],
             'ospfAreaId' => $ospf_area_id,
