@@ -64,8 +64,6 @@ class Smsfeedback extends Transport
         $ret = curl_exec($curl);
         if (substr($ret, 0, 8) == "accepted") {
             return true;
-        } else {
-            return false;
         }
     }
 
