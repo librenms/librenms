@@ -156,4 +156,4 @@ if (empty($ports_keys)) {
     $component->setComponentPrefs($device_id, $portsc);
 }
 
-update_application($app, 'OK', $ports);
+update_application($app, 'OK', array_flatten($ports));
