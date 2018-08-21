@@ -26,12 +26,6 @@
             ],
             "application_metrics": [
                 {
-                    "metric": ,
-                    "value": "",
-                    "value_prev": null,
-                    "app_type": "portactivity"
-                },
-                {
                     "metric": "ssh_total_to",
                     "value": "1",
                     "value_prev": null,
@@ -288,7 +282,7 @@
                     "value": "1",
                     "value_prev": null,
                     "app_type": "portactivity"
-                },
+                }
             ]
         }
     }
