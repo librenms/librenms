@@ -1,6 +1,6 @@
 <?php
 /**
- * OspfInstance.php
+ * OspfNbr.php
  *
  * -Description-
  *
@@ -25,27 +25,25 @@
 
 namespace App\Models;
 
-class OspfInstance extends BaseModel
+class OspfNbr extends BaseModel
 {
     public $timestamps = false;
     protected $fillable = [
         'device_id',
-        'ospf_instance_id',
+        'port_id',
+        'ospf_nbr_id',
         'context_name',
-        'ospfRouterId',
-        'ospfAdminStat',
-        'ospfVersionNumber',
-        'ospfAreaBdrRtrStatus',
-        'ospfASBdrRtrStatus',
-        'ospfExternLsaCount',
-        'ospfExternLsaCksumSum',
-        'ospfTOSSupport',
-        'ospfOriginateNewLsas',
-        'ospfRxNewLsas',
-        'ospfExtLsdbLimit',
-        'ospfMulticastExtensions',
-        'ospfExitOverflowInterval',
-        'ospfDemandExtensions',
+        'ospfNbrIpAddr',
+        'ospfNbrAddressLessIndex',
+        'ospfNbrRtrId',
+        'ospfNbrOptions',
+        'ospfNbrPriority',
+        'ospfNbrState',
+        'ospfNbrEvents',
+        'ospfNbrLsRetransQLen',
+        'ospfNbmaNbrStatus',
+        'ospfNbmaNbrPermanence',
+        'ospfNbrHelloSuppressed',
     ];
 
     // ---- Query Scopes ----

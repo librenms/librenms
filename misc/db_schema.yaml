@@ -168,8 +168,8 @@ application_metrics:
   Columns:
     - { Field: app_id, Type: int(11), 'Null': false, Extra: '' }
     - { Field: metric, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: value, Type: 'double', 'Null': true, Extra: '' }
-    - { Field: value_prev, Type: 'double', 'Null': true, Extra: '' }
+    - { Field: value, Type: double, 'Null': true, Extra: '' }
+    - { Field: value_prev, Type: double, 'Null': true, Extra: '' }
   Indexes:
     application_metrics_app_id_metric_uindex: { Name: application_metrics_app_id_metric_uindex, Columns: [app_id, metric], Unique: true, Type: BTREE }
 authlog:
@@ -938,6 +938,7 @@ notifications_attribs:
     PRIMARY: { Name: PRIMARY, Columns: [attrib_id], Unique: true, Type: BTREE }
 ospf_areas:
   Columns:
+    - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: int(11), 'Null': false, Extra: '' }
     - { Field: ospfAreaId, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfAuthType, Type: varchar(64), 'Null': false, Extra: '' }
@@ -951,9 +952,11 @@ ospf_areas:
     - { Field: ospfAreaStatus, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_area: { Name: device_area, Columns: [device_id, ospfAreaId, context_name], Unique: true, Type: BTREE }
 ospf_instances:
   Columns:
+    - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: int(11), 'Null': false, Extra: '' }
     - { Field: ospf_instance_id, Type: int(11), 'Null': false, Extra: '' }
     - { Field: ospfRouterId, Type: varchar(32), 'Null': false, Extra: '' }
@@ -972,11 +975,13 @@ ospf_instances:
     - { Field: ospfDemandExtensions, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id, ospf_instance_id, context_name], Unique: true, Type: BTREE }
 ospf_nbrs:
   Columns:
+    - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: int(11), 'Null': false, Extra: '' }
-    - { Field: port_id, Type: int(11), 'Null': false, Extra: '' }
+    - { Field: port_id, Type: int(11), 'Null': true, Extra: '' }
     - { Field: ospf_nbr_id, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfNbrIpAddr, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfNbrAddressLessIndex, Type: int(11), 'Null': false, Extra: '' }
@@ -991,9 +996,11 @@ ospf_nbrs:
     - { Field: ospfNbrHelloSuppressed, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id, ospf_nbr_id, context_name], Unique: true, Type: BTREE }
 ospf_ports:
   Columns:
+    - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: int(11), 'Null': false, Extra: '' }
     - { Field: port_id, Type: int(11), 'Null': false, Extra: '' }
     - { Field: ospf_port_id, Type: varchar(32), 'Null': false, Extra: '' }
@@ -1019,6 +1026,7 @@ ospf_ports:
     - { Field: ospfIfAuthType, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id, ospf_port_id, context_name], Unique: true, Type: BTREE }
 packages:
   Columns:
