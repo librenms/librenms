@@ -15,25 +15,25 @@ use LibreNMS\Alert\Transport;
 
 class Kayako extends Transport
 {
-    public function deliverAlert($kayako_obj, $kayako_opts)
+    public function deliverAlert($host, $kayako)
     {
         if (!empty($this->config)) {
-            $kayako_opts['url'] = $this->config['kayako-url'];
-            $kayako_opts['key'] = $this->config['kayako-key'];
-            $kayako_opts['secret'] = $this->config['kayako-secret'];
-            $kayako_opts['user'] = $this->config['kayako-user'];
-            $kayako_opts['department'] = $this->config['kayako-department'];
+            $kayako['url'] = $this->config['kayako-url'];
+            $kayako['key'] = $this->config['kayako-key'];
+            $kayako['secret'] = $this->config['kayako-secret'];
+            $kayako['user'] = $this->config['kayako-user'];
+            $kayako['department'] = $this->config['kayako-department'];
         }
-        return $this->contactKayako($kayako_obj, $kayako_opts);
+        return $this->contactKayako($host, $kayako);
     }
 
-    public function contactKayako($kayako_obj, $kayako_opts)
+    public function contactKayako($host, $kayako)
     {
-        $url   = $kayako_opts['url']."/Tickets/Ticket";
-        $key = $kayako_opts['key'];
-        $secret = $kayako_opts['secret'];
-        $user = $kayako_opts['user'];
-        $department = $kayako_opts['department'];
+        $url   = $kayako['url']."/Tickets/Ticket";
+        $key = $kayako['key'];
+        $secret = $kayako['secret'];
+        $user = $kayako['user'];
+        $department = $kayako['department'];
         $ticket_type= 1;
         $ticket_status = 1;
         $ticket_prio = 1;
@@ -41,10 +41,10 @@ class Kayako extends Transport
         $signature = base64_encode(hash_hmac('sha256', $salt, $secret, true));
 
         $protocol = array(
-            'subject' => ($kayako_obj['name'] ? $kayako_obj['name'] . ' on ' . $kayako_obj['hostname'] : $kayako_obj['title']),
+            'subject' => ($host['name'] ? $host['name'] . ' on ' . $host['hostname'] : $host['title']),
             'fullname' => 'LibreNMS Alert',
             'email' => $user,
-            'contents' => strip_tags($kayako_obj['msg']),
+            'contents' => strip_tags($host['msg']),
             'departmentid' => $department,
             'ticketstatusid' => $ticket_status,
             'ticketpriorityid' => $ticket_prio,
