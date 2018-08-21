@@ -248,13 +248,13 @@
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_total_other",
+                    "metric": "ssh_total_SYN_RECEIVED",
                     "value": 0.0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_total_other",
+                    "metric": "ssh_total_SYN_SENT",
                     "value": 0.0,
                     "value_prev": null,
                     "app_type": "portactivity"
@@ -267,7 +267,7 @@
                 },
                 {
                     "metric": "ssh_total_to",
-                    "value": 0.0,
+                    "value": 1.0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
