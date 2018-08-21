@@ -21,7 +21,6 @@ class Kayako extends Transport
             $kayako['url'] = $this->config['kayako-url'];
             $kayako['key'] = $this->config['kayako-key'];
             $kayako['secret'] = $this->config['kayako-secret'];
-            $kayako['user'] = $this->config['kayako-user'];
             $kayako['department'] = $this->config['kayako-department'];
         }
         return $this->contactKayako($host, $kayako);
@@ -29,10 +28,11 @@ class Kayako extends Transport
 
     public function contactKayako($host, $kayako)
     {
+        global $config;
         $url   = $kayako['url']."/Tickets/Ticket";
         $key = $kayako['key'];
         $secret = $kayako['secret'];
-        $user = $kayako['user'];
+        $user = $config['email_from'];
         $department = $kayako['department'];
         $ticket_type= 1;
         $ticket_status = 1;
@@ -96,12 +96,6 @@ class Kayako extends Transport
                     'type' => 'text'
                 ],
                 [
-                    'title' => 'Kayako User',
-                    'name' => 'kayako-user',
-                    'descr' => 'ServiceDesk API User',
-                    'type' => 'text'
-                ],
-                [
                     'title' => 'Kayako Department',
                     'name' => 'kayako-department',
                     'descr' => 'Department to post a ticket',
@@ -112,7 +106,6 @@ class Kayako extends Transport
                 'kayako-url' => 'required|url',
                 'kayako-key' => 'required|string',
                 'kayako-secret' => 'required|string',
-                'kayako-user' => 'required|string',
                 'kayako-department' => 'required|string'
             ]
         ];
