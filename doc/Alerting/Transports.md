@@ -463,3 +463,21 @@ As a requirement, you have to know API Url, API Key and API Secret to connect to
 | Kayako API Secret | Y2NhZDIxNDMtNjVkMi0wYzE0LWExYTUtZGUwMjJiZDI0ZWEzMmRhOGNiYWMtNTU2YS0yODk0LTA1MTEtN2VhN2YzYzgzZjk5 |
 | Kayako User | librenms@example.com |
 | Kayako Department | 1 |
+
+## SMSFeedback
+SMSFeedback is a SAAS service, which can be used to deliver Alerts via API, using API url, Username & Password.
+
+Destination numbers are one per line, with no spaces. They can be in either local or international dialling format.
+
+[SMSFeedback Api Docs](https://www.smsfeedback.ru/smsapi/)
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| SMSFeedback URL | api.smsfeedback.ru |
+| User | smsfeedback_user |
+| Password | smsfeedback_password |
+| Mobiles | 71234567890 |
+|  | 381234567890 |
+| Sender name| CIA |
