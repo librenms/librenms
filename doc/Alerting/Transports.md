@@ -441,7 +441,6 @@ sending the alerts such as librenms. I.e:
 | ------ | ------- |
 | Post URL | https://alert.victorops.com/integrations/generic/20132414/alert/2f974ce1-08fc-4dg8-a4f4-9aee6cf35c98/librenms |
 
-
 ## Kayako Classic
 LibreNMS can send alerts to Kayako Classic API which are then converted to tickets. To use this module, you need REST API feature enabled in Kayako Classic. To enable this, do this:
 
