@@ -36,7 +36,7 @@ class Smsfeedback extends Transport
         $smsfeedback_opts['user']  = $this->config['smsfeedback-user'];
         $smsfeedback_opts['token'] = $this->config['smsfeedback-pass'];
         $smsfeedback_opts['sender'] = $this->config['smsfeedback-sender'];
-        $smsfeedback_opts['to']    = preg_split('/([,\r\n]+)/', $this->config['smsfeedback-mobiles']);
+        $smsfeedback_opts['to']    = $this->config['smsfeedback-mobiles'];
         return $this->contactsmsfeedback($obj, $smsfeedback_opts);
     }
 
@@ -50,7 +50,7 @@ class Smsfeedback extends Transport
         $params = [
             'login' => $opts['user'],
             'pass' => md5($opts['token']),
-            'phone' => implode(',', $opts['to']),
+            'phone' => $opts['to'],
             'text' => $obj['title'],
             'sender' => $opts['sender'],
         ];
@@ -94,7 +94,7 @@ class Smsfeedback extends Transport
                 [
                     'title' => 'Mobiles',
                     'name' => 'smsfeedback-mobiles',
-                    'descr' => 'smsfeedback Mobiles, can be new line or comma separated',
+                    'descr' => 'smsfeedback Mobile number',
                     'type' => 'textarea',
                 ],
                 [

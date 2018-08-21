@@ -467,7 +467,7 @@ As a requirement, you have to know API Url, API Key and API Secret to connect to
 ## SMSFeedback
 SMSFeedback is a SAAS service, which can be used to deliver Alerts via API, using API url, Username & Password.
 
-Destination numbers are one per line, with no spaces. They can be in either local or international dialling format.
+They can be in international dialling format only.
 
 [SMSFeedback Api Docs](https://www.smsfeedback.ru/smsapi/)
 
@@ -479,5 +479,4 @@ Destination numbers are one per line, with no spaces. They can be in either loca
 | User | smsfeedback_user |
 | Password | smsfeedback_password |
 | Mobiles | 71234567890 |
-|  | 381234567890 |
 | Sender name| CIA |
