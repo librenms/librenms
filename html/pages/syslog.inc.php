@@ -42,7 +42,7 @@ $pagetitle[] = 'Syslog';
         '<form method="post" action="" class="form-inline" role="form" id="result_form">' +
         '<div class="form-group">' +
         <?php
-        if (!is_numeric($vars['device'])) {
+        if (!isset($vars['fromdevice'])) {
         ?>
         '<select name="device" id="device" class="form-control input-sm">' +
         '<option value="">All Devices&nbsp;&nbsp;</option>' +
@@ -75,7 +75,7 @@ $pagetitle[] = 'Syslog';
         }
         $sqlstatement = $sqlstatement . ' ORDER BY `program`';
         foreach (dbFetchRows($sqlstatement, $param) as $data) {
-            echo "'<option value=\"" . mres($data['program']) . "\"";
+            echo "'<option value=\"" . $data['program'] . "\"";
             if ($data['program'] == $vars['program']) {
                 echo ' selected';
             }
@@ -95,7 +95,7 @@ $pagetitle[] = 'Syslog';
         }
         $sqlstatement = $sqlstatement . ' ORDER BY `level`';
         foreach (dbFetchRows($sqlstatement, $param) as $data) {
-            echo "'<option value=\"" . mres($data['priority']) . "\"";
+            echo "'<option value=\"" . $data['priority'] . "\"";
             if ($data['priority'] == $vars['priority']) {
                 echo ' selected';
             }
