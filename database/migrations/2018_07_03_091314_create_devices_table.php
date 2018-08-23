@@ -61,6 +61,7 @@ class CreateDevicesTable extends Migration
             $table->boolean('override_sysLocation')->nullable()->default(0);
             $table->text('notes', 65535)->nullable();
             $table->integer('port_association_mode')->default(1);
+            $table->integer('max_depth')->default(0);
         });
 
         \DB::statement("ALTER TABLE `devices` CHANGE `device_id` `device_id` int(11) unsigned NOT NULL auto_increment;");

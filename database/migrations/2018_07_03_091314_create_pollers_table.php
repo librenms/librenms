@@ -19,11 +19,12 @@ class CreatePollersTable extends Migration
             $table->dateTime('last_polled');
             $table->integer('devices');
             $table->float('time_taken', 10, 0);
+            $table->primary('poller_name');
+            $table->index('id', 'id');
         });
 
-        \DB::statement("ALTER TABLE `pollers` ADD UNIQUE `id` (`id`);");
+        // set id as auto-increment, but not the primary key
         \DB::statement("ALTER TABLE `pollers` CHANGE `id` `id` int(11) NOT NULL auto_increment;");
-        \DB::statement("ALTER TABLE `pollers` ADD PRIMARY KEY (`poller_name`);");
     }
 
     /**

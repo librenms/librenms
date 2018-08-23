@@ -13,7 +13,6 @@ class CreateRouteTable extends Migration
      */
     public function up()
     {
-        \Illuminate\Support\Facades\Schema::defaultStringLength(100);
         Schema::create('route', function (Blueprint $table) {
             $table->integer('device_id');
             $table->string('context_name', 128);

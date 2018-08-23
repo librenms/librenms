@@ -14,6 +14,7 @@ class CreateOspfInstancesTable extends Migration
     public function up()
     {
         Schema::create('ospf_instances', function (Blueprint $table) {
+            $table->integer('id', true);
             $table->integer('device_id');
             $table->integer('ospf_instance_id');
             $table->string('ospfRouterId', 32);

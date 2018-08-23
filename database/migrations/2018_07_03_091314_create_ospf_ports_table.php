@@ -14,6 +14,7 @@ class CreateOspfPortsTable extends Migration
     public function up()
     {
         Schema::create('ospf_ports', function (Blueprint $table) {
+            $table->integer('id', true);
             $table->integer('device_id');
             $table->integer('port_id');
             $table->string('ospf_port_id', 32);

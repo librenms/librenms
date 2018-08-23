@@ -15,7 +15,6 @@ class CreateAlertTemplatesTable extends Migration
     {
         Schema::create('alert_templates', function (Blueprint $table) {
             $table->integer('id', true);
-            $table->string('rule_id')->default(',');
             $table->string('name');
             $table->longText('template');
             $table->string('title')->nullable();
