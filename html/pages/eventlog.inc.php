@@ -43,7 +43,7 @@ $pagetitle[] = 'Eventlog';
         '<form method="post" action="" class="form-inline" role="form" id="result_form">' +
         '<div class="form-group">' +
         <?php
-        if (!is_numeric($vars['device'])) {
+        if (!isset($vars['fromdevice'])) {
         ?>
         '<label><strong>Device&nbsp;&nbsp;</strong></label>' +
         '<select name="device" id="device" class="form-control input-sm">' +
