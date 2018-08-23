@@ -2488,11 +2488,7 @@ function db_schema_is_current()
 {
     $current = get_db_schema();
 
-    $schemas = get_schema_list();
-    end($schemas);
-    $latest = key($schemas);
-
-    return $current >= $latest;
+    return $current >= 1000;
 }
 
 /**

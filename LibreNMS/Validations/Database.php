@@ -46,10 +46,7 @@ class Database extends BaseValidation
 
         // check database schema version
         $current = get_db_schema();
-
-        $schemas = get_schema_list();
-        end($schemas);
-        $latest = key($schemas);
+        $latest = 1000;
 
         if ($current < $latest) {
             $validator->fail(
