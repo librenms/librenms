@@ -16,5 +16,6 @@ class DatabaseSeeder extends Seeder
         $this->call(DefaultGraphTypeSeeder::class);
         $this->call(DefaultPortDataSeeder::class);
         $this->call(DefaultWidgetSeeder::class);
+        $this->call(DefaultLegacySchemaSeeder::class);
     }
 }

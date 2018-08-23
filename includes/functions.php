@@ -2468,7 +2468,7 @@ function get_db_schema()
     try {
         $db = \LibreNMS\DB\Eloquent::DB();
         if ($db) {
-            return $db->table('dbSchema')
+            return (int)$db->table('dbSchema')
                 ->orderBy('version', 'DESC')
                 ->value('version');
         }

@@ -20,7 +20,7 @@ use LibreNMS\Util\MemcacheLock;
 
 if (!isset($init_modules) && php_sapi_name() == 'cli') {
     // Not called from within discovery, let's load up the necessary stuff.
-    $init_modules = [];
+    $init_modules = ['laravel'];
     require realpath(__DIR__ . '/../..') . '/includes/init.php';
 }
 
@@ -35,51 +35,28 @@ try {
         }
     }
 
-    // only import build.sql to an empty database
-    $tables = dbFetchRows("SHOW TABLES");
+    $db_rev = get_db_schema();
 
-    if (empty($tables)) {
-        echo "-- Creating base database structure\n";
-        $step = 0;
-        $sql_fh = fopen('build.sql', 'r');
-        if ($sql_fh === false) {
-            echo 'ERROR: Cannot open SQL build script build.sql' . PHP_EOL;
-            $return = 1;
-        }
-
-        while (!feof($sql_fh)) {
-            $line = fgetss($sql_fh);
-            echo 'Step #' . $step++ . ' ...' . PHP_EOL;
-
-            if (!empty($line)) {
-                if (!dbQuery($line)) {
-                    $return = 1;
-                }
-            }
-        }
-
-        fclose($sql_fh);
+    $migrate_opts = ['--force' => true];
+    if(\Config::has('database.connections.setup')) {
+        $migrate_opts['--database'] = 'setup';
     }
 
-
-    d_echo("DB Schema update started....\n");
-
-    if (db_schema_is_current()) {
-        d_echo("DB Schema already up to date.\n");
+    if ($db_rev === 0) {
+        $migrate_opts['--seed'] = true;
+        \Artisan::call('migrate', $migrate_opts);
+    } elseif ($db_rev == 1000) {
+        \Artisan::call('migrate', $migrate_opts);
     } else {
+        // legacy update
+        d_echo("DB Schema update started....\n");
+
         // Set Database Character set and Collation
         dbQuery('ALTER DATABASE CHARACTER SET utf8 COLLATE utf8_unicode_ci;');
 
-        $db_rev = get_db_schema();
-        $insert = ($db_rev == 0); // if $db_rev == 0, insert the first update
-
-        $updating = 0;
+        echo "-- Updating database schema\n";
         foreach (get_schema_list() as $file_rev => $file) {
             if ($file_rev > $db_rev) {
-                if (!$updating) {
-                    echo "-- Updating database schema\n";
-                }
-
                 printf('%03d -> %03d ...', $db_rev, $file_rev);
 
                 $err = 0;
@@ -103,20 +80,17 @@ try {
                     $return = 1;
                 }//end if
 
-                $updating++;
-                $db_rev = $file_rev;
-                if ($insert) {
-                    dbInsert(array('version' => $db_rev), 'dbSchema');
-                    $insert = false;
+                if ($db_rev == 0) {
+                    dbInsert(['version' => $file_rev], 'dbSchema');
                 } else {
-                    dbUpdate(array('version' => $db_rev), 'dbSchema');
+                    dbUpdate(['version' => $file_rev], 'dbSchema');
                 }
+                $db_rev = $file_rev;
             }//end if
         }//end foreach
 
-        if ($updating) {
-            echo "-- Done\n";
-        }
+        echo "-- Done\n";
+        // end legacy update
     }
 
     if (isset($schemaLock)) {

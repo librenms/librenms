@@ -25,24 +25,33 @@
  */
 
 if (!isset($init_modules)) {
-    $init_modules = array('nodb');
+    $init_modules = ['nodb', 'laravel'];
     require __DIR__ . '/includes/init.php';
 
     $opts = getopt('ldh:u:p:n:t:s:');
 
-    if (isset($opts['h'])) {
-        dbConnect(
-            isset($opts['h']) ? $opts['h'] : null,
-            isset($opts['u']) ? $opts['u'] : '',
-            isset($opts['p']) ? $opts['p'] : '',
-            isset($opts['n']) ? $opts['n'] : '',
-            isset($opts['t']) ? $opts['t'] : null,
-            isset($opts['s']) ? $opts['s'] : null
-        );
-    } else {
-        // use configured database credentials
-        \LibreNMS\DB\Eloquent::boot();
+    // grab the default settings
+    $default = config('database.connections.' . config('database.default'), 'mysql');
+
+    $map = [
+        'h' => 'host',
+        'u' => 'username',
+        'p' => 'password',
+        'n' => 'database',
+        't' => 'port',
+        's' => 'unix_socket',
+    ];
+
+    // update any settings
+    foreach ($map as $opt => $config_key) {
+        if (isset($opts[$opt])) {
+            $default[$config_key] = $opts[$opt];
+        }
     }
+
+    // save to setup
+    \Config::set('database.connections.setup', $default);
+
 
     set_debug(isset($opts['d']));
     $skip_schema_lock = isset($opts['l']);

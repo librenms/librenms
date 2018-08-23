@@ -13,13 +13,14 @@ class CreateRouteTable extends Migration
      */
     public function up()
     {
+        \Illuminate\Support\Facades\Schema::defaultStringLength(100);
         Schema::create('route', function (Blueprint $table) {
             $table->integer('device_id');
             $table->string('context_name', 128);
-            $table->string('ipRouteDest', 256);
+            $table->string('ipRouteDest', 39);
             $table->string('ipRouteIfIndex', 256)->nullable();
             $table->string('ipRouteMetric', 256);
-            $table->string('ipRouteNextHop', 256);
+            $table->string('ipRouteNextHop', 39);
             $table->string('ipRouteType', 256);
             $table->string('ipRouteProto', 256);
             $table->integer('discoveredAt');
