@@ -65,6 +65,8 @@ switch ($vars['section']) {
         include 'pages/syslog.inc.php';
         break;
     case 'eventlog':
+        include 'pages/eventlog.inc.php';
+        break;
     case 'graylog':
         include 'pages/device/logs/'.$vars['section'].'.inc.php';
         break;
