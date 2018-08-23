@@ -1,0 +1,263 @@
+SCTE-HMS-HEADENDIDENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Integer32, Unsigned32, OBJECT-IDENTITY, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC 
+    insidePlantIdent 
+        FROM SCTE-HMS-ROOTS;  -- see ANSI_SCTE 37 (formerly HMS072)
+
+headEndIdentMib MODULE-IDENTITY
+    LAST-UPDATED "200801161300Z" 
+    ORGANIZATION "SCTE HMS Working Group"
+    CONTACT-INFO
+            "   SCTE HMS Subcommittee, Chairman             
+                mailto:standards@scte.org"
+
+    DESCRIPTION
+            "The MIB module is for representing optical equipment
+             present in the headend (or indoor) and is supported by
+             a SNMP agent. This module defines the root OID (under
+             the scteHmsTree) for the indoor optic device MIBs such
+             as Optical transmitters, receivers, amplifiers etc.
+             This module also defines textual conventions that are
+             common across indoor devices."
+
+    REVISION "200801161300Z" 
+    DESCRIPTION 
+        "Changed due to Comment Resolution Meeting."
+
+    REVISION "200710030000Z"  -- Oct 03, 2007
+    DESCRIPTION 
+        "added heDigital and heManagedServer to the mib tree."
+
+    ::= { insidePlantIdent 0 }
+
+-- Registration subtree
+
+heOptics    OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+            "Defines the base OID for the inside plant optical equipment 
+            (see SCTE 83-1, formerly HMS108) including, but not limited to,
+             optical transmitters (see SCTE 85-1, formerly HMS112),
+             optical receivers (see SCTE 85-2, formerly HMS113),
+             optical amplifiers (see SCTE 85-3, formerly HMS118),
+             optical switches etc."
+    ::= { insidePlantIdent 1 }
+
+heBaseIdent OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+            "Defines the base OID for the common part of the inside plant 
+             equipment (see SCTE 84-1; formerly HMS111) including, but not
+             limited to, power supplies (see SCTE 84-2; formerly HMS116),
+             fans (see SCTE 84-3; formerly HMS117), etc."
+    ::= { insidePlantIdent 2 }
+
+heCommon  OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+            "Defines the base OID for the modelling of
+            all indoor equipment(see SCTE 84-1; formerly HMS111)."
+    ::= { heBaseIdent 1 }
+
+hePowerSupply  OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+            "Defines the base OID for the modelling of
+            indoor Power Supply(see SCTE 84-2; formerly HMS116)."
+    ::= { heBaseIdent 2 }
+
+heFans OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+            "Defines the base OID for the modelling of
+            indoor Fans (see SCTE 84-3; formerly HMS117)."
+    ::= { heBaseIdent 3 }
+               
+
+heHMTS OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+            "Defines the base of the HMTS (see SCTE 83-3; formerly HMS120)."
+    ::= { insidePlantIdent 3 }
+
+heRF    OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+            "Defines the base OID for the inside plant RF equipment 
+            (see SCTE 83-4, formerly HMS133) including, but not limited to,
+             RF amplifiers (see SCTE 94-1, formerly HMS131),
+             RF switches (see SCTE 94-2, formerly HMS132) etc."
+    ::= { insidePlantIdent 4 }
+
+heDigital    OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+            "Defines the base OID for the inside plant Digital devices
+            including QAM, Encoders, Decoders, MPEG, IP etc ...."
+    ::= { insidePlantIdent 5 }
+
+heManagedServer    OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+            "Defines the base OID for the inside plant Managed Servers.
+            Servers can be any machine that is used to serve data such
+            as a video server, a timing server, a resource server ..etc"
+    ::= { insidePlantIdent 6 }
+
+
+-- Textual Conventions
+
+HeTenthVolt ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS       current
+    DESCRIPTION
+        "This data type represents voltage levels that are normally
+         expressed in volts. Units are in tenths of a volt;
+         for example, -48.1 volts will be represented as -481."
+    SYNTAX       Integer32
+
+HeTenthdBm ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS       current
+    DESCRIPTION
+        "This data type represents power levels 
+         that are normally expressed in dBm. Units 
+         are in tenths of a dBm;
+         for example, -5.1 dBm will be represented as -51."
+    SYNTAX       Integer32
+
+HeTenthdBmV ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS       current
+    DESCRIPTION
+        "This data type represents power levels 
+         that are normally expressed in dBmV. Units 
+         are in tenths of a dBmV;
+         for example, -5.1 dBmV will be represented as -51."
+    SYNTAX       Integer32
+
+HeTenthCentigrade ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS       current
+    DESCRIPTION
+        "This data type represents temperature values that
+         are normally expressed in Centigrade. Units are in
+         tenths of a Centigrade;
+         for example, -5.1 Centigrade will be represented as -51."
+    SYNTAX       Integer32
+
+HeHundredthNanoMeter ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS       current
+    DESCRIPTION
+        "This data type represents wavelength values that
+         are normally expressed in nano meters. Units are in
+         hundredths of a NanoMeter;
+         for example, 1550.56 nm will be represented as 155056."
+    SYNTAX       Unsigned32
+
+HeTenthdB ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS       current
+    DESCRIPTION
+            "This data type represents power levels 
+            that are normally expressed in dB. Units 
+            are in tenths of a dB;
+            for example, -5.1 dB will be represented as -51."
+    SYNTAX       Integer32
+
+HeOnOffControl ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+            "An enumerated value that provides a control of a particular
+            hardware or software parameter that usually represent
+            some sort of switch.
+
+            A SET request with a value off(1) will cause the switch
+            to be shut off. 
+
+            A SET request with a value on(2) will cause the switch
+            to be turned on.
+
+            A value meaningless(3) will be implemented by the
+            variables that represent a switch with write-only access.
+            A GET request for the value of the write-only variable
+            shall return a value meaningless(3). 
+
+            A SET request with a value meaningless(3) for the variable
+            with write access shall have no effect and no exception is
+            generated.
+
+            A value may be used by the variables with both read-write
+            and write-only access.
+
+            The variables with read-only access shall be defined with 
+            the textual convention HeOnOffStatus."
+    SYNTAX      INTEGER {
+        off(1),
+        on(2),
+        meaningless(3)
+    }
+
+HeOnOffStatus ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+            "An enumerated value that provides a status of a particular
+            hardware or software parameter that usually represent
+            some sort of switch.
+
+            A value off(1) indicates the switch is off. 
+
+            A value on(2) indicates the switch is on."
+    SYNTAX      INTEGER {
+        off(1),
+        on(2)
+    }
+
+HeFaultStatus ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+            "An enumerated value that provides a fault status of
+            a particular hardware or software parameter that
+            usually represent some sort of condition.
+
+            A value normal(1) indicates the normal condition. 
+
+            A value fault(2) indicates the fault condition."
+    SYNTAX      INTEGER {
+        normal(1),
+        fault(2)
+    }
+
+HeLaserType  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+            "Laser type. Some example values are: unisolated FP, 
+            isolated FP, uncooled DFB, cooled DFB, ITU (up to 
+            32 colors)."
+    SYNTAX      DisplayString
+
+HeMilliAmp ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-3"
+    STATUS       current
+    DESCRIPTION
+        "This data type represents current levels that are normally
+         expressed in amperes. Units are in milliamperes;
+         for example, 2.1 Amperes would be expressed as 2100."
+    SYNTAX       Unsigned32
+
+HeHundredthWatts ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS       current
+    DESCRIPTION
+        "This data type represents power values that
+         are normally expressed in watts. Units are in
+         hundredths of a watt;
+         for example, 420 watts will be represented as 42000."
+    SYNTAX       Unsigned32
+
+END

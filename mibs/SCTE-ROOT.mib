@@ -1,0 +1,36 @@
+-- ****************************************************************************
+-- *
+-- * Module Name: HMS028R6 (SCTE 36)
+-- *
+-- * SCTE Status: ADOPTED JANUARY 11, 2002
+-- *  
+-- * This MIB provides the root object identifier for the
+-- * Society of Telecommunications Engineers (SCTE) as an enterprise,
+-- * as assigned by the Internet Assigned Numbers Authority (IANA).
+-- *
+-- * MIBs which fall under the auspices of the SCTE MUST be assigned object
+-- * identifiers underneath this enterprise object-id.
+-- *
+-- ****************************************************************************
+
+SCTE-ROOT DEFINITIONS ::= BEGIN
+
+IMPORTS
+     enterprises
+          FROM RFC1155-SMI
+;
+
+scteRoot  OBJECT IDENTIFIER ::= { enterprises 5591 }
+
+-- DESCRIPTION
+--     "scteRoot defines the main root of the SCTE Enterprises MIB tree. "
+
+
+scteHmsTree  OBJECT IDENTIFIER  ::= { scteRoot 1 }
+ 
+-- DESCRIPTION
+--     "scteHmsTree defines the root of the HMS MIB tree.     
+--     All standard HMS MIBS reside under this tree level.
+
+END
+

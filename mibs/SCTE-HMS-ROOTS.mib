@@ -1,0 +1,118 @@
+SCTE-HMS-ROOTS DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    scteHmsTree
+          FROM SCTE-ROOT;
+
+hmsScteRootMIB MODULE-IDENTITY
+    LAST-UPDATED "200803040000Z"  -- March 04, 2008
+    ORGANIZATION "SCTE HMS Working Group"
+    CONTACT-INFO
+            "SCTE HMS Subcommittee, Chairman
+             mailto: standards@SCTE.org"
+
+        DESCRIPTION		         
+                "This MIB module is defining objects under the SCTE HMS tree."
+ 
+	REVISION "200803040000Z"  -- March 04, 2008
+	DESCRIPTION 
+	"Updated the revision information of the file"
+
+	REVISION "200802040000Z"  -- Feb 04, 2008
+	DESCRIPTION 
+	"Modified with comments from Meeting 1-11-08
+	1. Removed import of enterprises and OBJECT-TYPE which was never used.
+	2. Added word Over, in Voice Over IP description.
+	3. Standard Module Identity was added since released version."
+
+  REVISION "200708150000Z"  -- Aug 15, 2007
+    DESCRIPTION 
+        "Added Multi Media to the list "
+
+    REVISION "200705261730Z" -- May 26, 2007
+    DESCRIPTION 
+    	"Added voipIdent to the list."
+            
+    ::=  {  scteHmsTree 0  }
+
+propertyIdent OBJECT IDENTIFIER ::= { scteHmsTree 1}
+
+--     DESCRIPTION
+--     "Defines the base OID of the property MIB"
+--     "SCTE-HMS-PROPERTY-MIB is defined by SCTE 38-1 (formerly HMS026)"
+
+alarmsIdent   OBJECT IDENTIFIER ::= { scteHmsTree 2}
+
+--     DESCRIPTION
+--     "Defines the base OID of the Alarms MIB"
+--     "SCTE-HMS-ALARMS-MIB is defined by SCTE 38-2 (formerly HMS023)"
+
+commonIdent   OBJECT IDENTIFIER ::= { scteHmsTree 3}
+
+--     DESCRIPTION
+--     "Defines the base OID of the Common MIB"
+--     "SCTE-HMS-COMMON-MIB is defined by SCTE 38-3  (formerly HMS024)"
+
+psIdent       OBJECT IDENTIFIER ::= { scteHmsTree 4}
+
+--     DESCRIPTION
+--     "Defines the base OID of the Power Supply MIB"
+--     "SCTE-HMS-PS-MIB is defined by SCTE 38-4 (formerly HMS027)"
+
+fnIdent       OBJECT IDENTIFIER ::= { scteHmsTree 5}
+
+--     DESCRIPTION
+--     "Defines the base OID of the Fiber Node MIB"
+--     "SCTE-HMS-FIBERNODE-MIB is defined by SCTE 38-5 (formerly HMS025)"
+
+genIdent      OBJECT IDENTIFIER ::= { scteHmsTree 6}
+
+--     DESCRIPTION
+--     "Defines the base OID of the Generator MIB"
+--     "SCTE-HMS-GEN-MIB is defined by SCTE 38-6 (formerly HMS033)"
+
+transponderInterfaceBusIdent  OBJECT IDENTIFIER ::= { scteHmsTree 7}
+
+--     DESCRIPTION
+--     "Defines the base OID of the Transponder Interface Bus MIB"
+--     "SCTE-HMS-TIB-MIB is defined by SCTE 38-7 (formerly HMS050)"
+
+downloadIdent    OBJECT IDENTIFIER ::= { scteHmsTree 8}
+
+--     DESCRIPTION
+--     "Defines the base OID of the Download MIB"
+--     "SCTE-HMS-DOWNLOAD-MIB is defined by SCTE 38-8 (formerly HMS063)"
+
+oaIdent OBJECT IDENTIFIER ::= { scteHmsTree 9}
+
+--     DESCRIPTION
+--     "Defines the base OID of the Optical Amplifier MIB for outside plant equipment"
+--     "SCTE-HMS-OPTICALAMP-MIB is defined by SCTE 38-9 (formerly HMS082 )"
+
+rfAmplifierIdent OBJECT IDENTIFIER ::= { scteHmsTree 10}
+
+--     DESCRIPTION
+--     "Defines the base OID of the RF Amplifier MIB"
+--     "SCTE-HMS-RFAMP-MIB is defined by SCTE 38-10 (formerly HMS115 )"
+
+insidePlantIdent OBJECT IDENTIFIER ::= { scteHmsTree 11}
+
+--     DESCRIPTION
+--     "Defines the base OID for all inside plant equipment"
+--     "including, but not limited to, indoor optics, HMTS,"
+--     "chassis auxilliary equipment, etc."
+--     "SCTE-HMS-HEADENDIDENT-MIB is defined by SCTE 38-11 (formerly HMS114)"
+
+voipIdent OBJECT IDENTIFIER ::= { scteHmsTree 12}
+
+--     DESCRIPTION
+--     "Defines the base OID for all Voice Over IP mibs"
+
+multiMediaIdent OBJECT IDENTIFIER ::= { scteHmsTree 13}
+
+--     DESCRIPTION
+--     "Defines the base OID for all Multi Media Mibs"
+  
+END
