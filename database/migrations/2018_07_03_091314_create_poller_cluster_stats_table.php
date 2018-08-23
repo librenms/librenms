@@ -14,7 +14,7 @@ class CreatePollerClusterStatsTable extends Migration
     public function up()
     {
         Schema::create('poller_cluster_stats', function (Blueprint $table) {
-            $table->integer('id');
+            $table->integer('id', true);
             $table->string('parent_poller')->default('');
             $table->string('poller_type')->default('');
             $table->unsignedInteger('depth');
@@ -22,17 +22,8 @@ class CreatePollerClusterStatsTable extends Migration
             $table->double('worker_seconds')->unsigned();
             $table->unsignedInteger('workers');
             $table->unsignedInteger('frequency');
+            $table->unique(['parent_poller', 'poller_type'], 'parent_poller_poller_type');
         });
-
-        \DB::statement("ALTER TABLE `poller_cluster_stats` CHANGE `depth` `depth` int(11) unsigned NOT NULL ;");
-        \DB::statement("ALTER TABLE `poller_cluster_stats` CHANGE `devices` `devices` int(11) unsigned NOT NULL ;");
-        \DB::statement("ALTER TABLE `poller_cluster_stats` CHANGE `workers` `workers` int(11) unsigned NOT NULL ;");
-        \DB::statement("ALTER TABLE `poller_cluster_stats` CHANGE `frequency` `frequency` int(11) unsigned NOT NULL ;");
-
-
-        \DB::statement("ALTER TABLE `poller_cluster_stats` ADD UNIQUE `id` (`id`);");
-        \DB::statement("ALTER TABLE `poller_cluster_stats` CHANGE `id` `id` int(11) NOT NULL auto_increment;");
-        \DB::statement("ALTER TABLE `poller_cluster_stats` ADD PRIMARY KEY (`parent_poller`,`poller_type`);");
     }
 
     /**

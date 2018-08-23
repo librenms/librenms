@@ -19,7 +19,7 @@ class CreateBillHistoryTable extends Migration
             $table->timestamp('updated')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->dateTime('bill_datefrom');
             $table->dateTime('bill_dateto');
-            $table->text('bill_type', 65535);
+            $table->text('bill_type');
             $table->bigInteger('bill_allowed');
             $table->bigInteger('bill_used');
             $table->bigInteger('bill_overuse');

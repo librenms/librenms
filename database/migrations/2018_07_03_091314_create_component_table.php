@@ -14,7 +14,7 @@ class CreateComponentTable extends Migration
     public function up()
     {
         Schema::create('component', function (Blueprint $table) {
-            $table->increments('id')->unsigned()->comment('ID for each component, unique index');
+            $table->increments('id')->comment('ID for each component, unique index');
             $table->unsignedInteger('device_id')->index('device')->comment('device_id from the devices table');
             $table->string('type', 50)->index('type')->comment('name from the component_type table');
             $table->string('label')->nullable()->comment('Display label for the component');
@@ -23,9 +23,6 @@ class CreateComponentTable extends Migration
             $table->boolean('ignore')->default(0)->comment('Should this component be alerted on');
             $table->string('error')->nullable()->comment('Error message if in Alert state');
         });
-
-        \DB::statement("ALTER TABLE `component` CHANGE `id` `id` int(11) unsigned NOT NULL auto_increment;");
-        \DB::statement("ALTER TABLE `component` CHANGE `device_id` `device_id` int(11) unsigned NOT NULL ;");
     }
 
     /**

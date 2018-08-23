@@ -40,9 +40,8 @@ class CreateMacAccountingTable extends Migration
             $table->integer('poll_time')->nullable();
             $table->integer('poll_prev')->nullable();
             $table->integer('poll_period')->nullable();
+            $table->index('port_id', 'interface_id');
         });
-
-        \DB::statement("ALTER TABLE `mac_accounting` ADD INDEX `interface_id` (`port_id`);");
     }
 
     /**

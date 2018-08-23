@@ -18,10 +18,8 @@ class CreateCustomersTable extends Migration
             $table->char('username', 64)->unique('username');
             $table->char('password', 32);
             $table->char('string', 64);
-            $table->boolean('level')->default(0);
+            $table->tinyInteger('level')->default(0);
         });
-
-        \DB::statement("ALTER TABLE `customers` CHANGE `level` `level` tinyint(4) NOT NULL DEFAULT '0' ;");
     }
 
     /**

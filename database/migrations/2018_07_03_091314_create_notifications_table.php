@@ -20,10 +20,8 @@ class CreateNotificationsTable extends Migration
             $table->integer('severity')->nullable()->default(0)->index()->comment('0=ok,1=warning,2=critical');
             $table->string('source')->default('');
             $table->string('checksum', 128)->unique('checksum');
-            $table->dateTime('datetime')->default('1970-01-02 00:00:00');
+            $table->timestamp('datetime')->default('1970-01-02 00:00:00');
         });
-
-        \DB::statement("ALTER TABLE `notifications` CHANGE `datetime` `datetime` timestamp NOT NULL DEFAULT '1970-01-02 00:00:00' ;");
     }
 
     /**

@@ -20,12 +20,9 @@ class CreateStateTranslationsTable extends Migration
             $table->boolean('state_draw_graph');
             $table->smallInteger('state_value')->default(0);
             $table->boolean('state_generic_value');
-            $table->timestamp('state_lastupdated')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('state_lastupdated')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
             $table->unique(['state_index_id','state_value'], 'state_index_id_value');
         });
-
-        \DB::statement("ALTER TABLE `state_translations` CHANGE `state_value` `state_value` smallint(5) NOT NULL DEFAULT '0' ;");
-        \DB::statement("ALTER TABLE `state_translations` CHANGE `state_lastupdated` `state_lastupdated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP;");
     }
 
     /**

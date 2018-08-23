@@ -21,11 +21,9 @@ class CreateDeviceOidsTable extends Migration
             $table->string('object_type');
             $table->string('value')->nullable();
             $table->bigInteger('numvalue')->nullable();
-            $table->timestamp('last_modified')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('last_modified')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
             $table->primary(['device_id','oid']);
         });
-
-        \DB::statement("ALTER TABLE `device_oids` CHANGE `last_modified` `last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP;");
     }
 
     /**

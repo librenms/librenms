@@ -17,22 +17,16 @@ class CreateUsersWidgetsTable extends Migration
             $table->integer('user_widget_id', true);
             $table->integer('user_id');
             $table->integer('widget_id');
-            $table->boolean('col');
-            $table->boolean('row');
-            $table->boolean('size_x');
-            $table->boolean('size_y');
+            $table->tinyInteger('col');
+            $table->tinyInteger('row');
+            $table->tinyInteger('size_x');
+            $table->tinyInteger('size_y');
             $table->string('title');
-            $table->boolean('refresh')->default(60);
-            $table->text('settings', 65535);
+            $table->tinyInteger('refresh')->default(60);
+            $table->text('settings');
             $table->integer('dashboard_id');
             $table->index(['user_id','widget_id'], 'user_id');
         });
-
-        \DB::statement("ALTER TABLE `users_widgets` CHANGE `col` `col` tinyint(4) NOT NULL ;");
-        \DB::statement("ALTER TABLE `users_widgets` CHANGE `row` `row` tinyint(4) NOT NULL ;");
-        \DB::statement("ALTER TABLE `users_widgets` CHANGE `size_x` `size_x` tinyint(4) NOT NULL ;");
-        \DB::statement("ALTER TABLE `users_widgets` CHANGE `size_y` `size_y` tinyint(4) NOT NULL ;");
-        \DB::statement("ALTER TABLE `users_widgets` CHANGE `refresh` `refresh` tinyint(4) NOT NULL DEFAULT '60' ;");
     }
 
     /**

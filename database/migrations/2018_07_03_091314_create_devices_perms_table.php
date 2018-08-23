@@ -16,9 +16,7 @@ class CreateDevicesPermsTable extends Migration
         Schema::create('devices_perms', function (Blueprint $table) {
             $table->integer('user_id')->index('user_id');
             $table->integer('device_id');
-            $table->integer('access_level')->default(0);
         });
-        \DB::statement("ALTER TABLE `devices_perms` CHANGE `access_level` `access_level` int(4) NOT NULL DEFAULT '0' ;");
     }
 
     /**

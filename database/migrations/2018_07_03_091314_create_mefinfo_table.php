@@ -23,9 +23,6 @@ class CreateMefinfoTable extends Migration
             $table->string('mefAdmState', 128);
             $table->string('mefRowState', 128);
         });
-
-        \DB::statement("ALTER TABLE `mefinfo` CHANGE `mefID` `mefID` int(32) NOT NULL ;");
-        \DB::statement("ALTER TABLE `mefinfo` CHANGE `mefMTU` `mefMTU` int(16) NOT NULL DEFAULT '1500' ;");
     }
 
     /**

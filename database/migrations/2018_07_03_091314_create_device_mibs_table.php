@@ -18,11 +18,9 @@ class CreateDeviceMibsTable extends Migration
             $table->string('module');
             $table->string('mib');
             $table->string('included_by');
-            $table->timestamp('last_modified')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('last_modified')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
             $table->primary(['device_id','module','mib']);
         });
-
-        \DB::statement("ALTER TABLE `device_mibs` CHANGE `last_modified` `last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP;");
     }
 
     /**

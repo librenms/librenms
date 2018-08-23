@@ -17,14 +17,12 @@ class CreateHrDeviceTable extends Migration
             $table->integer('hrDevice_id', true);
             $table->integer('device_id')->index('device_id');
             $table->integer('hrDeviceIndex');
-            $table->text('hrDeviceDescr', 65535);
-            $table->text('hrDeviceType', 65535);
+            $table->text('hrDeviceDescr');
+            $table->text('hrDeviceType');
             $table->integer('hrDeviceErrors')->default(0);
-            $table->text('hrDeviceStatus', 65535);
-            $table->boolean('hrProcessorLoad')->nullable();
+            $table->text('hrDeviceStatus');
+            $table->tinyInteger('hrProcessorLoad')->nullable();
         });
-
-        \DB::statement("ALTER TABLE `hrDevice` CHANGE `hrProcessorLoad` `hrProcessorLoad` tinyint(4) NULL ;");
     }
 
     /**

@@ -22,10 +22,6 @@ class CreateBillDataTable extends Migration
             $table->bigInteger('out_delta');
             $table->primary(['bill_id','timestamp']);
         });
-
-        \DB::statement("ALTER TABLE `bill_data` CHANGE `delta` `delta` bigint(11) NOT NULL ;");
-        \DB::statement("ALTER TABLE `bill_data` CHANGE `in_delta` `in_delta` bigint(11) NOT NULL ;");
-        \DB::statement("ALTER TABLE `bill_data` CHANGE `out_delta` `out_delta` bigint(11) NOT NULL ;");
     }
 
 

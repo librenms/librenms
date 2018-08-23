@@ -14,16 +14,12 @@ class CreatePortsFdbTable extends Migration
     public function up()
     {
         Schema::create('ports_fdb', function (Blueprint $table) {
-            $table->bigInteger('ports_fdb_id', true)->unsigned();
-            $table->integer('port_id')->unsigned()->index();
+            $table->unsignedBigInteger('ports_fdb_id', true);
+            $table->unsignedInteger('port_id')->index();
             $table->string('mac_address', 32)->index('mac_address');
-            $table->integer('vlan_id')->unsigned()->index();
-            $table->integer('device_id')->unsigned()->index();
+            $table->unsignedInteger('vlan_id')->index();
+            $table->unsignedInteger('device_id')->index();
         });
-
-        \DB::statement("ALTER TABLE `ports_fdb` CHANGE `port_id` `port_id` int(11) unsigned NOT NULL ;");
-        \DB::statement("ALTER TABLE `ports_fdb` CHANGE `vlan_id` `vlan_id` int(11) unsigned NOT NULL ;");
-        \DB::statement("ALTER TABLE `ports_fdb` CHANGE `device_id` `device_id` int(11) unsigned NOT NULL ;");
     }
 
     /**

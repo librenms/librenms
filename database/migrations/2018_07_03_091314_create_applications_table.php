@@ -21,12 +21,10 @@ class CreateApplicationsTable extends Migration
             $table->tinyInteger('discovered')->default(0);
             $table->string('app_state_prev', 32)->nullable();
             $table->string('app_status', 8);
-            $table->timestamp('timestamp')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('timestamp')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
             $table->string('app_instance');
             $table->unique(['device_id','app_type'], 'unique_index');
         });
-
-        \DB::statement("ALTER TABLE `applications` CHANGE `timestamp` `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP;");
     }
 
     /**

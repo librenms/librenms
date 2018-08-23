@@ -23,11 +23,9 @@ class CreateMibdefsTable extends Migration
             $table->string('max_access')->nullable();
             $table->string('status')->nullable();
             $table->string('included_by');
-            $table->timestamp('last_modified')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('last_modified')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
             $table->primary(['module','mib','object_type']);
         });
-
-        \DB::statement("ALTER TABLE `mibdefs` CHANGE `last_modified` `last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP;");
     }
 
     /**

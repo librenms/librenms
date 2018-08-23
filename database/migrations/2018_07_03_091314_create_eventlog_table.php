@@ -18,14 +18,12 @@ class CreateEventlogTable extends Migration
             $table->integer('host')->default(0)->index('host');
             $table->integer('device_id')->index('device_id');
             $table->dateTime('datetime')->default('1970-01-02 00:00:01')->index('datetime');
-            $table->text('message', 65535)->nullable();
+            $table->text('message')->nullable();
             $table->string('type', 64)->nullable();
             $table->string('reference', 64);
             $table->string('username', 128)->nullable();
-            $table->integer('severity')->nullable()->default(2);
+            $table->tinyInteger('severity')->nullable()->default(2);
         });
-
-        \DB::statement("ALTER TABLE `eventlog` CHANGE `severity` `severity` int(1) NULL DEFAULT '2' ;");
     }
 
     /**

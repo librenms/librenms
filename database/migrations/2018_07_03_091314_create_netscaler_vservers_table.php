@@ -27,8 +27,6 @@ class CreateNetscalerVserversTable extends Migration
             $table->integer('vsvr_bps_in');
             $table->integer('vsvr_bps_out');
         });
-
-        \DB::statement("ALTER TABLE `netscaler_vservers` CHANGE `vsvr_port` `vsvr_port` int(8) NOT NULL ;");
     }
 
     /**

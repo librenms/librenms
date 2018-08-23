@@ -25,9 +25,6 @@ class CreatePortsVlansTable extends Migration
             $table->boolean('untagged')->default(0);
             $table->unique(['device_id','port_id','vlan'], 'unique');
         });
-
-        \DB::statement("ALTER TABLE `ports_vlans` CHANGE `priority` `priority` bigint(32) NOT NULL ;");
-        \DB::statement("ALTER TABLE `ports_vlans` CHANGE `untagged` `untagged` tinyint(4) NOT NULL DEFAULT '0' ;");
     }
 
     /**

@@ -15,18 +15,16 @@ class CreateEntityStateTable extends Migration
     {
         Schema::create('entityState', function (Blueprint $table) {
             $table->integer('entity_state_id', true);
-            $table->integer('device_id')->nullable()->index();
+            $table->integer('device_id')->nullable();
             $table->integer('entPhysical_id')->nullable();
             $table->dateTime('entStateLastChanged')->nullable();
             $table->integer('entStateAdmin')->nullable();
             $table->integer('entStateOper')->nullable();
             $table->integer('entStateUsage')->nullable();
-            $table->text('entStateAlarm', 65535)->nullable();
+            $table->text('entStateAlarm')->nullable();
             $table->integer('entStateStandby')->nullable();
+            $table->index('device_id', 'entityState_device_id_index');
         });
-
-        \DB::statement("ALTER TABLE `entityState` DROP INDEX `entitystate_device_id_index`;");
-        \DB::statement("ALTER TABLE `entityState` ADD INDEX `entityState_device_id_index` (`device_id`);");
     }
 
     /**

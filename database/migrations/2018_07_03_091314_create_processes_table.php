@@ -20,12 +20,8 @@ class CreateProcessesTable extends Migration
             $table->integer('rss');
             $table->string('cputime', 12);
             $table->string('user', 50);
-            $table->text('command', 65535);
+            $table->text('command');
         });
-
-        \DB::statement("ALTER TABLE `processes` CHANGE `pid` `pid` int(255) NOT NULL ;");
-        \DB::statement("ALTER TABLE `processes` CHANGE `vsz` `vsz` int(255) NOT NULL ;");
-        \DB::statement("ALTER TABLE `processes` CHANGE `rss` `rss` int(255) NOT NULL ;");
     }
 
     /**

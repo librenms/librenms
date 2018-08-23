@@ -18,10 +18,8 @@ class CreateDevicesAttribsTable extends Migration
             $table->integer('device_id')->index('device_id');
             $table->string('attrib_type', 32);
             $table->text('attrib_value', 65535);
-            $table->timestamp('updated')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
         });
-
-        \DB::statement("ALTER TABLE `devices_attribs` CHANGE `updated` `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP;");
     }
 
     /**

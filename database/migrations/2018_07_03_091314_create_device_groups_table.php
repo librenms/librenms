@@ -17,11 +17,9 @@ class CreateDeviceGroupsTable extends Migration
             $table->increments('id');
             $table->string('name')->default('')->unique('name');
             $table->string('desc')->default('');
-            $table->text('pattern', 65535)->nullable();
-            $table->text('params', 65535)->nullable();
+            $table->text('pattern')->nullable();
+            $table->text('params')->nullable();
         });
-
-        \DB::statement("ALTER TABLE `device_groups` CHANGE `id` `id` int(11) unsigned NOT NULL auto_increment;");
     }
 
     /**

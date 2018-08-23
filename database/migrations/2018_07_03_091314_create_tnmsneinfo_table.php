@@ -24,8 +24,6 @@ class CreateTnmsneinfoTable extends Migration
             $table->string('neOpMode', 128);
             $table->string('neOpState', 128);
         });
-
-        \DB::statement("ALTER TABLE `tnmsneinfo` CHANGE `neID` `neID` int(32) NOT NULL ;");
     }
 
     /**

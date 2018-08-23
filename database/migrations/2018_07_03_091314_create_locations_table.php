@@ -15,16 +15,11 @@ class CreateLocationsTable extends Migration
     {
         Schema::create('locations', function (Blueprint $table) {
             $table->integer('id', true);
-            $table->text('location', 65535);
+            $table->text('location');
             $table->float('lat', 10, 6);
             $table->float('lng', 10, 6);
             $table->dateTime('timestamp');
         });
-
-        \DB::statement("ALTER TABLE `locations` CHANGE `lat` `lat` float(10,6) NOT NULL ;");
-        \DB::statement("ALTER TABLE `locations` CHANGE `lng` `lng` float(10,6) NOT NULL ;");
-        \DB::statement("ALTER TABLE `locations` ADD INDEX `id` (`id`);");
-        \DB::statement("ALTER TABLE `locations` DROP INDEX `PRIMARY`;");
     }
 
     /**

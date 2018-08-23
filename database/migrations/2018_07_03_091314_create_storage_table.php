@@ -15,7 +15,7 @@ class CreateStorageTable extends Migration
     {
         Schema::create('storage', function (Blueprint $table) {
             $table->integer('storage_id', true);
-            $table->integer('device_id')->index('device_id_2');
+            $table->integer('device_id')->index('device_id');
             $table->string('storage_mib', 16);
             $table->string('storage_index', 64)->nullable();
             $table->string('storage_type', 32)->nullable();
@@ -29,8 +29,6 @@ class CreateStorageTable extends Migration
             $table->boolean('storage_deleted')->default(0);
             $table->unique(['device_id','storage_mib','storage_index'], 'index_unique');
         });
-
-        \DB::statement("ALTER TABLE `storage` ADD INDEX `device_id` (`device_id`);");
     }
 
     /**

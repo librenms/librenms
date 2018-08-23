@@ -31,12 +31,6 @@ class CreateMempoolsTable extends Migration
             $table->boolean('mempool_deleted')->default(0);
             $table->integer('mempool_perc_warn')->nullable()->default(75);
         });
-
-        \DB::statement("ALTER TABLE `mempools` CHANGE `mempool_used` `mempool_used` bigint(16) NOT NULL ;");
-        \DB::statement("ALTER TABLE `mempools` CHANGE `mempool_free` `mempool_free` bigint(16) NOT NULL ;");
-        \DB::statement("ALTER TABLE `mempools` CHANGE `mempool_total` `mempool_total` bigint(16) NOT NULL ;");
-        \DB::statement("ALTER TABLE `mempools` CHANGE `mempool_largestfree` `mempool_largestfree` bigint(16) NULL ;");
-        \DB::statement("ALTER TABLE `mempools` CHANGE `mempool_lowestfree` `mempool_lowestfree` bigint(16) NULL ;");
     }
 
     /**

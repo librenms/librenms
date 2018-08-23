@@ -16,19 +16,17 @@ class CreateServicesTable extends Migration
         Schema::create('services', function (Blueprint $table) {
             $table->integer('service_id', true);
             $table->integer('device_id')->index('service_host');
-            $table->text('service_ip', 65535);
+            $table->text('service_ip');
             $table->string('service_type');
-            $table->text('service_desc', 65535);
-            $table->text('service_param', 65535);
+            $table->text('service_desc');
+            $table->text('service_param');
             $table->boolean('service_ignore');
-            $table->boolean('service_status')->default(0);
+            $table->tinyInteger('service_status')->default(0);
             $table->integer('service_changed')->default(0);
-            $table->text('service_message', 65535);
+            $table->text('service_message');
             $table->boolean('service_disabled')->default(0);
-            $table->text('service_ds', 65535);
+            $table->text('service_ds');
         });
-
-        \DB::statement("ALTER TABLE `services` CHANGE `service_status` `service_status` tinyint(4) NOT NULL DEFAULT '0' ;");
     }
 
     /**

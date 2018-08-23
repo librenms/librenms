@@ -17,7 +17,7 @@ class CreateDevicesTable extends Migration
             $table->increments('device_id');
             $table->string('hostname', 128)->index('hostname');
             $table->string('sysName', 128)->nullable()->index('sysName');
-            $table->binary('ip', 16)->nullable();
+            $table->binary('ip')->nullable();
             $table->string('community')->nullable();
             $table->enum('authlevel', array('noAuthNoPriv','authNoPriv','authPriv'))->nullable();
             $table->string('authname', 64)->nullable();
@@ -33,12 +33,12 @@ class CreateDevicesTable extends Migration
             $table->boolean('snmp_disable')->default(0);
             $table->string('bgpLocalAs', 16)->nullable();
             $table->string('sysObjectID', 128)->nullable();
-            $table->text('sysDescr', 65535)->nullable();
-            $table->text('sysContact', 65535)->nullable();
-            $table->text('version', 65535)->nullable();
-            $table->text('hardware', 65535)->nullable();
-            $table->text('features', 65535)->nullable();
-            $table->text('location', 65535)->nullable();
+            $table->text('sysDescr')->nullable();
+            $table->text('sysContact')->nullable();
+            $table->text('version')->nullable();
+            $table->text('hardware')->nullable();
+            $table->text('features')->nullable();
+            $table->text('location')->nullable();
             $table->string('os', 32)->nullable()->index('os');
             $table->boolean('status')->default(0)->index('status');
             $table->string('status_reason', 50);
@@ -46,12 +46,12 @@ class CreateDevicesTable extends Migration
             $table->boolean('disabled')->default(0);
             $table->bigInteger('uptime')->nullable();
             $table->integer('agent_uptime')->default(0);
-            $table->dateTime('last_polled')->nullable()->index('last_polled');
-            $table->dateTime('last_poll_attempted')->nullable()->index('last_poll_attempted');
+            $table->timestamp('last_polled')->nullable()->index('last_polled');
+            $table->timestamp('last_poll_attempted')->nullable()->index('last_poll_attempted');
             $table->float('last_polled_timetaken', 5)->nullable();
             $table->float('last_discovered_timetaken', 5)->nullable();
-            $table->dateTime('last_discovered')->nullable();
-            $table->dateTime('last_ping')->nullable();
+            $table->timestamp('last_discovered')->nullable();
+            $table->timestamp('last_ping')->nullable();
             $table->float('last_ping_timetaken', 5)->nullable();
             $table->text('purpose', 65535)->nullable();
             $table->string('type', 20)->default('');
@@ -64,14 +64,7 @@ class CreateDevicesTable extends Migration
             $table->integer('max_depth')->default(0);
         });
 
-        \DB::statement("ALTER TABLE `devices` CHANGE `device_id` `device_id` int(11) unsigned NOT NULL auto_increment;");
         \DB::statement("ALTER TABLE `devices` CHANGE `ip` `ip` varbinary(16) NULL ;");
-        \DB::statement("ALTER TABLE `devices` CHANGE `status` `status` tinyint(4) NOT NULL DEFAULT '0' ;");
-        \DB::statement("ALTER TABLE `devices` CHANGE `ignore` `ignore` tinyint(4) NOT NULL DEFAULT '0' ;");
-        \DB::statement("ALTER TABLE `devices` CHANGE `last_polled` `last_polled` timestamp NULL ;");
-        \DB::statement("ALTER TABLE `devices` CHANGE `last_poll_attempted` `last_poll_attempted` timestamp NULL ;");
-        \DB::statement("ALTER TABLE `devices` CHANGE `last_discovered` `last_discovered` timestamp NULL ;");
-        \DB::statement("ALTER TABLE `devices` CHANGE `last_ping` `last_ping` timestamp NULL ;");
     }
 
     /**

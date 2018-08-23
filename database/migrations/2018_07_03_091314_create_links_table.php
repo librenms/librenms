@@ -27,8 +27,6 @@ class CreateLinksTable extends Migration
             $table->string('remote_version', 256);
             $table->index(['local_device_id','remote_device_id'], 'local_device_id');
         });
-
-        \DB::statement("ALTER TABLE `links` CHANGE `active` `active` tinyint(4) NOT NULL DEFAULT '1' ;");
     }
 
 

@@ -31,8 +31,6 @@ class CreateAccessPointsTable extends Migration
             $table->unsignedTinyInteger('interference');
             $table->index(['name','radio_number'], 'name');
         });
-
-        \DB::statement("ALTER TABLE `access_points` CHANGE `channel` `channel` tinyint(4) unsigned NOT NULL DEFAULT '0' ;");
     }
 
     /**

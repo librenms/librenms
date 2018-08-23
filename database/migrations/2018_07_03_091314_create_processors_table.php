@@ -17,7 +17,7 @@ class CreateProcessorsTable extends Migration
             $table->integer('processor_id', true);
             $table->integer('entPhysicalIndex')->default(0);
             $table->integer('hrDeviceIndex')->nullable();
-            $table->integer('device_id')->index('device_id_2');
+            $table->integer('device_id')->index('device_id');
             $table->string('processor_oid', 128);
             $table->string('processor_index', 32);
             $table->string('processor_type', 16);
@@ -26,8 +26,6 @@ class CreateProcessorsTable extends Migration
             $table->integer('processor_precision')->default(1);
             $table->integer('processor_perc_warn')->nullable()->default(75);
         });
-        
-        \DB::statement("ALTER TABLE `processors` ADD INDEX `device_id` (`device_id`);");
     }
 
     /**

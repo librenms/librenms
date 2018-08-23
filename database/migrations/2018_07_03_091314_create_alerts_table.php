@@ -20,12 +20,10 @@ class CreateAlertsTable extends Migration
             $table->integer('state');
             $table->integer('alerted');
             $table->integer('open');
-            $table->text('note', 65535)->nullable();
-            $table->timestamp('timestamp')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->text('note')->nullable();
+            $table->timestamp('timestamp')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
             $table->unique(['device_id','rule_id'], 'unique_alert');
         });
-
-        \DB::statement("ALTER TABLE `alerts` CHANGE `timestamp` `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP;");
     }
 
 

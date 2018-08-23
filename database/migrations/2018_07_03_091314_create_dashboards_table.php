@@ -17,10 +17,8 @@ class CreateDashboardsTable extends Migration
             $table->integer('dashboard_id', true);
             $table->integer('user_id')->default(0);
             $table->string('dashboard_name');
-            $table->integer('access')->default(0);
+            $table->boolean('access')->default(0);
         });
-
-        \DB::statement("ALTER TABLE `dashboards` CHANGE `access` `access` int(1) NOT NULL DEFAULT '0' ;");
     }
 
     /**
