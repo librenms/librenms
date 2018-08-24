@@ -78,10 +78,10 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
     foreach ($ospf_ports_poll as $ospf_port_id => $ospf_port) {
         // find port_id
         if ($ospf_port['ospfAddressLessIf']) {
-            $ospf_port['port_id'] = $device_model->ports()->where('ifIndex', $ospf_port['ospfAddressLessIf'])->value('port_id');
+            $ospf_port['port_id'] = (int)$device_model->ports()->where('ifIndex', $ospf_port['ospfAddressLessIf'])->value('port_id');
         } else {
             // FIXME force same device ?
-            $ospf_port['port_id'] = Ipv4Address::query()
+            $ospf_port['port_id'] = (int)Ipv4Address::query()
                 ->where('ipv4_address', $ospf_port['ospfIfIpAddress'])
                 ->where('context_name', $device['context_name'])
                 ->value('port_id');
