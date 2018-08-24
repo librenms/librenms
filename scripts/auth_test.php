@@ -83,7 +83,11 @@ try {
 
     if (isset($options['l'])) {
         $users = $authorizer->getUserlist();
-        echo "Users: " . implode(', ', array_column($users, 'username')) . PHP_EOL;
+        $output = array_map(function ($user) {
+            return "{$user['username']} ({$user['user_id']})";
+        }, $users);
+
+        echo "Users: " . implode(', ', $output) . PHP_EOL;
         echo "Total users: " . count($users) . PHP_EOL;
         exit;
     }
