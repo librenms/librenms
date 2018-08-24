@@ -35,6 +35,10 @@ if ($device['os'] == 'edgecos') {
         $temp_mibs = 'ECS3510-MIB';
     };
 
+    if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.8.1.11.')) { //ES3510MA
+        $temp_mibs = 'ES3510MA-MIB';
+    };
+
     $temp_data = snmp_get_multi_oid($device, 'memoryTotal.0 memoryFreed.0', '-OUQs', $temp_mibs);
     $total = $temp_data['memoryTotal.0'];
     $avail = $temp_data['memoryFreed.0'];
