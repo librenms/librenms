@@ -14,7 +14,7 @@ if (!Auth::user()->isAdmin()) {
     if (Auth::get()->canManageUsers()) {
         if ($vars['action'] == 'del') {
             $id = (int) $vars['id'];
-            $delete_username = dbFetchCell('SELECT username FROM users WHERE user_id = ?', array($id));
+            $delete_username = dbFetchCell('SELECT username FROM users WHERE user_id = ?', [$id]);
 
             if ($vars['confirm'] == 'yes') {
                 if (Auth::get()->deleteUser($id) >= 0) {
