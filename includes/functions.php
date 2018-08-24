@@ -2397,7 +2397,11 @@ function cache_peeringdb()
                         }
                     }
                     $pdb_ix_peers_ids = implode(',', $peer_keep);
-                    dbDelete('pdb_ix_peers', "`pdb_ix_peers_id` NOT IN ($pdb_ix_peers_ids)");
+                    if (empty($pdb_ix_peers_ids)) {
+                        dbDelete('pdb_ix_peers');
+                    } else {
+                        dbDelete('pdb_ix_peers', "`pdb_ix_peers_id` NOT IN ($pdb_ix_peers_ids)");
+                    }
                 }
                 $pdb_ix_ids = implode(',', $keep);
                 dbDelete('pdb_ix', "`pdb_ix_id` NOT IN ($pdb_ix_ids)");
