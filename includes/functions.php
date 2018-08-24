@@ -2400,8 +2400,18 @@ function cache_peeringdb()
                     }
                 }
             }
-            dbDelete('pdb_ix_peers', "`pdb_ix_peers_id` NOT IN " . dbGenPlaceholders(count($peer_keep)), $peer_keep);
-            dbDelete('pdb_ix', "`pdb_ix_id` NOT IN " . dbGenPlaceholders(count($ix_keep)), $ix_keep);
+
+            // cleanup
+            if (empty($peer_keep)) {
+                dbDelete('pdb_ix_peers');
+            } else {
+                dbDelete('pdb_ix_peers', "`pdb_ix_peers_id` NOT IN " . dbGenPlaceholders(count($peer_keep)), $peer_keep);
+            }
+            if (empty($ix_keep)) {
+                dbDelete('pdb_ix');
+            } else {
+                dbDelete('pdb_ix', "`pdb_ix_id` NOT IN " . dbGenPlaceholders(count($ix_keep)), $ix_keep);
+            }
         } else {
             echo "Cached PeeringDB data found....." . PHP_EOL;
         }
