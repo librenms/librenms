@@ -297,7 +297,16 @@ function poll_device($device, $force_module = false)
                 $start_memory = memory_get_usage();
                 $module_start = microtime(true);
                 echo "\n#### Load poller module $module ####\n";
-                include "includes/polling/$module.inc.php";
+
+                try {
+                    include "includes/polling/$module.inc.php";
+                } catch (Exception $e) {
+                    // isolate module exceptions so they don't disrupt the polling process
+                    echo $e->getTraceAsString() .PHP_EOL;
+                    c_echo("%rError in $module module.%n " . $e->getMessage() . PHP_EOL);
+                    logfile("Error in $module module. " . $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL);
+                }
+
                 $module_time = microtime(true) - $module_start;
                 $module_mem  = (memory_get_usage() - $start_memory);
                 printf("\n>> Runtime for poller module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
