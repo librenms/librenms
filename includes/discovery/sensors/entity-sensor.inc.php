@@ -58,8 +58,7 @@ if (!empty($entity_oids)) {
                 $card = str_split($index);
                 if (count($card) === 3) {
                     $card = $card[0] . "00";
-                } 
-                elseif (count($card) === 4) {
+                } elseif (count($card) === 4) {
                     $card = $card[0] . $card[1] . "00";
                 }
                 $descr = ucwords($entity_array[$card]['entPhysicalName']) . " " . ucwords($entity_array[$index]['entPhysicalDescr']);
