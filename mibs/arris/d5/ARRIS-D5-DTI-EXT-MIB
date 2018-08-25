@@ -1,0 +1,98 @@
+    ARRIS-D5-DTI-EXT-MIB DEFINITIONS ::= BEGIN
+        
+        IMPORTS
+            enterprises, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32,
+                    Counter32, Gauge32, IpAddress
+                FROM SNMPv2-SMI
+            TEXTUAL-CONVENTION, TruthValue, RowStatus, DisplayString,
+            TimeStamp, DateAndTime
+                FROM SNMPv2-TC
+            OBJECT-GROUP, MODULE-COMPLIANCE
+                FROM SNMPv2-CONF
+            ifIndex, InterfaceIndex, InterfaceIndexOrZero
+                FROM IF-MIB
+            arrisD5UEQam
+                FROM ARRIS-MIB;
+        
+            d5DtiExtMIB  MODULE-IDENTITY
+                LAST-UPDATED "200808200000Z"
+                ORGANIZATION "Arris Group, Inc"
+                CONTACT-INFO
+                    "   Network Management
+                        Postal: Arris Group
+                                3871 Lakefield Drive
+                                Suwanee, GA 30324
+                        Tel:    678 473 8500"
+        
+                DESCRIPTION
+                    "This MIB manages the DTI Client interface on the
+                     Arris D5 DMTS."
+                ::= { arrisD5UEQam 17 }
+        
+            d5DtiObjects OBJECT IDENTIFIER ::= { d5DtiExtMIB 1 }
+
+-- DTI Client Control
+-- Provides mechanisms to control the ARRIS DTI Client
+
+            dtiClientControlTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF DtiClientControlEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "A conceptual table for the control of a DTI client."
+                ::= { d5DtiObjects 1 }
+
+            dtiClientControlEntry OBJECT-TYPE
+                SYNTAX DtiClientControlEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "A conceptual row entry of this table."
+                INDEX { ifIndex }
+            ::= { dtiClientControlTable 1 }
+
+            DtiClientControlEntry ::=
+                SEQUENCE {
+                    dtiClientControlRevertive     TruthValue,
+                    dtiClientControlAutoSelect    TruthValue,
+                    dtiClientControlDisable       TruthValue,
+                    dtiClientControlPreferPortTwo TruthValue
+                }
+
+            dtiClientControlRevertive OBJECT-TYPE
+                SYNTAX TruthValue
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        "When set to true, automatic port selection is revertive."
+                DEFVAL { FALSE }
+                ::= { dtiClientControlEntry 1 }
+
+            dtiClientControlAutoSelect OBJECT-TYPE
+                SYNTAX TruthValue
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        "When set to true, port selection is automatic."
+                DEFVAL { TRUE }
+                ::= { dtiClientControlEntry 2 }
+
+            dtiClientControlDisable OBJECT-TYPE
+                SYNTAX TruthValue
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        "When set to true, DTI timing is disabled."
+                DEFVAL { TRUE }
+                ::= { dtiClientControlEntry 3 }
+
+            dtiClientControlPreferPortTwo OBJECT-TYPE
+                SYNTAX TruthValue
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        "When set to true, prefer port 2."
+                DEFVAL { FALSE }
+                ::= { dtiClientControlEntry 4 }
+
+    END
