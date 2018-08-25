@@ -155,6 +155,50 @@ foreach ((array)$config['webui']['custom_css'] as $custom_css) {
   </script>
   <script type="text/javascript" src="js/overlib_mini.js"></script>
   <script type="text/javascript" src="js/toastr.min.js"></script>
+    <?php
+    if ($config['webui']['dynamic_graphs'] === true) {
+    ?>
+  <script src="js/RrdGraphJS/q-5.0.2.min.js"></script>
+  <script src="js/RrdGraphJS/moment-timezone-with-data.js"></script>
+  <script src="js/RrdGraphJS/rrdGraphPng.js"></script>
+  <script type="text/javascript">
+      q.ready(function(){
+
+          // 'activate' the charts
+          var graphs = [];
+          q('.graph').forEach(function(item){
+              graphs.push(
+                  q(item).rrdGraphPng({
+                      canvasPadding: 120,
+                        <?php
+                        echo 'initialStart: ';
+                        if (isset($vars['from'])) {
+                            echo $vars['from'];
+                        } else {
+                            echo '(new Date()).getTime() / 1000 - 24*3600';
+                        }
+                        echo ',' . PHP_EOL;
+                        ?>
+                        <?php
+                        echo 'initialRange: ';
+                        if (isset($vars['to'])) {
+                            echo ($vars['to'] - $vars['from']);
+                        } else {
+                            echo '24*3600';
+                        }
+                        echo PHP_EOL;
+                        ?>
+                  })
+              );
+          });
+      });
+      // needed for dynamic height
+      window.onload = function(){ window.dispatchEvent(new Event('resize')); }
+  </script>
+    <?php
+    }
+    ?>
+
 </head>
 <body>
 

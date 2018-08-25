@@ -576,6 +576,33 @@ function generate_lazy_graph_tag($args)
     }
 }//end generate_lazy_graph_tag()
 
+function generate_dynamic_graph_tag($args)
+{
+    global $config;
+    $urlargs = array();
+    $w = 0;
+    foreach ($args as $key => $arg) {
+        switch (strtolower($key)) {
+            case 'width':
+                $w = $arg;
+                $value = "{{width}}";
+                break;
+            case 'from':
+                $value = "{{start}}";
+                break;
+            case 'to':
+                $value = "{{end}}";
+                break;
+            default:
+                $value = $arg;
+                break;
+        }
+        $urlargs[] = $key . "=" . $value;
+    }
+
+    return '<img style="width:'.$w.'px;height:100%" class="graph img-responsive" data-src-template="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
+}//end generate_dynamic_graph_tag()
+
 
 function generate_graph_js_state($args)
 {
