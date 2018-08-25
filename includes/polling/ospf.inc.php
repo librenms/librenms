@@ -42,7 +42,12 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
         ->where(['device_id' => $device['device_id'], 'context_name' => $device['context_name']])
         ->whereNotIn('id', $ospf_instances->pluck('id'))->delete();
 
-    echo $ospf_instances->count();
+    $instance_count = $ospf_instances->count();
+    echo $instance_count;
+    if ($instance_count == 0) {
+        // if there are no instances, don't check for areas, neighbors, and ports
+        return;
+    }
 
     echo ' Areas: ';
 
@@ -145,7 +150,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('neighbours', 'GAUGE', 0, 1000000);
 
 $fields = [
-    'instances'   => $ospf_instances->count(),
+    'instances'   => $instance_count,
     'areas'       => $ospf_areas->count(),
     'ports'       => $ospf_ports->count(),
     'neighbours'  => $ospf_neighbours->count(),
@@ -158,6 +163,7 @@ echo PHP_EOL;
 
 unset(
     $ospf_instances,
+    $instance_count,
     $ospf_areas,
     $ospf_ports,
     $ospf_neighbours,
