@@ -137,8 +137,8 @@ DAEMON=/usr/bin/rrdcached
 WRITE_TIMEOUT=1800
 WRITE_JITTER=1800
 WRITE_THREADS=4
-BASE_PATH=/mnt/librenms/rrd/db
-JOURNAL_PATH=/mnt/librenms/rrd/journal/
+BASE_PATH=/opt/librenms/rrd/
+JOURNAL_PATH=/var/lib/rrdcached/journal/
 PIDFILE=/var/run/rrdcached.pid
 SOCKFILE=/var/run/rrdcached.sock
 SOCKGROUP=librenms
@@ -149,7 +149,7 @@ BASE_OPTIONS="-B -F -R"
 
 3. Fix permissions
 ```bash
-chown librenms:librenms /mnt/librenms/rrd/journal/
+chown librenms:librenms /var/lib/rrdcached/journal/
 ```
 
 4. Restart the rrdcached service
