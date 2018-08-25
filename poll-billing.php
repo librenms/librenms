@@ -24,9 +24,9 @@ if (isset($argv[1]) && is_numeric($argv[1])) {
 set_debug(isset($options['d']));
 
 // Wait for schema update, as running during update can break update
-if (get_db_schema() < 107) {	
-    logfile("BILLING: Cannot continue until the database schema update to >= 107 is complete");	
-    exit(1);	
+if (get_db_schema() < 107) {
+    logfile("BILLING: Cannot continue until the database schema update to >= 107 is complete");
+    exit(1);
 }
 
 rrdtool_initialize();
