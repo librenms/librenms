@@ -1,7 +1,7 @@
 <?php
 
 /*
- * LibreNMS LNB Voltage State for the PBI HEADEND
+ * LibreNMS LNB Voltage State for the IRD PBI Headends
  *
  * © 2018 Jozef Rebjak <jozefrebjak@icloud.com>
  *
@@ -12,11 +12,11 @@
  * the source code distribution for details.
  */
 
-d_echo('pbi_state');
-$pbi_state_oid = '.1.3.6.1.4.1.1070.3.1.1.104.3.4.0';
-$state_name = 'pbi_state';
+d_echo('ird_state');
+$ird_state_oid = '.1.3.6.1.4.1.1070.3.1.1.104.3.4.0';
+$state_name = 'ird_state';
 $descr = 'LNB Voltage';
-$state = snmp_get($device, $pbi_state_oid, '-Oqv');
+$state = snmp_get($device, $ird_state_oid, '-Oqv');
 if (!empty($state)) {
     $state_index_id = create_state_index($state_name);
     if ($state_index_id !== null) {
@@ -38,6 +38,6 @@ if (!empty($state)) {
             dbInsert($insert, 'state_translations');
         }
     }
-    discover_sensor($valid['sensor'], 'state', $device, $pbi_state_oid, 1, $state_name, $descr, '1', '1', null, null, null, null, $state, 'snmp', 1);
+    discover_sensor($valid['sensor'], 'state', $device, $ird_state_oid, 1, $state_name, $descr, '1', '1', null, null, null, null, $state, 'snmp', 1);
     create_sensor_to_state_index($device, $state_name, 1);
 }
