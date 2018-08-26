@@ -1029,20 +1029,21 @@ function list_alerts()
     check_is_read();
     $app    = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
+
+    $sql = "SELECT `D`.`hostname`, `A`.*, `R`.`severity` FROM `alerts` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` AND `A`.`state` IN ";
     if (isset($_GET['state'])) {
-        $param = array(mres($_GET['state']));
+        $param = explode(',', $_GET['state']);
     } else {
-        $param = array('1');
+        $param = [1];
     }
+    $sql .= dbGenPlaceholders(count($param));
 
-    $sql = '';
     if (isset($router['id']) && $router['id'] > 0) {
-        $alert_id = mres($router['id']);
-        $sql      = 'AND `A`.id=?';
-        array_push($param, $alert_id);
+        $param[] = $router['id'];
+        $sql .= 'AND `A`.id=?';
     }
 
-    $alerts       = dbFetchRows("SELECT `D`.`hostname`, `A`.*, `R`.`severity` FROM `alerts` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` AND `A`.`state` IN (?) $sql", $param);
+    $alerts = dbFetchRows($sql, $param);
     api_success($alerts, 'alerts');
 }
 

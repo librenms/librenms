@@ -194,10 +194,10 @@ if (is_numeric($rule_id) && $rule_id > 0) {
 
     // Remove old mappings
     if (!empty($t_del)) {
-        dbDelete('alert_transport_map', 'target_type="single" AND transport_or_group_id IN (?)', array(array(implode(',', $t_del))));
+        dbDelete('alert_transport_map', 'target_type="single" AND transport_or_group_id IN ' . dbGenPlaceholders(count($t_del)), $t_del);
     }
     if (!empty($g_del)) {
-        dbDelete('alert_transport_map', 'target_type="group" AND transport_or_group_id IN (?)', array(array(implode(',', $g_del))));
+        dbDelete('alert_transport_map', 'target_type="group" AND transport_or_group_id IN ' . dbGenPlaceholders(count($g_del)), $g_del);
     }
 }
 
