@@ -124,4 +124,42 @@ if (isset($options[s])) {
         "1.3.6.1.4.1.8072.1.3.2.2.1.21.6.100.105.115.116.114.111|2|1\n".
         "1.3.6.1.4.1.8072.1.3.2.2.1.21.".$oid."|2|1\n".
         "1.3.6.1.4.1.8072.1.3.2.3.1.2.".$oid."|4x|".bin2hex($raw_json)."\n";
+    exit(0);
+}
+
+// prints the json test data file if asked to
+if (isset($options[j])) {
+    $test_data=array(
+        "discovery" => array(
+            "applications" => array(
+                "app_type" => $options[a],
+                "app_state" => "UNKNOWN",
+                "discovered" => "1",
+                "app_state_prev" => null,
+                "app_status" => "",
+                "app_instance" => "",),
+            "application_metrics" => array(),
+        ),
+        "poller" => array(
+            "applications" => array(
+                "app_type" => $options[a],
+                "app_state" => "OK",
+                "discovered" => "1",
+                "app_state_prev" => "UNKNOWN",
+                "app_status" => "",
+                "app_instance" => "",),
+            "application_metrics" => array(),
+        ),
+
+    );
+    foreach ($metrics_keys as $key) {
+        $test_data[poller][application_metrics][]=array(
+            "metric" => $key,
+            "value" => $metrics[$key],
+            "value_prev" => null,
+            "app_type" => $options[a],
+        );
+    }
+    echo json_encode($test_data, JSON_PRETTY_PRINT)."\n";
+    exit(0);
 }
