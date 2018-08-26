@@ -1,7 +1,7 @@
 <?php
 
 /*
- * LibreNMS Satellite Frequency Sensor for the PBI HEADEND
+ * LibreNMS Satellite Frequency Sensor for the IRD PBI Headends
  *
  * © 2018 Jozef Rebjak <jozefrebjak@icloud.com>
  *
@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-echo 'pbi_sat_frequency';
+echo 'ird_sat_frequency';
 
 $freq_oid = '.1.3.6.1.4.1.1070.3.1.1.104.3.2.0';
 $freq_value = snmp_get($device, $freq_oid, '-Oqv');
