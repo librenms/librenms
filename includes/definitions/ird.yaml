@@ -2,7 +2,7 @@ os: ird
 text: 'Linux'
 type: network
 icon: pbi
-group: pbi
+group: ird
 over:
     - { graph: device_signal, text: 'Signal Strength' }
 discovery:
