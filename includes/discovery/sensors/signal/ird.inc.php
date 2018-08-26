@@ -1,7 +1,7 @@
 <?php
 
 /*
- * LibreNMS Signal Strength for the PBI HEADEND
+ * LibreNMS Signal Strength for the IRD PBI Headends
  *
  * © 2018 Jozef Rebjak <jozefrebjak@icloud.com>
  *
@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-echo 'pbi_signal_strength';
+echo 'ird_signal_strength';
 
 $signal_oid = '.1.3.6.1.4.1.1070.3.1.1.104.1.1.6.0';
 $signal_value = snmp_get($device, $signal_oid, '-Oqv');
