@@ -39,7 +39,7 @@ $options = getopt($short_opts);
 
 // print the help
 if (isset($options[h])) {
-    echo "LibreNMS JSON App test generator
+    echo "LibreNMS JSON App tool
   -j      The file containing the JSON to use for the test.
   -s      Print the SNMPrec data.
   -t      Print the JSON test data file.
@@ -47,7 +47,21 @@ if (isset($options[h])) {
   -m      Extract and print metric variables from the JSON file.
   -k      If m is specified, just print the keys in tested order.
   -a      The application name for use with -s and -t.
-  -h      Show this help text.\n";
+  -h      Show this help text.
+
+-j must always be specified.
+
+-a must always be given with -s and -t.
+
+-l if specified will override any others. If none of the others are
+   specified and just -j is given, then the file is loaded and then
+   linted if needed. For linting jsonlint needs to be installed.
+
+-m is handy if you want to grab a list of metrics a JSON app is returning
+   and how they data is flattned as well for when writing alert rules. -k
+   prints it in a slightly neater manner and in a manner and in tested
+   order.
+";
     exit();
 }
 
