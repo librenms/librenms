@@ -2344,6 +2344,8 @@ function cache_peeringdb()
             $rand = rand(3, 30);
             echo "No cached PeeringDB data found, sleeping for $rand seconds" . PHP_EOL;
             sleep($rand);
+            $peer_keep = [];
+            $ix_keep = [];
             foreach (dbFetchRows("SELECT `bgpLocalAs` FROM `devices` WHERE `disabled` = 0 AND `ignore` = 0 AND `bgpLocalAs` > 0 AND (`bgpLocalAs` < 64512 OR `bgpLocalAs` > 65535) AND `bgpLocalAs` < 4200000000 GROUP BY `bgpLocalAs`") as $as) {
                 $asn = $as['bgpLocalAs'];
                 $get = Requests::get($peeringdb_url . '/net?depth=2&asn=' . $asn, array(), array('proxy' => get_proxy()));
@@ -2366,7 +2368,7 @@ function cache_peeringdb()
                         );
                         $pdb_ix_id = dbInsert($insert, 'pdb_ix');
                     }
-                    $keep = $pdb_ix_id;
+                    $ix_keep[] = $pdb_ix_id;
                     $get_ix = Requests::get("$peeringdb_url/netixlan?ix_id=$ixid", array(), array('proxy' => get_proxy()));
                     $ix_json = $get_ix->body;
                     $ix_data = json_decode($ix_json);
@@ -2396,11 +2398,19 @@ function cache_peeringdb()
                             $peer_keep[] = dbInsert($peer_insert, 'pdb_ix_peers');
                         }
                     }
-                    $pdb_ix_peers_ids = implode(',', $peer_keep);
-                    dbDelete('pdb_ix_peers', "`pdb_ix_peers_id` NOT IN ($pdb_ix_peers_ids)");
                 }
-                $pdb_ix_ids = implode(',', $keep);
-                dbDelete('pdb_ix', "`pdb_ix_id` NOT IN ($pdb_ix_ids)");
+            }
+
+            // cleanup
+            if (empty($peer_keep)) {
+                dbDelete('pdb_ix_peers');
+            } else {
+                dbDelete('pdb_ix_peers', "`pdb_ix_peers_id` NOT IN " . dbGenPlaceholders(count($peer_keep)), $peer_keep);
+            }
+            if (empty($ix_keep)) {
+                dbDelete('pdb_ix');
+            } else {
+                dbDelete('pdb_ix', "`pdb_ix_id` NOT IN " . dbGenPlaceholders(count($ix_keep)), $ix_keep);
             }
         } else {
             echo "Cached PeeringDB data found....." . PHP_EOL;

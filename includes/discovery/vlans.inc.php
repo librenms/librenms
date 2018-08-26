@@ -90,8 +90,8 @@ foreach ($vlans_db as $domain_id => $vlans) {
 }
 
 // remove non-existent port-vlan mappings
-if (is_array($valid_vlan_port) && count($valid_vlan_port) > 0) {
-    $num = dbDelete('ports_vlans', '`device_id`=? AND `port_vlan_id` NOT IN ('.join(',', $valid_vlan_port).')', array($device['device_id']));
+if (!empty($valid_vlan_port)) {
+    $num = dbDelete('ports_vlans', '`device_id`=? AND `port_vlan_id` NOT IN ' . dbGenPlaceholders(count($valid_vlan_port)), array_merge([$device['device_id']], $valid_vlan_port));
     d_echo("Deleted $num vlan mappings\n");
 }
 
