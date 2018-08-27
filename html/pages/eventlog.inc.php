@@ -42,6 +42,9 @@ $pagetitle[] = 'Eventlog';
         '<div class="pull-left">' +
         '<form method="post" action="" class="form-inline" role="form" id="result_form">' +
         '<div class="form-group">' +
+        <?php
+        if (!isset($vars['fromdevice'])) {
+        ?>
         '<label><strong>Device&nbsp;&nbsp;</strong></label>' +
         '<select name="device" id="device" class="form-control input-sm">' +
         '<option value="">All Devices</option>' +
@@ -58,6 +61,11 @@ $pagetitle[] = 'Eventlog';
         }
         ?>
         '</select>' +
+        <?php
+        } else {
+            echo "'&nbsp;&nbsp;<input type=\"hidden\" name=\"device\" id=\"device\" value=\"" . $vars['device'] . "\">' + ";
+        }
+        ?>
         '</div>&nbsp;&nbsp;&nbsp;&nbsp;' +
         '<div class="form-group"><label><strong>Type&nbsp;&nbsp;</strong></label>' +
         '<select name="eventtype" id="eventtype" class="form-control input-sm">' +
@@ -80,6 +88,3 @@ $pagetitle[] = 'Eventlog';
         '</div>'
     );
 </script>
-
-
-

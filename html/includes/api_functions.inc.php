@@ -1031,28 +1031,33 @@ function list_alerts()
     check_is_read();
     $app    = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
+    $vars = array();
+
+    $sql = "SELECT `D`.`hostname`, `A`.*, `R`.`severity` FROM `alerts` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` AND `A`.`state` IN ";
     if (isset($_GET['state'])) {
-        $param = array(mres($_GET['state']));
+        $param = explode(',', $_GET['state']);
     } else {
-        $param = array('1');
+        $param = [1];
     }
+    $sql .= dbGenPlaceholders(count($param));
 
-    $sql = '';
     if (isset($router['id']) && $router['id'] > 0) {
-        $alert_id = mres($router['id']);
-        $sql      = ' AND `A`.id=?';
-        array_push($param, $alert_id);
+        $param[] = $router['id'];
+        $sql .= 'AND `A`.id=?';
     }
 
-    if (isset($_GET['severity'])) {
-        $severity = mres($_GET['severity']);
-        if ($severity == 'ok' || $severity == 'warning' || $severity == 'critical') {
-            $sql = ' AND `R`.severity=?';
-            array_push($param, $severity);
+    $vars['severity'] = $_GET['severity'];
+    if (isset($vars['severity'])) {
+        if ($vars['severity'] == 'ok' || $vars['severity'] == 'warning' || $vars['severity'] == 'critical') {
+            $param[] = $vars['severity'];
+            $sql .= ' AND `R`.severity=?';
         }
     }
+    
+    $vars['order'] = $_GET['order'] ?: "timestamp desc";
+    $sql .= ' ORDER BY A.'.$vars['order'];
 
-    $alerts       = dbFetchRows("SELECT `D`.`hostname`, `A`.*, `R`.`severity` FROM `alerts` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` AND `A`.`state` IN (?) $sql", $param);
+    $alerts = dbFetchRows($sql, $param);
     api_success($alerts, 'alerts');
 }
 

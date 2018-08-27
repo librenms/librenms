@@ -50,6 +50,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <option value="hipchat-form">Hipchat</option>
                                     <option value="irc-form">IRC</option>
                                     <option value="jira-form">Jira</option>
+                                    <option value="kayako-form">Kayako Classic</option>
                                     <option value="mail-form" selected>Mail</option>
                                     <option value="msteams-form">Microsoft Teams</option>
                                     <option value="nagios-form">Nagios</option>
@@ -62,6 +63,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <option value="rocket-form">Rocket.chat</option>
                                     <option value="slack-form">Slack</option>
                                     <option value="smseagle-form">SMSEagle</option>
+                                    <option value="smsfeedback-form">SMSFeedback</option>
                                     <option value="syslog-form">Syslog</option>
                                     <option value="telegram-form">Telegram</option>
                                     <option value="victorops-form">Victorops</option>
