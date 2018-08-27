@@ -1031,7 +1031,7 @@ function list_alerts()
     check_is_read();
     $app    = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
-    $vars = array();
+    $vars = [];
 
     $sql = "SELECT `D`.`hostname`, `A`.*, `R`.`severity` FROM `alerts` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` AND `A`.`state` IN ";
     if (isset($_GET['state'])) {
@@ -1046,16 +1046,16 @@ function list_alerts()
         $sql .= 'AND `A`.id=?';
     }
 
-    $vars['severity'] = $_GET['severity'];
-    if (isset($vars['severity'])) {
-        if ($vars['severity'] == 'ok' || $vars['severity'] == 'warning' || $vars['severity'] == 'critical') {
-            $param[] = $vars['severity'];
+    $severity = $_GET['severity'];
+    if (isset($severity)) {
+        if (in_array($severity, ['ok', 'warning', 'critical'])) {
+            $param[] = $severity;
             $sql .= ' AND `R`.severity=?';
         }
     }
     
-    $vars['order'] = $_GET['order'] ?: "timestamp desc";
-    $sql .= ' ORDER BY A.'.$vars['order'];
+    $order = $_GET['order'] ?: "timestamp desc";
+    $sql .= ' ORDER BY A.'.$order;
 
     $alerts = dbFetchRows($sql, $param);
     api_success($alerts, 'alerts');
