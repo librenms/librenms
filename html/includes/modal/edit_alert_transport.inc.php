@@ -56,6 +56,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <option value="nagios-form">Nagios</option>
                                     <option value="opsgenie-form">OpsGenie</option>
                                     <option value="osticket-form">osTicket</option>
+                                    <option value="pagerduty-form">PagerDuty</option>
                                     <option value="hue-form">Phillips Hue</option>
                                     <option value="playsms-form">PlaySMS</option>
                                     <option value="pushbullet-form">Pushbullet</option>

@@ -29,19 +29,31 @@ class Pagerduty extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
+
+        if ($obj['state'] == 0) {
+            $obj['event_type'] = 'resolve';
+        } elseif ($obj['state'] == 2) {
+            $obj['event_type'] = 'acknowledge';
+        } else {
+            $obj['event_type'] = 'trigger';
+        }
+
+        if (empty($this->config)) {
+            return $this->deliverAlertOld($obj, $opts);
+        }
+        return $this->contactPagerduty($obj, $this->config);
+    }
+
+    public function deliverAlertOld($obj, $opts)
+    {
+        // This code uses legacy events for PD
         $protocol = array(
             'service_key' => $opts,
             'incident_key' => ($obj['id'] ? $obj['id'] : $obj['uid']),
             'description' => ($obj['name'] ? $obj['name'] . ' on ' . $obj['hostname'] : $obj['title']),
             'client' => 'LibreNMS',
         );
-        if ($obj['state'] == 0) {
-            $protocol['event_type'] = 'resolve';
-        } elseif ($obj['state'] == 2) {
-            $protocol['event_type'] = 'acknowledge';
-        } else {
-            $protocol['event_type'] = 'trigger';
-        }
+
         foreach ($obj['faults'] as $fault => $data) {
             $protocol['details'][] = $data['string'];
         }
@@ -60,13 +72,60 @@ class Pagerduty extends Transport
         return true;
     }
 
-    public function contactPagerduty()
+    public function contactPagerduty($obj, $config)
     {
-        return [];// Pagerduty is a custom transport.
+        foreach ($obj['faults'] as $fault => $data) {
+            $fault .= $data['string'] . PHP_EOL;
+        }
+        $data = [
+            'routing_key'  => $config['pagerduty-integrationkey'],
+            'event_action' => $obj['event_type'],
+            'dedup_key'    => $obj['uid'],
+            'payload'    => [
+                'summary'  => $fault,
+                'source'   => $obj['hostname'],
+                'severity' => $obj['severity'],
+            ],
+        ];
+        $curl = curl_init();
+        set_curl_proxy($curl);
+        curl_setopt($curl, CURLOPT_URL, 'https://events.pagerduty.com/v2/enqueue');
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [
+            'Content-type'  => 'application/json',
+            'Authorization' => "Token token={$config['pagerduty-apikey']}",
+        ]);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+        $ret = json_decode(curl_exec($curl), true);
+        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        if ($code != 200 && $code != 202) {
+            var_dump("PagerDuty returned Error ({$ret['message']})"); //FIXME: propper debuging
+            return 'HTTP Status code ' . $code;
+        }
+        return true;
     }
 
     public static function configTemplate()
     {
-        return [];// Pagerduty is a custom transport.
+        return [
+            'config' => [
+                [
+                    'title' => 'API Key',
+                    'name' => 'pagerduty-apikey',
+                    'descr' => 'API Key',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Integration Key',
+                    'name' => 'pagerduty-integrationkey',
+                    'descr' => 'Integration Key',
+                    'type' => 'text',
+                ],
+            ],
+            'validation' => [
+                'pagerduty-apikey'         => 'required|string',
+                'pagerduty-integrationkey' => 'required|string|size:32'
+            ]
+        ];
     }
 }
