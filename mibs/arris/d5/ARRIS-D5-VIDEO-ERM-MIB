@@ -1,0 +1,332 @@
+ARRIS-D5-VIDEO-ERM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        arrisD5UEQam
+            FROM ARRIS-MIB
+        MODULE-IDENTITY,
+        NOTIFICATION-TYPE,
+        OBJECT-TYPE,
+        Integer32,
+        Counter32,
+        Unsigned32
+                FROM SNMPv2-SMI
+        DateAndTime,
+        TEXTUAL-CONVENTION,
+        DisplayString,
+        RowStatus,
+        TruthValue
+                FROM SNMPv2-TC
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP,
+        MODULE-COMPLIANCE
+                FROM SNMPv2-CONF
+        ifIndex,
+        InterfaceIndex
+                FROM IF-MIB
+        InetAddress,
+        InetAddressType
+                FROM INET-ADDRESS-MIB
+        SnmpAdminString 
+                FROM SNMP-FRAMEWORK-MIB;
+
+arrisD5UEQamErmMib MODULE-IDENTITY
+		LAST-UPDATED "200711080000Z" -- 08th November 2007
+		ORGANIZATION "Arris Group"
+		CONTACT-INFO
+				"           Software Development
+						Postal: ARRIS Group
+										3871 Lakefield Drive
+										Suwanee, GA 30024
+										USA
+						Tel:    800-469-6569
+						Fax:    678-473-8770"
+
+		DESCRIPTION
+				"This MIB manages the erm software on the
+				 ARRIS D5 product"
+		::= { arrisD5UEQam 11 }
+
+
+arrisD5UEQamErmGroup OBJECT-GROUP
+	OBJECTS {
+		d5ErmComponentName,
+		d5ErmStreamingZone
+  }
+  STATUS current
+   DESCRIPTION
+"A collection of objects providing system erm configuration."
+ ::= { arrisD5UEQamErmMib 1 }
+   
+
+d5ErmComponentName OBJECT-TYPE
+   SYNTAX       DisplayString
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+        "Sets component name advertised during VREP OPEN."
+   ::= { arrisD5UEQamErmGroup 1 }
+
+d5ErmStreamingZone OBJECT-TYPE
+   SYNTAX       DisplayString
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+        "Sets streaming zone that ERM/ED are configured in."
+   ::= { arrisD5UEQamErmGroup 2 }
+
+
+d5ErmTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF D5ErmEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table describes the configuration parameters 
+            associated with remote Edge Resource Manager (ERM)
+            devices. Use of multiple entries within this table
+            enables the logical separation of the D5 to multiple
+            ERMs."
+        ::= { arrisD5UEQamErmMib 2 }
+
+d5ErmEntry OBJECT-TYPE
+        SYNTAX      D5ErmEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry corresponds to an individual ERM 
+            configuration."
+        INDEX { d5ErmName }
+        ::= { d5ErmTable 1 }
+
+D5ErmEntry ::= SEQUENCE { 
+          d5ErmName                  DisplayString,
+          d5ErmDescription           DisplayString,
+          d5ErmLocalIpAddress        InetAddress,
+          d5ErmRemoteIpName          DisplayString,
+          d5ErmVrepPort              Integer32,
+          d5ErmHoldTime              Unsigned32,
+          d5ErmBwInterval			 Unsigned32,
+          d5ErmBwThreshold			 Unsigned32,
+          d5ErmCost					 Unsigned32,
+          d5ErmRtspPort              Integer32,
+          d5ErmRtspConnectionTimeout Integer32,
+          d5ErmRtspMessageTimeout    Integer32,
+          d5ErmRtspSessionTimeout    Integer32,
+          d5ErmAdminStatus           INTEGER,
+          d5ErmVrepStatus            INTEGER,
+          d5ErmVrepConnRetryTimeout  Unsigned32,
+          d5ErmRtspStatus            INTEGER,
+          d5ErmRowStatus             RowStatus
+      }
+
+d5ErmName OBJECT-TYPE
+   SYNTAX       DisplayString
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+        "Name of ERM configuration entry."
+   ::= { d5ErmEntry 1 }
+
+d5ErmDescription OBJECT-TYPE 
+   SYNTAX       DisplayString
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+        "Contains text description of the ERM configuration."
+   ::= { d5ErmEntry 2 }
+
+d5ErmLocalIpAddress OBJECT-TYPE
+   SYNTAX      InetAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "Local IP address to use for DRRP/VREP and RTSP connections."
+   ::= { d5ErmEntry 3 }
+
+d5ErmRemoteIpName OBJECT-TYPE
+   SYNTAX       DisplayString
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+        "A comma seperated list of up to three remote addresses. The first entry in the list is the primary remote erm address.  Subsequent values are the secondary remote erm addresses.  An IPV4 address or hostname is acceptable for each value."
+   ::= { d5ErmEntry 4 }
+
+d5ErmVrepPort OBJECT-TYPE
+   SYNTAX Integer32 ( 0..65535 )
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+        "Contains TCP port value used for DRRP listener/connections."
+   ::= { d5ErmEntry 5 }
+
+d5ErmHoldTime OBJECT-TYPE
+   SYNTAX Unsigned32 ( 0..65535 )
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+        "Contains VREP/DRRP hold-time for connection timeout."
+   ::= { d5ErmEntry 6 }
+
+d5ErmBwInterval OBJECT-TYPE
+   SYNTAX Unsigned32 ( 0..65535 )
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+        "Interval to send AvailableBandwidth UDPATE messages."
+   ::= { d5ErmEntry 7 }
+
+d5ErmBwThreshold OBJECT-TYPE
+   SYNTAX Unsigned32 ( 0..65535 )
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+        "Change in bandwith utilisation required to trigger an AvailableBandwidth UDPATE messages."
+   ::= { d5ErmEntry 8 }
+
+d5ErmCost OBJECT-TYPE
+   SYNTAX Unsigned32 ( 0..65535 )
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+        "Cost to advertise in VREP OPEN message."
+   ::= { d5ErmEntry 9 }
+
+d5ErmRtspPort OBJECT-TYPE
+   SYNTAX Integer32 ( 0..65535 )
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+        "Contains TCP port value used for incoming RTSP connections."
+   ::= { d5ErmEntry 10 }
+
+d5ErmRtspConnectionTimeout OBJECT-TYPE
+   SYNTAX Integer32 ( 0..65535 )
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+        "RTSP Connection timeout."
+   ::= { d5ErmEntry 11 }
+
+d5ErmRtspMessageTimeout OBJECT-TYPE
+   SYNTAX Integer32 ( 0..65535 )
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+        "RTSP Message timeout."
+   ::= { d5ErmEntry 12 }
+
+d5ErmRtspSessionTimeout OBJECT-TYPE
+   SYNTAX Integer32 ( 0..65535 )
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+        "RTSP Session timeout."
+   ::= { d5ErmEntry 13 }
+
+
+d5ErmAdminStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                down(1),
+                up(2),
+                shuttingdown(3)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The desired state of the interface.  The shuttingDown(3) state
+            indicates that the ERM interface is transitioning from up(1) to down(2),
+            but the system is waiting for the resources to be withdrawn from the ERM."
+    ::= { d5ErmEntry 14 }
+
+d5ErmVrepStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+							idle(1),
+							connect(2),
+							active(3),
+							opensent(4),
+							openconfirm(5),
+							established(6)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current state of the VREP state machine."
+    ::= { d5ErmEntry 15 }
+
+d5ErmVrepConnRetryTimeout OBJECT-TYPE
+    SYNTAX  Unsigned32 ( 0..65535 )
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The current state of the RTSP server."
+    ::= { d5ErmEntry 16 }
+
+d5ErmRtspStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+							notrunning(1),
+							notconnected(2),
+							connected(3)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current state of the RTSP server."
+    ::= { d5ErmEntry 17 }
+    
+d5ErmRowStatus OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+        "The values that control the creation/deletion of ERMs on 
+        the D5."
+   ::= { d5ErmEntry 18 }
+
+d5ErmSubIfTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF D5ErmSubIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table used for binding primary subinterfaces to an ERM interface"
+        ::= { arrisD5UEQamErmMib 3 }
+
+d5ErmSubIfEntry OBJECT-TYPE
+        SYNTAX      D5ErmSubIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            ""
+        INDEX { ifIndex }
+        ::= { d5ErmSubIfTable 1 }
+
+D5ErmSubIfEntry ::= SEQUENCE { 
+          d5ErmSubIfErmName     OCTET STRING,
+          d5ErmSubIfEigName     OCTET STRING,
+          d5ErmSubIfRowStatus   RowStatus
+      }
+
+d5ErmSubIfErmName OBJECT-TYPE
+   SYNTAX       OCTET STRING (SIZE(0..16))
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION
+        "name of configured ERM that this ethernet is available to"
+   ::= { d5ErmSubIfEntry 1 }
+
+d5ErmSubIfEigName OBJECT-TYPE
+   SYNTAX       OCTET STRING (SIZE(0..16))
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION
+        "name of Edge Input Group name for this interface"
+   ::= { d5ErmSubIfEntry 2 }
+
+d5ErmSubIfRowStatus OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+        "The values that control the creation/deletion of entries in the d5ErmSubIfTable"
+   ::= { d5ErmSubIfEntry 3 }
+  
+
+END

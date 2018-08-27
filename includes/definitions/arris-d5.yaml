@@ -1,0 +1,12 @@
+os: arris-d5
+text: 'Arris D5 Universal EdgeQAM'
+type: network
+icon: arris
+group: arris
+mib_dir:
+- arris/d5
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.4115.1.8

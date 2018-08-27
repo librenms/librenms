@@ -1,0 +1,181 @@
+	ARRIS-D5-ENT-SENSOR-THRESH-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			packetport, cm110, tcm, ttm, ttp, 
+			cmtsMSAS, cmts1500, cmtsC3, cmtsC4, cmtsCommon, 
+			mrcController, arrisGlobalAccessMib, arrisGlobalAccessProductUas, arrisD5UEQam			
+				FROM ARRIS-MIB			
+			entPhysicalIndex, entityPhysicalGroup			
+				FROM ENTITY-MIB			
+			entPhySensorType, entPhySensorScale, entPhySensorPrecision, entPhySensorValue, entPhySensorOperStatus, 
+			entPhySensorUnitsDisplay, entPhySensorValueTimeStamp, entPhySensorValueUpdateRate, entitySensorCompliance, entitySensorValueGroup, 
+			entPhySensorEntry			
+				FROM ENTITY-SENSOR-MIB			
+			OBJECT-GROUP, MODULE-COMPLIANCE			
+				FROM SNMPv2-CONF			
+			Integer32, OBJECT-TYPE, MODULE-IDENTITY			
+				FROM SNMPv2-SMI;
+	
+	
+		-- 1.3.6.1.4.1.4115.1.7.1.4
+		arrisEntSensorThreshMIB MODULE-IDENTITY 
+			LAST-UPDATED "200710100000Z" -- 10th Oct 2007
+			ORGANIZATION 
+				"Arris"
+			CONTACT-INFO 
+				"Cindy Tromer
+						Postal: Arris Interactive
+						        3871 Lakefield Drive
+						        Suite 300
+						        Suwanee, GA 30024-1242
+						        U.S.A.
+						Phone:  +1 770 622 8679
+						E-mail: cindy.tromer@arrisi.com
+						
+						Initial MIB creator: Cindy Tromer
+						Postal: Arris Interactive
+						        3871 Lakefield Drive
+						        Suite 300
+						        Suwanee, GA 30024-1242
+						        U.S.A.
+						Phone:  +1 770 622 8679
+						E-mail: cindy.tromer@arrisi.com
+				"
+			DESCRIPTION 
+				"This is the extension Module to rfc3433 ENTITY-SENSOR-MIB."
+			::= { arrisD5UEQam 4 }
+
+		
+	
+	
+--
+-- Node definitions
+--
+	
+		-- 1.3.6.1.4.1.4115.1.7.1.4.1
+		entThreshObjects OBJECT IDENTIFIER ::= { arrisEntSensorThreshMIB 1 }
+
+		
+		-- 1.3.6.1.4.1.4115.1.7.1.4.1.1
+		entThreshTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF EntThreshEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table contains one row per physical sensor. 
+				
+				Each row contains the set of thresholds maintained
+				for each pyhsical sensor."
+			::= { entThreshObjects 1 }
+
+		
+		-- 1.3.6.1.4.1.4115.1.7.1.4.1.1.1
+		entThreshEntry OBJECT-TYPE
+			SYNTAX EntThreshEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The threshold information for a particular 
+				physical sensor.
+				
+				An entry in this table describes the upper and lower warning
+				thresholds, as well as the upper and lower fatal thresholds."
+			AUGMENTS { entPhySensorEntry }
+			::= { entThreshTable 1 }
+
+		
+		EntThreshEntry ::=
+			SEQUENCE { 
+				entLowerWarnThresh
+					Integer32,
+				entUpperWarnThresh
+					Integer32,
+				entLowerFatalThresh
+					Integer32,
+				entUpperFatalThresh
+					Integer32
+			 }
+
+		-- 1.3.6.1.4.1.4115.1.7.1.4.1.1.1.1
+		entLowerWarnThresh OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The lower warning threshold for a physical sensor. 
+				When a sensor value goes below this threshold, the 
+				system will continue to operate, but the craftperson
+				should evaluate the problem. "
+			::= { entThreshEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.4115.1.7.1.4.1.1.1.2
+		entUpperWarnThresh OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The upper warning threshold for a physical sensor. 
+				When a sensor value goes above this threshold, the 
+				system will continue to operate, but the craftperson
+				should evaluate the problem. "
+			::= { entThreshEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.4115.1.7.1.4.1.1.1.3
+		entLowerFatalThresh OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The lower fatal threshold for a physical sensor. 
+				When a sensor value goes below this threshold, the 
+				system will shutdown."
+			::= { entThreshEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.4115.1.7.1.4.1.1.1.4
+		entUpperFatalThresh OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The upper fatal threshold for a physical sensor. 
+				When a sensor value goes above this threshold, the 
+				system will shutdown."
+			::= { entThreshEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.4115.1.7.1.4.2
+		entThreshConformance OBJECT IDENTIFIER ::= { arrisEntSensorThreshMIB 2 }
+
+		
+		-- 1.3.6.1.4.1.4115.1.7.1.4.2.1
+		entThreshCompliances OBJECT IDENTIFIER ::= { entThreshConformance 1 }
+
+		
+		-- 1.3.6.1.4.1.4115.1.7.1.4.2.1.1
+		entThreshCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			MODULE -- this module
+				MANDATORY-GROUPS { entThreshValueGroup }
+			::= { entThreshCompliances 1 }
+
+		
+		-- 1.3.6.1.4.1.4115.1.7.1.4.2.2
+		entThreshGroups OBJECT IDENTIFIER ::= { entThreshConformance 2 }
+
+		
+		-- 1.3.6.1.4.1.4115.1.7.1.4.2.2.1
+		entThreshValueGroup OBJECT-GROUP
+			OBJECTS { entLowerWarnThresh, entUpperWarnThresh, entUpperFatalThresh, entLowerFatalThresh }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { entThreshGroups 1 }
+
+		
+	
+	END
