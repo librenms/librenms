@@ -13,6 +13,7 @@
  */
 
 use LibreNMS\Authentication\Auth;
+use LibreNMS\Alerting\QueryBuilderParser;
 
 function authToken(\Slim\Route $route)
 {
