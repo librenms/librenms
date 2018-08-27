@@ -13,6 +13,6 @@ $cn_oid = '.1.3.6.1.4.1.1070.3.1.1.104.1.1.8.0';
 $value = snmp_get($device, $cn_oid, '-Oqv');
 $descr = 'C/N';
 $divisor = 10;
-if (is_numeric($value) && $value > 0){
+if (is_numeric($value) && $value > 0){ 
     discover_sensor($valid['sensor'], 'dbm', $device, $cn_oid, 0, $device['os'], $descr, $divisor, 1, null, null, null, null, $value / $divisor );
  }
