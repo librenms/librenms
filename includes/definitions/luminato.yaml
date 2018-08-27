@@ -1,8 +1,8 @@
-os: teleste
+os: luminato
 text: 'Teleste Luminato'
 type: network
 icon: teleste
-group: teleste
+group: luminato
 mib_dir:
     - teleste
 over:
