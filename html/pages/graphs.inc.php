@@ -159,6 +159,7 @@ if (!$auth) {
 
     echo('<div style="width: '.$graph_array['width'].'; margin: auto;"><center>');
     if ($config['webui']['dynamic_graphs'] === true) {
+        echo generate_dynamic_graph_js($graph_array);
         echo generate_dynamic_graph_tag($graph_array);
     } else {
         echo generate_lazy_graph_tag($graph_array);
