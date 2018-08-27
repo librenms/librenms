@@ -322,6 +322,12 @@ You can increase this if you want to try and fit more of the hostname in graph t
 The default value is 12
 However, this can possibly break graph generation if this is very long.
 
+```php
+$config['webui']['dynamic_graphs'] = true;
+```
+
+Enable dynamic graphs by implementing RrdGraphJS (https://github.com/oetiker/RrdGraphJS). Graphs will be movable/scalable without reloading the page.
+
 ### Stacked Graphs
 You can enable stacked graphs instead of the default inverted graphs. 
 Enabling them is possible via webui Global Settings -> Webui Settings -> Graph settings -> Use stacked graphs
