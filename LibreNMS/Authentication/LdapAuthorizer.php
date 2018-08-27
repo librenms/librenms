@@ -358,7 +358,7 @@ class LdapAuthorizer extends AuthorizerBase
         return [
             'username' => $entry['uid'][0],
             'realname' => $entry['cn'][0],
-            'user_id' => $entry[$uid_attr][0],
+            'user_id' => (int)$entry[$uid_attr][0],
             'email' => $entry[Config::get('auth_ldap_emailattr', 'mail')][0],
             'level' => $this->getUserlevel($entry['uid'][0]),
         ];

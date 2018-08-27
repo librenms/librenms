@@ -203,8 +203,8 @@ function record_sensor_data($device, $all_sensors)
         if ($sensor['sensor_class'] == 'state' && $prev_sensor_value != $sensor_value) {
             $trans = array_column(
                 dbFetchRows(
-                    "SELECT `state_translations`.`state_value`, `state_translations`.`state_descr` FROM `sensors_to_state_indexes` LEFT JOIN `state_translations` USING (`state_index_id`) WHERE `sensors_to_state_indexes`.`sensor_id`=? AND `state_translations`.`state_value` IN ($sensor_value,$prev_sensor_value)",
-                    array($sensor['sensor_id'])
+                    "SELECT `state_translations`.`state_value`, `state_translations`.`state_descr` FROM `sensors_to_state_indexes` LEFT JOIN `state_translations` USING (`state_index_id`) WHERE `sensors_to_state_indexes`.`sensor_id`=? AND `state_translations`.`state_value` IN (?,?)",
+                    [$sensor['sensor_id'], $sensor_value, $prev_sensor_value]
                 ),
                 'state_descr',
                 'state_value'
@@ -297,7 +297,16 @@ function poll_device($device, $force_module = false)
                 $start_memory = memory_get_usage();
                 $module_start = microtime(true);
                 echo "\n#### Load poller module $module ####\n";
-                include "includes/polling/$module.inc.php";
+
+                try {
+                    include "includes/polling/$module.inc.php";
+                } catch (Exception $e) {
+                    // isolate module exceptions so they don't disrupt the polling process
+                    echo $e->getTraceAsString() .PHP_EOL;
+                    c_echo("%rError in $module module.%n " . $e->getMessage() . PHP_EOL);
+                    logfile("Error in $module module. " . $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL);
+                }
+
                 $module_time = microtime(true) - $module_start;
                 $module_mem  = (memory_get_usage() - $start_memory);
                 printf("\n>> Runtime for poller module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
@@ -657,15 +666,15 @@ function update_application($app, $response, $metrics = array(), $status = '')
                     array(
                         'app_id' => $app['app_id'],
                         'metric' => $metric_name,
-                        'value' => (int)$value,
+                        'value' => $value,
                     ),
                     'application_metrics'
                 );
                 echo '+';
-            } elseif ((int)$value != (int)$db_metrics[$metric_name]['value']) {
+            } elseif ($value != $db_metrics[$metric_name]['value']) {
                 dbUpdate(
                     array(
-                        'value' => (int)$value,
+                        'value' => $value,
                         'value_prev' => $db_metrics[$metric_name]['value'],
                     ),
                     'application_metrics',
@@ -742,7 +751,12 @@ function convert_to_celsius($value)
  * @param integer $min_version the minimum version to accept for the returned JSON. default: 1
  *
  * @return array The json output data parsed into an array
+ * @throws JsonAppBlankJsonException
+ * @throws JsonAppExtendErroredException
+ * @throws JsonAppMissingKeysException
+ * @throws JsonAppParsingFailedException
  * @throws JsonAppPollingFailedException
+ * @throws JsonAppWrongVersionException
  */
 function json_app_get($device, $extend, $min_version = 1)
 {

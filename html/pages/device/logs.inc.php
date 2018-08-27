@@ -62,9 +62,13 @@ echo '<div style="width:99%;margin:0 auto;">';
 
 switch ($vars['section']) {
     case 'syslog':
+        $vars[fromdevice] = true;
         include 'pages/syslog.inc.php';
         break;
     case 'eventlog':
+        $vars[fromdevice] = true;
+        include 'pages/eventlog.inc.php';
+        break;
     case 'graylog':
         include 'pages/device/logs/'.$vars['section'].'.inc.php';
         break;

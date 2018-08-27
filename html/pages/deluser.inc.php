@@ -13,16 +13,17 @@ if (!Auth::user()->isAdmin()) {
 
     if (Auth::get()->canManageUsers()) {
         if ($vars['action'] == 'del') {
-            $delete_username = dbFetchCell('SELECT username FROM users WHERE user_id = ?', array($vars['id']));
+            $id = (int)$vars['id'];
+            $delete_username = dbFetchCell('SELECT username FROM users WHERE user_id = ?', [$id]);
 
             if ($vars['confirm'] == 'yes') {
-                if (Auth::get()->deleteUser($vars['id']) >= 0) {
+                if (Auth::get()->deleteUser($id) >= 0) {
                     print_message('<div class="infobox">User "'.$delete_username.'" deleted!');
                 } else {
                     print_error('Error deleting user "'.$delete_username.'"!');
                 }
             } else {
-                print_error('You have requested deletion of the user "'.$delete_username.'". This action can not be reversed.<br /><a class="btn btn-danger" href="deluser/action=del/id='.$vars['id'].'/confirm=yes">Click to confirm</a>');
+                print_error('You have requested deletion of the user "'.$delete_username.'". This action can not be reversed.<br /><a class="btn btn-danger" href="deluser/action=del/id='.$id.'/confirm=yes">Click to confirm</a>');
             }
         }
 

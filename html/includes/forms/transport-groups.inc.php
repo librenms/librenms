@@ -86,7 +86,7 @@ if (empty($name)) {
 
         // Remove old transport group members
         if (!empty($remove)) {
-            dbDelete('transport_group_transport', 'transport_group_id=? AND `transport_id` IN (?)', array($group_id, array(implode(',', $remove))));
+            dbDelete('transport_group_transport', 'transport_group_id=? AND `transport_id` IN ' . dbGenPlaceholders(count($remove)), array_merge([$group_id], $remove));
         }
         $message = 'Updated alert transport group';
     } else {

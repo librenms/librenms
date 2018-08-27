@@ -58,6 +58,7 @@ function rewrite_entity_descr($descr)
     $descr = str_replace('Power Supply Module', 'PSU ', $descr);
     $descr = str_replace('/Voltage Sensor/', 'Voltage', $descr);
     $descr = str_replace('Sensor', '', $descr);
+    $descr = str_replace('PMOD', 'PSU', $descr);
     $descr = preg_replace('/^temperatures /', '', $descr);
     $descr = preg_replace('/^voltages /', '', $descr);
 

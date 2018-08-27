@@ -238,8 +238,8 @@ if ($options['f'] === 'purgeusers') {
             foreach (dbFetchRows("SELECT DISTINCT(`user`) FROM `authlog` WHERE `datetime` >= DATE_SUB(NOW(), INTERVAL ? DAY)", array($purge)) as $user) {
                 $users[] = $user['user'];
             }
-            $del_users = '"'.implode('","', $users).'"';
-            if (dbDelete('users', "username NOT IN ($del_users)", array($del_users))) {
+
+            if (dbDelete('users', "username NOT IN " . dbGenPlaceholders(count($users)), $users)) {
                 echo "Removed users that haven't logged in for $purge days";
             }
         }

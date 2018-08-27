@@ -81,7 +81,7 @@ class PingCheck implements ShouldQueue
 
         $cmd = ['fping', '-f', '-', '-e', '-t', $timeout, '-r', $retries];
 
-        $wait = Config::get('rrd_step', 300) * 2;
+        $wait = Config::get('rrd.step', 300) * 2;
 
         $this->process = new Process($cmd, null, null, null, $wait);
     }
