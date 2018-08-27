@@ -79,7 +79,6 @@ class QueryBuilderParser implements \JsonSerializable
     ];
 
     private $builder;
-    private $options;
     private $schema;
 
     private function __construct(array $builder)
@@ -236,16 +235,14 @@ class QueryBuilderParser implements \JsonSerializable
         $wrap = false;
 
         if ($expand) {
-            $sql = 'SELECT *';
-            $sql .= ' FROM ' .implode(',', $this->getTables());
+            $sql = 'SELECT * FROM ' .implode(',', $this->getTables());
             $sql .= ' WHERE ' . $this->generateGlue() . ' AND ';
 
             // only wrap in ( ) if the condition is OR and there is more than one rule
             $wrap = $this->builder['condition'] == 'OR' && count($this->builder['rules']) > 1;
         }
 
-        $query = $sql . $this->parseGroup($this->builder, $expand, $wrap);
-        return $query;
+        return $sql . $this->parseGroup($this->builder, $expand, $wrap);
     }
 
     /**

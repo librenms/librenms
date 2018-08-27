@@ -124,13 +124,14 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                             <div role="tabpanel" class="tab-pane" id="advanced">
                                 <div class="form-group">
-                                    <div class="col-sm-12 col-md-12">
-                                        <strong>Override SQL:</strong>
+                                    <label for="override_query" class="col-sm-3 col-md-2 control-label">Override SQL</label>
+                                    <div class="col-sm-9 col-md-10">
+                                        <input type='checkbox' name='override_query' id='override_query'>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="adv_query" class="col-sm-2 col-md-1 control-label">Query</label>
-                                    <div class="col-sm-10 col-md-11">
+                                    <label for="adv_query" class="col-sm-3 col-md-2 control-label">Query</label>
+                                    <div class="col-sm-9 col-md-10">
                                         <input type="text" id="adv_query" name="adv_query" class="form-control">
                                     </div>
                                 </div>
@@ -284,6 +285,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $("#mute").bootstrapSwitch('state', false);
                 $("#invert").bootstrapSwitch('state', false);
                 $("#recovery").bootstrapSwitch('state', true);
+                $("#override_query").bootstrapSwitch('state', false);
                 $(this).find("input[type=text]").val("");
                 $('#count').val('-1');
                 $('#delay').val('1m');
@@ -293,7 +295,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 var $maps = $('#maps');
                 $maps.empty();
                 $maps.val(null).trigger('change');
-                setRuleDevice() // pre-populate device in the maps if this is a per-device rule
+                setRuleDevice();// pre-populate device in the maps if this is a per-device rule
                 
                 var $transports = $("#transports");
                 $transports.empty();
@@ -307,6 +309,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             $('#proc').val(rule.proc);
             $('#builder').queryBuilder("setRules", rule.builder);
             $('#severity').val(rule.severity).trigger('change');
+            $('#adv_query').val(rule.adv_query);
 
             var $maps = $('#maps');
             $maps.empty();
@@ -353,8 +356,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                     $('#interval').val(extra.interval);
                 }
 
-                if (extra.options.adv_query) {
-                    $('#adv_query').val(extra.options.adv_query);
+                if (extra.adv_query) {
+                    $('#adv_query').val(extra.adv_query);
                 }
 
                 $("[name='mute']").bootstrapSwitch('state', extra.mute);
@@ -362,7 +365,11 @@ if (Auth::user()->hasGlobalAdmin()) {
                 if (typeof extra.recovery == 'undefined') {
                     extra.recovery = true;
                 }
-                $("[name='recovery']").bootstrapSwitch('state', extra.recovery)
+                if (typeof extra.options.override_query == 'undefined') {
+                    extra.options.override_query = false;
+                }
+                $("[name='recovery']").bootstrapSwitch('state', extra.recovery);
+                $("[name='override_query']").bootstrapSwitch('state', extra.options.override_query);
             } else {
                 $('#count').val('-1');
             }

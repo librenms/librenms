@@ -64,8 +64,12 @@ Here are some of the other options available when adding an alerting rule:
 
 On the Advanced tab, you can specify some additional options for the alert rule:
 
-- Aggregate Options
-  - Type + Field: Here you can choose a MySQL 
+- Override SQL: Enable this if you using a custom query
+- Query: The query to be used for the alert.
+ 
+> An example of this would be an average rule for all CPUs over 10%:
+> SELECT *,AVG(processors.processor_usage) as cpu_avg FROM devices,processors WHERE (devices.device_id = ? AND devices.device_id = processors.device_id) AND (devices.status = 1 && (devices.disabled = 0 && devices.ignore = 0)) = 1 HAVING AVG(processors.processor_usage)  > 10
+> cpu_avg would then contain the average CPU usage value.
 
 ## Procedure
 You can associate a rule to a procedure by giving the URL of the procedure when creating the rule. Only links like "http://" are supported, otherwise an error will be returned. Once configured, procedure can be opened from the Alert widget through the "Open" button, which can be shown/hidden from the widget configuration box.

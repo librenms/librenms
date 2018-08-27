@@ -43,7 +43,7 @@ Placeholders are special variables that if used within the template will be repl
 - long uptime of the Device (28 days, 22h 30m 7s): `$alert->uptime_long`
 - description (purpose db field) of the Device: `$alert->description`
 - notes of the Device: `$alert->notes`
-- notes of the alert: `$alert->alert_notes`
+- notes of the alert (ack notes): `$alert->alert_notes`
 - ping timestamp (if icmp enabled): `$alert->ping_timestamp`
 - ping loss (if icmp enabled): `$alert->ping_loss`
 - ping min (if icmp enabled): `$alert->ping_min`

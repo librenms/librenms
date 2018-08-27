@@ -38,9 +38,18 @@ if (!Auth::user()->hasGlobalAdmin()) {
 $status = 'ok';
 $message = '';
 
-$builder_json    = $vars['builder_json'];
-$query           = $vars['query'];
-$query        = QueryBuilderParser::fromJson($builder_json, $options['query'])->toSql();
+$builder_json   = $vars['builder_json'];
+$override_query = $vars['override_query'];
+
+$options = [
+    'override_query' => $override_query,
+];
+
+if ($override_query === 'on') {
+    $query = $vars['adv_query'];
+} else {
+    $query = QueryBuilderParser::fromJson($builder_json)->toSql();
+}
 $rule_id      = $_POST['rule_id'];
 $count        = mres($_POST['count']);
 $delay        = mres($_POST['delay']);

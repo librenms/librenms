@@ -1064,9 +1064,9 @@ function add_edit_rule()
         $device_id = '-1';
     }
 
-    $rule = $data['rule'];
-    if (empty($rule)) {
-        api_error(400, 'Missing the alert rule');
+    $builder = $data['builder'] ?: $data['rule'];
+    if (empty($builder)) {
+        api_error(400, 'Missing the alert builder rule');
     }
 
     $name = mres($data['name']);
@@ -1092,6 +1092,8 @@ function add_edit_rule()
     $count     = mres($data['count']);
     $mute      = mres($data['mute']);
     $delay     = mres($data['delay']);
+    $override_query = $data['override_query'];
+    $adv_query = $data['adv_query'];
     $delay_sec = convert_delay($delay);
     if ($mute == 1) {
         $mute = true;
@@ -1099,12 +1101,19 @@ function add_edit_rule()
         $mute = false;
     }
 
-    $extra      = array(
+    $extra      = [
         'mute'  => $mute,
         'count' => $count,
         'delay' => $delay_sec,
-    );
+        'override_query' => $override_query,
+    ];
     $extra_json = json_encode($extra);
+
+    if ($override_query === 'on') {
+        $query = $adv_query;
+    } else {
+        $query = QueryBuilderParser::fromJson($builder);
+    }
 
     if (!isset($rule_id)) {
         if (dbFetchCell('SELECT `name` FROM `alert_rules` WHERE `name`=?', array($name)) == $name) {
@@ -1117,10 +1126,10 @@ function add_edit_rule()
     }
 
     if (is_numeric($rule_id)) {
-        if (!(dbUpdate(array('name' => $name, 'rule' => $rule, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json), 'alert_rules', 'id=?', array($rule_id)) >= 0)) {
+        if (!(dbUpdate(array('name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json), 'alert_rules', 'id=?', array($rule_id)) >= 0)) {
             api_error(500, 'Failed to update existing alert rule');
         }
-    } elseif (!dbInsert(array('name' => $name, 'device_id' => $device_id, 'rule' => $rule, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json), 'alert_rules')) {
+    } elseif (!dbInsert(array('name' => $name, 'device_id' => $device_id, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json), 'alert_rules')) {
         api_error(500, 'Failed to create new alert rule');
     }
 
