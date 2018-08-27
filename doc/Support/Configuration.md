@@ -469,7 +469,7 @@ LoadPlugin rrdtool
        CacheFlush   900
 </Plugin>
 ```
-etc/collectd.d/rrdtool.conf
+/etc/collectd.d/rrdtool.conf
 
 ```php
 $config['collectd_sock']                 = 'unix:///var/run/collectd.sock';
