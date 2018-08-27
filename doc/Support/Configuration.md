@@ -448,7 +448,28 @@ Setting `rancid_ignorecomments` will disable showing lines that start with #
 ```php
 $config['collectd_dir']                 = '/var/lib/collectd/rrd';
 ```
-Specify the location of the collectd rrd files.
+Specify the location of the collectd rrd files. Note that the location in config.php should be consistent with the location set in /etc/collectd.conf and etc/collectd.d/rrdtool.conf
+
+```php
+<Plugin rrdtool>
+        DataDir "/var/lib/collectd/rrd"
+        CreateFilesAsync false
+        CacheTimeout 120
+        CacheFlush   900
+        WritesPerSecond 50
+</Plugin>
+```
+/etc/collectd.conf
+
+```php
+LoadPlugin rrdtool
+<Plugin rrdtool>
+       DataDir "/var/lib/collectd/rrd"
+       CacheTimeout 120
+       CacheFlush   900
+</Plugin>
+```
+/etc/collectd.d/rrdtool.conf
 
 ```php
 $config['collectd_sock']                 = 'unix:///var/run/collectd.sock';
