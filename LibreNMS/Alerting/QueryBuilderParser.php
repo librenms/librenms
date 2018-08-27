@@ -82,10 +82,9 @@ class QueryBuilderParser implements \JsonSerializable
     private $options;
     private $schema;
 
-    private function __construct(array $builder, $options = [])
+    private function __construct(array $builder)
     {
         $this->builder = $builder;
-        $this->options = $options;
         $this->schema = new Schema();
     }
 
@@ -145,13 +144,13 @@ class QueryBuilderParser implements \JsonSerializable
      * @param string|array $json
      * @return static
      */
-    public static function fromJson($json, $options = [])
+    public static function fromJson($json)
     {
         if (!is_array($json)) {
             $json = json_decode($json, true);
         }
 
-        return new static($json, $options);
+        return new static($json);
     }
 
     /**
@@ -238,10 +237,6 @@ class QueryBuilderParser implements \JsonSerializable
 
         if ($expand) {
             $sql = 'SELECT *';
-            if ($this->options['aggregate'] && $this->options['aggregate']) {
-                list(, $column) = explode('.', $this->options['aggregate_field']);
-                $sql .= ", {$this->options['aggregate']}({$this->options['aggregate_field']}) AS $column";
-            }
             $sql .= ' FROM ' .implode(',', $this->getTables());
             $sql .= ' WHERE ' . $this->generateGlue() . ' AND ';
 
@@ -250,9 +245,6 @@ class QueryBuilderParser implements \JsonSerializable
         }
 
         $query = $sql . $this->parseGroup($this->builder, $expand, $wrap);
-        if ($this->options['aggregate_field']) {
-            $query .= " GROUP BY `devices`.`device_id`";
-        }
         return $query;
     }
 

@@ -38,15 +38,8 @@ if (!Auth::user()->hasGlobalAdmin()) {
 $status = 'ok';
 $message = '';
 
-$builder_json = $_POST['builder_json'];
-$aggregate       = $vars['aggregate'];
-$aggregate_field = $vars['aggregate_field'];
-$options         = ['query' =>
-    [
-        'aggregate' => $aggregate,
-        'aggregate_field' => $aggregate_field
-    ]
-];
+$builder_json    = $vars['builder_json'];
+$query           = $vars['query'];
 $query        = QueryBuilderParser::fromJson($builder_json, $options['query'])->toSql();
 $rule_id      = $_POST['rule_id'];
 $count        = mres($_POST['count']);

@@ -125,20 +125,13 @@ if (Auth::user()->hasGlobalAdmin()) {
                             <div role="tabpanel" class="tab-pane" id="advanced">
                                 <div class="form-group">
                                     <div class="col-sm-12 col-md-12">
-                                        <strong>Aggregate Options:</strong>
+                                        <strong>Override SQL:</strong>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="aggregate" class="col-sm-2 col-md-2 control-label">Type</label>
-                                    <div class="col-sm-3 col-md-2">
-                                        <select name="aggregate" id="aggregate" class="form-control">
-                                            <option value=""></option>
-                                            <option value="avg">Average</option>
-                                        </select>
-                                    </div>
-                                    <label for="aggregate_field" class="col-sm-2 col-md-1 control-label">Field</label>
-                                    <div class="col-sm-5 col-md-5">
-                                        <select id="aggregate_field" name="aggregate_field" class="form-control"></select>
+                                    <label for="adv_query" class="col-sm-2 col-md-1 control-label">Query</label>
+                                    <div class="col-sm-10 col-md-11">
+                                        <input type="text" id="adv_query" name="adv_query" class="form-control">
                                     </div>
                                 </div>
                             </div>
@@ -295,8 +288,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $('#count').val('-1');
                 $('#delay').val('1m');
                 $('#interval').val('5m');
-                $('#aggregate').val('');
-                $('#aggregate_field').val('');
+                $('#adv_query').val('');
 
                 var $maps = $('#maps');
                 $maps.empty();
@@ -361,12 +353,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                     $('#interval').val(extra.interval);
                 }
 
-                if (extra.options.query.aggregate) {
-                    $('#aggregate').val(extra.options.query.aggregate);
-                }
-                if (extra.options.query.aggregate_field) {
-                    var option = new Option(extra.options.query.aggregate_field, extra.options.query.aggregate_field, true, true);
-                    $('#aggregate_field').append(option).trigger('change');
+                if (extra.options.adv_query) {
+                    $('#adv_query').val(extra.options.adv_query);
                 }
 
                 $("[name='mute']").bootstrapSwitch('state', extra.mute);
@@ -405,22 +393,6 @@ if (Auth::user()->hasGlobalAdmin()) {
             }
         });
 
-        $("#aggregate_field").select2({
-            dropdownParent: $('#create-alert'),
-            width: '100%',
-            minimumResultsForSearch: 20,
-            placeholder: "Database Fields",
-            ajax: {
-                url: 'ajax_list.php',
-                delay: 500,
-                data: function (params) {
-                    return {
-                        type: 'table_columns',
-                        search: params.term
-                    };
-                }
-            }
-        });
         $("#transports").select2({
             width: "100%",
             placeholder: "Transport/Group Name",
