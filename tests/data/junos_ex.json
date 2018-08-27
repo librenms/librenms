@@ -1,117 +1,113 @@
 {
     "bgp-peers": {
         "discovery": {
-            "devices": [
-                {
-                    "bgpLocalAs": "65501"
-                }
-            ],
             "bgpPeers": [
                 {
                     "astext": "",
                     "bgpPeerIdentifier": "192.168.1.4",
-                    "bgpPeerRemoteAs": "65502",
+                    "bgpPeerRemoteAs": 65502,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerInUpdates": "0",
-                    "bgpPeerOutUpdates": "0",
-                    "bgpPeerInTotalMessages": "0",
-                    "bgpPeerOutTotalMessages": "0",
-                    "bgpPeerFsmEstablishedTime": "0",
-                    "bgpPeerInUpdateElapsedTime": "0",
-                    "context_name": ""
+                    "bgpPeerInUpdates": 0,
+                    "bgpPeerOutUpdates": 0,
+                    "bgpPeerInTotalMessages": 0,
+                    "bgpPeerOutTotalMessages": 0,
+                    "bgpPeerFsmEstablishedTime": 0,
+                    "bgpPeerInUpdateElapsedTime": 0,
+                    "context_name": "",
+                    "bgpLocalAs": "65501"
                 },
                 {
                     "astext": "",
                     "bgpPeerIdentifier": "192.168.1.186",
-                    "bgpPeerRemoteAs": "65503",
+                    "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerInUpdates": "0",
-                    "bgpPeerOutUpdates": "0",
-                    "bgpPeerInTotalMessages": "0",
-                    "bgpPeerOutTotalMessages": "0",
-                    "bgpPeerFsmEstablishedTime": "0",
-                    "bgpPeerInUpdateElapsedTime": "0",
-                    "context_name": ""
+                    "bgpPeerInUpdates": 0,
+                    "bgpPeerOutUpdates": 0,
+                    "bgpPeerInTotalMessages": 0,
+                    "bgpPeerOutTotalMessages": 0,
+                    "bgpPeerFsmEstablishedTime": 0,
+                    "bgpPeerInUpdateElapsedTime": 0,
+                    "context_name": "",
+                    "bgpLocalAs": "65501"
                 },
                 {
                     "astext": "",
                     "bgpPeerIdentifier": "192.168.1.226",
-                    "bgpPeerRemoteAs": "65504",
+                    "bgpPeerRemoteAs": 65504,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerInUpdates": "0",
-                    "bgpPeerOutUpdates": "0",
-                    "bgpPeerInTotalMessages": "0",
-                    "bgpPeerOutTotalMessages": "0",
-                    "bgpPeerFsmEstablishedTime": "0",
-                    "bgpPeerInUpdateElapsedTime": "0",
-                    "context_name": ""
+                    "bgpPeerInUpdates": 0,
+                    "bgpPeerOutUpdates": 0,
+                    "bgpPeerInTotalMessages": 0,
+                    "bgpPeerOutTotalMessages": 0,
+                    "bgpPeerFsmEstablishedTime": 0,
+                    "bgpPeerInUpdateElapsedTime": 0,
+                    "context_name": "",
+                    "bgpLocalAs": "65501"
                 }
             ],
             "bgpPeers_cbgp": []
         },
         "poller": {
-            "devices": [
-                {
-                    "bgpLocalAs": "65501"
-                }
-            ],
             "bgpPeers": [
                 {
                     "astext": "",
                     "bgpPeerIdentifier": "192.168.1.4",
-                    "bgpPeerRemoteAs": "65502",
+                    "bgpPeerRemoteAs": 65502,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
                     "bgpLocalAddr": "192.168.1.43",
                     "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerInUpdates": "10526",
-                    "bgpPeerOutUpdates": "531",
-                    "bgpPeerInTotalMessages": "824076",
-                    "bgpPeerOutTotalMessages": "871063",
-                    "bgpPeerFsmEstablishedTime": "23675506",
-                    "bgpPeerInUpdateElapsedTime": "21748",
-                    "context_name": ""
+                    "bgpPeerInUpdates": 10526,
+                    "bgpPeerOutUpdates": 531,
+                    "bgpPeerInTotalMessages": 824076,
+                    "bgpPeerOutTotalMessages": 871063,
+                    "bgpPeerFsmEstablishedTime": 23675506,
+                    "bgpPeerInUpdateElapsedTime": 21748,
+                    "context_name": "",
+                    "bgpLocalAs": "65501"
                 },
                 {
                     "astext": "",
                     "bgpPeerIdentifier": "192.168.1.186",
-                    "bgpPeerRemoteAs": "65503",
+                    "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
                     "bgpLocalAddr": "192.168.1.185",
                     "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerInUpdates": "1",
-                    "bgpPeerOutUpdates": "1",
-                    "bgpPeerInTotalMessages": "29928",
-                    "bgpPeerOutTotalMessages": "28798",
-                    "bgpPeerFsmEstablishedTime": "785386",
-                    "bgpPeerInUpdateElapsedTime": "785386",
-                    "context_name": ""
+                    "bgpPeerInUpdates": 1,
+                    "bgpPeerOutUpdates": 1,
+                    "bgpPeerInTotalMessages": 29928,
+                    "bgpPeerOutTotalMessages": 28798,
+                    "bgpPeerFsmEstablishedTime": 785386,
+                    "bgpPeerInUpdateElapsedTime": 785386,
+                    "context_name": "",
+                    "bgpLocalAs": "65501"
                 },
                 {
                     "astext": "",
                     "bgpPeerIdentifier": "192.168.1.226",
-                    "bgpPeerRemoteAs": "65504",
+                    "bgpPeerRemoteAs": 65504,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
                     "bgpLocalAddr": "192.168.1.225",
                     "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerInUpdates": "3",
-                    "bgpPeerOutUpdates": "1",
-                    "bgpPeerInTotalMessages": "25802",
-                    "bgpPeerOutTotalMessages": "28382",
-                    "bgpPeerFsmEstablishedTime": "774041",
-                    "bgpPeerInUpdateElapsedTime": "774040",
-                    "context_name": ""
+                    "bgpPeerInUpdates": 3,
+                    "bgpPeerOutUpdates": 1,
+                    "bgpPeerInTotalMessages": 25802,
+                    "bgpPeerOutTotalMessages": 28382,
+                    "bgpPeerFsmEstablishedTime": 774041,
+                    "bgpPeerInUpdateElapsedTime": 774040,
+                    "context_name": "",
+                    "bgpLocalAs": "65501"
                 }
             ],
             "bgpPeers_cbgp": []

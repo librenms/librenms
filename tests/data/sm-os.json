@@ -2357,18 +2357,6 @@
             ]
         }
     },
-    "bgp-peers": {
-        "discovery": {
-            "devices": [
-                {
-                    "bgpLocalAs": "0"
-                }
-            ],
-            "bgpPeers": [],
-            "bgpPeers_cbgp": []
-        },
-        "poller": "matches discovery"
-    },
     "vlans": {
         "discovery": {
             "vlans": [
