@@ -17,7 +17,7 @@ try {
     $nfs=array(
         data => array(),
     );
-    
+
     list($nfs['data']['Getattr'], $nfs['data']['Setattr'], $nfs['data']['Lookup'], $nfs['data']['Readlink'],
          $nfs['data']['Read'], $nfs['data']['Write'], $nfs['data']['Create'], $nfs['data']['Remove'], $nfs['data']['Rename'],
          $nfs['data']['Link'], $nfs['data']['Symlink'], $nfs['data']['Mkdir'], $nfs['data']['Rmdir'], $nfs['data']['Readdir'],
@@ -126,4 +126,4 @@ $fields = array(
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
-update_application($app, $nfs, $fields);
+update_application($app, 'OK', $fields);

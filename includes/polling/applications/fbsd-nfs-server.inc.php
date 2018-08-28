@@ -11,7 +11,7 @@ echo $name;
 
 try {
     $nfs=json_app_get($device, 'fbsdnfsserver');
-}catch (JsonAppParsingFailedException $e) {
+} catch (JsonAppParsingFailedException $e) {
     // Legacy script, build compatible array
     $legacy = $e->getOutput();
 
@@ -100,4 +100,4 @@ $fields = array(
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
-update_application($app, $nfs, $fields);
+update_application($app, 'OK', $fields);
