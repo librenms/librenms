@@ -924,7 +924,6 @@ $config['leaflet']['tile_url']                          = "{s}.tile.openstreetma
 
 // General GUI options
 $config['gui']['network-map']['style']                  = 'new';//old is also valid
-$config['webui']['dynamic_graphs']                      = false;
 
 // Navbar variables
 $config['navbar']['manage_groups']['hide']              = 0;
