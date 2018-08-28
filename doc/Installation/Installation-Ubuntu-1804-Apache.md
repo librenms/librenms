@@ -34,15 +34,12 @@ FLUSH PRIVILEGES;
 exit
 ```
 
-    nano /etc/mysql/mariadb.conf.d/50-server.cnf
-
-> NOTE: Whilst we are working on ensuring LibreNMS is compatible with MySQL strict mode, for now, please disable this after mysql is installed.
+    vi /etc/mysql/mariadb.conf.d/50-server.cnf
 
 Within the `[mysqld]` section please add:
 
 ```bash
 innodb_file_per_table=1
-sql-mode=""
 lower_case_table_names=0
 ```
     systemctl restart mysql
@@ -53,17 +50,16 @@ lower_case_table_names=0
 
 Ensure date.timezone is set in php.ini to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
 
-    nano /etc/php/7.2/apache2/php.ini
-    nano /etc/php/7.2/cli/php.ini
+    vi /etc/php/7.2/apache2/php.ini
+    vi /etc/php/7.2/cli/php.ini
 
     a2enmod php7.2
     a2dismod mpm_event
     a2enmod mpm_prefork
-    phpenmod mcrypt
 
 ### Configure Apache
 
-    nano /etc/apache2/sites-available/librenms.conf
+    vi /etc/apache2/sites-available/librenms.conf
 
 Add the following config, edit `ServerName` as required:
 
@@ -91,7 +87,7 @@ Add the following config, edit `ServerName` as required:
 #### Configure snmpd
 
     cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
-    nano /etc/snmp/snmpd.conf
+    vi /etc/snmp/snmpd.conf
 
 Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community string.
 
@@ -112,14 +108,18 @@ LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large an
 ### Set permissions
 
     chown -R librenms:librenms /opt/librenms
-    setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs
-    setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs
+    setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
+    setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
 
 ## Web installer ##
 
 Now head to the web installer and follow the on-screen instructions.
 
     http://librenms.example.com/install.php
+
+The web installer might prompt you to create a `config.php` file in your librenms install location manually, copying the content displayed on-screen to the file. If you have to do this, please remember to set the permissions on config.php after you copied the on-screen contents to the file. Run:
+
+    chown librenms:librenms /opt/librenms/config.php
 
 ### Final steps
 

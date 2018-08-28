@@ -5,6 +5,7 @@ source: Installation/Installation-Ubuntu-1804-Nginx.md
 
 ## Install Required Packages ##
 
+    apt update
     apt install composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.2-cli php7.2-curl php7.2-fpm php7.2-gd php7.2-mysql php7.2-snmp php7.2-xml php7.2-zip python-memcache python-mysqldb rrdtool snmp snmpd whois
     
 #### Add librenms user
@@ -32,15 +33,12 @@ FLUSH PRIVILEGES;
 exit
 ```
 
-    nano /etc/mysql/mariadb.conf.d/50-server.cnf
-
-> NOTE: Whilst we are working on ensuring LibreNMS is compatible with MySQL strict mode, for now, please disable this after mysql is installed.
+    vi /etc/mysql/mariadb.conf.d/50-server.cnf
 
 Within the `[mysqld]` section please add:
 
 ```bash
 innodb_file_per_table=1
-sql-mode=""
 lower_case_table_names=0
 ```
     systemctl restart mysql
@@ -50,14 +48,14 @@ lower_case_table_names=0
 ### Configure and Start PHP-FPM
 Ensure date.timezone is set in php.ini to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
 
-    nano /etc/php/7.2/fpm/php.ini
-    nano /etc/php/7.2/cli/php.ini
+    vi /etc/php/7.2/fpm/php.ini
+    vi /etc/php/7.2/cli/php.ini
 
     systemctl restart php7.2-fpm
 
 #### Configure NGINX
 
-    nano /etc/nginx/conf.d/librenms.conf
+    vi /etc/nginx/conf.d/librenms.conf
 
 Add the following config, edit `server_name` as required:
 
@@ -94,7 +92,7 @@ server {
 #### Configure snmpd
 
     cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
-    nano /etc/snmp/snmpd.conf
+    vi /etc/snmp/snmpd.conf
 
 Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community string.
 
@@ -115,8 +113,8 @@ LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large an
 ### Set permissions
 
     chown -R librenms:librenms /opt/librenms
-    setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs
-    setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs
+    setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
+    setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
 
 ## Web installer ##
 
@@ -124,6 +122,10 @@ Now head to the web installer and follow the on-screen instructions.
 
     http://librenms.example.com/install.php
 
+The web installer might prompt you to create a `config.php` file in your librenms install location manually, copying the content displayed on-screen to the file. If you have to do this, please remember to set the permissions on config.php after you copied the on-screen contents to the file. Run:
+
+    chown librenms:librenms /opt/librenms/config.php
+    
 ### Final steps
 
 That's it!  You now should be able to log in to http://librenms.example.com/.  Please note that we have not covered HTTPS setup in this example, so your LibreNMS install is not secure by default.  Please do not expose it to the public Internet unless you have configured HTTPS and taken appropriate web server hardening steps.
