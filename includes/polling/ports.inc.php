@@ -175,9 +175,7 @@ $dot3_oids = [
     'dot3StatsDuplexStatus',
 ];
 
-$pvid_oids = [
-    'dot1qPvid',
-];
+$pvid_oids = ['dot1qPvid'];
 
 // Query known ports and mapping table in order of discovery to make sure
 // the latest discoverd/polled port is in the mapping tables.
