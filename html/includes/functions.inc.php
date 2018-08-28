@@ -1096,9 +1096,8 @@ function get_config_by_group($group)
 
 function get_config_like_name($name)
 {
-    $name = array($name);
     $items = array();
-    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_name` LIKE '%?%'", array($name)) as $config_item) {
+    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_name` LIKE ?", array("%$name%")) as $config_item) {
         $items[$config_item['config_id']] = $config_item;
     }
 

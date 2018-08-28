@@ -318,6 +318,8 @@ function list_devices()
 
     if ($type == 'all' || empty($type)) {
         $sql = '1';
+    } elseif ($type == 'active') {
+        $sql = "`d`.`ignore`='0' AND `d`.`disabled`='0'";
     } elseif ($type == 'location') {
         $sql = "`d`.`location` LIKE '%".$query."%'";
     } elseif ($type == 'ignored') {
@@ -1029,20 +1031,32 @@ function list_alerts()
     check_is_read();
     $app    = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
+
+    $sql = "SELECT `D`.`hostname`, `A`.*, `R`.`severity` FROM `alerts` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` AND `A`.`state` IN ";
     if (isset($_GET['state'])) {
-        $param = array(mres($_GET['state']));
+        $param = explode(',', $_GET['state']);
     } else {
-        $param = array('1');
+        $param = [1];
     }
+    $sql .= dbGenPlaceholders(count($param));
 
-    $sql = '';
     if (isset($router['id']) && $router['id'] > 0) {
-        $alert_id = mres($router['id']);
-        $sql      = 'AND `A`.id=?';
-        array_push($param, $alert_id);
+        $param[] = $router['id'];
+        $sql .= 'AND `A`.id=?';
     }
 
-    $alerts       = dbFetchRows("SELECT `D`.`hostname`, `A`.*, `R`.`severity` FROM `alerts` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` AND `A`.`state` IN (?) $sql", $param);
+    $severity = $_GET['severity'];
+    if (isset($severity)) {
+        if (in_array($severity, ['ok', 'warning', 'critical'])) {
+            $param[] = $severity;
+            $sql .= ' AND `R`.severity=?';
+        }
+    }
+    
+    $order = $_GET['order'] ?: "timestamp desc";
+    $sql .= ' ORDER BY A.'.$order;
+
+    $alerts = dbFetchRows($sql, $param);
     api_success($alerts, 'alerts');
 }
 

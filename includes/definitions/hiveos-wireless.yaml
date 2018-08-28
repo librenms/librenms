@@ -10,4 +10,4 @@ over:
     - { graph: device_wireless_clients, text: 'Wifi Clients' }
 discovery:
     - sysDescr_regex:
-        - '/^(Hive)*AP[0-9]+, HiveOS/'
+        - '/^(Hive)*AP[0-9]+(?:_n)?, HiveOS/'

@@ -694,6 +694,7 @@ function loadAlerts($where)
         } else {
             $alert['alert_id'] = $alert_status['id'];
             $alert['state'] = $alert_status['state'];
+            $alert['note'] = $alert_status['note'];
             if (!empty($alert['details'])) {
                 $alert['details'] = json_decode(gzuncompress($alert['details']), true);
             }

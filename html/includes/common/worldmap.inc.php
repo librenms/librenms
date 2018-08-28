@@ -168,15 +168,17 @@ var greenMarker = L.AwesomeMarkers.icon({
     markerColor: \'green\', prefix: \'fa\', iconColor: \'white\'
   });
         ';
+        $status_select = explode(',', $widget_settings['status']);
+
         // Checking user permissions
         if (Auth::user()->hasGlobalRead()) {
         // Admin or global read-only - show all devices
             $sql = "SELECT DISTINCT(`device_id`),`devices`.`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng` FROM `devices`
                     LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
                     WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`devices`.`location` REGEXP '\[[0-9\.\, ]+\]'))
-                      AND `status` IN (".$widget_settings['status'].")
-                    ORDER BY `status` ASC, `hostname`";
-            $param = [];
+                    AND `status` IN " . dbGenPlaceholders(count($status_select)) .
+                    " ORDER BY `status` ASC, `hostname`";
+            $param = $status_select;
         } else {
         // Normal user - grab devices that user has permissions to
             $sql = "SELECT DISTINCT(`devices`.`device_id`) as `device_id`,`devices`.`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng`
@@ -184,9 +186,9 @@ var greenMarker = L.AwesomeMarkers.icon({
                     LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
                     WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`devices`.`location` REGEXP '\[[0-9\.\, ]+\]'))
                     AND `devices`.`device_id` = `devices_perms`.`device_id`
-                    AND `devices_perms`.`user_id` = ? AND `status` IN (".$widget_settings['status'].")
-                    ORDER BY `status` ASC, `hostname`";
-            $param[] = Auth::id();
+                    AND `devices_perms`.`user_id` = ? AND `status` IN " . dbGenPlaceholders(count($status_select)) .
+                    " ORDER BY `status` ASC, `hostname`";
+            $param = array_merge([Auth::id()], $status_select);
         }
 
         foreach (dbFetchRows($sql, $param) as $map_devices) {
