@@ -23,7 +23,10 @@
  */
 namespace LibreNMS\Alert\Transport;
 
+use Illuminate\Http\Request;
 use LibreNMS\Alert\Transport;
+use Log;
+use Validator;
 
 class Pagerduty extends Transport
 {
@@ -110,22 +113,41 @@ class Pagerduty extends Transport
         return [
             'config' => [
                 [
-                    'title' => 'API Key',
-                    'name' => 'pagerduty-apikey',
-                    'descr' => 'API Key',
-                    'type' => 'text',
-                ],
-                [
-                    'title' => 'Integration Key',
-                    'name' => 'pagerduty-integrationkey',
-                    'descr' => 'Integration Key',
-                    'type' => 'text',
-                ],
-            ],
-            'validation' => [
-                'pagerduty-apikey'         => 'required|string',
-                'pagerduty-integrationkey' => 'required|string|size:32'
+                    'title' => 'Authorize',
+                    'descr' => 'Alert with PagerDuty',
+                    'type' => 'oauth',
+                    'icon' => 'pagerduty-white.svg',
+                    'class' => 'btn-success',
+                    'url' => 'https://connect.pagerduty.com/connect?vendor=2fc7c9f3c8030e74aae6&callback='
+                ]
             ]
         ];
+    }
+
+    public function handleOauth(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'account' => 'alpha_dash',
+            'service_key' => 'regex:/^[a-fA-F0-9]+$/',
+            'service_name' => 'string',
+        ]);
+
+        if ($validator->fails()) {
+            Log::error('Pagerduty oauth failed validation.', ['request' => $request->all()]);
+            return false;
+        }
+
+        $config = json_encode($request->only('account', 'service_key', 'service_name'));
+
+        if ($id = $request->get('id')) {
+            return (bool)dbUpdate(['transport_config' => $config], 'alert_transports', 'transport_id=?', [$id]);
+        } else {
+            return (bool)dbInsert([
+                'transport_name' => $request->get('service_name', 'PagerDuty'),
+                'transport_type' => 'pagerduty',
+                'is_default' => 0,
+                'transport_config' => $config,
+            ], 'alert_transports');
+        }
     }
 }
