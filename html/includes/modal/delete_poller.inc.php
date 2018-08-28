@@ -45,6 +45,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                 data-target="poller-removal">Delete
                         </button>
                         <input type="hidden" name="id" id="id" value="">
+                        <input type="hidden" name="pollertype" id="pollertype" value="">
                         <input type="hidden" name="confirm" id="confirm" value="yes">
                     </form>
                 </div>
@@ -55,16 +56,19 @@ if (Auth::user()->hasGlobalAdmin()) {
     <script>
         $('#confirm-delete').on('show.bs.modal', function (e) {
             id = $(e.relatedTarget).data('id');
+            pollertype = $(e.relatedTarget).data('pollertype');
             $("#id").val(id);
+            $("#pollertype").val(pollertype);
         });
 
         $('#poller-removal').click('', function (e) {
             e.preventDefault();
             var id = $("#id").val();
+            var pollertype = $("#pollertype").val();
             $.ajax({
                 type: 'POST',
                 url: 'ajax_form.php',
-                data: {type: "delete-poller", id: id},
+                data: {type: pollertype, id: id},
                 success: function (result) {
                     if (result.status == 0) {
                         toastr.success(result.message);

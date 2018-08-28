@@ -28,6 +28,7 @@ before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y snmp fping
   - mysql -e 'CREATE DATABASE librenms_phpunit_78hunjuybybh;'
+  - cp tests/config/config.test.php config.php
 
 install:
   - composer install --prefer-dist --no-interaction
@@ -37,9 +38,9 @@ after_failure:
   - tail /tmp/snmpsimd.log
 
 script:
-  - php scripts/pre-commit.php -l
-  - php scripts/pre-commit.php -s
-  - php scripts/pre-commit.php -u --db --snmpsim --fail-fast
+  - php scripts/pre-commit.php -q -l
+  - php scripts/pre-commit.php -q -s
+  - php scripts/pre-commit.php -q -u --db --snmpsim --fail-fast
   - bash -n daily.sh
   - pylint -E poller-wrapper.py discovery-wrapper.py
   - bash scripts/deploy-docs.sh

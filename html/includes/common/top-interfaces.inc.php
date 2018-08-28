@@ -99,16 +99,20 @@ $(function() {
     ';
 } else {
     $interval = $widget_settings['time_interval'];
-    (integer) $lastpoll_seconds = ($interval * 60);
-    (integer) $interface_count = $widget_settings['interface_count'];
-    $params = array('user' => Auth::id(), 'lastpoll' => array($lastpoll_seconds), 'count' => array($interface_count), 'filter' => ($widget_settings['interface_filter']?:(int)1));
+    (integer) $lastpoll_seconds = ($interval * 60) ?: 300;
+    (integer) $interface_count = $widget_settings['interface_count'] ?: 5;
+    $params = ['lastpoll' => $lastpoll_seconds, 'count' => $interface_count, 'filter1' => ($widget_settings['interface_filter']?:(int)1), 'filter2' => ($widget_settings['interface_filter']?:(int)1)];
+    if (!Auth::user()->hasGlobalRead()) {
+        $params['user1'] = Auth::id();
+        $params['user2'] = Auth::id();
+    }
     if (Auth::user()->hasGlobalRead()) {
         $query = '
             SELECT p.*, devices.*, p.ifInOctets_rate + p.ifOutOctets_rate as total
             FROM ports as p
             INNER JOIN devices ON p.device_id = devices.device_id
             AND unix_timestamp() - p.poll_time <= :lastpoll
-            AND ( p.ifType = :filter || 1 = :filter )
+            AND ( p.ifType = :filter1 || 1 = :filter2 )
             AND ( p.ifInOctets_rate > 0 || p.ifOutOctets_rate > 0 )
             ORDER BY total DESC
             LIMIT :count
@@ -120,9 +124,9 @@ $(function() {
             INNER JOIN devices ON ports.device_id = devices.device_id
             LEFT JOIN ports_perms ON ports.port_id = ports_perms.port_id
             LEFT JOIN devices_perms ON devices.device_id = devices_perms.device_id
-            WHERE ( ports_perms.user_id = :user || devices_perms.user_id = :user )
+            WHERE ( ports_perms.user_id = :user1 || devices_perms.user_id = :user2 )
             AND unix_timestamp() - ports.poll_time <= :lastpoll
-            AND ( ports.ifType = :filter || 1 = :filter )
+            AND ( ports.ifType = :filter1 || 1 = :filter2 )
             AND ( ports.ifInOctets_rate > 0 || ports.ifOutOctets_rate > 0 )
             GROUP BY ports.port_id
             ORDER BY total DESC

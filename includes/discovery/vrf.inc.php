@@ -3,7 +3,8 @@
 use LibreNMS\Config;
 
 if (Config::get('enable_vrfs')) {
-    if ($device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os'] == 'ironware') {
+    if (in_array($device['os_group'], ['vrp', 'cisco']) ||
+        in_array($device['os'], ['junos', 'ironware'])) {
         unset($vrf_count);
 
         /*
@@ -19,16 +20,28 @@ if (Config::get('enable_vrfs')) {
 
         if (empty($rds)) {
             $rds    = snmp_walk($device, 'mplsVpnVrfRouteDistinguisher', '-Osqn', 'MPLS-VPN-MIB', null);
-            $vpnmib = 'MPLS-VPN-MIB';
-            $rds    = str_replace('.1.3.6.1.3.118.1.2.2.1.3.', '', $rds);
+            
+            if (empty($rds) && $device['os_group'] == 'cisco') {
+                // Use CISCO-VRF-MIB if others don't work
+                $rds = snmp_walk($device, 'cvVrfName', '-Osqn', 'CISCO-VRF-MIB', null);
+                $rds = str_replace('.1.3.6.1.4.1.9.9.711.1.1.1.1.2.', '', $rds);
 
-            $descrs_oid = '.1.3.6.1.3.118.1.2.2.1.2';
-            $ports_oid  = '.1.3.6.1.3.118.1.2.1.1.2';
+                $vpnmib = 'CISCO-VRF-MIB';
+                // No descr_oid given, does not exist for CISCO-VRF-MIB
+                $descr_oid = null;
+                $ports_oid = '.1.3.6.1.4.1.9.9.711.1.2.1.1.2';
+            } else {
+                $vpnmib = 'MPLS-VPN-MIB';
+                $rds    = str_replace('.1.3.6.1.3.118.1.2.2.1.3.', '', $rds);
+
+                $descr_oid = '.1.3.6.1.3.118.1.2.2.1.2';
+                $ports_oid  = '.1.3.6.1.3.118.1.2.1.1.2';
+            }
         } else {
             $vpnmib = 'MPLS-L3VPN-STD-MIB';
             $rds    = str_replace('.1.3.6.1.2.1.10.166.11.1.2.2.1.4.', '', $rds);
 
-            $descrs_oid = '.1.3.6.1.2.1.10.166.11.1.2.2.1.3';
+            $descr_oid = '.1.3.6.1.2.1.10.166.11.1.2.2.1.3';
             $ports_oid  = '.1.3.6.1.2.1.10.166.11.1.2.1.1.2';
         }
 
@@ -37,20 +50,19 @@ if (Config::get('enable_vrfs')) {
 
         $rds = trim($rds);
 
-        $descrs = snmp_walk($device, $descrs_oid, '-Osqn', $vpnmib, null);
-        $ports  = snmp_walk($device, $ports_oid, '-Osqn', $vpnmib, null);
-
-        $descrs = trim(str_replace("$descrs_oid.", '', $descrs));
-        $ports  = trim(str_replace("$ports_oid.", '', $ports));
-
-        $descr_table = array();
-        $port_table  = array();
-
-        foreach (explode("\n", $descrs) as $descr) {
-            $t = explode(' ', $descr, 2);
-            $descr_table[$t[0]] = $t[1];
+        if ($descr_oid) {
+            $descrs = snmp_walk($device, $descr_oid, '-Osqn', $vpnmib, null);
+            $descrs = trim(str_replace("$descr_oid.", '', $descrs));
+            $descr_table = array();
+            foreach (explode("\n", $descrs) as $descr) {
+                $t = explode(' ', $descr, 2);
+                $descr_table[$t[0]] = $t[1];
+            }
         }
 
+        $ports  = snmp_walk($device, $ports_oid, '-Osqn', $vpnmib, null);
+        $ports  = trim(str_replace("$ports_oid.", '', $ports));
+        $port_table  = array();
         foreach (explode("\n", $ports) as $port) {
             $t       = explode(' ', $port);
             $dotpos  = strrpos($t[0], '.');
@@ -65,6 +77,10 @@ if (Config::get('enable_vrfs')) {
         }
 
         foreach (explode("\n", $rds) as $oid) {
+            if (empty($descr_oid) && strpos($oid, 'Platform_iVRF')) {
+                // Skip since it is an internal service and not a VRF
+                continue;
+            }
             echo "\n";
             if ($oid) {
                 // 8.49.53.48.56.58.49.48.48 "1508:100"
@@ -76,8 +92,18 @@ if (Config::get('enable_vrfs')) {
                     $vrf_name .= chr($oid_values[$i]);
                 }
 
-                // Brocade Ironware outputs VRF RD values as Hex-STRING rather than string. This has to be converted to decimal
+                // Some VRP versions output VRF RD values as Null terminated Hex-STRING rather than string.
+                // This has to be converted to decimal
+                if ($device['os'] == 'vrp'  && preg_match('/^([^ ]+) +(([^ ]+) +.*) 00/', $oid, $matches)) {
+                    //.1.3.6.1.2.1.10.166.11.1.2.2.1.4.5.116.101.115.116.49 36 35 33 30 31 3A 31 00
+                    // regexp result => 5.116.101.115.116.49 -- 36 35 33 30 31 3A 31 -- 00
+                    d_echo("  [DEBUG] VRP: RD HexString handling: $matches[2]");
+                    $hex_vrf_rd = str_replace(' ', '', $matches[2]);
+                    $vrf_rd = hex2str($hex_vrf_rd);
+                    d_echo("\n  [DEBUG] VRP: RD : $hex_vrf_rd -> $vrf_rd");
+                }
 
+                // Brocade Ironware outputs VRF RD values as Hex-STRING rather than string. This has to be converted to decimal
                 if ($device['os'] == 'ironware') {
                     $vrf_rd = substr($oid, -24);  // Grab last 24 characters from $oid, which is the RD hex value
                     $vrf_rd = str_replace(' ', '', $vrf_rd); // Remove whitespace
@@ -85,6 +111,10 @@ if (Config::get('enable_vrfs')) {
                     $vrf_rd[0] = hexdec($vrf_rd[0]); // Convert first object to decimal
                     $vrf_rd[1] = hexdec($vrf_rd[1]); // Convert second object to deciamal
                     $vrf_rd = implode(':', $vrf_rd); // Combine back into string, delimiter by colon
+                } elseif (empty($descr_oid)) {
+                    // Move rd to vrf_name and remove rd (no way to grab these values with CISCO-VRF-MIB)
+                    $vrf_name = $vrf_rd;
+                    unset($vrf_rd);
                 }
 
                 echo "\n  [VRF $vrf_name] OID   - $vrf_oid";

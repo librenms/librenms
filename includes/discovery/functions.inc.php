@@ -110,10 +110,15 @@ function load_discovery(&$device)
     }
 }
 
-function discover_device(&$device, $options = null)
+/**
+ * @param array $device The device to poll
+ * @param bool $force_module Ignore device module overrides
+ * @return bool if the device was discovered or skipped
+ */
+function discover_device(&$device, $force_module = false)
 {
     if ($device['snmp_disable'] == '1') {
-        return;
+        return false;
     }
 
     global $valid;
@@ -131,7 +136,7 @@ function discover_device(&$device, $options = null)
     $response = device_is_up($device, true);
 
     if ($response['status'] !== '1') {
-        return;
+        return false;
     }
 
     if ($device['os'] == 'generic') {
@@ -152,18 +157,6 @@ function discover_device(&$device, $options = null)
 
     echo "\n";
 
-    $force_module = false;
-    // If we've specified modules, use them, else walk the modules array
-    if ($options['m']) {
-        Config::set('discovery_modules', array());
-        foreach (explode(',', $options['m']) as $module) {
-            if (is_file("includes/discovery/$module.inc.php")) {
-                Config::set("discovery_modules.$module", 1);
-                $force_module = true;
-            }
-        }
-    }
-
     $discovery_devices = Config::get('discovery_modules', array());
     $discovery_devices = array('core' => true) + $discovery_devices;
 
@@ -180,7 +173,16 @@ function discover_device(&$device, $options = null)
             $module_start = microtime(true);
             $start_memory = memory_get_usage();
             echo "\n#### Load disco module $module ####\n";
-            include "includes/discovery/$module.inc.php";
+
+            try {
+                include "includes/discovery/$module.inc.php";
+            } catch (Exception $e) {
+                // isolate module exceptions so they don't disrupt the polling process
+                echo $e->getTraceAsString() .PHP_EOL;
+                c_echo("%rError in $module module.%n " . $e->getMessage() . PHP_EOL);
+                logfile("Error in $module module. " . $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL);
+            }
+
             $module_time = microtime(true) - $module_start;
             $module_time = substr($module_time, 0, 5);
             $module_mem = (memory_get_usage() - $start_memory);
@@ -207,10 +209,8 @@ function discover_device(&$device, $options = null)
 
     echo "Discovered in $device_time seconds\n";
 
-    global $discovered_devices;
-
-    echo "\n";
-    $discovered_devices++;
+    echo PHP_EOL;
+    return true;
 }
 //end discover_device()
 
@@ -956,7 +956,7 @@ function can_skip_sensor($value, $data, $group, $pre_cache = array())
         }
     }
 
-    $skip_value_gt = array_reduce((array)$group['skip_value_gt'], (array)$data['skip_value_gt']);
+    $skip_value_gt = array_replace((array)$group['skip_value_gt'], (array)$data['skip_value_gt']);
     foreach ($skip_value_gt as $skip_value) {
         if ($value > $skip_value) {
             return true;
@@ -1044,7 +1044,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
                     $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
                     $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
-                    
+
                     $limits = ['low_limit', 'low_warn_limit', 'warn_limit', 'high_limit'];
                     foreach ($limits as $limit) {
                         if (is_numeric($data[$limit])) {
@@ -1392,12 +1392,12 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
 }
 
 /**
- * Try to find a port by ifDescr, ifName, or MAC
+ * Try to find a port by ifDescr, ifName, ifAlias, or MAC
  *
- * @param string $description matched against ifDescr and ifName
- * @param string $identifier matched against ifDescr and ifName
+ * @param string $description matched against ifDescr, ifName, and ifAlias
+ * @param string $identifier matched against ifDescr, ifName, and ifAlias
  * @param int $device_id restrict search to ports on a specific device
- * @param string $mac_address check against ifPysAddress (should be in lowercase hexadecimal)
+ * @param string $mac_address check against ifPhysAddress (should be in lowercase hexadecimal)
  * @return int
  */
 function find_port_id($description, $identifier = '', $device_id = 0, $mac_address = null)
@@ -1411,10 +1411,15 @@ function find_port_id($description, $identifier = '', $device_id = 0, $mac_addre
 
     if ($device_id) {
         if ($description) {
+            // order is important here, the standard says this is ifDescr, which some mfg confuse with ifName
             $statements[] = "SELECT `port_id` FROM `ports` WHERE `device_id`=? AND (`ifDescr`=? OR `ifName`=?)";
-
             $params[] = $device_id;
             $params[] = $description;
+            $params[] = $description;
+
+            // we check ifAlias last because this is a user editable field, but some bad LLDP implementations use it
+            $statements[] = "SELECT `port_id` FROM `ports` WHERE `device_id`=? AND `ifAlias`=?";
+            $params[] = $device_id;
             $params[] = $description;
         }
 

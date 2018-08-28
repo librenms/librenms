@@ -49,6 +49,10 @@ if (is_numeric($vars['acknowledged'])) {
     $where .= " AND `alerts`.`state`" . ($vars['acknowledged'] ? "=" : "!=") . $alert_states['acknowledged'];
 }
 
+if (is_numeric($vars['fired'])) {
+    $where .= " AND `alerts`.`alerted`=" . $alert_states['alerted'];
+}
+
 if (is_numeric($vars['state'])) {
     $where .= " AND `alerts`.`state`=" . $vars['state'];
     if ($vars['state'] == $alert_states['recovered']) {
@@ -96,8 +100,10 @@ if (empty($total)) {
     $total = 0;
 }
 
-if (!isset($sort) || empty($sort)) {
+if (!isset($vars['sort']) || empty($vars['sort'])) {
     $sort = 'timestamp DESC';
+} else {
+    $sort = '`alert_rules`.`severity` DESC, timestamp DESC';
 }
 
 $sql .= " ORDER BY $sort";

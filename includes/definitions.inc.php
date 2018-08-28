@@ -134,50 +134,9 @@ $config['graph_types']['device']['sub10_sub10RadioLclDataRate']['order'] = '4';
 $config['graph_types']['device']['sub10_sub10RadioLclDataRate']['descr'] = 'Data Rate on the Airside interface';
 
 //cambium graphs
-$config['graph_types']['device']['cambium_650_rawReceivePower']['section'] = 'wireless';
-$config['graph_types']['device']['cambium_650_rawReceivePower']['order']   = '0';
-$config['graph_types']['device']['cambium_650_rawReceivePower']['descr']   = 'Raw Receive Power';
-$config['graph_types']['device']['cambium_650_transmitPower']['section'] = 'wireless';
-$config['graph_types']['device']['cambium_650_transmitPower']['order']   = '1';
-$config['graph_types']['device']['cambium_650_transmitPower']['descr']   = 'Transmit Power';
-$config['graph_types']['device']['cambium_650_modulationMode']['section'] = 'wireless';
-$config['graph_types']['device']['cambium_650_modulationMode']['order']   = '2';
-$config['graph_types']['device']['cambium_650_modulationMode']['descr']   = 'Moduation Mode';
-$config['graph_types']['device']['cambium_650_dataRate']['section'] = 'wireless';
-$config['graph_types']['device']['cambium_650_dataRate']['order']   = '3';
-$config['graph_types']['device']['cambium_650_dataRate']['descr']   = 'Data Rate';
-$config['graph_types']['device']['cambium_650_ssr']['section'] = 'wireless';
-$config['graph_types']['device']['cambium_650_ssr']['order']   = '4';
-$config['graph_types']['device']['cambium_650_ssr']['descr']   = 'Signal Strength Ratio';
-$config['graph_types']['device']['cambium_650_gps']['section'] = 'wireless';
-$config['graph_types']['device']['cambium_650_gps']['order']   = '5';
-$config['graph_types']['device']['cambium_650_gps']['descr']   = 'GPS Status';
-
-$config['graph_types']['device']['cambium_250_receivePower']['section'] = 'wireless';
-$config['graph_types']['device']['cambium_250_receivePower']['order']   = '0';
-$config['graph_types']['device']['cambium_250_receivePower']['descr']   = 'Raw Receive Power';
-$config['graph_types']['device']['cambium_250_transmitPower']['section'] = 'wireless';
-$config['graph_types']['device']['cambium_250_transmitPower']['order']   = '1';
-$config['graph_types']['device']['cambium_250_transmitPower']['descr']   = 'Transmit Power';
-$config['graph_types']['device']['cambium_250_modulationMode']['section'] = 'wireless';
-$config['graph_types']['device']['cambium_250_modulationMode']['order']   = '2';
-$config['graph_types']['device']['cambium_250_modulationMode']['descr']   = 'Moduation Mode';
-$config['graph_types']['device']['cambium_250_dataRate']['section'] = 'wireless';
-$config['graph_types']['device']['cambium_250_dataRate']['order']   = '3';
-$config['graph_types']['device']['cambium_250_dataRate']['descr']   = 'Data Rate';
-$config['graph_types']['device']['cambium_250_ssr']['section'] = 'wireless';
-$config['graph_types']['device']['cambium_250_ssr']['order']   = '4';
-$config['graph_types']['device']['cambium_250_ssr']['descr']   = 'Signal Strength Ratio';
-
-$config['graph_types']['device']['canopy_generic_whispGPSStats']['section'] = 'wireless';
-$config['graph_types']['device']['canopy_generic_whispGPSStats']['order']   = '0';
-$config['graph_types']['device']['canopy_generic_whispGPSStats']['descr']   = 'GPS Status';
 $config['graph_types']['device']['canopy_generic_gpsStats']['section'] = 'wireless';
 $config['graph_types']['device']['canopy_generic_gpsStats']['order']   = '0';
 $config['graph_types']['device']['canopy_generic_gpsStats']['descr']   = 'GPS Stats';
-$config['graph_types']['device']['canopy_generic_rssi']['section'] = 'wireless';
-$config['graph_types']['device']['canopy_generic_rssi']['order']   = '1';
-$config['graph_types']['device']['canopy_generic_rssi']['descr']   = 'Signal Rssi';
 $config['graph_types']['device']['canopy_generic_jitter']['section'] = 'wireless';
 $config['graph_types']['device']['canopy_generic_jitter']['order']   = '2';
 $config['graph_types']['device']['canopy_generic_jitter']['descr']   = 'Jitter';
@@ -196,40 +155,22 @@ $config['graph_types']['device']['canopy_generic_450_ptpSNR']['descr']   = 'Mast
 $config['graph_types']['device']['canopy_generic_450_slaveHV']['section'] = 'wireless';
 $config['graph_types']['device']['canopy_generic_450_slaveHV']['order']   = '7';
 $config['graph_types']['device']['canopy_generic_450_slaveHV']['descr']   = 'Dbm H/V';
-$config['graph_types']['device']['canopy_generic_450_slaveSNR']['section'] = 'wireless';
-$config['graph_types']['device']['canopy_generic_450_slaveSNR']['order']   = '8';
-$config['graph_types']['device']['canopy_generic_450_slaveSNR']['descr']   = 'SNR';
-$config['graph_types']['device']['canopy_generic_450_slaveSSR']['section'] = 'wireless';
-$config['graph_types']['device']['canopy_generic_450_slaveSSR']['order']   = '9';
-$config['graph_types']['device']['canopy_generic_450_slaveSSR']['descr']   = 'SSR';
-$config['graph_types']['device']['canopy_generic_450_masterSSR']['section'] = 'wireless';
-$config['graph_types']['device']['canopy_generic_450_masterSSR']['order']   = '10';
-$config['graph_types']['device']['canopy_generic_450_masterSSR']['descr']   = 'Master SSR';
 $config['graph_types']['device']['canopy_generic_regCount']['section'] = 'wireless';
 $config['graph_types']['device']['canopy_generic_regCount']['order']   = '11';
 $config['graph_types']['device']['canopy_generic_regCount']['descr']   = 'Registered SM';
-$config['graph_types']['device']['canopy_generic_freq']['section'] = 'wireless';
-$config['graph_types']['device']['canopy_generic_freq']['order']   = '12';
-$config['graph_types']['device']['canopy_generic_freq']['descr']   = 'Radio Frequency';
 $config['graph_types']['device']['canopy_generic_radioDbm']['section'] = 'wireless';
 $config['graph_types']['device']['canopy_generic_radioDbm']['order']   = '13';
 $config['graph_types']['device']['canopy_generic_radioDbm']['descr']   = 'Radio Dbm';
 $config['graph_types']['device']['canopy_generic_errorCount']['section'] = 'wireless';
 $config['graph_types']['device']['canopy_generic_errorCount']['order']   = '14';
-$config['graph_types']['device']['canopy_generic_errorCount']['descr']   = 'Error Count';
+$config['graph_types']['device']['canopy_generic_errorCount']['descr']   = 'Error Count (Migrated to Wireless Sensor)';
 $config['graph_types']['device']['canopy_generic_crcErrors']['section'] = 'wireless';
 $config['graph_types']['device']['canopy_generic_crcErrors']['order']   = '15';
-$config['graph_types']['device']['canopy_generic_crcErrors']['descr']   = 'CRC Errors';
-$config['graph_types']['device']['canopy-generic-frameUtilization']['section'] = 'wireless';
-$config['graph_types']['device']['canopy-generic-frameUtilization']['order']   = '16';
-$config['graph_types']['device']['canopy-generic-frameUtilization']['descr']   = 'Frame Utilization';
+$config['graph_types']['device']['canopy_generic_crcErrors']['descr']   = 'CRC Errors (Migrated to Wireless Sensor)';
 
 $config['graph_types']['device']['cambium_epmp_RFStatus']['section'] = 'wireless';
 $config['graph_types']['device']['cambium_epmp_RFStatus']['order']   = '0';
 $config['graph_types']['device']['cambium_epmp_RFStatus']['descr']   = 'RF Status';
-$config['graph_types']['device']['cambium_epmp_gps']['section'] = 'wireless';
-$config['graph_types']['device']['cambium_epmp_gps']['order']   = '1';
-$config['graph_types']['device']['cambium_epmp_gps']['descr']   = 'GPS Info';
 $config['graph_types']['device']['cambium_epmp_modulation']['section'] = 'wireless';
 $config['graph_types']['device']['cambium_epmp_modulation']['order']   = '2';
 $config['graph_types']['device']['cambium_epmp_modulation']['descr']   = 'ePMP Modulation';
@@ -319,7 +260,24 @@ $config['graph_types']['device']['pf_inserts']['descr']             = 'Inserts';
 $config['graph_types']['device']['pf_removals']['section']           = 'firewall';
 $config['graph_types']['device']['pf_removals']['order']             = '4';
 $config['graph_types']['device']['pf_removals']['descr']             = 'Removals';
-
+$config['graph_types']['device']['pf_matches']['section']            = 'firewall';
+$config['graph_types']['device']['pf_matches']['order']              = '5';
+$config['graph_types']['device']['pf_matches']['descr']              = 'Matches';
+$config['graph_types']['device']['pf_badoffset']['section']          = 'firewall';
+$config['graph_types']['device']['pf_badoffset']['order']            = '6';
+$config['graph_types']['device']['pf_badoffset']['descr']            = 'BadOffset';
+$config['graph_types']['device']['pf_fragmented']['section']         = 'firewall';
+$config['graph_types']['device']['pf_fragmented']['order']           = '7';
+$config['graph_types']['device']['pf_fragmented']['descr']           = 'Fragmented';
+$config['graph_types']['device']['pf_short']['section']              = 'firewall';
+$config['graph_types']['device']['pf_short']['order']                = '8';
+$config['graph_types']['device']['pf_short']['descr']                = 'Short';
+$config['graph_types']['device']['pf_normalized']['section']         = 'firewall';
+$config['graph_types']['device']['pf_normalized']['order']           = '9';
+$config['graph_types']['device']['pf_normalized']['descr']           = 'Normalized';
+$config['graph_types']['device']['pf_memdropped']['section']         = 'firewall';
+$config['graph_types']['device']['pf_memdropped']['order']           = '10';
+$config['graph_types']['device']['pf_memdropped']['descr']           = 'MemDropped';
 
 
 
@@ -517,6 +475,41 @@ $config['graph_types']['device']['xirrus_stations']['descr']   = 'Associated Sta
 $config['graph_types']['device']['sgos_average_requests']['section']  = 'network';
 $config['graph_types']['device']['sgos_average_requests']['order']    = '0';
 $config['graph_types']['device']['sgos_average_requests']['descr']    = 'Average HTTP Requests';
+
+// SRX Flow Sessions
+$config['graph_types']['device']['junos_jsrx_spu_sessions']['section']  = 'network';
+$config['graph_types']['device']['junos_jsrx_spu_sessions']['order']    = '0';
+$config['graph_types']['device']['junos_jsrx_spu_sessions']['descr']    = 'Flow Sessions';
+
+// Blue Coat SGOS
+// Client Connections
+$config['graph_types']['device']['bluecoat_http_client_connections']['section'] = 'network';
+$config['graph_types']['device']['bluecoat_http_client_connections']['order']    = '0';
+$config['graph_types']['device']['bluecoat_http_client_connections']['descr']    = 'HTTP Client Connections';
+// Server Connections
+$config['graph_types']['device']['bluecoat_http_server_connections']['section'] = 'network';
+$config['graph_types']['device']['bluecoat_http_server_connections']['order']    = '0';
+$config['graph_types']['device']['bluecoat_http_server_connections']['descr']    = 'HTTP Server Connections';
+
+// Client Connections Active
+$config['graph_types']['device']['bluecoat_http_client_connections_active']['section']  = 'network';
+$config['graph_types']['device']['bluecoat_http_client_connections_active']['order']    = '0';
+$config['graph_types']['device']['bluecoat_http_client_connections_active']['descr']    = 'HTTP Client Connections Active';
+// Server Connections Active
+$config['graph_types']['device']['bluecoat_http_server_connections_active']['section'] = 'network';
+$config['graph_types']['device']['bluecoat_http_server_connections_active']['order']    = '0';
+$config['graph_types']['device']['bluecoat_http_server_connections_active']['descr']    = 'HTTP Server Connections Active';
+
+// Client Connections Idle
+$config['graph_types']['device']['bluecoat_http_client_connections_idle']['section']  = 'network';
+$config['graph_types']['device']['bluecoat_http_client_connections_idle']['order']    = '0';
+$config['graph_types']['device']['bluecoat_http_client_connections_idle']['descr']    = 'HTTP Client Connections Idle';
+
+// Server Connections Idle
+$config['graph_types']['device']['bluecoat_http_server_connections_idle']['section']  = 'network';
+$config['graph_types']['device']['bluecoat_http_server_connections_idle']['order']    = '0';
+$config['graph_types']['device']['bluecoat_http_server_connections_idle']['descr']    = 'HTTP Server Connections Idle';
+
 
 //riverbed specific graphs
 $config['graph_types']['device']['riverbed_connections']['section'] = 'network';

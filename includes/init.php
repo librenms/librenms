@@ -30,9 +30,11 @@
 use LibreNMS\Authentication\Auth;
 use LibreNMS\Config;
 
-global $config;
+global $config, $permissions, $vars;
 
 error_reporting(E_ERROR|E_PARSE|E_CORE_ERROR|E_COMPILE_ERROR);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
 
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
@@ -90,26 +92,33 @@ if (module_selected('alerts', $init_modules)) {
     require_once $install_dir . '/includes/alerts.inc.php';
 }
 
+if (module_selected('laravel', $init_modules)) {
+    // make sure Laravel isn't already booted
+    if (!class_exists('App') || !App::isBooted()) {
+        define(LARAVEL_START, microtime(true));
+        $app = require_once $install_dir . '/bootstrap/app.php';
+        $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+        $kernel->bootstrap();
+    }
+}
+
+if (!module_selected('nodb', $init_modules)) {
+    \LibreNMS\DB\Eloquent::boot();
+
+    if (!\LibreNMS\DB\Eloquent::isConnected()) {
+        echo "Could not connect to database, check logs/librenms.log.\n";
+        exit;
+    }
+}
+
 // Display config.php errors instead of http 500
 $display_bak = ini_get('display_errors');
 ini_set('display_errors', 1);
 
-if (!module_selected('nodb', $init_modules)) {
-    // Connect to database
-    try {
-        dbConnect();
-    } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
-        if (isCli()) {
-            echo 'MySQL Error: ' . $e->getMessage() . PHP_EOL;
-        } else {
-            echo "<h2>MySQL Error</h2><p>" . $e->getMessage() . "</p>";
-        }
-        exit(2);
-    }
+// Load config if not already loaded (which is the case if inside Laravel)
+if (!Config::has('install_dir')) {
+    Config::load();
 }
-
-// try to load from database, otherwise, just process config
-Config::load();
 
 // set display_errors back
 ini_set('display_errors', $display_bak);

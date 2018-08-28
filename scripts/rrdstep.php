@@ -24,6 +24,8 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
+use LibreNMS\Config;
+
 $init_modules = array();
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
@@ -49,26 +51,54 @@ if (empty($hostname)) {
     exit;
 }
 
-$step      = $config['rrd']['step'];
-$heartbeat = $config['rrd']['heartbeat'];
-$rrdtool   = $config['rrdtool'];
-$tmp_path  = $config['temp_dir'];
+$system_step      = Config::get('rrd.step', 300);
+$icmp_step        = Config::get('ping_rrd_step', $system_step);
+$system_heartbeat = Config::get('rrd.heartbeat', $system_step * 2);
+$rrdtool          = Config::get('rrdtool', 'rrdtool');
+$tmp_path         = Config::get('temp_dir', '/tmp');
 
 if ($hostname === 'all') {
     $hostname = '*';
 }
 $files = glob(get_rrd_dir($hostname) . '/*.rrd');
 
-$run = readline("Are you sure you want to run this command [N/y]: ");
-if (!($run == 'y' || $run == 'Y')) {
-    echo "Exiting....." . PHP_EOL;
-    exit;
-}
+$converted = 0;
+$skipped = 0;
+$failed = 0;
 
 foreach ($files as $file) {
     $random = $tmp_path.'/'.mt_rand() . '.xml';
-    $tmp = explode('/', $file);
-    $rrd_file = array_pop($tmp);
+    $rrd_file = basename($file, '.rrd');
+
+    if ($rrd_file == 'ping-perf') {
+        $step = $icmp_step;
+        $heartbeat = $icmp_step * 2;
+    } else {
+        $step = $system_step;
+        $heartbeat = $system_heartbeat;
+    }
+
+    $rrd_info = shell_exec("$rrdtool info $file");
+    preg_match('/step = (\d+)/', $rrd_info, $step_matches);
+
+    if ($step_matches[1] == $step) {
+        preg_match_all('/minimal_heartbeat = (\d+)/', $rrd_info, $heartbeat_matches);
+        try {
+            foreach ($heartbeat_matches[1] as $ds_heartbeat) {
+                if ($ds_heartbeat != $heartbeat) {
+                    throw new Exception("Mismatched heartbeat. {$ds_heartbeat} != $heartbeat");
+                }
+            }
+            // all heartbeats ok
+
+            d_echo("Skipping $file, step is already $step.\n");
+            $skipped++;
+            continue;
+        } catch (Exception $e) {
+            echo $e->getMessage() . PHP_EOL;
+        }
+    }
+
     echo "Converting $file: ";
     $command = "$rrdtool dump $file > $random && 
         sed -i 's/<step>\([0-9]*\)/<step>$step/' $random && 
@@ -78,7 +108,11 @@ foreach ($files as $file) {
     exec($command, $output, $code);
     if ($code === 0) {
         echo "[OK]\n";
+        $converted++;
     } else {
         echo "\033[FAIL]\n";
+        $failed++;
     }
 }
+
+echo "Converted: $converted  Failed: $failed  Skipped: $skipped\n";

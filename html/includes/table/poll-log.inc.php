@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Config;
 use LibreNMS\Authentication\Auth;
 
 $sql = ' FROM `devices` AS D ';
@@ -21,7 +22,8 @@ if (isset($searchPhrase) && !empty($searchPhrase)) {
 }
 
 if ($vars['type'] == "unpolled") {
-    $sql .= " AND `last_polled` <= DATE_ADD(NOW(), INTERVAL - 15 minute)";
+    $overdue = (int)(Config::get('rrd.step', 300) * 1.2);
+    $sql .= " AND `last_polled` <= DATE_ADD(NOW(), INTERVAL - $overdue SECOND)";
 }
 
 if (!isset($sort) || empty($sort)) {

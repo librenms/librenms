@@ -75,7 +75,7 @@ if ($config['title_image']) {
           </li>
           <li class="dropdown-submenu">
             <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> Plugins</a>
-            <ul class="dropdown-menu scrollable-menu">
+            <ul class="dropdown-menu">
                 <?php
                 \LibreNMS\Plugins::call('menu');
 
@@ -214,6 +214,11 @@ if (Auth::user()->hasGlobalAdmin()) {
     }
 
     echo '<li><a href="'.generate_url(array('page'=>'device-dependencies')).'"><i class="fa fa-group fa-fw fa-lg"></i> Device Dependencies</a></li>';
+
+    $vm_count = dbFetchCell('SELECT COUNT(id) from `vminfo`');
+    if ($vm_count > 0) {
+        echo '<li><a href="'.generate_url(array('page'=>'vminfo')).'"><i class="fa fa-cog fa-fw fa-lg"></i> Virtual Machines</a></li>';
+    }
 
      echo '
             <li role="presentation" class="divider"></li>
@@ -606,6 +611,7 @@ if ($alerts['active_count'] > 0) {
                     <li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><i class="fa fa-list fa-fw fa-lg" aria-hidden="true"></i> Alert Rules</a></li>
                     <li><a href="<?php echo(generate_url(array('page'=>'alert-schedule'))); ?>"><i class="fa fa-calendar fa-fw fa-lg" aria-hidden="true"></i> Scheduled Maintenance</a></li>
                     <li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><i class="fa fa-file fa-fw fa-lg" aria-hidden="true"></i> Alert Templates</a></li>
+                    <li><a href="<?php echo(generate_url(array('page'=>'alert-transports'))); ?>"><i class="fa fa-bus fa-fw fa-lg" aria-hidden="true"></i> Alert Transports</a></li>
                 <?php } ?>
           </ul>
       </li>

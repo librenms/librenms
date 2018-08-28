@@ -1,16 +1,16 @@
----
-engines:
+version: "2"
+plugins:
   markdownlint:
     enabled: true
   phan:
-    enabled: true
-    config:
-      file_extensions: "php"
-engines:
+    enabled: false
   phpcodesniffer:
     enabled: true
     config:
         standard: "PSR2"
+    checks:
+      Generic Files LineLength TooLong:
+        enabled: false
   duplication:
     enabled: true
     config:
@@ -26,22 +26,14 @@ engines:
     enabled: true
   phpmd:
     enabled: true
+    checks:
+      Controversial/CamelCaseVariableName:
+        enabled: false
   radon:
     enabled: true
-ratings:
-  paths:
-  - "**.css"
-  - "**.coffee"
-  - "**.inc"
-  - "**.js"
-  - "**.jsx"
-  - "**.module"
-  - "**.php"
-  - "**.py"
-  - "**.rb"
-exclude_paths:
-- "tests/"
-- "lib/"
-- "html/js/"
-- "html/css/"
-- "html/lib/"
+exclude_patterns:
+  - "tests/"
+  - "lib/"
+  - "vendor/"
+  - "html/js/"
+  - "html/css/"

@@ -7,7 +7,7 @@ IMPORTS
 -- Blue Coat Systems Inc. private MIBs
 
 blueCoat MODULE-IDENTITY
-        LAST-UPDATED    "201403040300Z"
+        LAST-UPDATED    "201512150300Z"
         ORGANIZATION    "Blue Coat Systems, Inc."
         CONTACT-INFO    "support.services@bluecoat.com
                          http://www.bluecoat.com"
@@ -15,8 +15,15 @@ blueCoat MODULE-IDENTITY
                          Note that the enterprise number is 
                          that of CacheFlow, Blue Coat's 
                          former corporate name."
+        REVISION        "201512150300Z"
+        DESCRIPTION     "Added device id for sgxen."
+        REVISION        "201504240300Z"
+        DESCRIPTION     "Added device id for sghyperv. 
+                         Added product asg. Added asg id for asgs400, asgs500, asgs200"
         REVISION        "201403040300Z"
         DESCRIPTION     "Added device id for sgs200."
+        REVISION        "201312120300Z"
+        DESCRIPTION     "Added cas product and cas id for cass400."
         REVISION        "201311120300Z"
         DESCRIPTION     "Added device id for sgvmwareesx."
         REVISION        "201309240300Z"
@@ -36,9 +43,13 @@ blueCoat MODULE-IDENTITY
 products        OBJECT IDENTIFIER ::= { blueCoat 1 }
 blueCoatMgmt    OBJECT IDENTIFIER ::= { blueCoat 2 }
 
+-- 'device' refers to the sg product (ProxySG)
 device          OBJECT IDENTIFIER ::= { products 1 }
 director        OBJECT IDENTIFIER ::= { products 2 }
 av              OBJECT IDENTIFIER ::= { products 3 }
+cas             OBJECT IDENTIFIER ::= { products 4 }
+sslv            OBJECT IDENTIFIER ::= { products 5 }
+asg             OBJECT IDENTIFIER ::= { products 6 }
 
 sg1000          OBJECT IDENTIFIER ::= { device 1 }
 sg100           OBJECT IDENTIFIER ::= { device 2 }
@@ -74,6 +85,9 @@ sg900           OBJECT IDENTIFIER ::= { device 34 }
 sgs500          OBJECT IDENTIFIER ::= { device 36 }
 sgs400          OBJECT IDENTIFIER ::= { device 37 }
 sgs200          OBJECT IDENTIFIER ::= { device 38 }
+sghyperv        OBJECT IDENTIFIER ::= { device 42 }
+sgxen           OBJECT IDENTIFIER ::= { device 43 }
+sgkvm			OBJECT IDENTIFIER ::= { device 44 }
 
 sgme710         OBJECT IDENTIFIER ::= { director 1 }
 sgme800         OBJECT IDENTIFIER ::= { director 2 }
@@ -86,6 +100,16 @@ av1400          OBJECT IDENTIFIER ::= { av 5 }
 av2400          OBJECT IDENTIFIER ::= { av 6 }
 av1200          OBJECT IDENTIFIER ::= { av 7 }
 
+cass400         OBJECT IDENTIFIER ::= { cas 1 }
+
+sslv800         OBJECT IDENTIFIER ::= { sslv 1 }
+sslv1800        OBJECT IDENTIFIER ::= { sslv 2 }
+sslv2800        OBJECT IDENTIFIER ::= { sslv 3 }
+sslv3800        OBJECT IDENTIFIER ::= { sslv 4 }
+
+asgs500         OBJECT IDENTIFIER ::= { asg 1 }
+asgs400         OBJECT IDENTIFIER ::= { asg 2 }
+asgs200         OBJECT IDENTIFIER ::= { asg 3 }
 
 END
 

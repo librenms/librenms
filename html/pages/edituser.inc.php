@@ -68,7 +68,7 @@ if (!Auth::user()->isAdmin()) {
 
         $device_perms = dbFetchRows('SELECT * from devices_perms as P, devices as D WHERE `user_id` = ? AND D.device_id = P.device_id', array($vars['user_id']));
         foreach ($device_perms as $device_perm) {
-            echo '<tr><td><strong>'.$device_perm['hostname']."</td><td> <a href='edituser/action=deldevperm/user_id=".$vars['user_id'].'/device_id='.$device_perm['device_id']."'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a></strong></td></tr>";
+            echo '<tr><td><strong>'.format_hostname($device_perm)."</td><td> <a href='edituser/action=deldevperm/user_id=".$vars['user_id'].'/device_id='.$device_perm['device_id']."'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a></strong></td></tr>";
             $access_list[] = $device_perm['device_id'];
             $permdone      = 'yes';
         }

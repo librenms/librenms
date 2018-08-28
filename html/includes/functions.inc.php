@@ -141,6 +141,9 @@ function nicecase($item)
         case 'zfs':
             return 'ZFS';
 
+        case 'asterisk':
+            return 'Asterisk';
+
         default:
             return ucfirst($item);
     }
@@ -848,30 +851,30 @@ function getlocations()
 }//end getlocations()
 
 
+/**
+ * Get the recursive file size and count for a directory
+ *
+ * @param string $path
+ * @return array [size, file count]
+ */
 function foldersize($path)
 {
     $total_size = 0;
-    $files = scandir($path);
     $total_files = 0;
 
-    foreach ($files as $t) {
-        if (is_dir(rtrim($path, '/') . '/' . $t)) {
-            if ($t <> '.' && $t <> '..') {
-                $size = foldersize(rtrim($path, '/') . '/' . $t);
-                $total_size += $size;
-            }
+    foreach (glob(rtrim($path, '/').'/*', GLOB_NOSORT) as $item) {
+        if (is_dir($item)) {
+            list($folder_size, $file_count) = foldersize($item);
+            $total_size += $folder_size;
+            $total_files += $file_count;
         } else {
-            $size = filesize(rtrim($path, '/') . '/' . $t);
-            $total_size += $size;
+            $total_size += filesize($item);
             $total_files++;
         }
     }
 
-    return array(
-        $total_size,
-        $total_files,
-    );
-}//end foldersize()
+    return [$total_size, $total_files];
+}
 
 
 function generate_ap_link($args, $text = null, $type = null)
@@ -1069,9 +1072,8 @@ function clean_bootgrid($string)
 
 function get_config_by_group($group)
 {
-    $group = array($group);
     $items = array();
-    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_group` = '?'", array($group)) as $config_item) {
+    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_group` = ?", array($group)) as $config_item) {
         $val = $config_item['config_value'];
         if (filter_var($val, FILTER_VALIDATE_INT)) {
             $val = (int)$val;
@@ -1094,9 +1096,8 @@ function get_config_by_group($group)
 
 function get_config_like_name($name)
 {
-    $name = array($name);
     $items = array();
-    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_name` LIKE '%?%'", array($name)) as $config_item) {
+    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_name` LIKE ?", array("%$name%")) as $config_item) {
         $items[$config_item['config_id']] = $config_item;
     }
 
@@ -1575,7 +1576,6 @@ function get_disks_with_smart($device, $app_id)
  */
 function get_dashboards($user_id = null)
 {
-    global $authorizer;
     $default = get_user_pref('dashboard');
     $dashboards = dbFetchRows(
         "SELECT * FROM `dashboards` WHERE dashboards.access > 0 || dashboards.user_id = ?",

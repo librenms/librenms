@@ -6,35 +6,35 @@ over:
     - { graph: device_temperature, text: Temperature }
 mib_dir:
     - hwg
-nobulk: 1
+nobulk: true
 poller_modules:
-    applications : 0
-    bgp-peers: 0
-    ipmi : 0
-    ospf: 0
-    stp: 0
-    netstats: 0
+    applications: false
+    bgp-peers: false
+    ipmi: false
+    ospf: false
+    stp: false
+    netstats: false
 discovery_modules:
-    applications: 0
-    arp-table : 0
-    bgp-peers: 0
-    cisco-vrf-lite : 0
-    discovery-protocols : 0
-    fdb-table : 0
-    hr-device: 0
-    ipv4-addresses : 0
-    ipv6-addresses : 0
-    mempools : 0
-    ntp : 0
-    ports : 0
-    ports-stack : 0
-    processors : 0
-    services: 0
-    storage : 0
-    stp: 0
-    ucd-diskio : 0
-    vlans : 0
-    wireless : 0
+    applications: false
+    arp-table: false
+    bgp-peers: false
+    cisco-vrf-lite: false
+    discovery-protocols: false
+    fdb-table: false
+    hr-device: false
+    ipv4-addresses: false
+    ipv6-addresses: false
+    mempools: false
+    ntp: false
+    ports: false
+    ports-stack: false
+    processors: false
+    services: false
+    storage: false
+    stp: false
+    ucd-diskio: false
+    vlans: false
+    wireless: false
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.21796.4.1

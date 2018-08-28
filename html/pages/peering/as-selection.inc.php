@@ -33,8 +33,8 @@ echo "<div class='alert alert-info' role='alert'>Cached date: $cache_date</div>"
         <table id="asn" class="table table-bordered table-hover">
             <thead>
                 <tr>
-                    <th data-column-id="asn">ASN</th>
-                    <th data-column-id="asname" data-searchable="false">AS Name</th>
+                    <th data-column-id="bgpLocalAs">ASN</th>
+                    <th data-column-id="asname" data-searchable="false" data-sortable="false">AS Name</th>
                     <th data-column-id="action" data-sortable="false"></th>
                 </tr>
             </thead>

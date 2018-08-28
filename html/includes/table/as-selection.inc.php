@@ -36,9 +36,9 @@ $sql = "SELECT `bgpLocalAs` $sql";
 foreach (dbFetchRows($sql) as $asn) {
     $astext = get_astext($asn['bgpLocalAs']);
     $response[] = array(
-        'asn'    => $asn['bgpLocalAs'],
+        'bgpLocalAs'    => $asn['bgpLocalAs'],
         'asname' => $astext,
-        'action' => "<a class='btn btn-sm btn-primary' href='" . generate_url(array('page' => 'peering', 'section' => 'ix-list', 'asn' => $asn['bgpLocalAs'])) . "' role='button'>Show connectd IXes</a>",
+        'action' => "<a class='btn btn-sm btn-primary' href='" . generate_url(array('page' => 'peering', 'section' => 'ix-list', 'bgpLocalAs' => $asn['bgpLocalAs'])) . "' role='button'>Show connectd IXes</a>",
     );
 }
 

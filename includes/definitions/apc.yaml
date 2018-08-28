@@ -12,3 +12,4 @@ discovery:
         - APC MasterSwitch PDU
         - APC Metered Rack PDU
         - APC Embedded PowerNet
+        - APC Environmental Manager

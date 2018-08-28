@@ -62,7 +62,7 @@ if (Config::get('enable_vrf_lite_cisco')) {
         }
         unset($listIntance);
 
-        foreach ($tableVrf as $context => $vrf) {
+        foreach ((array)$tableVrf as $context => $vrf) {
             if ($debug) {
                 echo ("\n[DEBUG]\nRelation:t" . $context . "t" . $vrf['intance'] . "t" . $vrf['vrf'] . "\n[/DEBUG]\n");
             }

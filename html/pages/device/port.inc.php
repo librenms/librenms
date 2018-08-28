@@ -50,13 +50,13 @@ echo '</table></div>';
 
 $pos = strpos(strtolower($ifname), 'vlan');
 if ($pos !== false) {
-    $broke = yes;
+    $broke = 'yes';
 }
 
 $pos = strpos(strtolower($ifname), 'loopback');
 
 if ($pos !== false) {
-    $broke = yes;
+    $broke = 'yes';
 }
 
 echo "<div style='clear: both;'>";
@@ -102,6 +102,11 @@ $components = $component->getComponents($device['device_id'], $options);
 $components = $components[$device['device_id']];        // We only care about our device id.
 if (count($components) > 0) {
     $menu_options['cbqos'] = 'CBQoS';
+}
+
+if (LibreNMS\Plugins::countHooks('port_container')) {
+    // Checking if any plugin implements the port_container. If yes, allow to display the menu_option
+    $menu_options['plugins'] = 'Plugins';
 }
 
 $sep = '';

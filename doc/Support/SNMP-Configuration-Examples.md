@@ -21,6 +21,7 @@ Table of Content:
         - [PANOS 6.x/7.x](#panos-6x7x)
     - [VMware](#vmware)
         - [ESX/ESXi 5.x/6.x](#esxesxi-5x6x)
+        - [VCenter 6.x](#vcenter-6x)
 - [Operating systems](#operating-systems)
     - [Linux (snmpd v2)](#linux-snmpd)
     - [Linux (snmpd v3)](#linux-snmpd-v3)
@@ -211,6 +212,30 @@ esxcli system snmp set -C noc@your.org
 esxcli system snmp set --enable true
 ```
 
+>Note: In case of snmp timouts, disable the firewall with `esxcli network firewall set --enabled false`  
+>If snmp timeouts still occur with firewall disabled, migrate VMs if needed and reboot ESXi host.
+
+#### VCenter 6.x
+
+Log on to your ESX server by means of ssh. You may have to enable the ssh service in the GUI first.
+From the CLI, execute the following commands:
+```
+snmp.set --authentication SHA1
+snmp.set --privacy AES128
+snmp.hash --auth_hash YOUR_AUTH_SECRET --priv_hash YOUR_PRIV_SECRET --raw_secret true
+```
+This command produces output like this
+```
+   Privhash: 0596ab30b315576a4e9f7d7bde65bf49b749e335
+   Authhash: f3d8982fc28e8d1346c26eee49eb2c4a5950c934
+```
+Now define a SNMPv3 user:
+```
+snmp.set --users authpriv/f3d8982fc28e8d1346c26eee49eb2c4a5950c934/0596ab30b315576a4e9f7d7bde65bf49b749e335/priv
+snmp.enable
+```
+
+
 ## Operating systems
 ### Linux (snmpd v2)
 
@@ -233,16 +258,15 @@ syscontact Your Name <your@email.address>
 
 #Distro Detection
 extend .1.3.6.1.4.1.2021.7890.1 distro /usr/bin/distro
+
+#Hardware Detection (uncomment to enable)
+#extend .1.3.6.1.4.1.2021.7890.2 hardware '/bin/cat /sys/devices/virtual/dmi/id/product_name'
+#extend .1.3.6.1.4.1.2021.7890.3 manufacturer '/bin/cat /sys/devices/virtual/dmi/id/sys_vendor'
+#extend .1.3.6.1.4.1.2021.7890.4 serial '/bin/cat /sys/devices/virtual/dmi/id/product_serial'
 ```
 
-If you have 'dmidecode' installed on your host, you can add the following lines for additional hardware detection.
+**NOTE**: On some systems the snmpd is running as its own user, which means it can't read `/sys/devices/virtual/dmi/id/product_serial` which is mode 0400. One solution is to `chmod 444 /sys/devices/virtual/dmi/id/product_serial` in `/etc/rc.local` or equivalent.
 
-**NOTE**: On some systems the snmpd is running as an own user, making dmidecode unable to read out `/dev/mem` and thus showing multiple errors. Either add the snmp user to the `kmem` group or remove these lines again.
-```
-extend .1.3.6.1.4.1.2021.7890.2 hardware '/usr/sbin/dmidecode -s system-product-name'
-extend .1.3.6.1.4.1.2021.7890.3 manufacturer '/usr/sbin/dmidecode -s system-manufacturer'
-extend .1.3.6.1.4.1.2021.7890.4 serial '/usr/sbin/dmidecode -s system-serial-number'
-```
 The LibreNMS server include a copy of this example here:
 
 ```

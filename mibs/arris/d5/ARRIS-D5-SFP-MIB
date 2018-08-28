@@ -1,0 +1,148 @@
+ARRIS-D5-SFP-MIB	DEFINITIONS	::=	BEGIN
+
+IMPORTS	
+	arrisD5UEQam
+		FROM	ARRIS-MIB
+	Integer32,	OBJECT-TYPE,	MODULE-IDENTITY	
+		FROM	SNMPv2-SMI	
+	TruthValue,	RowStatus,	DisplayString	
+		FROM	SNMPv2-TC;
+
+d5SfpMib	MODULE-IDENTITY	
+	LAST-UPDATED	"131207301100Z"
+	ORGANIZATION	
+		"Arris	International"
+	CONTACT-INFO	
+		"Network Management
+		 Postal: Arris	International.
+		 4300 Cork Airport Business Park
+		 Cork Airport, Kinsale Road
+		 Cork, Ireland.
+		 Tel: +353 21 7305 800
+		 Fax: +353 21 4321 972"
+	DESCRIPTION	
+		"This MIB contains objects related to the Arris D5 SFP modules."
+	REVISION	"200712131100Z"
+	DESCRIPTION
+		"D5	DMTS SFP MIB"
+	::=	{arrisD5UEQam 13}
+
+
+d5SfpTable	OBJECT-TYPE
+	SYNTAX	SEQUENCE	OF	D5SfpEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"This table extends d5SfpTable MIB with extra properties."
+	::=	{d5SfpMib 1}
+
+
+d5SfpEntry	OBJECT-TYPE
+	SYNTAX	D5SfpEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"An entry for a D5 SFP Table."
+	INDEX	{d5SfpIndex}
+	::=	{d5SfpTable 1}
+
+
+D5SfpEntry	::=	SEQUENCE	{	
+	d5SfpIndex				INTEGER,
+	d5SfpPresent			TruthValue,
+	d5SfpConnector			INTEGER,
+	d5SfpCompliance			Integer32,
+	d5SfpVendorName			DisplayString,
+	d5SfpProductName		DisplayString,
+	d5SfpRevision			DisplayString,
+	d5SfpSerialNumber		DisplayString,
+	d5SfpManufactureDate	DisplayString
+}
+
+d5SfpIndex	OBJECT-TYPE
+	SYNTAX	INTEGER (1..4)
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION	
+		"Sfp index."
+	::=	{d5SfpEntry 1}
+
+d5SfpPresent	OBJECT-TYPE
+	SYNTAX	TruthValue
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION	
+		"This value will be true if an SFP is present."
+	::=	{d5SfpEntry 2}
+
+d5SfpConnector	OBJECT-TYPE
+	SYNTAX	INTEGER	{
+		unknown(0),
+		sc(1),
+		fiber1(2),
+		fiber2(3),
+		bnc(4),
+		fcch(5),
+		fiberJack(6),
+		lc(7),
+		mtrj(8),
+		mu(9),
+		sg(10),
+		opticalPigtail(11),
+		hssdcII(32),
+		copperPigtail(33)
+	}	
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION	
+		"Code for connector type from SFP MSA Table 3.3."
+	::=	{d5SfpEntry 3}
+
+d5SfpCompliance	OBJECT-TYPE
+	SYNTAX	Integer32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION	
+	 "SFP Compliance Code from SFP MSA Table 3.4 Data Addr 6."
+	::=	{d5SfpEntry 4}
+
+d5SfpVendorName	OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION	
+		"Name of the SFP vendor."
+	::=	{d5SfpEntry 5}
+
+d5SfpProductName	OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION	
+		"Product Name of the SFP."
+	::=	{d5SfpEntry 6}
+
+d5SfpRevision	OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION	
+		"SFP	Revision."
+	::=	{d5SfpEntry 7}
+
+d5SfpSerialNumber	OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION	
+		"The	SFP	serial	number."
+	::=	{d5SfpEntry 8}
+
+d5SfpManufactureDate	OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION	
+		"The SFP date of manufacturer date."
+	::=	{d5SfpEntry 9}
+END

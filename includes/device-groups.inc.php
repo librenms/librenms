@@ -25,6 +25,8 @@
  * @subpackage Devices
  */
 
+use LibreNMS\Config;
+
 /**
  * Add a new device group
  * @param $pattern
@@ -263,9 +265,10 @@ function GetGroupsFromDevice($device_id, $extra = 0)
  */
 function RunGroupMacros($rule, $x = 1)
 {
-    global $config;
-    krsort($config['alert']['macros']['group']);
-    foreach ($config['alert']['macros']['group'] as $macro => $value) {
+    $macros = Config::get('alert.macros.group', []);
+
+    krsort($macros);
+    foreach ($macros as $macro => $value) {
         if (!strstr($macro, " ")) {
             $rule = str_replace('%macros.'.$macro, '('.$value.')', $rule);
         }
@@ -309,7 +312,7 @@ function UpdateGroupsForDevice($device_id)
 
     // remove old groups
     if (!empty($removed_groups)) {
-        dbDelete('device_group_device', '`device_id`=? AND `device_group_id` IN (?)', array($device_id, array(implode(',', $removed_groups))));
+        dbDelete('device_group_device', '`device_id`=? AND `device_group_id` IN ' . dbGenPlaceholders(count($removed_groups)), array_merge([$device_id], $removed_groups));
     }
     d_echo("### End Device Groups ###\n");
 }
@@ -338,7 +341,7 @@ function UpdateDeviceGroup($group_id)
 
     // remove old devices
     if (!empty($removed_devices)) {
-        dbDelete('device_group_device', '`device_group_id`=? AND `device_id` IN (?)', array($group_id, array(implode(',', $removed_devices))));
+        dbDelete('device_group_device', '`device_group_id`=? AND `device_id` IN ' . dbGenPlaceholders(count($removed_devices)), array_merge([$group_id], $removed_devices));
     }
 }
 

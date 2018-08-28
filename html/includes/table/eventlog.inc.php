@@ -40,7 +40,7 @@ if (Auth::user()->hasGlobalRead()) {
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' `D`.`sysName` LIKE '%$searchPhrase%' OR `E`.`datetime` LIKE '%$searchPhrase%' OR `E`.`message` LIKE '%$searchPhrase%' OR `E`.`type` LIKE '%$searchPhrase%' OR `E`.`username` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `D`.`sysName` LIKE '%$searchPhrase%' OR `E`.`datetime` LIKE '%$searchPhrase%' OR `E`.`message` LIKE '%$searchPhrase%' OR `E`.`type` LIKE '%$searchPhrase%' OR `E`.`username` LIKE '%$searchPhrase%')";
 }
 
 $count_sql = "SELECT COUNT(event_id) $sql";

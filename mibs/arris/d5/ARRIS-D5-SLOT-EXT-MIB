@@ -1,0 +1,162 @@
+    ARRIS-D5-SLOT-EXT-MIB DEFINITIONS ::= BEGIN
+        
+        IMPORTS
+            enterprises, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32,
+                    Counter32, Gauge32, IpAddress
+                FROM SNMPv2-SMI
+            TEXTUAL-CONVENTION, TruthValue, RowStatus, DisplayString,
+            TimeStamp, DateAndTime
+                FROM SNMPv2-TC
+            OBJECT-GROUP, MODULE-COMPLIANCE
+                FROM SNMPv2-CONF
+            ifIndex, InterfaceIndex, InterfaceIndexOrZero
+                FROM IF-MIB
+            arrisD5UEQam
+                FROM ARRIS-MIB;
+        
+            d5SlotExtMIB  MODULE-IDENTITY
+                LAST-UPDATED "200906100000Z"
+                ORGANIZATION "Arris Group, Inc"
+                CONTACT-INFO
+                    "   Network Management
+                        Postal: Arris Group
+                                3871 Lakefield Drive
+                                Suwanee, GA 30324
+                        Tel:    678 473 8500"
+        
+                DESCRIPTION
+                    "This MIB manages the slot assignments on the
+                     Arris D5 DMTS."
+                ::= { arrisD5UEQam 18 }
+        
+            d5SlotObjects OBJECT IDENTIFIER ::= { d5SlotExtMIB 1 }
+
+            WAN7 ::= TEXTUAL-CONVENTION
+            STATUS    current
+            DESCRIPTION
+                "The wan card in slot 7."
+            SYNTAX    Unsigned32 (7)
+
+            WAN8 ::= TEXTUAL-CONVENTION
+            STATUS    current
+            DESCRIPTION
+                "The wan card in slot 8."
+            SYNTAX    Unsigned32 (8)
+
+            WanValue ::= TEXTUAL-CONVENTION
+            STATUS    current
+            DESCRIPTION
+                "Wan card selection for slot assignment."
+            SYNTAX    Unsigned32 (WAN7 | WAN8)
+
+-- Slot Assignment
+-- Provides mechanisms to assign slots to wan cards
+
+            slotAssignmentTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF SlotAssignmentEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "A conceptual table for slot assignments."
+                ::= { d5SlotObjects 1 }
+
+            slotAssignmentEntry OBJECT-TYPE
+                SYNTAX SlotAssignmentEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "A conceptual row entry of this table."
+                INDEX { ifIndex }
+            ::= { slotAssignmentTable 1 }
+
+            SlotAssignmentEntry ::=
+                SEQUENCE {
+                    dualWanEnable      INTEGER,
+                    slot1Assignment    WanValue,
+                    slot2Assignment    WanValue,
+                    slot3Assignment    WanValue,
+                    slot4Assignment    WanValue,
+                    slot5Assignment    WanValue,
+                    slot6Assignment    WanValue
+                }
+
+            dualWanEnable OBJECT-TYPE
+                SYNTAX INTEGER {
+                  dualWanDisabled(0),
+                  dualWanEnabled(1)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        "Enable or disable dual wan operation."
+                DEFVAL { FALSE }
+                ::= { slotAssignmentEntry 1 }
+
+            slot1Assignment OBJECT-TYPE
+                SYNTAX WanValue
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        "Assign the slot to the specified wan card."
+                DEFVAL { WAN7 }
+                ::= { slotAssignmentEntry 2 }
+
+            slot2Assignment OBJECT-TYPE
+                SYNTAX WanValue
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        "Assign the slot to the specified wan card."
+                DEFVAL { WAN7 }
+                ::= { slotAssignmentEntry 3 }
+
+            slot3Assignment OBJECT-TYPE
+                SYNTAX WanValue
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        "Assign the slot to the specified wan card."
+                DEFVAL { WAN7 }
+                ::= { slotAssignmentEntry 4 }
+
+            slot4Assignment OBJECT-TYPE
+                SYNTAX WanValue
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        "Assign the slot to the specified wan card."
+                DEFVAL { WAN7 }
+                ::= { slotAssignmentEntry 5 }
+
+            slot5Assignment OBJECT-TYPE
+                SYNTAX WanValue
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        "Assign the slot to the specified wan card."
+                DEFVAL { WAN7 }
+                ::= { slotAssignmentEntry 6 }
+
+            slot6Assignment OBJECT-TYPE
+                SYNTAX WanValue
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        "Assign the slot to the specified wan card."
+                DEFVAL { WAN7 }
+                ::= { slotAssignmentEntry 7 }
+
+
+            --
+            -- 
+            --
+            
+            identifyWan OBJECT-TYPE
+                SYNTAX INTEGER ( 0..16 )
+			    MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Identify the WAN slot in a dual wan configuration."
+                ::= { d5SlotObjects 2 }
+
+    END

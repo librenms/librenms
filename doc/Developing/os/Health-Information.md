@@ -9,27 +9,27 @@ Currently we have support for the following health metrics along with the values
 | Class                           | Measurement                 |
 | ------------------------------- | --------------------------- |
 | airflow                         | cfm                         |
+| ber                             | ratio                       |
 | charge                          | %                           |
+| chromatic_disperision           | ps/nm                       |
 | cooling                         | W                           |
 | current                         | A                           |
 | dbm                             | dBm                         |
+| delay                           | s                           |
+| eer                             | eer                         |
 | fanspeed                        | rpm                         |
 | frequency                       | Hz                          |
 | humidity                        | %                           |
 | load                            | %                           |
 | power                           | W                           |
 | pressure                        | kPa                         |
+| quality_factor                  | dB                          |
 | runtime                         | Min                         |
 | signal                          | dBm                         |
 | snr                             | SNR                         |
 | state                           | #                           |
 | temperature                     | C                           |
 | voltage                         | V                           |
-| delay                           | s                           |
-| quality_factor                  | dB                          |
-| chromatic_disperision           | ps/nm                       |
-| ber                             | ratio                       |
-| eer                             | eer                         |
 | waterflow                       | l/m                         |
 
 #### Simple health discovery
@@ -38,7 +38,7 @@ We have support for defining health / sensor discovery using YAML files so that 
 
 > Please note that DISPLAY-HINTS are disabled so ensure you use the correct divisor / multiplier if applicable.
 
-All yaml files are located in `includes/definitions/discovery/$os.yaml`. Defining the information hear is not always 
+All yaml files are located in `includes/definitions/discovery/$os.yaml`. Defining the information here is not always 
 possible and is heavily reliant on vendors being sensible with the MIBs they generate. Only snmp walks are supported 
 and you must provide a sane table that can be traversed and contains all of the data you need. We will use netbotz as 
 an example here.

@@ -5,5 +5,4 @@ over:
     - { graph: device_temperature, text: temperature }
 discovery:
     - sysDescr:
-        - SNMP TME
         - TME

@@ -32,7 +32,12 @@ interface Transport
      *
      * @param $alert_data array An array created by DescribeAlert
      * @param $opts array|true The options from $config['alert']['transports'][$transport]
-     * @return bool Returns if the call was successful
+     * @return mixed Returns if the call was successful
      */
     public function deliverAlert($alert_data, $opts);
+
+    /**
+     * @return array
+     */
+    public static function configTemplate();
 }

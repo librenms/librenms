@@ -1,0 +1,1071 @@
+ARRIS-D5-DVB-EIS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32,
+    Unsigned32,
+    Counter32,
+    IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    RowStatus,
+    DisplayString,
+    TruthValue,
+    TimeStamp
+        FROM SNMPv2-TC
+    EMMGCommType,
+    SectionTSPktFlag,
+    ECMGCSuCasId
+        FROM SIM-MIB
+    D5PID
+        FROM ARRIS-D5-VIDEO-MIB
+    AdminState
+        FROM ARRIS-D5-ENT-CHASSIS-MIB
+    arrisD5UEQam
+        FROM ARRIS-MIB;
+ 
+d5EisMib  MODULE-IDENTITY
+    LAST-UPDATED "201008120000Z" -- 12th Aug 2010
+    ORGANIZATION "Arris International"
+    CONTACT-INFO
+        "   Network Management
+            Postal: Arris International.
+                    4400 Cork Airport Business Park
+                    Cork Airport, Kinsale Road
+                    Cork, Ireland.
+            Tel:    +353 21 7305 800
+            Fax:    +353 21 4321 972"
+
+    DESCRIPTION
+        "This MIB contains objects related to configured 
+        Arris D5 Video Encryption configuration" 
+
+    ::= { arrisD5UEQam 7 }
+
+    D5CryptoMode ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "A convenient type definition for crypto values."
+        SYNTAX INTEGER 
+        {
+            simulcrypt(1),
+            pm(2)
+        }
+
+
+-- -----------------------------------------
+-- simEisTable
+-- -----------------------------------------
+
+simEisTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF SimEisEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION 
+        "This table specifies the setting to be used by an EIS
+        to be able to communicate with the D5"    
+::= { d5EisMib 1 }
+
+simEisEntry OBJECT-TYPE
+    SYNTAX SimEisEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Information about a single EIS table Entry"
+    INDEX { simEisIndex }
+::= { simEisTable 1 }
+
+SimEisEntry ::= SEQUENCE {
+    simEisAdminState        AdminState,
+    simEisStatus            RowStatus,
+    simEisIndex             INTEGER,
+    simEisPort              INTEGER,
+    simEisClientIp          IpAddress,
+    simEisName              DisplayString,
+    simEisTimeActive        TimeStamp,
+    simEisCurrentSCGs       Counter32,
+    simEisChanId            INTEGER,
+    simEisTotChannels       Counter32,
+    simEisCurChannels       Counter32,
+    simEisChannelErrs       Counter32,
+    simEisChannelResets     Counter32,
+    simEisChannelTests      Counter32,
+    simEisScgProvs          Counter32,
+    simEisScgErrors         Counter32,
+    simEisScgLists          Counter32, 
+    simEisEsExclude         OCTET STRING
+ }
+    
+ simEisAdminState OBJECT-TYPE
+    SYNTAX          AdminState
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+    "Set state of EIS"
+::= { simEisEntry 1 }
+
+simEisStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "Show state of EIS"
+::= { simEisEntry 2 }
+
+simEisIndex OBJECT-TYPE
+    SYNTAX          INTEGER (1..65335)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The EIS Table unique index"
+::= { simEisEntry 3 }
+
+simEisPort OBJECT-TYPE
+    SYNTAX          INTEGER (0..65335)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The port an EIS must use to connect to the D5"
+::= { simEisEntry 4 }
+
+simEisClientIp OBJECT-TYPE
+    SYNTAX          IpAddress 
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Optionally restrict access to a port to this
+        ip address"
+::= { simEisEntry 5 }
+
+simEisName OBJECT-TYPE
+    SYNTAX          DisplayString 
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Name of EIS"
+::= { simEisEntry 6 }
+
+simEisTimeActive OBJECT-TYPE
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Lenght of time EIS has been active"
+::= { simEisEntry 7 }
+
+simEisCurrentSCGs OBJECT-TYPE
+    SYNTAX          Counter32 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "The total number of current SCGs 
+    for this EIS"
+::= { simEisEntry 8 }
+
+simEisChanId OBJECT-TYPE
+    SYNTAX          INTEGER (1..65335)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The channel id open on this eis"
+::= { simEisEntry 9 }
+
+simEisTotChannels OBJECT-TYPE
+    SYNTAX          Counter32 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "The total number of channels created
+    for this EIS"
+::= { simEisEntry 10 }
+
+simEisCurChannels OBJECT-TYPE
+    SYNTAX          Counter32 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "The total number of channels 
+    currently open on this EIS."
+::= { simEisEntry 11 }
+
+simEisChannelErrs OBJECT-TYPE
+    SYNTAX          Counter32 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "The total number of channels 
+    error received on this EIS."
+::= { simEisEntry 12 }
+
+simEisChannelResets OBJECT-TYPE
+    SYNTAX          Counter32 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "The total number of channels 
+    error received on this EIS."
+::= { simEisEntry 13 }
+
+simEisChannelTests OBJECT-TYPE
+    SYNTAX          Counter32 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "The total number of channels 
+    error received on this EIS."
+::= { simEisEntry 14 }
+
+simEisScgProvs OBJECT-TYPE
+    SYNTAX          Counter32 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "The total number of SCG  
+    provisions received on this EIS."
+::= { simEisEntry 15 }
+
+simEisScgErrors OBJECT-TYPE
+    SYNTAX          Counter32 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "The total number of SCG  
+    errors received on this EIS."
+::= { simEisEntry 16 }
+
+simEisScgLists OBJECT-TYPE
+    SYNTAX          Counter32 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "The total number of SCG Lists 
+    received on this EIS."
+::= { simEisEntry 17 }
+
+simEisEsExclude OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (0..15))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "List of up to 16 ES types (byte) which are to be excluded from the DVB-simulcrypt scrambling"
+::= { simEisEntry 18 }
+
+-------------------------------------------
+-- EIS Channel Table - Used for monitoring
+-- channel information. It is indexed by 
+-- the EIS index from the EIS table and the
+-- channel ID
+-- -----------------------------------------
+simEisCTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF SimEisCEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "This table specifies information relating
+    to EIS/SCS channels including IP addresses
+    of EISs communicating with the SCS"
+::= { d5EisMib 2 }    
+
+simEisCEntry OBJECT-TYPE
+    SYNTAX          SimEisCEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+    "Information about a single table entry"
+    INDEX       { simEisIndex, simEisChannelId } 
+::= { simEisCTable 1 }    
+
+SimEisCEntry ::= SEQUENCE {
+    simEisChannelId     INTEGER,
+    simEisCTestsRx      Counter32,
+    simEisCTestsTx      Counter32,
+    simEisCErrorRx      Counter32,
+    simEisCErrorTx      Counter32,
+    simEisCScgProvs     Counter32,
+    simEisCScgTests     Counter32,
+    simEisCScgLists     Counter32
+}
+
+simEisChannelId OBJECT-TYPE
+    SYNTAX          INTEGER (1..65535) 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "The ID of this channel 
+    currently open on this EIS."
+::= { simEisCEntry 1 }
+
+simEisCTestsRx OBJECT-TYPE
+    SYNTAX          Counter32 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "The total number of channel 
+    status messages received" 
+::= { simEisCEntry 2 }
+
+simEisCTestsTx OBJECT-TYPE
+    SYNTAX          Counter32 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "The total number of channel
+    status message sent."
+::= { simEisCEntry 3 }
+
+simEisCErrorRx OBJECT-TYPE
+    SYNTAX          Counter32 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "The total number of channel 
+    error messages received."
+::= { simEisCEntry 4 }
+
+simEisCErrorTx OBJECT-TYPE
+    SYNTAX          Counter32 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "The total number of channel 
+    error messages sent."
+::= { simEisCEntry 5 }
+
+simEisCScgProvs OBJECT-TYPE
+    SYNTAX          Counter32 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "The total number of SCG
+    provision messages received."
+::= { simEisCEntry 6 }
+
+simEisCScgTests OBJECT-TYPE
+    SYNTAX          Counter32 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "The total number of SCG Test
+    messages received."
+::= { simEisCEntry 7 }
+
+simEisCScgLists OBJECT-TYPE
+    SYNTAX          Counter32 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "The total number of SCG List 
+    messages received."
+::= { simEisCEntry 8 }
+
+-------------------------------------------
+-- simEisScgTable
+-- table of scgs
+-- -----------------------------------------
+simEisScgTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SimEisScgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies the SCG Details." 
+ ::= { d5EisMib 3 }
+
+simEisScgEntry OBJECT-TYPE
+    SYNTAX SimEisScgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Information about a single table entry."
+INDEX { simEisIndex, simEisScgId}
+ ::= { simEisScgTable 1 }
+
+SimEisScgEntry ::= SEQUENCE {
+    simEisScgId             INTEGER,
+    simEisScgAdminState     AdminState,
+    simEisScgStatus         RowStatus,
+    simEisScgName           DisplayString,
+    simEisScgNetworkId      INTEGER,
+    simEisScgCpDuration     INTEGER,
+    simEisScgActivationTime TimeStamp,
+    simEisScgEcmWakeup      INTEGER,
+    simEisCaDesc            OCTET STRING,
+    simEisScgEsExclude      OCTET STRING
+
+}
+
+simEisScgId OBJECT-TYPE
+    SYNTAX                     INTEGER (1..65535)
+    MAX-ACCESS                 read-create
+    STATUS                     current
+    DESCRIPTION
+        "SCG ID."
+ ::= { simEisScgEntry 1 }
+
+simEisScgAdminState OBJECT-TYPE
+    SYNTAX          AdminState
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+    "Set state of Scg"
+::= { simEisScgEntry 2 }
+
+simEisScgStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "Show state of SCG"
+::= { simEisScgEntry 3 }
+
+simEisScgName OBJECT-TYPE
+    SYNTAX                     DisplayString
+    MAX-ACCESS                 read-create
+    STATUS                     current
+    DESCRIPTION
+        "SCG name."
+ ::= { simEisScgEntry 4 }
+
+simEisScgNetworkId             OBJECT-TYPE
+    SYNTAX                     INTEGER (0..65535)
+    MAX-ACCESS                 read-create
+    STATUS                     current
+    DESCRIPTION
+        "Original Network Id."
+ ::= { simEisScgEntry 5 }
+
+simEisScgCpDuration         OBJECT-TYPE
+    SYNTAX                     INTEGER (10..65535)
+    MAX-ACCESS                 read-create
+    STATUS                     current
+    DESCRIPTION
+        "Recommended Crypto Period Duration"
+ ::= { simEisScgEntry 6 }
+
+simEisScgActivationTime     OBJECT-TYPE
+    SYNTAX                     TimeStamp
+    MAX-ACCESS                 read-create
+    STATUS                     current
+    DESCRIPTION
+        "Activation Time."
+ ::= { simEisScgEntry 7 }
+ 
+simEisScgEcmWakeup OBJECT-TYPE
+    SYNTAX          INTEGER (0..65535)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    ".."
+::= { simEisScgEntry 9 }
+
+simEisCaDesc OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (0..255))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "Private data to be added to the CA_Desc in the PMT for this SCG."
+::= { simEisScgEntry 10 }
+
+simEisScgEsExclude OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (0..15))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "List of up to 16 ES types (byte) which are to be excluded from the DVB-simulcrypt scrambling"
+::= { simEisScgEntry 11 }
+
+-- ---------------------------------------------------------------------------------
+-- SCG Service Table - 
+-- ---------------------------------------------------------------------------------
+simEisScgSTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF SimEisScgSEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "This table specifies information relating to SCG services." 
+ ::= { d5EisMib 4 }
+
+simEisScgSEntry OBJECT-TYPE
+    SYNTAX SimEisScgSEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Information about a single table entry."
+INDEX { simEisIndex, simEisScgId, simEisScgSTransportId, simEisScgServiceId}
+ ::= { simEisScgSTable 1 }
+
+SimEisScgSEntry ::= SEQUENCE {
+    simEisScgSAdminState        AdminState,
+    simEisScgSStatus            RowStatus,
+    simEisScgSTransportId       INTEGER,
+    simEisScgServiceId          INTEGER,
+    simEisScgMpegMib            OBJECT IDENTIFIER,
+    simEisScgExclude            TruthValue,
+    simEisScgEphemeral          TruthValue
+}
+
+simEisScgSAdminState OBJECT-TYPE
+    SYNTAX          AdminState
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+    "Set state of Service"
+::= { simEisScgSEntry 1 }
+
+simEisScgSStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "Show state of Service"
+::= { simEisScgSEntry 2 }
+
+simEisScgSTransportId OBJECT-TYPE
+    SYNTAX          INTEGER (1..65536) 
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Transport ID."
+ ::= { simEisScgSEntry 3 } 
+
+simEisScgServiceId OBJECT-TYPE
+    SYNTAX          INTEGER (1..65536)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The SCG service identifier."
+ ::= { simEisScgSEntry 4 }
+
+ simEisScgMpegMib OBJECT-TYPE
+    SYNTAX             OBJECT IDENTIFIER
+    MAX-ACCESS         read-only
+    STATUS             current
+    DESCRIPTION
+        "The pointer to a provider proprietary MPEG MIB." 
+ ::= { simEisScgSEntry 5 }
+
+simEisScgExclude OBJECT-TYPE
+    SYNTAX             TruthValue
+    MAX-ACCESS         read-create
+    STATUS             current
+    DESCRIPTION
+        "If this vairable is set to TRUE then the associated service is excluded from scrambling." 
+ ::= { simEisScgSEntry 6 }
+
+simEisScgEphemeral OBJECT-TYPE
+    SYNTAX             TruthValue
+    MAX-ACCESS         read-only
+    STATUS             current
+    DESCRIPTION
+        "If this vairable is set to TRUE then the associated service matches a wildcard." 
+ ::= { simEisScgSEntry 7 }
+
+-- ---------------------------------------------------------------------------------
+-- SCG EcmGroup Table - 
+-- ---------------------------------------------------------------------------------
+simEisScgETable OBJECT-TYPE
+    SYNTAX                         SEQUENCE OF SimEisScgEEntry
+    MAX-ACCESS                     not-accessible
+    STATUS                         current
+    DESCRIPTION
+        "This table specifies information relating to SCG ecmgroups." 
+ ::= { d5EisMib 5 }
+
+simEisScgEEntry OBJECT-TYPE
+    SYNTAX                         SimEisScgEEntry
+    MAX-ACCESS                     not-accessible
+    STATUS                         current
+    DESCRIPTION
+        "Information about a single ECMGroup entry."
+INDEX { simEisIndex, simEisScgId, simEisScgEcmId}
+ ::= { simEisScgETable 1}
+
+SimEisScgEEntry ::= SEQUENCE {
+    simEisScgEAdminState        AdminState,
+    simEisScgEStatus            RowStatus,
+    simEisScgEcmId              INTEGER,
+    simEisScgSuperCasId         ECMGCSuCasId,                     
+    simEisScgAccessCriteria     DisplayString,
+    simEisScgEStreamMib         OBJECT IDENTIFIER,
+    
+    simEisScgPid                D5PID    
+}
+
+simEisScgEAdminState OBJECT-TYPE
+    SYNTAX          AdminState
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+    "Set state of Scg"
+::= { simEisScgEEntry 1 }
+
+simEisScgEStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "Show state of SCG"
+::= { simEisScgEEntry 2 }
+
+simEisScgEcmId OBJECT-TYPE
+    SYNTAX                         INTEGER (1..65535)
+    MAX-ACCESS                     read-create
+    STATUS                         current
+    DESCRIPTION
+        "The SCG ECM ID identifier."
+ ::= { simEisScgEEntry 3 }
+
+simEisScgSuperCasId OBJECT-TYPE
+    SYNTAX                         ECMGCSuCasId
+    MAX-ACCESS                     read-create
+    STATUS                         current
+    DESCRIPTION
+        "The SCG EcmGroup SuperCas identifier."
+ ::= { simEisScgEEntry 4 }
+
+ simEisScgAccessCriteria OBJECT-TYPE
+    SYNTAX                         DisplayString
+    MAX-ACCESS                     read-create
+    STATUS                         current
+    DESCRIPTION
+        "The access criteria used by this ecmgroup."
+  ::= { simEisScgEEntry 6 }
+
+ simEisScgEStreamMib OBJECT-TYPE
+    SYNTAX                     OBJECT IDENTIFIER
+    MAX-ACCESS                 read-only
+    STATUS                     current
+    DESCRIPTION
+        "The pointer to a provider proprietary MIB." 
+ ::= { simEisScgEEntry 8 }
+ 
+simEisScgPid OBJECT-TYPE
+    SYNTAX                     D5PID
+    MAX-ACCESS                 read-create
+    STATUS                     current
+    DESCRIPTION
+        "The PID to be used to transmit the ECM for this ECM Stream." 
+ ::= { simEisScgEEntry 9 }
+  
+-- ---------------------------------------------------------------------------------  
+-- d5SimEcmgTable
+-- ---------------------------------------------------------------------------------
+d5SimEcmgTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF D5SimEcmgEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { d5EisMib 7 }
+        
+        d5SimEcmgEntry OBJECT-TYPE
+            SYNTAX D5SimEcmgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "."
+            INDEX { d5SimEcmgName }
+            ::= { d5SimEcmgTable 1 }
+
+        D5SimEcmgEntry ::=
+            SEQUENCE { 
+                d5SimEcmgName              DisplayString,   
+                d5SimEcmgAdminState        AdminState,
+                d5SimEcmgStatus            RowStatus,
+                d5SimEcmgIpAddress         IpAddress,
+                d5SimEcmgTcpPort	       INTEGER,
+                d5SimEcmgSuCasId	       ECMGCSuCasId,
+                d5SimEcmgPrimary           TruthValue,
+                d5SimEcmgGroup             DisplayString,
+                d5SimEcmgProtoVersion      INTEGER,
+                d5SimEcmgTableVersion      INTEGER,
+                d5SimEcmgTableDuration     TimeStamp,
+                d5SimEcmgChannelTest       INTEGER,
+                d5SimEcmgChannelTimeout    INTEGER,
+                d5SimEcmgChannelDelay      INTEGER
+             }
+
+         d5SimEcmgName OBJECT-TYPE
+            SYNTAX DisplayString 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Name of ECMG"
+            ::= { d5SimEcmgEntry 1 }
+
+        d5SimEcmgAdminState OBJECT-TYPE
+            SYNTAX AdminState
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                ". "
+            ::= { d5SimEcmgEntry 2 }
+
+        d5SimEcmgStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                ". "
+            ::= { d5SimEcmgEntry 3 }
+
+        d5SimEcmgIpAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "IP address of the host of the ECMG."
+            ::= { d5SimEcmgEntry 4 }
+            
+        d5SimEcmgTcpPort OBJECT-TYPE
+            SYNTAX INTEGER (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "TCP port of the ECMG."
+            ::= { d5SimEcmgEntry 5 }
+            
+        d5SimEcmgSuCasId OBJECT-TYPE
+            SYNTAX ECMGCSuCasId
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The Super_CAS_ID is formed by concatenation of the CA_system_id
+                 (16 bit) and the CA_subsystem_ID (16 bit). It defines uniquely a
+                 set of ECMGs for a given SCS."
+            ::= { d5SimEcmgEntry 6 }
+    
+        d5SimEcmgPrimary OBJECT-TYPE
+            SYNTAX TruthValue 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Set to TRUE if this is the primary ECMG in the group"
+            ::= { d5SimEcmgEntry 7 }
+
+        d5SimEcmgGroup OBJECT-TYPE
+            SYNTAX DisplayString 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Name of the ECMG Group this ECMG is in."
+            ::= { d5SimEcmgEntry 8 }
+
+        d5SimEcmgProtoVersion OBJECT-TYPE
+            SYNTAX INTEGER (1..3)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Protocol version to use."
+            ::= { d5SimEcmgEntry 9 }
+
+        d5SimEcmgTableVersion OBJECT-TYPE
+            SYNTAX INTEGER (1..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "ECM Table version in use."
+            ::= { d5SimEcmgEntry 10 }
+
+        d5SimEcmgTableDuration OBJECT-TYPE
+            SYNTAX TimeStamp
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Protocol version to use."
+            ::= { d5SimEcmgEntry 11 }
+
+        d5SimEcmgChannelTest OBJECT-TYPE
+            SYNTAX INTEGER (5..120)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "channel test setting."
+            ::= { d5SimEcmgEntry 12 }
+
+        d5SimEcmgChannelTimeout OBJECT-TYPE
+            SYNTAX INTEGER (2..20)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "channel timeout setting."
+            ::= { d5SimEcmgEntry 13 }
+
+        d5SimEcmgChannelDelay OBJECT-TYPE
+            SYNTAX INTEGER (1..20)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "channel delay setting."
+            ::= { d5SimEcmgEntry 14 }        
+            
+-- ---------------------------------------------------------------------------------  
+-- d5SimEcmgGroupTable
+-- ---------------------------------------------------------------------------------
+d5SimEcmgGroupTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF D5SimEcmgGroupEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { d5EisMib 8 }
+        
+        d5SimEcmgGroupEntry OBJECT-TYPE
+            SYNTAX D5SimEcmgGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "."
+            INDEX { d5SimEcmgGroupName }
+            ::= { d5SimEcmgGroupTable 1 }
+
+        D5SimEcmgGroupEntry ::=
+            SEQUENCE { 
+                d5SimEcmgGroupName        DisplayString,   
+                d5SimEcmgGroupAdminState  AdminState,
+                d5SimEcmgGroupStatus      RowStatus,
+                d5SimEcmgGroupCaSystemId  INTEGER,
+                d5SimEcmgGroupLoadBalance TruthValue
+             }
+
+         d5SimEcmgGroupName OBJECT-TYPE
+            SYNTAX DisplayString 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Name of ECMG Group"
+            ::= { d5SimEcmgGroupEntry 1 }
+
+        d5SimEcmgGroupAdminState OBJECT-TYPE
+            SYNTAX AdminState
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                ". "
+            ::= { d5SimEcmgGroupEntry 2 }
+
+        d5SimEcmgGroupStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                ". "
+            ::= { d5SimEcmgGroupEntry 3 }
+
+        d5SimEcmgGroupCaSystemId OBJECT-TYPE
+            SYNTAX INTEGER (1..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "."
+            ::= { d5SimEcmgGroupEntry 4 }
+                
+        d5SimEcmgGroupLoadBalance OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                 "."
+           ::= { d5SimEcmgGroupEntry 5 }
+            
+-- ---------------------------------------------------------------------------------  
+-- d5SimEmmgTable
+-- ---------------------------------------------------------------------------------
+d5SimEmmgTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF D5SimEmmgEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { d5EisMib 9 }
+        
+        d5SimEmmgEntry OBJECT-TYPE
+            SYNTAX D5SimEmmgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "."
+            INDEX { d5SimEmmgName }
+            ::= { d5SimEmmgTable 1 }
+
+        D5SimEmmgEntry ::=
+            SEQUENCE { 
+                d5SimEmmgName              DisplayString,   
+                d5SimEmmgAdminState        AdminState,
+                d5SimEmmgStatus            RowStatus,
+                d5SimEmmgCommType          EMMGCommType,
+                d5SimEmmgClientId	       ECMGCSuCasId,
+                d5SimEmmgMuxIpAddress      IpAddress,
+                d5SimEmmgMuxPort           INTEGER,
+                d5SimEmmgMuxUIpAddress     IpAddress,
+                d5SimEmmgMuxUPort          INTEGER,
+                d5SimEmmgChannelContainer  DisplayString,   
+                d5SimEmmgPid               D5PID,
+                d5SimEmmgCaDesc            OCTET STRING,
+                d5SimEmmgBandwidth         INTEGER,
+                d5SimEmmgMpegSection       TruthValue,
+                d5SimEmmgDataId            INTEGER
+             }
+
+        d5SimEmmgName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                ". "
+            ::= { d5SimEmmgEntry 1 }
+
+        d5SimEmmgAdminState OBJECT-TYPE
+            SYNTAX AdminState
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Used by an authorized manager to lock a conceptual row for exclusive
+                 write and create access."
+            ::= { d5SimEmmgEntry 2 }
+          
+        d5SimEmmgStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Used for table row creation management."
+            ::= { d5SimEmmgEntry 3 }
+          
+         d5SimEmmgClientId OBJECT-TYPE
+            SYNTAX ECMGCSuCasId
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Client ID for EMMG"
+            ::= { d5SimEmmgEntry 4 }
+          
+       d5SimEmmgCommType OBJECT-TYPE
+            SYNTAX EMMGCommType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Type of communication between EMMG/PDG and the multiplexer. Currently TCP or UDP."
+            ::= { d5SimEmmgEntry 5 }
+          
+        d5SimEmmgMuxIpAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "IP address of the multiplexer for EMMG/PDG TCP communication."
+            ::= { d5SimEmmgEntry 6 }
+          
+        d5SimEmmgMuxPort OBJECT-TYPE
+            SYNTAX INTEGER (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Port number (TCP) of the multiplexer for EMMG/PDG TCP communication."
+            ::= { d5SimEmmgEntry 7 }
+          
+        d5SimEmmgMuxUIpAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "IP address of the multiplexer for EMMG/PDG UDP communication."
+            ::= { d5SimEmmgEntry 8 } 
+          
+        d5SimEmmgMuxUPort OBJECT-TYPE
+            SYNTAX INTEGER (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Port number (UDP) of the multiplexer for EMMG/PDG UDP communication."
+            ::= { d5SimEmmgEntry 9 }
+          
+        d5SimEmmgChannelContainer OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                ". "
+            ::= { d5SimEmmgEntry 10 }
+
+        d5SimEmmgPid OBJECT-TYPE
+            SYNTAX D5PID
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                ". "
+            ::= { d5SimEmmgEntry 11 }
+
+        d5SimEmmgCaDesc OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..255))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                ". "
+            ::= { d5SimEmmgEntry 12 }
+ 
+        d5SimEmmgBandwidth OBJECT-TYPE
+            SYNTAX INTEGER (1..50000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                ". "
+            ::= { d5SimEmmgEntry 13 }
+
+        d5SimEmmgMpegSection OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                ". "
+            ::= { d5SimEmmgEntry 14 }
+
+        d5SimEmmgDataId OBJECT-TYPE
+            SYNTAX INTEGER (1..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                ". "
+            ::= { d5SimEmmgEntry 15 }
+
+-- ---------------------------------------------------------------------------------  
+-- d5SimCryptoGroup
+-- ---------------------------------------------------------------------------------
+d5SimCryptoGroup OBJECT IDENTIFIER ::= { d5EisMib 10 }
+
+        d5SimCryptoMode OBJECT-TYPE
+            SYNTAX      D5CryptoMode
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                "Global setting for Crypto Mode."
+            ::= { d5SimCryptoGroup 1 }
+            
+        d5SimScsId OBJECT-TYPE
+            SYNTAX      INTEGER (0..255)
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                "Global SCS-ID used when sharing an ECMG between D5s."
+            ::= { d5SimCryptoGroup 2 }
+            
+        d5CwConformanceMechanism OBJECT-TYPE
+            SYNTAX      TruthValue
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                "DVB CAS CW conformance mechanism control. TRUE => enabled (default)"
+            ::= { d5SimCryptoGroup 3 }
+            
+        d5StrictEncryptionPolicy OBJECT-TYPE
+            SYNTAX      TruthValue
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                "DVB CAS Strict Encryption policy. FALSE => disabled (default)
+                 Controls how sevices transition from CLEAR to SCRAMBLED
+                 TRUE  => all service/components which match an active SCG config are scrambled irrespective of whether an ECM has been provisioned
+                 FALSE => service only transition from CLEAR to SCRAMBLED if an ECM as been provisioned - transtion_start_delay timer is honored"
+           ::= { d5SimCryptoGroup 4 }
+
+END  

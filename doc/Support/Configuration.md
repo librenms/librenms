@@ -284,6 +284,10 @@ Enable or disable the sysDescr output for a device.
 $config['force_ip_to_sysname'] = false;
 ```
 When using IP addresses as a hostname you can instead represent the devices on the WebUI by its SNMP sysName resulting in an easier to read overview of your network. This would apply on networks where you don't have DNS records for most of your devices.
+```php
+$config['force_hostname_to_sysname'] = false;
+```
+When using a dynamic DNS hostname or one that does not resolve, this option would allow you to make use of the SNMP sysName instead as the preferred reference to the device.
 
 ```php
 $config['device_traffic_iftype'][] = '/loopback/';
@@ -340,8 +344,8 @@ $config['allow_duplicate_sysName'] = false;
 Generally, it is a better to set these [per OS](../Developing/os/Settings.md#poller-and-discovery-modules) or device.
 
 ```php
-$config['discovery_modules]['arp-table'] = 1;
-$config['poller_modules']['bgp-peers'] = 0;
+$config['discovery_modules]['arp-table'] = true;
+$config['poller_modules']['bgp-peers'] = false;
 ```
 
 ### SNMP Settings
@@ -444,7 +448,28 @@ Setting `rancid_ignorecomments` will disable showing lines that start with #
 ```php
 $config['collectd_dir']                 = '/var/lib/collectd/rrd';
 ```
-Specify the location of the collectd rrd files.
+Specify the location of the collectd rrd files. Note that the location in config.php should be consistent with the location set in /etc/collectd.conf and etc/collectd.d/rrdtool.conf
+
+```php
+<Plugin rrdtool>
+        DataDir "/var/lib/collectd/rrd"
+        CreateFilesAsync false
+        CacheTimeout 120
+        CacheFlush   900
+        WritesPerSecond 50
+</Plugin>
+```
+/etc/collectd.conf
+
+```php
+LoadPlugin rrdtool
+<Plugin rrdtool>
+       DataDir "/var/lib/collectd/rrd"
+       CacheTimeout 120
+       CacheFlush   900
+</Plugin>
+```
+/etc/collectd.d/rrdtool.conf
 
 ```php
 $config['collectd_sock']                 = 'unix:///var/run/collectd.sock';
