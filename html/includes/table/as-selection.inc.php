@@ -32,7 +32,7 @@ if ($rowCount != -1) {
 }
 
 $sql = "SELECT `bgpLocalAs` $sql";
-var_dump($sql);
+
 foreach (dbFetchRows($sql) as $asn) {
     $astext = get_astext($asn['bgpLocalAs']);
     $response[] = array(
