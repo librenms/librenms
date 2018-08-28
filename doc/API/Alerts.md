@@ -99,10 +99,18 @@ Route: `/api/v0/alerts`
 Input:
 
   - state: Filter the alerts by state, 0 = ok, 1 = alert, 2 = ack
+  - severity: Filter the alerts by severity. Valid values are `ok`, `warning`, `critical`.
+  - order: How to order the output, default is by timestamp (descending). Can be appended by DESC or ASC to change the order.
 
-Example:
+Examples:
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/alerts?state=1
+```
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/alerts?severity=critical
+```
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/alerts?order=timestamp%20ASC
 ```
 
 Output:

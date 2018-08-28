@@ -768,6 +768,7 @@ Input:
   - order: How to order the output, default is by hostname. Can be prepended by DESC or ASC to change the order.
   - type: can be one of the following to filter or search by:
     - all: All devices
+    - active: Only not ignored and not disabled devices
     - ignored: Only ignored devices
     - up: Only devices that are up
     - down: Only devices that are down

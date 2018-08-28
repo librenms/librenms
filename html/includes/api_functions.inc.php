@@ -318,6 +318,8 @@ function list_devices()
 
     if ($type == 'all' || empty($type)) {
         $sql = '1';
+    } elseif ($type == 'active') {
+        $sql = "`d`.`ignore`='0' AND `d`.`disabled`='0'";
     } elseif ($type == 'location') {
         $sql = "`d`.`location` LIKE '%".$query."%'";
     } elseif ($type == 'ignored') {
@@ -1042,6 +1044,17 @@ function list_alerts()
         $param[] = $router['id'];
         $sql .= 'AND `A`.id=?';
     }
+
+    $severity = $_GET['severity'];
+    if (isset($severity)) {
+        if (in_array($severity, ['ok', 'warning', 'critical'])) {
+            $param[] = $severity;
+            $sql .= ' AND `R`.severity=?';
+        }
+    }
+    
+    $order = $_GET['order'] ?: "timestamp desc";
+    $sql .= ' ORDER BY A.'.$order;
 
     $alerts = dbFetchRows($sql, $param);
     api_success($alerts, 'alerts');
