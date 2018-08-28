@@ -23,6 +23,8 @@
  */
 namespace LibreNMS\Alert\Transport;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
 use LibreNMS\Alert\Transport;
 use Log;
@@ -30,6 +32,8 @@ use Validator;
 
 class Pagerduty extends Transport
 {
+    public static $integrationKey = '2fc7c9f3c8030e74aae6';
+
     public function deliverAlert($obj, $opts)
     {
         if ($obj['state'] == 0) {
@@ -43,7 +47,7 @@ class Pagerduty extends Transport
         if (empty($this->config)) {
             return $this->deliverAlertEvent($obj, $opts);
         }
-        return $this->deliverAlertEvent($obj, $this->config['service_key']);
+        return $this->contactPagerduty($obj, $this->config);
     }
 
     public function deliverAlertEvent($obj, $opts)
@@ -74,37 +78,38 @@ class Pagerduty extends Transport
         return true;
     }
 
+    /**
+     * @param $obj
+     * @param $config
+     * @return bool|string
+     */
     public function contactPagerduty($obj, $config)
     {
-        foreach ($obj['faults'] as $fault => $data) {
-            $fault .= $data['string'] . PHP_EOL;
-        }
         $data = [
-            'routing_key'  => $config['pagerduty-integrationkey'],
+            'routing_key'  => $config['service_key'],
             'event_action' => $obj['event_type'],
             'dedup_key'    => $obj['uid'],
             'payload'    => [
-                'summary'  => $fault,
+                'summary'  => implode(PHP_EOL, array_column($obj['faults'], 'string')) ?: 'Test',
                 'source'   => $obj['hostname'],
                 'severity' => $obj['severity'],
             ],
         ];
-        $curl = curl_init();
-        set_curl_proxy($curl);
-        curl_setopt($curl, CURLOPT_URL, 'https://events.pagerduty.com/v2/enqueue');
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, [
-            'Content-type'  => 'application/json',
-            'Authorization' => "Token token={$config['pagerduty-apikey']}",
-        ]);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
-        $ret = json_decode(curl_exec($curl), true);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($code != 200 && $code != 202) {
-            var_dump("PagerDuty returned Error ({$ret['message']})"); //FIXME: propper debuging
-            return 'HTTP Status code ' . $code;
+
+        $url = 'https://events.pagerduty.com/v2/enqueue';
+        $client = new Client();
+
+        try {
+            $result = $client->request('POST', $url, ['json' => $data]);
+
+            if ($result->getStatusCode() == 202) {
+                return true;
+            }
+
+            return $result->getReasonPhrase();
+        } catch (GuzzleException $e) {
+            return "Request to PagerDuty API failed. " . $e->getMessage();
         }
-        return true;
     }
 
     public static function configTemplate()
@@ -117,7 +122,7 @@ class Pagerduty extends Transport
                     'type'  => 'oauth',
                     'icon'  => 'pagerduty-white.svg',
                     'class' => 'btn-success',
-                    'url'   => 'https://connect.pagerduty.com/connect?vendor=2fc7c9f3c8030e74aae6&callback='
+                    'url'   => 'https://connect.pagerduty.com/connect?vendor=' . self::$integrationKey . '&callback='
                 ],
                 [
                     'title' => 'Account',
