@@ -21,8 +21,7 @@ if ($request->has('oauthtransport')) {
     }
 
     // remove get variables otherwise things will get double added
-
-    echo '<script>window.history.pushState(null, null, window.location.pathname);</script>';
+    echo '<script>window.history.replaceState(null, null, window.location.pathname);</script>';
 }
 unset($request);
 

@@ -251,7 +251,6 @@ foreach (scandir($transport_dir) as $transport) {
 
         $(".btn-oath").click(function (e) {
             this.href = $(this).data('base-url') + '%26id=' + $("#transport_id").val();
-            console.log(this.href);
         });
 
         // Save alert transport
