@@ -1,0 +1,205 @@
+{
+    "discovery": {
+        "applications": {
+            "app_type": "fbsdnfsserver",
+            "app_state": "UNKNOWN",
+            "discovered": "1",
+            "app_state_prev": null,
+            "app_status": "",
+            "app_instance": ""
+        },
+        "application_metrics": []
+    },
+    "poller": {
+        "applications": {
+            "app_type": "fbsdnfsserver",
+            "app_state": "OK",
+            "discovered": "1",
+            "app_state_prev": "UNKNOWN",
+            "app_status": "",
+            "app_instance": ""
+        },
+        "application_metrics": [
+            {
+                "metric": "Access",
+                "value": "2756963",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Commit",
+                "value": "226823",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Create",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Faults",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Fsinfo",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Fsstat",
+                "value": "108431",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Getattr",
+                "value": "2131314",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Idem",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Inprog",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Link",
+                "value": "1250",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Lookup",
+                "value": "6062252",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Misses",
+                "value": "20162662",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Mkdir",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Mknod",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Nonidem",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Opsaved",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "PathConf",
+                "value": "12",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "RdirPlus",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Read",
+                "value": "8043676",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Readdir",
+                "value": "221801",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Readlink",
+                "value": "394",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Remove",
+                "value": "32375",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Rename",
+                "value": "31097",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "RetFailed",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Rmdir",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Setattr",
+                "value": "43045",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Symlink",
+                "value": "24",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "Write",
+                "value": "464478",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "WriteOps",
+                "value": "464478",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            },
+            {
+                "metric": "WriteRPC",
+                "value": "464478",
+                "value_prev": null,
+                "app_type": "fbsdnfsserver"
+            }
+        ]
+    }
+}
