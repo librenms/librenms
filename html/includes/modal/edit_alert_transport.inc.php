@@ -132,6 +132,18 @@ foreach (scandir($transport_dir) as $transport) {
             echo '<textarea name="' . $item['name'] . '" id="' . $item['name'] . '" class="form-control" placeholder="'.$item['descr'].'">';
             echo '</textarea>';
             echo '</div>';
+        } elseif ($item['type'] === 'oauth') {
+            $class = isset($item['class']) ? $item['class'] : 'btn-success';
+            $callback = urlencode(url()->current() . '/?oauthtransport=' . $transport);
+            $url = $item['url'] . $callback;
+
+            echo '<a class="btn btn-oath ' . $class . '"';
+            echo '" href="' . $url . '" data-base-url="' . $url . '">';
+            if (isset($item['icon'])) {
+                echo '<img src="' . asset('images/transports/' . $item['icon']) . '"  width="24" height="24"> ';
+            }
+            echo $item['descr'];
+            echo '</a>';
         }
         echo '</div>';
     }
@@ -236,6 +248,11 @@ foreach (scandir($transport_dir) as $transport) {
                 }
             });
         }
+
+        $(".btn-oath").click(function (e) {
+            this.href = $(this).data('base-url') + '%26id=' + $("#transport_id").val();
+            console.log(this.href);
+        });
 
         // Save alert transport
         $(".btn-save").on("click", function (e) {
