@@ -175,7 +175,7 @@ $dot3_oids = [
     'dot3StatsDuplexStatus',
 ];
 
-$pvid_oids = ['dot1qPvid'];
+$pvid_oids = 'dot1qPvid';
 
 // Query known ports and mapping table in order of discovery to make sure
 // the latest discoverd/polled port is in the mapping tables.
@@ -256,7 +256,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
                     $port_stats = snmp_get_multi($device, $extra_oids, '-OQUst', 'EtherLike-MIB', null, $port_stats);
 
                     if ($device['os'] != 'asa') {
-                        $extra_pvid_oids = implode(".$ifIndex ", $pvid_oids) . ".$ifIndex";
+                        $extra_pvid_oids = "$pvid_oid.$ifIndex";
                         $port_stats = snmp_get_multi($device, $extra_pvid_oids, '-OQUst', 'Q-BRIDGE-MIB', null, $port_stats);
                     }
                 }
