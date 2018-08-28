@@ -35,8 +35,8 @@ try {
     // Legacy script, build compatible array
     $legacy = trim($e->getOutput());
 
+    // pull apart the legacy info and create the basic required hash with it
     list ($line_volt, $load, $charge, $remaining, $bat_volt, $line_nominal, $bat_nominal) = explode("\n", $legacy);
-
     $json_retrun=array(
         'data' => array(
             'charge' => $charge,
