@@ -32,7 +32,6 @@ class Pagerduty extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-
         if ($obj['state'] == 0) {
             $obj['event_type'] = 'resolve';
         } elseif ($obj['state'] == 2) {
@@ -42,14 +41,14 @@ class Pagerduty extends Transport
         }
 
         if (empty($this->config)) {
-            return $this->deliverAlertOld($obj, $opts);
+            return $this->deliverAlertEvent($obj, $opts);
         }
-        return $this->contactPagerduty($obj, $this->config);
+        return $this->deliverAlertEvent($obj, $this->config['service_key']);
     }
 
-    public function deliverAlertOld($obj, $opts)
+    public function deliverAlertEvent($obj, $opts)
     {
-        // This code uses legacy events for PD
+        // This code uses events for PD
         $protocol = array(
             'service_key' => $opts,
             'incident_key' => ($obj['id'] ? $obj['id'] : $obj['uid']),
@@ -130,7 +129,8 @@ class Pagerduty extends Transport
                     'type'  => 'hidden',
                     'name'  => 'service_name',
                 ]
-            ]
+            ],
+            'validation' => []
         ];
     }
 
