@@ -137,7 +137,7 @@ foreach (scandir($transport_dir) as $transport) {
             $callback = urlencode(url()->current() . '/?oauthtransport=' . $transport);
             $url = $item['url'] . $callback;
 
-            echo '<a class="btn btn-oath ' . $class . '"';
+            echo '<a class="btn btn-oauth ' . $class . '"';
             echo '" href="' . $url . '" data-base-url="' . $url . '">';
             if (isset($item['icon'])) {
                 echo '<img src="' . asset('images/transports/' . $item['icon']) . '"  width="24" height="24"> ';
@@ -249,7 +249,7 @@ foreach (scandir($transport_dir) as $transport) {
             });
         }
 
-        $(".btn-oath").click(function (e) {
+        $(".btn-oauth").click(function (e) {
             this.href = $(this).data('base-url') + '%26id=' + $("#transport_id").val();
         });
 
