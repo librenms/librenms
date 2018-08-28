@@ -442,7 +442,7 @@ devices:
     - { Field: timeout, Type: int(11), 'Null': true, Extra: '' }
     - { Field: retries, Type: int(11), 'Null': true, Extra: '' }
     - { Field: snmp_disable, Type: tinyint(1), 'Null': false, Extra: '', Default: '0' }
-    - { Field: bgpLocalAs, Type: varchar(16), 'Null': true, Extra: '' }
+    - { Field: bgpLocalAs, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
     - { Field: sysObjectID, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: sysDescr, Type: text, 'Null': true, Extra: '' }
     - { Field: sysContact, Type: text, 'Null': true, Extra: '' }
