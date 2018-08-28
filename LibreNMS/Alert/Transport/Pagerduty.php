@@ -115,10 +115,20 @@ class Pagerduty extends Transport
                 [
                     'title' => 'Authorize',
                     'descr' => 'Alert with PagerDuty',
-                    'type' => 'oauth',
-                    'icon' => 'pagerduty-white.svg',
+                    'type'  => 'oauth',
+                    'icon'  => 'pagerduty-white.svg',
                     'class' => 'btn-success',
-                    'url' => 'https://connect.pagerduty.com/connect?vendor=2fc7c9f3c8030e74aae6&callback='
+                    'url'   => 'https://connect.pagerduty.com/connect?vendor=2fc7c9f3c8030e74aae6&callback='
+                ],
+                [
+                    'title' => 'Account',
+                    'type'  => 'hidden',
+                    'name'  => 'account',
+                ],
+                [
+                    'title' => 'Service',
+                    'type'  => 'hidden',
+                    'name'  => 'service_name',
                 ]
             ]
         ];
