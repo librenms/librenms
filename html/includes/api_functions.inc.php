@@ -1031,7 +1031,6 @@ function list_alerts()
     check_is_read();
     $app    = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
-    $vars = [];
 
     $sql = "SELECT `D`.`hostname`, `A`.*, `R`.`severity` FROM `alerts` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` AND `A`.`state` IN ";
     if (isset($_GET['state'])) {
