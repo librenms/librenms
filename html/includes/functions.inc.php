@@ -576,6 +576,58 @@ function generate_lazy_graph_tag($args)
     }
 }//end generate_lazy_graph_tag()
 
+function generate_dynamic_graph_tag($args)
+{
+    $urlargs = array();
+    $width = 0;
+    foreach ($args as $key => $arg) {
+        switch (strtolower($key)) {
+            case 'width':
+                $width = $arg;
+                $value = "{{width}}";
+                break;
+            case 'from':
+                $value = "{{start}}";
+                break;
+            case 'to':
+                $value = "{{end}}";
+                break;
+            default:
+                $value = $arg;
+                break;
+        }
+        $urlargs[] = $key . "=" . $value;
+    }
+
+    return '<img style="width:'.$width.'px;height:100%" class="graph img-responsive" data-src-template="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
+}//end generate_dynamic_graph_tag()
+
+function generate_dynamic_graph_js($args)
+{
+    $from = (is_numeric($args['from']) ? $args['from'] : '(new Date()).getTime() / 1000 - 24*3600');
+    $range = (is_numeric($args['to']) ? $args['to'] - $args['from'] : '24*3600');
+
+    $output = '<script src="js/RrdGraphJS/q-5.0.2.min.js"></script>
+        <script src="js/RrdGraphJS/moment-timezone-with-data.js"></script>
+        <script src="js/RrdGraphJS/rrdGraphPng.js"></script>
+          <script type="text/javascript">
+              q.ready(function(){
+                  var graphs = [];
+                  q(\'.graph\').forEach(function(item){
+                      graphs.push(
+                          q(item).rrdGraphPng({
+                              canvasPadding: 120,
+                                initialStart: ' . $from . ',
+                                initialRange: ' . $range . '
+                          })
+                      );
+                  });
+              });
+              // needed for dynamic height
+              window.onload = function(){ window.dispatchEvent(new Event(\'resize\')); }
+          </script>';
+    return $output;
+}//end generate_dynamic_graph_js()
 
 function generate_graph_js_state($args)
 {
