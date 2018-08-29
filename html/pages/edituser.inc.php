@@ -266,10 +266,6 @@ if (!Auth::user()->isAdmin()) {
         echo "
             <input type='hidden' value='" . $access_configs_updateDB . "' name='access_configs_updateDB'>
             </div><button type='submit' class='btn btn-default' name='Submit'>" . $access_configs_result ."</button></form>";
-<<<<<<< HEAD
-
-=======
->>>>>>> 58f71a4e968f0618dd2cb15c16aeefb172d122f8
 
     } elseif ($vars['user_id'] && $vars['edit']) {
         if (Auth::user()->isDemoUser()) {
