@@ -26,19 +26,29 @@ function prometheus_push($device, $measurement, $tags, $fields)
 
                 foreach ($fields as $k => $v) {
                     if ($v !== null) {
+                        $k = preg_replace('/([a-z]{1,})/', '$1_', $k); // Generally, metric naming in Prometheus is done with underscores without capital letters
+                        $k = substr($k, 0, -1);
+                        $k = preg_replace('/([_]{2})/', '_', $k);
+                        $k = strtolower($k);
                         $vals = $vals . "$k $v\n";
                     }
                 }
-                
+
                 foreach ($tags as $t => $v) {
                     if ($v !== null) {
+                        if(strpos($v,"/") === false) {
+                            ;
+                        }
+                        else {
+                            $v = str_replace("/", "", $v); // Prometheus does not accept "/" symbol in label names, so we need to strip them out
+                        }
                         $promtags = $promtags . "/$t/$v";
                     }
                 }
 
                 $promurl = $config['prometheus']['url'].'/metrics/job/'.$config['prometheus']['job'].'/instance/'.$device['hostname'].$promtags;
                 $promurl = str_replace(" ", "-", $promurl); // Prometheus doesn't handle tags with spaces in url
-        
+
                 d_echo("\nPrometheus data:\n");
                 d_echo($measurement);
                 d_echo($tags);
@@ -51,14 +61,13 @@ function prometheus_push($device, $measurement, $tags, $fields)
                 curl_setopt($ch, CURLOPT_POST, 1);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $vals);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
- 
+
                 $headers = array();
                 $headers[] = "Content-Type: test/plain";
                 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
-        
-                curl_exec($ch);
- 
+                curl_exec($ch); // It would be helpful to provide type of metric along with the values itself, but documentation says untyped metrics are still fine for custom exporters
+
                 if (curl_errno($ch)) {
                     d_echo('Error:' . curl_error($ch));
                 }
