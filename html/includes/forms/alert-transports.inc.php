@@ -93,16 +93,19 @@ if (empty($name)) {
             }
             $status = 'error';
         } else {
+            $transport_config = json_decode(dbFetchCell('SELECT transport_config FROM alert_transports WHERE transport_id=?', [$transport_id]), true);
             foreach ($result['config'] as $tmp_config) {
-                $transport_config[$tmp_config['name']] = $vars[$tmp_config['name']];
+                if (isset($tmp_config['name']) && $tmp_config['type'] !== 'hidden') {
+                    $transport_config[$tmp_config['name']] = $vars[$tmp_config['name']];
+                }
             }
             //Update the json config field
             if ($transport_config) {
                 $transport_config = json_encode($transport_config);
-                $detail = array(
+                $detail = [
                     'transport_type' => $transport_type,
                     'transport_config' => $transport_config
-                );
+                ];
                 $where = 'transport_id=?';
 
                 dbUpdate($detail, 'alert_transports', $where, [$transport_id]);

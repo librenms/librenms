@@ -606,9 +606,7 @@ function IssueAlert($alert)
     $obj = DescribeAlert($alert);
     if (is_array($obj)) {
         echo 'Issuing Alert-UID #'.$alert['id'].'/'.$alert['state'].': ';
-        if (!empty($config['alert']['transports'])) {
-            ExtTransports($obj);
-        }
+        ExtTransports($obj);
 
         echo "\r\n";
     }
