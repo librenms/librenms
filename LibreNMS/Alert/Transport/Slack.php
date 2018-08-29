@@ -98,7 +98,7 @@ class Slack extends Transport
                 ],
                 [
                     'title' => 'Slack Options',
-                    'name' => 'options',
+                    'name' => 'slack-options',
                     'descr' => 'Slack Options',
                     'type' => 'textarea',
                 ]
