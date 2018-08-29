@@ -203,7 +203,12 @@ class Checks
 
     private static function missingPhpExtensions()
     {
-        $required_modules = ['mysqli', 'mbstring', 'pcre', 'curl', 'session', 'xml', 'gd'];
+        // allow mysqli, but prefer mysqlnd
+        if (!extension_loaded('mysqlnd') && !extension_loaded('mysqli')) {
+            return ['mysqlnd'];
+        }
+
+        $required_modules = ['mbstring', 'pcre', 'curl', 'session', 'xml', 'gd'];
 
         return array_filter($required_modules, function ($module) {
             return !extension_loaded($module);
