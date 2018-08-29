@@ -31,7 +31,7 @@ benuWagStatsMIB  MODULE-IDENTITY
                 Copyright (C)  2012 by Benu Networks, Inc.
                 All rights reserved."
 
-            REVISION "2017020210000Z" -- Feb 02, 2017
+            REVISION "201702210000Z" -- Feb 02, 2017
             DESCRIPTION "Added fragmentation scalars."
 
             REVISION "201701310000Z" -- Jan 31, 2017
