@@ -60,6 +60,10 @@ foreach (dbFetchRows($query) as $transport) {
     $transport_config = json_decode($transport['config'], true);
 
     foreach ($tmp['config'] as $item) {
+        if ($item['type'] == 'oauth') {
+            continue;
+        }
+
         $val = $transport_config[$item['name']];
 
         // Match value to key name for select inputs
