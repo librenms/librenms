@@ -775,15 +775,15 @@ function snmp_gen_auth(&$device)
             $cmd = " -v3 -n '".$device['context_name']."' -l '".$device['authlevel']."'";
         }
 
-        if ($device['authlevel'] === 'noAuthNoPriv') {
+        if (strtolower($device['authlevel']) === 'noauthnopriv') {
             // We have to provide a username anyway (see Net-SNMP doc)
             $username = !empty($device['authname']) ? $device['authname'] : 'root';
             $cmd .= " -u '".$username."'";
-        } elseif ($device['authlevel'] === 'authNoPriv') {
+        } elseif (strtolower($device['authlevel']) === 'authnopriv') {
             $cmd .= " -a '".$device['authalgo']."'";
             $cmd .= " -A '".$device['authpass']."'";
             $cmd .= " -u '".$device['authname']."'";
-        } elseif ($device['authlevel'] === 'authPriv') {
+        } elseif (strtolower($device['authlevel']) === 'authpriv') {
             $cmd .= " -a '".$device['authalgo']."'";
             $cmd .= " -A '".$device['authpass']."'";
             $cmd .= " -u '".$device['authname']."'";

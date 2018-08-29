@@ -419,7 +419,7 @@ function add_device()
             'cryptoalgo' => mres($data['cryptoalgo']),
         );
 
-        array_push($config['snmp']['v3'], $v3);
+        array_unshift($config['snmp']['v3'], $v3);
         $snmpver = 'v3';
     } else {
         api_error(400, 'You haven\'t specified an SNMP version to use');
