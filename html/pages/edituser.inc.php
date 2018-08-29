@@ -265,7 +265,7 @@ if (!Auth::user()->isAdmin()) {
 
         echo "
             <input type='hidden' value='" . $access_configs_updateDB . "' name='access_configs_updateDB'>
-            <input id='configcheckbox' type='checkbox' name='accessconfigs'></div><button type='submit' class='btn btn-default' name='Submit'>" . $access_configs_result ."</button></form>";
+            </div><button type='submit' class='btn btn-default' name='Submit'>" . $access_configs_result ."</button></form>";
 
     } elseif ($vars['user_id'] && $vars['edit']) {
         if (Auth::user()->isDemoUser()) {
