@@ -56,7 +56,6 @@ if (!Auth::user()->isAdmin()) {
                 dbUpdate(array('access_configs' => $vars['access_configs_updateDB']), 'users', '`user_id` = ?', array($vars['user_id']));
         }
 
-
         echo '<div class="row">
            <div class="col-md-4">';
 
@@ -266,7 +265,7 @@ if (!Auth::user()->isAdmin()) {
 
         echo "
             <input type='hidden' value='" . $access_configs_updateDB . "' name='access_configs_updateDB'>
-            <input id='123' type='checkbox' name='accessconfigs'></div><button type='submit' class='btn btn-default' name='Submit'>" . $access_configs_result ."</button></form>";
+            <input id='configcheckbox' type='checkbox' name='accessconfigs'></div><button type='submit' class='btn btn-default' name='Submit'>" . $access_configs_result ."</button></form>";
 
     } elseif ($vars['user_id'] && $vars['edit']) {
         if (Auth::user()->isDemoUser()) {
@@ -382,7 +381,6 @@ if (!Auth::user()->isAdmin()) {
 
                     echo "<div class='form-group'>
     <div class='col-sm-6'>
-
       <div class='checkbox'>
         <label>
           <input type='checkbox' ";
