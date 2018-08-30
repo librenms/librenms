@@ -266,8 +266,6 @@ if (is_array($msg_box)) {
     foreach ($msg_box as $message) {
         Toastr::add($message['type'], $message['message'], $message['title']);
     }
-
-    echo Toastr::render();
 }
 
 if ($no_refresh !== true && $config['page_refresh'] != 0) {
