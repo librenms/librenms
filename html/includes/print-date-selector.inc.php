@@ -1,8 +1,10 @@
 <?php
 
+use LibreNMS\Config;
+
 echo "<div style='text-align: center;'>
         <form class='form-inline' id='customrange'>
-        <input type=hidden id='selfaction' value='" . $_SERVER['REQUEST_URI'] . "'>
+        <input type=hidden id='selfaction' value='" . Config::get('base_url') . "{$_SERVER['REQUEST_URI']}'>
 ";
 
 echo '
