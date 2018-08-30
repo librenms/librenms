@@ -502,20 +502,16 @@ function getImageName($device, $use_database = true, $dir = 'images/os/')
 
 function renamehost($id, $new, $source = 'console')
 {
-    global $config;
+    $host = gethostbyid($id);
 
-    $host = dbFetchCell("SELECT `hostname` FROM `devices` WHERE `device_id` = ?", array($id));
     if (!is_dir(get_rrd_dir($new)) && rename(get_rrd_dir($host), get_rrd_dir($new)) === true) {
-        dbUpdate(array('hostname' => $new), 'devices', 'device_id=?', array($id));
+        dbUpdate(['hostname' => $new, 'ip' => null], 'devices', 'device_id=?', [$id]);
         log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
-    } else {
-        log_event("Renaming of $host failed", $id, 'system', 5);
-        if (__FILE__ === $_SERVER['SCRIPT_FILE_NAME']) {
-            echo "Renaming of $host failed\n";
-        } else {
-            return "Renaming of $host failed\n";
-        }
+        return '';
     }
+
+    log_event("Renaming of $host failed", $id, 'system', 5);
+    return "Renaming of $host failed\n";
 }
 
 function delete_device($id)
