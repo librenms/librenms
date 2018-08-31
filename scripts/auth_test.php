@@ -21,6 +21,8 @@ if (isset($options['d'])) {
 $init_modules = [];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
+set_debug(isset($options['d']));
+
 if (isset($options['v'])) {
     // Enable debug mode for auth methods that have it
     $config['auth_ad_debug'] = 1;
