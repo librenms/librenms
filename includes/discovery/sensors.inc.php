@@ -34,6 +34,10 @@ if (strstr($device['hardware'], 'ProLiant')) {
     include 'includes/discovery/sensors/state/hp.inc.php';
 }
 
+if ($device['os'] == 'gw-eydfa') {
+    include 'includes/discovery/sensors/gw-eydfa.inc.php';
+}
+
 $run_sensors = array(
     'airflow',
     'current',
