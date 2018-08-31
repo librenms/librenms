@@ -78,7 +78,7 @@ Optional:
     exit;
 }
 
-$debug = (isset($options['d']) || isset($options['debug']));
+set_debug(isset($options['d']) || isset($options['debug']));
 
 if (isset($options['m'])) {
     $modules_input = $options['m'];

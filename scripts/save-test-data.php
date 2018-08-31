@@ -27,8 +27,7 @@ $options = getopt(
 $init_modules = array('discovery', 'polling');
 require $install_dir . '/includes/init.php';
 
-$debug = (isset($options['d']) || isset($options['debug']));
-$vdebug = $debug;
+$vdebug = set_debug(isset($options['d']) || isset($options['debug']));
 
 
 if (isset($options['snmpsim'])) {

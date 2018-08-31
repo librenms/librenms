@@ -18,10 +18,7 @@ include_once __DIR__ . '/includes/notifications.php';
 
 $options = getopt('df:o:t:r:');
 
-if (isset($options['d'])) {
-    echo "DEBUG\n";
-    $debug = true;
-}
+set_debug(isset($options['d']));
 
 if ($options['f'] === 'update') {
     if (!$config['update']) {

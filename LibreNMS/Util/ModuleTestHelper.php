@@ -173,11 +173,11 @@ class ModuleTestHelper
         ob_start();
         $save_debug = $debug;
         $save_vedbug = $vdebug;
-        $debug = true;
+        set_debug(true);
         $vdebug = false;
         discover_device($device, $this->parseArgs('discovery'));
         poll_device($device, $this->parseArgs('poller'));
-        $debug = $save_debug;
+        set_debug($save_debug);
         $vdebug = $save_vedbug;
         $collection_output = ob_get_contents();
         ob_end_clean();
@@ -528,7 +528,7 @@ class ModuleTestHelper
         $save_debug = $debug;
         $save_vedbug = $vdebug;
         if ($this->quiet) {
-            $debug = true;
+            set_debug(true);
             $vdebug = true;
         }
         ob_start();
@@ -537,7 +537,7 @@ class ModuleTestHelper
 
         $this->discovery_output = ob_get_contents();
         if ($this->quiet) {
-            $debug = $save_debug;
+            set_debug($save_debug);
             $vdebug = $save_vedbug;
         } else {
             ob_flush();
@@ -556,7 +556,7 @@ class ModuleTestHelper
 
         // Run the poller
         if ($this->quiet) {
-            $debug = true;
+            set_debug(true);
             $vdebug = true;
         }
         ob_start();
@@ -565,7 +565,7 @@ class ModuleTestHelper
 
         $this->poller_output = ob_get_contents();
         if ($this->quiet) {
-            $debug = $save_debug;
+            set_debug($save_debug);
             $vdebug = $save_vedbug;
         } else {
             ob_flush();
@@ -581,8 +581,7 @@ class ModuleTestHelper
 
         // Remove the test device, we don't need the debug from this
         if ($device['hostname'] == $snmpsim->getIp()) {
-            global $debug;
-            $debug = false;
+            set_debug(false);
             delete_device($device['device_id']);
         }
 

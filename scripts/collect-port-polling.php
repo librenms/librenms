@@ -21,9 +21,7 @@ function print_help()
     echo "\n";
 }
 
-if (isset($options['d'])) {
-    $debug = true;
-}
+set_debug(isset($options['d']));
 
 if (isset($options['help'])) {
     print_help();
