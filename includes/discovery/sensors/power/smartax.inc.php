@@ -22,7 +22,7 @@
  * @copyright  2018 TheGreatDoc
  * @author     TheGreatDoc
  */
-$pow_frame_oid = '1.3.6.1.4.1.2011.2.6.7.1.1.1.1.11';
+
 $power_frame_oid = '.1.3.6.1.4.1.2011.2.6.7.1.1.1.1.11.0';
 
 $power = snmp_get($device, $power_frame_oid, '-Ovq');
