@@ -140,3 +140,25 @@ $sensor_index = str_replace(' ', '', $descr);
 discover_sensor($valid['sensor'], 'dbm', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, null, $low_limit, $low_warn, $high_warn, $high_limit, $value);
 
 unset($num_oid, $value, $divisor, $descr, $low_limit, $low_warn, $high_warn, $sensor_index);
+
+// Power Supply State
+
+$oids = array('.1.3.6.1.4.1.17409.1.1.2.1.4.11.1.3.6.1.4.1.17409.1.11.100.0.2', '.1.3.6.1.4.1.17409.1.1.2.1.4.11.1.3.6.1.4.1.17409.1.11.101.0.2');
+
+$state_name = 'PowerSupplyState';
+$states = array(
+    array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'normal'),
+    array('value' => 7, 'generic' => 1, 'graph' => 0, 'descr' => 'warning'),
+    array('value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'critical'),
+);
+create_state_index($state_name, $states);
+$n = 1;
+foreach ($oids as $oid) {
+    $value = snmp_get($device, $oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB');
+    $descr = 'Power Supply ' . $n;
+    $sensor_index = str_replace(' ', '', $descr);
+    discover_sensor($valid['sensor'], 'state', $device, $oid, $sensor_index, $state_name, $descr, '1', '1', null, null, null, null, $value, 'snmp');
+    create_sensor_to_state_index($device, $state_name, $sensor_index);
+    $n++;
+}
+
