@@ -108,8 +108,10 @@ class Wireless implements DiscoveryModule, PollerModule
         // check yaml first
 //        $processors = self::processYaml($os);
 
-        // output update status
-        WirelessSensor::observe(new DiscoveryModelObserver());
+        // output update status, but don't install listener twice (tests)
+        if (!WirelessSensor::getEventDispatcher()->hasListeners('eloquent.created: App\Models\WirelessSensor')) {
+            WirelessSensor::observe(new DiscoveryModelObserver());
+        }
 
         foreach (self::getTypes() as $type => $descr) {
             echo "$type: ";
