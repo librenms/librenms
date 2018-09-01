@@ -1041,7 +1041,7 @@ function send_mail($emails, $subject, $message, $html = false)
 {
     global $config;
     if (is_array($emails) || ($emails = parse_email($emails))) {
-        d_echo("Attempting to email $subject to: " . implode('; ', $emails) . PHP_EOL);
+        d_echo("Attempting to email $subject to: " . implode('; ', array_keys($emails)) . PHP_EOL);
         $mail = new PHPMailer();
         $mail->Hostname = php_uname('n');
 
