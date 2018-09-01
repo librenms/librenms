@@ -15,6 +15,17 @@ header('Content-type: application/json');
 use LibreNMS\Config;
 use LibreNMS\Authentication\Auth;
 
+function oxidized_node_update($hostname, $msg, $username = '')
+{
+    $postdata = ["user" => $username, "msg" => $msg];
+    $oxidized_url = Config::get('oxidized.url');
+    if (!empty($oxidized_url)) {
+        Requests::put("$oxidized_url/node/next/$hostname", [], json_encode($postdata), ['proxy' => get_proxy()]);
+        return true;
+    } 
+    return false;
+}//end oxidized_node_update()
+
 $device_hostname = clean($_POST['device_hostname']);
 if (Auth::user()->hasGlobalAdmin() && isset($device_hostname)) {
     if (oxidized_node_update($device_hostname, "LibreNMS GUI refresh", $_SESSION['username'])) {
@@ -36,16 +47,3 @@ $output = array(
 
 header('Content-type: application/json');
 echo _json_encode($output);
-
-
-function oxidized_node_update($hostname, $msg, $username = '')
-{
-    $postdata = ["user" => $username, "msg" => $msg];
-    $oxidized_url = Config::get('oxidized.url');
-    if (!empty($oxidized_url)) {
-        Requests::put("$oxidized_url/node/next/$hostname", [], json_encode($postdata), ['proxy' => get_proxy()]);
-        return true;
-    } else {
-        return false;
-    }
-}//end oxidized_node_update()
