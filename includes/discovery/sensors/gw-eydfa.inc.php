@@ -30,12 +30,12 @@ if ($oids) {
     echo 'GW EYDFA PUMP ';
 }
 
-foreach(explode("\n", $oids) as $data) {
+foreach (explode("\n", $oids) as $data) {
     list($oid, $value) = explode(' ', $data);
     $split_oid = explode('.', $oid);
     $index = $split_oid[1];
     // Check for sensor type
-    if ($split_oid[0] == "oaPumpBIAS"){ // Current - mA
+    if ($split_oid[0] == "oaPumpBIAS") { // Current - mA
         $divisor = 1000;
         $descr = 'BIAS Pump - ' . $index;
         $num_oid = '.1.3.6.1.4.1.17409.1.11.4.1.2.' . $index;
@@ -44,9 +44,9 @@ foreach(explode("\n", $oids) as $data) {
         $high_warn = snmp_get($device, 'analogAlarmHI.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / 1000;
         $high_limit = snmp_get($device, 'analogAlarmHIHI.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / 1000;
         $sensor_index = str_replace(' ', '', $descr);
-        discover_sensor($valid['sensor'],'current', $device, $num_oid,$sensor_index, 'gw-eydfa', $descr, $divisor, null, $low_limit, $low_warn, $high_warn, $high_limit, $value);
+        discover_sensor($valid['sensor'],'current', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, null, $low_limit, $low_warn, $high_warn, $high_limit, $value);
     }
-    if ($split_oid[0] == "oaPumpTEC" && $index = 1){ // Current - A
+    if ($split_oid[0] == "oaPumpTEC" && $index = 1) { // Current - A
         $divisor = 100;
         $descr = 'TEC Pump - ' . $index;
         $num_oid = '.1.3.6.1.4.1.17409.1.11.4.1.3.' . $index;
@@ -55,9 +55,9 @@ foreach(explode("\n", $oids) as $data) {
         $high_warn = snmp_get($device, 'analogAlarmHI.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / 100;
         $high_limit = snmp_get($device, 'analogAlarmHIHI.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / 100;
         $sensor_index = str_replace(' ', '', $descr);
-        discover_sensor($valid['sensor'],'current', $device, $num_oid,$sensor_index, 'gw-eydfa', $descr, $divisor, null, $low_limit, $low_warn, $high_warn, $high_limit, $value);
+        discover_sensor($valid['sensor'],'current', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, null, $low_limit, $low_warn, $high_warn, $high_limit, $value);
     }
-    if ($split_oid[0] == "oaPumpTemp" && $index = 1){ // Temperature - C
+    if ($split_oid[0] == "oaPumpTemp" && $index = 1) { // Temperature - C
         $divisor = 10;
         $descr = 'Temperature Pump - ' . $index;
         $num_oid = '.1.3.6.1.4.1.17409.1.11.4.1.4.' . $index;
@@ -66,7 +66,7 @@ foreach(explode("\n", $oids) as $data) {
         $high_warn = snmp_get($device, 'analogAlarmHI.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / 10;
         $high_limit = snmp_get($device, 'analogAlarmHIHI.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / 10;
         $sensor_index = str_replace(' ', '', $descr);
-        discover_sensor($valid['sensor'],'temperature', $device, $num_oid,$sensor_index, 'gw-eydfa', $descr, $divisor, null, $low_limit, $low_warn, $high_warn, $high_limit, $value);
+        discover_sensor($valid['sensor'],'temperature', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, null, $low_limit, $low_warn, $high_warn, $high_limit, $value);
     }
     unset($oids, $split_oid, $index, $divisor, $descr, $low_limit, $low_warn, $high_warn, $sensor_index);
 }
@@ -80,7 +80,7 @@ if ($oids) {
     echo 'GW EYDFA DC POWER ';
 }
 
-foreach(explode("\n", $oids) as $data) {
+foreach (explode("\n", $oids) as $data) {
     list($oid, $value) = explode(' ', $data);
     $split_oid = explode('.', $oid);
     $index = $split_oid[1];
@@ -109,7 +109,7 @@ $low_warn = snmp_get($device, 'analogAlarmLO.12.1.3.6.1.4.1.17409.1.3.1.13.0', '
 $high_warn = snmp_get($device, 'analogAlarmHI.12.1.3.6.1.4.1.17409.1.3.1.13.0', '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB');
 $high_limit = snmp_get($device, 'analogAlarmHIHI.12.1.3.6.1.4.1.17409.1.3.1.13.0', '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB');
 $sensor_index = str_replace(' ', '', $descr);
-discover_sensor($valid['sensor'],'temperature', $device, $num_oid,$sensor_index, 'gw-eydfa', $descr, null, null, $low_limit, $low_warn, $high_warn, $high_limit, $value);
+discover_sensor($valid['sensor'],'temperature', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, null, null, $low_limit, $low_warn, $high_warn, $high_limit, $value);
 
 unset($num_oid, $value, $descr, $low_limit, $low_warn, $high_warn, $sensor_index);
 
@@ -161,4 +161,3 @@ foreach ($oids as $oid) {
     create_sensor_to_state_index($device, $state_name, $sensor_index);
     $n++;
 }
-
