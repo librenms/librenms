@@ -34,6 +34,7 @@ $pagetitle[] = 'Oxidized';
                                 <th data-column-id="last_update">Last Update</th>
                                 <th data-column-id="model">Model</th>
                                 <th data-column-id="group">Group</th>
+                                <th data-column-id="actions"></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -62,6 +63,28 @@ $pagetitle[] = 'Oxidized';
     </div>
 </div>
 <script>
+
+    function refresh_oxidized_node(device_hostname){
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: {
+                type: "refresh-oxidized-node",
+                device_hostname: device_hostname
+            },
+            success: function (data) {
+                if(data['status'] == 'ok') {
+                    toastr.success(data['message']);
+                } else {
+                    toastr.error(data['message']);
+                }
+            },
+            error:function(){
+                toastr.error('An error occured while refreshing an oxidized node (hostname: ' + device_hostname + ')');
+            }
+        });
+    }
+    
     $("[name='btn-search']").on('click', function (event) {
         event.preventDefault();
         var $this = $(this);
