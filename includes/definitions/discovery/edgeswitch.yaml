@@ -59,7 +59,7 @@ modules:
         temperature:
             data:
                 -
-                    oid: boxServicesTempSensorIndex
+                    oid: BoxServicesTempSensorsEntry
                     value: boxServicesTempSensorTemperature
                     num_oid: .1.3.6.1.4.1.4413.1.1.43.1.8.1.5.1.
                     index: 'boxServicesTempSensorTemperature.{{ $index }}'
