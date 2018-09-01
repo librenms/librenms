@@ -1,0 +1,188 @@
+NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB DEFINITIONS ::= BEGIN
+
+-- *****************************************************************************
+--                           附录M 光放大器MIB
+-- *****************************************************************************
+
+IMPORTS
+    OBJECT-TYPE
+        FROM RFC-1212
+    DisplayString
+        FROM RFC1213-MIB
+    oaIdent
+        FROM NSCRTV-ROOT;
+
+    oaVendorOID OBJECT-TYPE
+        SYNTAX OBJECT IDENTIFIER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "此对象提供厂商对光放大器MIB的扩充。无扩充时此对象应指向光放大器节点oaIdent。"
+        ::= { oaIdent 1 }
+    
+    oaOutputOpticalPower OBJECT-TYPE
+        SYNTAX INTEGER ( 0..65535 )
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "输出光功率,单位为0.1dBm,此对象要求在属性MIB中登记一个条目。"
+        ::= { oaIdent 2 }
+    
+    oaInputOpticalPower OBJECT-TYPE
+        SYNTAX INTEGER ( -128..127 )
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "输入光功率,单位为0.1dBm,此对象要求在属性MIB中登记一个条目。"
+        ::= { oaIdent 3 }
+
+-- *
+-- *   激光泵浦参数
+-- *
+
+    oaPumpTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OaPumpEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "光入大器激光泵浦信息表。"
+        ::= { oaIdent 4 }
+    
+    oaPumpEntry OBJECT-TYPE
+        SYNTAX OaPumpEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "每个光放大器激光泵浦的信息表目。"
+        INDEX { oaPumpIndex }
+        ::= { oaPumpTable 1 }
+    
+    OaPumpEntry ::= SEQUENCE
+        {
+        oaPumpIndex
+            INTEGER,
+        oaPumpBIAS
+            INTEGER,
+        oaPumpTEC
+            INTEGER,
+        oaPumpTemp
+            INTEGER
+        }
+    
+    oaPumpIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "光放大器激光泵浦索引值。"
+        ::= { oaPumpEntry 1 }
+    
+    oaPumpBIAS OBJECT-TYPE
+        SYNTAX INTEGER ( 0..65535 )
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "激光泵浦偏置电流,单位为mA,此对象要求在属性MIB中登记一个条目。"
+        ::= { oaPumpEntry 2 }
+    
+    oaPumpTEC OBJECT-TYPE
+        SYNTAX INTEGER ( -32768..32767 )
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "激光泵致冷电流,单位为0.01A,此对象要求在属性MIB中登记一个条目。"
+        ::= { oaPumpEntry 3 }
+    
+    oaPumpTemp OBJECT-TYPE
+        SYNTAX INTEGER ( 0..32768 )
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "激光泵浦温度,单位为0.1摄氏度,此对象要求在属性MIB中登记一个条目。"
+        ::= { oaPumpEntry 4 }
+
+-- *
+-- *   直流电源
+-- *
+
+    oaNumberDCPowerSupply OBJECT-TYPE
+        SYNTAX INTEGER ( 0..16 )
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "内部直流电源的数目，'0'表示应答器不支持此功能。"
+        ::= { oaIdent 5 }
+
+    oaDCPowerSupplyMode OBJECT-TYPE
+        SYNTAX INTEGER { loadsharing(1), switchedRedundant(2), aloneSupply(3) }
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "供电电源工作模式：负载分担、备用切换或独立供电。"
+        ::= { oaIdent 6 }
+    
+    oaDCPowerTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OaDCPowerEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "直流电源信息表。"
+        ::= { oaIdent 7 }
+    
+    oaDCPowerEntry OBJECT-TYPE
+        SYNTAX OaDCPowerEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "直流电源信息表目。"
+        INDEX { oaDCPowerIndex }
+        ::= { oaDCPowerTable 1 }
+    
+    OaDCPowerEntry ::= SEQUENCE
+        {
+        oaDCPowerIndex
+            INTEGER,
+        oaDCPowerVoltage
+            INTEGER,
+        oaDCPowerCurrent
+            INTEGER,
+        oaDCPowerName
+            DisplayString
+        }
+    
+    oaDCPowerIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "直流电源索引。"
+        ::= { oaDCPowerEntry 1 }
+    
+    oaDCPowerVoltage OBJECT-TYPE
+        SYNTAX INTEGER ( -32768..32767 )
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "电源电压，单位为0.1V。此对象要求在属性MIB中登记一个条目。"
+        ::= { oaDCPowerEntry 2 }
+    
+    oaDCPowerCurrent OBJECT-TYPE
+        SYNTAX INTEGER ( 0..65535 )
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "电源的电流，单位为0.1A。此对象要求在属性MIB中登记一个条目。"
+        ::= { oaDCPowerEntry 3 }
+    
+    oaDCPowerName OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "标明该电源的名称，例如：24V直流电源。
+            此字段值由用户规定，至少应标明工作电压并将多个电源相互区分开。
+            当此表中的对象产生告警时，此对象名称应放进hfcAlarmEvent陷阱的alarmText对象里。"
+        ::= { oaDCPowerEntry 4 }
+
+--******************************************************************************
+END
