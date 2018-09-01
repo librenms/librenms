@@ -2,10 +2,10 @@
 
 namespace LibreNMS\OS;
 
-use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessMseDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
 class SmOs extends OS implements
@@ -19,7 +19,7 @@ class SmOs extends OS implements
         $sensors = array();
 
         foreach ($oids as $index => $entry) {
-            $sensors[] = new WirelessSensor(
+            $sensors[] = Wireless::discover(
                 'rssi',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.3373.1103.80.12.1.3.' . $index,
@@ -37,7 +37,7 @@ class SmOs extends OS implements
         $sensors = array();
 
         foreach ($oids as $index => $entry) {
-            $sensors[] = new WirelessSensor(
+            $sensors[] = Wireless::discover(
                 'frequency',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.3373.1103.80.9.1.4.' . $index,
@@ -55,7 +55,7 @@ class SmOs extends OS implements
         $sensors = array();
 
         foreach ($oids as $index => $entry) {
-            $sensors[] = new WirelessSensor(
+            $sensors[] = Wireless::discover(
                 'mse',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.3373.1103.80.12.1.5.' . $index,

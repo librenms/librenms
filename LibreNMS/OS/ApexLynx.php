@@ -9,12 +9,12 @@
 
 namespace LibreNMS\OS;
 
-use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessMseDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorRateDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
 class ApexLynx extends OS implements
@@ -30,7 +30,7 @@ class ApexLynx extends OS implements
         $oid = '.1.3.6.1.4.1.5454.1.80.3.14.2.0';
         $sensors = array();
 
-        $sensors[] = new WirelessSensor(
+        $sensors[] = Wireless::discover(
             'rssi',
             $this->getDeviceId(),
             $oid,
@@ -48,7 +48,7 @@ class ApexLynx extends OS implements
         $rxoid = '.1.3.6.1.4.1.5454.1.80.3.1.2.2.0';
 
         return array(
-            new WirelessSensor(
+            Wireless::discover(
                 'frequency',
                 $this->getDeviceId(),
                 $txoid,
@@ -56,7 +56,7 @@ class ApexLynx extends OS implements
                 0,
                 'Tx Frequency'
             ),
-            new WirelessSensor(
+            Wireless::discover(
                 'frequency',
                 $this->getDeviceId(),
                 $rxoid,
@@ -73,7 +73,7 @@ class ApexLynx extends OS implements
         $oid = '.1.3.6.1.4.1.5454.1.80.2.4.2.2.0';
         $sensors = array();
 
-        $sensors[] = new WirelessSensor(
+        $sensors[] = Wireless::discover(
             'mse',
             $this->getDeviceId(),
             $oid,
@@ -90,7 +90,7 @@ class ApexLynx extends OS implements
         $oid = '.1.3.6.1.4.1.5454.1.80.3.6.4.2.0';
         $sensors = array();
 
-        $sensors[] = new WirelessSensor(
+        $sensors[] = Wireless::discover(
             'rate',
             $this->getDeviceId(),
             $oid,
@@ -107,7 +107,7 @@ class ApexLynx extends OS implements
         $oid = '.1.3.6.1.4.1.5454.1.80.2.4.1.1.0';
         $sensors = array();
 
-        $sensors[] = new WirelessSensor(
+        $sensors[] = Wireless::discover(
             'error-rate',
             $this->getDeviceId(),
             $oid,
