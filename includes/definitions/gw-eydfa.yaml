@@ -40,7 +40,6 @@ poller_modules:
   netscaler-vsvr: false
   netstats: false
   ntp: false
-  os: false
   ospf: false
   ports: false
   processors: false
@@ -56,7 +55,6 @@ discovery_modules:
   cisco-cef: false
   cisco-sla: false
   cisco-mac-accounting: false
-  os: false
   ports: false
   ports-stack: false
   entity-physical: false
