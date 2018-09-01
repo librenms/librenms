@@ -52,6 +52,10 @@ if ($stage > 1) {
     try {
         if ($stage != 6) {
             dbConnect($dbhost, $dbuser, $dbpass, $dbname, $dbport, $dbsocket);
+            if (dbIsConnected() === false) {
+                $msg = "We could not connect to your database, please check the details and try again";
+                $stage = 1;
+            }
         }
         if ($stage == 2 && $_SESSION['build-ok'] == true) {
             $stage = 3;
