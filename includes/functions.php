@@ -1083,8 +1083,7 @@ function send_mail($emails, $subject, $message, $html = false)
             }
             $mail->send();
             return true;
-        }
-        catch (phpmailerException $e) {
+        } catch (phpmailerException $e) {
             return $e->errorMessage();
         } catch (Exception $e) {
             return $e->getMessage();
