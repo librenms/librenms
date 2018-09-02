@@ -142,22 +142,24 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
 
 unset($device['context_name'], $vrfs_lite_cisco, $vrf_lite);
 
-// Create device-wide statistics RRD
-$rrd_def = RrdDefinition::make()
-    ->addDataset('instances', 'GAUGE', 0, 1000000)
-    ->addDataset('areas', 'GAUGE', 0, 1000000)
-    ->addDataset('ports', 'GAUGE', 0, 1000000)
-    ->addDataset('neighbours', 'GAUGE', 0, 1000000);
+if ($instance_count) {
+    // Create device-wide statistics RRD
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('instances', 'GAUGE', 0, 1000000)
+        ->addDataset('areas', 'GAUGE', 0, 1000000)
+        ->addDataset('ports', 'GAUGE', 0, 1000000)
+        ->addDataset('neighbours', 'GAUGE', 0, 1000000);
 
-$fields = [
-    'instances'   => $instance_count,
-    'areas'       => $ospf_areas->count(),
-    'ports'       => $ospf_ports->count(),
-    'neighbours'  => $ospf_neighbours->count(),
-];
+    $fields = [
+        'instances'   => $instance_count,
+        'areas'       => $ospf_areas->count(),
+        'ports'       => $ospf_ports->count(),
+        'neighbours'  => $ospf_neighbours->count(),
+    ];
 
-$tags = compact('rrd_def');
-data_update($device, 'ospf-statistics', $tags, $fields);
+    $tags = compact('rrd_def');
+    data_update($device, 'ospf-statistics', $tags, $fields);
+}
 
 echo PHP_EOL;
 
