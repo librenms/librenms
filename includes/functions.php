@@ -2644,4 +2644,3 @@ function oxidized_node_update($hostname, $msg, $username = 'not_provided')
     }
     return false;
 }//end oxidized_node_update()
-
