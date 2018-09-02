@@ -6,7 +6,7 @@ over:
 - { graph: device_temperature, text: 'Temperatures' }
 - { graph: device_dbm, text: 'Optics' }
 mib_dir:
-- gw-eydfa
+- glassway
 discovery:
 - sysObjectID:
   - .1.3.6.1.4.1.17409.1.11
