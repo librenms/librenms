@@ -22,13 +22,13 @@
  * @copyright  2018 TheGreatDoc
  * @author     TheGreatDoc
  */
-$pow_frame_oid = '1.3.6.1.4.1.2011.2.6.7.1.1.1.1.11';
+
 $power_frame_oid = '.1.3.6.1.4.1.2011.2.6.7.1.1.1.1.11.0';
 
 $power = snmp_get($device, $power_frame_oid, '-Ovq');
 $index = '0';
 
-discover_sensor($valid['sensor'], 'power', $device, $power_frame_oid, $index, 'smartax', 'Chassis Total', '1', '1', null, null, null, null, $power);
+discover_sensor($valid['sensor'], 'power', $device, $power_frame_oid, $index, 'smartax-total', 'Chassis Total', '1', '1', null, null, null, null, $power);
 
 $power_oid = '1.3.6.1.4.1.2011.2.6.7.1.1.2.1.11.0';
 $descr_oid = '1.3.6.1.4.1.2011.2.6.7.1.1.2.1.7.0';
