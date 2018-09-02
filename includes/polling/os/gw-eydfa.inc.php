@@ -23,5 +23,8 @@
  * @author     TheGreatDoc
  */
 
-$hardware = snmp_get($device, ".1.3.6.1.4.1.17409.1.3.3.2.2.1.4.1", "-OQv");
-$serial = snmp_get($device, ".1.3.6.1.4.1.17409.1.3.3.2.2.1.5.1", "-OQv");
+$data = snmp_get_multi($device, "commonDeviceModelNumber.1 commonDeviceSerialNumber.1 commonDeviceVendorInfo.1", "-OQUs", 'NSCRTV-HFCEMS-COMMON-MIB');
+
+$hardware = $data['1']['commonDeviceModelNumber'];
+$serial = $data['1']['commonDeviceSerialNumber'];
+$version = $data['1']['commonDeviceVendorInfo'];
