@@ -329,6 +329,11 @@ $general_conf = array(
           'descr'              => 'Updates to contact email addresses not honored',
           'type'               => 'checkbox',
     ),
+    [
+        'name'                 => 'alert.ack_until_clear',
+        'descr'                => 'Default acknowledge until alert clears option',
+        'type'                 => 'checkbox',
+    ]
 );
 
 $mail_conf = array(

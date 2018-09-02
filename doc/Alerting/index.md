@@ -9,6 +9,7 @@ The system requires a set of user-defined rules to evaluate the situation of eac
 
 Table of Content:
 
+- [Introduction](Introduction.md)
 - [Rules](Rules.md)
     - [Syntax](Rules.md#syntax)
     - [Options](Rules.md#options)
