@@ -31,20 +31,19 @@ function prometheus_push($device, $measurement, $tags, $fields)
                         $k = preg_replace('/([_]{2})/', '_', $k);
                         $k = strtolower($k);
                         $vals = $vals . "$k $v\n";
-                    }
-                }
+                    } 
+                } 
 
                 foreach ($tags as $t => $v) {
                     if ($v !== null) {
-                        if(strpos($v,"/") === false) {
+                        if (strpos($v, "/") === false) {
                             ;
-                        }
-                        else {
+                        } else {
                             $v = str_replace("/", "", $v); // Prometheus does not accept "/" symbol in label names, so we need to strip them out
-                        }
+                        } 
                         $promtags = $promtags . "/$t/$v";
-                    }
-                }
+                    } 
+                } 
 
                 $promurl = $config['prometheus']['url'].'/metrics/job/'.$config['prometheus']['job'].'/instance/'.$device['hostname'].$promtags;
                 $promurl = str_replace(" ", "-", $promurl); // Prometheus doesn't handle tags with spaces in url
