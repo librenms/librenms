@@ -353,8 +353,9 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
             <i class="fa fa-bar-chart fa-lg icon-theme"  aria-hidden="true"></i> Alert Stats
             </a>
             </li>';
+        $can_access_configs = dbFetchCell('SELECT access_configs from users WHERE user_id = ?;', Auth::user()->user_id);
 
-        if (Auth::user()->hasGlobalAdmin()) {
+        if (Auth::user()->hasGlobalAdmin() || $can_access_configs == 1 ) {
             if (!is_array($config['rancid_configs'])) {
                 $config['rancid_configs'] = array($config['rancid_configs']);
             }

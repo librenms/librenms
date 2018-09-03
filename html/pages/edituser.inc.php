@@ -52,6 +52,9 @@ if (!Auth::user()->isAdmin()) {
                 dbInsert(array('bill_id' => $vars['bill_id'], 'user_id' => $vars['user_id']), 'bill_perms');
             }
         }
+       if ($vars['action'] == 'accessconfigs') {
+                dbUpdate(array('access_configs' => $vars['access_configs_updateDB']), 'users', '`user_id` = ?', array($vars['user_id']));
+        }
 
         echo '<div class="row">
            <div class="col-md-4">';
@@ -242,6 +245,28 @@ if (!Auth::user()->isAdmin()) {
           <button type='submit' class='btn btn-default' name='Submit' value='Add'>Add</button>
         </form>
         </div>";
+        echo "</div>
+          <div class='col-md-4'><h3>Config Access</h3></br>
+            <form class='form-inline' role='form' method='post' action=''>
+            <input type='hidden' value='".$vars['user_id']."' name='user_id'>
+            <input type='hidden' value='edituser' name='page'>
+            <input type='hidden' value='accessconfigs' name='action'>
+            <div class='form-group'>";
+
+        $access_configs = dbFetchCell('SELECT access_configs from users WHERE user_id = ?;', array($vars['user_id']));
+
+        if ($access_configs == 0) {
+         $access_configs_result = "Allow";
+         $access_configs_updateDB = 1;
+        } else {
+         $access_configs_result = "Disallow";
+         $access_configs_updateDB = 0;
+        }
+
+        echo "
+            <input type='hidden' value='" . $access_configs_updateDB . "' name='access_configs_updateDB'>
+            </div><button type='submit' class='btn btn-default' name='Submit'>" . $access_configs_result ."</button></form>";
+
     } elseif ($vars['user_id'] && $vars['edit']) {
         if (Auth::user()->isDemoUser()) {
             demo_account();
