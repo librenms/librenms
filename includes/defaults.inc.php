@@ -516,6 +516,7 @@ $config['billing']['base'] = 1000;
 // Set the base to divider bytes to kB, MB, GB ,... (1000|1024)
 // External Integration
 // $config['rancid_configs'][]             = '/var/lib/rancid/network/configs/';
+$config['rancid_repo_type'] = 'svn';
 $config['rancid_ignorecomments'] = 0;
 // Ignore lines starting with #
 // $config['collectd_dir']                 = '/var/lib/collectd/rrd';
