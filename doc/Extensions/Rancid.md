@@ -36,7 +36,7 @@ The options shown below also contains the default values.
 
 `sudo apt-get install rancid subversion`
 
-Edit Rancid config file to use subversion instead of default cvs, and adds a group:
+Edit Rancid config file to use subversion or git instead of default cvs, and adds a group:
 `sudo vi /etc/rancid/rancid.conf`
 
 `LIST_OF_GROUPS="librenms"`
@@ -130,6 +130,7 @@ Add Rancid into LibreNMS config.php:
 ```php
 ### Rancid
 $config['rancid_configs'][]             = '/var/lib/rancid/librenms/configs/';
+$config['rancid_repo_type']             = 'svn';  //'svn' or 'git'
 $config['rancid_ignorecomments']        = 0;
 ```
 

@@ -2,14 +2,16 @@
 
 // FIXME svn stuff still using optc etc, won't work, needs updating!
 use LibreNMS\Authentication\Auth;
+use LibreNMS\Config;
+use Symfony\Component\Process\Process;
 
 if (Auth::user()->hasGlobalAdmin()) {
-    if (!is_array($config['rancid_configs'])) {
-        $config['rancid_configs'] = array($config['rancid_configs']);
+    if (!is_array(Config::get('rancid_configs'))) {
+        Config::set('rancid_configs', array(Config::get('rancid_configs')));
     }
 
-    if (isset($config['rancid_configs'][0])) {
-        foreach ($config['rancid_configs'] as $configs) {
+    if (isset(Config::get('rancid_configs')[0])) {
+        foreach (Config::get('rancid_configs') as $configs) {
             if ($configs[(strlen($configs) - 1)] != '/') {
                 $configs .= '/';
             }
@@ -19,9 +21,9 @@ if (Auth::user()->hasGlobalAdmin()) {
             } elseif (is_file($configs.strtok($device['hostname'], '.'))) { // Strip domain
                 $file = $configs.strtok($device['hostname'], '.');
             } else {
-                if (!empty($config['mydomain'])) { // Try with domain name if set
-                    if (is_file($configs.$device['hostname'].'.'.$config['mydomain'])) {
-                        $file = $configs.$device['hostname'].'.'.$config['mydomain'];
+                if (!empty(Config::get('mydomain'))) { // Try with domain name if set
+                    if (is_file($configs.$device['hostname'].'.'.Config::get('mydomain'))) {
+                        $file = $configs.$device['hostname'].'.'.Config::get('mydomain');
                     }
                 }
             } // end if
@@ -41,7 +43,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             echo generate_link('Latest', array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig'));
         }
 
-        if (function_exists('svn_log')) {
+        if (Config::get('rancid_repo_type') == 'svn' && function_exists('svn_log')) {
             $sep     = ' | ';
             $svnlogs = svn_log($file, SVN_REVISION_HEAD, null, 8);
             $revlist = array();
@@ -54,7 +56,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                     echo '<span class="pagemenu-selected">';
                 }
 
-                $linktext = 'r'.$svnlog['rev'].' <small>'.date($config['dateformat']['byminute'], strtotime($svnlog['date'])).'</small>';
+                $linktext = 'r'.$svnlog['rev'].' <small>'.date(Config::get('dateformat')['byminute'], strtotime($svnlog['date'])).'</small>';
                 echo generate_link($linktext, array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig', 'rev' => $svnlog['rev']));
 
                 if ($vars['rev'] == $svnlog['rev']) {
@@ -64,29 +66,80 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $sep = ' | ';
             }
         }//end if
+        if (Config::get('rancid_repo_type') == 'git') {
+            $sep     = ' | ';
+
+            $process = new Process(array('git', 'log', '-n 8', '--pretty=format:%h;%ct', $file), $configs);
+            $process->run();
+            $gitlogs_raw = explode(PHP_EOL, $process->getOutput());
+            $gitlogs = array();
+
+            foreach ($gitlogs_raw as $gl) {
+                list($rev, $ts) = explode(";", $gl);
+                $gitlogs[] = array("rev" => $rev, "date" => $ts);
+            }
+
+            $revlist = array();
+
+            foreach ($gitlogs as $gitlog) {
+                echo $sep;
+                $revlist[] = $gitlog['rev'];
+
+                if ($vars['rev'] == $gitlog['rev']) {
+                    echo '<span class="pagemenu-selected">';
+                }
+
+                $linktext = 'r'.$gitlog['rev'].' <small>'.date(Config::get('dateformat')['byminute'], $gitlog['date']).'</small>';
+                echo generate_link($linktext, array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig', 'rev' => $gitlog['rev']));
+
+                if ($vars['rev'] == $gitlog['rev']) {
+                    echo '</span>';
+                }
+
+                $sep = ' | ';
+            }
+        }
 
         print_optionbar_end();
 
-        if (function_exists('svn_log') && in_array($vars['rev'], $revlist)) {
-            list($diff, $errors) = svn_diff($file, ($vars['rev'] - 1), $file, $vars['rev']);
-            if (!$diff) {
-                $text = 'No Difference';
-            } else {
-                $text = '';
-                while (!feof($diff)) {
-                    $text .= fread($diff, 8192);
-                }
+        if (Config::get('rancid_repo_type') == 'svn') {
+            if (function_exists('svn_log') && in_array($vars['rev'], $revlist)) {
+                list($diff, $errors) = svn_diff($file, ($vars['rev'] - 1), $file, $vars['rev']);
+                if (!$diff) {
+                    $text = 'No Difference';
+                } else {
+                    $text = '';
+                    while (!feof($diff)) {
+                        $text .= fread($diff, 8192);
+                    }
 
-                fclose($diff);
-                fclose($errors);
+                    fclose($diff);
+                    fclose($errors);
+                }
+            } else {
+                $fh   = fopen($file, 'r') or die("Can't open file");
+                $text = fread($fh, filesize($file));
+                fclose($fh);
             }
-        } else {
-            $fh   = fopen($file, 'r') or die("Can't open file");
-            $text = fread($fh, filesize($file));
-            fclose($fh);
+        } elseif (Config::get('rancid_repo_type') == 'git') {
+            if (in_array($vars['rev'], $revlist)) {
+                $process = new Process(array('git', 'diff', $vars['rev'] . '^', $vars['rev'], $file), $configs);
+                $process->run();
+                $diff = $process->getOutput();
+                if (!$diff) {
+                    $text = 'No Difference';
+                } else {
+                    $text = $diff;
+                    $previous_config = $vars['rev'] . '^';
+                }
+            } else {
+                $fh   = fopen($file, 'r') or die("Can't open file");
+                $text = fread($fh, filesize($file));
+                fclose($fh);
+            }
         }
 
-        if ($config['rancid_ignorecomments']) {
+        if (Config::get('rancid_ignorecomments')) {
             $lines = explode("\n", $text);
             for ($i = 0; $i < count($lines); $i++) {
                 if ($lines[$i][0] == '#') {
@@ -96,11 +149,11 @@ if (Auth::user()->hasGlobalAdmin()) {
 
             $text = join("\n", $lines);
         }
-    } elseif ($config['oxidized']['enabled'] === true && isset($config['oxidized']['url'])) {
+    } elseif (Config::get('oxidized')['enabled'] === true && isset(Config::get('oxidized')['url'])) {
         // Try with hostname as set in librenms first
         $oxidized_hostname = $device['hostname'];
         // fetch info about the node and then a list of versions for that node
-        $node_info = json_decode(file_get_contents($config['oxidized']['url'].'/node/show/'.$oxidized_hostname.'?format=json'), true);
+        $node_info = json_decode(file_get_contents(Config::get('oxidized')['url'].'/node/show/'.$oxidized_hostname.'?format=json'), true);
         
         // Try other hostname format if Oxidized request failed
         if (! $node_info) {
@@ -108,18 +161,18 @@ if (Auth::user()->hasGlobalAdmin()) {
             if (strpos($oxidized_hostname, '.') !== false) {
                 // Use short name
                 $oxidized_hostname = strtok($device['hostname'], '.');
-            } elseif ($config['mydomain']) {
-                $oxidized_hostname = $device['hostname'].'.'.$config['mydomain'];
+            } elseif (Config::get('mydomain')) {
+                $oxidized_hostname = $device['hostname'].'.'.Config::get('mydomain');
             }
 
             // Try Oxidized again with new hostname, if it has changed
             if ($oxidized_hostname != $device['hostname']) {
-                $node_info = json_decode(file_get_contents($config['oxidized']['url'].'/node/show/'.$oxidized_hostname.'?format=json'), true);
+                $node_info = json_decode(file_get_contents(Config::get('oxidized')['url'].'/node/show/'.$oxidized_hostname.'?format=json'), true);
             }
         }
 
-        if ($config['oxidized']['features']['versioning'] === true) { // fetch a list of versions
-            $config_versions = json_decode(file_get_contents($config['oxidized']['url'].'/node/version?node_full='.(isset($node_info['full_name']) ? $node_info['full_name'] : $oxidized_hostname).'&format=json'), true);
+        if (Config::get('oxidized')['features']['versioning'] === true) { // fetch a list of versions
+            $config_versions = json_decode(file_get_contents(Config::get('oxidized')['url'].'/node/version?node_full='.(isset($node_info['full_name']) ? $node_info['full_name'] : $oxidized_hostname).'&format=json'), true);
         }
 
         $config_total = 1;
@@ -157,7 +210,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             }
 
             if (isset($previous_config)) {
-                $url = $config['oxidized']['url'].'/node/version/diffs?node='.$oxidized_hostname;
+                $url = Config::get('oxidized')['url'].'/node/version/diffs?node='.$oxidized_hostname;
                 if (!empty($node_info['group'])) {
                     $url .= '&group='.$node_info['group'];
                 }
@@ -166,10 +219,10 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $text = file_get_contents($url); // fetch diff
             } else {
                 // fetch current_version
-                $text = file_get_contents($config['oxidized']['url'].'/node/version/view?node='.$oxidized_hostname.(!empty($node_info['group']) ? '&group='.$node_info['group'] : '').'&oid='.$current_config['oid'].'&date='.urlencode($current_config['date']).'&num='.$current_config['version'].'&format=text');
+                $text = file_get_contents(Config::get('oxidized')['url'].'/node/version/view?node='.$oxidized_hostname.(!empty($node_info['group']) ? '&group='.$node_info['group'] : '').'&oid='.$current_config['oid'].'&date='.urlencode($current_config['date']).'&num='.$current_config['version'].'&format=text');
             }
         } else {  // just fetch the only version
-            $text = file_get_contents($config['oxidized']['url'].'/node/fetch/'.(!empty($node_info['group']) ? $node_info['group'].'/' : '').$oxidized_hostname);
+            $text = file_get_contents(Config::get('oxidized')['url'].'/node/fetch/'.(!empty($node_info['group']) ? $node_info['group'].'/' : '').$oxidized_hostname);
         }
 
         if (is_array($node_info) || $config_total > 1) {
