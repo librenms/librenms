@@ -58,7 +58,7 @@ class Nagios extends Transport
 
         $format = '';
         $format .= "[HOSTPERFDATA]\t";
-        $format .= $obj['timestamp'] . "\t";
+        $format .= strtotime($obj['timestamp']) . "\t";
         $format .= $obj['hostname'] . "\t";
         $format .= md5($obj['rule']) . "\t"; //FIXME: Better entity
         $format .= ($obj['state'] ? $obj['severity'] : "ok") . "\t";
