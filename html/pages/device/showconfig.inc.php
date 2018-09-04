@@ -3,6 +3,7 @@
 // FIXME svn stuff still using optc etc, won't work, needs updating!
 use LibreNMS\Authentication\Auth;
 use LibreNMS\Config;
+use Symfony\Component\Process\Process;
 
 if (Auth::user()->hasGlobalAdmin()) {
     if (!is_array(Config::get('rancid_configs'))) {
@@ -68,9 +69,9 @@ if (Auth::user()->hasGlobalAdmin()) {
         if (Config::get('rancid_repo_type') == 'git') {
             $sep     = ' | ';
 
-            chdir($configs);
-            $gitlogs_raw = external_exec('git log -n 8 --pretty=format:"%h;%ct" ' . $file);
-            $gitlogs_raw = explode(PHP_EOL, $gitlogs_raw);
+            $process = new Process(array('git', 'log', '-n 8', '--pretty=format:%h;%ct', $file), $configs);
+            $process->run();
+            $gitlogs_raw = explode(PHP_EOL, $process->getOutput());
             $gitlogs = array();
 
             foreach ($gitlogs_raw as $gl) {
@@ -122,8 +123,9 @@ if (Auth::user()->hasGlobalAdmin()) {
             }
         } elseif (Config::get('rancid_repo_type') == 'git') {
             if (in_array($vars['rev'], $revlist)) {
-                chdir($configs);
-                $diff = external_exec('git diff ' . $vars['rev'] . '^ ' . $vars['rev'] . ' ' . $file);
+                $process = new Process(array('git', 'diff', $vars['rev'] . '^', $vars['rev'], $file), $configs);
+                $process->run();
+                $diff = $process->getOutput();
                 if (!$diff) {
                     $text = 'No Difference';
                 } else {

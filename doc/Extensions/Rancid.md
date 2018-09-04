@@ -130,7 +130,7 @@ Add Rancid into LibreNMS config.php:
 ```php
 ### Rancid
 $config['rancid_configs'][]             = '/var/lib/rancid/librenms/configs/';
-$config['rancid_repo_type']             = 'svn';
+$config['rancid_repo_type']             = 'svn';  //'svn' or 'git'
 $config['rancid_ignorecomments']        = 0;
 ```
 
