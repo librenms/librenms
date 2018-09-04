@@ -2,9 +2,8 @@
 
 namespace LibreNMS\OS;
 
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
-use App\Models\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 

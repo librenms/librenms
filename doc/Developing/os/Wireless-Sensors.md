@@ -33,8 +33,8 @@ Your new OS class should extend LibreNMS\OS and implement the interfaces for the
 ```php
 namespace LibreNMS\OS;
 
-use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
 class Airos extends OS implements WirelessClientsDiscovery
@@ -73,8 +73,6 @@ All discovery interfaces will require you to return an array of WirelessSensor o
   - $low_limit = Defaults to null. Sets the low threshold limit for the sensor, used in alerting to report out range sensors.
   - $high_warn = Defaults to null. Sets the high warning limit for the sensor, used in alerting to report near out of range sensors.
   - $low_warn = Defaults to null. Sets the low warning limit for the sensor, used in alerting to report near out of range sensors.
-  - $entPhysicalIndex = Defaults to null. Sets the entPhysicalIndex to be used to look up further hardware if available.
-  - $entPhysicalIndexMeasured = Defaults to null. Sets the type of entPhysicalIndex used, i.e ports.
 
 Polling is done automatically based on the discovered data.  If for some reason you need to override polling, you can implement 
 the required polling interface in `LibreNMS/Interfaces/Polling/Sensors`.  Using the polling interfaces should be avoided if possible.
