@@ -208,7 +208,7 @@ Note: To use HTML emails you must set HTML email to Yes in the WebUI under Globa
 
 Note: To include Graphs you must enable unauthorized graphs in config.php. Allow_unauth_graphs_cidr is optional, but more secure.
 ```
-$config['allow_unauth_graphs_cidr'] = array(127.0.0.1/32');  
+$config['allow_unauth_graphs_cidr'] = array('127.0.0.1/32');  
 $config['allow_unauth_graphs'] = true;
 ```
 
