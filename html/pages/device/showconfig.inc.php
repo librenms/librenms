@@ -130,6 +130,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                     $text = 'No Difference';
                 } else {
                     $text = $diff;
+                    $previous_config = $vars['rev'] . '^';
                 }
             } else {
                 $fh   = fopen($file, 'r') or die("Can't open file");
