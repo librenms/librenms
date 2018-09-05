@@ -31,6 +31,8 @@ source: Support/FAQ.md
  - [Why does modifying 'Default Alert Template' fail?](#faq31)
  - [Why would alert un-mute itself](#faq32)
  - [How do I change the Device Type?](#faq33)
+ - [Where do I update my database credentials?](#faq-where-do-i-update-my-database-credentials)
+
 ### Developing
  - [How do I add support for a new OS?](#faq8)
  - [What information do you need to add a new OS?](#faq20)
@@ -352,6 +354,27 @@ mysql -u librenms -p < sql-schema/202.sql
 If alert un-mutes itself then it most likely means that the alert cleared and is then triggered again.
 Please review eventlog as it will tell you in there.
 
-### <a name ="faq33"> How do I change the Device Type?</a>
+### <a name="faq33"> How do I change the Device Type?</a>
 You can change the Device Type by going to the device you would like to change, then click on the Gear Icon -> Edit.
 If you would like to define custom types, we suggest using [Device Groups](/Extensions/Device-Groups/). They will be listed in the menu similarly to device types.
+
+### <a name="faq-where-do-i-update-my-database-credentials">Where do I update my database credentials?</a>
+If you've changed your database credentials then you will need to update LibreNMS with those new details.
+Please edit both `config.php` and `.env`
+
+config.php:
+```php
+$config['db_host'] = '';
+$config['db_user'] = '';
+$config['db_pass'] = '';
+$config['db_name'] = '';
+```
+
+.env:
+```bash
+DB_HOST=
+DB_DATABASE=
+DB_USERNAME=
+DB_PASSWORD=
+DB_PORT=
+```
