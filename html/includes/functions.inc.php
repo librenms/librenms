@@ -1530,6 +1530,15 @@ function get_oxidized_nodes_list()
         <td>
         " . $object['group'] . "
         </td>
+        <td>
+          <button class='btn btn-default btn-sm' name='btn-refresh-node-devId" . $device['device_id'] . "' id='btn-refresh-nod
+e-devId" . $device['device_id'] . "' onclick='refresh_oxidized_node(\"" . $device['hostname'] . "\")'>
+            <i class='fa fa-refresh'></i>
+          </button>
+          <a href='/device/device=".$device['device_id']."/tab=showconfig/'>
+            <i class='fa fa-align-justify fa-lg icon-theme'></i>
+          </a>
+        </td>
         </tr>";
     }
 }
