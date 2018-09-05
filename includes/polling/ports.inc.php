@@ -112,9 +112,6 @@ $ifmib_oids = array(
 );
 
 $table_base_oids = array(
-    'ifName',
-    'ifAlias',
-    'ifDescr',
     'ifHighSpeed',
     'ifOperStatus',
     'ifAdminStatus',
@@ -158,6 +155,9 @@ $nonhc_oids = array(
 );
 
 $shared_oids = array(
+    'ifName',
+    'ifAlias',
+    'ifDescr',
     'ifInErrors',
     'ifOutErrors',
     'ifInNUcastPkts',
