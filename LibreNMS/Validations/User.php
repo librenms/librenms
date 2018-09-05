@@ -74,6 +74,7 @@ class User extends BaseValidation
                     "$dir/storage/framework/sessions/",
                     "$dir/storage/framework/views/",
                     "$dir/storage/debugbar/",
+                    "$dir/.pki/", // ignore files/folders created by setting the librenms home directory to the install directory
                 );
 
                 $files = array_filter(explode(PHP_EOL, $find_result), function ($file) use ($ignore_files) {
