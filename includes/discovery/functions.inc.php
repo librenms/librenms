@@ -15,6 +15,7 @@
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Interfaces\PollerModule;
 use LibreNMS\OS;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv6;
@@ -146,6 +147,7 @@ function discover_device(&$device, $force_module = false)
         if ($device['os'] != 'generic') {
             echo "\nDevice os was updated to " . $device['os'] . '!';
             dbUpdate(array('os' => $device['os']), 'devices', '`device_id` = ?', array($device['device_id']));
+            App::forgetInstance(\LibreNMS\OS::class);  // clear OS singleton
         }
     }
 
@@ -153,49 +155,64 @@ function discover_device(&$device, $force_module = false)
     load_discovery($device);
     register_mibs($device, Config::getOsSetting($device['os'], 'register_mibs', array()), 'includes/discovery/os/' . $device['os'] . '.inc.php');
 
-    $os = OS::make($device);
-
     echo "\n";
 
-    $discovery_devices = Config::get('discovery_modules', array());
-    $discovery_devices = array('core' => true) + $discovery_devices;
+    $discovery_devices = Config::get('discovery_modules', []);
+    $discovery_devices['core'] = true;
 
-    foreach ($discovery_devices as $module => $module_status) {
-        $os_module_status = Config::getOsSetting($device['os'], "discovery_modules.$module");
+    foreach ($discovery_devices as $module_name => $module_status) {
+        $os_module_status = Config::getOsSetting($device['os'], "discovery_modules.$module_name");
         d_echo("Modules status: Global" . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
         d_echo("OS" . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
-        d_echo("Device" . (isset($attribs['discover_' . $module]) ? ($attribs['discover_' . $module] ? '+ ' : '- ') : '  '));
-        if ($force_module === true ||
-            $attribs['discover_' . $module] ||
-            ($os_module_status && !isset($attribs['discover_' . $module])) ||
-            ($module_status && !isset($os_module_status) && !isset($attribs['discover_' . $module]))
-        ) {
-            $module_start = microtime(true);
-            $start_memory = memory_get_usage();
-            echo "\n#### Load disco module $module ####\n";
-
-            try {
-                include "includes/discovery/$module.inc.php";
-            } catch (Exception $e) {
-                // isolate module exceptions so they don't disrupt the polling process
-                echo $e->getTraceAsString() .PHP_EOL;
-                c_echo("%rError in $module module.%n " . $e->getMessage() . PHP_EOL);
-                logfile("Error in $module module. " . $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL);
+        d_echo("Device" . (isset($attribs['discover_' . $module_name]) ? ($attribs['discover_' . $module_name] ? '+ ' : '- ') : '  '));
+        try {
+            if ($module_class = config('librenms.modules.' . $module_name)) {
+                $module = app($module_class);
             }
 
-            $module_time = microtime(true) - $module_start;
-            $module_time = substr($module_time, 0, 5);
-            $module_mem = (memory_get_usage() - $start_memory);
-            printf("\n>> Runtime for discovery module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
-            printChangedStats();
-            echo "#### Unload disco module $module ####\n\n";
-        } elseif (isset($attribs['discover_' . $module]) && $attribs['discover_' . $module] == '0') {
-            echo "Module [ $module ] disabled on host.\n\n";
-        } elseif (isset($os_module_status) && $os_module_status == '0') {
-            echo "Module [ $module ] disabled on os.\n\n";
-        } else {
-            echo "Module [ $module ] disabled globally.\n\n";
+            if ($force_module === true ||
+                $attribs['discover_' . $module_name] ||
+                ($os_module_status && !isset($attribs['discover_' . $module_name])) ||
+                ($module_status && !isset($os_module_status) && !isset($attribs['discover_' . $module_name]))
+            ) {
+                $module_start = microtime(true);
+                $start_memory = memory_get_usage();
+                echo "\n#### Load disco module $module_name ####\n";
+
+                if ($module instanceof PollerModule) {
+                    $module->runDiscovery();
+                } else {
+                    include "includes/discovery/$module_name.inc.php";
+                }
+
+                $module_time = microtime(true) - $module_start;
+                $module_time = substr($module_time, 0, 5);
+                $module_mem = (memory_get_usage() - $start_memory);
+                printf("\n>> Runtime for discovery module '%s': %.4f seconds with %s bytes\n", $module_name, $module_time, $module_mem);
+                printChangedStats();
+                echo "#### Unload disco module $module_name ####\n\n";
+            } else {
+                if (isset($attribs['discover_' . $module_name]) && $attribs['discover_' . $module_name] == '0') {
+                    echo "Module [ $module_name ] disabled on host.\n\n";
+                } elseif (isset($os_module_status) && $os_module_status == '0') {
+                    echo "Module [ $module_name ] disabled on os.\n\n";
+                } else {
+                    echo "Module [ $module_name ] disabled globally.\n\n";
+                }
+
+                if ($module instanceof PollerModule) {
+                    d_echo("Module [ $module_name ] cleanup.\n");
+                    $module->runCleanup();
+                }
+            }
+        } catch (Exception $e) {
+            // isolate module exceptions so they don't disrupt the polling process
+            echo $e->getTraceAsString() .PHP_EOL;
+            c_echo("%rError in $module_name module.%n " . $e->getMessage() . PHP_EOL);
+            logfile("Error in $module_name module. " . $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL);
         }
+
+        unset($module);
     }
 
     if (is_mib_poller_enabled($device)) {

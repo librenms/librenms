@@ -12,7 +12,7 @@ if ($os_name != $device['os']) {
 
     load_os($device);
     load_discovery($device);
-    $os = OS::make($device);
+    App::forgetInstance(\LibreNMS\OS::class);  // clear OS singleton
 
     echo "Changed ";
 }

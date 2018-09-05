@@ -13,7 +13,7 @@
 
 use LibreNMS\Util\FileLock;
 
-$init_modules = array('discovery');
+$init_modules = ['discovery', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
 $start         = microtime(true);

@@ -13,7 +13,7 @@
 
 use LibreNMS\Config;
 
-$init_modules = array('polling', 'alerts');
+$init_modules = ['polling', 'alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
 $poller_start = microtime(true);

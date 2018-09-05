@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Interfaces\PollerModule;
+use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppPollingFailedException;
@@ -285,58 +287,72 @@ function poll_device($device, $force_module = false)
         }
 
         printChangedStats(true); // don't count previous stats
-        foreach ($config['poller_modules'] as $module => $module_status) {
-            $os_module_status = $config['os'][$device['os']]['poller_modules'][$module];
+        foreach ($config['poller_modules'] as $module_name => $module_status) {
+            $os_module_status = $config['os'][$device['os']]['poller_modules'][$module_name];
             d_echo("Modules status: Global" . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
             d_echo("OS" . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
-            d_echo("Device" . (isset($attribs['poll_' . $module]) ? ($attribs['poll_' . $module] ? '+ ' : '- ') : '  '));
-            if ($force_module === true ||
-                $attribs['poll_'.$module] ||
-                ($os_module_status && !isset($attribs['poll_'.$module])) ||
-                ($module_status && !isset($os_module_status) && !isset($attribs['poll_' . $module]))) {
-                $start_memory = memory_get_usage();
-                $module_start = microtime(true);
-                echo "\n#### Load poller module $module ####\n";
+            d_echo("Device" . (isset($attribs['poll_' . $module_name]) ? ($attribs['poll_' . $module_name] ? '+ ' : '- ') : '  '));
 
-                try {
-                    include "includes/polling/$module.inc.php";
-                } catch (Exception $e) {
-                    // isolate module exceptions so they don't disrupt the polling process
-                    echo $e->getTraceAsString() .PHP_EOL;
-                    c_echo("%rError in $module module.%n " . $e->getMessage() . PHP_EOL);
-                    logfile("Error in $module module. " . $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL);
-                }
-
-                $module_time = microtime(true) - $module_start;
-                $module_mem  = (memory_get_usage() - $start_memory);
-                printf("\n>> Runtime for poller module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
-                printChangedStats();
-                echo "#### Unload poller module $module ####\n\n";
-
-                // save per-module poller stats
-                $tags = array(
-                    'module'      => $module,
-                    'rrd_def'     => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
-                    'rrd_name'    => array('poller-perf', $module),
-                );
-                $fields = array(
-                    'poller' => $module_time,
-                );
-                data_update($device, 'poller-perf', $tags, $fields);
-
-                // remove old rrd
-                $oldrrd = rrd_name($device['hostname'], array('poller', $module, 'perf'));
-                if (is_file($oldrrd)) {
-                    unlink($oldrrd);
-                }
-                unset($tags, $fields, $oldrrd);
-            } elseif (isset($attribs['poll_'.$module]) && $attribs['poll_'.$module] == '0') {
-                echo "Module [ $module ] disabled on host.\n\n";
-            } elseif (isset($os_module_status) && $os_module_status == '0') {
-                echo "Module [ $module ] disabled on os.\n\n";
-            } else {
-                echo "Module [ $module ] disabled globally.\n\n";
+            if ($module_class = config('librenms.modules.' . $module_name)) {
+                $module = app($module_class);
             }
+
+            try {
+                if ($force_module === true ||
+                    $attribs['poll_'.$module_name] ||
+                    ($os_module_status && !isset($attribs['poll_'.$module_name])) ||
+                    ($module_status && !isset($os_module_status) && !isset($attribs['poll_' . $module_name]))) {
+                    $start_memory = memory_get_usage();
+                    $module_start = microtime(true);
+                    echo "\n#### Load poller module $module_name ####\n";
+
+                    if ($module instanceof PollerModule) {
+                        $module->runPolling();
+                    } else {
+                        include "includes/polling/$module_name.inc.php";
+                    }
+
+
+                    $module_time = microtime(true) - $module_start;
+                    $module_mem  = (memory_get_usage() - $start_memory);
+                    printf("\n>> Runtime for poller module '%s': %.4f seconds with %s bytes\n", $module_name, $module_time, $module_mem);
+                    printChangedStats();
+                    echo "#### Unload poller module $module_name ####\n\n";
+
+                    // save per-module poller stats
+                    $tags = array(
+                        'module'      => $module_name,
+                        'rrd_def'     => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
+                        'rrd_name'    => array('poller-perf', $module_name),
+                    );
+                    $fields = array(
+                        'poller' => $module_time,
+                    );
+                    data_update($device, 'poller-perf', $tags, $fields);
+
+                    // remove old rrd
+                    $oldrrd = rrd_name($device['hostname'], array('poller', $module_name, 'perf'));
+                    if (is_file($oldrrd)) {
+                        unlink($oldrrd);
+                    }
+                    unset($tags, $fields, $oldrrd);
+                } else {
+                    if (isset($attribs['poll_'.$module_name]) && $attribs['poll_'.$module_name] == '0') {
+                        echo "Module [ $module_name ] disabled on host.\n\n";
+                    } elseif (isset($os_module_status) && $os_module_status == '0') {
+                        echo "Module [ $module_name ] disabled on os.\n\n";
+                    } else {
+                        echo "Module [ $module_name ] disabled globally.\n\n";
+                    }
+                }
+            } catch (Exception $e) {
+                // isolate module exceptions so they don't disrupt the polling process
+                echo $e->getTraceAsString() .PHP_EOL;
+                c_echo("%rError in $module_name module.%n " . $e->getMessage() . PHP_EOL);
+                logfile("Error in $module_name module. " . $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL);
+            }
+
+            unset($module);
         }
 
         // Update device_groups

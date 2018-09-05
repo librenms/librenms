@@ -28,14 +28,20 @@ namespace LibreNMS\Modules;
 use App\Models\Device;
 use App\Models\WirelessSensor;
 use Illuminate\Support\Collection;
-use LibreNMS\Interfaces\Discovery\DiscoveryModule;
-use LibreNMS\Interfaces\Polling\PollerModule;
+use LibreNMS\Interfaces\PollerModule;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\DiscoveryModelObserver;
 
-class Wireless implements DiscoveryModule, PollerModule
+class Wireless implements PollerModule
 {
+    /** @var OS $os */
+    private $os;
+
+    public function __construct(OS $os)
+    {
+        $this->os = $os;
+    }
 
     public static function discover(
         $type,
@@ -74,8 +80,8 @@ class Wireless implements DiscoveryModule, PollerModule
         if (is_null($value)) {
             $sensors = collect([$sensor]);
 
-            $prefetch = Wireless::fetchSnmpData(Device::find($device_id), $sensors);
-            $data = Wireless::processSensorData($sensors, $prefetch);
+            $prefetch = self::fetchSnmpData(Device::find($device_id), $sensors);
+            $data = self::processSensorData($sensors, $prefetch);
 
             $sensor_array['value'] = $data->first();
         }
@@ -103,7 +109,7 @@ class Wireless implements DiscoveryModule, PollerModule
         return $sensor;
     }
 
-    public static function runDiscovery(OS $os)
+    public function runDiscovery()
     {
         // check yaml first
 //        $processors = self::processYaml($os);
@@ -117,13 +123,13 @@ class Wireless implements DiscoveryModule, PollerModule
             echo "$type: ";
 
             // save valid sensors, and collect ids
-            $valid_ids = Wireless::discoverType($os, $type)
+            $valid_ids = $this->discoverType($type)
                 ->filter->isValid()
                 ->each->save()
                 ->pluck(['wireless_sensor_id']);
 
             // remove invalid sensors (mass delete will not trigger Eloquent deleted event)
-            $deleted = WirelessSensor::where('device_id', $os->getDeviceId())
+            $deleted = WirelessSensor::where('device_id', $this->os->getDeviceId())
                 ->where('type', $type)
                 ->whereNotIn('wireless_sensor_id', $valid_ids)->delete();
             echo str_repeat('-', $deleted);
@@ -132,17 +138,17 @@ class Wireless implements DiscoveryModule, PollerModule
         }
     }
 
-    public static function discoverType(OS $os, $type)
+    public function discoverType($type)
     {
-        $typeInterface = Wireless::getDiscoveryInterface($type);
+        $typeInterface = $this->getDiscoveryInterface($type);
         if (!interface_exists($typeInterface)) {
             echo "ERROR: Discovery Interface doesn't exist! $typeInterface\n";
         }
 
-        $have_discovery = $os instanceof $typeInterface;
+        $have_discovery = $this->os instanceof $typeInterface;
         if ($have_discovery) {
-            $function = Wireless::getDiscoveryMethod($type);
-            $sensors = $os->$function();
+            $function = $this->getDiscoveryMethod($type);
+            $sensors = $this->os->$function();
 
             if (is_array($sensors)) {
                 return collect($sensors);
@@ -297,82 +303,80 @@ class Wireless implements DiscoveryModule, PollerModule
         return collect($types);
     }
 
-    public static function getDiscoveryInterface($type)
+    protected function getDiscoveryInterface($type)
     {
         return str_to_class($type, 'LibreNMS\\Interfaces\\Discovery\\Sensors\\Wireless') . 'Discovery';
     }
 
-    public static function getDiscoveryMethod($type)
+    public function getDiscoveryMethod($type)
     {
         return 'discoverWireless' . str_to_class($type);
     }
 
-    public static function getPollingInterface($type)
+    public function getPollingInterface($type)
     {
         return str_to_class($type, 'LibreNMS\\Interfaces\\Polling\\Sensors\\Wireless') . 'Polling';
     }
 
-    public static function getPollingMethod($type)
+    public function getPollingMethod($type)
     {
         return 'pollWireless' . str_to_class($type);
     }
 
-    public static function poll(OS $os)
+    public function runPolling()
     {
-
         // fetch and group sensors, decode oids
-        $sensors = WirelessSensor::where('device_id', $os->getDeviceId())->get()->groupBy('type');
+        $sensors = WirelessSensor::where('device_id', $this->os->getDeviceId())->get()->groupBy('type');
 
         foreach ($sensors as $type => $type_sensors) {
             // check for custom polling
-            $typeInterface = Wireless::getPollingInterface($type);
+            $typeInterface = $this->getPollingInterface($type);
             if (!interface_exists($typeInterface)) {
                 echo "ERROR: Polling Interface doesn't exist! $typeInterface\n";
             }
 
             // fetch custom data
-            if ($os instanceof $typeInterface) {
-                Wireless::pollSensorType($os, $type, $type_sensors, collect());
+            if ($this->os instanceof $typeInterface) {
+                $this->pollSensorType($type, $type_sensors, collect());
                 $sensors->forget($type); // remove from sensors array to prevent double polling
             }
         }
 
         // pre-fetch all standard sensors
         $standard_sensors = $sensors->flatten();
-        $pre_fetch = self::fetchSnmpData($os->getDevice(), $standard_sensors);
+        $pre_fetch = self::fetchSnmpData($this->os->getDevice(), $standard_sensors);
 
         // poll standard sensors
         foreach ($sensors as $type => $type_sensors) {
-            Wireless::pollSensorType($os, $type, $type_sensors, $pre_fetch);
+            $this->pollSensorType($type, $type_sensors, $pre_fetch);
         }
     }
 
     /**
      * Poll all sensors of a specific class
      *
-     * @param OS $os
      * @param string $type
      * @param Collection $sensors
      * @param Collection|array $prefetch
      */
-    public static function pollSensorType($os, $type, $sensors, $prefetch = [])
+    public function pollSensorType($type, $sensors, $prefetch = [])
     {
         echo "$type:\n";
         $prefetch = is_array($prefetch) ? collect($prefetch) : $prefetch;
 
         // process data or run custom polling
-        $typeInterface = self::getPollingInterface($type);
-        if ($os instanceof $typeInterface) {
+        $typeInterface = $this->getPollingInterface($type);
+        if ($this->os instanceof $typeInterface) {
             d_echo("Using OS polling for $type\n");
-            $function = self::getPollingMethod($type);
-            $data = $os->$function($sensors);
+            $function = $this->getPollingMethod($type);
+            $data = $this->os->$function($sensors);
         } else {
             $data = self::processSensorData($sensors, $prefetch);
         }
 
         d_echo($data);
 
-        self::recordSensorData($os, $sensors, $data);
+        $this->recordSensorData($sensors, $data);
     }
 
     /**
@@ -456,14 +460,13 @@ class Wireless implements DiscoveryModule, PollerModule
     /**
      * Record sensor data in the database and data stores
      *
-     * @param $os
      * @param Collection $sensors
      * @param Collection $data
      */
-    public static function recordSensorData(OS $os, $sensors, $data)
+    public function recordSensorData($sensors, $data)
     {
         $types = Wireless::getTypes();
-        $hostname = $os->getDevice()['hostname'];
+        $hostname = $this->os->getDevice()['hostname'];
 
         /** @var WirelessSensor $sensor */
         foreach ($sensors as $sensor) {
@@ -489,7 +492,7 @@ class Wireless implements DiscoveryModule, PollerModule
                 'rrd_name' => $rrd_name,
                 'rrd_def' => $rrd_def
             ];
-            data_update($os->getDevice(), $sensor->measurementName(), $tags, $fields);
+            data_update($this->os->getDevice(), $sensor->measurementName(), $tags, $fields);
 
             $sensor->fill([
                 'previous_value' => $sensor->value,
@@ -499,4 +502,15 @@ class Wireless implements DiscoveryModule, PollerModule
             $sensor->save();
         }
     }
+
+    /**
+     * Remove all side effects of this module for the device attached to this OS
+     *
+     * @return void
+     */
+    public function runCleanup()
+    {
+        WirelessSensor::where('device_id', $this->os->getDeviceId())->delete();
+    }
+
 }

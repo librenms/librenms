@@ -67,6 +67,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->singleton(\LibreNMS\OS::class, function ($app) {
+            global $device;
+            return \LibreNMS\OS::make($device);
+        });
     }
 }

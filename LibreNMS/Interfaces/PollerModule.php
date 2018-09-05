@@ -1,6 +1,6 @@
 <?php
 /**
- * wireless.inc.php
+ * PollerModule.php
  *
  * -Description-
  *
@@ -19,10 +19,36 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017-2018 Tony Murray
+ * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\Modules\Wireless;
+namespace LibreNMS\Interfaces;
 
-Wireless::runDiscovery($os);
+use LibreNMS\OS;
+
+interface PollerModule
+{
+    public function __construct(OS $os);
+
+    /**
+     * Run discovery for this module against the OS (with device attached)
+     *
+     * @return void
+     */
+    public function runDiscovery();
+
+    /**
+     * Poll the device contain in this OS
+     *
+     * @return void
+     */
+    public function runPolling();
+
+    /**
+     * Remove all side effects of this module for the device attached to this OS
+     *
+     * @return void
+     */
+    public function runCleanup();
+}
