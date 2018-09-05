@@ -1557,7 +1557,7 @@ function fping($host, $count = 3, $interval = 1000, $timeout = 500, $address_fam
 
     $process = new Process($cmd);
     $process->run(function ($type, $buffer) {
-        if (preg_match('#= (\d+)/(\d+)/(\d+)%, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+)$#', $buffer, $parsed)) {
+        if ($type === Process::ERR && preg_match('#= (\d+)/(\d+)/(\d+)%, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+)$#', $buffer, $parsed)) {
             list(, $xmt, $rcv, $loss, $min, $avg, $max) = $parsed;
 
             if ($loss < 0) {
