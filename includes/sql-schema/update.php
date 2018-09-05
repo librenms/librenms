@@ -44,9 +44,9 @@ try {
 
     if ($db_rev === 0) {
         $migrate_opts['--seed'] = true;
-        \Artisan::call('migrate', $migrate_opts);
+        $return = \Artisan::call('migrate', $migrate_opts);
     } elseif ($db_rev == 1000) {
-        \Artisan::call('migrate', $migrate_opts);
+        $return = \Artisan::call('migrate', $migrate_opts);
     } else {
         // legacy update
         d_echo("DB Schema update started....\n");

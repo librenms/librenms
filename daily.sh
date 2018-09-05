@@ -223,8 +223,7 @@ main () {
             no-code-update)
                 # Updates of the code are disabled, just check for schema updates
                 # and clean up the db.
-                # status_run 'Updating SQL-Schema' 'php includes/sql-schema/update.php'
-                status_run 'Updating SQL-Schema' 'php artisan migrate'
+                status_run 'Updating SQL-Schema' 'php includes/sql-schema/update.php'
                 status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
             ;;
             post-pull)
@@ -246,8 +245,7 @@ main () {
                 fi
 
                 # List all tasks to do after pull in the order of execution
-                # status_run 'Updating SQL-Schema' 'php includes/sql-schema/update.php'
-                status_run 'Updating SQL-Schema' 'php artisan migrate'
+                status_run 'Updating SQL-Schema' 'php includes/sql-schema/update.php'
                 status_run 'Updating submodules' "$DAILY_SCRIPT submodules"
                 status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
                 status_run 'Fetching notifications' "$DAILY_SCRIPT notifications"
