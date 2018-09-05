@@ -555,8 +555,8 @@ device_perf:
     - { Field: max, Type: float, 'Null': false, Extra: '' }
     - { Field: avg, Type: float, 'Null': false, Extra: '' }
   Indexes:
-    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
     id: { Name: id, Columns: [id], Unique: false, Type: BTREE }
+    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
 device_relationships:
   Columns:
     - { Field: parent_device_id, Type: 'int(11) unsigned', 'Null': false, Extra: '', Default: '0' }
