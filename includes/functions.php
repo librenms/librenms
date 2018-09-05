@@ -1553,28 +1553,29 @@ function fping($host, $count = 3, $interval = 1000, $timeout = 500, $address_fam
 
     d_echo("[FPING] $cmd\n");
 
+    $response = ['xmt' => 0, 'rcv' => 0, 'loss' => 0, 'min' => 0, 'max' => 0, 'avg' => 0, 'exitcode' => 1];
+
     $process = new Process($cmd);
-    $process->run();
-    $output = $process->getErrorOutput();
+    $process->run(function ($type, $buffer) {
+        if (preg_match('#= (\d+)/(\d+)/(\d+)%, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+)$#', $buffer, $parsed)) {
+            list(, $xmt, $rcv, $loss, $min, $avg, $max) = $parsed;
 
-    preg_match('#= (\d+)/(\d+)/(\d+)%, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+)$#', $output, $parsed);
-    list(, $xmt, $rcv, $loss, $min, $avg, $max) = $parsed;
+            if ($loss < 0) {
+                $xmt = 1;
+                $rcv = 1;
+                $loss = 100;
+            }
 
-    if ($loss < 0) {
-        $xmt = 1;
-        $rcv = 1;
-        $loss = 100;
-    }
+            $response['xmt'] = set_numeric($xmt);
+            $response['rcv'] = set_numeric($rcv);
+            $response['loss'] = set_numeric($loss);
+            $response['min'] = set_numeric($min);
+            $response['max'] = set_numeric($max);
+            $response['avg'] = set_numeric($avg);
+        }
+    });
 
-    $response = [
-        'xmt'  => set_numeric($xmt),
-        'rcv'  => set_numeric($rcv),
-        'loss' => set_numeric($loss),
-        'min'  => set_numeric($min),
-        'max'  => set_numeric($max),
-        'avg'  => set_numeric($avg),
-        'exitcode' => $process->getExitCode(),
-    ];
+    $response['exitcode'] = $process->getExitCode();
     d_echo($response);
 
     return $response;
