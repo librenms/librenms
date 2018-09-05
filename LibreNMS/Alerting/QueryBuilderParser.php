@@ -146,7 +146,7 @@ class QueryBuilderParser implements \JsonSerializable
     public static function fromJson($json)
     {
         if (!is_array($json)) {
-            $json = json_decode($json, true);
+            $json = json_decode($json, true) ?: [];
         }
 
         return new static($json);
