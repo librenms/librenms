@@ -234,7 +234,7 @@ Route: `/api/v0/rules`
 
 Input (JSON):
 
-  - device_id: This is either the device id or -1 for a global rule
+  - devices: This is either an array of device ids or -1 for a global rule
   - builder: The rule which should be in the format entity.condition value (i.e devices.status != 0 for devices marked as down). It must be json encoded in the format rules are currently stored.
   - severity: The severity level the alert will be raised against, Ok, Warning, Critical.
   - disabled: Whether the rule will be disabled or not, 0 = enabled, 1 = disabled
@@ -246,7 +246,7 @@ Input (JSON):
 
 Example:
 ```curl
-curl -X POST -d '{"device_id":"-1", "builder":"{\"condition\":\"AND\",\"rules\":[{\"id\":\"devices.hostname\",\"field\":\"devices.hostname\",\"type\":\"string\",\"input\":\"text\",\"operator\":\"equal\",\"value\":\"localhost\"}],\"valid\":true}","severity": "critical","count":15,"delay":"5 m","mute":false}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/rules
+curl -X POST -d '{"device_id":[1,2,3], "name": "testrule", builder":"{\"condition\":\"AND\",\"rules\":[{\"id\":\"devices.hostname\",\"field\":\"devices.hostname\",\"type\":\"string\",\"input\":\"text\",\"operator\":\"equal\",\"value\":\"localhost\"}],\"valid\":true}","severity": "critical","count":15,"delay":"5 m","mute":false}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/rules
 ```
 
 Output:
@@ -269,7 +269,7 @@ Route: `/api/v0/rules`
 Input (JSON):
 
   - rule_id: You must specify the rule_id to edit an existing rule, if this is absent then a new rule will be created.
-  - device_id: This is either the device id or -1 for a global rule
+  - devices: This is either an array of device ids or -1 for a global rule
   - builder: The rule which should be in the format entity.condition value (i.e devices.status != 0 for devices marked as down). It must be json encoded in the format rules are currently stored.
   - severity: The severity level the alert will be raised against, Ok, Warning, Critical.
   - disabled: Whether the rule will be disabled or not, 0 = enabled, 1 = disabled
@@ -281,7 +281,7 @@ Input (JSON):
 
 Example:
 ```curl
-curl -X PUT -d '{"rule_id":1,"device_id":"-1", "builder":"{\"condition\":\"AND\",\"rules\":[{\"id\":\"devices.hostname\",\"field\":\"devices.hostname\",\"type\":\"string\",\"input\":\"text\",\"operator\":\"equal\",\"value\":\"localhost\"}],\"valid\":true}","severity": "critical","count":15,"delay":"5 m","mute":false}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/rules
+curl -X PUT -d '{"rule_id":1,"device_id":"-1", "name": "testrule", "builder":"{\"condition\":\"AND\",\"rules\":[{\"id\":\"devices.hostname\",\"field\":\"devices.hostname\",\"type\":\"string\",\"input\":\"text\",\"operator\":\"equal\",\"value\":\"localhost\"}],\"valid\":true}","severity": "critical","count":15,"delay":"5 m","mute":false}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/rules
 ```
 
 Output:
