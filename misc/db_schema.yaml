@@ -1105,8 +1105,8 @@ poller_cluster:
 poller_cluster_stats:
   Columns:
     - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
-    - { Field: parent_poller, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
-    - { Field: poller_type, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
+    - { Field: parent_poller, Type: int(11), 'Null': false, Extra: '', Default: '0' }
+    - { Field: poller_type, Type: varchar(64), 'Null': false, Extra: '', Default: '' }
     - { Field: depth, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
     - { Field: devices, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
     - { Field: worker_seconds, Type: 'double unsigned', 'Null': false, Extra: '' }

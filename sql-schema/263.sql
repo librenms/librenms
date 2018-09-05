@@ -99,3 +99,6 @@ ALTER TABLE `poller_cluster_stats` DROP INDEX `PRIMARY`;
 ALTER TABLE `poller_cluster_stats` ADD PRIMARY KEY (`id`);
 ALTER TABLE `poller_cluster_stats` MODIFY `id` int(11) NOT NULL auto_increment;
 ALTER TABLE `poller_cluster_stats` ADD UNIQUE `parent_poller_poller_type` (`parent_poller`, `poller_type`);
+ALTER TABLE `poller_cluster_stats` CHANGE `parent_poller` `parent_poller` int(11) NOT NULL DEFAULT 0 ;
+ALTER TABLE `poller_cluster_stats` CHANGE `poller_type` `poller_type` varchar(64) NOT NULL DEFAULT '' ;
+
