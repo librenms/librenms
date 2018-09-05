@@ -463,7 +463,7 @@ devices:
     - { Field: last_discovered_timetaken, Type: 'double(5,2)', 'Null': true, Extra: '' }
     - { Field: last_discovered, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: last_ping, Type: timestamp, 'Null': true, Extra: '' }
-    - { Field: last_ping_timetaken, Type: 'double(5,2)', 'Null': true, Extra: '' }
+    - { Field: last_ping_timetaken, Type: 'double(8,2)', 'Null': true, Extra: '' }
     - { Field: purpose, Type: text, 'Null': true, Extra: '' }
     - { Field: type, Type: varchar(20), 'Null': false, Extra: '', Default: '' }
     - { Field: serial, Type: text, 'Null': true, Extra: '' }
