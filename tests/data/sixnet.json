@@ -3831,21 +3831,21 @@
         "discovery": {
             "sensors": [
                 {
-                    "sensor_deleted": "0",
+                    "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.20540.2.1.1.3.0",
                     "sensor_index": "oKstatus.0",
                     "sensor_type": "oKstatus",
                     "sensor_descr": "Ok Relay",
-                    "sensor_divisor": "1",
-                    "sensor_multiplier": "1",
-                    "sensor_current": "0",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
-                    "sensor_alert": "1",
+                    "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
@@ -3854,21 +3854,21 @@
                     "state_name": "oKstatus"
                 },
                 {
-                    "sensor_deleted": "0",
+                    "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.20540.2.1.1.1.0",
                     "sensor_index": "p1status.0",
                     "sensor_type": "p1status",
                     "sensor_descr": "Power Supply #1",
-                    "sensor_divisor": "1",
-                    "sensor_multiplier": "1",
-                    "sensor_current": "1",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
-                    "sensor_alert": "1",
+                    "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
@@ -3877,21 +3877,21 @@
                     "state_name": "p1status"
                 },
                 {
-                    "sensor_deleted": "0",
+                    "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.20540.2.1.1.2.0",
                     "sensor_index": "p2status.0",
                     "sensor_type": "p2status",
                     "sensor_descr": "Power Supply #2",
-                    "sensor_divisor": "1",
-                    "sensor_multiplier": "1",
-                    "sensor_current": "0",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
-                    "sensor_alert": "1",
+                    "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
@@ -3904,65 +3904,65 @@
                 {
                     "state_name": "oKstatus",
                     "state_descr": "Off",
-                    "state_draw_graph": "1",
-                    "state_value": "0",
-                    "state_generic_value": "2"
+                    "state_draw_graph": 1,
+                    "state_value": 0,
+                    "state_generic_value": 2
                 },
                 {
                     "state_name": "oKstatus",
                     "state_descr": "On",
-                    "state_draw_graph": "1",
-                    "state_value": "1",
-                    "state_generic_value": "0"
+                    "state_draw_graph": 1,
+                    "state_value": 1,
+                    "state_generic_value": 0
                 },
                 {
                     "state_name": "oKstatus",
                     "state_descr": "Unknown",
-                    "state_draw_graph": "1",
-                    "state_value": "2",
-                    "state_generic_value": "3"
+                    "state_draw_graph": 1,
+                    "state_value": 2,
+                    "state_generic_value": 3
                 },
                 {
                     "state_name": "p1status",
                     "state_descr": "Off",
-                    "state_draw_graph": "1",
-                    "state_value": "0",
-                    "state_generic_value": "2"
+                    "state_draw_graph": 1,
+                    "state_value": 0,
+                    "state_generic_value": 2
                 },
                 {
                     "state_name": "p1status",
                     "state_descr": "On",
-                    "state_draw_graph": "1",
-                    "state_value": "1",
-                    "state_generic_value": "0"
+                    "state_draw_graph": 1,
+                    "state_value": 1,
+                    "state_generic_value": 0
                 },
                 {
                     "state_name": "p1status",
                     "state_descr": "Unknown",
-                    "state_draw_graph": "1",
-                    "state_value": "2",
-                    "state_generic_value": "3"
+                    "state_draw_graph": 1,
+                    "state_value": 2,
+                    "state_generic_value": 3
                 },
                 {
                     "state_name": "p2status",
                     "state_descr": "Off",
-                    "state_draw_graph": "1",
-                    "state_value": "0",
-                    "state_generic_value": "2"
+                    "state_draw_graph": 1,
+                    "state_value": 0,
+                    "state_generic_value": 2
                 },
                 {
                     "state_name": "p2status",
                     "state_descr": "On",
-                    "state_draw_graph": "1",
-                    "state_value": "1",
-                    "state_generic_value": "0"
+                    "state_draw_graph": 1,
+                    "state_value": 1,
+                    "state_generic_value": 0
                 },
                 {
                     "state_name": "p2status",
                     "state_descr": "Unknown",
-                    "state_draw_graph": "1",
-                    "state_value": "2",
-                    "state_generic_value": "3"
+                    "state_draw_graph": 1,
+                    "state_value": 2,
+                    "state_generic_value": 3
                 }
             ]
         },

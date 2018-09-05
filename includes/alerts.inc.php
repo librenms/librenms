@@ -279,7 +279,7 @@ function GetContacts($results)
             }
         }
         if (is_numeric($result["port_id"])) {
-            $tmpa = dbFetchRows("SELECT user_id FROM ports_perms WHERE access_level >= 0 AND port_id = ?", array($result["port_id"]));
+            $tmpa = dbFetchRows("SELECT user_id FROM ports_perms WHERE port_id = ?", array($result["port_id"]));
             foreach ($tmpa as $tmp) {
                 $uids[$tmp['user_id']] = $tmp['user_id'];
             }
@@ -295,7 +295,7 @@ function GetContacts($results)
                     $contacts[$tmpa] = '';
                 }
             }
-            $tmpa = dbFetchRows("SELECT user_id FROM devices_perms WHERE access_level >= 0 AND device_id = ?", array($result["device_id"]));
+            $tmpa = dbFetchRows("SELECT user_id FROM devices_perms WHERE device_id = ?", array($result["device_id"]));
             foreach ($tmpa as $tmp) {
                 $uids[$tmp['user_id']] = $tmp['user_id'];
             }
