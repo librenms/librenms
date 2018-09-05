@@ -1054,15 +1054,23 @@ function add_edit_rule()
     check_is_admin();
     $app  = \Slim\Slim::getInstance();
     $data = json_decode(file_get_contents('php://input'), true);
-
-    $rule_id = mres($data['rule_id']);
-    $device_id = mres($data['device_id']);
-    if (empty($device_id) && !isset($rule_id)) {
-        api_error(400, 'Missing the device id or global device id (-1)');
+    if (json_last_error()) {
+        api_error(500, "We couldn't parse the provided json");
     }
 
-    if ($device_id == 0) {
-        $device_id = '-1';
+    $rule_id = mres($data['rule_id']);
+    $tmp_devices = (array)mres($data['devices']);
+    $groups  = (array)$data['groups'];
+    if (empty($tmp_devices) && !isset($rule_id)) {
+        api_error(400, 'Missing the devices or global device (-1)');
+    }
+
+    $devices = [];
+    foreach ($tmp_devices as $device) {
+        if ($device == "-1") {
+            continue;
+        }
+        $devices[] = ctype_digit($device) ? $device : getidbyname($device);
     }
 
     $builder = $data['builder'] ?: $data['rule'];
@@ -1106,14 +1114,20 @@ function add_edit_rule()
         'mute'  => $mute,
         'count' => $count,
         'delay' => $delay_sec,
-        'override_query' => $override_query,
+        'options' =>
+            [
+                'override_query' => $override_query
+            ],
     ];
     $extra_json = json_encode($extra);
 
     if ($override_query === 'on') {
         $query = $adv_query;
     } else {
-        $query = QueryBuilderParser::fromJson($builder);
+        $query = QueryBuilderParser::fromJson($builder)->toSql();
+        if (empty($query)) {
+            api_error(500, "We couldn't parse your rule");
+        }
     }
 
     if (!isset($rule_id)) {
@@ -1122,7 +1136,7 @@ function add_edit_rule()
         }
     } else {
         if (dbFetchCell("SELECT name FROM alert_rules WHERE name=? AND id !=? ", array($name, $rule_id)) == $name) {
-            api_error(500, 'Addition failed : Name has already been used');
+            api_error(500, 'Update failed : Invalid rule id');
         }
     }
 
@@ -1130,10 +1144,12 @@ function add_edit_rule()
         if (!(dbUpdate(array('name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json), 'alert_rules', 'id=?', array($rule_id)) >= 0)) {
             api_error(500, 'Failed to update existing alert rule');
         }
-    } elseif (!dbInsert(array('name' => $name, 'device_id' => $device_id, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json), 'alert_rules')) {
+    } elseif (!$rule_id = dbInsert(array('name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json), 'alert_rules')) {
         api_error(500, 'Failed to create new alert rule');
     }
 
+    dbSyncRelationship('alert_device_map', 'rule_id', $rule_id, 'device_id', $devices);
+    dbSyncRelationship('alert_group_map', 'rule_id', $rule_id, 'group_id', $groups);
     api_success_noresult(200);
 }
 
