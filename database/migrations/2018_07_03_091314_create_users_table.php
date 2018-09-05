@@ -26,8 +26,8 @@ class CreateUsersTable extends Migration
             $table->string('remember_token', 100)->nullable();
         });
 
-        \DB::statement("ALTER TABLE `users` CHANGE `created_at` `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ;");
-        \DB::statement("ALTER TABLE `users` CHANGE `updated_at` `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ;");
+        \DB::statement("ALTER TABLE `users` CHANGE `created_at` `created_at` timestamp NOT NULL DEFAULT '1970-01-02 00:00:01'");
+        \DB::statement("ALTER TABLE `users` CHANGE `updated_at` `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP");
     }
 
     /**

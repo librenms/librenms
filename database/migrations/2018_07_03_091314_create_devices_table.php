@@ -31,7 +31,7 @@ class CreateDevicesTable extends Migration
             $table->integer('timeout')->nullable();
             $table->integer('retries')->nullable();
             $table->boolean('snmp_disable')->default(0);
-            $table->string('bgpLocalAs', 16)->nullable();
+            $table->unsignedInteger('bgpLocalAs')->nullable();
             $table->string('sysObjectID', 128)->nullable();
             $table->text('sysDescr')->nullable();
             $table->text('sysContact')->nullable();
