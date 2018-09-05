@@ -29,6 +29,7 @@ function prometheus_push($device, $measurement, $tags, $fields)
                         $k = preg_replace('/([a-z]{1,})/', '$1_', $k); // Generally, metric naming in Prometheus is done with underscores without capital letters
                         $k = substr($k, 0, -1);
                         $k = preg_replace('/([_]{2})/', '_', $k);
+                        $k = preg_replace('/([0-9]{1,})(.*)/', '$2$1', $k); // Prometheus does not accept metric names that start with numbers, so we switch them
                         $k = strtolower($k);
                         $vals = $vals . "$k $v\n";
                     }
@@ -36,11 +37,7 @@ function prometheus_push($device, $measurement, $tags, $fields)
 
                 foreach ($tags as $t => $v) {
                     if ($v !== null) {
-                        if (strpos($v, "/") === false) {
-                            ;
-                        } else {
-                            $v = str_replace("/", "", $v); // Prometheus does not accept "/" symbol in label names, so we need to strip them out
-                        }
+                        $v = str_replace("/", "", $v); // Prometheus does not accept "/" symbol in label names, so we need to strip them out
                         $promtags = $promtags . "/$t/$v";
                     }
                 }
