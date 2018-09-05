@@ -22,12 +22,10 @@ class CreateUsersTable extends Migration
             $table->char('descr', 30);
             $table->tinyInteger('level')->default(0);
             $table->boolean('can_modify_passwd')->default(1);
-            $table->timestamps();
+            $table->timestamp('created_at')->default('1970-01-02 00:00:01');
+            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->string('remember_token', 100)->nullable();
         });
-
-        \DB::statement("ALTER TABLE `users` CHANGE `created_at` `created_at` timestamp NOT NULL DEFAULT '1970-01-02 00:00:01'");
-        \DB::statement("ALTER TABLE `users` CHANGE `updated_at` `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP");
     }
 
     /**
