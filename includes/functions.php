@@ -1553,7 +1553,7 @@ function fping($host, $count = 3, $interval = 1000, $timeout = 500, $address_fam
 
     d_echo("[FPING] $cmd\n");
 
-    $response = ['xmt' => 0, 'rcv' => 0, 'loss' => 0, 'min' => 0, 'max' => 0, 'avg' => 0, 'exitcode' => 1];
+    $response = ['xmt' => 0, 'rcv' => 0, 'loss' => 100, 'min' => 0, 'max' => 0, 'avg' => 0, 'exitcode' => 1];
 
     $process = new Process($cmd);
     $process->run(function ($type, $buffer) {
