@@ -1,6 +1,4 @@
 <?php
 
-use LibreNMS\Device\Processor;
-use LibreNMS\OS;
-
-Processor::runDiscovery($os);
+// Call runDiscovery with dependency injection to resolve OS
+app()->call('LibreNMS\Device\Processor::runDiscovery');

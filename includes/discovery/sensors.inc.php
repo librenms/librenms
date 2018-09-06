@@ -7,7 +7,7 @@ use LibreNMS\OS;
 $valid['sensor'] = array();
 
 /** @var OS $os */
-$pre_cache = $os->preCache();
+$pre_cache = app()->make(\LibreNMS\OS::class)->preCache();
 
 // Run custom sensors
 require 'includes/discovery/sensors/cisco-entity-sensor.inc.php';

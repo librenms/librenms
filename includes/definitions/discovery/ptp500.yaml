@@ -48,10 +48,17 @@ modules:
     wireless:
         power:
             data:
-                oid: transmitPower
-                num_oid: .1.3.6.1.4.1.17713.5.12.3.0
-                index: 0
-                descr: PTP500 Transmit
-                divisor: 10
-                type: ptp500-tx
+                -
+                    oid: transmitPower
+                    num_oid: .1.3.6.1.4.1.17713.5.12.3.0
+                    index: 0
+                    descr: PTP500 Transmit
+                    divisor: 10
+                    subtype: ptp500-tx
+                -
+                    oid: receivePower
+                    num_oid: .1.3.6.1.4.1.17713.5.12.1.0
+                    descr: PTP500 Receive
+                    subtype: ptp500-rx
+                    divisor: 10
 

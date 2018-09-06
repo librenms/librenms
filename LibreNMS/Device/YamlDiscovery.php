@@ -26,6 +26,7 @@
 namespace LibreNMS\Device;
 
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
 class YamlDiscovery
@@ -41,11 +42,6 @@ class YamlDiscovery
         $pre_cache = $os->preCache();
         $items = array();
 
-        // convert to class name for static call below
-        if (is_object($class)) {
-            $class = get_class($class);
-        }
-
         d_echo("YAML Discovery Data: ");
         d_echo($yaml_data);
 
@@ -57,7 +53,7 @@ class YamlDiscovery
             $group_options = isset($first_yaml['options']) ? $first_yaml['options'] : array();
 
             // find the data array, we could already be at for simple modules
-            if (isset($data['data'])) {
+            if (isset($data['data'])) { // FIXME always false
                 $first_yaml = $first_yaml['data'];
             } elseif ($first_key !== 'data') {
                 continue;
@@ -78,6 +74,11 @@ class YamlDiscovery
                         $data['value'] = $data['oid'];
                     }
 
+                    // set the type if given
+                    if (isset($yaml_data['type'])) {
+                        $current_data['type'] = $yaml_data['type'];
+                    }
+
                     foreach ($data as $name => $value) {
                         if ($name == '$oid' || $name == 'skip_values') {
                             $current_data[$name] = $value;
@@ -94,7 +95,12 @@ class YamlDiscovery
                         continue;
                     }
 
-                    $item = $class::fromYaml($os, $index, $current_data);
+                    if (is_object($class)) {
+                        /** @var Wireless $class */
+                        $item = $class->fromYaml($index, $current_data);
+                    } else {
+                        $item = $class::fromYaml($os, $index, $current_data);
+                    }
 
                     if ($item->isValid()) {
                         $items[] = $item;
@@ -206,6 +212,8 @@ class YamlDiscovery
                                 $snmp_flag .= ' -Ih';
 
                                 $mib = $device['dynamic_discovery']['mib'];
+                                global $now;
+                                $now = true;
                                 $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid], $mib, null, $snmp_flag);
                             }
                         }
@@ -252,7 +260,7 @@ class YamlDiscovery
             }
         }
 
-        $skip_value_gt = array_reduce((array)$group_options['skip_value_gt'], (array)$yaml_item_data['skip_value_gt']);
+        $skip_value_gt = array_replace((array)$group_options['skip_value_gt'], (array)$yaml_item_data['skip_value_gt']);
         foreach ($skip_value_gt as $skip_value) {
             if ($value > $skip_value) {
                 return true;

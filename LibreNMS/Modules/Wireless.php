@@ -28,6 +28,7 @@ namespace LibreNMS\Modules;
 use App\Models\Device;
 use App\Models\WirelessSensor;
 use Illuminate\Support\Collection;
+use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Interfaces\PollerModule;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
@@ -73,6 +74,7 @@ class Wireless implements PollerModule
         $sensor_array = get_defined_vars();
 
 
+        /** @var WirelessSensor $sensor */
         $sensor = WirelessSensor::where('device_id', $device_id)
             ->firstOrNew(compact(['type', 'subtype', 'index']), $sensor_array);
 
@@ -111,9 +113,6 @@ class Wireless implements PollerModule
 
     public function runDiscovery()
     {
-        // check yaml first
-//        $processors = self::processYaml($os);
-
         // output update status, but don't install listener twice (tests)
         if (!WirelessSensor::getEventDispatcher()->hasListeners('eloquent.created: App\Models\WirelessSensor')) {
             WirelessSensor::observe(new DiscoveryModelObserver());
@@ -122,9 +121,22 @@ class Wireless implements PollerModule
         foreach (self::getTypes() as $type => $descr) {
             echo "$type: ";
 
+            // check yaml first
+            $device = $this->os->getDevice();
+            if (empty($device['dynamic_discovery']['modules']['wireless'][$type])) {
+                d_echo("No YAML Discovery data.\n");
+            } else {
+                $yaml_config = $device['dynamic_discovery']['modules']['wireless'][$type];
+                $yaml_config['type'] = $type;
+                $discovered = collect(YamlDiscovery::discover($this->os, $this, $yaml_config));
+            }
+
+            if (empty($discovered)) {
+                $discovered = $this->discoverType($type);
+            }
+
             // save valid sensors, and collect ids
-            $valid_ids = $this->discoverType($type)
-                ->filter->isValid()
+            $valid_ids = $discovered->filter->isValid()
                 ->each->save()
                 ->pluck(['wireless_sensor_id']);
 
@@ -138,7 +150,25 @@ class Wireless implements PollerModule
         }
     }
 
-    public function discoverType($type)
+    public function fromYaml($index, array $data)
+    {
+        return static::discover(
+            $data['type'],
+            $this->os->getDeviceId(),
+            $data['num_oid'],
+            isset($data['subtype']) ? $data['subtype'] : $this->os->getName(),
+            isset($data['index']) ? $data['index'] : $index,
+            $data['descr'],
+            $data['value'],
+            $data['multiplier'] ?: 1,
+            $data['divisor'] ?: 1,
+            $data['aggregator'] ?: 'sum',
+            null // APs not supported by yaml
+            // FIXME limits
+        );
+    }
+
+    protected function discoverType($type)
     {
         $typeInterface = $this->getDiscoveryInterface($type);
         if (!interface_exists($typeInterface)) {
@@ -308,17 +338,17 @@ class Wireless implements PollerModule
         return str_to_class($type, 'LibreNMS\\Interfaces\\Discovery\\Sensors\\Wireless') . 'Discovery';
     }
 
-    public function getDiscoveryMethod($type)
+    protected function getDiscoveryMethod($type)
     {
         return 'discoverWireless' . str_to_class($type);
     }
 
-    public function getPollingInterface($type)
+    protected function getPollingInterface($type)
     {
         return str_to_class($type, 'LibreNMS\\Interfaces\\Polling\\Sensors\\Wireless') . 'Polling';
     }
 
-    public function getPollingMethod($type)
+    protected function getPollingMethod($type)
     {
         return 'pollWireless' . str_to_class($type);
     }
@@ -359,7 +389,7 @@ class Wireless implements PollerModule
      * @param Collection $sensors
      * @param Collection|array $prefetch
      */
-    public function pollSensorType($type, $sensors, $prefetch = [])
+    protected function pollSensorType($type, $sensors, $prefetch = [])
     {
         echo "$type:\n";
         $prefetch = is_array($prefetch) ? collect($prefetch) : $prefetch;
@@ -387,7 +417,7 @@ class Wireless implements PollerModule
      * @param Collection $sensors
      * @return Collection
      */
-    public static function fetchSnmpData($device, $sensors)
+    protected static function fetchSnmpData($device, $sensors)
     {
         return self::getOidsFromSensors($sensors, get_device_oid_limit($device))
             // fetch data in chunks
@@ -412,7 +442,7 @@ class Wireless implements PollerModule
      * @param int $chunk How many oids per chunk.  Default 10.
      * @return Collection OIDs
      */
-    public static function getOidsFromSensors($sensors, $chunk = 10)
+    protected static function getOidsFromSensors($sensors, $chunk = 10)
     {
         // collect all oids and chunk them
         return $sensors->pluck('oids')->flatten()->unique()->chunk($chunk);
@@ -426,7 +456,7 @@ class Wireless implements PollerModule
      * @param Collection $prefetch
      * @return Collection
      */
-    public static function processSensorData($sensors, $prefetch)
+    protected static function processSensorData($sensors, $prefetch)
     {
         return $sensors->reduce(function (Collection $all_data, $sensor) use ($prefetch) {
             // pull out the data for this sensor
@@ -463,7 +493,7 @@ class Wireless implements PollerModule
      * @param Collection $sensors
      * @param Collection $data
      */
-    public function recordSensorData($sensors, $data)
+    protected function recordSensorData($sensors, $data)
     {
         $types = Wireless::getTypes();
         $hostname = $this->os->getDevice()['hostname'];
