@@ -220,6 +220,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             } else {
                 // fetch current_version
                 $text = file_get_contents(Config::get('oxidized')['url'].'/node/version/view?node='.$oxidized_hostname.(!empty($node_info['group']) ? '&group='.$node_info['group'] : '').'&oid='.$current_config['oid'].'&date='.urlencode($current_config['date']).'&num='.$current_config['version'].'&format=text');
+                //print_r($current_config);
             }
         } else {  // just fetch the only version
             $text = file_get_contents(Config::get('oxidized')['url'].'/node/fetch/'.(!empty($node_info['group']) ? $node_info['group'].'/' : '').$oxidized_hostname);
@@ -236,10 +237,10 @@ if (Auth::user()->hasGlobalAdmin()) {
                           <div class="panel panel-primary">
                               <div class="panel-heading">Sync status: <strong>'.$node_info['last']['status'].'</strong></div>
                               <ul class="list-group">
-                                  <li class="list-group-item"><strong>Node:</strong> '.$node_info['name'].'</strong></li>
-                                  <li class="list-group-item"><strong>IP:</strong> '.$node_info['ip'].'</strong></li>
-                                  <li class="list-group-item"><strong>Model:</strong> '.$node_info['model'].'</strong></li>
-                                  <li class="list-group-item"><strong>Last Sync:</strong> '.$node_info['last']['end'].'</strong></li>
+                                  <li class="list-group-item"><strong>Node:</strong> '.$node_info['name'].'</li>
+                                  <li class="list-group-item"><strong>IP:</strong> '.$node_info['ip'].'</li>
+                                  <li class="list-group-item"><strong>Model:</strong> '.$node_info['model'].'</li>
+                                  <li class="list-group-item"><strong>Last Sync:</strong> '.$node_info['last']['end'].' &nbsp;<button class="btn btn-primary btn-xs" style="float: right;" name="queue-refresh"  onclick=\'refresh_oxidized_node("' . $device['hostname'] . '")\'>Refresh</button></li>
                               </ul>
                           </div>
                       </div>
@@ -260,6 +261,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                 foreach ($config_versions as $version) {
                     echo '<option value="'.$version['oid'].'|'.$version['date'].'|'.$config_total.'" ';
                     if ($current_config['oid'] == $version['oid']) {
+                        $author = $version['author']['name'] . '(' . $version['author']['email'] . ')';
+                        $msg = $version['message'];
                         if (isset($previous_config)) {
                             echo 'selected>+';
                         } else {
@@ -300,6 +303,19 @@ if (Auth::user()->hasGlobalAdmin()) {
         }
     }//end if
 
+    if (!empty($author)) {
+        echo '
+                          <div class="panel panel-primary">
+                              <div class="panel-heading">Author: <strong>'.$author.'</strong></div>';
+        if (!empty($msg)) {
+            echo '
+                              <ul class="list-group">
+                                  <li class="list-group-item"><strong>Message:</strong> '.$msg.'</li>
+                              </ul>';
+        }
+        echo '
+                          </div>';
+    }
     if (!empty($text)) {
         if (isset($previous_config)) {
             $language = 'diff';
@@ -318,3 +334,29 @@ if (Auth::user()->hasGlobalAdmin()) {
 }//end if
 
 $pagetitle[] = 'Config';
+
+
+echo '
+<script type="text/javascript">
+    function refresh_oxidized_node(device_hostname){
+        $.ajax({
+            type: \'POST\',
+            url: \'ajax_form.php\',
+            data: {
+                type: "refresh-oxidized-node",
+                device_hostname: device_hostname
+            },
+            success: function (data) {
+                if(data[\'status\'] == \'ok\') {
+                    toastr.success(data[\'message\']);
+                } else {
+                    toastr.error(data[\'message\']);
+                }
+            },
+            error:function(){
+                toastr.error(\'An error occured while refreshing an oxidized node (hostname: \' + device_hostname + \')\');
+            }
+        });
+    }    
+</script>
+';
