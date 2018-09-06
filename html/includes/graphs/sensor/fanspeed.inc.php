@@ -9,7 +9,7 @@ $rrd_options .= " COMMENT:'                         Last     Max\\n'";
 $rrd_options .= " DEF:sensor=$rrd_filename:sensor:AVERAGE";
 $rrd_options .= " LINE1.5:sensor#cc0000:'".rrdtool_escape($sensor['sensor_descr'], 20)."'";
 
-if ($device["os"] == 'edgeswitch') {
+if ($config["os"][$device["os"]]["bad_fanspeed"]) {
     $rrd_options .= ' GPRINT:sensor:LAST:%3.0lf%%';
     $rrd_options .= ' GPRINT:sensor:MAX:%3.0lf%%\l';
 } else {

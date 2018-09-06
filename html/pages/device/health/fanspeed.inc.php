@@ -2,7 +2,7 @@
 
 $class = 'fanspeed';
 
-if ($device["os"] == 'edgeswitch') {
+if ($config["os"][$device["os"]]["bad_fanspeed"]) {
     $unit = '%';
 } else {
     $unit = 'RPM';
