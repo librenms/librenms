@@ -220,7 +220,6 @@ if (Auth::user()->hasGlobalAdmin()) {
             } else {
                 // fetch current_version
                 $text = file_get_contents(Config::get('oxidized')['url'].'/node/version/view?node='.$oxidized_hostname.(!empty($node_info['group']) ? '&group='.$node_info['group'] : '').'&oid='.$current_config['oid'].'&date='.urlencode($current_config['date']).'&num='.$current_config['version'].'&format=text');
-                //print_r($current_config);
             }
         } else {  // just fetch the only version
             $text = file_get_contents(Config::get('oxidized')['url'].'/node/fetch/'.(!empty($node_info['group']) ? $node_info['group'].'/' : '').$oxidized_hostname);
@@ -334,7 +333,6 @@ if (Auth::user()->hasGlobalAdmin()) {
 }//end if
 
 $pagetitle[] = 'Config';
-
 
 echo '
 <script type="text/javascript">
