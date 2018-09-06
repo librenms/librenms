@@ -294,7 +294,7 @@ function poll_device($device, $force_module = false)
             d_echo("Device" . (isset($attribs['poll_' . $module_name]) ? ($attribs['poll_' . $module_name] ? '+ ' : '- ') : '  '));
 
             if ($module_class = config('librenms.modules.' . $module_name)) {
-                $module = app($module_class);
+                $module = app()->make($module_class);
             }
 
             try {

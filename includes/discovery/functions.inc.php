@@ -167,7 +167,7 @@ function discover_device(&$device, $force_module = false)
         d_echo("Device" . (isset($attribs['discover_' . $module_name]) ? ($attribs['discover_' . $module_name] ? '+ ' : '- ') : '  '));
         try {
             if ($module_class = config('librenms.modules.' . $module_name)) {
-                $module = app($module_class);
+                $module = app()->make($module_class);
             }
 
             if ($force_module === true ||

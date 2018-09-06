@@ -25,7 +25,7 @@ return [
     'group' => env('LIBRENMS_GROUP', env('LIBRENMS_USER', 'librenms')),
 
     'modules' => [
-        'wireless' => 'LibreNMS\Modules\Wireless',
+        'wireless' => \LibreNMS\Modules\Wireless::class,
     ],
 
 ];

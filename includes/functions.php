@@ -188,7 +188,7 @@ function parse_modules($type, $options)
             }
 
             $dir = $type == 'poller' ? 'polling' : $type;
-            if (is_file("includes/$dir/$module.inc.php")) {
+            if (is_file("includes/$dir/$module.inc.php")  || config("librenms.modules.$module")) {
                 Config::set("{$type}_modules.$module", 1);
                 $override = true;
             }

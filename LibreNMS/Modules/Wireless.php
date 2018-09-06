@@ -512,5 +512,4 @@ class Wireless implements PollerModule
     {
         WirelessSensor::where('device_id', $this->os->getDeviceId())->delete();
     }
-
 }
