@@ -10,6 +10,7 @@
                     "bgpPeerAdminStatus": "stop",
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 0,
@@ -17,7 +18,7 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": "65504"
+                    "bgpLocalAs": 65504
                 },
                 {
                     "astext": "",
@@ -27,6 +28,7 @@
                     "bgpPeerAdminStatus": "stop",
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 0,
@@ -34,7 +36,7 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": "65504"
+                    "bgpLocalAs": 65504
                 }
             ],
             "bgpPeers_cbgp": []
@@ -49,6 +51,7 @@
                     "bgpPeerAdminStatus": "start",
                     "bgpLocalAddr": "192.168.3.51",
                     "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 1,
                     "bgpPeerOutUpdates": 6,
                     "bgpPeerInTotalMessages": 4875,
@@ -56,7 +59,7 @@
                     "bgpPeerFsmEstablishedTime": 259280,
                     "bgpPeerInUpdateElapsedTime": 259280,
                     "context_name": "",
-                    "bgpLocalAs": "65504"
+                    "bgpLocalAs": 65504
                 },
                 {
                     "astext": "",
@@ -66,6 +69,7 @@
                     "bgpPeerAdminStatus": "start",
                     "bgpLocalAddr": "192.168.2.58",
                     "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 1,
                     "bgpPeerOutUpdates": 87,
                     "bgpPeerInTotalMessages": 423531,
@@ -73,7 +77,7 @@
                     "bgpPeerFsmEstablishedTime": 22497219,
                     "bgpPeerInUpdateElapsedTime": 22497219,
                     "context_name": "",
-                    "bgpLocalAs": "65504"
+                    "bgpLocalAs": 65504
                 }
             ],
             "bgpPeers_cbgp": []

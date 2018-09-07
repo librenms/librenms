@@ -10,6 +10,7 @@
                     "bgpPeerAdminStatus": "stop",
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 0,
@@ -17,7 +18,7 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": "64513"
+                    "bgpLocalAs": 64513
                 },
                 {
                     "astext": "",
@@ -27,6 +28,7 @@
                     "bgpPeerAdminStatus": "stop",
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 0,
@@ -34,7 +36,7 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": "64513"
+                    "bgpLocalAs": 64513
                 },
                 {
                     "astext": "",
@@ -44,6 +46,7 @@
                     "bgpPeerAdminStatus": "stop",
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 0,
@@ -51,7 +54,7 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": "64513"
+                    "bgpLocalAs": 64513
                 }
             ],
             "bgpPeers_cbgp": [
@@ -283,6 +286,7 @@
                     "bgpPeerAdminStatus": "running",
                     "bgpLocalAddr": "192.168.99.24",
                     "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 56,
                     "bgpPeerOutUpdates": 1,
                     "bgpPeerInTotalMessages": 13199,
@@ -290,7 +294,7 @@
                     "bgpPeerFsmEstablishedTime": 361781,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": "64513"
+                    "bgpLocalAs": 64513
                 },
                 {
                     "astext": "",
@@ -300,6 +304,7 @@
                     "bgpPeerAdminStatus": "running",
                     "bgpLocalAddr": "192.168.99.24",
                     "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 6,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 14583,
@@ -307,7 +312,7 @@
                     "bgpPeerFsmEstablishedTime": 437296,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": "64513"
+                    "bgpLocalAs": 64513
                 },
                 {
                     "astext": "",
@@ -317,6 +322,7 @@
                     "bgpPeerAdminStatus": "running",
                     "bgpLocalAddr": "fd00:0028:0001:0001:0000:0000:0001:0004",
                     "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 0,
@@ -324,7 +330,7 @@
                     "bgpPeerFsmEstablishedTime": 633976,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": "64513"
+                    "bgpLocalAs": 64513
                 }
             ],
             "bgpPeers_cbgp": [
