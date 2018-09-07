@@ -41,32 +41,32 @@ use LibreNMS\Config;
     $('#alert_ack_modal').on('show.bs.modal', function () {
         if ($("#ack_alert_state").val() == 2) {
             var button_label = 'Un-acknowledge alert';
-            document.getElementById("ack_section").style.display = 'none';
+            $('#ack_section').hide();
         } else {
             var button_label = 'Acknowledge alert';
+            $('#ack_section').show();
         }
         document.getElementById('ack-alert').innerText = button_label;
-        $("#ack_until_clear").bootstrapSwitch('state', <?php echo Config::get('alert.ack_until_clear', false); ?>);
+        $("#ack_until_clear").bootstrapSwitch('state', <?php echo Config::get('alert.ack_until_clear') ? 'true' : 'false'; ?>);
     });
     $("#ack-alert").click('', function(event) {
         event.preventDefault();
         var ack_alert_id    = $("#ack_alert_id").val();
         var ack_alert_note  = $('#ack_msg').val();
         var ack_alert_state = $("#ack_alert_state").val();
-        var ack_until_clear = document.getElementById("ack_until_clear").checked;
+        var ack_until_clear = $("#ack_until_clear").bootstrapSwitch('state');
         $.ajax({
             type: "POST",
             url: "ajax_form.php",
             dataType: "json",
             data: { type: "ack-alert", alert_id: ack_alert_id, state: ack_alert_state, ack_msg: ack_alert_note, ack_until_clear: ack_until_clear },
             success: function (data) {
-                if (data.status == "ok") {
+                if (data.status === "ok") {
                     toastr.success(data.message);
-                    $(".alerts").each(function(index) {
-                        var $sortDictionary = $(this).bootgrid("getSortDictionary");
-                        $(this).reload;
-                        $(this).bootgrid("sort", $sortDictionary);
-                    });
+                    var $table = $('table.alerts');
+                    var sortDictionary = $table.bootgrid("getSortDictionary");
+                    $table.bootgrid('reload');
+                    $table.bootgrid("sort", sortDictionary);
                     $("#alert_ack_modal").modal('hide');
                 } else {
                     toastr.error(data.message);

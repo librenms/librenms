@@ -141,11 +141,11 @@ foreach (dbFetchRows($sql, $param) as $alert) {
             $msg = '<i class="fa fa-angle-double-up" style="font-size:20px;" aria-hidden="true" title="Status got better"></i>';
         }
     } elseif ((int)$alert['state'] === 2) {
-        $ack_ico = $alert_to_nack;
-    }
-
-    if ($info['until_clear'] === false) {
-        $ack_ico = $alert_to_unack;
+        if ($info['until_clear'] === false) {
+            $ack_ico = $alert_to_unack;
+        } else {
+            $ack_ico = $alert_to_nack;
+        }
     }
 
     $severity = $alert['severity'];
