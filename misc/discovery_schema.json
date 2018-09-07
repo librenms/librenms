@@ -252,6 +252,12 @@
                         "waterflow": {"$ref": "#/definitions/sensor"},
                         "eer": {"$ref": "#/definitions/sensor"}
                     }
+                },
+                "wireless": {
+                    "type": "object",
+                    "properties": {
+                        "power": {"$ref": "#/definitions/sensor"}
+                    }
                 }
             }
         }
@@ -297,8 +303,23 @@
                     "divisor": {
                         "type": "integer"
                     },
+                    "multiplier": {
+                        "type": "integer"
+                    },
                     "value": {
                         "type": "string"
+                    },
+                    "low_limit": {
+                        "type": ["integer", "string"]
+                    },
+                    "low_warn_limit": {
+                        "type": ["integer", "string"]
+                    },
+                    "warn_limit": {
+                        "type": ["integer", "string"]
+                    },
+                    "high_limit": {
+                        "type": ["integer", "string"]
                     },
                     "skip_values": {
                         "type": ["number", "array"],
@@ -323,6 +344,12 @@
                             ]
                         }
                     },
+                    "skip_value_gt": {
+                        "type": "integer"
+                    },
+                    "skip_value_lt": {
+                        "type": "integer"
+                    },
                     "snmp_flags": {
                         "type": "string"
                     },
@@ -331,8 +358,12 @@
                     },
                     "entPhysicalIndex_measured": {
                         "type": "string"
+                    },
+                    "user_func": {
+                        "type": "string"
                     }
                 },
+                "additionalProperties": false,
                 "required": [
                     "descr",
                     "num_oid",
@@ -359,7 +390,10 @@
                         }
                     ]
                 },
-                "skip_values_lt": {
+                "skip_value_gt": {
+                    "type": "integer"
+                },
+                "skip_value_lt": {
                     "type": "integer"
                 }
             },
