@@ -4,7 +4,6 @@ type: network
 icon: ubiquiti
 ifname: true
 bad_snmpEngineTime: true
-bad_fanspeed: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
