@@ -195,7 +195,7 @@ if (!Auth::user()->hasGlobalRead()) {
     print_optionbar_end();
 
     echo "<table border=0 cellspacing=0 cellpadding=5 width=100% class='table sortable'>";
-    echo '<tr style="height: 30px"><td width=1></td><th>Local address</th><th></th><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>Peer Description</th><th>State</th><th width=200>Uptime / Updates</th></tr>';
+    echo '<tr style="height: 30px"><td width=1></td><th>Local address</th><th></th><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>Peer description</th><th>State</th><th width=200>Uptime / Updates</th></tr>';
 
     if ($vars['type'] == 'external') {
         $where = 'AND D.bgpLocalAs != B.bgpPeerRemoteAs';
