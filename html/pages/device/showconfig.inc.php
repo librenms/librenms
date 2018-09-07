@@ -239,7 +239,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                   <li class="list-group-item"><strong>Node:</strong> '.$node_info['name'].'</li>
                                   <li class="list-group-item"><strong>IP:</strong> '.$node_info['ip'].'</li>
                                   <li class="list-group-item"><strong>Model:</strong> '.$node_info['model'].'</li>
-                                  <li class="list-group-item"><strong>Last Sync:</strong> '.$node_info['last']['end'].' &nbsp;<button class="btn btn-primary btn-xs" style="float: right;" name="queue-refresh"  onclick=\'refresh_oxidized_node("' . $device['hostname'] . '")\'>Refresh</button></li>
+                                  <li class="list-group-item" style="overflow:hidden"><strong>Last Sync:</strong> '.$node_info['last']['end'].' &nbsp;<button class="btn btn-primary btn-xs" style="float: right;" name="queue-refresh"  onclick=\'refresh_oxidized_node("' . $device['hostname'] . '")\'>Refresh</button></li>
                               </ul>
                           </div>
                       </div>
