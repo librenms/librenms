@@ -3,7 +3,7 @@ modules:
     sensors:
         fanspeed:
             options:
-                skip_values_lt: 0
+                skip_value_lt: 0
             data:
                 -
                     oid: fanDescriptionEntry
@@ -13,7 +13,7 @@ modules:
                     index: 'fanSpeed.{{ $index }}'
         power:
             options:
-                skip_values_lt: 0
+                skip_value_lt: 0
             data:
                 -
                     oid: powerSupplyDescriptionEntry

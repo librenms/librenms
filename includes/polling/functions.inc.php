@@ -283,7 +283,7 @@ function poll_device($device, $force_module = false)
             $config['poller_modules'] = array();
         } else {
             // we always want the core module to be included, prepend it
-            $config['poller_modules'] = array('core' => true) + $config['poller_modules'];
+            $config['poller_modules'] = ['core' => true] + $config['poller_modules'];
         }
 
         printChangedStats(true); // don't count previous stats

@@ -158,7 +158,7 @@ function discover_device(&$device, $force_module = false)
     echo "\n";
 
     $discovery_devices = Config::get('discovery_modules', []);
-    $discovery_devices['core'] = true;
+    $discovery_devices =  ['core' => true] + $discovery_devices;
 
     foreach ($discovery_devices as $module_name => $module_status) {
         $os_module_status = Config::getOsSetting($device['os'], "discovery_modules.$module_name");
