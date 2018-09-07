@@ -9,11 +9,7 @@
 preg_match("/Version [^\s]*/m", $device['sysDescr'], $matches);
 $version = trim(str_replace('Version ', '', $matches[0]));
 
-preg_match("/\(([^\s]*) (V...R...C..SPC...)/m", $device['sysDescr'], $matches);
-
-d_echo($device['sysDescr']);
-echo "\n";
-d_echo($matches);
+preg_match("/\(([^\s]*) (V[0-9]{3}R[0-9]{3}[0-9A-Z]+)/m", $device['sysDescr'], $matches);
 
 if (!empty($matches[2])) {
     $version .= " (" . trim($matches[2]) . ")";
@@ -28,9 +24,9 @@ if (!empty($matches[1])) {
     $oidList[] = '.1.3.6.1.4.1.2011.5.25.183.1.25.1.5.1';
     $oidList[] = '.1.3.6.1.4.1.2011.5.25.31.6.5.0';
     foreach ($oidList as $oid) {
-        $hardware_tmp = trim(snmp_get($device, $oid, '-OQv'), '"');
+        $hardware_tmp = snmp_get($device, $oid, '-OQv');
         if (!empty($hardware_tmp)) {
-            $hardware=$hardware_tmp;
+            $hardware = "Huawei " . $hardware_tmp;
             break;
         }
     }
