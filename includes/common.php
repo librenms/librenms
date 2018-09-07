@@ -1473,6 +1473,21 @@ if (!function_exists('starts_with')) {
     }
 }
 
+if (!function_exists('str_start')) {
+    /**
+     * Begin a string with a single instance of a given value.
+     *
+     * @param  string  $value
+     * @param  string  $prefix
+     * @return string
+     */
+    function str_start($value, $prefix)
+    {
+        $quoted = preg_quote($prefix, '/');
+        return $prefix.preg_replace('/^(?:'.$quoted.')+/u', '', $value);
+    }
+}
+
 /**
  * Print a list of items up to a max amount
  * If over that number, a line will print the total items

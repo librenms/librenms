@@ -2,7 +2,7 @@
 
 use LibreNMS\Config;
 
-$request_uri = rtrim(Config::get('base_url', ''), '/') . $_SERVER['REQUEST_URI'];
+$request_uri = str_start($_SERVER['REQUEST_URI'], Config::get('base_url', ''));
 
 echo "<div style='text-align: center;'>
         <form class='form-inline' id='customrange'>
