@@ -192,6 +192,7 @@ bgpPeers:
     - { Field: bgpPeerAdminStatus, Type: text, 'Null': false, Extra: '' }
     - { Field: bgpLocalAddr, Type: text, 'Null': false, Extra: '' }
     - { Field: bgpPeerRemoteAddr, Type: text, 'Null': false, Extra: '' }
+    - { Field: bgpPeerDescr, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: bgpPeerInUpdates, Type: int(11), 'Null': false, Extra: '' }
     - { Field: bgpPeerOutUpdates, Type: int(11), 'Null': false, Extra: '' }
     - { Field: bgpPeerInTotalMessages, Type: int(11), 'Null': false, Extra: '' }
@@ -1057,7 +1058,7 @@ pdb_ix_peers:
     - { Field: pdb_ix_peers_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
     - { Field: ix_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
     - { Field: peer_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
-    - { Field: remote_asn, Type: varchar(16), 'Null': false, Extra: '' }
+    - { Field: remote_asn, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
     - { Field: remote_ipaddr4, Type: varchar(15), 'Null': true, Extra: '' }
     - { Field: remote_ipaddr6, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: name, Type: varchar(255), 'Null': true, Extra: '' }
