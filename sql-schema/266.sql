@@ -1,1 +1,1 @@
-ALTER TABLE `bgpPeers` ADD `bgpPeerDescr` VARCHAR(255) NULL DEFAULT NULL AFTER `bgpPeerRemoteAddr`;
+ALTER TABLE `bgpPeers` ADD `bgpPeerDescr` VARCHAR(255) NOT NULL DEFAULT '' AFTER `bgpPeerRemoteAddr`;
