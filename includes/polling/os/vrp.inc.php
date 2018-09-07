@@ -35,4 +35,3 @@ if (!empty($matches[1])) {
         }
     }
 }
-
