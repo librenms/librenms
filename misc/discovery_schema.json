@@ -294,6 +294,9 @@
                         "type": "string",
                         "pattern": "^(\\.\\d+)+\\.?$"
                     },
+                    "subtype": {
+                        "type": "string"
+                    },
                     "index": {
                         "type": ["integer", "string"]
                     },

@@ -32,7 +32,7 @@ use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
 class Ptp500 extends OS implements
-//    WirelessPowerDiscovery,
+    WirelessPowerDiscovery,
     WirelessRateDiscovery,
     WirelessSsrDiscovery
 {
