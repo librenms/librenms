@@ -20,9 +20,9 @@
         <thead>
         <tr>
             <th data-column-id="hostname">Device</th>
-            <th data-column-id="routing_peer">Peer address</th>
-            <th data-column-id="routing_remoteas">Remote AS</th>
-            <th data-column-id="routing_descr" data-formatter="descr_update" data-header-css-class="edit-routing-input">Description</th>
+            <th data-column-id="bgpPeerIdentifier">Peer address</th>
+            <th data-column-id="bgpPeerRemoteAs">Remote AS</th>
+            <th data-column-id="bgpPeerDescr" data-formatter="descr_update" data-header-css-class="edit-routing-input">Description</th>
         </tr>
         </thead>
     </table>
@@ -42,7 +42,7 @@
         url: "ajax_table.php",
         formatters: {
             "descr_update": function(column,row) {
-                return "<div class='form-group'><input type='text' class='form-control input-sm routing' data-device_id='<?php echo $device['device_id']; ?>' data-routing_id='"+row.routing_id+"' value='"+row.routing_descr+"'></div>";
+                return "<div class='form-group'><input type='text' class='form-control input-sm routing' data-device_id='<?php echo $device['device_id']; ?>' data-routing_id='"+row.routing_id+"' value='"+row.bgpPeerDescr+"'></div>";
             }
         },
         templates: {

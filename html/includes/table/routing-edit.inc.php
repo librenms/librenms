@@ -18,7 +18,7 @@ $sql = " FROM `bgpPeers` AS `B` LEFT JOIN `devices` AS `D` ON `B`.`device_id` = 
 $param[] = $device_id;
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `B`.`bgpPeerRemoteAs` LIKE '%$searchPhrase%' OR `B.`bgpPeerRemoteAddr` LIKE '%$searchPhrase%' OR `B`.`bgpPeerDescr` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `B`.`bgpPeerRemoteAs` LIKE '%$searchPhrase%' OR `B`.`bgpPeerIdentifier` LIKE '%$searchPhrase%' OR `B`.`bgpPeerDescr` LIKE '%$searchPhrase%')";
 }
 
 $count_sql = "SELECT COUNT(`bgpPeer_id`) $sql";
@@ -49,9 +49,9 @@ foreach (dbFetchRows($sql, $param) as $routing) {
     $response[] = array(
         'routing_id' => $routing['bgpPeer_id'],
         'hostname' => generate_device_link($routing),
-        'routing_peer' => $routing['bgpPeerRemoteAddr'],
-        'routing_remoteas' => $routing['bgpPeerRemoteAs'],
-        'routing_descr' => $routing['bgpPeerDescr']);
+        'bgpPeerIdentifier' => $routing['bgpPeerIdentifier'],
+        'bgpPeerRemoteAs' => $routing['bgpPeerRemoteAs'],
+        'bgpPeerDescr' => $routing['bgpPeerDescr']);
 }
 
 $output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$total);
