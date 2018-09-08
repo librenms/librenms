@@ -28,7 +28,10 @@ header('Content-type: application/json');
 
 $status    = 'error';
 $message   = 'unknown error';
-if (isset($_REQUEST['dashboard_name']) && ($dash_id = dbInsert(array('dashboard_name'=>$_REQUEST['dashboard_name'],'user_id'=>Auth::id()), 'dashboards'))) {
+
+$dashboard_name = display($_REQUEST['dashboard_name']);
+
+if (!empty($dashboard_name) && ($dash_id = dbInsert(['dashboard_name' => $dashboard_name, 'user_id' => Auth::id()], 'dashboards'))) {
     $status  = 'ok';
     $message = 'Created';
 } else {
