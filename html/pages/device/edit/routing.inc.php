@@ -42,7 +42,7 @@
         url: "ajax_table.php",
         formatters: {
             "descr_update": function(column,row) {
-                return "<div class='form-group has-feedback'><input type='text' class='form-control input-sm routing' data-device_id='<?php echo $device['device_id']; ?>' data-routing_id='"+row.routing_id+"' value='"+row.bgpPeerDescr+"'><span class='glyphicon form-control-feedback' aria-hidden='true'></span><span id='inputSuccess2Status' class='sr-only'>(success)</span></div>";
+                return "<div class='form-group'><input type='text' class='form-control input-sm routing' data-device_id='<?php echo $device['device_id']; ?>' data-routing_id='"+row.routing_id+"' value='"+row.bgpPeerDescr+"'></div>";
             }
         },
         templates: {
@@ -68,12 +68,7 @@
                     }
                 },
                 error: function () {
-                    $this.closest('.form-group').addClass('has-error');
-                    $this.next('.glyphicon').addClass('glyphicon-remove');
-                    setTimeout(function () {
-                        $this.closest('.form-group').removeClass('has-error');
-                        $this.next('.glyphicon').removeClass('glyphicon-remove');
-                    }, 2000);
+                    toastr.error(data.message);
                 }
             });
         });
