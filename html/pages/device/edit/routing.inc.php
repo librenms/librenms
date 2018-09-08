@@ -62,19 +62,9 @@
                 dataType: "json",
                 success: function (data) {
                     if (data.status == 'ok') {
-                        $this.closest('.form-group').addClass('has-success');
-                        $this.next('.glyphicon').addClass('glyphicon-ok');
-                        setTimeout(function () {
-                            $this.closest('.form-group').removeClass('has-success');
-                            $this.next('.glyphicon').removeClass('glyphicon-ok');
-                        }, 2000);
+                        toastr.success(data.message);
                     } else {
-                        $this.closest('.form-group').addClass('has-error');
-                        $this.next('.glyphicon').addClass('glyphicon-remove');
-                        setTimeout(function () {
-                            $this.closest('.form-group').removeClass('has-error');
-                            $this.next('.glyphicon').removeClass('glyphicon-remove');
-                        }, 2000);
+                        toastr.error(data.message);
                     }
                 },
                 error: function () {
