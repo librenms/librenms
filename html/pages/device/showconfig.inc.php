@@ -260,7 +260,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 foreach ($config_versions as $version) {
                     echo '<option value="'.$version['oid'].'|'.$version['date'].'|'.$config_total.'" ';
                     if ($current_config['oid'] == $version['oid']) {
-                        $author = $version['author']['name'] . '(' . $version['author']['email'] . ')';
+                        $author = $version['author']['name'];
                         $msg = $version['message'];
                         if (isset($previous_config)) {
                             echo 'selected>+';
