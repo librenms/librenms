@@ -37,7 +37,7 @@ if (!is_numeric($_POST['template_id'])) {
     }
 
     if (!empty($ids)) {
-        dbDelete('alert_template_map', 'id NOT IN ' . dbGenPlaceholders(count($ids)) . ' AND alert_templates_id =?', array_merge([$_POST['template_id']], $ids));
+        dbDelete('alert_template_map', 'id NOT IN ' . dbGenPlaceholders(count($ids)) . ' AND alert_templates_id =?', array_merge($ids, [$_POST['template_id']]));
         echo "Alert rules have been attached to this template.";
         exit;
     }
