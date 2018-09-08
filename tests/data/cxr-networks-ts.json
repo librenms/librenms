@@ -11,7 +11,7 @@
                     "hardware": null,
                     "features": null,
                     "location": null,
-                    "os": "cxr-networks",
+                    "os": "cxr-networks-ts",
                     "type": "network",
                     "serial": null,
                     "icon": "cxr-networks.png"
@@ -29,7 +29,7 @@
                     "hardware": "TS 324 (047202CD)",
                     "features": null,
                     "location": "<private>",
-                    "os": "cxr-networks",
+                    "os": "cxr-networks-ts",
                     "type": "network",
                     "serial": null,
                     "icon": "cxr-networks.png"
