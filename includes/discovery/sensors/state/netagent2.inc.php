@@ -23,6 +23,9 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+// This functionality moved to file includes/definitions/discovery/netagent2.inc.php
+
+/*
 $ups_state_oid = '.1.3.6.1.4.1.935.1.1.1.4.1.1.0';
 $ups_state = snmp_get($device, $ups_state_oid, '-Oqv');
 
@@ -88,3 +91,4 @@ if (!empty($ups_state) || $ups_state == 0) {
         $index
     );
 }
+*/
