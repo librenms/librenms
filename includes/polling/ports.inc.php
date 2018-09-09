@@ -295,8 +295,8 @@ if ($device['os'] == 'procera') {
     require_once 'ports/procera.inc.php';
 }
 
-if ($device['os'] == 'cxr-networks-ts') {
-    require_once 'ports/cxr-networks-ts.inc.php';
+if ($device['os'] == 'cxr-ts') {
+    require_once 'ports/cxr-ts.inc.php';
 }
 
 if ($device['os'] == 'cmm') {
