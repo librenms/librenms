@@ -1,4 +1,4 @@
-mib: ELTEK-DISTRIBUTED-MIB
+mib: SNMPv2-MIB:ELTEK-DISTRIBUTED-MIB
 modules:
     sensors:
         runtime:
