@@ -32,7 +32,7 @@
     $in_phaseNum = snmp_get($device, $upsInputNumLines_oid, '-Oqv');
 
 // Single-phase system
-if ($in_phaseNum == '1'){
+if ($in_phaseNum == '1') {
     $load_oid = '.1.3.6.1.4.1.935.1.1.1.4.2.3.0';
     $output_load = snmp_get($device, $load_oid, '-Oqv');
 

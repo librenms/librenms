@@ -63,7 +63,7 @@
     $out_phaseNum = snmp_get($device, $upsOutputNumLines_oid, '-Oqv');
 
 // INPUT single-phase system
-if ($in_phaseNum == '1'){
+if ($in_phaseNum == '1') {
     $in_voltage_oid = '.1.3.6.1.4.1.935.1.1.1.3.2.1.0';
     $in_voltage = snmp_get($device, $in_voltage_oid, '-Oqv');
 
@@ -180,7 +180,7 @@ if ($in_phaseNum == '3') {
 }
 
 // OUTPUT voltage single-phase
-if ($in_phaseNum == '1'){
+if ($in_phaseNum == '1') {
     $out_voltage_oid = '.1.3.6.1.4.1.935.1.1.1.4.2.1.0';
     $out_voltage = snmp_get($device, $out_voltage_oid, '-Oqv');
 
@@ -354,60 +354,60 @@ if ($out_phaseNum == '3') {
             $warnlimit,
             $limit,
             $voltage
-            );
-        }
+        );
+    }
     // Phase L3 (T)
     $bypass_voltage3_oid       = '.1.3.6.1.4.1.935.1.1.1.8.4.4.0';
     $bypass_voltage3           = snmp_get($device, $bypass_voltage3_oid, '-Oqv');
 
-      if (!empty($bypass_voltage3) || $bypass_voltage3 == 0) {
-          $type           = 'netagent2';
-          $index++;
-          $divisor        = $divisor3phase;
-          $voltage        = $bypass_voltage3 / $divisor;
-          $descr          = 'Bypass L3';
+    if (!empty($bypass_voltage3) || $bypass_voltage3 == 0) {
+        $type           = 'netagent2';
+        $index++;
+        $divisor        = $divisor3phase;
+        $voltage        = $bypass_voltage3 / $divisor;
+        $descr          = 'Bypass L3';
 
-          discover_sensor(
-              $valid['sensor'],
-              'voltage',
-              $device,
-              $bypass_voltage3_oid,
-              $index,
-              $type,
-              $descr,
-              $divisor,
-              '1',
-              $lowlimit,
-              $lowwarnlimit,
-              $warnlimit,
-              $limit,
-              $voltage
-              );
-          }
+        discover_sensor(
+            $valid['sensor'],
+            'voltage',
+            $device,
+            $bypass_voltage3_oid,
+            $index,
+            $type,
+            $descr,
+            $divisor,
+            '1',
+            $lowlimit,
+            $lowwarnlimit,
+            $warnlimit,
+            $limit,
+            $voltage
+        );
+    }
 }
 
 // BATTERY Voltage
-    # Set divisor and limit ranges 1 phase UPS systems
-    if ($in_phaseNum == '1') {
-        $battery_voltage_oid = '.1.3.6.1.4.1.935.1.1.1.2.2.2.0';
-        $battery_voltage1 = snmp_get($device, $battery_voltage_oid, '-Oqv');
-        $limit = $bat_1phase_limit;
-        $warnlimit = $bat_1phase_warnlimit;
-        $lowlimit = $bat_1phase_lowlimit;
-        $lowwarnlimit = $bat_1phase_lowwarnlimit;
-        $divisor = $bat_1phase_divisor;
-    }
+# Set divisor and limit ranges 1 phase UPS systems
+if ($in_phaseNum == '1') {
+    $battery_voltage_oid = '.1.3.6.1.4.1.935.1.1.1.2.2.2.0';
+    $battery_voltage1 = snmp_get($device, $battery_voltage_oid, '-Oqv');
+    $limit = $bat_1phase_limit;
+    $warnlimit = $bat_1phase_warnlimit;
+    $lowlimit = $bat_1phase_lowlimit;
+    $lowwarnlimit = $bat_1phase_lowwarnlimit;
+    $divisor = $bat_1phase_divisor;
+}
 
 # Set divisor and limit ranges 3 phase UPS systems
-    if ($in_phaseNum == '3') {
-        $battery_voltage1_oid = '.1.3.6.1.2.1.33.1.2.5.0';
-        $battery_voltage1 = snmp_get($device, $battery_voltage1_oid, '-Oqv');
-        $limit = $bat_3phase_limit;
-        $warnlimit = $bat_3phase_warnlimit;
-        $lowlimit = $bat_3phase_lowlimit;
-        $lowwarnlimit = $bat_3phase_lowwarnlimit;
-        $divisor = $bat_3phase_divisor;
-    }
+if ($in_phaseNum == '3') {
+    $battery_voltage1_oid = '.1.3.6.1.2.1.33.1.2.5.0';
+    $battery_voltage1 = snmp_get($device, $battery_voltage1_oid, '-Oqv');
+    $limit = $bat_3phase_limit;
+    $warnlimit = $bat_3phase_warnlimit;
+    $lowlimit = $bat_3phase_lowlimit;
+    $lowwarnlimit = $bat_3phase_lowwarnlimit;
+    $divisor = $bat_3phase_divisor;
+}
 
 if (!empty($battery_voltage1) || $battery_voltage1 == 0) {
     $type           = 'netagent2';
