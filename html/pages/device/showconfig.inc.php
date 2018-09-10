@@ -236,10 +236,10 @@ if (Auth::user()->hasGlobalAdmin()) {
                           <div class="panel panel-primary">
                               <div class="panel-heading">Sync status: <strong>'.$node_info['last']['status'].'</strong></div>
                               <ul class="list-group">
-                                  <li class="list-group-item"><strong>Node:</strong> '.$node_info['name'].'</strong></li>
-                                  <li class="list-group-item"><strong>IP:</strong> '.$node_info['ip'].'</strong></li>
-                                  <li class="list-group-item"><strong>Model:</strong> '.$node_info['model'].'</strong></li>
-                                  <li class="list-group-item"><strong>Last Sync:</strong> '.$node_info['last']['end'].'</strong></li>
+                                  <li class="list-group-item"><strong>Node:</strong> '.$node_info['name'].'</li>
+                                  <li class="list-group-item"><strong>IP:</strong> '.$node_info['ip'].'</li>
+                                  <li class="list-group-item"><strong>Model:</strong> '.$node_info['model'].'</li>
+                                  <li class="list-group-item" style="overflow:hidden"><strong>Last Sync:</strong> '.$node_info['last']['end'].' &nbsp;<button class="btn btn-primary btn-xs" style="float: right;" name="queue-refresh"  onclick=\'refresh_oxidized_node("' . $device['hostname'] . '")\'>Refresh</button></li>
                               </ul>
                           </div>
                       </div>
@@ -260,6 +260,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                 foreach ($config_versions as $version) {
                     echo '<option value="'.$version['oid'].'|'.$version['date'].'|'.$config_total.'" ';
                     if ($current_config['oid'] == $version['oid']) {
+                        $author = $version['author']['name'];
+                        $msg = $version['message'];
                         if (isset($previous_config)) {
                             echo 'selected>+';
                         } else {
@@ -300,6 +302,19 @@ if (Auth::user()->hasGlobalAdmin()) {
         }
     }//end if
 
+    if (!empty($author)) {
+        echo '
+                          <div class="panel panel-primary">
+                              <div class="panel-heading">Author: <strong>'.$author.'</strong></div>';
+        if (!empty($msg)) {
+            echo '
+                              <ul class="list-group">
+                                  <li class="list-group-item"><strong>Message:</strong> '.$msg.'</li>
+                              </ul>';
+        }
+        echo '
+                          </div>';
+    }
     if (!empty($text)) {
         if (isset($previous_config)) {
             $language = 'diff';
