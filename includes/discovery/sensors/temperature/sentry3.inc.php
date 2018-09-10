@@ -1,5 +1,4 @@
 <?php
-// TODO use pre-cache prevent redundant snmp reads
 $oids = snmp_walk($device, 'tempHumidSensorTempValue', '-Osqn', 'Sentry3-MIB');
 d_echo($oids."\n");
 
@@ -14,7 +13,7 @@ if ($oids) {
         if ($data) {
             list($oid,$descr) = explode(' ', $data, 2);
             $split_oid        = explode('.', $oid);
-            $index            = substr($oid, -3);        
+            $index            = substr($oid, -3);
 
             // tempHumidSensorTempValue
             $temperature_oid = '.1.3.6.1.4.1.1718.3.2.5.1.6.'.$index;
@@ -26,7 +25,6 @@ if ($oids) {
             $current         = (snmp_get($device, "$temperature_oid", '-OvqU', 'Sentry3-MIB') / $divisor);
 
             $sentry_temp_scale = snmp_get($device, "tempHumidSensorTempScale.$index", '-Ovq', 'Sentry3-MIB');
-            // TODO passing user func does not convert limits only value
             if ($sentry_temp_scale == 'fahrenheit') {
                 $low_limit = fahrenheit_to_celsius($low_limit, $sentry_temp_scale);
                 $high_limit = fahrenheit_to_celsius($high_limit, $sentry_temp_scale);

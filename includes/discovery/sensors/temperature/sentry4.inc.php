@@ -15,7 +15,6 @@
  * limitations under the License.
 */
 
-// TODO use pre-cache prevent redundant snmp gets
 $oids = snmp_walk($device, 'st4TempSensorValue', '-Osqn', 'Sentry4-MIB');
 d_echo($oids."\n");
 
@@ -43,7 +42,6 @@ if ($oids) {
             $high_limit = snmp_get($device, "st4TempSensorHighAlarm.$index", '-OQUnv', 'Sentry4-MIB');
             $current = (snmp_get($device, "$temperature_oid", '-OvqU', 'Sentry4-MIB') / $divisor);
 
-            // TODO user func does not convert limits, doing it manually
             if ($sentry_temp_scale == 'fahrenheit') {
                 $low_warn_limit = fahrenheit_to_celsius($low_warn_limit, $sentry_temp_scale);
                 $low_limit = fahrenheit_to_celsius($low_limit, $sentry_temp_scale);
