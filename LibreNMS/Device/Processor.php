@@ -23,7 +23,6 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-
 namespace LibreNMS\Device;
 
 use LibreNMS\Config;
@@ -145,6 +144,11 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         // if no processors found, check OS discovery (which will fall back to HR and UCD if not implemented
         if (empty($processors) && $os instanceof ProcessorDiscovery) {
             $processors = $os->discoverProcessors();
+        }
+
+        foreach ($processors as $processor) {
+            $processor->processor_descr = substr($processor->processor_descr, 0, 64);
+            $processors[] = $processor;
         }
 
         if (isset($processors) && is_array($processors)) {
