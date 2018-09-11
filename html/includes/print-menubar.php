@@ -1,7 +1,7 @@
 <?php
 // FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\ObjectCache;
 
@@ -652,8 +652,16 @@ if (empty($notifications['count']) && empty($notifications['sticky_count'])) {
 <?php
 
 if (Auth::check()) {
-    echo('
-           <li><a href="logout/"><i class="fa fa-sign-out fa-fw fa-lg" aria-hidden="true"></i> Logout</a></li>');
+    echo '<li><a href="';
+    echo route('logout');
+    echo '" onclick="event.preventDefault(); document.getElementById(\'logout-form\').submit();">';
+    echo ' <i class="fa fa-sign-out fa-fw fa-lg" aria-hidden="true"></i> ';
+    echo __('Logout');
+    echo '</a><form id="logout-form" action="';
+    echo route('logout');
+    echo '" method="POST" style="display: none;">';
+    echo csrf_field();
+    echo '</form></li>';
 }
 ?>
          </ul>
@@ -671,7 +679,7 @@ if (Auth::user()->hasGlobalAdmin()) {
           <li role="presentation" class="divider"></li>
 
 <?php if (Auth::user()->hasGlobalAdmin()) {
-    if (Auth::get()->canManageUsers()) {
+    if (LegacyAuth::get()->canManageUsers()) {
         echo('
            <li><a href="adduser/"><i class="fa fa-user-plus fa-fw fa-lg" aria-hidden="true"></i> Add User</a></li>
            <li><a href="deluser/"><i class="fa fa-user-times fa-fw fa-lg" aria-hidden="true"></i> Remove User</a></li>

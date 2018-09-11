@@ -22,14 +22,14 @@
  * @subpackage Alerts
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $status = 'error';
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     header('Content-Type: application/json');
     $response = array('status' => $status, 'message' => 'You need to be admin');
-    die(_json_encode($response));
+    die(json_encode($response));
 }
 
 $template_id = 0;

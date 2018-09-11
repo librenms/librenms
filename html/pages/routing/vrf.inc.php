@@ -1,9 +1,9 @@
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Exceptions\InvalidIpException;
 
-if (!Auth::user()->hasGlobalRead()) {
+if (!LegacyAuth::user()->hasGlobalRead()) {
     include 'includes/error-no-perm.inc.php';
 } else {
     $link_array = array(
@@ -53,12 +53,12 @@ if (!Auth::user()->hasGlobalRead()) {
         if ($vars['graph'] == $type) {
             echo "<span class='pagemenu-selected'>";
         }
-        
+
         echo generate_link($descr, $link_array, array('view' => 'graphs', 'graph' => $type));
         if ($vars['graph'] == $type) {
             echo '</span>';
         }
-        
+
         $type_sep = ' | ';
     }
 
@@ -79,7 +79,7 @@ if (!Auth::user()->hasGlobalRead()) {
                 array_push($vrf_devices[$vrf_device['vrf_name']][$vrf_device['mplsVpnVrfRouteDistinguisher']], $vrf_device);
             }
         }
-        
+
         unset($ports);
         foreach (dbFetchRows("SELECT $port_fields FROM `ports` WHERE ifVrf<>0") as $port) {
             if (empty($ports[$port['ifvrf']][$port['device_id']])) {

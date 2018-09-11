@@ -13,7 +13,7 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $where = '1';
 $param = array();
@@ -47,14 +47,14 @@ if (!empty($vars['to'])) {
     $param[] = $vars['to'];
 }
 
-if (Auth::user()->hasGlobalRead()) {
+if (LegacyAuth::user()->hasGlobalRead()) {
     $sql  = 'FROM syslog AS S';
     $sql .= ' WHERE '.$where;
 } else {
     $sql   = 'FROM syslog AS S, devices_perms AS P ';
     $sql  .= 'WHERE S.device_id = P.device_id AND P.user_id = ? AND ';
     $sql  .= $where;
-    $param = array_merge(array(Auth::id()), $param);
+    $param = array_merge(array(LegacyAuth::id()), $param);
 }
 
 $count_sql = "SELECT COUNT(*) $sql";

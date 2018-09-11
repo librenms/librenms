@@ -24,7 +24,7 @@
  * @author     f0o <f0o@devilcode.org>
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 ?>
 
@@ -42,7 +42,7 @@ use LibreNMS\Authentication\Auth;
 <?php
 
 
-if (Auth::user()->hasGlobalAdmin()) {
+if (LegacyAuth::user()->hasGlobalAdmin()) {
     echo '<ul class="nav nav-tabs">';
     $pages = dbFetchRows("SELECT DISTINCT `config_group` FROM `config` WHERE `config_group` IS NOT NULL AND `config_group` != ''");
     array_unshift($pages, array('config_group' => 'Global')); // Add Global tab
@@ -105,7 +105,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
         echo '<div class="table-responsive">' . a2t($config) . '</div>';
 
-        if ($debug && Auth::user()->hasGlobalAdmin()) {
+        if ($debug && LegacyAuth::user()->hasGlobalAdmin()) {
             echo("<pre>");
             print_r($config);
             echo("</pre>");

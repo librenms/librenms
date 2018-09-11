@@ -18,17 +18,6 @@ interface Authorizer
     public function authenticate($username, $password);
 
     /**
-     * Check for cookie token to see if this is a valid saved session
-     * Authorizers should check if the user is still valid then return checkRememberMe()
-     *
-     * @param int $sess_id
-     * @param string $token
-     * @return bool
-     * @throws AuthenticationException thrown if the cookie or user is invalid
-     */
-    public function reauthenticate($sess_id, $token);
-
-    /**
      * Check if a $username exists.
      *
      * @param string $username
@@ -142,31 +131,6 @@ interface Authorizer
      * @return bool
      */
     public function canUpdatePasswords($username = '');
-
-    /**
-     * Log out the user, unset cookies, destroy the session
-     *
-     * @param string $message The logout message.
-     */
-    public function logOutUser($message = 'Logged Out');
-
-    /**
-     * Log in the user and set up a few login tasks
-     * $_SESSION['username'] must be set prior to calling this function
-     * If twofactor authentication is enabled, it will be checked here.
-     *
-     * If everything goes well, $_SESSION['authenticated'] will be true after this function completes.
-     * @return bool If the user was successfully logged in.
-     * @throws AuthenticationException if anything failed why trying to log in
-     */
-    public function logInUser();
-
-    /**
-     * Check if the session is authenticated
-     *
-     * @return bool
-     */
-    public function sessionAuthenticated();
 
     /**
      * Indicates if the authentication happens within the LibreNMS process, or external to it.

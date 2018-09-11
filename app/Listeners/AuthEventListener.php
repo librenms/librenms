@@ -1,0 +1,75 @@
+<?php
+
+namespace App\Listeners;
+
+use App\Checks;
+use App\Events\Event;
+use App\Models\User;
+use DB;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
+use Request;
+use Session;
+use Toastr;
+
+class AuthEventListener
+{
+    /**
+     * Create the event listener.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Handle the login event.
+     *
+     * @param Login $event
+     * @return void
+     */
+    public function login(Login $event)
+    {
+        /** @var User $user */
+        $user = $event->user;
+
+        DB::table('authlog')->insert(['user' => $user->username ?: '', 'address' => Request::ip(), 'result' => 'Logged In']);
+
+        Toastr::info('Welcome ' . ($user->realname ?: $user->username));
+
+        // Authenticated, set up legacy session stuff.  TODO Remove once ajax and graphs are ported to Laravel.
+        session_start();
+        $_SESSION['username'] = $user->username;
+
+        // set up legacy variables, but don't override existing ones (ad anonymous bind can only get user_id at login)
+        if (!isset($_SESSION['userlevel'])) {
+            $_SESSION['userlevel'] = $user->level;
+        }
+
+        if (!isset($_SESSION['user_id'])) {
+            $_SESSION['user_id'] = $user->user_id;
+        }
+
+        $_SESSION['authenticated'] = true;
+        session_write_close();
+    }
+
+    /**
+     * Handle the logout event.
+     *
+     * @param Logout $event
+     * @return void
+     */
+    public function logout(Logout $event)
+    {
+        DB::table('authlog')->insert(['user' => $event->user->username ?: '', 'address' => Request::ip(), 'result' => 'Logged Out']);
+
+        if (!isset($_SESSION)) {
+            session_start();
+        }
+        unset($_SESSION['authenticated']);
+        session_destroy();
+    }
+}

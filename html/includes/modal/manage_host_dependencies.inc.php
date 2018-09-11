@@ -11,9 +11,9 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
@@ -66,7 +66,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
 </div>
 
 <script>
-function changeParents(e, evttype) 
+function changeParents(e, evttype)
 {
     e.preventDefault();
     if (evttype == 'select' && e.params.data.id == 0) {
@@ -75,7 +75,7 @@ function changeParents(e, evttype)
     }
 
     var cur_option = $('#manavailableparents').select2('data');
-    // So that we'll see all devices. 
+    // So that we'll see all devices.
     var device_id = 0;
     var parent_ids = [];
     // This is needed to remove the None option if it is with another parent id

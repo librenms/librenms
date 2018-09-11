@@ -22,7 +22,7 @@
  * @subpackage Frontpage
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
 require_once $config['install_dir'] . '/includes/alerts.inc.php';
@@ -171,7 +171,7 @@ var greenMarker = L.AwesomeMarkers.icon({
         $status_select = explode(',', $widget_settings['status']);
 
         // Checking user permissions
-        if (Auth::user()->hasGlobalRead()) {
+        if (LegacyAuth::user()->hasGlobalRead()) {
         // Admin or global read-only - show all devices
             $sql = "SELECT DISTINCT(`device_id`),`devices`.`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng` FROM `devices`
                     LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
@@ -188,7 +188,7 @@ var greenMarker = L.AwesomeMarkers.icon({
                     AND `devices`.`device_id` = `devices_perms`.`device_id`
                     AND `devices_perms`.`user_id` = ? AND `status` IN " . dbGenPlaceholders(count($status_select)) .
                     " ORDER BY `status` ASC, `hostname`";
-            $param = array_merge([Auth::id()], $status_select);
+            $param = array_merge([LegacyAuth::id()], $status_select);
         }
 
         foreach (dbFetchRows($sql, $param) as $map_devices) {
