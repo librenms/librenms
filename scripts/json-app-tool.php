@@ -38,7 +38,7 @@ $short_opts='sktmlhj:a:';
 $options = getopt($short_opts);
 
 // print the help
-if (isset($options[h])) {
+if (isset($options['h'])) {
     echo "LibreNMS JSON App tool
   -j      The file containing the JSON to use for the test.
   -s      Print the SNMPrec data.
@@ -66,13 +66,13 @@ if (isset($options[h])) {
 }
 
 // make sure we have a JSON file to work with
-if (!isset($options[j])) {
+if (!isset($options['j'])) {
     echo "Nothing JSON file specified via -j.\n";
     exit(1);
 }
 
 //read in the file
-$raw_json=file_get_contents($options[j]);
+$raw_json=file_get_contents($options['j']);
 if ($raw_json === false) {
     exit(2);
 }
@@ -82,36 +82,36 @@ $json=json_decode(stripslashes($raw_json), true);
 
 // check json_decode() for any errors
 if (json_last_error() !== JSON_ERROR_NONE) {
-    echo "Parsing '".$options[j]."' failed. Running jsonlint...\n\n";
-    system('jsonlint '.escapeshellarg($options[j]));
+    echo "Parsing '".$options['j']."' failed. Running jsonlint...\n\n";
+    system('jsonlint '.escapeshellarg($options['j']));
     exit(3);
 }
 
 //make sure the JSON actually contains something
 if (empty($json)) {
-    echo "'".$options[j]."' is a blank JSON file.\n";
+    echo "'".$options['j']."' is a blank JSON file.\n";
     exit(4);
 }
 
 //make sure it has all the required keys
 if (!isset($json['error'], $json['data'], $json['errorString'], $json['version'])) {
-    echo "'".$options[j]."' is missing one or more of the keys 'error', 'errorString', 'version', or 'data'.\n";
+    echo "'".$options['j']."' is missing one or more of the keys 'error', 'errorString', 'version', or 'data'.\n";
     exit(5);
 }
 
 //successfully loaded and tested the file, just exit now if asked to
-if (isset($options[l])) {
+if (isset($options['l'])) {
     exit(0);
 }
 
 //pulls out the metrics
-$data=$json[data];
+$data=$json['data'];
 $metrics=data_flatten($data);
 $metrics_keys=array_keys($metrics);
 usort($metrics_keys, "strcasecmp"); //orders them in the manner in which the test script compares them
 //print metrics if needed
 if (isset($options[m])) {
-    if (isset($options[k])) {
+    if (isset($options['k'])) {
         foreach ($metrics_keys as $key) {
             print $key."\n";
         }
@@ -126,8 +126,8 @@ if (isset($options[m])) {
 // For anything past here, we need -a given
 
 // Output snmprec data for snmpsim for use with testing.
-if (isset($options[s])) {
-    $oid=string_to_oid($options[a]);
+if (isset($options['s'])) {
+    $oid=string_to_oid($options['a']);
     echo "1.3.6.1.2.1.1.1.0|4|Linux server 3.10.0-693.5.2.el7.x86_64 #1 SMP Fri Oct 20 20:32:50 UTC 2017 x86_64\n".
         "1.3.6.1.2.1.1.2.0|6|1.3.6.1.4.1.8072.3.2.10\n".
         "1.3.6.1.2.1.1.3.0|67|77550514\n".
@@ -142,11 +142,11 @@ if (isset($options[s])) {
 }
 
 // prints the json test data file if asked to
-if (isset($options[j])) {
+if (isset($options['j'])) {
     $test_data=array(
         "discovery" => array(
             "applications" => array(
-                "app_type" => $options[a],
+                "app_type" => $options['a'],
                 "app_state" => "UNKNOWN",
                 "discovered" => "1",
                 "app_state_prev" => null,
@@ -156,7 +156,7 @@ if (isset($options[j])) {
         ),
         "poller" => array(
             "applications" => array(
-                "app_type" => $options[a],
+                "app_type" => $options['a'],
                 "app_state" => "OK",
                 "discovered" => "1",
                 "app_state_prev" => "UNKNOWN",
@@ -171,7 +171,7 @@ if (isset($options[j])) {
             "metric" => $key,
             "value" => $metrics[$key],
             "value_prev" => null,
-            "app_type" => $options[a],
+            "app_type" => $options['a'],
         );
     }
     echo json_encode($test_data, JSON_PRETTY_PRINT)."\n";
