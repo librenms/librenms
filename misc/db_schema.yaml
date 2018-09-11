@@ -192,6 +192,7 @@ bgpPeers:
     - { Field: bgpPeerAdminStatus, Type: text, 'Null': false, Extra: '' }
     - { Field: bgpLocalAddr, Type: text, 'Null': false, Extra: '' }
     - { Field: bgpPeerRemoteAddr, Type: text, 'Null': false, Extra: '' }
+    - { Field: bgpPeerDescr, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
     - { Field: bgpPeerInUpdates, Type: int(11), 'Null': false, Extra: '' }
     - { Field: bgpPeerOutUpdates, Type: int(11), 'Null': false, Extra: '' }
     - { Field: bgpPeerInTotalMessages, Type: int(11), 'Null': false, Extra: '' }
