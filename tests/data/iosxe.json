@@ -10,6 +10,7 @@
                     "bgpPeerAdminStatus": "stop",
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 0,
@@ -17,7 +18,7 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": "65031"
+                    "bgpLocalAs": 65031
                 },
                 {
                     "astext": "",
@@ -27,6 +28,7 @@
                     "bgpPeerAdminStatus": "stop",
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 0,
@@ -34,7 +36,7 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": "65031"
+                    "bgpLocalAs": 65031
                 },
                 {
                     "astext": "",
@@ -44,6 +46,7 @@
                     "bgpPeerAdminStatus": "stop",
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 0,
@@ -51,7 +54,7 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": "65031"
+                    "bgpLocalAs": 65031
                 },
                 {
                     "astext": "",
@@ -61,6 +64,7 @@
                     "bgpPeerAdminStatus": "stop",
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 0,
@@ -68,7 +72,7 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": "65031"
+                    "bgpLocalAs": 65031
                 }
             ],
             "bgpPeers_cbgp": [
@@ -180,6 +184,7 @@
                     "bgpPeerAdminStatus": "start",
                     "bgpLocalAddr": "10.44.32.14",
                     "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 1,
                     "bgpPeerOutUpdates": 4,
                     "bgpPeerInTotalMessages": 302,
@@ -187,7 +192,7 @@
                     "bgpPeerFsmEstablishedTime": 8497,
                     "bgpPeerInUpdateElapsedTime": 8491,
                     "context_name": "",
-                    "bgpLocalAs": "65031"
+                    "bgpLocalAs": 65031
                 },
                 {
                     "astext": "",
@@ -197,6 +202,7 @@
                     "bgpPeerAdminStatus": "start",
                     "bgpLocalAddr": "10.45.63.162",
                     "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 1,
                     "bgpPeerOutUpdates": 4,
                     "bgpPeerInTotalMessages": 303,
@@ -204,7 +210,7 @@
                     "bgpPeerFsmEstablishedTime": 8492,
                     "bgpPeerInUpdateElapsedTime": 8491,
                     "context_name": "",
-                    "bgpLocalAs": "65031"
+                    "bgpLocalAs": 65031
                 },
                 {
                     "astext": "",
@@ -214,6 +220,7 @@
                     "bgpPeerAdminStatus": "start",
                     "bgpLocalAddr": "2001:0db8:85a3:0000:341a:8a2e:03e1:000e",
                     "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 1,
                     "bgpPeerOutUpdates": 3,
                     "bgpPeerInTotalMessages": 302,
@@ -221,7 +228,7 @@
                     "bgpPeerFsmEstablishedTime": 8487,
                     "bgpPeerInUpdateElapsedTime": 8486,
                     "context_name": "",
-                    "bgpLocalAs": "65031"
+                    "bgpLocalAs": 65031
                 },
                 {
                     "astext": "",
@@ -231,6 +238,7 @@
                     "bgpPeerAdminStatus": "start",
                     "bgpLocalAddr": "2001:0db8:85a3:0000:341a:8a2e:03e2:00a2",
                     "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 1,
                     "bgpPeerOutUpdates": 3,
                     "bgpPeerInTotalMessages": 303,
@@ -238,7 +246,7 @@
                     "bgpPeerFsmEstablishedTime": 8487,
                     "bgpPeerInUpdateElapsedTime": 8486,
                     "context_name": "",
-                    "bgpLocalAs": "65031"
+                    "bgpLocalAs": 65031
                 }
             ],
             "bgpPeers_cbgp": [

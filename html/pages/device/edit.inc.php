@@ -17,6 +17,10 @@ if (!Auth::user()->hasGlobalAdmin()) {
         $panes['ports']    = 'Port Settings';
     }
 
+    if (dbFetchCell("SELECT COUNT(*) FROM `bgpPeers` WHERE `device_id` = ? LIMIT 1", array($device['device_id'])) > 0) {
+        $panes['routing'] = 'Routing';
+    }
+
     if (count($config['os'][$device['os']]['icons'])) {
         $panes['icon']  = 'Icon';
     }
