@@ -123,7 +123,11 @@ if (isset($options[m])) {
     exit(0);
 }
 
+
 // For anything past here, we need -a given
+if (!isset($options['a'])) {
+    exit(0);
+}
 
 // Output snmprec data for snmpsim for use with testing.
 if (isset($options['s'])) {
