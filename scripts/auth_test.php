@@ -1,12 +1,11 @@
 #!/usr/bin/php
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $options = getopt('u:rldvh');
 if (isset($options['h']) || (!isset($options['l']) && !isset($options['u']))) {
     echo ' -u <username>  (Required) username to test
- -r             Reauthenticate user, (requires previous web login with "Remember me" enabled)
  -l             List all users (checks that auth can enumerate all allowed users)
  -d             Enable debug output
  -v             Enable verbose debug output
@@ -19,7 +18,7 @@ if (isset($options['d'])) {
     $debug = true;
 }
 
-$init_modules = array('web', 'auth');
+$init_modules = [];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 if (isset($options['v'])) {
@@ -31,7 +30,7 @@ if (isset($options['v'])) {
 echo "Authentication Method: {$config['auth_mechanism']}\n";
 
 // if ldap like, check selinux
-if ($config['auth_mechanism'] = 'ldap' || $config['auth_mechanism'] = "active_directory") {
+if ($config['auth_mechanism'] == 'ldap' || $config['auth_mechanism'] == "active_directory") {
     $enforce = shell_exec('getenforce 2>/dev/null');
     if (str_contains($enforce, 'Enforcing')) {
         // has selinux
@@ -43,7 +42,7 @@ if ($config['auth_mechanism'] = 'ldap' || $config['auth_mechanism'] = "active_di
     }
 }
 try {
-    $authorizer = Auth::get();
+    $authorizer = LegacyAuth::get();
 
     // AD bind tests
     if ($authorizer instanceof \LibreNMS\Authentication\ActiveDirectoryAuthorizer) {
@@ -94,46 +93,24 @@ try {
 
     $test_username = $options['u'];
     $auth = false;
-    if (isset($options['r'])) {
-        echo "Reauthenticate Test\n";
 
-        $session = dbFetchRow(
-            'SELECT * FROM `session` WHERE `session_username`=? ORDER BY `session_id` DESC LIMIT 1',
-            array($test_username)
-        );
-        d_echo($session);
-        if (empty($session)) {
-            print_error('Requires previous login with \'Remember me\' box checked on the webui');
-            exit;
-        }
+    echo 'Password: ';
+    `stty -echo`;
+    $test_password = trim(fgets(STDIN));
+    `stty echo`;
+    echo PHP_EOL;
 
-        $token = $session['session_username'] . '|' . password_hash($session['session_username'] . $session['session_token'], PASSWORD_DEFAULT);
+    echo "Authenticate user $test_username: \n";
+    $auth = $authorizer->authenticate($test_username, $test_password);
+    unset($test_password);
 
-        $auth = $authorizer->reauthenticate($session['session_value'], $token);
-        if ($auth) {
-            print_message("Reauthentication successful.\n");
-        } else {
-            print_error('Reauthentication failed or is unsupported');
-        }
+    if ($auth) {
+        print_message("AUTH SUCCESS\n");
     } else {
-        echo 'Password: ';
-        `stty -echo`;
-        $test_password = trim(fgets(STDIN));
-        `stty echo`;
-        echo PHP_EOL;
-
-        echo "Authenticate user $test_username: \n";
-        $auth = $authorizer->authenticate($test_username, $test_password);
-        unset($test_password);
-
-        if ($auth) {
-            print_message("AUTH SUCCESS\n");
-        } else {
-            if (isset($ldap_connection)) {
-                echo ldap_error($ldap_connection) . PHP_EOL;
-            }
-            print_error('AUTH FAILURE');
+        if (isset($ldap_connection)) {
+            echo ldap_error($ldap_connection) . PHP_EOL;
         }
+        print_error('AUTH FAILURE');
     }
 
     if ($auth) {

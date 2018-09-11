@@ -1,12 +1,12 @@
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $no_refresh = true;
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     include 'includes/error-no-perm.inc.php';
-} elseif (Auth::user()->isDemoUser()) {
+} elseif (LegacyAuth::user()->isDemoUser()) {
     demo_account();
 } else {
     echo '<h3>Add User</h3>';
@@ -14,10 +14,10 @@ if (!Auth::user()->hasGlobalAdmin()) {
 
     $pagetitle[] = 'Add user';
 
-    if (Auth::get()->canManageUsers()) {
+    if (LegacyAuth::get()->canManageUsers()) {
         if ($_POST['action'] == 'add') {
             if ($_POST['new_username']) {
-                if (!Auth::get()->userExists($_POST['new_username'])) {
+                if (!LegacyAuth::get()->userExists($_POST['new_username'])) {
                     if (isset($_POST['can_modify_passwd'])) {
                         $_POST['can_modify_passwd'] = 1;
                     } else {
@@ -25,7 +25,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
                     }
 
                     // FIXME: missing email field here on the form
-                    if (Auth::get()->addUser($_POST['new_username'], $_POST['new_password'], $_POST['new_level'], $_POST['new_email'], $_POST['new_realname'], $_POST['can_modify_passwd'])) {
+                    if (LegacyAuth::get()->addUser($_POST['new_username'], $_POST['new_password'], $_POST['new_level'], $_POST['new_email'], $_POST['new_realname'], $_POST['can_modify_passwd'])) {
                         echo '<span class=info>User '.$_POST['new_username'].' added!</span>';
                     }
                 } else {

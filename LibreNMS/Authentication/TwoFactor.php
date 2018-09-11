@@ -30,6 +30,7 @@ namespace LibreNMS\Authentication;
 
 use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
+use Session;
 
 class TwoFactor
 {
@@ -121,127 +122,6 @@ class TwoFactor
             $ret .= self::$base32_enc[base_convert(str_pad($bin[$x], 5, '0'), 2, 10)];
         }
         return $ret;
-    }
-
-    /**
-     * Return the HTML for the TwoFactor Input-Form
-     * @param boolean $form_tags Include FORM-tags
-     * @return string
-     */
-    public static function getForm($form_tags = true)
-    {
-        $ret = '';
-
-        if ($form_tags) {
-            $ret .= '
-      <div class="row">
-        <div class="col-md-offset-4 col-md-4">
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <h3 class="panel-title">
-                <img class="img-responsive" src="' . Config::get('title_image') . '">
-              </h3>
-            </div>
-            <div class="panel-body">
-              <div class="container-fluid">
-                  <form class="form-horizontal" role="form" action="" method="post" name="twofactorform">';
-        }
-
-        $ret .= '
-        <div class="form-group">
-          <div class="col-md-12">
-            <input type="text" name="twofactor" id="twofactor" class="form-control" autocomplete="off" placeholder="Please enter auth token" />
-          </div>
-        </div>
-        <div class="form-group">
-          <div class="col-md-12">
-            <button type="submit" class="btn btn-default btn-block" name="submit">Submit</button>
-          </div>
-         </div>
-        </div>';
-
-        $ret .= '<script>document.twofactorform.twofactor.focus();</script>';
-
-        if ($form_tags) {
-            $ret .= '</form>';
-        }
-
-        return $ret;
-    }
-
-    /**
-     * Authenticate with two factor
-     * Will set $twofactorform if the token hasn't been requested yet (page will redirect to the logon page)
-     *
-     * @return bool returns false if the form is not needed
-     * @throws AuthenticationException
-     */
-    public static function showForm()
-    {
-        global $twofactorform;
-
-        $twofactor = get_user_pref('twofactor');
-
-        // no need to show the form, user doesn't have a token
-        if (empty($twofactor)) {
-            $_SESSION['twofactor'] = true;
-            return false;
-        }
-
-        // lockout the user if there are too many failures
-        if ($twofactor['fails'] >= 3) {
-            if (!Config::get('twofactor_lock')) {
-                throw new AuthenticationException('Too many two-factor failures, please contact administrator.');
-            } elseif ((time() - $twofactor['last']) < Config::get('twofactor_lock')) {
-                $msg = "Too many two-factor failures, please wait " . Config::get('twofactor_lock') . " seconds";
-                throw new AuthenticationException($msg);
-            }
-        }
-
-        // set $twofactorform to show the form in logon.inc.php
-        $twofactorform = true;
-        return true;
-    }
-
-    /**
-     * Check a 2fa token this will be stored in $_POST['twofactor'] by the form
-     * If valid,  $_SESSION['twofactor'] = true will be set and this will return true
-     *
-     * @param string $token The 2fa token, stored in $_POST['twofactor'] by the form
-     * @return bool If the token was valid
-     * @throws AuthenticationException Thrown if the token was invalid
-     */
-    public static function authenticate($token)
-    {
-        if (!$token) {
-            throw new AuthenticationException("No Two-Factor Token entered.");
-        }
-
-        $twofactor = get_user_pref('twofactor');
-
-        if (empty($twofactor)) {
-            throw new AuthenticationException('No Two-Factor settings, how did you get here?');
-        }
-
-        if (($server_c = self::verifyHOTP($twofactor['key'], $_POST['twofactor'], $twofactor['counter'])) === false) {
-            $twofactor['fails']++;
-            $twofactor['last'] = time();
-            set_user_pref('twofactor', $twofactor);
-            throw new AuthenticationException("Wrong Two-Factor Token.");
-        }
-
-        if ($twofactor['counter'] !== false) {
-            if ($server_c !== true && $server_c !== $twofactor['counter']) {
-                $twofactor['counter'] = $server_c + 1;
-            } else {
-                $twofactor['counter']++;
-            }
-        }
-        $twofactor['fails'] = 0;
-        set_user_pref('twofactor', $twofactor);
-
-        $_SESSION['twofactor'] = true;
-        return true;
     }
 
     /**

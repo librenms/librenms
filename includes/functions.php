@@ -12,7 +12,7 @@
  */
 
 use Illuminate\Database\Events\QueryExecuted;
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
@@ -1007,7 +1007,7 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         'datetime' => array("NOW()"),
         'severity' => $severity,
         'message' => $text,
-        'username'  => isset(Auth::user()->username) ? Auth::user()->username : '',
+        'username'  => isset(LegacyAuth::user()->username) ? LegacyAuth::user()->username : '',
      );
 
     dbInsert($insert, 'eventlog');

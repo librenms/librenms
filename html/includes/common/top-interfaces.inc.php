@@ -25,7 +25,7 @@
  * @subpackage Widgets
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
     $common_output[] = '
@@ -102,11 +102,11 @@ $(function() {
     (integer) $lastpoll_seconds = ($interval * 60) ?: 300;
     (integer) $interface_count = $widget_settings['interface_count'] ?: 5;
     $params = ['lastpoll' => $lastpoll_seconds, 'count' => $interface_count, 'filter1' => ($widget_settings['interface_filter']?:(int)1), 'filter2' => ($widget_settings['interface_filter']?:(int)1)];
-    if (!Auth::user()->hasGlobalRead()) {
-        $params['user1'] = Auth::id();
-        $params['user2'] = Auth::id();
+    if (!LegacyAuth::user()->hasGlobalRead()) {
+        $params['user1'] = LegacyAuth::id();
+        $params['user2'] = LegacyAuth::id();
     }
-    if (Auth::user()->hasGlobalRead()) {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $query = '
             SELECT p.*, devices.*, p.ifInOctets_rate + p.ifOutOctets_rate as total
             FROM ports as p
