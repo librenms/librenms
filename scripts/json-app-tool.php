@@ -123,10 +123,15 @@ if (isset($options[m])) {
     exit(0);
 }
 
+# exit if -s or -t is not requested
+if ((!isset($options['s']))&&(!isset($options['t']))) {
+    exit(0);
+}
 
 // For anything past here, we need -a given
 if (!isset($options['a'])) {
-    exit(0);
+    echo "Nothing specified via -a\n";
+    exit(1);
 }
 
 // Output snmprec data for snmpsim for use with testing.
