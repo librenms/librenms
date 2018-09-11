@@ -42,16 +42,18 @@ if ($oids) {
             $high_limit = snmp_get($device, "st4TempSensorHighAlarm.$index", '-OQUnv', 'Sentry4-MIB');
             $current = (snmp_get($device, "$temperature_oid", '-OvqU', 'Sentry4-MIB') / $divisor);
 
+            $user_func = null;
             if ($sentry_temp_scale == 'fahrenheit') {
                 $low_warn_limit = fahrenheit_to_celsius($low_warn_limit, $sentry_temp_scale);
                 $low_limit = fahrenheit_to_celsius($low_limit, $sentry_temp_scale);
                 $high_warn_limit = fahrenheit_to_celsius($high_warn_limit, $sentry_temp_scale);
                 $high_limit = fahrenheit_to_celsius($high_limit, $sentry_temp_scale);
                 $current = fahrenheit_to_celsius($current, $sentry_temp_scale);
+                $user_func = 'fahrenheit_to_celsius';
             }
 
             if (is_numeric($current) && $current >= 0) {
-                discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $temperature_oid, 'sentry4', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current, 'snmp', null, null, null);
+                discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $temperature_oid, 'sentry4', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current, 'snmp', null, null, $user_func);
             }
         }
     }
