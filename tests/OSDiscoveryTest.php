@@ -100,12 +100,10 @@ class OSDiscoveryTest extends TestCase
      */
     private function checkOS($expected_os, $filename = null)
     {
-        global $vdebug;
-        set_debug(true);
-        $vdebug = true;
-
         $community = $filename ?: $expected_os;
-
+        global $debug, $vdebug;
+        $debug = true;
+        $vdebug = true;
         ob_start();
         $os = getHostOS($this->genDevice($community));
         $output = ob_get_contents();
