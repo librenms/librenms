@@ -12,7 +12,7 @@ if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.6.')) {
     $tmp_mib = 'ECS3510-MIB';
 } elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.')) {
     $tmp_mib = 'ECS4120-MIB';
-} elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.8.1.11.')) {
+} elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.8.1.11')) {
     $tmp_mib = 'ES3510MA-MIB';
 }
 
