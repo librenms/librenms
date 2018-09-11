@@ -110,7 +110,7 @@ $metrics=data_flatten($data);
 $metrics_keys=array_keys($metrics);
 usort($metrics_keys, "strcasecmp"); //orders them in the manner in which the test script compares them
 //print metrics if needed
-if (isset($options[m])) {
+if (isset($options['m'])) {
     if (isset($options['k'])) {
         foreach ($metrics_keys as $key) {
             print $key."\n";
@@ -153,27 +153,28 @@ if (isset($options['s'])) {
 // prints the json test data file if asked to
 if (isset($options['j'])) {
     $test_data=array(
-        "discovery" => array(
-            "applications" => array(
-                "app_type" => $options['a'],
-                "app_state" => "UNKNOWN",
-                "discovered" => "1",
-                "app_state_prev" => null,
-                "app_status" => "",
-                "app_instance" => "",),
-            "application_metrics" => array(),
+        'applications' => array (
+            "discovery" => array(
+                "applications" => array(
+                    "app_type" => $options['a'],
+                    "app_state" => "UNKNOWN",
+                    "discovered" => "1",
+                    "app_state_prev" => null,
+                    "app_status" => "",
+                    "app_instance" => "",),
+                "application_metrics" => array(),
+            ),
+            "poller" => array(
+                "applications" => array(
+                    "app_type" => $options['a'],
+                    "app_state" => "OK",
+                    "discovered" => "1",
+                    "app_state_prev" => "UNKNOWN",
+                    "app_status" => "",
+                    "app_instance" => "",),
+                "application_metrics" => array(),
+            ),
         ),
-        "poller" => array(
-            "applications" => array(
-                "app_type" => $options['a'],
-                "app_state" => "OK",
-                "discovered" => "1",
-                "app_state_prev" => "UNKNOWN",
-                "app_status" => "",
-                "app_instance" => "",),
-            "application_metrics" => array(),
-        ),
-
     );
     foreach ($metrics_keys as $key) {
         $test_data[poller][application_metrics][]=array(
