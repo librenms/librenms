@@ -15,8 +15,8 @@ modules:
                         - { value: 2, descr: warning, graph: 1, generic: 1 }
                         - { value: 3, descr: critical, graph: 1, generic: 2 }
                         - { value: 4, descr: shutdown, graph: 1, generic: 2 }
-                        - { value: 5, descr: notpresent, graph: 1, generic: 2 }
-                        - { value: 6, descr: notoperational, graph: 1, generic: 3 }
+                        - { value: 5, descr: notpresent, graph: 1, generic: 3 }
+                        - { value: 6, descr: notoperational, graph: 1, generic: 2 }
                 -
                     oid: boxServicesTempSensorsEntry
                     value: boxServicesTempSensorState
@@ -29,8 +29,8 @@ modules:
                         - { value: 2, descr: warning, graph: 1, generic: 1 }
                         - { value: 3, descr: critical, graph: 1, generic: 2 }
                         - { value: 4, descr: shutdown, graph: 1, generic: 2 }
-                        - { value: 5, descr: notpresent, graph: 1, generic: 2 }
-                        - { value: 6, descr: notoperational, graph: 1, generic: 3 }
+                        - { value: 5, descr: notpresent, graph: 1, generic: 3 }
+                        - { value: 6, descr: notoperational, graph: 1, generic: 2 }
  
                 -
                     oid: boxServicesFansEntry
@@ -39,13 +39,13 @@ modules:
                     descr: 'Fan {{ $index }}'
                     index: 'boxServicesFanItemState.{{ $index }}'
                     states:
-                        - { value: 1, descr: notpresent, graph: 1, generic: 1 }
-                        - { value: 2, descr: operational, graph: 1, generic: 2 }
-                        - { value: 3, descr: failed, graph: 1, generic: 3 }
-                        - { value: 4, descr: powering, graph: 1, generic: 4 }
-                        - { value: 5, descr: nopower, graph: 1, generic: 5 }
-                        - { value: 6, descr: notpowering, graph: 1, generic: 6 }
-                        - { value: 7, descr: incompatible, graph: 1, generic: 7 }
+                        - { value: 1, descr: notpresent, graph: 1, generic: 3 }
+                        - { value: 2, descr: operational, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
+                        - { value: 4, descr: powering, graph: 1, generic: 0 }
+                        - { value: 5, descr: nopower, graph: 1, generic: 2 }
+                        - { value: 6, descr: notpowering, graph: 1, generic: 2 }
+                        - { value: 7, descr: incompatible, graph: 1, generic: 1 }
 
         fanspeed:
             data:
