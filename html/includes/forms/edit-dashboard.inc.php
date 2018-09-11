@@ -22,7 +22,7 @@
  * @subpackage Dashboards
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 header('Content-type: application/json');
 
@@ -34,7 +34,7 @@ $dashboard_name = display($_REQUEST['dashboard_name']);
 $access = $_REQUEST['access'] ? 1 : 0;
 
 if (isset($dashboard_id) && isset($dashboard_name) && isset($access)) {
-    if (dbUpdate(['dashboard_name'=> $dashboard_name,'access'=> $access], 'dashboards', '(user_id = ? || access = 2) && dashboard_id = ?', [Auth::id(), $dashboard_id]) >= 0) {
+    if (dbUpdate(['dashboard_name'=> $dashboard_name,'access'=> $access], 'dashboards', '(user_id = ? || access = 2) && dashboard_id = ?', [LegacyAuth::id(), $dashboard_id]) >= 0) {
         $status  = 'ok';
         $message = 'Updated dashboard';
     } else {

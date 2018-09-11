@@ -12,9 +12,9 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
-if (Auth::user()->hasGlobalAdmin()) {
+if (LegacyAuth::user()->hasGlobalAdmin()) {
     if (empty($_POST['token'])) {
         $_POST['token'] = bin2hex(openssl_random_pseudo_bytes(16));
     }
@@ -56,7 +56,7 @@ if (Auth::user()->hasGlobalAdmin()) {
               <div class="col-sm-4">
                 <select class="form-control" id="user_id" name="user_id">
 <?php
-foreach ($userlist = Auth::get()->getUserlist() as $users) {
+foreach ($userlist = LegacyAuth::get()->getUserlist() as $users) {
     echo '<option value="'.$users['user_id'].'">'.$users['username'].'</option>';
 }
 

@@ -1,10 +1,10 @@
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
-if (Auth::user()->hasGlobalRead()) {
+if (LegacyAuth::user()->hasGlobalRead()) {
     if ($vars['addsrv']) {
-        if (Auth::user()->hasGlobalAdmin()) {
+        if (LegacyAuth::user()->hasGlobalAdmin()) {
             $updated = '1';
 
             $service_id = add_service($vars['device'], $vars['type'], $vars['descr'], $vars['ip'], $vars['params'], 0);

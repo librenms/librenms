@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Tests;
 
-class DBTestCase extends TestCase
+abstract class DBTestCase extends TestCase
 {
     protected $db_name;
 

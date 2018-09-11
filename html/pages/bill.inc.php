@@ -1,10 +1,10 @@
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $bill_id = mres($vars['bill_id']);
 
-if (Auth::user()->hasGlobalAdmin()) {
+if (LegacyAuth::user()->hasGlobalAdmin()) {
     include 'pages/bill/actions.inc.php';
 }
 
@@ -100,7 +100,7 @@ if (bill_permitted($bill_id)) {
         'transfer' => 'Transfer Graphs',
         'history' => 'Historical Graphs'
     );
-if (Auth::user()->hasGlobalAdmin()) {
+if (LegacyAuth::user()->hasGlobalAdmin()) {
     $menu_options['edit'] = 'Edit';
     $menu_options['delete'] = 'Delete';
     $menu_options['reset'] = 'Reset';
@@ -124,11 +124,11 @@ foreach ($menu_options as $option => $text) {
 
     print_optionbar_end();
 
-if ($vars['view'] == 'edit' && Auth::user()->hasGlobalAdmin()) {
+if ($vars['view'] == 'edit' && LegacyAuth::user()->hasGlobalAdmin()) {
     include 'pages/bill/edit.inc.php';
-} elseif ($vars['view'] == 'delete' && Auth::user()->hasGlobalAdmin()) {
+} elseif ($vars['view'] == 'delete' && LegacyAuth::user()->hasGlobalAdmin()) {
     include 'pages/bill/delete.inc.php';
-} elseif ($vars['view'] == 'reset' && Auth::user()->hasGlobalAdmin()) {
+} elseif ($vars['view'] == 'reset' && LegacyAuth::user()->hasGlobalAdmin()) {
     include 'pages/bill/reset.inc.php';
 } elseif ($vars['view'] == 'history') {
     include 'pages/bill/history.inc.php';

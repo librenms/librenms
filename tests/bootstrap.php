@@ -24,6 +24,7 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\DB\Eloquent;
 use LibreNMS\Exceptions\DatabaseConnectException;
 use LibreNMS\Util\Snmpsim;
 

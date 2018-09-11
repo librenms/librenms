@@ -1603,6 +1603,8 @@ ucd_diskio:
 users:
   Columns:
     - { Field: user_id, Type: int(11), 'Null': false, Extra: auto_increment }
+    - { Field: auth_type, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: auth_id, Type: int(11), 'Null': true, Extra: '' }
     - { Field: username, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: password, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: realname, Type: varchar(64), 'Null': false, Extra: '' }
@@ -1615,7 +1617,7 @@ users:
     - { Field: remember_token, Type: varchar(100), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [user_id], Unique: true, Type: BTREE }
-    username: { Name: username, Columns: [username], Unique: true, Type: BTREE }
+    username: { Name: username, Columns: [auth_type, username], Unique: true, Type: BTREE }
 users_prefs:
   Columns:
     - { Field: user_id, Type: int(11), 'Null': false, Extra: '' }

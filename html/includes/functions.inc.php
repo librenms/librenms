@@ -12,7 +12,7 @@
  * @copyright  (C) 2013 LibreNMS Group
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 /**
  * Compare $t with the value of $vars[$v], if that exists
@@ -452,7 +452,7 @@ function bill_permitted($bill_id)
 {
     global $permissions;
 
-    if (Auth::user()->hasGlobalRead()) {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $allowed = true;
     } elseif ($permissions['bill'][$bill_id]) {
         $allowed = true;
@@ -472,7 +472,7 @@ function port_permitted($port_id, $device_id = null)
         $device_id = get_device_id_by_port_id($port_id);
     }
 
-    if (Auth::user()->hasGlobalRead()) {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $allowed = true;
     } elseif (device_permitted($device_id)) {
         $allowed = true;
@@ -495,7 +495,7 @@ function application_permitted($app_id, $device_id = null)
             $device_id = get_device_id_by_app_id($app_id);
         }
 
-        if (Auth::user()->hasGlobalRead()) {
+        if (LegacyAuth::user()->hasGlobalRead()) {
             $allowed = true;
         } elseif (device_permitted($device_id)) {
             $allowed = true;
@@ -516,7 +516,7 @@ function device_permitted($device_id)
 {
     global $permissions;
 
-    if (Auth::user()->hasGlobalRead()) {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $allowed = true;
     } elseif ($permissions['device'][$device_id]) {
         $allowed = true;
@@ -883,10 +883,10 @@ function getlocations()
     $locations = array();
 
     // Fetch regular locations
-    if (Auth::user()->hasGlobalRead()) {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $rows = dbFetchRows('SELECT location FROM devices AS D GROUP BY location ORDER BY location');
     } else {
-        $rows = dbFetchRows('SELECT location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? GROUP BY location ORDER BY location', array(Auth::id()));
+        $rows = dbFetchRows('SELECT location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? GROUP BY location ORDER BY location', array(LegacyAuth::id()));
     }
 
     foreach ($rows as $row) {
@@ -1640,18 +1640,18 @@ function get_dashboards($user_id = null)
     $default = get_user_pref('dashboard');
     $dashboards = dbFetchRows(
         "SELECT * FROM `dashboards` WHERE dashboards.access > 0 || dashboards.user_id = ?",
-        array(is_null($user_id) ? Auth::id() : $user_id)
+        array(is_null($user_id) ? LegacyAuth::id() : $user_id)
     );
 
     $usernames = array(
-        Auth::id() => Auth::user()->username
+        LegacyAuth::id() => LegacyAuth::user()->username
     );
 
     $result = array();
     foreach ($dashboards as $dashboard) {
         $duid = $dashboard['user_id'];
         if (!isset($usernames[$duid])) {
-            $user = Auth::get()->getUser($duid);
+            $user = LegacyAuth::get()->getUser($duid);
             $usernames[$duid] = $user['username'];
         }
 

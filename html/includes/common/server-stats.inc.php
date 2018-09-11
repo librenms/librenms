@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $device_id = $widget_settings['device'];
 $column = $widget_settings['columnsize'];
@@ -25,12 +25,12 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             </div>
             <div class="col-sm-6">
                 <select id="device" name="device" class="form-control">';
-    if (Auth::user()->hasGlobalRead()) {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $sql = "SELECT `devices`.`device_id`, `hostname` FROM `devices` WHERE disabled = 0 AND `type` = 'server' ORDER BY `hostname` ASC";
         $param = array();
     } else {
         $sql = "SELECT `devices`.`device_id`, `hostname` FROM `devices` LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id` WHERE disabled = 0 AND `type` = 'server' AND `DP`.`user_id`=? ORDER BY `hostname` ASC";
-        $param = array(Auth::id());
+        $param = array(LegacyAuth::id());
     }
     foreach (dbFetchRows($sql, $param) as $dev) {
         if ($dev['device_id'] == $cur_dev) {

@@ -136,6 +136,53 @@ class Device extends BaseModel
     }
 
     /**
+     * Get the display name of this device (hostname) unless force_ip_to_sysname is set
+     * and hostname is an IP and sysName is set
+     *
+     * @return string
+     */
+    public function displayName()
+    {
+        if (\LibreNMS\Config::get('force_ip_to_sysname') && $this->sysName && IP::isValid($this->hostname)) {
+            return $this->sysName;
+        }
+
+        return $this->hostname;
+    }
+
+    public function formatUptime($short = false)
+    {
+        $result = '';
+        $interval = $this->uptime;
+        $data = [
+            'years' => 31536000,
+            'days' => 86400,
+            'hours' => 3600,
+            'minutes' => 60,
+            'seconds' => 1,
+        ];
+
+        foreach ($data as $k => $v) {
+            if ($interval >= $v) {
+                $diff = floor($interval / $v);
+
+                $result .= " $diff";
+                if ($short) {
+                    $result .= substr($k, 0, 1);
+                } elseif ($diff > 1) {
+                    $result .= $k;
+                } else {
+                    $result .= substr($k, 0, -1);
+                }
+
+                $interval -= $v * $diff;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * @return string
      */
     public function logo()
@@ -224,6 +271,7 @@ class Device extends BaseModel
     }
 
     // ---- Accessors/Mutators ----
+
     public function getIconAttribute($icon)
     {
         if (isset($icon)) {
