@@ -164,6 +164,10 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
             $user_id = $entries[0]['uidnumber'][0];
         }
 
+        if ($user_id === -1) {
+            throw new AuthenticationException();
+        }
+
         $this->authLdapSessionCacheSet('userid', $user_id);
         return $user_id;
     }
