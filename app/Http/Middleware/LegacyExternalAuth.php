@@ -23,12 +23,13 @@ class LegacyExternalAuth
     {
         if (!Auth::check() && LegacyAuth::get()->authIsExternal()) {
             try {
-                $username = LegacyAuth::get()->getExternalUsername();
-                $password = isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : '';
+                $credentials = [
+                    'username' => LegacyAuth::get()->getExternalUsername(),
+                    'password' => isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : ''
+                ];
 
-                if (LegacyAuth::get()->authenticate($username, $password)) {
-                    $user_id = User::thisAuth()->where('username', $username)->value('user_id');
-                     Auth::loginUsingId($user_id);
+                if (Auth::attempt($credentials)) {
+                    throw new AuthenticationException('Failed......');
                 }
             } catch (AuthenticationException $e) {
                 $message = $e->getMessage();
