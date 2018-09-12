@@ -161,7 +161,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
         if ($entries['count']) {
-            $user_id = $entries[0]['uidnumber'][0];
+            $user_id = (int)$entries[0]['uidnumber'][0];
         }
 
         if ($user_id === -1) {
