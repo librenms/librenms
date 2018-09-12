@@ -220,6 +220,7 @@ class LegacyUserProvider implements UserProvider
         // doing this here in case it was null (legacy)
         $user->auth_type = $type;
         $user->auth_id = $auth_id;
+        $user->level = $new_user['level'];
         $user->save();
 
         return $user;
