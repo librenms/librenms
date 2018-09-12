@@ -913,7 +913,7 @@ function get_astext($asn)
         return $cache['astext'][$asn];
     }
 
-    $result = dns_get_record("AS$asn.asn.cymru.com", DNS_TXT);
+    $result = @dns_get_record("AS$asn.asn.cymru.com", DNS_TXT);
     if (!empty($result[0]['txt'])) {
         $txt = explode('|', $result[0]['txt']);
         $result = trim($txt[4], ' "');
