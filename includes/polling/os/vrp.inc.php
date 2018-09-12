@@ -15,19 +15,22 @@ if (!empty($matches[2])) {
     $version .= " (" . trim($matches[2]) . ")";
 }
 
-if (!empty($matches[1])) {
-    $hardware = "Huawei " . trim($matches[1]);
-} else {
-    // The HW cannot be extracted from sysdescr, let's try OIDs
-    $oidList[] = '.1.3.6.1.4.1.2011.2.33.20.1.1.1.3.0';
-    $oidList[] = '.1.3.6.1.4.1.2011.5.25.188.1.4.0';
-    $oidList[] = '.1.3.6.1.4.1.2011.5.25.183.1.25.1.5.1';
-    $oidList[] = '.1.3.6.1.4.1.2011.5.25.31.6.5.0';
-    foreach ($oidList as $oid) {
-        $hardware_tmp = snmp_get($device, $oid, '-OQv');
-        if (!empty($hardware_tmp)) {
-            $hardware = "Huawei " . $hardware_tmp;
-            break;
-        }
+$oidList = [ 
+    'HUAWEI-ENTITY-EXTENT-MIB::hwEntityExtentMIB.6.5.0',
+    'HUAWEI-DEVICE-EXT-MIB::hwProductName.0',
+    'HUAWEI-MIB::hwDatacomm.183.1.25.1.5.1',
+    'HUAWEI-MIB::mlsr.20.1.1.1.3.0',
+];
+foreach ($oidList as $oid) {
+    $hardware_tmp = snmp_get($device, $oid, '-OQv');
+
+    if (!empty($hardware_tmp)) {
+        $hardware = "Huawei " . $hardware_tmp;
+        break;
     }
 }
+
+// Let's use sysDescr if nothing else is found in the OIDs. sysDescr is less detailled than OIDs most of the time
+if (empty($hardware_tmp) && !empty($matches[1])) {
+    $hardware = "Huawei " . trim($matches[1]);
+} 
