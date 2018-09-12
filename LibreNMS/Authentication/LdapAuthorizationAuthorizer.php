@@ -75,8 +75,6 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         }
     }
 
-
-
     public function authenticate($username, $password)
     {
         if ($this->userExists($username)) {
@@ -165,6 +163,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         }
 
         if ($user_id === -1) {
+            // no user or guest user, don't allow
             throw new AuthenticationException();
         }
 
@@ -242,9 +241,11 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
 
     protected function authLdapSessionCacheGet($attr)
     {
-        $ttl = 300;
-        if (Config::get('auth_ldap_cache_ttl')) {
-            $ttl = Config::get('auth_ldap_cache_ttl');
+        $ttl = Config::get('auth_ldap_cache_ttl', 300);
+
+        // no session, don't cache
+        if (!class_exists('Session')) {
+            return null;
         }
 
         // auth_ldap cache present in this session?
@@ -270,10 +271,12 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
 
     protected function authLdapSessionCacheSet($attr, $value)
     {
-        Session::put($attr, [
-            'value' => $value,
-            'last_updated' => Carbon::now(),
-        ]);
+        if (class_exists('Session')) {
+            Session::put($attr, [
+                'value' => $value,
+                'last_updated' => Carbon::now(),
+            ]);
+        }
     }
 
 
