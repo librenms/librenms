@@ -15,4 +15,4 @@ $descr = 'C/N';
 $divisor = 10;
 if (is_numeric($value) && $value > 0){ 
     discover_sensor($valid['sensor'], 'dbm', $device, $cn_oid, 0, $device['os'], $descr, $divisor, 1, null, null, null, null, $value / $divisor );
- }
+}
