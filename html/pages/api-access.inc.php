@@ -142,22 +142,20 @@ echo '
 ';
 
 foreach (ApiToken::all() as $api) {
-    if ($api->disabled == '1') {
-        $api_disabled = 'checked';
-    } else {
-        $api_disabled = '';
-    }
     $user_details = $userlist->where('user_id', $api->user_id)->first();
 
+    $api_disabled = $api->disabled == 1 ? 'checked' : '';
+    $color = $user_details->auth_type == LegacyAuth::getType() ? '' : 'bgcolor="lightgrey"';
+
     echo '
-        <tr id="'.$api->username.'">
+        <tr id="'.$api->id.'" ' . $color . '>
           <td>'.$user_details->username.'</td>
           <td>'.$user_details->auth_type.'</td>
           <td>'.$api->token_hash.'</td>
-          <td><button class="btn btn-info btn-xs" data-toggle="modal" data-target="#display-qr" data-token_hash="'.$api['token_hash'].'"><i class="fa fa-qrcode" ></i></button></td>
-          <td>'.$api['description'].'</td>
-          <td><input type="checkbox" name="token-status" data-token_id="'.$api['id'].'" data-off-text="No" data-on-text="Yes" data-on-color="danger" '.$api_disabled.' data-size="mini"></td>
-          <td><button type="button" class="btn btn-danger btn-xs" id="'.$api['id'].'" data-token_id="'.$api['id'].'" data-toggle="modal" data-target="#confirm-delete">Delete</button></td>
+          <td><button class="btn btn-info btn-xs" data-toggle="modal" data-target="#display-qr" data-token_hash="'.$api->token_hash.'"><i class="fa fa-qrcode" ></i></button></td>
+          <td>'.$api->description.'</td>
+          <td><input type="checkbox" name="token-status" data-token_id="'.$api->id.'" data-off-text="No" data-on-text="Yes" data-on-color="danger" '.$api_disabled.' data-size="mini"></td>
+          <td><button type="button" class="btn btn-danger btn-xs" id="'.$api->id.'" data-token_id="'.$api->id.'" data-toggle="modal" data-target="#confirm-delete">Delete</button></td>
         </tr>
 ';
 }
