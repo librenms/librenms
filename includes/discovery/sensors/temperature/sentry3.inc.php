@@ -1,7 +1,7 @@
 <?php
 
 $oids = snmpwalk_cache_oid($device, 'tempHumidSensorEntry', array(), 'Sentry3-MIB');
-d_echo($oids."\n");
+d_echo($oids);
 $divisor    = '10';
 $multiplier = '1';
 if ($oids) {
@@ -25,7 +25,7 @@ if ($oids) {
             $current = fahrenheit_to_celsius($current, $sentry_temp_scale);
         }
 
-        if (is_numeric($current) && $current >= 0) {
+        if ($current >= 0) {
             discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $sensor_index, 'sentry3', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current, 'snmp', null, null, $user_func);
         }
     }

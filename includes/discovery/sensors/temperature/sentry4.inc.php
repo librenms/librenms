@@ -38,7 +38,7 @@ foreach ($pre_cache['sentry4_temp'] as $index => $data) {
         $current = fahrenheit_to_celsius($current, $sentry_temp_scale);
         $user_func = 'fahrenheit_to_celsius';
     }
-    if (is_numeric($current) && $current >= 0) {
+    if ($current >= 0) {
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'sentry4', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current, 'snmp', null, null, $user_func);
     }
 }
