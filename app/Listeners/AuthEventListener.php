@@ -54,9 +54,7 @@ class AuthEventListener
     {
         DB::table('authlog')->insert(['user' => $event->user->username ?: '', 'address' => Request::ip(), 'result' => 'Logged Out']);
 
-        if (!isset($_SESSION)) {
-            session_start();
-        }
+        @session_start();
         unset($_SESSION['authenticated']);
         session_destroy();
     }
