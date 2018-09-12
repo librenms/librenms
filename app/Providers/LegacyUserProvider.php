@@ -46,9 +46,7 @@ class LegacyUserProvider implements UserProvider
      */
     public function retrieveById($identifier)
     {
-        $username = User::where('user_id', $identifier)->value('username');
-
-        return $this->fetchUserByName($username);
+        return User::find($identifier);
     }
 
     /**
