@@ -72,10 +72,17 @@ class TokenUserProvider extends LegacyUserProvider implements UserProvider
             return $user;
         }
 
-        // missing user for existing token, create it
-        $user_id = ApiToken::idFromToken($credentials['api_token']);
+        // missing user for existing token, create it assuming legacy auth_id
+        $api_token = ApiToken::where('token_hash', $credentials['api_token'])->first();
+        $user = $this->retrieveByLegacyId($api_token->user_id);
 
-        return $this->retrieveById($user_id);
+        // update token user_id
+        if ($user) {
+            $api_token->user_id = $user->user_id;
+            $api_token->save();
+        }
+
+        return $user;
     }
 
     /**
