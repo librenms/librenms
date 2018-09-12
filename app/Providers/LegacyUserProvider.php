@@ -34,6 +34,7 @@ use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Exceptions\AuthenticationException;
 use Request;
 use Session;
+use Toastr;
 
 class LegacyUserProvider implements UserProvider
 {
@@ -48,6 +49,21 @@ class LegacyUserProvider implements UserProvider
         $username = User::where('user_id', $identifier)->value('username');
 
         return $this->fetchUserByName($username);
+    }
+
+    /**
+     * Retrieve a user by their legacy auth specific identifier.
+     *
+     * @param  int $identifier
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     */
+    public function retrieveByLegacyId($identifier)
+    {
+        error_reporting(0);
+        $legacy_user = LegacyAuth::get()->getUser($identifier);
+        error_reporting(-1);
+
+        return $this->fetchUserByName($legacy_user['username']);
     }
 
     /**
@@ -181,10 +197,11 @@ class LegacyUserProvider implements UserProvider
 
                 error_reporting(-1);
             } catch (AuthenticationException $ae) {
-                //
+                Toastr::error($ae->getMessage());
             }
 
             if (empty($new_user)) {
+                Toastr::info("No user ($auth_id) [$username]");
                 return null;
             }
         }
