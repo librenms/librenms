@@ -19,24 +19,16 @@ class LegacyExternalAuth
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next, $guard = null)
     {
-        if (!Auth::check() && LegacyAuth::get()->authIsExternal()) {
-            try {
-                $username = LegacyAuth::get()->getExternalUsername();
-                $password = isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : '';
+        if (!Auth::guard($guard)->check() && LegacyAuth::get()->authIsExternal()) {
+            $credentials = [
+                'username' => LegacyAuth::get()->getExternalUsername(),
+                'password' => isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : ''
+            ];
 
-                if (LegacyAuth::get()->authenticate($username, $password)) {
-                    $user_id = User::thisAuth()->where('username', $username)->value('user_id');
-                     Auth::loginUsingId($user_id);
-                }
-            } catch (AuthenticationException $e) {
-                $message = $e->getMessage();
-                Log::critical('HTTP Auth Error: ' . $message);
-
-                if (!Config::get('auth.debug', false)) {
-                    $message = '';
-                }
+            if (!Auth::guard($guard)->attempt($credentials)) {
+                $message = ''; // no debug info for now...
 
                 // force user to failure page
                 return response(view('auth.external-auth-failed')->with('message', $message));
