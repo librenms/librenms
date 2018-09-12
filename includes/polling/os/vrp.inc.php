@@ -1,10 +1,6 @@
 <?php
 
 //Huawei VRP devices are not providing the HW description in a unified way
-// 
-//We try from SysDescr, as most of the information is already there. 
-//if we succeed, then we don't even have to do an snmp request
-//if we fail, we try a few OIDs
 
 preg_match("/Version [^\s]*/m", $device['sysDescr'], $matches);
 $version = trim(str_replace('Version ', '', $matches[0]));
