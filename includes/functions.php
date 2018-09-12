@@ -37,8 +37,6 @@ function set_debug($state = true, $silence = false)
 
     $debug = $state; // set to global
 
-    $db = \LibreNMS\DB\Eloquent::DB();
-
     restore_error_handler(); // disable Laravel error handler
 
     if (isset($debug) && $debug) {
@@ -47,75 +45,16 @@ function set_debug($state = true, $silence = false)
         ini_set('log_errors', 0);
         error_reporting(E_ALL & ~E_NOTICE);
 
-        if (class_exists('Log')) {
-            $logger = Log::getMonolog();
-
-            // only install if not existing
-            $install = true;
-            $logfile = Config::get('log_file', base_path('logs/librenms.log'));
-            foreach ($logger->getHandlers() as $handler) {
-                if ($handler instanceof \Monolog\Handler\StreamHandler) {
-                    if ($handler->getUrl() == 'php://stdout') {
-                        $install = false;
-                    } elseif ($handler->getUrl() == $logfile) {
-                        // send to librenms log file if not a cli app
-                        if (!App::runningInConsole()) {
-                            set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-                                Log::error("$errno $errfile:$errline $errstr");
-                            });
-                            $handler->setLevel(\Monolog\Logger::DEBUG);
-                        }
-                    }
-                }
-            }
-
-            if ($install) {
-                $handler = new \Monolog\Handler\StreamHandler(
-                    'php://stdout',
-                    \Monolog\Logger::DEBUG
-                );
-
-                $handler->setFormatter(new LibreNMS\Util\CliColorFormatter());
-
-                $logger->pushHandler($handler);
-            }
-        }
-
-        if ($db && !$db->getEventDispatcher()->hasListeners('Illuminate\Database\Events\QueryExecuted')) {
-            $db->listen(function (QueryExecuted $query) {
-                // collect bindings and make them a little more readable
-                $bindings = collect($query->bindings)->map(function ($item) {
-                    if ($item instanceof \Carbon\Carbon) {
-                        return $item->toDateTimeString();
-                    }
-
-                    return $item;
-                })->toJson();
-
-                if (class_exists('Log')) {
-                    Log::debug("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n", ['color' => true]);
-                } else {
-                    c_echo("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n");
-                }
-            });
-        }
+        \LibreNMS\Util\Laravel::enableCliDebugOutput();
+        \LibreNMS\Util\Laravel::enableQueryDebug();
     } else {
         ini_set('display_errors', 0);
         ini_set('display_startup_errors', 0);
         ini_set('log_errors', 1);
         error_reporting($silence ? 0 : E_ERROR);
 
-        if (class_exists('Log')) {
-            $handlers = Log::getMonolog()->getHandlers();
-            if (isset($handlers[0]) && $handlers[0]->getUrl() == 'php://stdout') {
-                Log::getMonolog()->popHandler();
-            }
-        }
-
-        if ($db) {
-            // remove all query executed event handlers
-            $db->getEventDispatcher()->flush('Illuminate\Database\Events\QueryExecuted');
-        }
+        \LibreNMS\Util\Laravel::enableCliDebugOutput();
+        \LibreNMS\Util\Laravel::disableQueryDebug();
     }
 
     return $debug;
