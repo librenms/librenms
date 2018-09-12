@@ -27,7 +27,7 @@ class LegacyExternalAuth
                 'password' => isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : ''
             ];
 
-            if (!Auth::attempt($credentials)) {
+            if (!Auth::guard($guard)->attempt($credentials)) {
                 $message = ''; // no debug info for now...
 
                 // force user to failure page
