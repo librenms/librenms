@@ -1,4 +1,4 @@
-?php
+<?php
  /*
  * LibreNMS Signal Strength for the IRD PBI Headends
  * © 2018 Jozef Rebjak <jozefrebjak@icloud.com>
@@ -14,5 +14,5 @@ $signal_value = snmp_get($device, $signal_oid, '-Oqv');
 $descr = 'Signal Strength';
 $divisor = -10;
 if (is_numeric($signal_value) && $signal_value > 0) {
-    discover_sensor($valid['sensor'], 'signal', $device, $signal_oid, 0, $device['os'], $descr, $divisor, 1, null, null, null, null, $signal_value / $divisor );
+    discover_sensor($valid['sensor'], 'signal', $device, $signal_oid, 0, $device['os'], $descr, $divisor, 1, null, null, null, null, $signal_value / $divisor);
 }
