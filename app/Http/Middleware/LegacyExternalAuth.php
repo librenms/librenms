@@ -28,7 +28,7 @@ class LegacyExternalAuth
                     'password' => isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : ''
                 ];
 
-                if (Auth::attempt($credentials)) {
+                if (!Auth::attempt($credentials)) {
                     throw new AuthenticationException('Failed......');
                 }
             } catch (AuthenticationException $e) {
