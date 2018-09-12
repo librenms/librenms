@@ -8,6 +8,7 @@ use App\Models\User;
 use DB;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
+use LibreNMS\Authentication\LegacyAuth;
 use Request;
 use Session;
 use Toastr;
@@ -40,20 +41,7 @@ class AuthEventListener
         Toastr::info('Welcome ' . ($user->realname ?: $user->username));
 
         // Authenticated, set up legacy session stuff.  TODO Remove once ajax and graphs are ported to Laravel.
-        session_start();
-        $_SESSION['username'] = $user->username;
-
-        // set up legacy variables, but don't override existing ones (ad anonymous bind can only get user_id at login)
-        if (!isset($_SESSION['userlevel'])) {
-            $_SESSION['userlevel'] = $user->level;
-        }
-
-        if (!isset($_SESSION['user_id'])) {
-            $_SESSION['user_id'] = $user->user_id;
-        }
-
-        $_SESSION['authenticated'] = true;
-        session_write_close();
+        LegacyAuth::setUpLegacySession();
     }
 
     /**
