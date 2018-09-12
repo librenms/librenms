@@ -217,8 +217,9 @@ class LegacyUserProvider implements UserProvider
         $user = User::thisAuth()->firstOrNew(['username' => $username], $new_user);
         /** @var User $user */
 
-        // doing this here in case it was null (legacy)
-        $user->auth_type = $type;
+
+        $user->fill($new_user); // fill all attributes
+        $user->auth_type = $type; // doing this here in case it was null (legacy)
         $user->auth_id = $auth_id;
         $user->save();
 
