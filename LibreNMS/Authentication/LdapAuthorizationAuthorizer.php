@@ -150,9 +150,10 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         $user_id = $this->authLdapSessionCacheGet('userid');
         if (isset($user_id)) {
             return $user_id;
-        } else {
-            $user_id = User::thisAuth()->where('username', Config::get('http_auth_guest'))->value('auth_id') ?: -1;
         }
+
+        $guest_username = Config::get('http_auth_guest');
+        $user_id = User::thisAuth()->where('username', $guest_username)->value('auth_id') ?: -1;
 
         $filter  = '(' . Config::get('auth_ldap_prefix') . $username . ')';
         $search  = ldap_search($this->ldap_connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
@@ -164,7 +165,11 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
 
         if ($user_id === -1) {
             // no user or guest user, don't allow
-            throw new AuthenticationException();
+            if ($guest_username) {
+                throw new AuthenticationException();
+            } else {
+                throw new AuthenticationException('Guest login allowed.');
+            }
         }
 
         $this->authLdapSessionCacheSet('userid', $user_id);
