@@ -1531,11 +1531,10 @@ function get_oxidized_nodes_list()
         " . $object['group'] . "
         </td>
         <td>
-          <button class='btn btn-default btn-sm' name='btn-refresh-node-devId" . $device['device_id'] . "' id='btn-refresh-nod
-e-devId" . $device['device_id'] . "' onclick='refresh_oxidized_node(\"" . $device['hostname'] . "\")'>
+          <button class='btn btn-default btn-sm' name='btn-refresh-node-devId" . $device['device_id'] . "' id='btn-refresh-node-devId" . $device['device_id'] . "' onclick='refresh_oxidized_node(\"" . $device['hostname'] . "\")'>
             <i class='fa fa-refresh'></i>
           </button>
-          <a href='/device/device=".$device['device_id']."/tab=showconfig/'>
+          <a href='" . generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig')) . "'>
             <i class='fa fa-align-justify fa-lg icon-theme'></i>
           </a>
         </td>
