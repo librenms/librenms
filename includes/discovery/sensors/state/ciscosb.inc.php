@@ -39,7 +39,7 @@ if (is_array($temp)) {
     foreach ($temp as $index => $entry) {
         $port_descr = get_port_by_index_cache($device['device_id'], str_replace('1.', '', $index));
         $descr = $port_descr['ifDescr'] . ' Suspended Status';
-        if (str_contains($descr, 'ethernet')) {
+        if (str_contains($descr, ['ethernet','Ethernet'])) {
             //Discover Sensors
             discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, $descr, '1', '1', null, null, null, null, $temp[$index]['swIfOperSuspendedStatus'], 'snmp', $index);
 
