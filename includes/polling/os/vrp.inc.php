@@ -11,7 +11,7 @@ if (!empty($matches[2])) {
     $version .= " (" . trim($matches[2]) . ")";
 }
 
-$oidList = [ 
+$oidList = [
     'HUAWEI-ENTITY-EXTENT-MIB::hwEntityExtentMIB.6.5.0',
     'HUAWEI-DEVICE-EXT-MIB::hwProductName.0',
     'HUAWEI-MIB::hwDatacomm.183.1.25.1.5.1',
@@ -29,4 +29,4 @@ foreach ($oidList as $oid) {
 // Let's use sysDescr if nothing else is found in the OIDs. sysDescr is less detailled than OIDs most of the time
 if (empty($hardware_tmp) && !empty($matches[1])) {
     $hardware = "Huawei " . trim($matches[1]);
-} 
+}
