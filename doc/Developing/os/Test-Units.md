@@ -11,7 +11,7 @@ consistent manner.
 
 > We utilise [snmpsim](http://snmpsim.sourceforge.net/) to do unit testing. For OS discovery, we can mock snmpsim, but
 > for other tests you will need it installed and functioning.  We run snmpsim during our integration tests, but not by
-> default when running `./scripts/pre-commit.php`.
+> default when running `./scripts/pre-commit.php`.  You can install snmpsim with the command `pip3 install snmpsim`.
 
 ## Capturing test data
 
@@ -20,7 +20,7 @@ consistent manner.
  Make sure to re-run the script if you add additional support. Check the command-line help for more options.
 
 After you have collected snmp data, run `./scripts/save-test-data.php` with the --os (-o) option to dump the post discovery
-and post poll database entries to json files.
+and post poll database entries to json files. This step requires snmpsim, if you are having issues, the maintainers may help you generate it from the snmprec you created in the previous step.
 
 Generally, you will only need to capture data once.  After you have the data you need in the snmprec file, you can
 just use save-test-data.php to update the database dump (json) after that.
