@@ -116,6 +116,7 @@ Unique-ID: {{ $alert->uid }}
 Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
 @if ($alert->faults) Faults:
 @foreach ($alert->faults as $key => $value)
+  {{ $key }}: {{ $value['string'] }}
 @endforeach
 @endif
 Alert sent to:
@@ -280,6 +281,7 @@ Alert-ID: {{ $alert->id }} <br>
 Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif <br>
 @if ($alert->faults) Faults:
 @foreach ($alert->faults as $key => $value)
+{{ $key }}: {{ $value['string'] }}<br>
 @endforeach 
 @if ($alert->faults) <b>Faults:</b><br>
 @foreach ($alert->faults as $key => $value)<img src="https://server/graph.php?device={{ $value['device_id'] }}&type=device_processor&width=459&height=213&lazy_w=552&from=end-72h><br>
