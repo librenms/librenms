@@ -30,6 +30,7 @@ use App\Models\Notification;
 use Auth;
 use Cache;
 use Carbon\Carbon;
+use DB;
 use Dotenv\Dotenv;
 use Toastr;
 use LibreNMS\Config;
