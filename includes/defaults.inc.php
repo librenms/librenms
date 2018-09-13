@@ -31,8 +31,12 @@ $config['log_dir']     = $config['install_dir'].'/logs';
 // MySQL Debug level
 $config['mysql_log_level']       = 'ERROR';
 
-//MySQL port
+//MySQL Settings
 $config['db_port']               = 3306;
+$config['db_socket']             = null;
+$config['db_name']               = 'librenms';
+$config['db_user']               = 'librenms';
+$config['db_pass']               = null;
 $config['db_socket']             = null;
 
 // What is my own hostname (used to identify this host in its own database)

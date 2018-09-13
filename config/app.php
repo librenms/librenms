@@ -167,6 +167,7 @@ return [
          */
         Laravel\Tinker\TinkerServiceProvider::class,
         Kamaln7\Toastr\ToastrServiceProvider::class,
+        Fideloper\Proxy\TrustedProxyServiceProvider::class,
 
         /*
          * Application Service Providers...
