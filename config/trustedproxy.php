@@ -15,7 +15,7 @@ return [
      * of your proxy (e.g. if using ELB or similar).
      *
      */
-    'proxies' => empty(env('APP_TRUSTED_PROXIES')) ? '*' : explode(',', env('APP_TRUSTED_PROXIES')),
+    'proxies' => \LibreNMS\Util\Env::parseArray('APP_TRUSTED_PROXIES', '*', ['', '*', '**']),
 
     /*
      * To trust one or more specific proxies that connect
