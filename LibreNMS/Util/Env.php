@@ -2,7 +2,7 @@
 /**
  * Env.php
  *
- * -Description-
+ * Helpers to interact with environment variables.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ namespace LibreNMS\Util;
 class Env
 {
     /**
-     * Parse comma separated variable into an array.
+     * Parse comma separated environment variable into an array.
      *
      * @param string $env_name
      * @param mixed $default
