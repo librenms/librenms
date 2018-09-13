@@ -159,10 +159,10 @@ class Component
             }
 
             // Sort each component array so the attributes are in order.
-            if (!empty($RESULT[$RESULT[$COMPONENT['device_id']][$COMPONENT['id']]])) {
+            if (is_array($RESULT[$RESULT[$COMPONENT['device_id']][$COMPONENT['id']]])) {
                 ksort($RESULT[$RESULT[$COMPONENT['device_id']][$COMPONENT['id']]]);
             }
-            if (!empty($RESULT[$RESULT[$COMPONENT['device_id']]])) {
+            if (is_array($RESULT[$RESULT[$COMPONENT['device_id']]])) {
                 ksort($RESULT[$RESULT[$COMPONENT['device_id']]]);
             }
         }
