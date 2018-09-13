@@ -166,7 +166,7 @@ class Checks
                 Toastr::error("<a href='notifications/'>$notification->body</a>", $notification->title);
             }
 
-            if (Device::isUp()->whereTime('last_polled', '<=', Carbon::now()->subMinutes(15))->count() > 0) {
+            if (Device::isUp()->whereTime('last_polled', '<=', DB::raw('DATE_SUB(NOW(), INTERVAL 15 MINUTE)'))->exists()) {
                 Toastr::warning('<a href="poll-log/filter=unpolled/">It appears as though you have some devices that haven\'t completed polling within the last 15 minutes, you may want to check that out :)</a>', 'Devices unpolled');
             }
 
