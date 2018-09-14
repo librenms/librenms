@@ -348,6 +348,13 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
             $sidUnpacked = unpack('H*hex', $sid);
             $sidHex = array_shift($sidUnpacked);
             $subAuths = unpack('H2/H2/n/N/V*', $sid);
+            if (PHP_INT_SIZE <= 4){
+                for ($i = 1; $i <= count($subAuths); $i++) {
+                    if ($subAuths[$i] < 0) {
+                        $subAuths[$i] = $subAuths[$i] + 0x100000000;
+                    }
+                }
+            }
             $revLevel = hexdec(substr($sidHex, 0, 2));
             $authIdent = hexdec(substr($sidHex, 4, 12));
             return 'S-'.$revLevel.'-'.$authIdent.'-'.implode('-', $subAuths);
