@@ -742,7 +742,7 @@ The application should be auto-discovered as described at the top of the page. I
 ```
 extend phpfpmsp /etc/snmp/phpfpm-sp
 ```
-5: Edit /etc/snmp/phpfpm-sp to include the status URL for the PHP-FPM pool you are monitoring.
+5. Edit /etc/snmp/phpfpm-sp to include the status URL for the PHP-FPM pool you are monitoring.
 
 6. Restart snmpd on your host
 
