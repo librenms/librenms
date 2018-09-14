@@ -89,7 +89,7 @@ server {
     rm /etc/nginx/sites-enabled/default
     systemctl restart nginx
 
-#### Configure snmpd
+### Configure snmpd
 
     cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
     vi /etc/snmp/snmpd.conf
