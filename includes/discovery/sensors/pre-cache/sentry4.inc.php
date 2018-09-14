@@ -29,8 +29,8 @@ $pre_cache['sentry4_humid'] = snmpwalk_cache_oid($device, 'st4HumidSensorConfigT
 echo 'st4HumidSensorMonitorTable ';
 $pre_cache['sentry4_humid'] = snmpwalk_cache_oid($device, 'st4HumidSensorMonitorTable', $pre_cache['sentry4_humid'], 'Sentry4-MIB');
 
-echo 'st4TempSensorEventConfigTable ';
-$pre_cache['sentry4_humid'] = snmpwalk_cache_oid($device, 'st4TempSensorEventConfigTable', $pre_cache['sentry4_humid'], 'Sentry4-MIB');
+echo 'st4HumidSensorEventConfigTable ';
+$pre_cache['sentry4_humid'] = snmpwalk_cache_oid($device, 'st4HumidSensorEventConfigTable', $pre_cache['sentry4_humid'], 'Sentry4-MIB');
 
 echo 'st4TempSensorConfigTable ';
 $pre_cache['sentry4_temp'] = snmpwalk_cache_oid($device, 'st4TempSensorConfigTable', array(), 'Sentry4-MIB');
