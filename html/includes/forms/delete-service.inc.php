@@ -11,9 +11,9 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     $status = array('status' =>1, 'message' => 'ERROR: You need to be admin to delete services');
 } else {
     if (!is_numeric($vars['service_id'])) {

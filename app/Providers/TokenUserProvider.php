@@ -1,6 +1,6 @@
 <?php
 /**
- * LegacyAuth.php
+ * TokenUserProvider.php
  *
  * -Description-
  *
@@ -23,36 +23,14 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Extensions;
+namespace App\Providers;
 
-use App\Models\User;
+use App\Models\ApiToken;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
-use LibreNMS\Authentication\Auth as LegacyAuth;
-use LibreNMS\Exceptions\AuthenticationException;
 
-class LegacyUserProvider implements UserProvider
+class TokenUserProvider extends LegacyUserProvider implements UserProvider
 {
-
-    /**
-     * Retrieve a user by their unique identifier.
-     *
-     * @param  mixed $identifier
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
-     */
-    public function retrieveById($identifier)
-    {
-        $user_array = LegacyAuth::get()->getUser($identifier);
-        if (empty($user_array)) {
-            return null;
-        }
-
-        $user = new User($user_array);
-        $user->user_id = $user_array['user_id'];
-
-        return $user;
-    }
-
     /**
      * Retrieve a user by their unique identifier and "remember me" token.
      *
@@ -62,7 +40,7 @@ class LegacyUserProvider implements UserProvider
      */
     public function retrieveByToken($identifier, $token)
     {
-        // TODO: Implement retrieveByToken() method.
+        return null;
     }
 
     /**
@@ -74,7 +52,7 @@ class LegacyUserProvider implements UserProvider
      */
     public function updateRememberToken(Authenticatable $user, $token)
     {
-        // TODO: Implement updateRememberToken() method.
+        return;
     }
 
     /**
@@ -85,10 +63,26 @@ class LegacyUserProvider implements UserProvider
      */
     public function retrieveByCredentials(array $credentials)
     {
-        $username = $credentials['username'];
-        $user_id = LegacyAuth::get()->getUserid($username);
+        if (!ApiToken::isValid($credentials['api_token'])) {
+            return null;
+        }
 
-        return $this->retrieveById($user_id);
+        $user = ApiToken::userFromToken($credentials['api_token']);
+        if (!is_null($user)) {
+            return $user;
+        }
+
+        // missing user for existing token, create it assuming legacy auth_id
+        $api_token = ApiToken::where('token_hash', $credentials['api_token'])->first();
+        $user = $this->retrieveByLegacyId($api_token->user_id);
+
+        // update token user_id
+        if ($user) {
+            $api_token->user_id = $user->user_id;
+            $api_token->save();
+        }
+
+        return $user;
     }
 
     /**
@@ -100,12 +94,6 @@ class LegacyUserProvider implements UserProvider
      */
     public function validateCredentials(Authenticatable $user, array $credentials)
     {
-        try {
-            return LegacyAuth::get()->authenticate($credentials['username'], $credentials['password']);
-        } catch (AuthenticationException $e) {
-            \Toastr::error($e->getMessage());
-        }
-
-        return null;
+        return ApiToken::isValid($credentials['api_token'], $user->user_id);
     }
 }

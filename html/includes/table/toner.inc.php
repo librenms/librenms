@@ -15,7 +15,7 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $graph_type = 'toner_usage';
 
@@ -26,7 +26,7 @@ if (!empty($searchPhrase)) {
 }
 
 $count_sql = "SELECT COUNT(`toner_id`) FROM `toner`";
-$param[] = Auth::id();
+$param[] = LegacyAuth::id();
 
 $count     = dbFetchCell($count_sql, $param);
 if (empty($count)) {

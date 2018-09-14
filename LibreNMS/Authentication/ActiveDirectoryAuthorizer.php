@@ -55,27 +55,6 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         throw new AuthenticationException(ldap_error($this->ldap_connection));
     }
 
-    public function reauthenticate($sess_id, $token)
-    {
-        if ($this->bind(false, true)) {
-            $sess_id = clean($sess_id);
-            $token = clean($token);
-            list($username, $hash) = explode('|', $token);
-
-            if (!$this->userExists($username)) {
-                if (Config::get('auth_ad_debug', false)) {
-                    throw new AuthenticationException("$username is not a valid AD user");
-                }
-                throw new AuthenticationException();
-            }
-
-            return $this->checkRememberMe($sess_id, $token);
-        }
-
-        return false;
-    }
-
-
     protected function userInGroup($username, $groupname)
     {
         // check if user is member of the given group or nested groups
@@ -221,15 +200,6 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         }
 
         return array();
-    }
-
-    public function deleteUser($userid)
-    {
-        dbDelete('bill_perms', '`user_id` =  ?', array($userid));
-        dbDelete('devices_perms', '`user_id` =  ?', array($userid));
-        dbDelete('ports_perms', '`user_id` =  ?', array($userid));
-        dbDelete('users_prefs', '`user_id` =  ?', array($userid));
-        return 0;
     }
 
 

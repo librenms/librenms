@@ -13,9 +13,9 @@
  */
 
 use LibreNMS\Alerting\QueryBuilderFilter;
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
-if (Auth::user()->hasGlobalAdmin()) {
+if (LegacyAuth::user()->hasGlobalAdmin()) {
     $filters = json_encode(new QueryBuilderFilter('alert'));
 
     ?>

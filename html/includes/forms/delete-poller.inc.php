@@ -23,9 +23,9 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     $status = array('status' =>1, 'message' => 'ERROR: You need to be admin to delete poller entries');
 } else {
     $id = $vars['id'];

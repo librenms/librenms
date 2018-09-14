@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $no_refresh = true;
 
@@ -8,13 +8,17 @@ $link_array = array('page'    => 'device',
     'device'  => $device['device_id'],
     'tab' => 'edit');
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     print_error("Insufficient Privileges");
 } else {
     $panes['device']   = 'Device Settings';
     $panes['snmp']     = 'SNMP';
     if (!$device['snmp_disable']) {
         $panes['ports']    = 'Port Settings';
+    }
+
+    if (dbFetchCell("SELECT COUNT(*) FROM `bgpPeers` WHERE `device_id` = ? LIMIT 1", array($device['device_id'])) > 0) {
+        $panes['routing'] = 'Routing';
     }
 
     if (count($config['os'][$device['os']]['icons'])) {

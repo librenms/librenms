@@ -17,8 +17,6 @@
  */
 
 
-use LibreNMS\Authentication\Auth;
-
 $pagetitle[] = 'Virtual Machines';
 ?>
 <div class="table-responsive">

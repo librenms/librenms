@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 
 class AjaxController extends Controller
 {
+    // FIXME do not just pile functions on this controller, create separate controllers
+
     public function setResolution(Request $request)
     {
         $this->validate($request, [

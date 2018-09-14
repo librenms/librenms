@@ -1,10 +1,10 @@
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IPv6;
 
-if (!Auth::user()->hasGlobalRead()) {
+if (!LegacyAuth::user()->hasGlobalRead()) {
     include 'includes/error-no-perm.inc.php';
 } else {
     $link_array = array(
@@ -195,7 +195,7 @@ if (!Auth::user()->hasGlobalRead()) {
     print_optionbar_end();
 
     echo "<table border=0 cellspacing=0 cellpadding=5 width=100% class='table sortable'>";
-    echo '<tr style="height: 30px"><td width=1></td><th>Local address</th><th></th><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>State</th><th width=200>Uptime / Updates</th></tr>';
+    echo '<tr style="height: 30px"><td width=1></td><th>Local address</th><th></th><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>Peer description</th><th>State</th><th width=200>Uptime / Updates</th></tr>';
 
     if ($vars['type'] == 'external') {
         $where = 'AND D.bgpLocalAs != B.bgpPeerRemoteAs';
@@ -302,6 +302,7 @@ if (!Auth::user()->hasGlobalRead()) {
             <td width=50><b>$peer_type</b></td>
             <td width=50>".$peer['afi'].'</td>
             <td><strong>AS'.$peer['bgpPeerRemoteAs'].'</strong><br />'.$peer['astext']."</td>
+            <td>".$peer['bgpPeerDescr']."</td>
             <td><strong><span style='color: $admin_col;'>".$peer['bgpPeerAdminStatus']."</span><br /><span style='color: $col;'>".$peer['bgpPeerState'].'</span></strong></td>
             <td>'.formatUptime($peer['bgpPeerFsmEstablishedTime'])."<br />
             Updates <i class='fa fa-arrow-down icon-theme' aria-hidden='true'></i> ".format_si($peer['bgpPeerInUpdates'])."

@@ -1,0 +1,1 @@
+ALTER TABLE `bgpPeers` ADD `bgpPeerDescr` VARCHAR(255) NOT NULL DEFAULT '' AFTER `bgpPeerRemoteAddr`;
