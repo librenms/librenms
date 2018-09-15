@@ -194,7 +194,7 @@ class Database extends BaseValidation
         if (empty($schema_update)) {
             $validator->ok('Database schema correct');
         } else {
-            $result = ValidationResult::fail("We have detected that your database schema may be wrong, please report the following to us on IRC or the community site (https://t.libren.ms/5gscd):")
+            $result = ValidationResult::fail("We have detected that your database schema may be wrong, please report the following to us on Discord (https://t.libren.ms/discord) or the community site (https://t.libren.ms/5gscd):")
                 ->setFix('Run the following SQL statements to fix.')
                 ->setList('SQL Statements', $schema_update);
             $validator->result($result);
