@@ -4,6 +4,7 @@
  * LibreNMS
  *
  * Copyright (c) 2014 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk>
+ * Copyright (c) 2018 TheGreatDoc <https://github.com/TheGreatDoc>
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

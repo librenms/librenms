@@ -5,6 +5,7 @@
  *
  * Copyright (c) 2014 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk>
  * Copyright (c) 2017 Tony Murray <https://github.com/murrant>
+ * Copyright (c) 2018 TheGreatDoc <https://github.com/TheGreatDoc>
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -81,7 +82,7 @@ foreach (dbFetchRows("SELECT * FROM `$table` WHERE `device_id` = ? AND `sensor_d
         </div>
         </td>
         <td>
-        <input type="checkbox" name="alert-status" data-device_id="'.$sensor['device_id'].'" data-sensor_id="'.$sensor['sensor_id'].'" '.$alert_status.'>
+        <input type="checkbox" name="alert-status" data-device_id="'.$sensor['device_id'].'" data-sensor_id="'.$sensor['sensor_id'].'" data-sensor_desc="'.$sensor['sensor_descr'].'" '.$alert_status.'>
         </td>
         <td>
         <a type="button" class="btn btn-danger btn-sm '.$custom.' remove-custom" id="remove-custom" name="remove-custom" data-sensor_id="'.$sensor['sensor_id'].'">Clear custom</a>
@@ -111,18 +112,27 @@ foreach ($rollback as $reset_data) {
 <script>
 $('#newThread').on('click', function(e){
     e.preventDefault(); // preventing default click action
+
     var form = $('#alert-reset');
+
     $.ajax({
         type: 'POST',
             url: 'ajax_form.php',
             data: form.serialize(),
-      dataType: "html",
+      dataType: "json",
       success: function(data){
-          //alert(data);
-          location.reload(true);
+          if (data.status == 'ok') {
+              toastr.success(data.message);
+              setTimeout(function() {
+                  location.reload(true);
+              }, 2000);
+          } else {
+              toastr.error(data.message);
+          }
+
       },
           error:function(){
-              //alert('bad');
+              toastr.error(data.message);
           }
     });
 });
@@ -171,16 +181,25 @@ $('input[name="alert-status"]').on('switchChange.bootstrapSwitch',  function(eve
     var $this = $(this);
     var device_id = $(this).data("device_id");
     var sensor_id = $(this).data("sensor_id");
+    var sensor_desc = $(this).data("sensor_desc");
     $.ajax({
         type: 'POST',
             url: 'ajax_form.php',
-            data: { type: "<?php echo $ajax_prefix; ?>-alert-update", device_id: device_id, sensor_id: sensor_id, state: state},
-            dataType: "html",
+            data: { type: "<?php echo $ajax_prefix; ?>-alert-update", device_id: device_id, sensor_id: sensor_id, sensor_desc: sensor_desc, state: state},
+            dataType: "json",
             success: function(data){
-                //alert('good');
+                if (data.status != 'error') {
+                    if (data.status == 'ok') {
+                        toastr.success(data.message);
+                    } else {
+                        toastr.info(data.message);
+                    }
+                } else {
+                    toastr.error(data.message);
+                }
             },
                 error:function(){
-                    //alert('bad');
+                    toastr.error(data.message);
                 }
     });
 });
@@ -192,12 +211,13 @@ $("[name='remove-custom']").on('click', function(event) {
         type: 'POST',
             url: 'ajax_form.php',
             data: { type: "<?php echo $ajax_prefix; ?>-alert-update", sensor_id: sensor_id, sub_type: "remove-custom" },
-            dataType: "html",
+            dataType: "json",
             success: function(data){
+                toastr.success(data.message);
                 $this.addClass('disabled');
             },
                 error:function(){
-                    //alert('bad');
+                    toastr.error(data.message);
                 }
     });
 });
