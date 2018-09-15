@@ -149,10 +149,15 @@ $( ".sensor" ).bind('blur keyup',function(e) {
         type: 'POST',
             url: 'ajax_form.php',
             data: { type: "<?php echo $ajax_prefix; ?>-update", device_id: device_id, data: data, sensor_id: sensor_id , value_type: value_type},
-            dataType: "html",
+            dataType: "json",
             success: function(data){
+            if (data.status == 'ok') {
                 $('.remove-custom[data-sensor_id='+sensor_id+']').removeClass('disabled');
                 toastr.success(data.message);
+            } else {
+                toastr.error(data.message);
+            }
+
             },
             error:function(){
                 toastr.error(data.message);
