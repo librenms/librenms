@@ -25,6 +25,8 @@ echo "<h3>$title</h3>";
     <th>Desc</th>
     <th>Current</th>
     <th class="col-sm-1">High</th>
+    <th class="col-sm-1">High warn</th>
+    <th class="col-sm-1">Low warn</th>
     <th class="col-sm-1">Low</th>
     <th class="col-sm-2">Alerts</th>
     <th></th>
@@ -35,6 +37,8 @@ foreach (dbFetchRows("SELECT * FROM `$table` WHERE `device_id` = ? AND `sensor_d
     $rollback[] = array(
         'sensor_id'        => $sensor['sensor_id'],
         'sensor_limit'     => $sensor['sensor_limit'],
+        'sensor_limit_warn'     => $sensor['sensor_limit_warn'],
+        'sensor_limit_low_warn' => $sensor['sensor_limit_low_warn'],
         'sensor_limit_low' => $sensor['sensor_limit_low'],
         'sensor_alert'     => $sensor['sensor_alert'],
     );
@@ -59,17 +63,21 @@ foreach (dbFetchRows("SELECT * FROM `$table` WHERE `device_id` = ? AND `sensor_d
         <td>
         <div class="form-group has-feedback">
         <input type="text" class="form-control input-sm sensor" id="high-'.$sensor['device_id'].'" data-device_id="'.$sensor['device_id'].'" data-value_type="sensor_limit" data-sensor_id="'.$sensor['sensor_id'].'" value="'.$sensor['sensor_limit'].'">
-        <span class="form-control-feedback">
-            <i class="fa" aria-hidden="true"></i>
-        </span>
+        </div>
+        </td>
+        <td>
+        <div class="form-group has-feedback">
+        <input type="text" class="form-control input-sm sensor" id="high-'.$sensor['device_id'].'-warn" data-device_id="'.$sensor['device_id'].'" data-value_type="sensor_limit_warn" data-sensor_id="'.$sensor['sensor_id'].'" value="'.$sensor['sensor_limit_warn'].'">
+        </div>
+        </td>
+        <td>
+        <div class="form-group has-feedback">
+        <input type="text" class="form-control input-sm sensor" id="low-'.$sensor['device_id'].'-warn" data-device_id="'.$sensor['device_id'].'" data-value_type="sensor_limit_low_warn" data-sensor_id="'.$sensor['sensor_id'].'" value="'.$sensor['sensor_limit_low_warn'].'">
         </div>
         </td>
         <td>
         <div class="form-group has-feedback">
         <input type="text" class="form-control input-sm sensor" id="low-'.$sensor['device_id'].'" data-device_id="'.$sensor['device_id'].'" data-value_type="sensor_limit_low" data-sensor_id="'.$sensor['sensor_id'].'" value="'.$sensor['sensor_limit_low'].'">
-        <span class="form-control-feedback">
-            <i class="fa" aria-hidden="true"></i>
-        </span>
         </div>
         </td>
         <td>
@@ -90,6 +98,8 @@ foreach ($rollback as $reset_data) {
     echo '
         <input type="hidden" name="sensor_id[]" value="'.$reset_data['sensor_id'].'">
         <input type="hidden" name="sensor_limit[]" value="'.$reset_data['sensor_limit'].'">
+        <input type="hidden" name="sensor_limit_warn[]" value="'.$reset_data['sensor_limit_warn'].'">
+        <input type="hidden" name="sensor_limit_low_warn[]" value="'.$reset_data['sensor_limit_low_warn'].'">
         <input type="hidden" name="sensor_limit_low[]" value="'.$reset_data['sensor_limit_low'].'">
         <input type="hidden" name="sensor_alert[]" value="'.$reset_data['sensor_alert'].'">
         ';
@@ -141,23 +151,12 @@ $( ".sensor" ).bind('blur keyup',function(e) {
             data: { type: "<?php echo $ajax_prefix; ?>-update", device_id: device_id, data: data, sensor_id: sensor_id , value_type: value_type},
             dataType: "html",
             success: function(data){
-                $this.closest('.form-group').addClass('has-success');
-                $this.next().find('.fa').addClass('fa-check');
-                $this.data('val', $this.val());
                 $('.remove-custom[data-sensor_id='+sensor_id+']').removeClass('disabled');
-                setTimeout(function(){
-                    $this.closest('.form-group').removeClass('has-success');
-                    $this.next().find('.fa').removeClass('fa-check');
-                }, 2000);
+                toastr.success(data.message);
             },
-                error:function(){
-                    $this.closest('.form-group').addClass('has-error');
-                    $this.next().find('.fa').addClass('fa-times');
-                    setTimeout(function(){
-                        $this.closest('.form-group').removeClass('has-error');
-                        $this.next().find('.fa').removeClass('fa-times');
-                    }, 2000);
-                }
+            error:function(){
+                toastr.error(data.message);
+            }
     });
 });
 
