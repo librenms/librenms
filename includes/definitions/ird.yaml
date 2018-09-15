@@ -1,8 +1,10 @@
 os: ird
-text: 'Linux'
+text: 'PBI Digital Decoder'
 type: network
 icon: pbi
-group: ird
+group: pbi
+mib_dir:
+    - pbi
 over:
     - { graph: device_signal, text: 'Signal Strength' }
 discovery:
