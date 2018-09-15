@@ -53,7 +53,7 @@ function set_debug($state = true, $silence = false)
         ini_set('log_errors', 1);
         error_reporting($silence ? 0 : E_ERROR);
 
-        \LibreNMS\Util\Laravel::enableCliDebugOutput();
+        \LibreNMS\Util\Laravel::disableCliDebugOutput();
         \LibreNMS\Util\Laravel::disableQueryDebug();
     }
 
