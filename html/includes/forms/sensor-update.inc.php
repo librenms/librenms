@@ -51,6 +51,5 @@ if (!is_numeric($device_id)) {
 $response = array(
     'status'        => $status,
     'message'       => $message,
-    'extra'         => $extra,
 );
 echo _json_encode($response);
