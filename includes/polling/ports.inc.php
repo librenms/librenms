@@ -402,7 +402,6 @@ if ($config['enable_ports_nac']) {
             dbQuery("UPDATE `ports_nac` SET `port_descr` = '".$ports_mapped_desc."' WHERE `ports_nac`.`port_id` = '".$ports_mapped_id."';");
         }
         $cafSessionMethodsInfoEntry = snmpwalk_cache_oid($device, 'cafSessionMethodsInfoEntry', array(), 'CISCO-AUTH-FRAMEWORK-MIB');
-        print_r($cafSessionMethodsInfoEntry);
         foreach ($cafSessionMethodsInfoEntry as $cafSessionMethodsInfoEntryNAC => $cafSessionMethodsInfoEntryParameters) {
             $port_index_nac = substr($cafSessionMethodsInfoEntryNAC, 0, strpos($cafSessionMethodsInfoEntryNAC, "."));
             $port_method_nac = substr(strstr(substr(strstr($cafSessionMethodsInfoEntryNAC, "."),1),"."),1);
