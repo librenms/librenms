@@ -377,9 +377,11 @@ if ($config['enable_ports_nac']) {
                 echo "Not found\n";
                 dbInsert(array('auth_id' => $port_auth_id_nac), 'ports_nac');
             }
+            $IPHextpDec = explode(' ',$PortAuthSessionEntryParameters['cafSessionClientAddress']);
+            $IPHextpDec = hexdec($IPHextpDec[0]).'.'.hexdec($IPHextpDec[1]).'.'.hexdec($IPHextpDec[2]).'.'.hexdec($IPHextpDec[3]);
             dbQuery("UPDATE `ports_nac` SET `port_index` = ".$port_index_nac." WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
             dbQuery("UPDATE `ports_nac` SET `PortAuthSessionMacAddress` = '".$PortAuthSessionEntryParameters['cafSessionClientMacAddress']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
-            dbQuery("UPDATE `ports_nac` SET `PortAuthSessionIPAddress` = '".$PortAuthSessionEntryParameters['cafSessionClientAddress']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
+            dbQuery("UPDATE `ports_nac` SET `PortAuthSessionIPAddress` = '".$IPHextpDec."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
             dbQuery("UPDATE `ports_nac` SET `PortAuthSessionAuthzStatus` = '".$PortAuthSessionEntryParameters['cafSessionStatus']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
             dbQuery("UPDATE `ports_nac` SET `PortAuthSessionDomain` = '".$PortAuthSessionEntryParameters['cafSessionDomain']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
             dbQuery("UPDATE `ports_nac` SET `PortAuthSessionHostMode` = '".$PortAuthSessionEntryParameters['cafSessionAuthHostMode']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
