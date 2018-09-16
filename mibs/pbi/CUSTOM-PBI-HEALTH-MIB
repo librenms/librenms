@@ -55,6 +55,15 @@ satFrequency OBJECT-TYPE
    DESCRIPTION
       "The satellite frequency"
    ::= { global7 2 }
+   
+lnbFrequency OBJECT-TYPE
+   SYNTAX   INTEGER
+   UNITS    "MHz"
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION
+      "The LNB frequency"
+   ::= { global7 1 }  
 
 lnbVoltageState OBJECT-TYPE
     SYNTAX INTEGER {
