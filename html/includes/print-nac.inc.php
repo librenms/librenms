@@ -16,7 +16,7 @@ echo '<table class="table table-hover table-condensed">
         </tr>
     </thead>';
 
-foreach (dbFetchRows('SELECT * FROM ports_nac ORDER BY `ports_nac`.`port_index` ASC') as $nac) {
+foreach (dbFetchRows('SELECT * FROM ports_nac WHERE device_id = '.$device['device_id'].' ORDER BY `ports_nac`.`port_index` ASC') as $nac) {
 
     echo '<td>' . $nac['port_descr'] . '</td>';
     echo '<td>' . strtoupper($nac['PortAuthSessionMacAddress']) . '</td>';
