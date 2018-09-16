@@ -78,5 +78,20 @@ lnbVoltageState OBJECT-TYPE
     "  Current LNB Voltage state.
     "
     ::= {global7 4}
+    
+    diseqcState OBJECT-TYPE
+     SYNTAX INTEGER {
+         diseqcStateOff(0),
+         diseqcStatePortA(1),
+         diseqcStatePortB(2),
+         diseqcStatePortC(3) ,
+         diseqcStatePortD(4)
+     }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+     "  Current DiSEQC state.
+     "
+     ::= {global7 6}
 
 END
