@@ -440,6 +440,7 @@ Enable / disable additional port statistics.
 
 ```php
 $config['rancid_configs'][]             = '/var/lib/rancid/network/configs/';
+$config['rancid_repo_type']             = 'svn';
 $config['rancid_ignorecomments']        = 0;
 ```
 Rancid configuration, `rancid_configs` is an array containing all of the locations of your rancid files.

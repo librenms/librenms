@@ -11,9 +11,9 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
-if (Auth::user()->hasGlobalAdmin()) {
+if (LegacyAuth::user()->hasGlobalAdmin()) {
     ?>
 <!--Modal for adding or updating a transport group -->
     <div class="modal fade" id="edit-transport-group" tabindex="-1" role="dialog"

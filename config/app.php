@@ -64,7 +64,7 @@ return [
     |
     */
 
-    'timezone' => ini_get('date.timezone'), // use existing timezone
+    'timezone' => ini_get('date.timezone') ?: 'UTC', // use existing timezone
 
     /*
     |--------------------------------------------------------------------------
@@ -167,6 +167,7 @@ return [
          */
         Laravel\Tinker\TinkerServiceProvider::class,
         Kamaln7\Toastr\ToastrServiceProvider::class,
+        Fideloper\Proxy\TrustedProxyServiceProvider::class,
 
         /*
          * Application Service Providers...

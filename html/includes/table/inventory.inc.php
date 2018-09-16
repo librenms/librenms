@@ -1,17 +1,17 @@
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $where = '1';
 $param = array();
 
 
 
-if (Auth::user()->hasGlobalRead()) {
+if (LegacyAuth::user()->hasGlobalRead()) {
     $sql = " FROM entPhysical AS E, devices AS D WHERE $where AND D.device_id = E.device_id";
 } else {
     $sql     = " FROM entPhysical AS E, devices AS D, devices_perms AS P WHERE $where AND D.device_id = E.device_id AND P.device_id = D.device_id AND P.user_id = ?";
-    $param[] = Auth::id();
+    $param[] = LegacyAuth::id();
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {

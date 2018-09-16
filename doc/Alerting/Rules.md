@@ -41,9 +41,9 @@ __Conditions__ can be any of:
 - Less or Equal `<=`
 - Regex `REGEXP`
 
-__Values__ can be an entity or any data.
+__Values__ can be an entity or any data. If using macros as value you must include the macro name into backticks. i.e. \`macros.past_60m`
 
-__Note__: Regex supports MySQL Regular expressions
+__Note__: Regex supports MySQL Regular expressions.
 
 Arithmetics are allowed as well.
 

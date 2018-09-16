@@ -84,7 +84,7 @@ Add the following config, edit `ServerName` as required:
     a2enmod rewrite
     systemctl restart apache2
 
-#### Configure snmpd
+### Configure snmpd
 
     cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
     vi /etc/snmp/snmpd.conf

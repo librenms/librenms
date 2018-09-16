@@ -23,18 +23,16 @@
  * @author     Vivia Nguyen-Tran <vivia@ualberta.ca>
  */
 
-use LibreNMS\Authentication\Auth;
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Translation\FileLoader;
 use Illuminate\Translation\Translator;
-use Illuminate\Validation\DatabasePresenceVerifier;
 use Illuminate\Validation\Factory;
+use LibreNMS\Authentication\LegacyAuth;
 
 header('Content-type: application/json');
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     die(json_encode([
         'status' => 'error',
         'message' => 'You need to be admin'

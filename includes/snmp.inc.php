@@ -84,28 +84,24 @@ function get_mib_dir($device)
  * If $mibdir is empty '', return an empty string
  *
  * @param string $mibdir should be the name of the directory within $config['mib_dir']
- * @param string $device
+ * @param array $device
  * @return string The option string starting with -M
  */
-function mibdir($mibdir = null, $device = array())
+function mibdir($mibdir = null, $device = [])
 {
-    global $config;
+    $base = Config::get('mib_dir');
+    $dirs = get_mib_dir($device);
+    $dirs[] = "$base/$mibdir";
 
-    $extra_dir = implode(':', get_mib_dir($device));
-    if (!empty($extra_dir)) {
-        $extra_dir = ":".$extra_dir;
-    }
+    // make sure base directory is included first
+    array_unshift($dirs, $base);
 
-    if (is_null($mibdir)) {
-        return " -M ${config['mib_dir']}$extra_dir";
-    }
+    // remove trailing /, remove empty dirs, and remove duplicates
+    $dirs = array_unique(array_filter(array_map(function ($dir) {
+        return rtrim($dir, '/');
+    }, $dirs)));
 
-    if (empty($mibdir)) {
-        // use system mibs
-        return '';
-    }
-
-    return " -M ${config['mib_dir']}$extra_dir:${config['mib_dir']}/$mibdir";
+    return " -M " . implode(':', $dirs);
 }//end mibdir()
 
 /**

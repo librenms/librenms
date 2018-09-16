@@ -55,27 +55,6 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         throw new AuthenticationException(ldap_error($this->ldap_connection));
     }
 
-    public function reauthenticate($sess_id, $token)
-    {
-        if ($this->bind(false, true)) {
-            $sess_id = clean($sess_id);
-            $token = clean($token);
-            list($username, $hash) = explode('|', $token);
-
-            if (!$this->userExists($username)) {
-                if (Config::get('auth_ad_debug', false)) {
-                    throw new AuthenticationException("$username is not a valid AD user");
-                }
-                throw new AuthenticationException();
-            }
-
-            return $this->checkRememberMe($sess_id, $token);
-        }
-
-        return false;
-    }
-
-
     protected function userInGroup($username, $groupname)
     {
         // check if user is member of the given group or nested groups
@@ -223,15 +202,6 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         return array();
     }
 
-    public function deleteUser($userid)
-    {
-        dbDelete('bill_perms', '`user_id` =  ?', array($userid));
-        dbDelete('devices_perms', '`user_id` =  ?', array($userid));
-        dbDelete('ports_perms', '`user_id` =  ?', array($userid));
-        dbDelete('users_prefs', '`user_id` =  ?', array($userid));
-        return 0;
-    }
-
 
     public function getUserlist()
     {
@@ -375,12 +345,19 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 
     protected function sidFromLdap($sid)
     {
-            $sidUnpacked = unpack('H*hex', $sid);
-            $sidHex = array_shift($sidUnpacked);
-            $subAuths = unpack('H2/H2/n/N/V*', $sid);
-            $revLevel = hexdec(substr($sidHex, 0, 2));
-            $authIdent = hexdec(substr($sidHex, 4, 12));
-            return 'S-'.$revLevel.'-'.$authIdent.'-'.implode('-', $subAuths);
+        $sidUnpacked = unpack('H*hex', $sid);
+        $sidHex = array_shift($sidUnpacked);
+        $subAuths = unpack('H2/H2/n/N/V*', $sid);
+        if (PHP_INT_SIZE <= 4) {
+            for ($i = 1; $i <= count($subAuths); $i++) {
+                if ($subAuths[$i] < 0) {
+                    $subAuths[$i] = $subAuths[$i] + 0x100000000;
+                }
+            }
+        }
+        $revLevel = hexdec(substr($sidHex, 0, 2));
+        $authIdent = hexdec(substr($sidHex, 4, 12));
+        return 'S-'.$revLevel.'-'.$authIdent.'-'.implode('-', $subAuths);
     }
 
     /**

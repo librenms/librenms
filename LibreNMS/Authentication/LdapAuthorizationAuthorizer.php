@@ -39,8 +39,11 @@
 
 namespace LibreNMS\Authentication;
 
+use App\Models\User;
+use Carbon\Carbon;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
+use Session;
 
 class LdapAuthorizationAuthorizer extends AuthorizerBase
 {
@@ -49,10 +52,6 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
 
     public function __construct()
     {
-        if (! isset($_SESSION['username'])) {
-            $_SESSION['username'] = '';
-        }
-
         if (!function_exists('ldap_connect')) {
             throw new AuthenticationException("PHP does not support LDAP, please install or enable the PHP LDAP extension.");
         }
@@ -76,17 +75,14 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         }
     }
 
-
     public function authenticate($username, $password)
     {
-        if (isset($_SERVER['REMOTE_USER'])) {
-            $_SESSION['username'] = mres($_SERVER['REMOTE_USER']);
+        if ($this->userExists($username)) {
+            return true;
+        }
 
-            if ($this->userExists($_SESSION['username'])) {
-                return true;
-            }
-
-            $_SESSION['username'] = Config::get('http_auth_guest');
+        $guest = Config::get('http_auth_guest');
+        if ($guest && User::thisAuth()->where('username', $guest)->exists()) {
             return true;
         }
 
@@ -154,16 +150,26 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         $user_id = $this->authLdapSessionCacheGet('userid');
         if (isset($user_id)) {
             return $user_id;
-        } else {
-            $user_id = -1;
         }
+
+        $guest_username = Config::get('http_auth_guest');
+        $user_id = User::thisAuth()->where('username', $guest_username)->value('auth_id') ?: -1;
 
         $filter  = '(' . Config::get('auth_ldap_prefix') . $username . ')';
         $search  = ldap_search($this->ldap_connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
         if ($entries['count']) {
-            $user_id = $entries[0]['uidnumber'][0];
+            $user_id = (int)$entries[0]['uidnumber'][0];
+        }
+
+        if ($user_id === -1) {
+            // no user or guest user, don't allow
+            if ($guest_username) {
+                throw new AuthenticationException();
+            } else {
+                throw new AuthenticationException('Guest login allowed.');
+            }
         }
 
         $this->authLdapSessionCacheSet('userid', $user_id);
@@ -212,9 +218,10 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
 
     public function getUser($user_id)
     {
-        foreach ($this->getUserlist() as $users) {
-            if ($users['user_id'] === $user_id) {
-                return $users['username'];
+        foreach ($this->getUserlist() as $user) {
+            if ((int)$user['user_id'] === (int)$user_id) {
+                $user['level'] = $this->getUserlevel($user['username']);
+                return $user;
             }
         }
         return 0;
@@ -240,17 +247,19 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
 
     protected function authLdapSessionCacheGet($attr)
     {
-        $ttl = 300;
-        if (Config::get('auth_ldap_cache_ttl')) {
-            $ttl = Config::get('auth_ldap_cache_ttl');
-        }
+        $ttl = Config::get('auth_ldap_cache_ttl', 300);
 
-        // auth_ldap cache present in this session?
-        if (! isset($_SESSION['auth_ldap'])) {
+        // no session, don't cache
+        if (!class_exists('Session')) {
             return null;
         }
 
-        $cache = $_SESSION['auth_ldap'];
+        // auth_ldap cache present in this session?
+        if (!Session::has('auth_ldap')) {
+            return null;
+        }
+
+        $cache = Session::get('auth_ldap');
 
         // $attr present in cache?
         if (! isset($cache[$attr])) {
@@ -268,8 +277,12 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
 
     protected function authLdapSessionCacheSet($attr, $value)
     {
-        $_SESSION['auth_ldap'][$attr]['value'] = $value;
-        $_SESSION['auth_ldap'][$attr]['last_updated'] = time();
+        if (class_exists('Session')) {
+            Session::put($attr, [
+                'value' => $value,
+                'last_updated' => Carbon::now(),
+            ]);
+        }
     }
 
 

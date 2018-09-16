@@ -24,9 +24,9 @@
  */
 
 use LibreNMS\Alerting\QueryBuilderParser;
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     echo("Insufficient Privileges");
     exit();
 }

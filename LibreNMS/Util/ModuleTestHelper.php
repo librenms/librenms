@@ -509,6 +509,10 @@ class ModuleTestHelper
         try {
             Config::set('snmp.community', [$this->file_name]);
             $device_id = addHost($snmpsim->getIp(), 'v2c', $snmpsim->getPort());
+
+            // disable to block normal pollers
+            dbUpdate(['disabled' => 1], 'devices', 'device_id=?', [$device_id]);
+
             $this->qPrint("Added device: $device_id\n");
         } catch (\Exception $e) {
             echo $this->file_name . ': ' . $e->getMessage() . PHP_EOL;

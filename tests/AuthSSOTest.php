@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Tests;
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Exceptions\AuthenticationException;
 
 class AuthSSOTest extends DBTestCase
@@ -111,7 +111,7 @@ class AuthSSOTest extends DBTestCase
 
     public function breakUser()
     {
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         if ($this->last_user !== null) {
             $r = $a->deleteUser($a->getUserid($this->last_user));
@@ -128,7 +128,7 @@ class AuthSSOTest extends DBTestCase
         global $config;
 
         $this->basicConfig();
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         $config['sso']['create_users'] = false;
         $config['sso']['update_users'] = false;
@@ -151,7 +151,7 @@ class AuthSSOTest extends DBTestCase
         global $config;
 
         $this->basicConfig();
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         $config['sso']['create_users'] = true;
         $config['sso']['update_users'] = false;
@@ -186,7 +186,7 @@ class AuthSSOTest extends DBTestCase
         global $config;
 
         $this->basicConfig();
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         // Create a random username and store it with the defaults
         $this->basicEnvironmentEnv();
@@ -212,7 +212,7 @@ class AuthSSOTest extends DBTestCase
         global $config;
 
         $this->basicConfig();
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         $this->basicEnvironmentEnv();
         unset($_SERVER);
@@ -233,7 +233,7 @@ class AuthSSOTest extends DBTestCase
         global $config;
 
         $this->basicConfig();
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         $this->basicEnvironmentEnv();
         unset($_SERVER['displayName']);
@@ -248,16 +248,10 @@ class AuthSSOTest extends DBTestCase
         $this->assertTrue($a->authenticate($this->makeBreakUser(), null));
     }
 
-    public function testReauthenticate()
-    {
-        $this->setExpectedException(AuthenticationException::class);
-        Auth::reset()->reauthenticate(null, null);
-    }
-
     // Document the modules current behaviour, so that changes trigger test failures
     public function testCapabilityFunctions()
     {
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         $this->assertTrue($a->canUpdatePasswords() === 0);
         $this->assertTrue($a->changePassword(null, null) === 0);
@@ -273,7 +267,7 @@ class AuthSSOTest extends DBTestCase
         global $config;
 
         $this->basicConfig();
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         $this->basicEnvironmentEnv();
         $this->assertInternalType('string', $a->getExternalUsername());
@@ -307,7 +301,7 @@ class AuthSSOTest extends DBTestCase
     public function testGetAttr()
     {
         global $config;
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         $_SERVER['HTTP_VALID_ATTR'] = 'string';
         $_SERVER['alsoVALID-ATTR'] = 'otherstring';
@@ -330,7 +324,7 @@ class AuthSSOTest extends DBTestCase
     public function testTrustedProxies()
     {
         global $config;
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         $config['sso']['trusted_proxies'] = array('127.0.0.1', '::1', '2001:630:50::/48', '8.8.8.0/25');
 
@@ -383,7 +377,7 @@ class AuthSSOTest extends DBTestCase
     public function testLevelCaulculationFromAttr()
     {
         global $config;
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         $config['sso']['mode'] = 'env';
         $config['sso']['group_strategy'] = 'attribute';
@@ -428,7 +422,7 @@ class AuthSSOTest extends DBTestCase
         global $config;
 
         $this->basicConfig();
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         $this->basicEnvironmentEnv();
 

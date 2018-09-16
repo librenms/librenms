@@ -10,7 +10,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 header('Content-type: application/json');
 
@@ -20,7 +20,7 @@ $message   = 'unknown error';
 $device_id = mres($_POST['device_id']);
 $notes = $_POST['notes'];
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     $message = 'Only admin accounts can update notes';
 } elseif (isset($notes) && (dbUpdate(array('notes' => $notes), 'devices', 'device_id = ?', array($device_id)))) {
     $status  = 'ok';

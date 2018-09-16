@@ -1,5 +1,5 @@
 <?php
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 session_start();
 if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
@@ -468,9 +468,9 @@ if (!file_exists("../config.php")) {
       </div>
       <div class="col-md-6">
 <?php
-if (Auth::get()->canManageUsers()) {
-    if (!Auth::get()->userExists($add_user)) {
-        if (Auth::get()->addUser($add_user, $add_pass, '10', $add_email)) {
+if (LegacyAuth::get()->canManageUsers()) {
+    if (!LegacyAuth::get()->userExists($add_user)) {
+        if (LegacyAuth::get()->addUser($add_user, $add_pass, '10', $add_email)) {
             echo("<div class='alert alert-success'>User has been added successfully</div>");
             $proceed = 0;
         } else {

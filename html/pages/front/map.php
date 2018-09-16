@@ -22,7 +22,7 @@
  * @subpackage Frontpage
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 if ($config['map']['engine'] == 'leaflet') {
     require_once 'includes/common/worldmap.inc.php';
@@ -186,11 +186,11 @@ if ($config['enable_syslog']) {
     echo("</div>");
     echo("</div>");
 } else {
-    if (Auth::user()->hasGlobalAdmin()) {
+    if (LegacyAuth::user()->hasGlobalAdmin()) {
         $query = "SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` ORDER BY `datetime` DESC LIMIT 0,15";
     } else {
         $query = "SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` AS E, devices_perms AS P WHERE E.host =
-    P.device_id AND P.user_id = " . Auth::id() . " ORDER BY `datetime` DESC LIMIT 0,15";
+    P.device_id AND P.user_id = " . LegacyAuth::id() . " ORDER BY `datetime` DESC LIMIT 0,15";
     }
 
     echo('<div class="container-fluid">

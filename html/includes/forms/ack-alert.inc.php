@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
 header('Content-type: application/json');
@@ -60,12 +60,13 @@ if (!is_numeric($alert_id)) {
         'until_clear' => $until_clear,
     ]);
 
-    $username = Auth::user()->username;
+    $username = LegacyAuth::user()->username;
     $data = [
         'state' => $state,
         'open' => $open,
         'info' => $info,
     ];
+
     $note = dbFetchCell('SELECT note FROM alerts WHERE id=?', [$alert_id]);
     if (!empty($note)) {
         $note .= PHP_EOL;

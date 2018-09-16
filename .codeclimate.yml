@@ -2,6 +2,9 @@ version: "2"
 plugins:
   markdownlint:
     enabled: true
+    checks:
+      MD013:
+        line_length: 120
   phan:
     enabled: false
   phpcodesniffer:
@@ -28,6 +31,10 @@ plugins:
     enabled: true
     checks:
       Controversial/CamelCaseVariableName:
+        enabled: false
+      Controversial/CamelCaseParameterName:
+        enabled: false
+      CleanCode/StaticAccess:
         enabled: false
   radon:
     enabled: true

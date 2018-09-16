@@ -25,7 +25,7 @@
 use LibreNMS\Alert\Template;
 use LibreNMS\Alert\AlertData;
 use LibreNMS\Alerting\QueryBuilderParser;
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Alert\AlertUtil;
 
 /**
@@ -267,7 +267,7 @@ function GetContacts($results)
     if ($config['alert']['default_only'] === true || $config['alerts']['email']['default_only'] === true) {
         return array(''.($config['alert']['default_mail'] ? $config['alert']['default_mail'] : $config['alerts']['email']['default']) => '');
     }
-    $users = Auth::get()->getUserlist();
+    $users = LegacyAuth::get()->getUserlist();
     $contacts = array();
     $uids = array();
     foreach ($results as $result) {
@@ -279,7 +279,7 @@ function GetContacts($results)
             }
         }
         if (is_numeric($result["port_id"])) {
-            $tmpa = dbFetchRows("SELECT user_id FROM ports_perms WHERE access_level >= 0 AND port_id = ?", array($result["port_id"]));
+            $tmpa = dbFetchRows("SELECT user_id FROM ports_perms WHERE port_id = ?", array($result["port_id"]));
             foreach ($tmpa as $tmp) {
                 $uids[$tmp['user_id']] = $tmp['user_id'];
             }
@@ -295,7 +295,7 @@ function GetContacts($results)
                     $contacts[$tmpa] = '';
                 }
             }
-            $tmpa = dbFetchRows("SELECT user_id FROM devices_perms WHERE access_level >= 0 AND device_id = ?", array($result["device_id"]));
+            $tmpa = dbFetchRows("SELECT user_id FROM devices_perms WHERE device_id = ?", array($result["device_id"]));
             foreach ($tmpa as $tmp) {
                 $uids[$tmp['user_id']] = $tmp['user_id'];
             }
@@ -309,7 +309,7 @@ function GetContacts($results)
             $user['realname'] = $user['username'];
         }
         if (empty($user['level'])) {
-            $user['level'] = Auth::get()->getUserlevel($user['username']);
+            $user['level'] = LegacyAuth::get()->getUserlevel($user['username']);
         }
         if ($config['alert']['globals'] && ( $user['level'] >= 5 && $user['level'] < 10 )) {
             $contacts[$user['email']] = $user['realname'];
