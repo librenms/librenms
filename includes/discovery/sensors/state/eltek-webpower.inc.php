@@ -37,11 +37,21 @@ $oid = snmp_get_multi($device, 'batteryBanksSymmetry1enable.0 batteryBanksSymmet
 $count = array(1, 2, 3, 4, 5, 6, 7, 8);
 foreach ($count as &$countValue) {
     if ($oid[0]['batteryBanksSymmetry'.$countValue.'enable'] == 'enable') {
-	if ($oid[0]['batteryBanksSymmetry'.$countValue.'status'] == 'ok') {$state_numeric = 0;}
-        if ($oid[0]['batteryBanksSymmetry'.$countValue.'status'] == 'minorAlarm') {$state_numeric = 1;}
-        if ($oid[0]['batteryBanksSymmetry'.$countValue.'status'] == 'majorAlarm') {$state_numeric = 2;}
-        if ($oid[0]['batteryBanksSymmetry'.$countValue.'status'] == 'disabled') {$state_numeric = 3;}
-        if ($oid[0]['batteryBanksSymmetry'.$countValue.'status'] == 'error') {$state_numeric = 4;}
+	if ($oid[0]['batteryBanksSymmetry'.$countValue.'status'] == 'ok') {
+            $state_numeric = 0;
+        }
+        if ($oid[0]['batteryBanksSymmetry'.$countValue.'status'] == 'minorAlarm') {
+            $state_numeric = 1;
+        }
+        if ($oid[0]['batteryBanksSymmetry'.$countValue.'status'] == 'majorAlarm') {
+            $state_numeric = 2;
+        }
+        if ($oid[0]['batteryBanksSymmetry'.$countValue.'status'] == 'disabled') {
+            $state_numeric = 3;
+        }
+        if ($oid[0]['batteryBanksSymmetry'.$countValue.'status'] == 'error') {
+            $state_numeric = 4;
+        }
         $state_name = 'batteryBanksSymmetry'.$countValue.'status.0';
         $state_index_id = create_state_index($state_name);
         if ($state_index_id !== null) {
