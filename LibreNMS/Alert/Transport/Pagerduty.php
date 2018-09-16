@@ -90,11 +90,13 @@ class Pagerduty extends Transport
             'event_action' => $obj['event_type'],
             'dedup_key'    => $obj['uid'],
             'payload'    => [
-                'summary'  => implode(PHP_EOL, array_column($obj['faults'], 'string')) ?: 'Test',
+                'custom_details'  => substr(implode(PHP_EOL, array_column($obj['faults'], 'string')), 0, 1020) . '....' ?: 'Test',
                 'source'   => $obj['hostname'],
                 'severity' => $obj['severity'],
             ],
         ];
+
+        $data['payload']['summary'] = ($obj['name'] ? $obj['name'] . ' on ' . $obj['hostname'] : $obj['title']);
 
         $url = 'https://events.pagerduty.com/v2/enqueue';
         $client = new Client();
