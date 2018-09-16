@@ -90,7 +90,7 @@ lnbVoltageState OBJECT-TYPE
      MAX-ACCESS read-only
      STATUS current
      DESCRIPTION
-     "  Current DiSEQC state.
+     "  Current DiSEqC state.
      "
      ::= {global7 6}
 
