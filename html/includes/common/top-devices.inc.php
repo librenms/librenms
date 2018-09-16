@@ -26,6 +26,8 @@ $sort_order = $widget_settings['sort_order'];
 $selected_sort_asc = '';
 $selected_sort_desc = '';
 
+$exclude = $widget_settings['exclude'];
+
 if ($sort_order === 'asc') {
     $selected_sort_asc = 'selected';
 } elseif ($sort_order === 'desc') {
@@ -143,6 +145,14 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             </div>
         </div>
         <div class="form-group">
+            <div class="col-sm-4">
+                <label for="exclude" class="control-label availability-map-widget-header">Exclude type</label>
+            </div>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" name="exclude" placeholder="enter type to exclude" value="' . htmlspecialchars($widget_settings['exclude']) . '">
+            </div>
+        </div>
+        <div class="form-group">
             <div class="col-sm-10">
                 <button type="submit" class="btn btn-default">Set</button>
             </div>
@@ -165,6 +175,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             SELECT *, sum(p.ifInOctets_rate + p.ifOutOctets_rate) as total
             FROM ports as p, devices as d
             WHERE d.device_id = p.device_id
+            AND `d`.`type` <> "'. $exclude . '"
             AND unix_timestamp() - p.poll_time < :interval 
             AND ( p.ifInOctets_rate > 0
             OR p.ifOutOctets_rate > 0 )
@@ -178,6 +189,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             FROM ports as p, devices as d, `devices_perms` AS `P`
             WHERE `P`.`user_id` = :user AND `P`.`device_id` = `d`.`device_id` AND
             d.device_id = p.device_id
+            AND `d`.`type` <> "'. $exclude . '"
             AND unix_timestamp() - p.poll_time < :interval 
             AND ( p.ifInOctets_rate > 0
             OR p.ifOutOctets_rate > 0 )
@@ -191,12 +203,14 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             $query = 'SELECT `uptime`, `hostname`, `last_polled`, `device_id`, `sysName` 
                       FROM `devices` 
                       WHERE unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
+                      AND `d`.`type` <> "'. $exclude . '"
                       ORDER BY `uptime` ' . $sort_order . ' 
                       LIMIT :count';
         } else {
             $query = 'SELECT `uptime`, `hostname`, `last_polled`, `d`.`device_id`, `d`.`sysName`
                       FROM `devices` as `d`, `devices_perms` AS `P`
                       WHERE  `P`.`user_id` = :user
+                      AND `d`.`type` <> "'. $exclude . '"
                       AND `P`.`device_id` = `d`.`device_id`
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval
                       ORDER BY `uptime` ' . $sort_order . ' 
@@ -207,12 +221,14 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             $query = 'SELECT `last_ping_timetaken`, `hostname`, `last_polled`, `device_id`, `sysName`
                       FROM `devices` 
                       WHERE unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
+                      AND `d`.`type` <> "'. $exclude . '"
                       ORDER BY `last_ping_timetaken` ' . $sort_order . ' 
                       LIMIT :count';
         } else {
             $query = 'SELECT `last_ping_timetaken`, `hostname`, `last_polled`, `d`.`device_id`, `d`.`sysName`
                       FROM `devices` as `d`, `devices_perms` AS `P` 
                       WHERE `P`.`user_id` = :user 
+                      AND `d`.`type` <> "'. $exclude . '"
                       AND `P`.`device_id` = `d`.`device_id` 
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
                       ORDER BY `last_ping_timetaken` ' . $sort_order . ' 
@@ -223,6 +239,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, avg(`processor_usage`) as `cpuload`, `d`.`sysName`
                       FROM `processors` AS `procs`, `devices` AS `d` 
                       WHERE `d`.`device_id` = `procs`.`device_id` 
+                      AND `d`.`type` <> "'. $exclude . '"
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
                       GROUP BY `d`.`device_id`, `d`.`hostname`, `d`.`last_polled`, `d`.`sysName`
                       ORDER BY `cpuload` ' . $sort_order . ' 
@@ -231,6 +248,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, avg(`processor_usage`) as `cpuload`, `d`.`sysName`
                       FROM `processors` AS procs, `devices` AS `d`, `devices_perms` AS `P`
 					  WHERE `P`.`user_id` = :user AND `P`.`device_id` = `procs`.`device_id` AND `P`.`device_id` = `d`.`device_id` 
+                      AND `d`.`type` <> "'. $exclude . '"
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval
                       GROUP BY `procs`.`device_id`, `d`.`hostname`, `d`.`last_polled`, `d`.`sysName`
                       ORDER BY `cpuload` ' . $sort_order . '
@@ -241,6 +259,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, `mempool_perc`, `d`.`sysName`
                       FROM `mempools` as `mem`, `devices` as `d`
                       WHERE `d`.`device_id` = `mem`.`device_id`
+                      AND `d`.`type` <> "'. $exclude . '"
                       AND `mempool_descr` IN (\'Physical memory\',\'Memory\')
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
                       ORDER BY `mempool_perc` ' . $sort_order . '
@@ -249,6 +268,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, `mempool_perc`, `d`.`sysName`
                       FROM `mempools` as `mem`, `devices` as `d`, `devices_perms` AS `P`
                       WHERE `P`.`user_id` = :user AND `P`.`device_id` = `mem`.`device_id` AND `P`.`device_id` = `d`.`device_id` 
+                      AND `d`.`type` <> "'. $exclude . '"
                       AND `mempool_descr` IN (\'Physical memory\',\'Memory\')
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
                       ORDER BY `mempool_perc` ' . $sort_order . '
