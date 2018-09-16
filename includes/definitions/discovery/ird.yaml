@@ -35,5 +35,5 @@ modules:
                     states:
                         - { descr: Off, graph: 1, value: 0, generic: 3 }
                         - { descr: 13V, graph: 1, value: 1, generic: 0 }
-                        - { descr: 18V, graph: 1, value: 2, generic: 1 }
+                        - { descr: 18V, graph: 1, value: 2, generic: 0 }
                         - { descr: Failed, graph: 1, value: 3, generic: 2 }
