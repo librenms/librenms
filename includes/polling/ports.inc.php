@@ -389,16 +389,26 @@ if ($config['enable_ports_nac']) {
             dbQuery("UPDATE `ports_nac` SET `PortAuthSessionAuthzBy` = '".$PortAuthSessionEntryParameters['cafSessionAuthorizedBy']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
             dbQuery("UPDATE `ports_nac` SET `PortAuthSessionTimeOut` = '".$PortAuthSessionEntryParameters['cafSessionTimeout']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
             dbQuery("UPDATE `ports_nac` SET `PortAuthSessionTimeLeft` = '".$PortAuthSessionEntryParameters['cafSessionTimeLeft']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
-            dbQuery("UPDATE `ports_nac` SET `PortAuthSessionAuthnStatus` = '".$PortAuthSessionEntryParameters['cafSessionMethodState']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
             dbQuery("UPDATE `ports_nac` SET `device_id` = '".$device['device_id']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
         }
-            foreach ($ports_mapped['maps']['ifIndex'] as $ports_mapped_index => $ports_mapped_id) {
-                dbQuery("UPDATE `ports_nac` SET `port_id` = '".$ports_mapped_id."' WHERE `ports_nac`.`port_index` = '".$ports_mapped_index."';");
-            }
-            foreach ($ports_mapped['maps']['ifDescr'] as $ports_mapped_desc => $ports_mapped_id) {
-                dbQuery("UPDATE `ports_nac` SET `port_descr` = '".$ports_mapped_desc."' WHERE `ports_nac`.`port_id` = '".$ports_mapped_id."';");
-            }
+        foreach ($ports_mapped['maps']['ifIndex'] as $ports_mapped_index => $ports_mapped_id) {
+            dbQuery("UPDATE `ports_nac` SET `port_id` = '".$ports_mapped_id."' WHERE `ports_nac`.`port_index` = '".$ports_mapped_index."';");
         }
+        foreach ($ports_mapped['maps']['ifDescr'] as $ports_mapped_desc => $ports_mapped_id) {
+            dbQuery("UPDATE `ports_nac` SET `port_descr` = '".$ports_mapped_desc."' WHERE `ports_nac`.`port_id` = '".$ports_mapped_id."';");
+        }
+        $cafSessionMethodsInfoEntry = snmpwalk_cache_oid($device, 'cafSessionMethodsInfoEntry', array(), 'CISCO-AUTH-FRAMEWORK-MIB');
+        print_r($cafSessionMethodsInfoEntry);
+        foreach ($cafSessionMethodsInfoEntry as $cafSessionMethodsInfoEntryNAC => $cafSessionMethodsInfoEntryParameters) {
+            $port_index_nac = substr($cafSessionMethodsInfoEntryNAC, 0, strpos($cafSessionMethodsInfoEntryNAC, "."));
+            $port_method_nac = substr(strstr(substr(strstr($cafSessionMethodsInfoEntryNAC, "."),1),"."),1);
+            $port_auth_id_nac = substr($cafSessionMethodsInfoEntryNAC, 0, strpos($cafSessionMethodsInfoEntryNAC, '.', strpos($cafSessionMethodsInfoEntryNAC, '.')+1));
+            $port_auth_id_nac = strstr($port_auth_id_nac, '.');
+            $port_auth_id_nac = substr($port_auth_id_nac, 1);
+            dbQuery("UPDATE `ports_nac` SET `PortSessionMethod` = '".$port_method_nac."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."' AND `ports_nac`.`port_index` = '".$port_index_nac."';");
+            dbQuery("UPDATE `ports_nac` SET `PortAuthSessionAuthcStatus` = '".$cafSessionMethodsInfoEntryParameters['cafSessionMethodState']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
+         }
+    }
 }
 
 if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
