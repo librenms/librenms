@@ -435,6 +435,12 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
                 </a>
                 </li>';
         }
+        
+        echo '<li role="presentation" '.$select['nac'].'>
+        <a href="'.generate_device_url($device, array('tab' => 'nac')).'">
+        <i class="fa fa-lock fa-lg icon-theme"  aria-hidden="true"></i> NAC
+        </a>
+        </li>';
 
         echo '<li role="presentation" '.$select['notes'].'>
             <a href="'.generate_device_url($device, array('tab' => 'notes')).'">
