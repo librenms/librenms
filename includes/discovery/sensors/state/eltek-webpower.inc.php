@@ -52,6 +52,7 @@ foreach ($count as &$countValue) {
         if ($oid[0]['batteryBanksSymmetry'.$countValue.'status'] == 'error') {
             $state_numeric = 4;
         }
+
         $state_name = 'batteryBanksSymmetry'.$countValue.'status.0';
         $state_index_id = create_state_index($state_name);
         if ($state_index_id !== null) {
