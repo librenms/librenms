@@ -24,53 +24,39 @@ class Handler extends ExceptionHandler
         \Illuminate\Validation\ValidationException::class,
     ];
 
-    /**
-     * Report or log an exception.
-     *
-     * This is a great spot to send exceptions to Sentry, Bugsnag, etc.
-     *
-     * @param  \Exception  $exception
-     * @return void
-     */
-    public function report(Exception $exception)
-    {
-        parent::report($exception);
-    }
-
-    /**
-     * Render an exception into an HTTP response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $exception
-     * @return \Illuminate\Http\Response
-     */
     public function render($request, Exception $exception)
     {
-        if ($exception instanceof QueryException) {
-            // connect exception, convert to our standard connection exception
-            if (config('app.debug')) {
-                // get message form PDO exception, it doesn't contain the query
-                $message = $exception->getMessage();
-            } else {
-                $message = $exception->getPrevious()->getMessage();
-            }
-
-            if (in_array($exception->getCode(), [1044, 1045, 2002])) {
-                throw new DatabaseConnectException($message, $exception->getCode(), $exception);
-            }
-            return response('Unhandled MySQL Error [' . $exception->getCode() . "] $message");
-        }
-
         // emulate Laravel 5.5 renderable exceptions
         if (method_exists($exception, 'render')) {
             return $exception->render($request);
         }
 
-        if (config('app.debug')) {
-            return parent::render($request, $exception);
+        return parent::render($request, $exception);
+    }
+
+    protected function convertExceptionToResponse(Exception $e)
+    {
+        if ($e instanceof QueryException) {
+            // connect exception, convert to our standard connection exception
+            if (config('app.debug')) {
+                // get message form PDO exception, it doesn't contain the query
+                $message = $e->getMessage();
+            } else {
+                $message = $e->getPrevious()->getMessage();
+            }
+
+            if (in_array($e->getCode(), [1044, 1045, 2002])) {
+                throw new DatabaseConnectException($message, $e->getCode(), $e);
+            }
+            return response('Unhandled MySQL Error [' . $e->getCode() . "] $message");
         }
 
-        return view('errors.generic')->with('exception', $exception);
+        // show helpful response if debugging, otherwise print generic error so we don't leak information
+        if (config('app.debug')) {
+            return parent::convertExceptionToResponse($e);
+        }
+
+        return response()->view('errors.generic', ['exception' => $e]);
     }
 
     /**
@@ -82,7 +68,7 @@ class Handler extends ExceptionHandler
      */
     protected function unauthenticated($request, AuthenticationException $exception)
     {
-        if ($request->expectsJson()) {
+        if ($request->expectsJson() || $request->is('api/*')) {
             return response()->json(['error' => 'Unauthenticated.'], 401);
         }
 

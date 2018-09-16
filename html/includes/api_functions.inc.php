@@ -12,26 +12,23 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Alerting\QueryBuilderParser;
 
 function authToken(\Slim\Route $route)
 {
     global $permissions;
 
-    $app   = \Slim\Slim::getInstance();
-    $token = $app->request->headers->get('X-Auth-Token');
-    if (!empty($token)
-        && ($user_id = dbFetchCell('SELECT `AT`.`user_id` FROM `api_tokens` AS AT WHERE `AT`.`token_hash`=? && `AT`.`disabled`=0', array($token)))
-        && ($user = Auth::get()->getUser($user_id))
-    ) {
+    if (Auth::check()) {
+        $user = Auth::user();
+
         // Fake session so the standard auth/permissions checks work
-        $_SESSION = array(
-            'username' => $user['username'],
-            'user_id' => $user['user_id'],
-            'userlevel' => $user['level']
-        );
-        $permissions = permissions_cache(Auth::id());
+        $_SESSION = [
+            'username' => $user->username,
+            'user_id' => $user->user_id,
+            'userlevel' => $user->level
+        ];
+        $permissions = permissions_cache($user->user_id);
 
         return;
     }
@@ -110,14 +107,14 @@ function check_port_permission($port_id, $device_id)
 
 function check_is_admin()
 {
-    if (!Auth::user()->hasGlobalAdmin()) {
+    if (!LegacyAuth::user()->hasGlobalAdmin()) {
         api_error(403, 'Insufficient privileges');
     }
 }
 
 function check_is_read()
 {
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         api_error(403, 'Insufficient privileges');
     }
 }
@@ -319,6 +316,8 @@ function list_devices()
 
     if ($type == 'all' || empty($type)) {
         $sql = '1';
+    } elseif ($type == 'active') {
+        $sql = "`d`.`ignore`='0' AND `d`.`disabled`='0'";
     } elseif ($type == 'location') {
         $sql = "`d`.`location` LIKE '%".$query."%'";
     } elseif ($type == 'ignored') {
@@ -352,9 +351,9 @@ function list_devices()
     }
 
 
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         $sql .= " AND `d`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-        $param[] = Auth::id();
+        $param[] = LegacyAuth::id();
     }
     $devices = array();
     $dev_query = "SELECT $select FROM `devices` AS d $join WHERE $sql GROUP BY d.`hostname` ORDER BY $order";
@@ -418,7 +417,7 @@ function add_device()
             'cryptoalgo' => mres($data['cryptoalgo']),
         );
 
-        array_push($config['snmp']['v3'], $v3);
+        array_unshift($config['snmp']['v3'], $v3);
         $snmpver = 'v3';
     } else {
         api_error(400, 'You haven\'t specified an SNMP version to use');
@@ -582,9 +581,9 @@ function list_cbgp()
         $sql        = " AND `devices`.`device_id` = ?";
         $sql_params[] = $device_id;
     }
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         $sql .= " AND `bgpPeers_cbgp`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-        $sql_params[] = Auth::id();
+        $sql_params[] = LegacyAuth::id();
     }
 
     $bgp_counters = array();
@@ -909,7 +908,7 @@ function get_port_graphs()
     $params = array($device_id);
     if (!device_permitted($device_id)) {
         $sql = 'AND `port_id` IN (select `port_id` from `ports_perms` where `user_id` = ?)';
-        array_push($params, Auth::id());
+        array_push($params, LegacyAuth::id());
     }
 
     $ports       = dbFetchRows("SELECT $columns FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' $sql ORDER BY `ifIndex` ASC", $params);
@@ -979,10 +978,10 @@ function get_all_ports()
     validate_column_list($columns, 'ports');
     $params = array();
     $sql = '';
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         $sql = ' AND (device_id IN (SELECT device_id FROM devices_perms WHERE user_id = ?) OR port_id IN (SELECT port_id FROM ports_perms WHERE user_id = ?))';
-        array_push($params, Auth::id());
-        array_push($params, Auth::id());
+        array_push($params, LegacyAuth::id());
+        array_push($params, LegacyAuth::id());
     }
     $ports = dbFetchRows("SELECT $columns FROM `ports` WHERE `deleted` = 0 $sql", $params);
 
@@ -1043,6 +1042,17 @@ function list_alerts()
         $param[] = $router['id'];
         $sql .= 'AND `A`.id=?';
     }
+
+    $severity = $_GET['severity'];
+    if (isset($severity)) {
+        if (in_array($severity, ['ok', 'warning', 'critical'])) {
+            $param[] = $severity;
+            $sql .= ' AND `R`.severity=?';
+        }
+    }
+    
+    $order = $_GET['order'] ?: "timestamp desc";
+    $sql .= ' ORDER BY A.'.$order;
 
     $alerts = dbFetchRows($sql, $param);
     api_success($alerts, 'alerts');
@@ -1335,9 +1345,9 @@ function list_bills()
     } else {
         $sql = '1';
     }
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         $sql    .= ' AND `bill_id` IN (SELECT `bill_id` FROM `bill_perms` WHERE `user_id` = ?)';
-        $param[] = Auth::id();
+        $param[] = LegacyAuth::id();
     }
 
     if ($period === 'previous') {
@@ -1393,7 +1403,7 @@ function get_bill_graph()
     $bill_id = mres($router['bill_id']);
     $graph_type = $router['graph_type'];
 
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         check_bill_permission($bill_id);
     }
 
@@ -1419,7 +1429,7 @@ function get_bill_graphdata()
     $bill_id = mres($router['bill_id']);
     $graph_type = $router['graph_type'];
 
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         check_bill_permission($bill_id);
     }
 
@@ -1447,7 +1457,7 @@ function get_bill_history()
     $router = $app->router()->getCurrentRoute()->getParams();
     $bill_id = mres($router['bill_id']);
 
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         check_bill_permission($bill_id);
     }
 
@@ -1469,7 +1479,7 @@ function get_bill_history_graph()
     $bill_hist_id = mres($router['bill_hist_id']);
     $graph_type = $router['graph_type'];
 
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         check_bill_permission($bill_id);
     }
 
@@ -1513,7 +1523,7 @@ function get_bill_history_graphdata()
     $bill_hist_id = mres($router['bill_hist_id']);
     $graph_type = $router['graph_type'];
 
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         check_bill_permission($bill_id);
     }
 
@@ -1842,9 +1852,9 @@ function list_vrf()
         $sql        = "  AND `vrfs`.`vrf_name`=?";
         $sql_params = array($vrfname);
     }
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         $sql .= " AND `vrfs`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-        $sql_params[] = Auth::id();
+        $sql_params[] = LegacyAuth::id();
     }
 
     $vrfs       = array();
@@ -1915,9 +1925,9 @@ function list_vlans()
         $sql        = " AND `devices`.`device_id` = ?";
         $sql_params[] = $device_id;
     }
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         $sql .= " AND `vlans`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-        $sql_params[] = Auth::id();
+        $sql_params[] = LegacyAuth::id();
     }
 
     $vlans       = array();

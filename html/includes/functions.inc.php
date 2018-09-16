@@ -12,7 +12,7 @@
  * @copyright  (C) 2013 LibreNMS Group
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 /**
  * Compare $t with the value of $vars[$v], if that exists
@@ -452,7 +452,7 @@ function bill_permitted($bill_id)
 {
     global $permissions;
 
-    if (Auth::user()->hasGlobalRead()) {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $allowed = true;
     } elseif ($permissions['bill'][$bill_id]) {
         $allowed = true;
@@ -472,7 +472,7 @@ function port_permitted($port_id, $device_id = null)
         $device_id = get_device_id_by_port_id($port_id);
     }
 
-    if (Auth::user()->hasGlobalRead()) {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $allowed = true;
     } elseif (device_permitted($device_id)) {
         $allowed = true;
@@ -495,7 +495,7 @@ function application_permitted($app_id, $device_id = null)
             $device_id = get_device_id_by_app_id($app_id);
         }
 
-        if (Auth::user()->hasGlobalRead()) {
+        if (LegacyAuth::user()->hasGlobalRead()) {
             $allowed = true;
         } elseif (device_permitted($device_id)) {
             $allowed = true;
@@ -516,7 +516,7 @@ function device_permitted($device_id)
 {
     global $permissions;
 
-    if (Auth::user()->hasGlobalRead()) {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $allowed = true;
     } elseif ($permissions['device'][$device_id]) {
         $allowed = true;
@@ -576,6 +576,58 @@ function generate_lazy_graph_tag($args)
     }
 }//end generate_lazy_graph_tag()
 
+function generate_dynamic_graph_tag($args)
+{
+    $urlargs = array();
+    $width = 0;
+    foreach ($args as $key => $arg) {
+        switch (strtolower($key)) {
+            case 'width':
+                $width = $arg;
+                $value = "{{width}}";
+                break;
+            case 'from':
+                $value = "{{start}}";
+                break;
+            case 'to':
+                $value = "{{end}}";
+                break;
+            default:
+                $value = $arg;
+                break;
+        }
+        $urlargs[] = $key . "=" . $value;
+    }
+
+    return '<img style="width:'.$width.'px;height:100%" class="graph img-responsive" data-src-template="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
+}//end generate_dynamic_graph_tag()
+
+function generate_dynamic_graph_js($args)
+{
+    $from = (is_numeric($args['from']) ? $args['from'] : '(new Date()).getTime() / 1000 - 24*3600');
+    $range = (is_numeric($args['to']) ? $args['to'] - $args['from'] : '24*3600');
+
+    $output = '<script src="js/RrdGraphJS/q-5.0.2.min.js"></script>
+        <script src="js/RrdGraphJS/moment-timezone-with-data.js"></script>
+        <script src="js/RrdGraphJS/rrdGraphPng.js"></script>
+          <script type="text/javascript">
+              q.ready(function(){
+                  var graphs = [];
+                  q(\'.graph\').forEach(function(item){
+                      graphs.push(
+                          q(item).rrdGraphPng({
+                              canvasPadding: 120,
+                                initialStart: ' . $from . ',
+                                initialRange: ' . $range . '
+                          })
+                      );
+                  });
+              });
+              // needed for dynamic height
+              window.onload = function(){ window.dispatchEvent(new Event(\'resize\')); }
+          </script>';
+    return $output;
+}//end generate_dynamic_graph_js()
 
 function generate_graph_js_state($args)
 {
@@ -831,10 +883,10 @@ function getlocations()
     $locations = array();
 
     // Fetch regular locations
-    if (Auth::user()->hasGlobalRead()) {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $rows = dbFetchRows('SELECT location FROM devices AS D GROUP BY location ORDER BY location');
     } else {
-        $rows = dbFetchRows('SELECT location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? GROUP BY location ORDER BY location', array(Auth::id()));
+        $rows = dbFetchRows('SELECT location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? GROUP BY location ORDER BY location', array(LegacyAuth::id()));
     }
 
     foreach ($rows as $row) {
@@ -1478,6 +1530,14 @@ function get_oxidized_nodes_list()
         <td>
         " . $object['group'] . "
         </td>
+        <td>
+          <button class='btn btn-default btn-sm' name='btn-refresh-node-devId" . $device['device_id'] . "' id='btn-refresh-node-devId" . $device['device_id'] . "' onclick='refresh_oxidized_node(\"" . $device['hostname'] . "\")'>
+            <i class='fa fa-refresh'></i>
+          </button>
+          <a href='" . generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig')) . "'>
+            <i class='fa fa-align-justify fa-lg icon-theme'></i>
+          </a>
+        </td>
         </tr>";
     }
 }
@@ -1579,18 +1639,18 @@ function get_dashboards($user_id = null)
     $default = get_user_pref('dashboard');
     $dashboards = dbFetchRows(
         "SELECT * FROM `dashboards` WHERE dashboards.access > 0 || dashboards.user_id = ?",
-        array(is_null($user_id) ? Auth::id() : $user_id)
+        array(is_null($user_id) ? LegacyAuth::id() : $user_id)
     );
 
     $usernames = array(
-        Auth::id() => Auth::user()->username
+        LegacyAuth::id() => LegacyAuth::user()->username
     );
 
     $result = array();
     foreach ($dashboards as $dashboard) {
         $duid = $dashboard['user_id'];
         if (!isset($usernames[$duid])) {
-            $user = Auth::get()->getUser($duid);
+            $user = LegacyAuth::get()->getUser($duid);
             $usernames[$duid] = $user['username'];
         }
 

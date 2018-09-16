@@ -12,11 +12,11 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 header('Content-type: text/plain');
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
@@ -37,7 +37,7 @@ if (!is_numeric($_POST['template_id'])) {
     }
 
     if (!empty($ids)) {
-        dbDelete('alert_template_map', 'id NOT IN ' . dbGenPlaceholders(count($ids)) . ' AND alert_templates_id =?', array_merge([$_POST['template_id']], $ids));
+        dbDelete('alert_template_map', 'id NOT IN ' . dbGenPlaceholders(count($ids)) . ' AND alert_templates_id =?', array_merge($ids, [$_POST['template_id']]));
         echo "Alert rules have been attached to this template.";
         exit;
     }

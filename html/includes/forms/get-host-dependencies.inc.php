@@ -12,9 +12,9 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     $status = array('status' => 1, 'message' => 'You need to be admin');
 } else {
     if (isset($_POST['viewtype'])) {
@@ -71,7 +71,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
                     } else {
                         $parent = $myrow['parent'];
                     }
-                    
+
                     $hostname = get_device_name($myrow);
                     array_push($res_arr, array( "deviceid" => $myrow['id'], "hostname" => $myrow['hostname'], "sysname" => $hostname, "parent" => $parent, "parentid" => $myrow['parentid'] ));
                 }
@@ -108,6 +108,6 @@ if (!Auth::user()->hasGlobalAdmin()) {
         }
     }
 }
- 
+
 header('Content-Type: application/json');
 echo _json_encode($status);

@@ -1,3 +1,137 @@
+##1.43
+*(2018-08-30)*
+
+A big thank you to the following 29 contributors this last month:
+
+  - murrant (41)
+  - laf (15)
+  - TheGreatDoc (9)
+  - PipoCanaja (4)
+  - VanillaNinjaD (3)
+  - VVelox (2)
+  - zombah (2)
+  - DreadnaughtSec (2)
+  - metavrs (2)
+  - Evil2000 (2)
+  - dsgagi (2)
+  - gs-kamnas (1)
+  - cppmonkey (1)
+  - bonzai86 (1)
+  - dupondje (1)
+  - Landrash (1)
+  - bfarmerjr (1)
+  - theherodied (1)
+  - willhseitz (1)
+  - eastmane (1)
+  - MHammett (1)
+  - jepke (1)
+  - odvolk (1)
+  - nickhilliard (1)
+  - InsaneSplash (1)
+  - tomarch (1)
+  - crcro (1)
+  - Notre1 (1)
+  - LaZyDK (1)
+
+#### Bug
+* Fixed url to graphs from date selector ([#9109](https://github.com/librenms/librenms/pull/9109)) - [laf](https://github.com/laf)
+* Fixed slack options not showing in the webui ([#9107](https://github.com/librenms/librenms/pull/9107)) - [laf](https://github.com/laf)
+* Set ip to null when a device is renamed ([#9112](https://github.com/librenms/librenms/pull/9112)) - [murrant](https://github.com/murrant)
+* SNMP v3 auth is no longer checked for case sensitivity + push pass v3 creds to front of queue ([#9102](https://github.com/librenms/librenms/pull/9102)) - [laf](https://github.com/laf)
+* Fixed alert notes in templates ([#9093](https://github.com/librenms/librenms/pull/9093)) - [murrant](https://github.com/murrant)
+* Fixed sorting on PeeringDB AS Selection table ([#9096](https://github.com/librenms/librenms/pull/9096)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+* Fixed IN db queries ([#9077](https://github.com/librenms/librenms/pull/9077)) - [murrant](https://github.com/murrant)
+* Fixed port_id is null in ospf poller ([#9078](https://github.com/librenms/librenms/pull/9078)) - [murrant](https://github.com/murrant)
+* Fixed Device->Eventlog to show rows/pages and Syslog hostname filter ([#9060](https://github.com/librenms/librenms/pull/9060)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+* Fixed ldap fetching user_id as string ([#9067](https://github.com/librenms/librenms/pull/9067)) - [murrant](https://github.com/murrant)
+* Fixed port customers display ([#9048](https://github.com/librenms/librenms/pull/9048)) - [murrant](https://github.com/murrant)
+* Fixed OSPF duplicate DB entries ([#9051](https://github.com/librenms/librenms/pull/9051)) - [murrant](https://github.com/murrant)
+* Fixed dbFacile null parameters ([#9031](https://github.com/librenms/librenms/pull/9031)) - [murrant](https://github.com/murrant)
+* Added a check for a failed dns query in get_astext() ([#9020](https://github.com/librenms/librenms/pull/9020)) - [murrant](https://github.com/murrant)
+* Fixed invalid json in test data ([#9015](https://github.com/librenms/librenms/pull/9015)) - [murrant](https://github.com/murrant)
+* Reverted parse_mode in Telegram transport ([#9000](https://github.com/librenms/librenms/pull/9000)) - [laf](https://github.com/laf)
+* Linux sensors - check if value is valid before use discovery_sensor ([#8956](https://github.com/librenms/librenms/pull/8956)) - [tomarch](https://github.com/tomarch)
+* Remove non-existent PowerNet-MIB OIDs. ([#9005](https://github.com/librenms/librenms/pull/9005)) - [murrant](https://github.com/murrant)
+* Fixed incorrect heartbeat for ping rrds in rrdstep.php script ([#9004](https://github.com/librenms/librenms/pull/9004)) - [willhseitz](https://github.com/willhseitz)
+* Fixed the display of sysNames within the edit device permissions ([#8986](https://github.com/librenms/librenms/pull/8986)) - [InsaneSplash](https://github.com/InsaneSplash)
+* Correct config template for API transport ([#8991](https://github.com/librenms/librenms/pull/8991)) - [gs-kamnas](https://github.com/gs-kamnas)
+* Fixed Eventlog search ([#8981](https://github.com/librenms/librenms/pull/8981)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+
+#### Webui
+* Fixed url to graphs from date selector ([#9109](https://github.com/librenms/librenms/pull/9109)) - [laf](https://github.com/laf)
+* Added dynamic graphs with RrdGraphJS by oetiker ([#9087](https://github.com/librenms/librenms/pull/9087)) - [bonzai86](https://github.com/bonzai86)
+* Fixed PeeringDB AS Selection table ([#9096](https://github.com/librenms/librenms/pull/9096)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+* Fixed Device->Eventlog to show rows/pages and Syslog hostname filter ([#9060](https://github.com/librenms/librenms/pull/9060)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+* Fixed port customers display ([#9048](https://github.com/librenms/librenms/pull/9048)) - [murrant](https://github.com/murrant)
+* Convert old templates title as well as body ([#9034](https://github.com/librenms/librenms/pull/9034)) - [laf](https://github.com/laf)
+* Use rrdtool_escape() for sensors instead of manually padding text ([#9029](https://github.com/librenms/librenms/pull/9029)) - [nickhilliard](https://github.com/nickhilliard)
+* Added hiding of disabled ports in graph, device overview and device ports view. ([#9017](https://github.com/librenms/librenms/pull/9017)) - [Evil2000](https://github.com/Evil2000)
+* Update Alerts widget - Also sort by timestamp, after sorting/grouping by severity. ([#8977](https://github.com/librenms/librenms/pull/8977)) - [dsgagi](https://github.com/dsgagi)
+* Display MAX rrd value in Service Graphs ([#9001](https://github.com/librenms/librenms/pull/9001)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Updated Rockstor os and logo svgs ([#9002](https://github.com/librenms/librenms/pull/9002)) - [crcro](https://github.com/crcro)
+* Fixed the display of sysNames within the edit device permissions ([#8986](https://github.com/librenms/librenms/pull/8986)) - [InsaneSplash](https://github.com/InsaneSplash)
+* 'Disabled' and 'Down' state for devices/links rendered on NetworkMap ([#8926](https://github.com/librenms/librenms/pull/8926)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix Eventlog search ([#8981](https://github.com/librenms/librenms/pull/8981)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+* Line up ping graph legend ([#8955](https://github.com/librenms/librenms/pull/8955)) - [murrant](https://github.com/murrant)
+
+#### Alerting
+* Fixed slack options not showing in the webui ([#9107](https://github.com/librenms/librenms/pull/9107)) - [laf](https://github.com/laf)
+* Converted PagerDuty to new transport format ([#9092](https://github.com/librenms/librenms/pull/9092)) - [laf](https://github.com/laf)
+* Fixed alert notes for templates ([#9093](https://github.com/librenms/librenms/pull/9093)) - [murrant](https://github.com/murrant)
+* New transport modules (Kayako Classic, SMSFeedback) ([#9027](https://github.com/librenms/librenms/pull/9027)) - [odvolk](https://github.com/odvolk)
+* Correct config template for API transport ([#8991](https://github.com/librenms/librenms/pull/8991)) - [gs-kamnas](https://github.com/gs-kamnas)
+
+#### Documentation
+* Standardized install method for RaspberryPi App ([#9014](https://github.com/librenms/librenms/pull/9014)) - [cppmonkey](https://github.com/cppmonkey)
+* SNMP v3 auth is no longer checked for case sensitivity + push pass v3 creds to front of queue ([#9102](https://github.com/librenms/librenms/pull/9102)) - [laf](https://github.com/laf)
+* Added installation docs for Ubuntu 18.04 ([#8630](https://github.com/librenms/librenms/pull/8630)) - [bfarmerjr](https://github.com/bfarmerjr)
+* Added/Updated collectd information ([#9089](https://github.com/librenms/librenms/pull/9089)) - [theherodied](https://github.com/theherodied)
+* Fixed Debian Stretch rrdcached Base_Path ([#8966](https://github.com/librenms/librenms/pull/8966)) - [MHammett](https://github.com/MHammett)
+* Extended the templates documentation. ([#9055](https://github.com/librenms/librenms/pull/9055)) - [Evil2000](https://github.com/Evil2000)
+* Update validate to check for mysqlnd ([#9043](https://github.com/librenms/librenms/pull/9043)) - [murrant](https://github.com/murrant)
+* Snmp configuration docs for vCenter 6.x and ESXi ([#9022](https://github.com/librenms/librenms/pull/9022)) - [DreadnaughtSec](https://github.com/DreadnaughtSec)
+* Update ReadMe (postfix) ([#9019](https://github.com/librenms/librenms/pull/9019)) - [DreadnaughtSec](https://github.com/DreadnaughtSec)
+* Correct smokeping integration example ([#8997](https://github.com/librenms/librenms/pull/8997)) - [eastmane](https://github.com/eastmane)
+* Update Distributed-Poller.md to include daily.sh use ([#8988](https://github.com/librenms/librenms/pull/8988)) - [jepke](https://github.com/jepke)
+* Update Fast-Ping-Check.md to include config options ([#8987](https://github.com/librenms/librenms/pull/8987)) - [murrant](https://github.com/murrant)
+* Added another hardware setup ([#8983](https://github.com/librenms/librenms/pull/8983)) - [LaZyDK](https://github.com/LaZyDK)
+
+#### Api
+* SNMP v3 auth is no longer checked for case sensitivity + push pass v3 creds to front of queue ([#9102](https://github.com/librenms/librenms/pull/9102)) - [laf](https://github.com/laf)
+* Additional parameters for list_alerts and list_devices API calls ([#9040](https://github.com/librenms/librenms/pull/9040)) - [dsgagi](https://github.com/dsgagi)
+
+#### Feature
+* Added dynamic graphs with RrdGraphJS by oetiker ([#9087](https://github.com/librenms/librenms/pull/9087)) - [bonzai86](https://github.com/bonzai86)
+* Added cli options debug and bill_id to poll-billing.php ([#9042](https://github.com/librenms/librenms/pull/9042)) - [murrant](https://github.com/murrant)
+* Display user id for auth_test.php -l ([#9066](https://github.com/librenms/librenms/pull/9066)) - [murrant](https://github.com/murrant)
+* Convert zfs over to use json_app_get ([#8573](https://github.com/librenms/librenms/pull/8573)) - [VVelox](https://github.com/VVelox)
+* Add Juniper Junos syslog notification code ([#9006](https://github.com/librenms/librenms/pull/9006)) - [zombah](https://github.com/zombah)
+* Improved SNMPTrap handling ([#8898](https://github.com/librenms/librenms/pull/8898)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+* Log an event for each Service Status change ([#8968](https://github.com/librenms/librenms/pull/8968)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Device
+* Added fanspeed for EdgeSwitch ([#9013](https://github.com/librenms/librenms/pull/9013)) - [dupondje](https://github.com/dupondje)
+* Small sysDescr_regex update for improved hiveos-wireless OS Detecttion ([#9046](https://github.com/librenms/librenms/pull/9046)) - [Notre1](https://github.com/Notre1)
+* Added basic Support for Arris D5 EdgeQAM ([#9083](https://github.com/librenms/librenms/pull/9083)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+* Added basic Support for Allworx VoIP Systems ([#9057](https://github.com/librenms/librenms/pull/9057)) - [VanillaNinjaD](https://github.com/VanillaNinjaD)
+* Added basic support for IBM i ([#9030](https://github.com/librenms/librenms/pull/9030)) - [VanillaNinjaD](https://github.com/VanillaNinjaD)
+* Improved SmartAX OS support. Added CPU & Temperature for each card ([#9023](https://github.com/librenms/librenms/pull/9023)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+* Cleaned up Trango Apex Lynx OS code and added wireless sensors ([#9026](https://github.com/librenms/librenms/pull/9026)) - [metavrs](https://github.com/metavrs)
+* Added support for older Airmux-400 ([#9024](https://github.com/librenms/librenms/pull/9024)) - [VanillaNinjaD](https://github.com/VanillaNinjaD)
+* Added support for Huawei iBMC ([#9011](https://github.com/librenms/librenms/pull/9011)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Initial detection for SIAE Microelettronica ALFOplus2 microwave radio device ([#8953](https://github.com/librenms/librenms/pull/8953)) - [metavrs](https://github.com/metavrs)
+* Update sonus-sbc detection ([#8978](https://github.com/librenms/librenms/pull/8978)) - [murrant](https://github.com/murrant)
+
+#### Enhancement
+* Isolate poller and discovery modules ([#9074](https://github.com/librenms/librenms/pull/9074)) - [murrant](https://github.com/murrant)
+* Check for incorrect heartbeats in rrdtstep.php script ([#9041](https://github.com/librenms/librenms/pull/9041)) - [murrant](https://github.com/murrant)
+
+#### Security
+* Fix xss in deluser ([#9079](https://github.com/librenms/librenms/pull/9079)) - [murrant](https://github.com/murrant)
+
+#### Breaking Changes
+* Fixed slack options not showing in the WebUI. This will cause a loss of options ([#9107](https://github.com/librenms/librenms/pull/9107)) - [laf](https://github.com/laf) 
+
 ##1.42
 *(2018-08-02)*
 

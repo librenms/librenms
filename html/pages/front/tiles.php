@@ -16,7 +16,7 @@
  * Code for Gridster.sort_by_row_and_col_asc(serialization) call is from http://gridster.net/demos/grid-from-serialize.html
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $no_refresh   = true;
 $default_dash = get_user_pref('dashboard', 0);
@@ -26,7 +26,7 @@ require_once 'includes/modal/alert_notes.inc.php';
 // get all dashboards this user can access and put them into two lists user_dashboards and shared_dashboards
 $dashboards = get_dashboards();
 list($user_dashboards, $shared_dashboards) = array_reduce($dashboards, function ($ret, $dash) {
-    if ($dash['user_id'] == Auth::id()) {
+    if ($dash['user_id'] == LegacyAuth::id()) {
         $ret[0][] = $dash;
     } else {
         $ret[1][] = $dash;
@@ -44,16 +44,16 @@ if (!isset($dashboards[$default_dash])) {
 if ($default_dash == 0 && empty($user_dashboards)) {
     $new_dash = array(
         'dashboard_name'=>'Default',
-        'user_id'=>Auth::id(),
+        'user_id'=>LegacyAuth::id(),
     );
 
     $dashboard_id = dbInsert($new_dash, 'dashboards');
     $new_dash['dashboard_id'] = $dashboard_id;
-    $new_dash['username'] = Auth::user()->username;
+    $new_dash['username'] = LegacyAuth::user()->username;
     $vars['dashboard'] = $new_dash;
 
-    if (dbFetchCell('select 1 from users_widgets where user_id = ? && dashboard_id = ?', array(Auth::id(),0)) == 1) {
-        dbUpdate(array('dashboard_id'=>$dashboard_id), 'users_widgets', 'user_id = ? && dashboard_id = ?', array(Auth::id(), 0));
+    if (dbFetchCell('select 1 from users_widgets where user_id = ? && dashboard_id = ?', array(LegacyAuth::id(),0)) == 1) {
+        dbUpdate(array('dashboard_id'=>$dashboard_id), 'users_widgets', 'user_id = ? && dashboard_id = ?', array(LegacyAuth::id(), 0));
     }
 } else {
     // load a dashboard
@@ -93,7 +93,7 @@ if (empty($vars['bare']) || $vars['bare'] == "no") {
     <div class="btn-group btn-lg">
       <button class="btn btn-default disabled" style="min-width:160px;"><span class="pull-left">Dashboards</span></button>
       <div class="btn-group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;"><span class="pull-left"><?php echo ($vars['dashboard']['user_id'] != Auth::id() ? $vars['dashboard']['username'].':' : ''); ?><?php echo $vars['dashboard']['dashboard_name']; ?></span>
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;"><span class="pull-left"><?php echo ($vars['dashboard']['user_id'] != LegacyAuth::id() ? $vars['dashboard']['username'].':' : ''); ?><?php echo $vars['dashboard']['dashboard_name']; ?></span>
           <span class="pull-right">
             <span class="caret"></span>
             <span class="sr-only">Toggle Dropdown</span>
@@ -539,7 +539,7 @@ if (strpos($dash_config, 'globe') !== false) {
               '</span>'+
               '<span class="fade-edit pull-right">'+
                 <?php
-                if (($vars['dashboard']['access'] == 1 && Auth::id() === $vars['dashboard']['user_id']) ||
+                if (($vars['dashboard']['access'] == 1 && LegacyAuth::id() === $vars['dashboard']['user_id']) ||
                         ($vars['dashboard']['access'] == 0 || $vars['dashboard']['access'] == 2)) {
                         echo "'<i class=\"fa fa-pencil-square-o edit-widget\" data-widget-id=\"'+data.user_widget_id+'\" aria-label=\"Settings\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Settings\">&nbsp;</i>&nbsp;'+";
                 }

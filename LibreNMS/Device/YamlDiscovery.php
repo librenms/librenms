@@ -197,7 +197,7 @@ class YamlDiscovery
 
                     foreach ($data_array as $data) {
                         foreach ((array)$data['oid'] as $oid) {
-                            if (!isset($pre_cache[$oid])) {
+                            if (!array_key_exists($oid, $pre_cache)) {
                                 if (isset($data['snmp_flags'])) {
                                     $snmp_flag = $data['snmp_flags'];
                                 } else {

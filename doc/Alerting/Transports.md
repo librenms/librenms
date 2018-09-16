@@ -254,9 +254,18 @@ LibreNMS can send alerts to osTicket API which are then converted to osTicket ti
 | API Token | 123456789 |
 
 ## PagerDuty
-PagerDuty setup is currently done by a two way integration. Start this process from Settings -> Alerting Settings from within LibreNMS.
+LibreNMS can make use of PagerDuty, this is done by utilizing an API key and Integraton Key.
 
-[PagerDuty Docs](https://www.pagerduty.com/docs/guides/librenms-integration-guide/)
+API Keys can be found under 'API Access' in the PagerDuty portal.
+
+Integration Keys can be found under 'Integration' for the particular Service you have created in the PagerDuty portal.
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| API Key | randomsample |
+| Integration Key | somerandomstring |
 
 ## Philips Hue
 Want to spice up your noc life? LibreNMS will flash all lights connected to your philips hue bridge whenever an alert is triggered. 

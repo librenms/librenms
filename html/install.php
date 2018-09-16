@@ -1,5 +1,5 @@
 <?php
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 session_start();
 if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
@@ -27,7 +27,7 @@ $init_modules = array('web', 'nodb');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 // List of php modules we expect to see
-$modules = array('gd','mysqli');
+$modules = array('gd','mysqlnd');
 
 $dbhost = @$_POST['dbhost'] ?: 'localhost';
 $dbuser = @$_POST['dbuser'] ?: 'librenms';
@@ -52,6 +52,10 @@ if ($stage > 1) {
     try {
         if ($stage != 6) {
             dbConnect($dbhost, $dbuser, $dbpass, $dbname, $dbport, $dbsocket);
+            if (dbIsConnected() === false) {
+                $msg = "We could not connect to your database, please check the details and try again";
+                $stage = 1;
+            }
         }
         if ($stage == 2 && $_SESSION['build-ok'] == true) {
             $stage = 3;
@@ -464,9 +468,9 @@ if (!file_exists("../config.php")) {
       </div>
       <div class="col-md-6">
 <?php
-if (Auth::get()->canManageUsers()) {
-    if (!Auth::get()->userExists($add_user)) {
-        if (Auth::get()->addUser($add_user, $add_pass, '10', $add_email)) {
+if (LegacyAuth::get()->canManageUsers()) {
+    if (!LegacyAuth::get()->userExists($add_user)) {
+        if (LegacyAuth::get()->addUser($add_user, $add_pass, '10', $add_email)) {
             echo("<div class='alert alert-success'>User has been added successfully</div>");
             $proceed = 0;
         } else {

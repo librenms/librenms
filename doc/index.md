@@ -10,7 +10,7 @@
               </a>
             </div>
             <br />
-            <a href="/Installation/Installation-Ubuntu-1604-Nginx/">Ubuntu 16.04 + Nginx</a><br />
+            <a href="/Installation/Installation-Ubuntu-1804-Nginx/">Ubuntu 18.04 + Nginx</a><br />
             <a href="/Installation/Installation-CentOS-7-Nginx/">CentOS 7 + Nginx</a><br />
             <a href="/Installation/Migrating-from-Observium/">Migrating from Observium</a><br />
             <a href="/Installation/Installing-LibreNMS/"><strong>More...</strong></a>

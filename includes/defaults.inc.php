@@ -28,13 +28,15 @@ $config['project_id']   = strtolower($config['project_name']);
 $config['temp_dir']    = '/tmp';
 $config['log_dir']     = $config['install_dir'].'/logs';
 
-// MySQL extension to use
-$config['db']['extension']       = 'mysqli';
 // MySQL Debug level
 $config['mysql_log_level']       = 'ERROR';
 
-//MySQL port
+//MySQL Settings
 $config['db_port']               = 3306;
+$config['db_socket']             = null;
+$config['db_name']               = 'librenms';
+$config['db_user']               = 'librenms';
+$config['db_pass']               = null;
 $config['db_socket']             = null;
 
 // What is my own hostname (used to identify this host in its own database)
@@ -516,6 +518,7 @@ $config['billing']['base'] = 1000;
 // Set the base to divider bytes to kB, MB, GB ,... (1000|1024)
 // External Integration
 // $config['rancid_configs'][]             = '/var/lib/rancid/network/configs/';
+$config['rancid_repo_type'] = 'svn';
 $config['rancid_ignorecomments'] = 0;
 // Ignore lines starting with #
 // $config['collectd_dir']                 = '/var/lib/collectd/rrd';

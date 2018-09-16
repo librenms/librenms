@@ -41,7 +41,7 @@ class GitHub
     protected $pull_requests = [];
     protected $changelog = [];
     protected $markdown;
-    protected $labels = ['webui', 'api', 'documentation', 'security', 'feature', 'enhancement', 'device', 'bug', 'alerting'];
+    protected $labels = ['webui', 'api', 'documentation', 'security', 'feature', 'enhancement', 'device', 'bug', 'alerting','Breaking-Change'];
     protected $github = 'https://api.github.com/repos/librenms/librenms';
 
     public function __construct($tag, $from, $file, $token = null, $pr = null)
@@ -146,6 +146,7 @@ class GitHub
             if ($pr['merged_at']) {
                 foreach ($pr['labels'] as $key => $label) {
                     $name = preg_replace('/ :[\S]+:/', '', strtolower($label['name']));
+                    $name = str_replace('-', ' ', $name);
                     if (in_array($name, $this->labels)) {
                         $title = ucfirst(trim(preg_replace('/^[\S]+: /', '', $pr['title'])));
                         $output[$name][] = "$title ([#{$pr['number']}]({$pr['html_url']})) - [{$pr['user']['login']}]({$pr['user']['html_url']})" . PHP_EOL;
@@ -167,7 +168,7 @@ class GitHub
         $tmp_markdown = "##$this->tag" . PHP_EOL;
         $tmp_markdown .= '*(' . date('Y-m-d') . ')*' . PHP_EOL . PHP_EOL;
         if (!empty($this->changelog['users'])) {
-            $tmp_markdown .= "A big thank you to the following " . count($this->changelog['users']) . " contributors this last month:" . PHP_EOL;
+            $tmp_markdown .= "A big thank you to the following " . count($this->changelog['users']) . " contributors this last month:" . PHP_EOL . PHP_EOL;
             asort($this->changelog['users']);
             foreach (array_reverse($this->changelog['users']) as $user => $count) {
                 $tmp_markdown .= "  - $user ($count)" . PHP_EOL;

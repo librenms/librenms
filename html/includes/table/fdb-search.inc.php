@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $param = array();
 
@@ -17,10 +17,10 @@ $sql .= " LEFT JOIN ( SELECT `port_id`, COUNT(*) `portCount` FROM `ports_fdb` GR
 
 $where = " WHERE 1";
 
-if (!Auth::user()->hasGlobalRead()) {
+if (!LegacyAuth::user()->hasGlobalRead()) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` USING (`device_id`)';
     $where  .= ' AND `DP`.`user_id`=?';
-    $param[] = Auth::id();
+    $param[] = LegacyAuth::id();
 }
 
 if (is_numeric($vars['device_id'])) {
@@ -80,7 +80,7 @@ $sql .= " GROUP BY `device_id`, `port_id`, `mac_address`, `vlan`, `hostname`, `i
 $sql .= " `ifAdminStatus`, `ifDescr`, `ifOperStatus`, `ifInErrors`, `ifOutErrors`";
 
 // Get most likely endpoint port_id, used to add a visual marker for this element
-// in the list 
+// in the list
 if (isset($vars['searchby']) && !empty($vars['searchPhrase']) && $vars['searchby'] != 'vlan') {
     $countsql .= " ORDER BY `C`.`portCount` ASC LIMIT 1";
     foreach (dbFetchRows($select . $sql . $countsql, $param) as $entry) {

@@ -1,8 +1,12 @@
 <?php
 
+use LibreNMS\Config;
+
+$request_uri = rtrim(Config::get('base_url', ''), '/') . $_SERVER['REQUEST_URI'];
+
 echo "<div style='text-align: center;'>
         <form class='form-inline' id='customrange'>
-        <input type=hidden id='selfaction' value='" . $_SERVER['REQUEST_URI'] . "'>
+        <input type=hidden id='selfaction' value='$request_uri'>
 ";
 
 echo '

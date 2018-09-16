@@ -143,7 +143,7 @@ if (!file_exists(Config::get('install_dir').'/config.php')) {
 if (\LibreNMS\DB\Eloquent::isConnected()) {
     $validator->ok('Database connection successful', null, 'database');
 } else {
-    $validator->fail('Error connecting to your database. '.$e->getMessage(), null, 'database');
+    $validator->fail('Error connecting to your database.', null, 'database');
 }
 
 Config::load();
