@@ -44,6 +44,15 @@ cnPower OBJECT-TYPE
      DESCRIPTION
          "Power Levels"
      ::= { global6 8 }
+ 
+ ebn0Power OBJECT-TYPE
+      SYNTAX      TenthdBmV
+      UNITS       "dBmV"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Power Levels"
+      ::= { global6 9 }
 
 global7 OBJECT IDENTIFIER ::= { global4 3 }
 
