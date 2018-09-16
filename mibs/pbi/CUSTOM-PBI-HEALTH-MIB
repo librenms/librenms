@@ -47,15 +47,6 @@ cnPower OBJECT-TYPE
 
 global7 OBJECT IDENTIFIER ::= { global4 3 }
 
-satFrequency OBJECT-TYPE
-   SYNTAX   INTEGER
-   UNITS    "MHz"
-   ACCESS   read-only
-   STATUS   mandatory
-   DESCRIPTION
-      "The satellite frequency"
-   ::= { global7 2 }
-   
 lnbFrequency OBJECT-TYPE
    SYNTAX   INTEGER
    UNITS    "MHz"
@@ -64,6 +55,15 @@ lnbFrequency OBJECT-TYPE
    DESCRIPTION
       "The LNB frequency"
    ::= { global7 1 }  
+
+satFrequency OBJECT-TYPE
+   SYNTAX   INTEGER
+   UNITS    "MHz"
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION
+      "The satellite frequency"
+   ::= { global7 2 }
 
 lnbVoltageState OBJECT-TYPE
     SYNTAX INTEGER {
