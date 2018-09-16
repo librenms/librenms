@@ -37,7 +37,7 @@ $oid = snmp_get_multi($device, 'batteryBanksSymmetry1enable.0 batteryBanksSymmet
 $count = array(1, 2, 3, 4, 5, 6, 7, 8);
 foreach ($count as &$countValue) {
     if ($oid[0]['batteryBanksSymmetry'.$countValue.'enable'] == 'enable') {
-	if ($oid[0]['batteryBanksSymmetry'.$countValue.'status'] == 'ok') {
+        if ($oid[0]['batteryBanksSymmetry'.$countValue.'status'] == 'ok') {
             $state_numeric = 0;
         }
         if ($oid[0]['batteryBanksSymmetry'.$countValue.'status'] == 'minorAlarm') {
