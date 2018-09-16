@@ -3,6 +3,7 @@
  * LibreNMS
  *
  * Copyright (c) 2014 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk/fa>
+ * Copyright (c) 2018 TheGreatDoc <https://github.com/thegreatdoc/>
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -36,7 +37,13 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
 <?php
 
 foreach (dbFetchRows("SELECT `id`,`rule`,`name` FROM `alert_rules`", array()) as $rule) {
-    echo '<option value="'.$rule['id'].'">'.$rule['name'].'</option>';
+    $is_avail = dbFetchCell("SELECT `alert_templates_id` FROM `alert_template_map` WHERE `alert_rule_id` = " . $rule['id']);
+    if (!isset($is_avail)) {
+        echo '<option value="' . $rule['id'] . '">' . $rule['name'] . '</option>';
+    } else {
+        $template = dbFetchCell("SELECT `name` FROM `alert_templates` WHERE `id` = ". $is_avail);
+        echo '<option value="' . $rule['id'] . '" disabled>' . $rule['name'] . ' - Used in template: ' . $template . '</option>';
+    }
 }
 ?>
                         </select>
