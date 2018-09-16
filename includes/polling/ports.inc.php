@@ -368,13 +368,14 @@ if ($config['enable_ports_poe']) {
 }
 
 if ($config['enable_ports_nac']) {
-    if ($device['os'] == 'ios') {
+    if ($device['os'] == 'iosxe' || 'ios') {
         echo "\nCisco-NAC\n";
         $PortAuthSessionEntry = snmpwalk_cache_oid($device, 'cafSessionEntry', array(), 'CISCO-AUTH-FRAMEWORK-MIB');
         foreach ($PortAuthSessionEntry as $PortAuthSessionEntryNAC => $PortAuthSessionEntryParameters) {
-            $port_index_nac = substr($PortAuthSessionEntryNAC, 0, -27);
-            $port_auth_id_nac = substr($PortAuthSessionEntryNAC, 7 );
+            $port_index_nac = substr($PortAuthSessionEntryNAC, 0, strpos($PortAuthSessionEntryNAC, "."));
+            $port_auth_id_nac = strstr($PortAuthSessionEntryNAC, "'" );
             $port_auth_id_nac = substr($port_auth_id_nac, 0, -1 );
+            $port_auth_id_nac = substr($port_auth_id_nac, 1);
             $dbreult = dbFetchRow('SELECT * FROM `ports_nac` WHERE `auth_id` = ?' , $port_auth_id_nac);
             if ($dbreult == null){
                 echo "Not found\n";
