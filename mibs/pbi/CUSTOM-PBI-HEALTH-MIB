@@ -44,6 +44,15 @@ cnPower OBJECT-TYPE
      DESCRIPTION
          "Power Levels"
      ::= { global6 8 }
+ 
+ ebn0Power OBJECT-TYPE
+      SYNTAX      TenthdBmV
+      UNITS       "dBmV"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Power Levels"
+      ::= { global6 9 }
 
 global7 OBJECT IDENTIFIER ::= { global4 3 }
 
@@ -78,5 +87,20 @@ lnbVoltageState OBJECT-TYPE
     "  Current LNB Voltage state.
     "
     ::= {global7 4}
+    
+    diseqcState OBJECT-TYPE
+     SYNTAX INTEGER {
+         diseqcStateOff(0),
+         diseqcStatePortA(1),
+         diseqcStatePortB(2),
+         diseqcStatePortC(3) ,
+         diseqcStatePortD(4)
+     }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+     "  Current DiSEqC state.
+     "
+     ::= {global7 6}
 
 END
