@@ -7,6 +7,8 @@ use LibreNMS\Exceptions\AuthenticationException;
 
 class ADAuthorizationAuthorizer extends MysqlAuthorizer
 {
+    use LdapSessionCache;
+
     protected static $AUTH_IS_EXTERNAL = 1;
     protected static $CAN_UPDATE_PASSWORDS = 0;
 
@@ -14,10 +16,6 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
 
     public function __construct()
     {
-        if (! isset($_SESSION['username'])) {
-            $_SESSION['username'] = '';
-        }
-
         if (!function_exists('ldap_connect')) {
             throw new AuthenticationException("PHP does not support LDAP, please install or enable the PHP LDAP extension.");
         }
@@ -54,37 +52,16 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
 
     public function authenticate($username, $password)
     {
-        if (isset($_SERVER['REMOTE_USER'])) {
-            $_SESSION['username'] = mres($_SERVER['REMOTE_USER']);
+        if ($this->userExists($username)) {
+            $this->addUser($username, null);
+            return true;
+        }
 
-            if ($this->userExists($_SESSION['username'])) {
-                $this->addUser($username, null);
-                return true;
-            }
-
-            $_SESSION['username'] = Config::get('http_auth_guest');
+        if (Config::get('http_auth_guest')) {
             return true;
         }
 
         throw new AuthenticationException();
-    }
-
-    public function addUser($username, $password, $level = 0, $email = '', $realname = '', $can_modify_passwd = 0, $description = '')
-    {
-        // Check to see if user is already added in the database
-        if (!$this->userExists($username)) {
-            $userid = dbInsert(array('username' => $username, 'realname' => $realname, 'email' => $email, 'descr' => $description, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd, 'user_id' => $this->getUserid($username)), 'users');
-            if ($userid == false) {
-                return false;
-            } else {
-                foreach (dbFetchRows('select notifications.* from notifications where not exists( select 1 from notifications_attribs where notifications.notifications_id = notifications_attribs.notifications_id and notifications_attribs.user_id = ?) order by notifications.notifications_id desc', array($userid)) as $notif) {
-                    dbInsert(array('notifications_id'=>$notif['notifications_id'],'user_id'=>$userid,'key'=>'read','value'=>1), 'notifications_attribs');
-                }
-            }
-            return $userid;
-        } else {
-            return false;
-        }
     }
 
     public function userExists($username, $throw_exception = false)
@@ -291,39 +268,5 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         $revLevel = hexdec(substr($sidHex, 0, 2));
         $authIdent = hexdec(substr($sidHex, 4, 12));
         return 'S-'.$revLevel.'-'.$authIdent.'-'.implode('-', $subAuths);
-    }
-
-    protected function authLdapSessionCacheGet($attr)
-    {
-        $ttl = 300;
-        if (Config::get('auth_ldap_cache_ttl')) {
-            $ttl = Config::get('auth_ldap_cache_ttl');
-        }
-
-        // auth_ldap cache present in this session?
-        if (! isset($_SESSION['auth_ldap'])) {
-            return null;
-        }
-
-        $cache = $_SESSION['auth_ldap'];
-
-        // $attr present in cache?
-        if (! isset($cache[$attr])) {
-            return null;
-        }
-
-        // Value still valid?
-        if (time() - $cache[$attr]['last_updated'] >= $ttl) {
-            return null;
-        }
-
-        return $cache[$attr]['value'];
-    }
-
-
-    protected function authLdapSessionCacheSet($attr, $value)
-    {
-        $_SESSION['auth_ldap'][$attr]['value'] = $value;
-        $_SESSION['auth_ldap'][$attr]['last_updated'] = time();
     }
 }
