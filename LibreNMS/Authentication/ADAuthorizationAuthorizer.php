@@ -8,7 +8,7 @@ use LibreNMS\Exceptions\AuthenticationException;
 class ADAuthorizationAuthorizer extends MysqlAuthorizer
 {
     use LdapSessionCache;
-    use ADUtils;
+    use ActiveDirectoryCommon;
 
     protected static $AUTH_IS_EXTERNAL = 1;
     protected static $CAN_UPDATE_PASSWORDS = 0;
@@ -54,7 +54,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
     public function authenticate($username, $password)
     {
         if ($this->userExists($username)) {
-            $this->addUser($username, null);
+//            $this->addUser($username, null, $this->getUserlevel($username));
             return true;
         }
 

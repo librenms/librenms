@@ -10,7 +10,7 @@ use LibreNMS\Exceptions\AuthenticationException;
 
 class ActiveDirectoryAuthorizer extends AuthorizerBase
 {
-    use ADUtils;
+    use ActiveDirectoryCommon;
 
     protected static $CAN_UPDATE_PASSWORDS = 0;
 
@@ -167,40 +167,6 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         return -1;
     }
 
-    protected function getDomainSid()
-    {
-        $this->bind(); // make sure we called bind
-
-        // Extract only the domain components
-        $dn_candidate = preg_replace('/^.*?DC=/i', 'DC=', Config::get('auth_ad_base_dn'));
-
-        $search = ldap_read(
-            $this->ldap_connection,
-            $dn_candidate,
-            '(objectClass=*)',
-            array('objectsid')
-        );
-        $entry = ldap_get_entries($this->ldap_connection, $search);
-        return substr($this->sidFromLdap($entry[0]['objectsid'][0]), 0, 41);
-    }
-
-    public function getUser($user_id)
-    {
-        $this->bind(); // make sure we called bind
-
-        $domain_sid = $this->getDomainSid();
-
-        $search_filter = "(&(objectcategory=person)(objectclass=user)(objectsid=$domain_sid-$user_id))";
-        $attributes = array('samaccountname', 'displayname', 'objectsid', 'mail');
-        $search = ldap_search($this->ldap_connection, Config::get('auth_ad_base_dn'), $search_filter, $attributes);
-        $entry = ldap_get_entries($this->ldap_connection, $search);
-
-        if (isset($entry[0]['samaccountname'][0])) {
-            return $this->userFromAd($entry[0]);
-        }
-
-        return array();
-    }
 
     /**
      * Bind to AD with the bind user if available, otherwise anonymous bind

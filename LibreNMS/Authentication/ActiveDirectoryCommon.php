@@ -1,6 +1,6 @@
 <?php
 /**
- * ADUtils.php
+ * ActiveDirectoryCommonirectoryCommon.php
  *
  * Common code from AD auth modules
  *
@@ -27,7 +27,7 @@ namespace LibreNMS\Authentication;
 
 use LibreNMS\Config;
 
-trait ADUtils
+trait ActiveDirectoryCommon
 {
     protected function getUseridFromSid($sid)
     {
@@ -191,5 +191,39 @@ trait ADUtils
             'level' => $this->getUserlevel($entry['samaccountname'][0]),
             'can_modify_passwd' => 0,
         );
+    }
+
+    public function getUser($user_id)
+    {
+        $connection = $this->getConnection();
+        $domain_sid = $this->getDomainSid();
+
+        $search_filter = "(&(objectcategory=person)(objectclass=user)(objectsid=$domain_sid-$user_id))";
+        $attributes = array('samaccountname', 'displayname', 'objectsid', 'mail');
+        $search = ldap_search($connection, Config::get('auth_ad_base_dn'), $search_filter, $attributes);
+        $entry = ldap_get_entries($connection, $search);
+
+        if (isset($entry[0]['samaccountname'][0])) {
+            return $this->userFromAd($entry[0]);
+        }
+
+        return array();
+    }
+
+    protected function getDomainSid()
+    {
+        $connection = $this->getConnection();
+
+        // Extract only the domain components
+        $dn_candidate = preg_replace('/^.*?DC=/i', 'DC=', Config::get('auth_ad_base_dn'));
+
+        $search = ldap_read(
+            $connection,
+            $dn_candidate,
+            '(objectClass=*)',
+            array('objectsid')
+        );
+        $entry = ldap_get_entries($connection, $search);
+        return substr($this->sidFromLdap($entry[0]['objectsid'][0]), 0, 41);
     }
 }

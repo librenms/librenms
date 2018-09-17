@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Authentication;
 
+use Carbon\Carbon;
 use LibreNMS\Config;
 use Session;
 
