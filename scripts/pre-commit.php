@@ -124,7 +124,7 @@ if ($map['php'] === 0) {
 }
 
 // If we have no php files and no OS' found then also skip unit checks.
-if ($map['php'] === 0 && empty($map['os'])) {
+if ($map['php'] === 0 && empty($map['os']) && !$os) {
     putenv('SKIP_UNIT_CHECK=1');
 }
 
@@ -144,18 +144,9 @@ foreach (array_keys($options) as $opt) {
         $ret = run_check('style', $passthru, $command_only);
     } elseif ($opt == 'u' || $opt == 'unit') {
         if (!empty($map['os']) && $map['php'] === 0) {
-            foreach ($map['os'] as $os) {
-                echo "DOING $os" . PHP_EOL;
-                $completed_tests['unit'] = false;
-                $ret = run_check('unit', $passthru, $command_only, compact('fail_fast', 'os', 'module'));
-                echo "RESPONSE $ret". PHP_EOL;
-                if ($ret !== 0) {
-                    break;
-                }
-            }
-        } else {
-            $ret = run_check('unit', $passthru, $command_only, compact('fail_fast', 'os', 'module'));
+            $os = $map['os'];
         }
+        $ret = run_check('unit', $passthru, $command_only, compact('fail_fast', 'os', 'module'));
     }
 
     if ($fail_fast && $ret !== 0 && $ret !== 250) {
@@ -298,8 +289,8 @@ function check_unit($passthru = false, $command_only = false, $options = array()
     }
 
     if ($options['os']) {
-        echo "restricted to {$options['os']}...";
-        $phpunit_cmd .= " --group os --filter \"@{$options['os']}.*\"";
+        $filter = implode('.*|', (array)$options['os']);
+        $phpunit_cmd .= " --group os --filter \"@($filter.*)\"";
     }
 
     if ($options['module']) {
