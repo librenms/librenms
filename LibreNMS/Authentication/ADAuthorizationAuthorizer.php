@@ -54,7 +54,6 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
     public function authenticate($username, $password)
     {
         if ($this->userExists($username)) {
-//            $this->addUser($username, null, $this->getUserlevel($username));
             return true;
         }
 
