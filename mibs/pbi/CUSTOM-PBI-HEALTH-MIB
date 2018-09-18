@@ -1,0 +1,106 @@
+CUSTOM-PBI-HEALTH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32, Counter64
+        FROM SNMPv2-SMI
+    DisplayString, TruthValue
+        FROM SNMPv2-TC
+    enterprises
+        FROM SNMPv2-SMI;
+
+pbiHealth MODULE-IDENTITY
+    LAST-UPDATED "201809150000Z"
+    ORGANIZATION "LibreNMS"
+    CONTACT-INFO "Neil Lathwood:   gh+n@laf.io"
+
+    DESCRIPTION  "The Health MIB for PBI based devices."
+    ::= { enterprises 1070 }
+
+global OBJECT IDENTIFIER ::= { pbiHealth 3 }
+
+global2 OBJECT IDENTIFIER ::= { global 1 }
+
+global3 OBJECT IDENTIFIER ::= { global2 1 }
+
+global4 OBJECT IDENTIFIER ::= { global3 104 }
+
+global5 OBJECT IDENTIFIER ::= { global4 1 }
+
+global6 OBJECT IDENTIFIER ::= { global5 1 }
+
+signalStrength OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Signal Strength dBm"
+    ::= { global6 6 }
+
+cnPower OBJECT-TYPE
+     SYNTAX      TenthdBmV
+     UNITS       "dBmV"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Power Levels"
+     ::= { global6 8 }
+ 
+ ebn0Power OBJECT-TYPE
+      SYNTAX      TenthdBmV
+      UNITS       "dBmV"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Power Levels"
+      ::= { global6 9 }
+
+global7 OBJECT IDENTIFIER ::= { global4 3 }
+
+lnbFrequency OBJECT-TYPE
+   SYNTAX   INTEGER
+   UNITS    "MHz"
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION
+      "The LNB frequency"
+   ::= { global7 1 }  
+
+satFrequency OBJECT-TYPE
+   SYNTAX   INTEGER
+   UNITS    "MHz"
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION
+      "The satellite frequency"
+   ::= { global7 2 }
+
+lnbVoltageState OBJECT-TYPE
+    SYNTAX INTEGER {
+        lnbVoltageStateOff(0),
+        lnbVoltageState13V(1),
+        lnbVoltageState18V(2) ,
+        lnbVoltageStateFailed(3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "  Current LNB Voltage state.
+    "
+    ::= {global7 4}
+    
+    diseqcState OBJECT-TYPE
+     SYNTAX INTEGER {
+         diseqcStateOff(0),
+         diseqcStatePortA(1),
+         diseqcStatePortB(2),
+         diseqcStatePortC(3) ,
+         diseqcStatePortD(4)
+     }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+     "  Current DiSEqC state.
+     "
+     ::= {global7 6}
+
+END
