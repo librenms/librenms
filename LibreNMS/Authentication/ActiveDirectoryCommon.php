@@ -226,4 +226,11 @@ trait ActiveDirectoryCommon
         $entry = ldap_get_entries($connection, $search);
         return substr($this->sidFromLdap($entry[0]['objectsid'][0]), 0, 41);
     }
+
+    /**
+     * Provide a connected and bound ldap connection resource
+     *
+     * @return resource
+     */
+    abstract protected function getConnection();
 }
