@@ -27,7 +27,7 @@ modules:
                     oid: hwOpticalModuleInfoTable
                     value: hwEntityOpticalRxPower
                     num_oid: .1.3.6.1.4.1.2011.5.25.31.1.1.3.1.8.
-                    descr: '{{ $entPhysicalName }} Rx OLD'
+                    descr: '{{ $entPhysicalName }} Rx'
                     index: 'rx-{{ $index }}'
                     user_func: 'uw_to_dbm'
                     entPhysicalIndex: $index
@@ -40,7 +40,7 @@ modules:
                     oid: hwOpticalModuleInfoTable
                     value: hwEntityOpticalTxPower
                     num_oid: .1.3.6.1.4.1.2011.5.25.31.1.1.3.1.9.
-                    descr: '{{ $entPhysicalName }} Tx OLD'
+                    descr: '{{ $entPhysicalName }} Tx'
                     index: 'tx-{{ $index }}'
                     user_func: 'uw_to_dbm'  
                     entPhysicalIndex: $index
@@ -58,8 +58,8 @@ modules:
                     divisor: 100
                     skip_values:
                         -
-                            oid: hwEntityOpticalLaneTxPower
-                            op: '>='
+                            oid: hwEntityOpticalRxPower
+                            op: '>'
                             value: 0
                 -
                     oid: hwOpticalModuleInfoTable
@@ -69,8 +69,8 @@ modules:
                     index: 'lane-tx-{{ $index }}'
                     skip_values:
                         -
-                            oid: hwEntityOpticalLaneTxPower
-                            op: '>='
+                            oid: hwEntityOpticalTxPower
+                            op: '>'
                             value: 0
                     divisor: 100
         voltage:
