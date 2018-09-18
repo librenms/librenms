@@ -123,6 +123,5 @@ class User extends BaseValidation
         } else {
             $validator->warn("You don't have \$config['user'] set, this most likely needs to be set to librenms");
         }
-
     }
 }
