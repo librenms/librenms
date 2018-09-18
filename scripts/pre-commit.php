@@ -33,12 +33,12 @@ foreach ($changed_files as $file) {
     if (ends_with($file, '.sh')) {
         $map['bash']++;
     }
-    if (ends_with($file, '.php') && !starts_with($file, ['includes/polling/os/', 'scripts/'])) {
+
+    // check if os owned file or generic php file
+    if (!empty($os_name = os_from_file($file))) {
+        $map['os'][] = $os_name;
+    } elseif (ends_with($file, '.php')) {
         $map['php']++;
-    }
-    if (starts_with($file, ['includes/definitions/', 'includes/polling/os/']) && ends_with($file, ['.yaml', '.inc.php'])) {
-        $split_path = explode('/', $file);
-        $map['os'][] = str_replace(['.yaml', '.inc.php'], '', array_pop($split_path));
     }
 }
 
@@ -146,6 +146,11 @@ foreach (array_keys($options) as $opt) {
         if (!empty($map['os']) && $map['php'] === 0) {
             $os = $map['os'];
         }
+
+        if (!empty($os)) {
+            echo 'Only checking os: ' . implode(', ', (array)$os) . PHP_EOL;
+        }
+
         $ret = run_check('unit', $passthru, $command_only, compact('fail_fast', 'os', 'module'));
     }
 
@@ -161,6 +166,45 @@ if ($all && $return === 0) {
     echo "\033[32mTests ok, submit away :)\033[0m \n";
 }
 exit($return); //return the combined/single return value of tests
+
+function os_from_file($file)
+{
+    if (starts_with($file, 'includes/definitions/')) {
+        return basename($file, '.yaml');
+    } elseif (starts_with($file, ['includes/polling', 'includes/discovery'])) {
+        return os_from_php($file);
+    } elseif (starts_with($file, 'LibreNMS/OS/')) {
+        if (preg_match('#LibreNMS/OS/[^/]+.php#', $file)) {
+            // convert class name to os name
+            preg_match_all("/[A-Z][a-z]*/", basename($file, '.php'), $segments);
+            $osname = implode('-', array_map('strtolower', $segments[0]));
+            $os = os_from_php($osname);
+            if ($os) {
+                return $os;
+            }
+            return os_from_php(str_replace('-', '_', $osname));
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Extract os name from path and validate it exists.
+ *
+ * @param $php_file
+ * @return null|string
+ */
+function os_from_php($php_file)
+{
+    $os = basename($php_file, '.inc.php');
+
+    if (file_exists("includes/definitions/$os.yaml")) {
+        return $os;
+    }
+
+    return null;
+}
 
 
 /**
