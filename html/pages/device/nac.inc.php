@@ -7,8 +7,5 @@ $link_array = array(
               );
 $pagetitle[] = 'NAC';
 echo"<br>";
-
-
 include 'includes/print-nac.inc.php';
-
 echo '</table>';
