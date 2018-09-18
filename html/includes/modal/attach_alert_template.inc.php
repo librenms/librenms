@@ -76,7 +76,6 @@ $('#attach-alert-template').on('show.bs.modal', function(e) {
             $.each( output.rule_id, function( i, elem) {
                 elem = parseInt(elem);
                 selected_items.push(elem);
-                $("#rules_list option[value=" + elem + "]").prop('disabled', false)
             });
             $('#rules_list').val(selected_items);
         }
