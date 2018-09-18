@@ -27,18 +27,52 @@ modules:
                     oid: hwOpticalModuleInfoTable
                     value: hwEntityOpticalRxPower
                     num_oid: .1.3.6.1.4.1.2011.5.25.31.1.1.3.1.8.
-                    descr: '{{ $entPhysicalName }} Rx'
+                    descr: '{{ $entPhysicalName }} Rx OLD'
                     index: 'rx-{{ $index }}'
-                    skip_values: -1
                     user_func: 'uw_to_dbm'
+                    entPhysicalIndex: $index
+                    skip_values: 
+                        -
+                            oid: hwEntityOpticalRxPower
+                            op: '<='
+                            value: 0
                 -
                     oid: hwOpticalModuleInfoTable
                     value: hwEntityOpticalTxPower
                     num_oid: .1.3.6.1.4.1.2011.5.25.31.1.1.3.1.9.
-                    descr: '{{ $entPhysicalName }} Tx'
+                    descr: '{{ $entPhysicalName }} Tx OLD'
                     index: 'tx-{{ $index }}'
-                    skip_values: -1
-                    user_func: 'uw_to_dbm'
+                    user_func: 'uw_to_dbm'  
+                    entPhysicalIndex: $index
+                    skip_values:
+                        -
+                            oid: hwEntityOpticalTxPower
+                            op: '<='
+                            value: 0
+                -
+                    oid: hwOpticalModuleInfoTable
+                    value: hwEntityOpticalLaneRxPower
+                    num_oid: .1.3.6.1.4.1.2011.5.25.31.1.1.3.1.32.
+                    descr: '{{ $entPhysicalName }} Rx'
+                    index: 'lane-rx-{{ $index }}'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: hwEntityOpticalLaneTxPower
+                            op: '>='
+                            value: 0
+                -
+                    oid: hwOpticalModuleInfoTable
+                    value: hwEntityOpticalLaneTxPower
+                    num_oid: .1.3.6.1.4.1.2011.5.25.31.1.1.3.1.33.
+                    descr: '{{ $entPhysicalName }} Tx'
+                    index: 'lane-tx-{{ $index }}'
+                    skip_values:
+                        -
+                            oid: hwEntityOpticalLaneTxPower
+                            op: '>='
+                            value: 0
+                    divisor: 100
         voltage:
             data:
                 -
