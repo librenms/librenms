@@ -104,13 +104,17 @@ $('#alert-template-attach').click('', function(event) {
             if (data.status == 'ok') {
                 toastr.success(data.message);
                 $("#attach-alert-template").modal('hide');
-                $.each( data.old_rules2, function(index, itemData){
-                    $("#rules_list option[value=" + itemData + "]").removeAttr('disabled', false);
-                    console.log ('Old Rules '+index+' - '+itemData);
+                $.each( data.old_rules, function(index, itemData){
+                    if (itemData != "--Clear Rules--") {
+                        $("#rules_list option[value=" + itemData + "]").prop('disabled', false).text(data.rule_name[index]);
+                        console.log('Removed Rules ' + index + ' - RuleID: ' + itemData + ' - Rule: ' + data.rule_name[index]);
+                    }
                 });
                 $.each( data.new_rules, function(index, itemData){
-                    $("#rules_list option[value=" + itemData + "]").prop('disabled', true);
-                    console.log ('New Rules '+index+' - '+itemData);
+                    if (itemData != "--Clear Rules--") {
+                        $("#rules_list option[value=" + itemData + "]").prop('disabled', true).text(data.nrule_name[index] + ' - Used in template:' + data.template_name[index]);
+                        console.log('Added Rules ' + index + ' - RuleID ' + itemData + ' - Template: ' + data.template_name[index] + ' - Rule:' + data.nrule_name[index]);
+                    }
                 });
             } else {
                 //$('#template_error').html('<div class="alert alert-danger">'+msg+'</div>');

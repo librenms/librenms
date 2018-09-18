@@ -53,11 +53,21 @@ if (!is_numeric($_POST['template_id'])) {
         $message = "Alert rules have been attached to this template.";
     }
 }//end if
-$old_rules2 = array_diff($old_rules, $new_rules);
+//$old_rules = array_diff($old_rules, $new_rules);
+foreach ($old_rules as $rule) {
+    $rule_name[] = dbFetchCell("SELECT `name` FROM `alert_rules` WHERE `id` = ". $rule);
+}
+foreach ($new_rules as $template) {
+    $template_name[] = dbFetchCell("SELECT `name` FROM `alert_templates` WHERE `id` = ". $_POST['template_id']);
+    $nrule_name[] = dbFetchCell("SELECT `name` FROM `alert_rules` WHERE `id` = ". $template);
+}
 $response = array(
     'status'        => $status,
     'message'       => $message,
     'new_rules'     => $new_rules,
-    'old_rules2'     => $old_rules2
+    'nrule_name'     => $nrule_name,
+    'old_rules'     => $old_rules,
+    'rule_name'     => $rule_name,
+    'template_name'     => $template_name
 );
 echo _json_encode($response);
