@@ -57,7 +57,7 @@ trait LdapSessionCache
             return null;
         }
 
-        $cache[$attr]['value'];
+        return $cache[$attr]['value'];
     }
 
 
