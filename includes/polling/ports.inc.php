@@ -367,6 +367,7 @@ if ($config['enable_ports_poe']) {
     }
 }
 
+//NAC Polling
 if ($config['enable_ports_nac']) {
     if ($device['os'] == 'iosxe' || 'ios') {
         echo "\nCisco-NAC\n";
@@ -412,7 +413,7 @@ if ($config['enable_ports_nac']) {
             dbQuery("UPDATE `ports_nac` SET `PortAuthSessionAuthcStatus` = '".$cafSessionMethodsInfoEntryParameters['cafSessionMethodState']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
          }
     }
-}
+}//End NAC
 
 if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
     foreach ($pagp_oids as $oid) {
