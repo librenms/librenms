@@ -7,6 +7,43 @@ chdir($install_dir);
 
 require $install_dir . '/vendor/autoload.php';
 
+if (getenv('FILES')) {
+    $changed_files = rtrim(getenv('FILES'));
+} else {
+    $changed_files = exec("git diff --diff-filter=d --name-only master | tr '\n' ' '|sed 's/,*$//g'");
+}
+
+$changed_files = explode(' ', $changed_files);
+
+$map = [
+    'docs'   => 0,
+    'python' => 0,
+    'bash'   => 0,
+    'php'    => 0,
+    'os'     => [],
+];
+
+foreach ($changed_files as $file) {
+    if (starts_with($file, 'doc/')) {
+        $map['docs']++;
+    }
+    if (ends_with($file, '.py')) {
+        $map['python']++;
+    }
+    if (ends_with($file, '.sh')) {
+        $map['bash']++;
+    }
+    if (ends_with($file, '.php') && !starts_with($file, ['includes/polling/os/', 'scripts/'])) {
+        $map['php']++;
+    }
+    if (starts_with($file, ['includes/definitions/', 'includes/polling/os/']) && ends_with($file, ['.yaml', '.inc.php'])) {
+        $split_path = explode('/', $file);
+        $map['os'][] = str_replace(['.yaml', '.inc.php'], '', array_pop($split_path));
+    }
+}
+
+$map['os'] = array_unique($map['os']);
+
 $short_opts = 'lsufqcho:m:';
 $long_opts = array(
     'lint',
@@ -80,7 +117,25 @@ if (check_opt($options, 'db')) {
     putenv('DBTEST=1');
 }
 
+// No php files, skip the php checks.
+if ($map['php'] === 0) {
+    putenv('SKIP_LINT_CHECK=1');
+    putenv('SKIP_STYLE_CHECK=1');
+}
+
+// If we have no php files and no OS' found then also skip unit checks.
+if ($map['php'] === 0 && empty($map['os']) && !$os) {
+    putenv('SKIP_UNIT_CHECK=1');
+}
+
+// If we have more than 4 (arbitrary number) of OS' then blank them out
+// Unit tests may take longer to run in a loop so fall back to all.
+if (count($map['os']) > 4) {
+    unset($map['os']);
+}
+
 // run tests in the order they were specified
+
 foreach (array_keys($options) as $opt) {
     $ret = 0;
     if ($opt == 'l' || $opt == 'lint') {
@@ -88,6 +143,9 @@ foreach (array_keys($options) as $opt) {
     } elseif ($opt == 's' || $opt == 'style') {
         $ret = run_check('style', $passthru, $command_only);
     } elseif ($opt == 'u' || $opt == 'unit') {
+        if (!empty($map['os']) && $map['php'] === 0) {
+            $os = $map['os'];
+        }
         $ret = run_check('unit', $passthru, $command_only, compact('fail_fast', 'os', 'module'));
     }
 
@@ -220,6 +278,8 @@ function check_style($passthru = false, $command_only = false)
  */
 function check_unit($passthru = false, $command_only = false, $options = array())
 {
+    echo 'Running unit tests... ';
+
     $phpunit_bin = check_exec('phpunit');
 
     $phpunit_cmd = "$phpunit_bin --colors=always";
@@ -229,7 +289,8 @@ function check_unit($passthru = false, $command_only = false, $options = array()
     }
 
     if ($options['os']) {
-        $phpunit_cmd .= " --group os --filter \"@{$options['os']}.*\"";
+        $filter = implode('.*|', (array)$options['os']);
+        $phpunit_cmd .= " --group os --filter \"@($filter.*)\"";
     }
 
     if ($options['module']) {
@@ -241,7 +302,6 @@ function check_unit($passthru = false, $command_only = false, $options = array()
         return 250;
     }
 
-    echo 'Running unit tests... ';
     if ($passthru) {
         echo PHP_EOL;
         passthru($phpunit_cmd, $phpunit_ret);
