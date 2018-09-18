@@ -50,7 +50,7 @@ foreach ($tables as $tablevalue) {
         if ($state_index_id !== null) {
             if ($state_name == 'cRFStatusUnitState' || $state_name == 'cRFStatusPeerUnitState') {
                 $states = array(
-                    array($state_index_id,'notKnown',0,1,1) ,
+                    array($state_index_id,'notKnown',0,1,3) ,
                     array($state_index_id,'disabled',0,2,0) ,
                     array($state_index_id,'initialization',0,3,1) ,
                     array($state_index_id,'negotiation',0,4,1) ,
