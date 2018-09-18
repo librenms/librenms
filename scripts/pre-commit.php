@@ -146,6 +146,11 @@ foreach (array_keys($options) as $opt) {
         if (!empty($map['os']) && $map['php'] === 0) {
             $os = $map['os'];
         }
+
+        if (!empty($os)) {
+            echo 'Only checking os: ' . implode(', ', (array)$os) . PHP_EOL;
+        }
+
         $ret = run_check('unit', $passthru, $command_only, compact('fail_fast', 'os', 'module'));
     }
 
