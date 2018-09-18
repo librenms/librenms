@@ -33,7 +33,7 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
                     <div class="form-group">
                         <label for="rules_list">Select rules</label>
                         <select multiple="multiple" class="form-control" id="rules_list" name="rules_list" size="10">
-                            <option></option>
+                            <option>--Clear Rules--</option>
 <?php
 
 foreach (dbFetchRows("SELECT `id`,`rule`,`name` FROM `alert_rules`", array()) as $rule) {
@@ -99,17 +99,27 @@ $('#alert-template-attach').click('', function(event) {
         type: 'POST',
         url: 'ajax_form.php',
         data: { type: "attach-alert-template", template_id: template_id, rule_id: rules },
-        dataType: "html",
-        success: function(msg) {
-            if(msg.indexOf("ERROR:") <= -1) {
-                toastr.success(msg);
+        dataType: "json",
+        success: function(data) {
+            if (data.status == 'ok') {
+                toastr.success(data.message);
                 $("#attach-alert-template").modal('hide');
+                $.each( data.old_rules2, function(index, itemData){
+                    $("#rules_list option[value=" + itemData + "]").removeAttr('disabled', false);
+                    console.log ('Old Rules '+index+' - '+itemData);
+                });
+                $.each( data.new_rules, function(index, itemData){
+                    $("#rules_list option[value=" + itemData + "]").prop('disabled', true);
+                    console.log ('New Rules '+index+' - '+itemData);
+                });
             } else {
-                $('#template_error').html('<div class="alert alert-danger">'+msg+'</div>');
+                //$('#template_error').html('<div class="alert alert-danger">'+msg+'</div>');
+                toastr.error(data.message);
             }
         },
-        error: function() {
-            $("#template_error").html('<div class="alert alert-danger">The alert rules could not be attached to this template.</div>');
+        error: function(data) {
+            //$("#template_error").html('<div class="alert alert-danger">The alert rules could not be attached to this template.</div>');
+            toastr.error(data.message);
         }
     });
 });
