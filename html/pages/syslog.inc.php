@@ -13,12 +13,14 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Authentication\LegacyAuth;
+use Carbon\Carbon;
+use LibreNMS\Config;
 
 $no_refresh = true;
-$param = array();
+$param = [];
+$device_id = (int)$vars['device'];
 
-if ($vars['action'] == 'expunge' && LegacyAuth::user()->hasGlobalAdmin()) {
+if ($vars['action'] == 'expunge' && \Auth::user()->hasGlobalAdmin()) {
     dbQuery('TRUNCATE TABLE `syslog`');
     print_message('syslog truncated');
 }
@@ -35,7 +37,6 @@ $pagetitle[] = 'Syslog';
     echo implode('', $common_output);
     ?>
 </div>
-
 <script>
     $('.actionBar').append(
         '<div class="pull-left">' +
@@ -47,20 +48,14 @@ $pagetitle[] = 'Syslog';
         '<select name="device" id="device" class="form-control input-sm">' +
         '<option value="">All Devices&nbsp;&nbsp;</option>' +
         <?php
-        foreach (get_all_devices() as $data) {
-            if (device_permitted($data['device_id'])) {
-                echo "'<option value=\"" . $data['device_id'] . "\"";
-                if ($data['device_id'] == $vars['device']) {
-                    echo ' selected';
-                }
-                echo ">" . format_hostname($data) . "</option>' + ";
-            }
+        if ($device_id) {
+            echo "'<option value=$device_id>" . format_hostname(device_by_id_cache($device_id)) . "</option>' +";
         }
         ?>
         '</select>' +
         <?php
         } else {
-            echo "'&nbsp;&nbsp;<input type=\"hidden\" name=\"device\" id=\"device\" value=\"" . $vars['device'] . "\">' + ";
+            echo "'&nbsp;&nbsp;<input type=\"hidden\" name=\"device\" id=\"device\" value=\"" . $device_id . "\">' + ";
         }
         ?>
         '</div>' +
@@ -68,18 +63,9 @@ $pagetitle[] = 'Syslog';
         '<select name="program" id="program" class="form-control input-sm">' +
         '<option value="">All Programs&nbsp;&nbsp;</option>' +
         <?php
-        $sqlstatement = 'SELECT DISTINCT `program` FROM `syslog`';
-        if (is_numeric($vars['device'])) {
-            $sqlstatement = $sqlstatement . ' WHERE device_id=?';
-            $param[] = $vars['device'];
-        }
-        $sqlstatement = $sqlstatement . ' ORDER BY `program`';
-        foreach (dbFetchRows($sqlstatement, $param) as $data) {
-            echo "'<option value=\"" . $data['program'] . "\"";
-            if ($data['program'] == $vars['program']) {
-                echo ' selected';
-            }
-            echo ">" . $data['program'] . "</option>' + ";
+        if ($vars['program']) {
+            $js_program = addcslashes(htmlentities($vars['program']), "'");
+            echo "'<option value=\"$js_program\">$js_program</option>' +";
         }
         ?>
         '</select>' +
@@ -88,18 +74,9 @@ $pagetitle[] = 'Syslog';
         '<select name="priority" id="priority" class="form-control input-sm">' +
         '<option value="">All Priorities</option>' +
         <?php
-        $sqlstatement = 'SELECT DISTINCT `priority` FROM `syslog`';
-        if (is_numeric($vars['device'])) {
-            $sqlstatement = $sqlstatement . ' WHERE device_id=?';
-            $param[] = $vars['device'];
-        }
-        $sqlstatement = $sqlstatement . ' ORDER BY `level`';
-        foreach (dbFetchRows($sqlstatement, $param) as $data) {
-            echo "'<option value=\"" . $data['priority'] . "\"";
-            if ($data['priority'] == $vars['priority']) {
-                echo ' selected';
-            }
-            echo ">" . $data['priority'] . "</option>' + ";
+        if ($vars['priority']) {
+            $js_priority = addcslashes(htmlentities($vars['priority']), "'");
+            echo "'<option value=\"$js_priority\">$js_priority</option>' +";
         }
         ?>
         '</select>' +
@@ -130,7 +107,8 @@ $pagetitle[] = 'Syslog';
                 today: 'fa fa-calendar-check-o',
                 clear: 'fa fa-trash-o',
                 close: 'fa fa-close'
-            }
+            },
+            defaultDate: '<?php echo Carbon::now()->subDay()->format(Config::get('dateformat.byminute', 'Y-m-d H:i')); ?>'
         });
         $("#dtpickerfrom").on("dp.change", function (e) {
             $("#dtpickerto").data("DateTimePicker").minDate(e.date);
@@ -157,8 +135,53 @@ $pagetitle[] = 'Syslog';
         if ($("#dtpickerto").val() != "") {
             $("#dtpickerfrom").data("DateTimePicker").maxDate($("#dtpickerto").val());
         } else {
-            $("#dtpickerto").data("DateTimePicker").maxDate('<?php echo date($config['dateformat']['byminute']); ?>');
+            $("#dtpickerto").data("DateTimePicker").maxDate('<?php echo Carbon::now()->format(Config::get('dateformat.byminute', 'Y-m-d H:i')); ?>');
         }
     });
+
+    <?php if (!isset($vars['fromdevice'])) { ?>
+    $("#device").select2({
+        allowClear: true,
+        placeholder: "All Devices",
+        ajax: {
+            url: 'ajax/select/device',
+            delay: 200
+        }
+    })<?php echo $device_id ? ".val($device_id).trigger('change');" : ''; ?>;
+    <?php } ?>
+
+    $("#program").select2({
+        allowClear: true,
+        placeholder: "All Programs",
+        ajax: {
+            url: 'ajax/select/syslog',
+            delay: 200,
+            data: function(params) {
+                return {
+                    field: "program",
+                    device: $('#device').val(),
+                    term: params.term,
+                    page: params.page || 1
+                }
+            }
+        }
+    })<?php echo $vars['program'] ? ".val('" . addcslashes($vars['program'], "'") . "').trigger('change');" : ''; ?>;
+
+    $("#priority").select2({
+        allowClear: true,
+        placeholder: "All Priorities",
+        ajax: {
+            url: 'ajax/select/syslog',
+            delay: 200,
+            data: function(params) {
+                return {
+                    field: "priority",
+                    device: $('#device').val(),
+                    term: params.term,
+                    page: params.page || 1
+                }
+            }
+        }
+    })<?php echo $vars['priority'] ? ".val('" . addcslashes($vars['priority'], "'") . "').trigger('change');" : ''; ?>;
 </script>
 
