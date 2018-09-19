@@ -86,5 +86,4 @@ abstract class SelectController extends PaginatedAjaxController
             'text' => $attributes->forget($model->getKeyName())->first(),
         ];
     }
-
 }

@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Util;
 
-
 use App\Models\Device;
 use Auth;
 use Carbon\Carbon;
