@@ -50,9 +50,6 @@
         "fico7489/laravel-pivot": "*",
         "fideloper/proxy": "^4.0"
     },
-    "suggest": {
-        "ext-mysqlnd": "*"
-    },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.9.1",
         "phpunit/phpunit": "5.*",
@@ -66,7 +63,8 @@
     },
     "suggest": {
         "ext-memcached": "Required if you utilize distributed polling",
-        "ext-posix": "Allows for additional validation tests"
+        "ext-posix": "Allows for additional validation tests",
+        "ext-mysqlnd": "*"
     },
     "autoload": {
         "psr-4": {
