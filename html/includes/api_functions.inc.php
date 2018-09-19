@@ -12,8 +12,9 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Alerting\QueryBuilderParser;
+use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 
 function authToken(\Slim\Route $route)
 {
@@ -1185,15 +1186,27 @@ function delete_rule()
 function ack_alert()
 {
     check_is_admin();
-    global $config;
+
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
     $alert_id = mres($router['id']);
+    $data = json_decode(file_get_contents('php://input'), true);
 
     if (!is_numeric($alert_id)) {
         api_error(400, 'Invalid alert has been provided');
     }
-    if (dbUpdate(array('state' => 2), 'alerts', '`id` = ? LIMIT 1', array($alert_id))) {
+
+    $alert = dbFetchRow('SELECT note, info FROM alerts WHERE id=?', [$alert_id]);
+    $note  = $alert['note'];
+    $info  = json_decode($alert['info'], true);
+    if (!empty($note)) {
+        $note .= PHP_EOL;
+    }
+    $note .= date(Config::get('dateformat.long')) . " - Ack (" . Auth::user()->username . ") {$data['note']}";
+    $info['until_clear'] = $data['until_clear'];
+    $info = json_encode($info);
+
+    if (dbUpdate(['state' => 2, 'note' => $note, 'info' => $info], 'alerts', '`id` = ? LIMIT 1', [$alert_id])) {
         api_success_noresult(200, 'Alert has been acknowledged');
     } else {
         api_success_noresult(200, 'No Alert by that ID');
@@ -1203,16 +1216,25 @@ function ack_alert()
 function unmute_alert()
 {
     check_is_admin();
-    global $config;
+
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
     $alert_id = mres($router['id']);
+    $data = json_decode(file_get_contents('php://input'), true);
 
     if (!is_numeric($alert_id)) {
-        api_success_noresult(200, 'Alert has been acknowledged');
+        api_error(400, 'Invalid alert has been provided');
     }
 
-    if (dbUpdate(array('state' => 1), 'alerts', '`id` = ? LIMIT 1', array($alert_id))) {
+    $alert = dbFetchRow('SELECT note, info FROM alerts WHERE id=?', [$alert_id]);
+    $note  = $alert['note'];
+    $info  = json_decode($alert['info'], true);
+    if (!empty($note)) {
+        $note .= PHP_EOL;
+    }
+    $note .= date(Config::get('dateformat.long')) . " - Ack (" . Auth::user()->username . ") {$data['note']}";
+
+    if (dbUpdate(['state' => 1, 'note' => $note], 'alerts', '`id` = ? LIMIT 1', [$alert_id])) {
         api_success_noresult(200, 'Alert has been unmuted');
     } else {
         api_success_noresult(200, 'No alert by that ID');
