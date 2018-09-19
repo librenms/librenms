@@ -33,11 +33,17 @@ use Symfony\Component\Yaml\Yaml;
 
 class YamlTest extends TestCase
 {
+    /**
+     * @group os
+     */
     public function testOSDefinitionSchema()
     {
         $this->validateYamlFilesAgainstSchema('/includes/definitions', '/misc/os_schema.json');
     }
 
+    /**
+     * @group os
+     */
     public function testDiscoveryDefinitionSchema()
     {
         $this->validateYamlFilesAgainstSchema('/includes/definitions/discovery', '/misc/discovery_schema.json');
