@@ -34,6 +34,10 @@ foreach ($changed_files as $file) {
         $map['bash']++;
     }
 
+    if ($file == 'composer.lock') {
+        $map['php']++; // cause full tests to run
+    }
+
     // check if os owned file or generic php file
     if (!empty($os_name = os_from_file($file))) {
         $map['os'][] = $os_name;
