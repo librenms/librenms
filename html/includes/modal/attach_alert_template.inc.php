@@ -37,11 +37,11 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
 <?php
 
 foreach (dbFetchRows("SELECT `id`,`rule`,`name` FROM `alert_rules`", array()) as $rule) {
-    $is_avail = dbFetchCell("SELECT `alert_templates_id` FROM `alert_template_map` WHERE `alert_rule_id` = " . $rule['id']);
+    $is_avail = dbFetchCell("SELECT `alert_templates_id` FROM `alert_template_map` WHERE `alert_rule_id` = ?", [$rule['id']]);
     if (!isset($is_avail)) {
         echo '<option value="' . $rule['id'] . '">' . $rule['name'] . '</option>';
     } else {
-        $template = dbFetchCell("SELECT `name` FROM `alert_templates` WHERE `id` = ". $is_avail);
+        $template = dbFetchCell("SELECT `name` FROM `alert_templates` WHERE `id` = ?", [$is_avail]);
         echo '<option value="' . $rule['id'] . '" disabled>' . $rule['name'] . ' - Used in template: ' . $template . '</option>';
     }
 }
@@ -76,6 +76,7 @@ $('#attach-alert-template').on('show.bs.modal', function(e) {
             $.each( output.rule_id, function( i, elem) {
                 elem = parseInt(elem);
                 selected_items.push(elem);
+                $("#rules_list option[value='"+ elem + "']").attr('disabled', false);
             });
             $('#rules_list').val(selected_items);
         }
@@ -107,13 +108,11 @@ $('#alert-template-attach').click('', function(event) {
                 $.each( data.old_rules, function(index, itemData){
                     if (itemData != "--Clear Rules--") {
                         $("#rules_list option[value=" + itemData + "]").prop('disabled', false).text(data.rule_name[index]);
-                        console.log('Removed Rules ' + index + ' - RuleID: ' + itemData + ' - Rule: ' + data.rule_name[index]);
                     }
                 });
                 $.each( data.new_rules, function(index, itemData){
                     if (itemData != "--Clear Rules--") {
                         $("#rules_list option[value=" + itemData + "]").prop('disabled', true).text(data.nrule_name[index] + ' - Used in template:' + data.template_name[index]);
-                        console.log('Added Rules ' + index + ' - RuleID ' + itemData + ' - Template: ' + data.template_name[index] + ' - Rule:' + data.nrule_name[index]);
                     }
                 });
             } else {
