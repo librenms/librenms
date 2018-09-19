@@ -44,6 +44,8 @@ Acknowledge an alert
 Route: `/api/v0/alerts/:id`
 
   - id is the alert id, you can obtain a list of alert ids from [`list_alerts`](#function-list_alerts).
+  - note is the note to add to the alert
+  - until_clear is a boolean and if set to false, the alert will re-alert if it worsens/betters.
 
 Input:
 

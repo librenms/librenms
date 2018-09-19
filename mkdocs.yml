@@ -104,6 +104,7 @@ pages:
       - API/Logs.md
   - 8. Alerting:
       - Intro: Alerting/index.md
+      - Alerting/Introduction.md
       - Alerting/Rules.md
       - Alerting/Templates.md
       - Alerting/Transports.md

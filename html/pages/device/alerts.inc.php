@@ -12,5 +12,6 @@
  * the source code distribution for details.
  */
 require_once 'includes/modal/alert_notes.inc.php';
+require_once 'includes/modal/alert_ack.inc.php';
 require_once 'includes/common/alerts.inc.php';
 echo implode('', $common_output);
