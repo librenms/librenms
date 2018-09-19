@@ -4,7 +4,7 @@ source: Installation/Installation-Ubuntu-1804-Apache.md
 **Please note the minimum supported PHP version is 5.6.4**
 
 ## Install Required Packages ##
-
+    add-apt-repository universe
     apt update
     apt install curl apache2 composer fping git graphviz imagemagick libapache2-mod-php7.2 mariadb-client mariadb-server mtr-tiny nmap php7.2-cli php7.2-curl php7.2-gd php7.2-json php7.2-mbstring php7.2-mysql php7.2-snmp php7.2-xml php7.2-zip python-memcache python-mysqldb rrdtool snmp snmpd whois
 
