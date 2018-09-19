@@ -1,13 +1,18 @@
 -- ==================================================================
--- Copyright (C) 2007 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI Private MIB
 -- Reference:
--- Version: V1.0
--- History: V1.0 qiyanqing, 2007-05-14, publish
-
+-- Version: V2.03
+-- History: V1.0 
+--   <author>, <date>, <contents>
+--  qiyanqing, 2007-05-14, publish
 -- ==================================================================
-
+-- ==================================================================
+-- 
+-- Variables and types be imported
+-- 
+-- ==================================================================
 
     HUAWEI-TUNNEL-TE-MIB DEFINITIONS ::= BEGIN
  
@@ -22,7 +27,7 @@
                 FROM MPLS-TC-STD-MIB            
             SnmpAdminString            
                 FROM SNMP-FRAMEWORK-MIB            
-            OBJECT-GROUP, NOTIFICATION-GROUP            
+            OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE            
                 FROM SNMPv2-CONF            
             Integer32, Unsigned32, Counter32, Counter64, BITS, OBJECT-TYPE, 
             MODULE-IDENTITY, NOTIFICATION-TYPE            
@@ -31,20 +36,31 @@
                 FROM SNMPv2-TC;
     
         hwTunnelTeMib MODULE-IDENTITY 
-            LAST-UPDATED "200706101559Z"        -- June 10, 2007 at 15:59 GMT
+      	    LAST-UPDATED "201708171607Z"        -- August 17, 2017 at 16:07 GMT
             ORGANIZATION 
-                "Huawei Technologies Co., Ltd."
+                "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
-                "MPLS Team Huawei Technologies co.,Ltd.
-                 Huawei Bld.,NO.3 Xinxi Rd., 
-                 Shang-Di Information Industry Base,
-                 Hai-Dian District Beijing P.R. China
-                 http://www.huawei.com
-                 Zip:100085
-                "
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
             DESCRIPTION 
                 "This MIB contains private managed object  
-                definitions for the binding information."
+                definitions for the binding information."   		         
+
+           --  Revision history
+            REVISION   "201708171607Z"
+            DESCRIPTION "V2.03, modify description."
+
+            REVISION   "201708022038Z"
+            DESCRIPTION "V2.01, modify list head."
+			
+            REVISION   "201308281726Z"
+            DESCRIPTION "V2.01, modify comment."
+
             REVISION "200606301554Z"        -- June 30, 2006 at 15:54 GMT
             DESCRIPTION
                 "Initial version 2006/06/10,MPLS LSPM MIB GROUP."
@@ -169,7 +185,7 @@
      hwTunnelTeVsiTable OBJECT-TYPE
         SYNTAX SEQUENCE OF HwTunnelTeVsiEntry
         MAX-ACCESS not-accessible
-        STATUS current
+        STATUS obsolete
         DESCRIPTION 
             "The table describes the VPN binding of Tunnel."
         ::= { hwTunnelTeMibObject  2 }   
@@ -178,7 +194,7 @@
      hwTunnelTeVsiEntry OBJECT-TYPE
         SYNTAX HwTunnelTeVsiEntry
         MAX-ACCESS not-accessible
-        STATUS current
+        STATUS obsolete
         DESCRIPTION 
             "The L2VPN VSI binding configuration of tunnel interface."
         INDEX   { hwTunnelTeVsiIndex,hwTunnelTeVsiName } 
@@ -201,7 +217,7 @@
       hwTunnelTeVsiIndex OBJECT-TYPE
             SYNTAX InterfaceIndex
             MAX-ACCESS not-accessible
-            STATUS current
+            STATUS obsolete
             DESCRIPTION
                 "Uniquely identifies a set of tunnel instances
                 between a pair of ingress and egress LSRs.
@@ -217,7 +233,7 @@
       hwTunnelTeVsiName OBJECT-TYPE
          SYNTAX OCTET STRING (SIZE (0..47)) 
          MAX-ACCESS  not-accessible
-         STATUS  current
+         STATUS obsolete
          DESCRIPTION
                 "The name of VSI that the TE interface bind."
         ::= { hwTunnelTeVsiEntry 2 }    
@@ -226,7 +242,7 @@
       hwTunnelTeVsiCir OBJECT-TYPE
          SYNTAX Integer32 (100..10000000)
          MAX-ACCESS  read-only
-         STATUS  current
+         STATUS  obsolete
          DESCRIPTION
                 "The Committed Information Rate of the VSI."
         ::= { hwTunnelTeVsiEntry 3}
@@ -235,7 +251,7 @@
       hwTunnelTeVsiPir OBJECT-TYPE
          SYNTAX Integer32 (100..10000000)
          MAX-ACCESS  read-only
-         STATUS  current
+         STATUS  obsolete
          DESCRIPTION
                 "The Peak Information Rate of the VSI."
         ::= { hwTunnelTeVsiEntry 4 }
@@ -244,7 +260,7 @@
       hwTunnelTeVsiFlowQueue OBJECT-TYPE
          SYNTAX OCTET STRING (SIZE (0..31))
          MAX-ACCESS  read-only
-         STATUS  current
+         STATUS  obsolete
          DESCRIPTION
                 "Name of flow-queue template."
         ::= { hwTunnelTeVsiEntry 5 }
@@ -253,7 +269,7 @@
      hwTunnelTeVllTable OBJECT-TYPE
         SYNTAX SEQUENCE OF HwTunnelTeVllEntry
         MAX-ACCESS not-accessible
-        STATUS current
+        STATUS obsolete
         DESCRIPTION 
             "The table describes the VLL binding of tunnel."
         ::= { hwTunnelTeMibObject  3 }   
@@ -262,7 +278,7 @@
      hwTunnelTeVllEntry OBJECT-TYPE
         SYNTAX HwTunnelTeVllEntry
         MAX-ACCESS not-accessible
-        STATUS current
+        STATUS obsolete
         DESCRIPTION 
             "The VLL binding configuration of tunnel interface."
         INDEX   { hwTunnelTeVllIndex,hwTunnelTeVllInterfaceName } 
@@ -285,7 +301,7 @@
       hwTunnelTeVllIndex OBJECT-TYPE
             SYNTAX InterfaceIndex
             MAX-ACCESS not-accessible
-            STATUS current
+            STATUS obsolete
             DESCRIPTION
                 "Uniquely identifies a set of tunnel instances
                 between a pair of ingress and egress LSRs.
@@ -301,7 +317,7 @@
        hwTunnelTeVllInterfaceName OBJECT-TYPE
          SYNTAX OCTET STRING (SIZE (0..47)) 
          MAX-ACCESS  not-accessible
-         STATUS  current
+         STATUS  obsolete
          DESCRIPTION
                 "The interface name of VLL binding."
         ::= { hwTunnelTeVllEntry 2 }           
@@ -310,7 +326,7 @@
       hwTunnelTeVllCir OBJECT-TYPE
          SYNTAX Integer32 (100..10000000)
          MAX-ACCESS  read-only
-         STATUS  current
+         STATUS  obsolete
          DESCRIPTION
                 "The Committed Information Rate of the VLL."
         ::= { hwTunnelTeVllEntry 3}
@@ -319,7 +335,7 @@
       hwTunnelTeVllPir OBJECT-TYPE
          SYNTAX Integer32 (100..10000000)
          MAX-ACCESS  read-only
-         STATUS  current
+         STATUS  obsolete
          DESCRIPTION
                 "The Peak Information Rate of the VLL."
         ::= { hwTunnelTeVllEntry 4 }
@@ -328,7 +344,7 @@
       hwTunnelTeVllFlowQueue OBJECT-TYPE
          SYNTAX OCTET STRING (SIZE (0..31))
          MAX-ACCESS  read-only
-         STATUS  current
+         STATUS  obsolete
          DESCRIPTION
                 "Name of flow-queue template."
         ::= { hwTunnelTeVllEntry 5 }
@@ -336,7 +352,7 @@
      hwTunnelTeL3vpnTable OBJECT-TYPE
         SYNTAX SEQUENCE OF HwTunnelTeL3vpnEntry
         MAX-ACCESS not-accessible
-        STATUS current
+        STATUS obsolete
         DESCRIPTION 
             "The table describes the L3VPN binding of tunnel."
         ::= { hwTunnelTeMibObject  4 }   
@@ -345,7 +361,7 @@
      hwTunnelTeL3vpnEntry OBJECT-TYPE
         SYNTAX HwTunnelTeL3vpnEntry
         MAX-ACCESS not-accessible
-        STATUS current
+        STATUS obsolete
         DESCRIPTION 
             "The L3VPN binding configuration of tunnel interface."
         INDEX   { hwTunnelTeL3vpnIndex,hwTunnelTeL3vpnName } 
@@ -368,7 +384,7 @@
       hwTunnelTeL3vpnIndex OBJECT-TYPE
             SYNTAX InterfaceIndex
             MAX-ACCESS not-accessible
-            STATUS current
+            STATUS obsolete
             DESCRIPTION
                 "Uniquely identifies a set of tunnel instances
                 between a pair of ingress and egress LSRs.
@@ -385,7 +401,7 @@
       hwTunnelTeL3vpnName OBJECT-TYPE
          SYNTAX OCTET STRING (SIZE (0..47))
          MAX-ACCESS  not-accessible
-         STATUS  current
+         STATUS  obsolete
          DESCRIPTION
                 "The name of VPN instance that the TE interface bind."
         ::= { hwTunnelTeL3vpnEntry 2 }
@@ -394,7 +410,7 @@
       hwTunnelTeL3vpnCir OBJECT-TYPE
          SYNTAX Integer32 (100..10000000)
          MAX-ACCESS  read-only
-         STATUS  current
+         STATUS  obsolete
          DESCRIPTION
                 "The Committed Information Rate of the L3VPN."
         ::= { hwTunnelTeL3vpnEntry 3}
@@ -403,7 +419,7 @@
       hwTunnelTeL3vpnPir OBJECT-TYPE
          SYNTAX Integer32 (100..10000000)
          MAX-ACCESS  read-only
-         STATUS  current
+         STATUS  obsolete
          DESCRIPTION
                 "The Peak Information Rate of the L3VPN."
         ::= { hwTunnelTeL3vpnEntry 4 }
@@ -412,7 +428,7 @@
       hwTunnelTeL3vpnFlowQueue OBJECT-TYPE
          SYNTAX OCTET STRING (SIZE (0..31))
          MAX-ACCESS  read-only
-         STATUS  current
+         STATUS  obsolete
          DESCRIPTION
                 "Name of flow-queue template."
         ::= { hwTunnelTeL3vpnEntry 5 }
@@ -422,7 +438,8 @@
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION 
-            "The table describes the up/down state transition counts of the  TE tunnel interface."
+            "The table describes the up/down state transition counts of the TE tunnel interface. 
+              It also describes timestamps when an interface is hot swapped and a primary/backup tunnel switchover is performed."
         ::= { hwTunnelTeMibObject  5 }   
 
       hwTunnelTeStatisticsEntry OBJECT-TYPE
@@ -447,10 +464,8 @@
          MAX-ACCESS not-accessible
          STATUS current
          DESCRIPTION
-                "Uniquely identifies a set of tunnel instances
-                between a pair of ingress and egress LSRs.
-                Managers should obtain new values for row
-                creation in this table by reading mplsTunnelIndexNext."
+                "This object identifies the index of a TE tunnel. 
+                 The value is an unsigned 32-bit integer."
           ::= { hwTunnelTeStatisticsEntry 1 }   
             
        hwTunnelTeUpDownStatistics OBJECT-TYPE
@@ -610,8 +625,7 @@
             ::= { hwCtTemplateEntry 12 }
 
           
-      ----------------------
-      
+      --      
                  
                
           
@@ -760,8 +774,7 @@
                                                  
       
       
-      --------------
-      
+      --      
                  
           
      hwCtStatisticsTable OBJECT-TYPE
@@ -1294,7 +1307,6 @@
                 "The name of CT-FLOW template."
         ::= { hwCtFlowTemplateEntry 11 } 
         
-        --CT0参数定义
         hwCt0Cos  OBJECT-TYPE
         SYNTAX INTEGER {
                             be(1),
@@ -1334,8 +1346,6 @@
         DESCRIPTION
                 "The state of CT-FLOW templat row."
         ::= { hwCtFlowTemplateEntry 14 }                            
-        --CT0参数定义结束
-        --CT1参数定义
         hwCt1Cos  OBJECT-TYPE
         SYNTAX INTEGER {
                             be(1),
@@ -1376,8 +1386,6 @@
         DESCRIPTION
                 "The state of CT-FLOW templat row."
         ::= { hwCtFlowTemplateEntry 17 }                            
-        --CT1参数定义结束
-        --CT2参数定义
         hwCt2Cos  OBJECT-TYPE
         SYNTAX INTEGER {
                             be(1),
@@ -1418,8 +1426,6 @@
         DESCRIPTION
                 "The state of CT-FLOW templat row."
         ::= { hwCtFlowTemplateEntry 20 }                            
-        --CT2参数定义结束                            
-        --CT3参数定义
         hwCt3Cos  OBJECT-TYPE
         SYNTAX INTEGER {
                             be(1),
@@ -1459,8 +1465,6 @@
         DESCRIPTION
                 "The state of CT-FLOW templat row."
         ::= { hwCtFlowTemplateEntry 23 }                            
-        --CT3参数定义结束 
-        --CT4参数定义
         hwCt4Cos  OBJECT-TYPE
         SYNTAX INTEGER {
                             be(1),
@@ -1500,8 +1504,6 @@
         DESCRIPTION
                 "The state of CT-FLOW templat row."
         ::= { hwCtFlowTemplateEntry 26 }                            
-        --CT4参数定义结束                  
-        --CT5参数定义
         hwCt5Cos  OBJECT-TYPE
         SYNTAX INTEGER {
                             be(1),
@@ -1541,8 +1543,6 @@
         DESCRIPTION
                 "The state of CT-FLOW templat row."
         ::= { hwCtFlowTemplateEntry 29 }                            
-        --CT5参数定义结束                
-        --CT6参数定义
         hwCt6Cos  OBJECT-TYPE
         SYNTAX INTEGER {
                             be(1),
@@ -1582,8 +1582,6 @@
         DESCRIPTION
                 "The state of CT-FLOW templat row."
         ::= { hwCtFlowTemplateEntry 32 }                            
-        --CT6参数定义结束                
-        --CT7参数定义
         hwCt7Cos  OBJECT-TYPE
         SYNTAX INTEGER {
                             be(1),
@@ -1623,7 +1621,6 @@
         DESCRIPTION
                 "The state of CT-FLOW templat row."
         ::= { hwCtFlowTemplateEntry 35 }                            
-        --CT7参数定义结束                
         
         hwCtFlowTemplateCommit OBJECT-TYPE
         SYNTAX INTEGER {
@@ -1884,42 +1881,42 @@
         
         hwMplsFqShortage NOTIFICATION-TYPE
             OBJECTS { hwCtConfigTunnelName }
-            STATUS current
+            STATUS obsolete
             DESCRIPTION 
                 "This notification is generated when FQ (flow-queue) template resources are shortage."
             ::= { hwTunnelDsTeTrap 1 }  
             
         hwMplsSqShortage NOTIFICATION-TYPE
             OBJECTS { hwCtConfigTunnelName }
-            STATUS current
+            STATUS obsolete
             DESCRIPTION 
                 "This notification is generated when SQ (subscriber-queue) resources are shortage."
             ::= { hwTunnelDsTeTrap 2 }  
             
         hwMplsSqBandwidthExceed NOTIFICATION-TYPE
             OBJECTS { hwCtConfigTunnelName }
-            STATUS current
+            STATUS obsolete
             DESCRIPTION 
                 "This notification is generated when the total bandwidth of SQ (subscriber-queue) exceeds 10G bit/s in one LPU."
             ::= { hwTunnelDsTeTrap 3 }
 
         hwMplsHsbFqShortage NOTIFICATION-TYPE
             OBJECTS { hwCtConfigTunnelName }
-            STATUS current
+            STATUS obsolete
             DESCRIPTION 
                 "This notification is generated when FQ (flow-queue) template resources in HSB are shortage."
             ::= { hwTunnelDsTeTrap 4 }  
             
         hwMplsHsbSqShortage NOTIFICATION-TYPE
             OBJECTS { hwCtConfigTunnelName }
-            STATUS current
+            STATUS obsolete
             DESCRIPTION 
                 "This notification is generated when SQ (subscriber-queue) resources in HSB are shortage."
             ::= { hwTunnelDsTeTrap 5 }  
             
         hwMplsHsbSqBandwidthExceed NOTIFICATION-TYPE
             OBJECTS { hwCtConfigTunnelName }
-            STATUS current
+            STATUS obsolete
             DESCRIPTION 
                 "This notification is generated when the total bandwidth of SQ (subscriber-queue) in HSB exceeds 10G bit/s in one LPU."
             ::= { hwTunnelDsTeTrap 6 }
