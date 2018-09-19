@@ -19,12 +19,18 @@ require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 set_debug($_REQUEST['debug']);
 
+header('Content-type: application/json');
+
 if (!LegacyAuth::check()) {
-    echo 'unauthenticated';
+    $response = array(
+        'status'  => 'error',
+        'message' => 'Unauthenticated',
+    );
+    echo _json_encode($response);
     exit;
 }
 
-$type = mres($_POST['type']);
+$type = $_POST['type'];
 
 if ($type == 'placeholder') {
     $output = "<span style='text-align:left;'><br><h3>Click on the Edit Dashboard button (next to the list of dashboards) to add widgets</h3><br><h4><strong>Remember:</strong> You can only move & resize widgets when you're in <strong>Edit Mode</strong>.</h4><span>";
@@ -35,7 +41,7 @@ if ($type == 'placeholder') {
     $typeahead_limit   = $config['webui']['global_search_result_limit'];
     $no_form           = true;
     $unique_id         = str_replace(array("-","."), "_", uniqid($type, true));
-    $widget_id         = mres($_POST['id']);
+    $widget_id         = $_POST['id'];
     $widget_settings   = json_decode(dbFetchCell('select settings from users_widgets where user_widget_id = ?', array($widget_id)), true);
     $widget_dimensions = $_POST['dimensions'];
     if (!empty($_POST['settings'])) {
@@ -52,5 +58,5 @@ $response = array(
                   'html' => $output,
                   'title' => $title,
                  );
-header('Content-type: application/json');
+
 echo _json_encode($response);

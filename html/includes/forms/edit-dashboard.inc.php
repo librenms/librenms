@@ -31,20 +31,22 @@ $message   = 'unknown error';
 
 $dashboard_id = (int)$_REQUEST['dashboard_id'];
 $dashboard_name = display($_REQUEST['dashboard_name']);
-$access = $_REQUEST['access'] ? 1 : 0;
+$access = $_REQUEST['access'];
 
 if (isset($dashboard_id) && isset($dashboard_name) && isset($access)) {
     if (dbUpdate(['dashboard_name'=> $dashboard_name,'access'=> $access], 'dashboards', '(user_id = ? || access = 2) && dashboard_id = ?', [LegacyAuth::id(), $dashboard_id]) >= 0) {
         $status  = 'ok';
-        $message = 'Updated dashboard';
+        $message = 'Dashboard ' . $dashboard_name . ' updated';
     } else {
-        $message = 'ERROR: Could not update dashboard '. $dashboard_id;
+        $message = 'ERROR: Could not update dashboard '. $dashboard_name;
     }
 } else {
     $message = 'ERROR: Not enough params';
 }
 
-die(json_encode(array(
-    'status'       => $status,
-    'message'      => $message,
-)));
+$response = array(
+    'status'        => $status,
+    'message'       => $message
+);
+
+echo _json_encode($response);
