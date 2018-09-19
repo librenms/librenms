@@ -44,8 +44,6 @@ class Url
      */
     public static function deviceLink($device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
     {
-        global $config;
-
         if (!$start) {
             $start = Carbon::now()->subDay(1)->timestamp;
         }
@@ -211,8 +209,8 @@ class Url
 
         if ($device->ignore) {
             return $device->status ? 'list-device-ignored-up' : 'list-device-ignored';
-        } else {
-            return $device->status ? 'list-device' : 'list-device-down';
         }
+
+        return $device->status ? 'list-device' : 'list-device-down';
     }
 }

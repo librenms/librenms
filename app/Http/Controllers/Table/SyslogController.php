@@ -87,7 +87,7 @@ class SyslogController extends TableController
         return [
             'timestamp' => $syslog->timestamp,
             'level' => $syslog->level,
-            'device_id' => $device ? \LibreNMS\Util\Url::deviceLink($device, $device->displayName(true)) : '',
+            'device_id' => $device ? \LibreNMS\Util\Url::deviceLink($device, $device->shortDisplayName()) : '',
             'program' => $syslog->program,
             'msg' => $syslog->msg,
             'priority' => $syslog->priority,

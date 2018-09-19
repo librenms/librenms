@@ -27,6 +27,7 @@ namespace App\Http\Controllers\Select;
 
 use App\Http\Controllers\PaginatedAjaxController;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 abstract class SelectController extends PaginatedAjaxController
