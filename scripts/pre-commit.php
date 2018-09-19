@@ -334,7 +334,8 @@ function check_unit($passthru = false, $command_only = false, $options = array()
 
     if ($options['os']) {
         $filter = implode('.*|', (array)$options['os']);
-        $phpunit_cmd .= " --group os --filter \"@($filter.*)\"";
+        // include tests that don't have data providers and only data sets that match
+        $phpunit_cmd .= " --group os --filter '/::test[A-Za-z]+$|::test[A-Za-z]+ with data set \"$filter.*\"$/'";
     }
 
     if ($options['module']) {
@@ -368,15 +369,12 @@ function check_unit($passthru = false, $command_only = false, $options = array()
  *  Check if the given options array contains any of the $opts specified
  *
  * @param array $options the array from getopt()
- * @param string $opts,... options to check for
+ * @param string ...$opts options to check for
  * @return bool If one of the specified options is set
  */
-function check_opt($options)
+function check_opt($options, ...$opts)
 {
-    $args = func_get_args();
-    array_shift($args);
-
-    foreach ($args as $option) {
+    foreach ($opts as $option) {
         if (isset($options[$option])) {
             if ($options[$option] === false) {
                 // no data, return that option is enabled
