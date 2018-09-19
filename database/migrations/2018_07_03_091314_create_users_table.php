@@ -15,7 +15,9 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->integer('user_id', true);
-            $table->string('username')->unique('username');
+            $table->string('auth_type', 32)->nullable();
+            $table->integer('auth_id')->nullable();
+            $table->string('username');
             $table->string('password')->nullable();
             $table->string('realname', 64);
             $table->string('email', 64);
@@ -25,6 +27,7 @@ class CreateUsersTable extends Migration
             $table->timestamp('created_at')->default('1970-01-02 00:00:01');
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->string('remember_token', 100)->nullable();
+            $table->unique(['auth_type', 'username'], 'username');
         });
     }
 

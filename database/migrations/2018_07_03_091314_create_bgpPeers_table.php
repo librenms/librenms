@@ -23,6 +23,7 @@ class CreateBgpPeersTable extends Migration
             $table->text('bgpPeerAdminStatus', 65535);
             $table->text('bgpLocalAddr', 65535);
             $table->text('bgpPeerRemoteAddr', 65535);
+            $table->string('bgpPeerDescr')->default('');
             $table->integer('bgpPeerInUpdates');
             $table->integer('bgpPeerOutUpdates');
             $table->integer('bgpPeerInTotalMessages');

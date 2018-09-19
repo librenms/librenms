@@ -25,35 +25,29 @@
  */
 
 if (!isset($init_modules)) {
-    $init_modules = ['nodb', 'laravel'];
-    require __DIR__ . '/includes/init.php';
-
     $opts = getopt('ldh:u:p:n:t:s:');
 
-    // grab the default settings
-    $default = config('database.connections.' . config('database.default'), 'mysql');
-
     $map = [
-        'h' => 'host',
-        'u' => 'username',
-        'p' => 'password',
-        'n' => 'database',
-        't' => 'port',
-        's' => 'unix_socket',
+        'h' => 'DB_HOST',
+        'u' => 'DB_USERNAME',
+        'p' => 'DB_PASSWORD',
+        'n' => 'DB_DATABASE',
+        't' => 'DB_PORT',
+        's' => 'DB_SOCKET',
     ];
 
-    // update any settings
-    foreach ($map as $opt => $config_key) {
+    // set env variables
+    foreach ($map as $opt => $env_name) {
         if (isset($opts[$opt])) {
-            $default[$config_key] = $opts[$opt];
+            putenv("$env_name=" . $opts[$opt]);
         }
     }
 
-    // save to setup
-    \Config::set('database.connections.setup', $default);
-
+    $init_modules = ['nodb', 'laravel'];
+    require __DIR__ . '/includes/init.php';
 
     set_debug(isset($opts['d']));
+
     $skip_schema_lock = isset($opts['l']);
 }
 

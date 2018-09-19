@@ -52,7 +52,7 @@ class CreateDevicesTable extends Migration
             $table->float('last_discovered_timetaken', 5)->nullable();
             $table->timestamp('last_discovered')->nullable();
             $table->timestamp('last_ping')->nullable();
-            $table->float('last_ping_timetaken', 5)->nullable();
+            $table->float('last_ping_timetaken')->nullable();
             $table->text('purpose', 65535)->nullable();
             $table->string('type', 20)->default('');
             $table->text('serial', 65535)->nullable();

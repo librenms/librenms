@@ -1,15 +1,28 @@
 <?php
-
-/*
- * LibreNMS Network Management and Monitoring System
- * Copyright (C) 2006-2012, Observium Developers - http://www.observium.org
+/**
+ * update.php
+ *
+ * Database update script
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * See COPYING for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2006-2012, Observium Developers - http://www.observium.org
+ *
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ * @copyright  2017-2018 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
 use LibreNMS\Config;
@@ -38,9 +51,6 @@ try {
     $db_rev = get_db_schema();
 
     $migrate_opts = ['--force' => true];
-    if(\Config::has('database.connections.setup')) {
-        $migrate_opts['--database'] = 'setup';
-    }
 
     if ($db_rev === 0) {
         $migrate_opts['--seed'] = true;

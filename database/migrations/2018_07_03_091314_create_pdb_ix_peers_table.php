@@ -17,7 +17,7 @@ class CreatePdbIxPeersTable extends Migration
             $table->increments('pdb_ix_peers_id');
             $table->integer('ix_id')->unsigned();
             $table->integer('peer_id')->unsigned();
-            $table->string('remote_asn', 16);
+            $table->unsignedInteger('remote_asn');
             $table->string('remote_ipaddr4', 15)->nullable();
             $table->string('remote_ipaddr6', 128)->nullable();
             $table->string('name')->nullable();
