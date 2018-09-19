@@ -12,6 +12,7 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
@@ -1064,20 +1065,28 @@ function add_edit_rule()
     check_is_admin();
     $app  = \Slim\Slim::getInstance();
     $data = json_decode(file_get_contents('php://input'), true);
+    if (json_last_error()) {
+        api_error(500, "We couldn't parse the provided json");
+    }
 
     $rule_id = mres($data['rule_id']);
-    $device_id = mres($data['device_id']);
-    if (empty($device_id) && !isset($rule_id)) {
-        api_error(400, 'Missing the device id or global device id (-1)');
+    $tmp_devices = (array)mres($data['devices']);
+    $groups  = (array)$data['groups'];
+    if (empty($tmp_devices) && !isset($rule_id)) {
+        api_error(400, 'Missing the devices or global device (-1)');
     }
 
-    if ($device_id == 0) {
-        $device_id = '-1';
+    $devices = [];
+    foreach ($tmp_devices as $device) {
+        if ($device == "-1") {
+            continue;
+        }
+        $devices[] = ctype_digit($device) ? $device : getidbyname($device);
     }
 
-    $rule = $data['rule'];
-    if (empty($rule)) {
-        api_error(400, 'Missing the alert rule');
+    $builder = $data['builder'] ?: $data['rule'];
+    if (empty($builder)) {
+        api_error(400, 'Missing the alert builder rule');
     }
 
     $name = mres($data['name']);
@@ -1103,6 +1112,8 @@ function add_edit_rule()
     $count     = mres($data['count']);
     $mute      = mres($data['mute']);
     $delay     = mres($data['delay']);
+    $override_query = $data['override_query'];
+    $adv_query = $data['adv_query'];
     $delay_sec = convert_delay($delay);
     if ($mute == 1) {
         $mute = true;
@@ -1110,12 +1121,25 @@ function add_edit_rule()
         $mute = false;
     }
 
-    $extra      = array(
+    $extra      = [
         'mute'  => $mute,
         'count' => $count,
         'delay' => $delay_sec,
-    );
+        'options' =>
+            [
+                'override_query' => $override_query
+            ],
+    ];
     $extra_json = json_encode($extra);
+
+    if ($override_query === 'on') {
+        $query = $adv_query;
+    } else {
+        $query = QueryBuilderParser::fromJson($builder)->toSql();
+        if (empty($query)) {
+            api_error(500, "We couldn't parse your rule");
+        }
+    }
 
     if (!isset($rule_id)) {
         if (dbFetchCell('SELECT `name` FROM `alert_rules` WHERE `name`=?', array($name)) == $name) {
@@ -1123,18 +1147,20 @@ function add_edit_rule()
         }
     } else {
         if (dbFetchCell("SELECT name FROM alert_rules WHERE name=? AND id !=? ", array($name, $rule_id)) == $name) {
-            api_error(500, 'Addition failed : Name has already been used');
+            api_error(500, 'Update failed : Invalid rule id');
         }
     }
 
     if (is_numeric($rule_id)) {
-        if (!(dbUpdate(array('name' => $name, 'rule' => $rule, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json), 'alert_rules', 'id=?', array($rule_id)) >= 0)) {
+        if (!(dbUpdate(array('name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json), 'alert_rules', 'id=?', array($rule_id)) >= 0)) {
             api_error(500, 'Failed to update existing alert rule');
         }
-    } elseif (!dbInsert(array('name' => $name, 'device_id' => $device_id, 'rule' => $rule, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json), 'alert_rules')) {
+    } elseif (!$rule_id = dbInsert(array('name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json), 'alert_rules')) {
         api_error(500, 'Failed to create new alert rule');
     }
 
+    dbSyncRelationship('alert_device_map', 'rule_id', $rule_id, 'device_id', $devices);
+    dbSyncRelationship('alert_group_map', 'rule_id', $rule_id, 'group_id', $groups);
     api_success_noresult(200);
 }
 

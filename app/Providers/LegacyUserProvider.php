@@ -32,6 +32,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Exceptions\AuthenticationException;
+use Log;
 use Request;
 use Session;
 use Toastr;
@@ -199,7 +200,7 @@ class LegacyUserProvider implements UserProvider
             }
 
             if (empty($new_user)) {
-                Toastr::info("No user ($auth_id) [$username]");
+                Log::error("Auth Error ($type): No user ($auth_id) [$username]");
                 return null;
             }
         }
