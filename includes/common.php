@@ -1672,10 +1672,16 @@ function fahrenheit_to_celsius($value, $scale = 'fahrenheit')
     return sprintf('%.02f', $value);
 }
 
+/**
+ * Converts uW to dBm
+ * $value must be positive
+ *
+ */
 function uw_to_dbm($value)
 {
     return 10 * log10($value / 1000);
 }
+
 /**
  * @param $value
  * @param null $default
