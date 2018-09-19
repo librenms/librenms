@@ -306,36 +306,11 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
     alerts_grid.find(".command-ack-alert").on("click", function(e) {
         e.preventDefault();
         var alert_state = $(this).data("alert_state");
-        if (alert_state != 2) {
-            var ack_msg = window.prompt("Enter the reason you are acknowledging this alert:");
-        } else {
-            var ack_msg = "";
-        }
-        if (typeof ack_msg == "string") {
-            var alert_id = $(this).data("alert_id");
-            var state = $(this).data("state");
-            $.ajax({
-                type: "POST",
-                url: "ajax_form.php",
-                dataType: "json",
-                data: { type: "ack-alert", alert_id: alert_id, state: state, ack_msg: ack_msg },
-                success: function (data) {
-                    if (data.status == "ok") {
-                        toastr.success(data.message);
-                        $(".alerts").each(function(index) {
-                            var $sortDictionary = $(this).bootgrid("getSortDictionary");
-                            $(this).reload;
-                            $(this).bootgrid("sort", $sortDictionary);
-                        });
-                    } else {
-                        toastr.error(data.message);
-                    }
-                },
-                error: function(){
-                     toastr.error(data.message);
-                }
-            });
-         }
+        var alert_id = $(this).data(\'alert_id\');
+        $(\'#ack_alert_id\').val(alert_id);
+        $(\'#ack_alert_state\').val(alert_state);
+        $(\'#ack_msg\').val(\'\');
+        $("#alert_ack_modal").modal(\'show\');
     });
     alerts_grid.find(".command-alert-note").on("click", function(e) {
         e.preventDefault();
