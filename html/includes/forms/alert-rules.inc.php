@@ -38,8 +38,18 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
 $status = 'ok';
 $message = '';
 
-$builder_json = $_POST['builder_json'];
-$query        = QueryBuilderParser::fromJson($builder_json)->toSql();
+$builder_json   = $vars['builder_json'];
+$override_query = $vars['override_query'];
+
+$options = [
+    'override_query' => $override_query,
+];
+
+if ($override_query === 'on') {
+    $query = $vars['adv_query'];
+} else {
+    $query = QueryBuilderParser::fromJson($builder_json)->toSql();
+}
 $rule_id      = $_POST['rule_id'];
 $count        = mres($_POST['count']);
 $delay        = mres($_POST['delay']);
@@ -79,6 +89,7 @@ $extra = array(
     'invert'   => $invert,
     'interval' => $interval_sec,
     'recovery' => $recovery,
+    'options'  => $options,
 );
 
 $extra_json = json_encode($extra);

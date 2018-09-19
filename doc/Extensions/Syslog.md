@@ -214,6 +214,17 @@ set system syslog host librenms.ip exclude-hostname
 set system syslog time-format
 ```
 
+#### Allied Telesis Alliedware Plus
+```config
+log date-format iso // Required so syslog-ng/LibreNMS can correctly interpret the log message formatting.
+log host x.x.x.x
+log host x.x.x.x level <errors> // Required. A log-level must be specified for syslog messages to send. 
+log host x.x.x.x level notices program imish // Useful for seeing all commands executed by users.
+log host x.x.x.x level notices program imi // Required for Oxidized Syslog hook log message.  
+log host source <eth0>
+```
+
+
 If you have permitted udp and tcp 514 through any firewall then that should be all you need. Logs should start appearing and displayed within the LibreNMS web UI.
 
 ### Windows
@@ -265,3 +276,11 @@ $config['os']['iosxr']['syslog_hook'][] = Array('regex' => '/%GBL-CONFIG-6-DB_CO
 ```ssh
 $config['os']['junos']['syslog_hook'][] = Array('regex' => '/%UI_COMMIT:/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
 ```
+
+#### Allied Telesis Alliedware Plus
+**Note:** At least software version 5.4.8-2.1 is required. ```log host x.x.x.x level notices program imi``` may also be required depending on configuration. This is to ensure the syslog hook log message gets sent to the syslog server. 
+
+```ssh
+$config['os']['awplus']['syslog_hook'][] = Array('regex' => '/IMI.+.Startup-config saved on/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
+```
+

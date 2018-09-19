@@ -177,6 +177,8 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
 
     if (empty($rule['builder'])) {
         $rule_display = $rule['rule'];
+    } elseif ($rule_extra['options']['override_query'] === 'on') {
+        $rule_display = 'Custom SQL Query';
     } else {
         $rule_display = QueryBuilderParser::fromJson($rule['builder'])->toSql(false);
     }

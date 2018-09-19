@@ -146,7 +146,7 @@ class QueryBuilderParser implements \JsonSerializable
     public static function fromJson($json)
     {
         if (!is_array($json)) {
-            $json = json_decode($json, true);
+            $json = json_decode($json, true) ?: [];
         }
 
         return new static($json);
@@ -235,7 +235,7 @@ class QueryBuilderParser implements \JsonSerializable
         $wrap = false;
 
         if ($expand) {
-            $sql = 'SELECT * FROM ' . implode(',', $this->getTables());
+            $sql = 'SELECT * FROM ' .implode(',', $this->getTables());
             $sql .= ' WHERE ' . $this->generateGlue() . ' AND ';
 
             // only wrap in ( ) if the condition is OR and there is more than one rule

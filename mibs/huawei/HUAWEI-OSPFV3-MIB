@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2007 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
--- Description: The HUAWEI-OSPFV3-MIB provides information about OSPFv3
+-- Description: HUAWEI-OSPFV3-MIB.mib, The HUAWEI-OSPFV3-MIB provides information about OSPFv3
 -- Reference: draft-ietf-ospf-ospfv3-mib-11
--- Version:    V1.0
+-- Version:    V2.19
 -- History:
 -- ==================================================================
 
@@ -29,25 +29,84 @@
                     FROM OSPF-MIB; 
     
     hwOspfv3 MODULE-IDENTITY 
-            LAST-UPDATED "200706122000Z" 
+            LAST-UPDATED "201708172015Z" 
         ORGANIZATION 
-            "Huawei Technologies co., Ltd."
-        CONTACT-INFO 
-            " R&D BeiJing, Huawei Technologies co.,Ltd.
-            Huawei Bld.,NO.3 Xinxi Rd., 
-            Shang-Di Information Industry Base,
-            Hai-Dian District Beijing P.R. China
-            Zip:100085 
-            Http://www.huawei.com                                       
-            E-mail:support@huawei.com "
- 
+                 "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                 "Huawei Industrial Base
+                   Bantian, Longgang
+                    Shenzhen 518129
+                    People's Republic of China
+                    Website: http://www.huawei.com
+                    Email: support@huawei.com
+                  "
              DESCRIPTION 
                  "The MIB module for OSPF version 3. 
                   Copyright (C) The Internet Society (2006). 
                   This version of this MIB module is part of 
-                  RFC XXXX;  see the RFC itself for full legal 
+                  RFC draft-ietf-ospf-ospfv3-mib-11;  
+                  see the RFC itself for full legal 
                   notices." 
-    
+
+
+            REVISION "201708172015Z"
+            DESCRIPTION "modify hwOspfv3PeerFlappingSuppressStatus discription"
+
+            REVISION "201608041521Z"
+            DESCRIPTION "Added 		            
+	                hwOspfv3DeleteRouteByPurge,
+		            hwOspfv3DeleteRouteByPurgeClear,
+		            hwOspfv3RouteBeDeletedByPurgeExact,
+		            hwOspfv3RouteBeDeletedByPurgeExactClear,
+		            hwOspfv3RouteBeDeletedByPurgeInexact,
+		            hwOspfv3RouteBeDeletedByPurgeInexactClear,
+		            hwOspfv3RouteBeDeletedByPurge,
+		            hwOspfv3RouteBeDeletedByPurgeClear,
+		            hwOspfv3ThirdPartRouteBeDeletedByPurgeExact,
+		            hwOspfv3ThirdPartRouteBeDeletedByPurgeExactClear,
+		            hwOspfv3ThirdPartRouteBeDeletedByPurgeInexact,
+		            hwOspfv3ThirdPartRouteBeDeletedByPurgeInexactClear,
+		            hwOspfv3ThirdPartRouteBeDeletedByPurge,
+		            hwOspfv3ThirdPartRouteBeDeletedByPurgeClear " 
+
+            REVISION "201605251110Z"
+            DESCRIPTION "Added a trap hwOspfv3GreaterAgeLsaRecived"
+            
+            REVISION "201605251110Z"
+            DESCRIPTION "Added hwOspfv3LsaId to indicates the link-id of recived lsa"
+            
+            REVISION "201605251110Z"
+            DESCRIPTION "Added hwOspfv3LsaAge to indicates the age of recived lsa"                  
+                  
+	    REVISION "201603231750Z"
+            DESCRIPTION "Changed the type of hwOspfv3ProcessId from Integer32 to Unsigned32" 
+			    
+	    REVISION "201603181750Z"
+            DESCRIPTION "Added 
+	                    hwOspfv3ImportAseRouteThreshold,
+                            hwOspfv3ImportAseRouteThresholdClear,
+                            hwOspfv3ImportAseRouteExceed,
+                            hwOspfv3ImportAseRouteExceedClear,
+                            hwOspfv3ImportNssaRouteThreshold,
+                            hwOspfv3ImportNssaRouteThresholdClear,
+                            hwOspfv3ImportNssaRouteExceed,
+                            hwOspfv3ImportNssaRouteExceedClear" 
+
+            REVISION "201603011750Z"
+            DESCRIPTION "Deleted hwOspfv3PeerFlappingSuppressInterval, Added hwOspfv3PeerFlappingSuppressReason to indicates the suppress status change reason, change hwOspfv3PeerFlappingSuppressInterval of hwOspfv3PeerFlappingSuppressStatusChange to hwOspfv3PeerFlappingSuppressReason" 
+
+            REVISION "201603011750Z"
+            DESCRIPTION "Modified hwOspfv2PeerFlappingSuppressStatusChange status currentdescription"                   
+                  
+ 						 REVISION "201507081110Z"
+             DESCRIPTION "Added hwOspfv3PeerFlappingSuppressStatus to indicates the suppress status of peer flapping" 
+ 
+             REVISION "201505031110Z"
+             DESCRIPTION "Added hwOspfv3IntraAreaRouterIdConflictRecovered to indicates process id" 
+                              
+             REVISION "201504031110Z"
+             DESCRIPTION "Added hwOspfv3IntraAreaRouterIdConflictRecovered to indicates the routerid conflict recovered" 
+            
              REVISION "200706122100Z" 
              DESCRIPTION -- RFC Editor assigns RFC xxxx 
                  "Initial version, published as RFC xxxx" 
@@ -61,14 +120,14 @@
              DESCRIPTION 
                 "The values one might be able to configure for                  
                 variables bounded by the Refresh Interval" 
-             SYNTAX      Integer32 (0..3600) 
+             SYNTAX      Unsigned32 (0..3600) 
  
     HWOspfv3DeadIntRangeTc ::= TEXTUAL-CONVENTION 
              DISPLAY-HINT "d" 
              STATUS        current 
              DESCRIPTION 
                 "The range, in seconds, of dead interval value." 
-             SYNTAX      Integer32 (0..'FFFF'h) 
+             SYNTAX      Unsigned32 (0..'FFFF'h) 
     
     HWOspfv3RouterIdTc ::= TEXTUAL-CONVENTION 
              DISPLAY-HINT "d" 
@@ -80,7 +139,19 @@
                 IPv4 host addresses if IPv4 is configured on the 
                 router." 
              SYNTAX      Unsigned32 (0..'FFFFFFFF'h) 
- 
+
+    HWOspfv3LsIdTC ::= TEXTUAL-CONVENTION
+             DISPLAY-HINT "d"
+             STATUS      current
+             DESCRIPTION
+                  "A unique 32-bit identifier of the piece of the
+                  routing domain that is being described by a link
+                  state advertisement.  In contrast to OSPFv2, the
+                  Link State ID (LSID) has no addressing semantics."
+             REFERENCE
+                  "OSPF Version 2, Section 12.1.4, Link State ID"
+             SYNTAX      Unsigned32 (1..'FFFFFFFF'h)
+
     HWOspfv3AreaIdTc ::= TEXTUAL-CONVENTION 
              DISPLAY-HINT "d" 
              STATUS      current 
@@ -93,8 +164,37 @@
              STATUS      current 
              DESCRIPTION 
                 "An OSPFv3 interface instance ID" 
-             SYNTAX      Integer32 (0..255) 
+             SYNTAX      Unsigned32 (0..255) 
+
+    HWOspfv3LsaSequenceTC ::= TEXTUAL-CONVENTION
+             DISPLAY-HINT "d"
+             STATUS      current
+             DESCRIPTION
+                "The sequence number field is a signed 32-bit
+                integer.  It is used to detect old and duplicate
+                link state advertisements.  The space of
+                sequence numbers is linearly ordered.  The
+                larger the sequence number, the more recent the
+                advertisement."
+             REFERENCE
+                "OSPF Version 2, Section 12.1.6, LS sequence
+                number"
+             SYNTAX      Integer32
              
+    HWOspfv3LsaAgeTC ::= TEXTUAL-CONVENTION
+             DISPLAY-HINT "d"
+             STATUS      current
+             DESCRIPTION
+                "The age of the link state advertisement in
+                seconds.  The high-order bit of the LS age
+                field is considered the DoNotAge bit for
+                support of on-demand circuits."
+             REFERENCE
+                "OSPF Version 2, Section 12.1.1, LS age;
+                 Extending OSPF to Support Demand Circuits,
+                 Section 2.2, The LS age field"
+             SYNTAX      Unsigned32 (0..3600 | 32768..36368)             
+
    HWHelloRange ::= TEXTUAL-CONVENTION
             STATUS current
             DESCRIPTION 
@@ -183,7 +283,7 @@
             ::= { hwOspfv3GeneralGroup 6 } 
  
     hwOspfv3AsScopeLsaCksumSum OBJECT-TYPE 
-            SYNTAX          Integer32 
+            SYNTAX          Unsigned32 
             MAX-ACCESS      read-only 
             STATUS          current 
             DESCRIPTION 
@@ -326,11 +426,23 @@
                 generated. 
     
                 Configured values MUST survive an agent reboot." 
-           DEFVAL { false } 
        ::= { hwOspfv3GeneralGroup 17 } 
  
- 
- 
+    hwOspfv3ReferenceBandwidth OBJECT-TYPE   
+           SYNTAX       Unsigned32 
+           MAX-ACCESS   read-write  
+           STATUS       current  
+           DESCRIPTION
+               "Reference bandwidth in kilobits per second for
+               calculating default interface metrics.  The
+               default value is 100,000 KBPS (100 MBPS).
+
+               This object is persistent, and when written, the
+               entity SHOULD save the change to non-volatile
+               storage."
+           DEFVAL { 100000 }    
+           ::= { hwOspfv3GeneralGroup 18 }
+
     -- The OSPFv3 Area Data Structure contains information 
     -- regarding the various areas. The interfaces and 
     -- virtual links are configured as part of these areas. 
@@ -363,7 +475,7 @@
     HwOspfv3AreaEntry ::= SEQUENCE { 
             hwOspfv3AreaId 
                     HWOspfv3AreaIdTc, 
-            hwOspfv3ImportAsExtern 
+            hwOspfv3AreaImportAsExtern 
                     INTEGER, 
             hwOspfv3AreaSpfRuns 
                     Counter32, 
@@ -374,13 +486,21 @@
             hwOspfv3AreaScopeLsaCount 
                     Gauge32, 
             hwOspfv3AreaScopeLsaCksumSum 
-                    Integer32, 
+                    Unsigned32, 
             hwOspfv3AreaSummary 
                     INTEGER, 
             hwOspfv3AreaRowStatus 
                     RowStatus, 
-            hwOspfv3StubMetric 
-                    BigMetric
+            hwOspfv3AreaStubMetric 
+                    BigMetric,
+            hwOspfv3AreaNssaTranslatorRole
+                    INTEGER,
+            hwOspfv3AreaNssaTranslatorState
+                    INTEGER,
+            hwOspfv3AreaNssaTranslatorStabInterval
+                    Unsigned32,
+            hwOspfv3AreaNssaTranslatorEvents
+                    Counter32
              } 
  
     hwOspfv3AreaId OBJECT-TYPE 
@@ -394,7 +514,7 @@
                 "OSPF Version 2, Appendix C.2 Area parameters" 
             ::= { hwOspfv3AreaEntry 1 } 
  
-    hwOspfv3ImportAsExtern OBJECT-TYPE 
+    hwOspfv3AreaImportAsExtern OBJECT-TYPE 
             SYNTAX          INTEGER { 
                             importExternal(1),   -- normal area 
                             importNoExternal(2), -- stub area 
@@ -431,6 +551,7 @@
                 "The total number of area border routers 
                 reachable within this area. This is initially zero, 
                 and is calculated in each SPF Pass." 
+            DEFVAL { 0 } 
             ::= { hwOspfv3AreaEntry 4 } 
  
     hwOspfv3AreaAsBdrRtrCount OBJECT-TYPE 
@@ -442,6 +563,7 @@
                 routers reachable within this area. This is 
                 initially zero, and is calculated in each SPF 
                 Pass." 
+            DEFVAL { 0 }               
             ::= { hwOspfv3AreaEntry 5 } 
  
     hwOspfv3AreaScopeLsaCount OBJECT-TYPE 
@@ -452,10 +574,11 @@
                 "The total number of Area-Scope link state  
                 advertisements in this area's link state  
                 database." 
+             DEFVAL { 0 }                 
             ::= { hwOspfv3AreaEntry 6 } 
  
     hwOspfv3AreaScopeLsaCksumSum OBJECT-TYPE 
-            SYNTAX          Integer32 
+            SYNTAX          Unsigned32 
             MAX-ACCESS      read-only 
             STATUS          current 
             DESCRIPTION 
@@ -503,7 +626,7 @@
                 modified." 
             ::= { hwOspfv3AreaEntry 9 } 
  
-    hwOspfv3StubMetric OBJECT-TYPE 
+    hwOspfv3AreaStubMetric OBJECT-TYPE 
             SYNTAX          BigMetric 
             MAX-ACCESS      read-create 
             STATUS          current 
@@ -512,7 +635,65 @@
                  into Stub and NSSA areas." 
             ::= { hwOspfv3AreaEntry 10 } 
  
+    hwOspfv3AreaNssaTranslatorRole OBJECT-TYPE
+            SYNTAX          INTEGER { always(1), candidate(2) }
+            MAX-ACCESS      read-create
+            STATUS          current
+            DESCRIPTION
+                "Indicates an NSSA border router's policy to
+                perform NSSA translation of NSSA-LSAs into
+                AS-External-LSAs."
+            DEFVAL { candidate }
+            ::= { hwOspfv3AreaEntry 11 }
+            
+    hwOspfv3AreaNssaTranslatorState OBJECT-TYPE
+            SYNTAX          INTEGER {
+                            enabled(1),
+                            elected(2),
+                            disabled(3)
+                            }
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION
+                 "Indicates if and how an NSSA border router is
+                 performing NSSA translation of NSSA-LSAs into
+                 AS-External-LSAs.  When this object is set to
+                 'enabled', the NSSA border router's
+                 ospfv3AreaNssaTranslatorRole has been set to 'always'.
+                 When this object is set to 'elected', a candidate
+                 NSSA border router is translating NSSA-LSAs into
+                 AS-External-LSAs.  When this object is set to
+                 'disabled', a candidate NSSA Border router is NOT
+                 translating NSSA-LSAs into AS-External-LSAs."
+            ::= { hwOspfv3AreaEntry 12 }
+            
+    hwOspfv3AreaNssaTranslatorStabInterval OBJECT-TYPE 
+            SYNTAX          Unsigned32 
+            MAX-ACCESS      read-create 
+            STATUS          current 
+            DESCRIPTION
+                "The stability interval defined as the number of
+                seconds after an elected translator determines its
+                services are no longer required that it should
+                continue to perform its translation duties."
+            DEFVAL { 40 }
+            ::= { hwOspfv3AreaEntry 13 }
+            
+    hwOspfv3AreaNssaTranslatorEvents OBJECT-TYPE 
+            SYNTAX          Counter32 
+            MAX-ACCESS      read-only 
+            STATUS          current 
+            DESCRIPTION
+                "Indicates the number of Translator state changes
+                that have occurred since the last start-up of the
+                OSPFv3 routing process.
 
+                Discontinuities in the value of this counter
+                can occur at re-initialization of the management
+                system and at other times as indicated by the
+                value of ospfv3DiscontinuityTime."
+            ::= { hwOspfv3AreaEntry 14 }
+            
     -- OSPFv3 AS-Scope Link State Database 
     -- The Link State Database contains the AS-Scope Link State 
     -- Advertisements from throughout the areas that the 
@@ -545,9 +726,9 @@
             hwOspfv3AsLsdbLsId 
                     Unsigned32, 
             hwOspfv3AsLsdbSequence 
-                    Unsigned32, 
+                    HWOspfv3LsaSequenceTC,
             hwOspfv3AsLsdbAge 
-                    Integer32, 
+                    HWOspfv3LsaAgeTC,
             hwOspfv3AsLsdbChecksum 
                     Integer32, 
             hwOspfv3AsLsdbAdvertisement 
@@ -597,7 +778,7 @@
     -- Thus, a typical sequence number will be very negative. 
  
     hwOspfv3AsLsdbSequence OBJECT-TYPE 
-            SYNTAX          Unsigned32 
+            SYNTAX          HWOspfv3LsaSequenceTC
             MAX-ACCESS      read-only 
             STATUS          current 
             DESCRIPTION 
@@ -613,8 +794,8 @@
             ::= { hwOspfv3AsLsdbEntry 4 } 
  
     hwOspfv3AsLsdbAge OBJECT-TYPE 
-            SYNTAX          Integer32 -- Should be 0..MaxAge 
-                                      -- unless DoNotAge bit is set 
+            SYNTAX          HWOspfv3LsaAgeTC -- Should be 0..MaxAge 
+                                           -- unless DoNotAge bit is set 
             UNITS           "seconds" 
             MAX-ACCESS      read-only 
             STATUS          current 
@@ -696,9 +877,9 @@
             hwOspfv3AreaLsdbLsId 
                     Unsigned32, 
             hwOspfv3AreaLsdbSequence 
-                    Unsigned32, 
+                    HWOspfv3LsaSequenceTC,
             hwOspfv3AreaLsdbAge 
-                    Integer32, 
+                    HWOspfv3LsaAgeTC,
             hwOspfv3AreaLsdbChecksum 
                     Integer32, 
             hwOspfv3AreaLsdbAdvertisement 
@@ -759,7 +940,7 @@
     -- Thus, a typical sequence number will be very negative. 
  
     hwOspfv3AreaLsdbSequence OBJECT-TYPE 
-            SYNTAX          Unsigned32 
+            SYNTAX          HWOspfv3LsaSequenceTC
             MAX-ACCESS      read-only 
             STATUS          current 
             DESCRIPTION 
@@ -775,8 +956,8 @@
             ::= { hwOspfv3AreaLsdbEntry 5 } 
  
     hwOspfv3AreaLsdbAge OBJECT-TYPE 
-            SYNTAX          Integer32 -- Should be 0..MaxAge 
-                                      -- unless DoNotAge bit is set 
+            SYNTAX          HWOspfv3LsaAgeTC -- Should be 0..MaxAge 
+                                           -- unless DoNotAge bit is set 
             UNITS           "seconds" 
             MAX-ACCESS      read-only 
             STATUS          current 
@@ -851,7 +1032,7 @@
  
     HwOspfv3LinkLsdbEntry ::= SEQUENCE { 
             hwOspfv3LinkLsdbIfIndex 
-                    Gauge32, 
+                    InterfaceIndex,
             hwOspfv3LinkLsdbIfInstId 
                     HWOspfv3IfInstIdTc, 
             hwOspfv3LinkLsdbType 
@@ -859,11 +1040,11 @@
             hwOspfv3LinkLsdbRouterId 
                     HWOspfv3RouterIdTc, 
             hwOspfv3LinkLsdbLsId 
-                    Gauge32, 
+                    HWOspfv3LsIdTC,
             hwOspfv3LinkLsdbSequence 
-                    Unsigned32, 
+                    HWOspfv3LsaSequenceTC,
             hwOspfv3LinkLsdbAge 
-                    Integer32, 
+                    HWOspfv3LsaAgeTC,
             hwOspfv3LinkLsdbChecksum 
                     Integer32, 
             hwOspfv3LinkLsdbAdvertisement 
@@ -873,7 +1054,7 @@
             } 
 
     hwOspfv3LinkLsdbIfIndex OBJECT-TYPE 
-            SYNTAX         Gauge32 
+            SYNTAX         InterfaceIndex
             MAX-ACCESS     not-accessible 
             STATUS         current 
             DESCRIPTION 
@@ -913,7 +1094,7 @@
             ::= { hwOspfv3LinkLsdbEntry 4 } 
  
     hwOspfv3LinkLsdbLsId OBJECT-TYPE 
-            SYNTAX        Gauge32 
+            SYNTAX        HWOspfv3LsIdTC
             MAX-ACCESS    not-accessible 
             STATUS        current 
             DESCRIPTION 
@@ -931,7 +1112,7 @@
     -- Thus, a typical sequence number will be very negative. 
  
     hwOspfv3LinkLsdbSequence OBJECT-TYPE 
-            SYNTAX          Unsigned32 
+            SYNTAX          HWOspfv3LsaSequenceTC
             MAX-ACCESS      read-only 
             STATUS          current 
             DESCRIPTION 
@@ -947,8 +1128,8 @@
             ::= { hwOspfv3LinkLsdbEntry 6 } 
  
     hwOspfv3LinkLsdbAge OBJECT-TYPE 
-            SYNTAX          Integer32 -- Should be 0..MaxAge 
-                                      -- unless DoNotAge bit is set 
+            SYNTAX          HWOspfv3LsaAgeTC -- Should be 0..MaxAge 
+                                             -- unless DoNotAge bit is set 
             UNITS           "seconds" 
             MAX-ACCESS      read-only 
             STATUS          current 
@@ -1059,7 +1240,7 @@
             hwOspfv3IfLinkScopeLsaCount 
                     Gauge32, 
             hwOspfv3IfLinkLsaCksumSum 
-                    Integer32,
+                    Unsigned32,
             hwOspfv3IfPollInterval 
                     Unsigned32,
             hwOspfv3IfMulticastForwarding 
@@ -1277,7 +1458,7 @@
             ::= { hwOspfv3IfEntry 17 } 
  
      hwOspfv3IfLinkLsaCksumSum OBJECT-TYPE 
-            SYNTAX          Integer32 
+            SYNTAX          Unsigned32 
             MAX-ACCESS      read-only 
             STATUS          current 
             DESCRIPTION 
@@ -1355,7 +1536,7 @@
             hwOspfv3VirtIfNeighbor 
                     HWOspfv3RouterIdTc, 
             hwOspfv3VirtIfIndex 
-                    Unsigned32, 
+                    InterfaceIndex,
             hwOspfv3VirtIfInstId 
                     HWOspfv3IfInstIdTc, 
             hwOspfv3VirtIfTransitDelay 
@@ -1375,7 +1556,7 @@
             hwOspfv3VirtIfLinkScopeLsaCount 
                     Gauge32, 
             hwOspfv3VirtIfLinkLsaCksumSum 
-                    Integer32 
+                    Unsigned32
             } 
  
     hwOspfv3VirtIfAreaId OBJECT-TYPE 
@@ -1397,25 +1578,24 @@
             ::= { hwOspfv3VirtIfEntry 2 } 
  
     hwOspfv3VirtIfIndex OBJECT-TYPE 
-            SYNTAX          Unsigned32 
+            SYNTAX          InterfaceIndex
             MAX-ACCESS      read-only 
             STATUS          current 
             DESCRIPTION 
                 "The local interface index assigned to this 
                 OSPFv3 virtual interface. It is advertised in 
-                Hello's sent over the virtal link and in the 
+                Hello's sent over the virtual link and in the 
                 router's router-LSAs." 
             ::= { hwOspfv3VirtIfEntry 3 } 
  
     hwOspfv3VirtIfInstId OBJECT-TYPE 
             SYNTAX          HWOspfv3IfInstIdTc 
-            MAX-ACCESS      read-create 
+            MAX-ACCESS      read-only 
             STATUS          current 
             DESCRIPTION 
                 "Specifies the interface instance ID to be used 
                 for the virtual interface. This ID has local link 
                 significance only." 
-            DEFVAL          { 0 } 
             ::= { hwOspfv3VirtIfEntry 4 } 
  
     hwOspfv3VirtIfTransitDelay OBJECT-TYPE 
@@ -1471,7 +1651,7 @@
                 be some multiple of the Hello interval. This 
                 value must be the same for the virtual 
                 neighbor." 
-            DEFVAL          { 60 } 
+            DEFVAL          { 40 } 
             ::= { hwOspfv3VirtIfEntry 8 } 
  
     hwOspfv3VirtIfState OBJECT-TYPE 
@@ -1520,7 +1700,7 @@
             ::= { hwOspfv3VirtIfEntry 12 } 
  
     hwOspfv3VirtIfLinkLsaCksumSum OBJECT-TYPE 
-            SYNTAX          Integer32 
+            SYNTAX          Unsigned32
             MAX-ACCESS      read-only 
             STATUS          current 
             DESCRIPTION 
@@ -1634,7 +1814,7 @@
             ::= { hwOspfv3NbrEntry 4 } 
  
     hwOspfv3NbrAddress OBJECT-TYPE 
-            SYNTAX          InetAddress (SIZE (16)) 
+            SYNTAX          InetAddress 
             MAX-ACCESS      read-only 
             STATUS          current 
             DESCRIPTION 
@@ -1848,7 +2028,7 @@
                 router election algorithm. The value 0 signifies 
                 that the neighbor is not eligible to become the 
                 designated router on this particular network." 
-            DEFVAL          { 0 } 
+            DEFVAL          { 1 } 
             ::= { hwOspfv3CfgNbrEntry 4 } 
  
     hwOspfv3CfgNbrRowStatus OBJECT-TYPE 
@@ -1915,7 +2095,7 @@
             hwOspfv3VirtNbrHelloSuppressed 
                     TruthValue, 
             hwOspfv3VirtNbrIfId 
-                    Unsigned32, 
+                    InterfaceIndex,
             hwOspfv3VirtNbrRestartHelperStatus  
                     INTEGER,  
             hwOspfv3VirtNbrRestartHelperAge  
@@ -1969,7 +2149,7 @@
             ::= { hwOspfv3VirtNbrEntry 5 } 
  
     hwOspfv3VirtNbrAddress OBJECT-TYPE 
-            SYNTAX          InetAddress (SIZE (16)) 
+            SYNTAX          InetAddress  
             MAX-ACCESS      read-only 
             STATUS          current 
             DESCRIPTION 
@@ -2033,7 +2213,7 @@
             ::= { hwOspfv3VirtNbrEntry 11 } 
              
     hwOspfv3VirtNbrIfId OBJECT-TYPE 
-            SYNTAX          Unsigned32 
+            SYNTAX          InterfaceIndex
             MAX-ACCESS      read-only 
             STATUS          current 
             DESCRIPTION 
@@ -2173,7 +2353,7 @@
             ::= { hwOspfv3AreaAggregateEntry 4 } 
  
     hwOspfv3AreaAggregatePrefix OBJECT-TYPE 
-            SYNTAX          InetAddress (SIZE (0..16)) 
+            SYNTAX          InetAddress  
             MAX-ACCESS      not-accessible 
             STATUS          current 
             DESCRIPTION 
@@ -2183,7 +2363,7 @@
             ::= { hwOspfv3AreaAggregateEntry 5 } 
  
     hwOspfv3AreaAggregatePrefixLength OBJECT-TYPE 
-            SYNTAX          InetAddressPrefixLength (0..128) 
+            SYNTAX          InetAddressPrefixLength (1..128) 
             UNITS           "bits" 
             MAX-ACCESS      not-accessible 
             STATUS          current 
@@ -2291,13 +2471,275 @@
                Only IPv6 addresses without zone index are expected." 
         ::= { hwOspfv3NotificationEntry 3 } 
  
- 
-    -- Notification definitions 
- 
+    hwOspfv3IfName OBJECT-TYPE 
+            SYNTAX          OCTET STRING (SIZE (1..64)) 
+            MAX-ACCESS      accessible-for-notify 
+            STATUS          current 
+            DESCRIPTION 
+                "The interface name" 
+            ::= { hwOspfv3NotificationEntry 4 } 
+            
+    hwOspfv3IfStateChgReason OBJECT-TYPE
+        SYNTAX       INTEGER {
+        		noEvent(1),
+			interfaceUp(2),
+			waitTimerExpired(3),
+			backupSeenOccured(4),
+			neighborChangeEventOccured(5),
+			loopInd(6),
+			unloopInd(7),
+			interfaceDown(8)
+                        }
+        MAX-ACCESS   accessible-for-notify
+        STATUS   current
+        DESCRIPTION
+            "Interface state change reason."
+        ::= { hwOspfv3NotificationEntry 5 }      
+        
+   hwOspfv3NbrStateChgReason OBJECT-TYPE
+        SYNTAX       INTEGER {
+                        noEvent(1),
+			receivedHelloPacket(2),
+			start(3),
+			receivedTwoWay(4),
+			negotiationDone(5),
+			exchangeDone(6),
+			receivedBadLSRequest(7),
+			loadingDone(8),
+			establishedAdjacency(9),
+			mismatchInSeqNumber(10),
+			receivedOneWay(11),
+			nbrKilled(12),
+			inactivityTimerExpired(13),
+			linkDown(14)
+			}
+        MAX-ACCESS   accessible-for-notify
+        STATUS   current
+        DESCRIPTION
+            "Neighbor state change reason."
+        ::= { hwOspfv3NotificationEntry 6 }           
+    
+    hwOspfv3ProcessId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The process ID indicates the OSPFv3 process number. The value ranges from 1 to 4294967295."
+            ::= { hwOspfv3NotificationEntry 7 }
+            
+    hwOspfv3AreaIdIndex OBJECT-TYPE
+            SYNTAX          HWOspfv3AreaIdTc 
+            MAX-ACCESS      read-only 
+            STATUS          current 
+            DESCRIPTION 
+                "A 32-bit integer uniquely identifying an area. 
+                Area ID 0 is used for the OSPFv3 backbone." 
+            ::= { hwOspfv3NotificationEntry 8 }
+                  
+     hwOspfv3NewRouterId OBJECT-TYPE
+            SYNTAX         HWOspfv3RouterIdTc 
+            MAX-ACCESS     read-only 
+            STATUS         current 
+            DESCRIPTION
+                "A 32-bit integer uniquely identifying the 
+                router in the Autonomous System. To ensure 
+                uniqueness, this may default to the value of 
+                one of the router's IPv4 host addresses, 
+                represented as a 32-bit unsigned integer, 
+                if IPv4 is configured on the router." 
+            ::= { hwOspfv3NotificationEntry 9 }
+    
+     hwOspfv3PeerFlappingSuppressStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(1),
+                holddown(2),
+                holdmaxcost(3)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "his object indicates the mode of the OSPFv3 neighbor relationship flapping suppression.
+none(1): OSPFv3 neighbor relationship flapping suppression is not started yet.
+holddown(2): OSPFv3 neighbor relationship flapping suppression works in Hold-down mode.
+holdmaxcost(3): OSPFv3 neighbor relationship flapping suppression works in Hold-max-cost mode.
+"
+     ::= { hwOspfv3NotificationEntry 10 }
+
+     hwOspfv3PeerFlappingSuppressReason OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                resumeTimerExpired(1),
+                configureChange(2),
+                resetSuppressFlapping(3),
+                neighbourFlapping(4),
+                holddownToHoldmaxcost(5)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The reason of peer flapping suppress status change."
+            ::= { hwOspfv3NotificationEntry 11 }
+
+        hwOspfv3LsaId OBJECT-TYPE
+            SYNTAX HWOspfv3RouterIdTc
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                  "A 32-bit integer uniquely identifies an area.
+                LSA-ID 0.0.0.0 is used for the OSPF LSA."
+            ::= { hwOspfv3NotificationEntry 12 } 
+
+        hwOspfv3LsaAge OBJECT-TYPE
+            SYNTAX Integer32 (0..3600)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This age of the ospf lsa."
+            ::= { hwOspfv3NotificationEntry 13 } 
+            
+     hwOspfv3PurgeHostName OBJECT-TYPE
+            SYNTAX     OCTET STRING (SIZE (1..64)) 
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the name of an OSPFv3 router which purge OSPFv3 routes."
+            ::= { hwOspfv3NotificationEntry 14 }
+             
+     hwOspfv3PurgeIpAddress OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the IP address of an OSPFv3 router which purge OSPFv3 routes."
+            ::= { hwOspfv3NotificationEntry 15 }
+             
+     hwOspfv3PurgeRouterId OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the 32-bit integer that uniquely identifies the router in the Autonomous System."
+            ::= { hwOspfv3NotificationEntry 16 }
+             
+     hwOspfv3FlushLsaNum OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the number of LSAs deleted by the local device or another device."
+            ::= { hwOspfv3NotificationEntry 17 }
+             
+     hwOspfv3AffectedNodeNum OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the number of affected node when OSPFv3 routes were deleted."
+            ::= { hwOspfv3NotificationEntry 18 }
+             
+     hwOspfv3TotalNodeNum OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the total number of node in the System."
+            ::= { hwOspfv3NotificationEntry 19 }
+             
+     hwOspfv3PurgeStatPeriod OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the period interval for purge statistic."
+            ::= { hwOspfv3NotificationEntry 20 }
+             
+     hwOspfv3RuledOutDeviceNum OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the number of node ruled out when checking faulty device."
+            ::= { hwOspfv3NotificationEntry 21 }
+             
+     hwOspfv3PurgeHostName1 OBJECT-TYPE
+            SYNTAX     OCTET STRING (SIZE (1..64)) 
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the name of an OSPFv3 router which maybe purge OSPFv3 routes."
+            ::= { hwOspfv3NotificationEntry 22 }
+             
+     hwOspfv3PurgeHostName2 OBJECT-TYPE
+            SYNTAX     OCTET STRING (SIZE (1..64)) 
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the name of an OSPFv3 router which maybe purge OSPFv3 routes."
+            ::= { hwOspfv3NotificationEntry 23 }
+             
+     hwOspfv3PurgeHostName3 OBJECT-TYPE
+            SYNTAX     OCTET STRING (SIZE (1..64)) 
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the name of an OSPFv3 router which maybe purge OSPFv3 routes."
+            ::= { hwOspfv3NotificationEntry 24 }
+             
+     hwOspfv3PurgeIpAddress1 OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the IP address of an OSPFv3 router which maybe purge OSPFv3 routes."
+            ::= { hwOspfv3NotificationEntry 25 }
+             
+     hwOspfv3PurgeIpAddress2 OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the IP address of an OSPFv3 router which maybe purge OSPFv3 routes."
+            ::= { hwOspfv3NotificationEntry 26 }
+             
+     hwOspfv3PurgeIpAddress3 OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the IP address of an OSPFv3 router which maybe purge OSPFv3 routes."
+            ::= { hwOspfv3NotificationEntry 27 }
+             
+     hwOspfv3PurgeRouterId1 OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the 32-bit integer that uniquely identifies the router in the Autonomous System."
+            ::= { hwOspfv3NotificationEntry 28 }
+             
+     hwOspfv3PurgeRouterId2 OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the 32-bit integer that uniquely identifies the router in the Autonomous System."
+            ::= { hwOspfv3NotificationEntry 29 }
+             
+     hwOspfv3PurgeRouterId3 OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the 32-bit integer that uniquely identifies the router in the Autonomous System."
+            ::= { hwOspfv3NotificationEntry 30 }
+
+    -- Notification definitions  
  
    hwOspfv3VirtIfStateChange NOTIFICATION-TYPE 
         OBJECTS { hwOspfv3RouterId,  -- The originator of the notification 
-                  hwOspfv3VirtIfState  -- The new state 
+                  hwOspfv3VirtIfState,  -- The new state 
+                  hwOspfv3IfStateChgReason -- The interface state change reason
            } 
         STATUS       current 
         DESCRIPTION 
@@ -2312,7 +2754,9 @@
  
    hwOspfv3NbrStateChange NOTIFICATION-TYPE 
         OBJECTS { hwOspfv3RouterId,   -- The originator of the notification 
-                  hwOspfv3NbrState    -- The new state 
+                  hwOspfv3NbrState,    -- The new state                   
+                  hwOspfv3IfName,   -- The interface name
+                  hwOspfv3NbrStateChgReason -- The neighbor state change reason
            } 
         STATUS       current 
         DESCRIPTION 
@@ -2332,7 +2776,8 @@
  
    hwOspfv3VirtNbrStateChange NOTIFICATION-TYPE 
         OBJECTS { hwOspfv3RouterId, -- The originator of the notification 
-                  hwOspfv3VirtNbrState  -- The new state 
+                  hwOspfv3VirtNbrState,  -- The new state 
+                  hwOspfv3NbrStateChgReason -- The neighbor state change reason
            } 
         STATUS       current 
         DESCRIPTION 
@@ -2410,7 +2855,9 @@
    
    hwOspfv3IfStateChange NOTIFICATION-TYPE 
         OBJECTS { hwOspfv3RouterId, -- The originator of the notification 
-           hwOspfv3IfState   -- The new state 
+           hwOspfv3IfState,   -- The new state           
+           hwOspfv3IfName,   -- The interface name
+           hwOspfv3IfStateChgReason -- The interface state change reason
            } 
         STATUS       current 
         DESCRIPTION 
@@ -2484,7 +2931,229 @@
             transitions from or to any defined status on a per area basis." 
         ::= { hwOspfv3Notifications 12 } 
              
-    
+   hwOspfv3LastAuthKeyExpiry NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3RouterId, -- The originator of the notification 
+                  hwOspfv3IfName    -- The interface name
+                }  
+        STATUS       current 
+        DESCRIPTION 
+           "An hwOspfv3LastAuthKeyExpiry notification 
+            indicates that the last key associated with an interface has expired.
+            When this notification is received, either the lifetime of the key should be extended
+            or a new key should be configured." 
+        ::= { hwOspfv3Notifications 13 }   
+        
+   hwOspfv3AuthSequenceNumWrap NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3RouterId, -- The originator of the notification
+                  hwOspfv3IfName    -- The interface name                  
+                }  
+        STATUS       current 
+        DESCRIPTION 
+           "An hwOspfv3AuthSequenceNumWrap notification 
+            indicates that the 64-bit authentication sequence number has wrapped.
+            When this notification is received, all the keys must be reset
+            to avoid the possibility of replay attacks." 
+        ::= { hwOspfv3Notifications 14 }                  
+
+   hwOspfv3IntraAreaRouterIdConflictRecovered NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3AreaIdIndex, hwOspfv3RouterId, hwOspfv3NewRouterId }  
+        STATUS       current 
+        DESCRIPTION 
+           "The object is used to monitor router ID conflict recovery in an intra area." 
+        ::= { hwOspfv3Notifications 15 } 
+
+   hwOspfv3PeerFlappingSuppressStatusChange NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3RouterId, hwOspfv3AreaIdIndex, hwOspfv3IfName, hwOspfv3PeerFlappingSuppressStatus, hwOspfv3PeerFlappingSuppressReason }  
+        STATUS       current 
+        DESCRIPTION 
+           "These objects are used to monitor changed OSPFv3 peer flapping suppress status." 
+        ::= { hwOspfv3Notifications 16 } 
+        
+   hwOspfv3ImportAseRouteThreshold NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3ProcessId }  
+        STATUS       current 
+        DESCRIPTION 
+           "This object indicates that the number of AS-external LSAs generated when an OSPFv3 process imports external routes exceeds the configured alarm threshold." 
+        ::= { hwOspfv3Notifications 17 } 
+        
+   hwOspfv3ImportAseRouteThresholdClear NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3ProcessId }  
+        STATUS       current 
+        DESCRIPTION 
+           "This object indicates that the number of AS-external LSAs generated when an OSPFv3 process imports external routes has been less than the configured alarm threshold." 
+        ::= { hwOspfv3Notifications 18 } 
+        
+   hwOspfv3ImportAseRouteExceed NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3ProcessId }  
+        STATUS       current 
+        DESCRIPTION 
+           "This object indicates that the number of AS-external LSAs generated when an OSPFv3 process imports external routes exceeds the configured maximum number." 
+        ::= { hwOspfv3Notifications 19 } 
+        
+   hwOspfv3ImportAseRouteExceedClear NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3ProcessId }  
+        STATUS       current 
+        DESCRIPTION 
+           "This object indicates that the number of AS-external LSAs generated when an OSPFv3 process imports external routes has been less than the configured maximum number." 
+        ::= { hwOspfv3Notifications 20 }        
+                
+   hwOspfv3ImportNssaRouteThreshold NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3AreaIdIndex }  
+        STATUS       current 
+        DESCRIPTION 
+           "This object indicates that the number of NSSA LSAs generated when an OSPFv3 process imports external routes exceeds the configured alarm threshold." 
+        ::= { hwOspfv3Notifications 21 } 
+        
+   hwOspfv3ImportNssaRouteThresholdClear NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3AreaIdIndex }  
+        STATUS       current 
+        DESCRIPTION 
+           "This object indicates that the number of NSSA LSAs generated when an OSPFv3 process imports external routes has been less than the configured alarm threshold." 
+        ::= { hwOspfv3Notifications 22 } 
+        
+   hwOspfv3ImportNssaRouteExceed NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3AreaIdIndex }
+        STATUS       current 
+        DESCRIPTION 
+           "This object indicates that the number of NSSA LSAs generated when an OSPFv3 process imports external routes exceeds the configured maximum number." 
+        ::= { hwOspfv3Notifications 23 } 
+        
+   hwOspfv3ImportNssaRouteExceedClear NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3AreaIdIndex }  
+        STATUS       current 
+        DESCRIPTION 
+           "This object indicates that the number of NSSA LSAs generated when an OSPFv3 process imports external routes has been less than the configured maximum number." 
+        ::= { hwOspfv3Notifications 24 }
+
+   hwOspfv3GreaterAgeLsaRecived NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3RouterId, hwOspfv3AreaIdIndex, hwOspfv3IfName, hwOspfv3LsaId, hwOspfv3LsaAge }  
+        STATUS       current 
+        DESCRIPTION 
+           "This object is used to monitor the router recive a greater age lsa in ospfv3." 
+        ::= { hwOspfv3Notifications 25 }
+        
+   hwOspfv3DeleteRouteByPurge NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex, 
+                hwOspfv3FlushLsaNum, hwOspfv3AffectedNodeNum, hwOspfv3TotalNodeNum, hwOspfv3PurgeStatPeriod }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that the local device deleted OSPFv3 routes advertised by other devices. 
+            Reset or isolate the device from the network."
+        ::= { hwOspfv3Notifications 26 }
+        
+   hwOspfv3DeleteRouteByPurgeClear NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that the local device did not delete OSPFv3 routes advertised by other devices."
+        ::= { hwOspfv3Notifications 27 }
+        
+   hwOspfv3RouteBeDeletedByPurgeExact NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex, 
+                hwOspfv3FlushLsaNum, hwOspfv3AffectedNodeNum, hwOspfv3TotalNodeNum, hwOspfv3PurgeStatPeriod }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by the local device were deleted by another device. 
+            Reset or isolate the faulty device from the network."
+        ::= { hwOspfv3Notifications 28 }
+        
+   hwOspfv3RouteBeDeletedByPurgeExactClear NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by the local device were not deleted by another device."
+        ::= { hwOspfv3Notifications 29 }
+        
+   hwOspfv3RouteBeDeletedByPurgeInexact NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex, 
+                hwOspfv3FlushLsaNum, hwOspfv3AffectedNodeNum, hwOspfv3TotalNodeNum, hwOspfv3RuledOutDeviceNum, hwOspfv3PurgeStatPeriod }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by the local device were deleted by another device, 
+            and the possibly faulty device did not support OSPFv3 flush LSA source trace. Log in to the possibly faulty device. 
+            If the device is deleting routes, reset or isolate it from the network. Otherwise, check other devices. 
+            Neither of the devices displayed in the display ospfv3 purge-source-trace analysis-info  command output is the faulty device."
+        ::= { hwOspfv3Notifications 30 }
+        
+   hwOspfv3RouteBeDeletedByPurgeInexactClear NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by the local device were not deleted by another device."
+        ::= { hwOspfv3Notifications 31 }
+        
+   hwOspfv3RouteBeDeletedByPurge NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex, hwOspfv3TotalNodeNum, 
+                hwOspfv3PurgeHostName1, hwOspfv3PurgeIpAddress1, hwOspfv3PurgeRouterId1, 
+                hwOspfv3PurgeHostName2, hwOspfv3PurgeIpAddress2, hwOspfv3PurgeRouterId2, 
+                hwOspfv3PurgeHostName3, hwOspfv3PurgeIpAddress3, hwOspfv3PurgeRouterId3 }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by the local device were deleted by another device. 
+            Log in to the possibly faulty device. If the device is deleting routes, reset or isolate it from the network. 
+            Otherwise, check other devices."
+        ::= { hwOspfv3Notifications 32 }
+        
+   hwOspfv3RouteBeDeletedByPurgeClear NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by the local device were not deleted by another device."
+        ::= { hwOspfv3Notifications 33 }
+        
+   hwOspfv3ThirdPartRouteBeDeletedByPurgeExact NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex, 
+                hwOspfv3FlushLsaNum, hwOspfv3AffectedNodeNum, hwOspfv3TotalNodeNum, hwOspfv3PurgeStatPeriod }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by another device were deleted. 
+            Reset or isolate the faulty device from the network."
+        ::= { hwOspfv3Notifications 34 }
+        
+   hwOspfv3ThirdPartRouteBeDeletedByPurgeExactClear NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by another device were not deleted."
+        ::= { hwOspfv3Notifications 35 }
+        
+   hwOspfv3ThirdPartRouteBeDeletedByPurgeInexact NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex, 
+                hwOspfv3FlushLsaNum, hwOspfv3AffectedNodeNum, hwOspfv3TotalNodeNum, hwOspfv3RuledOutDeviceNum, hwOspfv3PurgeStatPeriod }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by another device were deleted, 
+            and the possibly faulty device did not support OSPFv3 flush LSA source trace. 
+            Log in to the possibly faulty device. If the device is deleting routes, reset or isolate it from the network. 
+            Otherwise, check other devices. Neither of the devices displayed in the display ospfv3 purge-source-trace analysis-info 
+            command output is the faulty device."
+        ::= { hwOspfv3Notifications 36 }
+        
+   hwOspfv3ThirdPartRouteBeDeletedByPurgeInexactClear NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by another device were not deleted."
+        ::= { hwOspfv3Notifications 37 }
+        
+   hwOspfv3ThirdPartRouteBeDeletedByPurge NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex, hwOspfv3TotalNodeNum, 
+                hwOspfv3PurgeHostName1, hwOspfv3PurgeIpAddress1, hwOspfv3PurgeRouterId1, 
+                hwOspfv3PurgeHostName2, hwOspfv3PurgeIpAddress2, hwOspfv3PurgeRouterId2, 
+                hwOspfv3PurgeHostName3, hwOspfv3PurgeIpAddress3, hwOspfv3PurgeRouterId3 }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by another device were deleted. Log in to the possibly faulty device. 
+            If the device is deleting routes, reset or isolate it from the network. Otherwise, check other devices."
+        ::= { hwOspfv3Notifications 38 }
+        
+   hwOspfv3ThirdPartRouteBeDeletedByPurgeClear NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by another device were not deleted."
+        ::= { hwOspfv3Notifications 39 }
+
     -- conformance information 
  
     hwOspfv3Groups      OBJECT IDENTIFIER ::= { hwOspfv3Conformance 1 } 
@@ -2501,11 +3170,10 @@
                             hwOspfv3AreaGroup, 
                             hwOspfv3IfGroup, 
                             hwOspfv3VirtIfGroup, 
-                            hwOspfv3NbrGroup,                             
+                            hwOspfv3NbrGroup,
+                            hwOspfv3CfgNbrGroup,                             
                             hwOspfv3VirtNbrGroup, 
-                            hwOspfv3AreaAggregateGroup, 
-                            hwOspfv3NotificationObjectGroup, 
-                            hwOspfv3NotificationGroup 
+                            hwOspfv3AreaAggregateGroup
                             } 
  
             GROUP           hwOspfv3AsLsdbGroup 
@@ -2523,21 +3191,256 @@
                 "This group is required for OSPFv3 systems that 
                 display their Link-scope link state database." 
  
- 
+            GROUP           hwOspfv3NotificationObjectGroup
+            DESCRIPTION
+                "This group is required for OSPFv3 systems that
+                support OSPFv3 notifications."
+
+            GROUP           hwOspfv3NotificationGroup
+            DESCRIPTION
+                "This group is required for OSPFv3 systems that
+                support OSPFv3 notifications."
+                
             OBJECT          hwOspfv3NbrAddressType 
             SYNTAX          InetAddressType -- { ipv6(2) }
             DESCRIPTION 
                 "An implementation is only required to support IPv6 
                 address without zone index." 
+                
+            OBJECT          hwOspfv3NbrAddress
+            SYNTAX          InetAddress (SIZE (16))
+            DESCRIPTION
+                "An implementation is only required to support IPv6
+                address without zone index."                
  
             OBJECT          hwOspfv3VirtNbrAddressType 
             SYNTAX          InetAddressType --{ ipv6(2) } 
             DESCRIPTION 
                 "An implementation is only required to support IPv6 
                 address without zone index." 
+                
+            OBJECT          hwOspfv3VirtNbrAddress
+            SYNTAX          InetAddress (SIZE (16))
+            DESCRIPTION
+                "An implementation is only required to support IPv6
+                address without zone index."                
  
             ::= { hwOspfv3Compliances 1 } 
- 
+            
+        hwOspfv3ReadOnlyCompliance MODULE-COMPLIANCE
+          STATUS     current
+          DESCRIPTION
+                  "When this MIB module is implemented without
+                  support for read-create (i.e., in read-only
+                  mode), the implementation can claim read-only
+                  compliance.  Such a device can then be monitored,
+                  but cannot be configured with this MIB."
+
+          MODULE -- this module
+               MANDATORY-GROUPS {
+                       hwOspfv3BasicGroup,
+                       hwOspfv3AreaGroup,
+                       hwOspfv3IfGroup,
+                       hwOspfv3VirtIfGroup,
+                       hwOspfv3NbrGroup,
+                       hwOspfv3CfgNbrGroup,
+                       hwOspfv3VirtNbrGroup,
+                       hwOspfv3AreaAggregateGroup
+                       }
+
+          GROUP           hwOspfv3AsLsdbGroup
+          DESCRIPTION
+              "This group is required for OSPFv3 systems that
+              display their AS-scope link state database."
+
+          GROUP           hwOspfv3AreaLsdbGroup
+          DESCRIPTION
+              "This group is required for OSPFv3 systems that
+              display their Area-scope link state database."
+
+          GROUP           hwOspfv3LinkLsdbGroup
+          DESCRIPTION
+              "This group is required for OSPFv3 systems that
+              display their Link-scope link state database
+              for non-virtual interfaces."
+
+          GROUP           hwOspfv3NotificationObjectGroup
+          DESCRIPTION
+              "This group is required for OSPFv3 systems that
+              support OSPFv3 notifications."
+
+          GROUP           hwOspfv3NotificationGroup
+          DESCRIPTION
+              "This group is required for OSPFv3 systems that
+              support OSPFv3 notifications."
+
+          OBJECT hwOspfv3RouterId
+          MIN-ACCESS read-only
+
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3AdminStatus
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3ExtAreaLsdbLimit
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3ReferenceBandwidth
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3RestartSupport
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3RestartInterval
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+
+          OBJECT hwOspfv3NotificationEnable
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+
+          OBJECT hwOspfv3AreaSummary
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3AreaRowStatus
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3AreaStubMetric
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3AreaNssaTranslatorRole
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3AreaNssaTranslatorStabInterval
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+
+          OBJECT hwOspfv3IfAreaId
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3IfType
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3IfAdminStatus
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3IfRtrPriority
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3IfTransitDelay
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3IfRetransInterval
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3IfHelloInterval
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3IfRtrDeadInterval
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3IfPollInterval
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3IfRowStatus
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3IfMetricValue
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3VirtIfTransitDelay
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3VirtIfRetransInterval
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3VirtIfHelloInterval
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3VirtIfRtrDeadInterval
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3VirtIfRowStatus
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3CfgNbrPriority
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3CfgNbrRowStatus
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3AreaAggregateRowStatus
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+          OBJECT hwOspfv3AreaAggregateEffect
+          MIN-ACCESS read-only
+          DESCRIPTION
+               "Write access is not required."
+
+       ::= { hwOspfv3Compliances 2 }
+       
+       
     -- units of conformance 
  
     hwOspfv3BasicGroup OBJECT-GROUP 
@@ -2558,7 +3461,8 @@
                             hwOspfv3RestartStatus, 
                             hwOspfv3RestartAge, 
                             hwOspfv3RestartExitRc, 
-                            hwOspfv3NotificationEnable 
+                            hwOspfv3NotificationEnable, 
+                            hwOspfv3ReferenceBandwidth
                             } 
             STATUS          current 
             DESCRIPTION 
@@ -2569,7 +3473,7 @@
  
     hwOspfv3AreaGroup OBJECT-GROUP 
             OBJECTS         {                       
-                            hwOspfv3ImportAsExtern, 
+                            hwOspfv3AreaImportAsExtern, 
                             hwOspfv3AreaSpfRuns, 
                             hwOspfv3AreaBdrRtrCount, 
                             hwOspfv3AreaAsBdrRtrCount, 
@@ -2577,7 +3481,11 @@
                             hwOspfv3AreaScopeLsaCksumSum, 
                             hwOspfv3AreaSummary, 
                             hwOspfv3AreaRowStatus, 
-                            hwOspfv3StubMetric
+                            hwOspfv3AreaStubMetric,
+                            hwOspfv3AreaNssaTranslatorRole,
+                            hwOspfv3AreaNssaTranslatorState,
+                            hwOspfv3AreaNssaTranslatorStabInterval,
+                            hwOspfv3AreaNssaTranslatorEvents
                                } 
             STATUS          current 
             DESCRIPTION 
@@ -2746,7 +3654,13 @@
             OBJECTS         { 
                             hwOspfv3ConfigErrorType, 
                             hwOspfv3PacketType, 
-                            hwOspfv3PacketSrc 
+                            hwOspfv3PacketSrc, 
+                            hwOspfv3IfName,
+                            hwOspfv3IfStateChgReason,
+                            hwOspfv3NbrStateChgReason,
+                            hwOspfv3ProcessId,
+                            hwOspfv3AreaIdIndex,
+                            hwOspfv3NewRouterId                            
                             } 
             STATUS          current 
             DESCRIPTION 
@@ -2767,7 +3681,34 @@
                             hwOspfv3RestartStatusChange, 
                             hwOspfv3NbrRestartHelperStatusChange, 
                             hwOspfv3VirtNbrRestartHelperStatusChange,
-                            hwOspfv3NssaTranslatorStatusChange 
+                            hwOspfv3NssaTranslatorStatusChange,
+                            hwOspfv3LastAuthKeyExpiry,
+                            hwOspfv3AuthSequenceNumWrap,
+                            hwOspfv3IntraAreaRouterIdConflictRecovered,
+                            hwOspfv3PeerFlappingSuppressStatusChange,
+                            hwOspfv3ImportAseRouteThreshold,
+                            hwOspfv3ImportAseRouteThresholdClear,
+                            hwOspfv3ImportAseRouteExceed,
+                            hwOspfv3ImportAseRouteExceedClear,
+                            hwOspfv3ImportNssaRouteThreshold,
+                            hwOspfv3ImportNssaRouteThresholdClear,
+                            hwOspfv3ImportNssaRouteExceed,
+                            hwOspfv3ImportNssaRouteExceedClear,
+                            hwOspfv3GreaterAgeLsaRecived,
+                            hwOspfv3DeleteRouteByPurge,
+                            hwOspfv3DeleteRouteByPurgeClear,
+                            hwOspfv3RouteBeDeletedByPurgeExact,
+                            hwOspfv3RouteBeDeletedByPurgeExactClear,
+                            hwOspfv3RouteBeDeletedByPurgeInexact,
+                            hwOspfv3RouteBeDeletedByPurgeInexactClear,
+                            hwOspfv3RouteBeDeletedByPurge,
+                            hwOspfv3RouteBeDeletedByPurgeClear,
+                            hwOspfv3ThirdPartRouteBeDeletedByPurgeExact,
+                            hwOspfv3ThirdPartRouteBeDeletedByPurgeExactClear,
+                            hwOspfv3ThirdPartRouteBeDeletedByPurgeInexact,
+                            hwOspfv3ThirdPartRouteBeDeletedByPurgeInexactClear,
+                            hwOspfv3ThirdPartRouteBeDeletedByPurge,
+                            hwOspfv3ThirdPartRouteBeDeletedByPurgeClear
                             } 
             STATUS          current 
             DESCRIPTION 
@@ -2775,17 +3716,3 @@
             ::= { hwOspfv3Groups 13 } 
  
     END  
-
- 
-
-
-
-
-    
-
-  
-
- 
- 
-
-
