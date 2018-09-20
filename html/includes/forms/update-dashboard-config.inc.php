@@ -16,10 +16,10 @@ if (!LegacyAuth::check()) {
 $status  = 'error';
 $message = 'Error updating user dashboard config';
 
-$data = json_decode($_POST['data'], true);
-$sub_type = $_POST['sub_type'];
-$widget_id = $_POST['widget_id'];
-$dasboard_id = $_POST['dashboard_id'];
+$data = json_decode($vars['data'], true);
+$sub_type = $vars['sub_type'];
+$widget_id = $vars['widget_id'];
+$dasboard_id = $vars['dashboard_id'];
 
 if ($sub_type == 'remove' && is_numeric($widget_id)) {
     if (dbFetchCell('select 1 from dashboards where (user_id = ? || access = 2) && dashboard_id = ?', array(LegacyAuth::id(),$dasboard_id)) == 1) {

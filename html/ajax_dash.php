@@ -30,7 +30,7 @@ if (!LegacyAuth::check()) {
     exit;
 }
 
-$type = $_POST['type'];
+$type = $vars['type'];
 
 if ($type == 'placeholder') {
     $output = "<span style='text-align:left;'><br><h3>Click on the Edit Dashboard button (next to the list of dashboards) to add widgets</h3><br><h4><strong>Remember:</strong> You can only move & resize widgets when you're in <strong>Edit Mode</strong>.</h4><span>";
@@ -41,10 +41,10 @@ if ($type == 'placeholder') {
     $typeahead_limit   = $config['webui']['global_search_result_limit'];
     $no_form           = true;
     $unique_id         = str_replace(array("-","."), "_", uniqid($type, true));
-    $widget_id         = $_POST['id'];
+    $widget_id         = $vars['id'];
     $widget_settings   = json_decode(dbFetchCell('select settings from users_widgets where user_widget_id = ?', array($widget_id)), true);
-    $widget_dimensions = $_POST['dimensions'];
-    if (!empty($_POST['settings'])) {
+    $widget_dimensions = $vars['dimensions'];
+    if (!empty($vars['settings'])) {
         define('SHOW_SETTINGS', true);
     }
     include 'includes/common/'.$type.'.inc.php';
