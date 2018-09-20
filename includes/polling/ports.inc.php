@@ -362,7 +362,6 @@ if ($config['enable_ports_poe']) {
         $port_stats = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', $port_stats, 'CISCO-POWER-ETHERNET-EXT-MIB');
     }
 }
-use LibreNMS\Util\IP;
             
 //NAC Polling
 if ($config['enable_ports_nac']) {
