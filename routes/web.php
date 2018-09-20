@@ -38,6 +38,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         });
 
         Route::group(['prefix' => 'table', 'namespace' => 'Table'], function () {
+            Route::post('eventlog', 'EventlogController');
             Route::post('syslog', 'SyslogController');
         });
     });
