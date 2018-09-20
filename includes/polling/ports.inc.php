@@ -380,17 +380,17 @@ if ($config['enable_ports_nac']) {
             }
             $IPHextpDec = explode(' ', $PortAuthSessionEntryParameters['cafSessionClientAddress']);
             $IPHextpDec = hexdec($IPHextpDec[0]).'.'.hexdec($IPHextpDec[1]).'.'.hexdec($IPHextpDec[2]).'.'.hexdec($IPHextpDec[3]);
-            dbQuery("UPDATE `ports_nac` SET `port_index` = ".$port_index_nac." WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
-            dbQuery("UPDATE `ports_nac` SET `PortAuthSessionMacAddress` = '".$PortAuthSessionEntryParameters['cafSessionClientMacAddress']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
-            dbQuery("UPDATE `ports_nac` SET `PortAuthSessionIPAddress` = '".$IPHextpDec."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
-            dbQuery("UPDATE `ports_nac` SET `PortAuthSessionAuthzStatus` = '".$PortAuthSessionEntryParameters['cafSessionStatus']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
-            dbQuery("UPDATE `ports_nac` SET `PortAuthSessionDomain` = '".$PortAuthSessionEntryParameters['cafSessionDomain']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
-            dbQuery("UPDATE `ports_nac` SET `PortAuthSessionHostMode` = '".$PortAuthSessionEntryParameters['cafSessionAuthHostMode']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
-            dbQuery("UPDATE `ports_nac` SET `PortAuthSessionUserName` = '".$PortAuthSessionEntryParameters['cafSessionAuthUserName']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
-            dbQuery("UPDATE `ports_nac` SET `PortAuthSessionAuthzBy` = '".$PortAuthSessionEntryParameters['cafSessionAuthorizedBy']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
-            dbQuery("UPDATE `ports_nac` SET `PortAuthSessionTimeOut` = '".$PortAuthSessionEntryParameters['cafSessionTimeout']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
-            dbQuery("UPDATE `ports_nac` SET `PortAuthSessionTimeLeft` = '".$PortAuthSessionEntryParameters['cafSessionTimeLeft']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
-            dbQuery("UPDATE `ports_nac` SET `device_id` = '".$device['device_id']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
+            dbUpdate(array('port_index' => $port_index_nac), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));
+            dbUpdate(array('PortAuthSessionMacAddress' => $PortAuthSessionEntryParameters['cafSessionClientMacAddress']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));            
+            dbUpdate(array('PortAuthSessionIPAddress' => $IPHextpDec), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));            
+            dbUpdate(array('PortAuthSessionAuthzStatus' => $PortAuthSessionEntryParameters['cafSessionStatus']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));            
+            dbUpdate(array('PortAuthSessionDomain' => $PortAuthSessionEntryParameters['cafSessionDomain']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));            
+            dbUpdate(array('PortAuthSessionHostMode' => $PortAuthSessionEntryParameters['cafSessionAuthHostMode']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));            
+            dbUpdate(array('PortAuthSessionUserName' => $PortAuthSessionEntryParameters['cafSessionAuthUserName']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));            
+            dbUpdate(array('PortAuthSessionAuthzBy' => $PortAuthSessionEntryParameters['cafSessionAuthorizedBy']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));            
+            dbUpdate(array('PortAuthSessionTimeOut' => $PortAuthSessionEntryParameters['cafSessionTimeout']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));            
+            dbUpdate(array('PortAuthSessionTimeLeft' => $PortAuthSessionEntryParameters['cafSessionTimeLeft']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));            
+            dbUpdate(array('device_id' => $device['device_id']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));            
         }
         foreach ($ports_mapped['maps']['ifIndex'] as $ports_mapped_index => $ports_mapped_id) {
             dbQuery("UPDATE `ports_nac` SET `port_id` = '".$ports_mapped_id."' WHERE `ports_nac`.`port_index` = '".$ports_mapped_index."';");
