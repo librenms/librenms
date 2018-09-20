@@ -26,6 +26,15 @@ use LibreNMS\Authentication\LegacyAuth;
 
 header('Content-type: application/json');
 
+if (!LegacyAuth::check()) {
+    $response = array(
+        'status'  => 'error',
+        'message' => 'Unauthenticated',
+    );
+    echo _json_encode($response);
+    exit;
+}
+
 $status    = 'error';
 $message   = 'unknown error';
 
@@ -33,14 +42,16 @@ $dashboard_name = display($_REQUEST['dashboard_name']);
 
 if (!empty($dashboard_name) && ($dash_id = dbInsert(['dashboard_name' => $dashboard_name, 'user_id' => LegacyAuth::id()], 'dashboards'))) {
     $status  = 'ok';
-    $message = 'Created';
+    $message = 'Dashboard ' . $dashboard_name . ' created';
 } else {
     $status  = 'error';
     $message = 'ERROR: Could not create';
 }
 
-die(json_encode(array(
-    'status'       => $status,
-    'message'      => $message,
+$response = array(
+    'status'        => $status,
+    'message'       => $message,
     'dashboard_id' => $dash_id
-)));
+);
+
+echo _json_encode($response);
