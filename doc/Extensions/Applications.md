@@ -284,8 +284,10 @@ The application should be auto-discovered as described at the top of the page. I
 SNMP extend script to get your exim stats data into your host.
 
 ##### SNMP Extend
-1. Copy the [exim stats](https://github.com/librenms/librenms-agent/blob/master/snmp/exim-stats.sh) to `/etc/snmp/` (or any other suitable location) on your host.
-
+1. Download the script onto the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/exim-stats.sh -O /etc/snmp/exim-stats.sh
+```
 2. Run `chmod +x /etc/snmp/exim-stats.sh`
 
 3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
