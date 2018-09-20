@@ -4,11 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class AjaxController extends Controller
+class ResolutionController extends Controller
 {
-    // FIXME do not just pile functions on this controller, create separate controllers
-
-    public function setResolution(Request $request)
+    public function set(Request $request)
     {
         $this->validate($request, [
             'width' => 'required|numeric',
