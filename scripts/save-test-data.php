@@ -97,7 +97,7 @@ if ($os_name) {
 $output_file = null;
 if (isset($options['f'])) {
     if (sizeof($os_list) != 1) {
-        echo "Failed to create test data, -f/--file option can be used with one os/variant combination.\n"; 
+        echo "Failed to create test data, -f/--file option can be used with one os/variant combination.\n";
         echo "Multiple combinations (".sizeof($os_list).") found.\n";
         exit(1);
     }
