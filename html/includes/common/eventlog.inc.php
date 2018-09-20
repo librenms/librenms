@@ -20,7 +20,7 @@ $common_output[] = '
             <tr>
                 <th data-column-id="datetime" data-order="desc">Timestamp</th>
                 <th data-column-id="type">Type</th>
-                <th data-column-id="hostname">Hostname</th>
+                <th data-column-id="device_id">Hostname</th>
                 <th data-column-id="message">Message</th>
                 <th data-column-id="username">User</th>
             </tr>
@@ -36,8 +36,8 @@ var eventlog_grid = $("#eventlog").bootgrid({
     {
         return {
             id: "eventlog",
-            device: "' . mres($vars['device']) . '",
-            eventtype: "' . mres($vars['eventtype']) . '",
+            device: "' . (int)($vars['device']) . '",
+            eventtype: "' . addcslashes($vars['eventtype'], '"') . '",
         };
     },
     url: "ajax/table/eventlog"

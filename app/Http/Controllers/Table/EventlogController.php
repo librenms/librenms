@@ -65,18 +65,20 @@ class EventlogController extends TableController
     {
         return [
             'datetime' => $this->formatDatetime($eventlog),
-            'hostname' => Url::deviceLink($eventlog->device, $eventlog->device->shortDisplayName()),
+            'device_id' => Url::deviceLink($eventlog->device, $eventlog->device->shortDisplayName()),
             'type' => $this->formatType($eventlog),
             'message' => htmlspecialchars($eventlog->message),
-            'username' => $eventlog->username,
+            'username' => $eventlog->username ?: 'System',
         ];
     }
 
     private function formatType($eventlog)
     {
         if ($eventlog->type == 'interface') {
-            $this_if = cleanPort(getifbyid($eventlog->reference));
-            return '<b>' . generate_port_link($this_if, makeshortif(strtolower($this_if['label']))) . '</b>';
+            if (is_numeric($eventlog->reference)) {
+                $port = $eventlog->related;
+                return '<b>' . Url::portLink($port, $port->getShortLabel()) . '</b>';
+            }
         }
 
         return $eventlog->type;

@@ -48,4 +48,9 @@ class Eventlog extends BaseModel
     {
         return $this->belongsTo('App\Models\Device', 'device_id');
     }
+
+    public function related()
+    {
+        return $this->morphTo('related', 'type', 'reference');
+    }
 }

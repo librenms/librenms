@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
@@ -49,6 +50,8 @@ class AppServiceProvider extends ServiceProvider
             return "<?php endif; ?>";
         });
 
+        $this->configureMorphAliases();
+
         // Development service providers
         if ($this->app->environment() !== 'production') {
             if (class_exists(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class)) {
@@ -72,5 +75,13 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         //
+    }
+
+    private function configureMorphAliases()
+    {
+        Relation::morphMap([
+            'interface' => \App\Models\Port::class,
+            'sensor' => \App\Models\Sensor::class,
+        ]);
     }
 }

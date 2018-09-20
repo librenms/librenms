@@ -26,6 +26,7 @@
 namespace LibreNMS\Util;
 
 use App\Models\Device;
+use App\Models\Port;
 use Auth;
 use Carbon\Carbon;
 use LibreNMS\Config;
@@ -106,16 +107,74 @@ class Url
             $link = Url::overlibLink($url, $text, $contents, $class);
         }
 
-        if (Auth::user()->hasGlobalRead() || $device->users()->where('devices_perms.user_id', Auth::id())->exists()) {
+        if ($device->canAccess(Auth::user())) {
             return $link;
         } else {
             return $device->displayName();
         }
     }
 
+    /**
+     * @param Port $port
+     * @param string $text
+     * @param string $type
+     * @param boolean $overlib
+     * @param boolean $single_graph
+     * @return mixed|string
+     */
+    public static function portLink($port, $text = null, $type = null, $overlib = true, $single_graph = false)
+    {
+
+        $label = Rewrite::normalizeIfName($port->getLabel());
+        if (!$text) {
+            $text = $label;
+        }
+
+        $content = '<div class=list-large>' . addslashes(htmlentities($port->device->displayName() . ' - ' . $label)) . '</div>';
+        if ($port->ifAlias) {
+            $content .= addslashes(htmlentities($port->ifAlias)) . '<br />';
+        }
+
+        $content .= "<div style=\'width: 850px\'>";
+        $graph_array = [
+            'type' => $type ?: 'port_bits',
+            'legend' => 'yes',
+            'height' => 100,
+            'width' => 340,
+            'to' => Carbon::now()->timestamp,
+            'from' => Carbon::now()->subDay()->timestamp,
+            'id' => $port->port_id,
+        ];
+
+        $content .= self::graphTag($graph_array);
+        if (!$single_graph) {
+            $graph_array['from'] = Carbon::now()->subWeek()->timestamp;
+            $content .= self::graphTag($graph_array);
+            $graph_array['from'] = Carbon::now()->subMonth()->timestamp;
+            $content .= self::graphTag($graph_array);
+            $graph_array['from'] = Carbon::now()->subYear()->timestamp;
+            $content .= self::graphTag($graph_array);
+        }
+
+        $content .= '</div>';
+
+        if (!$overlib) {
+            return $content;
+        } elseif ($port->canAccess(Auth::user())) {
+            return self::overlibLink(self::portUrl($port), $text, $content, self::portLinkDisplayClass($port));
+        }
+
+        return Rewrite::normalizeIfName($text);
+    }
+
     public static function deviceUrl($device, $vars = [])
     {
         return self::generate(['page' => 'device', 'device' => $device->device_id], $vars);
+    }
+
+    public static function portUrl($port, $vars = [])
+    {
+        return self::generate(['page' => 'device', 'device' => $port->device_id, 'tab' => 'port', 'port' => $port->port_id], $vars);
     }
 
     public static function generate($vars, $new_vars = [])
@@ -132,6 +191,20 @@ class Url
         }
 
         return $url;
+    }
+
+    /**
+     * @param array $args
+     * @return string
+     */
+    public static function graphTag($args)
+    {
+        $urlargs = [];
+        foreach ($args as $key => $arg) {
+            $urlargs[] = $key . '=' . urlencode($arg);
+        }
+
+        return '<img src="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
     }
 
     public static function overlibLink($url, $text, $contents, $class = null)
@@ -212,5 +285,18 @@ class Url
         }
 
         return $device->status ? 'list-device' : 'list-device-down';
+    }
+
+    private static function portLinkDisplayClass($port)
+    {
+        if ($port->ifAdminStatus == "down") {
+            return "interface-admindown";
+        }
+
+        if ($port->ifAdminStatus == "up" && $port->ifOperStatus == "down") {
+            return "interface-updown";
+        }
+
+        return "interface-upup";
     }
 }

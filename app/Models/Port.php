@@ -2,6 +2,10 @@
 
 namespace App\Models;
 
+use DB;
+use LibreNMS\Config;
+use LibreNMS\Util\Rewrite;
+
 class Port extends BaseModel
 {
     public $timestamps = false;
@@ -16,15 +20,70 @@ class Port extends BaseModel
      */
     public function getLabel()
     {
-        if ($this->ifName) {
-            return $this->ifName;
+        $os = $this->device->os;
+
+        if (Config::getOsSetting($os, 'ifname')) {
+            $label = $this->ifName;
+        } elseif (Config::getOsSetting($os, 'ifalias')) {
+            $label = $this->ifAlias;
         }
 
-        if ($this->ifDescr) {
-            return $this->ifDescr;
+        if (empty($label)) {
+            $label = $this->ifDescr;
+
+            if (Config::getOsSetting($os, 'ifindex')) {
+                $label .= " $this->ifIndex";
+            }
         }
 
-        return $this->ifIndex;
+        foreach ((array)Config::get('rewrite_if', []) as $src => $val) {
+            if (str_i_contains($label, $src)) {
+                $label = $val;
+            }
+        }
+
+        foreach ((array)Config::get('rewrite_if_regexp', []) as $reg => $val) {
+            $label = preg_replace($reg.'i', $val, $label);
+        }
+
+        return $label;
+    }
+
+    /**
+     * Get the shortened label for this device.  Replaces things like GigabitEthernet with GE.
+     *
+     * @return string
+     */
+    public function getShortLabel()
+    {
+        return Rewrite::shortenIfName(Rewrite::normalizeIfName($this->getLabel()));
+    }
+
+    /**
+     * Check if user can access this port.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function canAccess($user)
+    {
+        if (!$user) {
+            return false;
+        }
+
+        if ($user->hasGlobalRead()) {
+            return true;
+        }
+
+        $port_query = DB::table('ports_perms')
+            ->where('user_id', $user->user_id)
+            ->where('port_id', $this->port_id);
+
+        $device_query = DB::table('devices_perms')
+            ->where('user_id', $user->user_id)
+            ->where('device_id', $this->device_id);
+
+        return $port_query->union($device_query)->exists();
     }
 
     // ---- Accessors/Mutators ----
@@ -107,6 +166,11 @@ class Port extends BaseModel
     public function device()
     {
         return $this->belongsTo('App\Models\Device', 'device_id', 'device_id');
+    }
+
+    public function events()
+    {
+        return $this->morphMany(Eventlog::class, 'events', 'type', 'reference');
     }
 
     public function users()
