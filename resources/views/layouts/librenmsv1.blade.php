@@ -37,6 +37,7 @@
     <link href="css/MarkerCluster.Default.css" rel="stylesheet" type="text/css" />
     <link href="css/leaflet.awesome-markers.css" rel="stylesheet" type="text/css" />
     <link href="css/select2.min.css" rel="stylesheet" type="text/css" />
+    <link href="css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="css/query-builder.default.min.css" rel="stylesheet" type="text/css" />
     <link href="{{ LibreNMS\Config::get('stylesheet', 'css/styles.css') }}?ver=20180512" rel="stylesheet" type="text/css" />
     <link href="css/{{ LibreNMS\Config::get('site_style', 'light') }}.css?ver=632417642" rel="stylesheet" type="text/css" />
