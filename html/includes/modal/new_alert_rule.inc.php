@@ -115,6 +115,12 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                                         <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
                                     </div>
                                 </div>
+                                <div class="form-group" title="Restricts this alert rule to specified transports.">
+                                    <label for="transports" class="col-sm-3 col-md-2 control-label">Transports: </label>
+                                    <div class="col-sm-9 col-md-10">
+                                        <select id="transports" name="transports[]" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
                                 <div class='form-group' title="A link to some documentation on how to handle this alert. This will be included in notifications.">
                                     <label for='proc' class='col-sm-3 col-md-2 control-label'>Procedure URL: </label>
                                     <div class='col-sm-9 col-md-10'>
