@@ -362,7 +362,8 @@ if ($config['enable_ports_poe']) {
         $port_stats = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', $port_stats, 'CISCO-POWER-ETHERNET-EXT-MIB');
     }
 }
-
+use LibreNMS\Util\IP;
+            
 //NAC Polling
 if ($config['enable_ports_nac']) {
     if ($device['os'] == 'iosxe' || 'ios') {
@@ -378,19 +379,21 @@ if ($config['enable_ports_nac']) {
                 echo "Not found\n";
                 dbInsert(array('auth_id' => $port_auth_id_nac), 'ports_nac');
             }
-            $IPHextpDec = explode(' ', $PortAuthSessionEntryParameters['cafSessionClientAddress']);
-            $IPHextpDec = hexdec($IPHextpDec[0]).'.'.hexdec($IPHextpDec[1]).'.'.hexdec($IPHextpDec[2]).'.'.hexdec($IPHextpDec[3]);
+//            $IPHextpDec = explode(' ', $PortAuthSessionEntryParameters['cafSessionClientAddress']);
+//            $IPHextpDec = hexdec($IPHextpDec[0]).'.'.hexdec($IPHextpDec[1]).'.'.hexdec($IPHextpDec[2]).'.'.hexdec($IPHextpDec[3]);
+            $IPHextpDec = IP::fromHextString($PortAuthSessionEntryParameters['cafSessionClientAddress']);
+//            $IPHextpDec = '0.0.0.0';
             dbUpdate(array('port_index' => $port_index_nac), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));
-            dbUpdate(array('PortAuthSessionMacAddress' => $PortAuthSessionEntryParameters['cafSessionClientMacAddress']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));            
-            dbUpdate(array('PortAuthSessionIPAddress' => $IPHextpDec), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));            
-            dbUpdate(array('PortAuthSessionAuthzStatus' => $PortAuthSessionEntryParameters['cafSessionStatus']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));            
-            dbUpdate(array('PortAuthSessionDomain' => $PortAuthSessionEntryParameters['cafSessionDomain']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));            
-            dbUpdate(array('PortAuthSessionHostMode' => $PortAuthSessionEntryParameters['cafSessionAuthHostMode']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));            
-            dbUpdate(array('PortAuthSessionUserName' => $PortAuthSessionEntryParameters['cafSessionAuthUserName']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));            
-            dbUpdate(array('PortAuthSessionAuthzBy' => $PortAuthSessionEntryParameters['cafSessionAuthorizedBy']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));            
-            dbUpdate(array('PortAuthSessionTimeOut' => $PortAuthSessionEntryParameters['cafSessionTimeout']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));            
-            dbUpdate(array('PortAuthSessionTimeLeft' => $PortAuthSessionEntryParameters['cafSessionTimeLeft']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));            
-            dbUpdate(array('device_id' => $device['device_id']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));            
+            dbUpdate(array('PortAuthSessionMacAddress' => $PortAuthSessionEntryParameters['cafSessionClientMacAddress']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));
+            dbUpdate(array('PortAuthSessionIPAddress' => $IPHextpDec), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));
+            dbUpdate(array('PortAuthSessionAuthzStatus' => $PortAuthSessionEntryParameters['cafSessionStatus']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));
+            dbUpdate(array('PortAuthSessionDomain' => $PortAuthSessionEntryParameters['cafSessionDomain']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));
+            dbUpdate(array('PortAuthSessionHostMode' => $PortAuthSessionEntryParameters['cafSessionAuthHostMode']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));
+            dbUpdate(array('PortAuthSessionUserName' => $PortAuthSessionEntryParameters['cafSessionAuthUserName']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));
+            dbUpdate(array('PortAuthSessionAuthzBy' => $PortAuthSessionEntryParameters['cafSessionAuthorizedBy']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));
+            dbUpdate(array('PortAuthSessionTimeOut' => $PortAuthSessionEntryParameters['cafSessionTimeout']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));
+            dbUpdate(array('PortAuthSessionTimeLeft' => $PortAuthSessionEntryParameters['cafSessionTimeLeft']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));
+            dbUpdate(array('device_id' => $device['device_id']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));
         }
         foreach ($ports_mapped['maps']['ifIndex'] as $ports_mapped_index => $ports_mapped_id) {
             dbQuery("UPDATE `ports_nac` SET `port_id` = '".$ports_mapped_id."' WHERE `ports_nac`.`port_index` = '".$ports_mapped_index."';");
