@@ -35,7 +35,7 @@ foreach (dbFetchRows('SELECT * FROM ports_nac WHERE device_id = '.$device['devic
         echo '<td><i class="fa fa-exclamation-triangle fa-lg icon-theme"  aria-hidden="true" style="color:red;"></i></td>';
     } else {
         echo '<td>' . strtoupper($nac['PortAuthSessionDomain']) . '</td>';
-    } 
+    }
     echo '<td>' . $nac['PortAuthSessionHostMode'] . '</td>';
     echo '<td>' . $nac['PortAuthSessionUserName'] . '</td>';
     echo '<td>' . $nac['PortAuthSessionTimeOut'] . '</td>';
@@ -65,5 +65,5 @@ foreach (dbFetchRows('SELECT * FROM ports_nac WHERE device_id = '.$device['devic
         echo '<td>' . strtoupper($nac['PortSessionMethod']) . '</td>';
     }
     echo '</tr>';
-} 
+}
 echo '</table>';
