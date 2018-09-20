@@ -30,7 +30,16 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
 
     // Ajax routes
     Route::group(['prefix' => 'ajax'], function () {
-        Route::post('set_resolution', 'AjaxController@setResolution');
+        Route::post('set_resolution', 'ResolutionController@set');
+
+        Route::group(['prefix' => 'select', 'namespace' => 'Select'], function () {
+            Route::get('syslog', 'SyslogController');
+            Route::get('device', 'DeviceController');
+        });
+
+        Route::group(['prefix' => 'table', 'namespace' => 'Table'], function () {
+            Route::post('syslog', 'SyslogController');
+        });
     });
 
     // Debugbar routes need to be here because of catch-all

@@ -6,6 +6,7 @@ use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
+use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
@@ -143,11 +144,36 @@ class Device extends BaseModel
      */
     public function displayName()
     {
-        if (\LibreNMS\Config::get('force_ip_to_sysname') && $this->sysName && IP::isValid($this->hostname)) {
+        if (Config::get('force_ip_to_sysname') && $this->sysName && IP::isValid($this->hostname)) {
             return $this->sysName;
         }
 
         return $this->hostname;
+    }
+
+    /**
+     * Get the shortened display name of this device.
+     * Length is always overridden by shorthost_target_length.
+     *
+     * @param int $length length to shorten to, will not break up words so may be longer
+     * @return string
+     */
+    public function shortDisplayName($length = 12)
+    {
+        $name = $this->displayName();
+
+        // IP addresses should not be shortened
+        if (IP::isValid($name)) {
+            return $name;
+        }
+
+        $length = Config::get('shorthost_target_length', $length);
+        if ($length < strlen($name)) {
+            $take = substr_count($name, '.', 0, $length) + 1;
+            return implode('.', array_slice(explode('.', $name), 0, $take));
+        }
+
+        return $name;
     }
 
     public function formatUptime($short = false)
