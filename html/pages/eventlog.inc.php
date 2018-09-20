@@ -21,11 +21,6 @@ if ($device_id = (int)Request::get('device')) {
     $device = Device::find($device_id);
 }
 
-if ($vars['action'] == 'expunge' && \Auth::user()->hasGlobalAdmin()) {
-    dbQuery('TRUNCATE TABLE `eventlog`');
-    print_message('Event log truncated');
-}
-
 $pagetitle[] = 'Eventlog';
 ?>
 
@@ -46,13 +41,13 @@ $pagetitle[] = 'Eventlog';
         '<form method="post" action="" class="form-inline" role="form" id="result_form">' +
         '<div class="form-group">' +
         <?php
-        if (!Request::has('fromdevice')) {
+        if (!isset($vars['fromdevice'])) {
         ?>
         '<label><strong>Device&nbsp;&nbsp;</strong></label>' +
         '<select name="device" id="device" class="form-control">' +
         '<option value="">All Devices</option>' +
         <?php
-        if ($device) {
+        if ($device instanceof Device) {
             echo "'<option value=$device->device_id>" . $device->displayName() . "</option>' +";
         }
         ?>
@@ -79,7 +74,7 @@ $pagetitle[] = 'Eventlog';
         '</div>'
     );
 
-    <?php if (!Request::has('fromdevice')) { ?>
+    <?php if (!isset($vars['fromdevice'])) { ?>
     $("#device").select2({
         theme: 'bootstrap',
         dropdownAutoWidth : true,
