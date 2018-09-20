@@ -55,7 +55,7 @@ class SyslogController extends TableController
     public function baseQuery($request)
     {
         /** @var Builder $query */
-        $query = Syslog::hasAccess($request->user());
+        $query = Syslog::hasAccess($request->user())->with('device');
 
         if ($device_id = $request->get('device')) {
             $query->where('device_id', $device_id);

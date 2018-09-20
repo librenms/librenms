@@ -45,7 +45,7 @@ $pagetitle[] = 'Syslog';
         <?php
         if (!isset($vars['fromdevice'])) {
         ?>
-        '<select name="device" id="device" class="form-control input-sm">' +
+        '<select name="device" id="device" class="form-control">' +
         '<option value="">All Devices&nbsp;&nbsp;</option>' +
         <?php
         if ($device_id) {
@@ -60,7 +60,7 @@ $pagetitle[] = 'Syslog';
         ?>
         '</div>' +
         '&nbsp;&nbsp;<div class="form-group">' +
-        '<select name="program" id="program" class="form-control input-sm">' +
+        '<select name="program" id="program" class="form-control">' +
         '<option value="">All Programs&nbsp;&nbsp;</option>' +
         <?php
         if ($vars['program']) {
@@ -71,7 +71,7 @@ $pagetitle[] = 'Syslog';
         '</select>' +
         '</div>' +
         '&nbsp;&nbsp;<div class="form-group">' +
-        '<select name="priority" id="priority" class="form-control input-sm">' +
+        '<select name="priority" id="priority" class="form-control">' +
         '<option value="">All Priorities</option>' +
         <?php
         if ($vars['priority']) {
@@ -82,12 +82,12 @@ $pagetitle[] = 'Syslog';
         '</select>' +
         '</div>' +
         '&nbsp;&nbsp;<div class="form-group">' +
-        '<input name="from" type="text" class="form-control input-sm" id="dtpickerfrom" maxlength="16" value="<?php echo $vars['from']; ?>" placeholder="From" data-date-format="YYYY-MM-DD HH:mm">' +
+        '<input name="from" type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="<?php echo $vars['from']; ?>" placeholder="From" data-date-format="YYYY-MM-DD HH:mm">' +
         '</div>' +
         '<div class="form-group">' +
-        '&nbsp;&nbsp;<input name="to" type="text" class="form-control input-sm" id="dtpickerto" maxlength="16" value="<?php echo $vars['to']; ?>" placeholder="To" data-date-format="YYYY-MM-DD HH:mm">' +
+        '&nbsp;&nbsp;<input name="to" type="text" class="form-control" id="dtpickerto" maxlength="16" value="<?php echo $vars['to']; ?>" placeholder="To" data-date-format="YYYY-MM-DD HH:mm">' +
         '</div>' +
-        '&nbsp;&nbsp;<button type="submit" class="btn btn-default input-sm">Filter</button>' +
+        '&nbsp;&nbsp;<button type="submit" class="btn btn-default">Filter</button>' +
         '</form>' +
         '</div>' +
         '</div>' +
@@ -141,6 +141,7 @@ $pagetitle[] = 'Syslog';
 
     <?php if (!isset($vars['fromdevice'])) { ?>
     $("#device").select2({
+        theme: "bootstrap",
         dropdownAutoWidth : true,
         width: "auto",
         allowClear: true,
@@ -153,6 +154,7 @@ $pagetitle[] = 'Syslog';
     <?php } ?>
 
     $("#program").select2({
+        theme: "bootstrap",
         dropdownAutoWidth : true,
         width: "auto",
         allowClear: true,
@@ -172,6 +174,7 @@ $pagetitle[] = 'Syslog';
     })<?php echo $vars['program'] ? ".val('" . addcslashes($vars['program'], "'") . "').trigger('change');" : ''; ?>;
 
     $("#priority").select2({
+        theme: "bootstrap",
         dropdownAutoWidth : true,
         width: "auto",
         allowClear: true,
