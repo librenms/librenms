@@ -379,10 +379,8 @@ if ($config['enable_ports_nac']) {
                 echo "Not found\n";
                 dbInsert(array('auth_id' => $port_auth_id_nac), 'ports_nac');
             }
-//            $IPHextpDec = explode(' ', $PortAuthSessionEntryParameters['cafSessionClientAddress']);
-//            $IPHextpDec = hexdec($IPHextpDec[0]).'.'.hexdec($IPHextpDec[1]).'.'.hexdec($IPHextpDec[2]).'.'.hexdec($IPHextpDec[3]);
-            $IPHextpDec = IP::fromHextString($PortAuthSessionEntryParameters['cafSessionClientAddress']);
-//            $IPHextpDec = '0.0.0.0';
+            $IPHextpDec = explode(' ', $PortAuthSessionEntryParameters['cafSessionClientAddress']);
+            $IPHextpDec = hexdec($IPHextpDec[0]).'.'.hexdec($IPHextpDec[1]).'.'.hexdec($IPHextpDec[2]).'.'.hexdec($IPHextpDec[3]);
             dbUpdate(array('port_index' => $port_index_nac), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));
             dbUpdate(array('PortAuthSessionMacAddress' => $PortAuthSessionEntryParameters['cafSessionClientMacAddress']), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));
             dbUpdate(array('PortAuthSessionIPAddress' => $IPHextpDec), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));
