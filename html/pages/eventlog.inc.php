@@ -39,10 +39,10 @@ $pagetitle[] = 'Eventlog';
     $('.actionBar').append(
         '<div class="pull-left">' +
         '<form method="post" action="" class="form-inline" role="form" id="result_form">' +
-        '<div class="form-group">' +
         <?php
         if (!isset($vars['fromdevice'])) {
         ?>
+        '<div class="form-group">' +
         '<label><strong>Device&nbsp;&nbsp;</strong></label>' +
         '<select name="device" id="device" class="form-control">' +
         '<option value="">All Devices</option>' +
@@ -52,12 +52,12 @@ $pagetitle[] = 'Eventlog';
         }
         ?>
         '</select>' +
+        '</div>&nbsp;&nbsp;&nbsp;&nbsp;' +
         <?php
         } else {
             echo "'&nbsp;&nbsp;<input type=\"hidden\" name=\"device\" id=\"device\" value=\"" . $device_id . "\">' + ";
         }
         ?>
-        '</div>&nbsp;&nbsp;&nbsp;&nbsp;' +
         '<div class="form-group"><label><strong>Type&nbsp;&nbsp;</strong></label>' +
         '<select name="eventtype" id="eventtype" class="form-control input-sm">' +
         '<option value="">All types</option>' +
