@@ -370,15 +370,15 @@ if ($config['enable_ports_nac']) {
         $PortAuthSessionEntry = snmpwalk_cache_oid($device, 'cafSessionEntry', array(), 'CISCO-AUTH-FRAMEWORK-MIB');
         foreach ($PortAuthSessionEntry as $PortAuthSessionEntryNAC => $PortAuthSessionEntryParameters) {
             $port_index_nac = substr($PortAuthSessionEntryNAC, 0, strpos($PortAuthSessionEntryNAC, "."));
-            $port_auth_id_nac = strstr($PortAuthSessionEntryNAC, "'" );
-            $port_auth_id_nac = substr($port_auth_id_nac, 0, -1 );
+            $port_auth_id_nac = strstr($PortAuthSessionEntryNAC, "'");
+            $port_auth_id_nac = substr($port_auth_id_nac, 0, -1);
             $port_auth_id_nac = substr($port_auth_id_nac, 1);
-            $dbreult = dbFetchRow('SELECT * FROM `ports_nac` WHERE `auth_id` = ?' , $port_auth_id_nac);
-            if ($dbreult == null){
+            $dbreult = dbFetchRow('SELECT * FROM `ports_nac` WHERE `auth_id` = ?', $port_auth_id_nac);
+            if ($dbreult == null) {
                 echo "Not found\n";
                 dbInsert(array('auth_id' => $port_auth_id_nac), 'ports_nac');
             }
-            $IPHextpDec = explode(' ',$PortAuthSessionEntryParameters['cafSessionClientAddress']);
+            $IPHextpDec = explode(' ', $PortAuthSessionEntryParameters['cafSessionClientAddress']);
             $IPHextpDec = hexdec($IPHextpDec[0]).'.'.hexdec($IPHextpDec[1]).'.'.hexdec($IPHextpDec[2]).'.'.hexdec($IPHextpDec[3]);
             dbQuery("UPDATE `ports_nac` SET `port_index` = ".$port_index_nac." WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
             dbQuery("UPDATE `ports_nac` SET `PortAuthSessionMacAddress` = '".$PortAuthSessionEntryParameters['cafSessionClientMacAddress']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
@@ -401,13 +401,13 @@ if ($config['enable_ports_nac']) {
         $cafSessionMethodsInfoEntry = snmpwalk_cache_oid($device, 'cafSessionMethodsInfoEntry', array(), 'CISCO-AUTH-FRAMEWORK-MIB');
         foreach ($cafSessionMethodsInfoEntry as $cafSessionMethodsInfoEntryNAC => $cafSessionMethodsInfoEntryParameters) {
             $port_index_nac = substr($cafSessionMethodsInfoEntryNAC, 0, strpos($cafSessionMethodsInfoEntryNAC, "."));
-            $port_method_nac = substr(strstr(substr(strstr($cafSessionMethodsInfoEntryNAC, "."),1),"."),1);
+            $port_method_nac = substr(strstr(substr(strstr($cafSessionMethodsInfoEntryNAC, "."), 1), "."), 1);
             $port_auth_id_nac = substr($cafSessionMethodsInfoEntryNAC, 0, strpos($cafSessionMethodsInfoEntryNAC, '.', strpos($cafSessionMethodsInfoEntryNAC, '.')+1));
             $port_auth_id_nac = strstr($port_auth_id_nac, '.');
             $port_auth_id_nac = substr($port_auth_id_nac, 1);
             dbQuery("UPDATE `ports_nac` SET `PortSessionMethod` = '".$port_method_nac."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."' AND `ports_nac`.`port_index` = '".$port_index_nac."';");
             dbQuery("UPDATE `ports_nac` SET `PortAuthSessionAuthcStatus` = '".$cafSessionMethodsInfoEntryParameters['cafSessionMethodState']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
-         }
+        }
     }
 }//End NAC
 
