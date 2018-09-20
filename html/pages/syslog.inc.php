@@ -141,6 +141,8 @@ $pagetitle[] = 'Syslog';
 
     <?php if (!isset($vars['fromdevice'])) { ?>
     $("#device").select2({
+        dropdownAutoWidth : true,
+        width: "auto",
         allowClear: true,
         placeholder: "All Devices",
         ajax: {
@@ -151,6 +153,8 @@ $pagetitle[] = 'Syslog';
     <?php } ?>
 
     $("#program").select2({
+        dropdownAutoWidth : true,
+        width: "auto",
         allowClear: true,
         placeholder: "All Programs",
         ajax: {
@@ -168,6 +172,8 @@ $pagetitle[] = 'Syslog';
     })<?php echo $vars['program'] ? ".val('" . addcslashes($vars['program'], "'") . "').trigger('change');" : ''; ?>;
 
     $("#priority").select2({
+        dropdownAutoWidth : true,
+        width: "auto",
         allowClear: true,
         placeholder: "All Priorities",
         ajax: {

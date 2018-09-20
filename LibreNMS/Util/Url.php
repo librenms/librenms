@@ -88,7 +88,7 @@ class Url
 
         $contents .= '</div>';
 
-        foreach ($graphs as $entry) {
+        foreach ((array)$graphs as $entry) {
             $graph = isset($entry['graph']) ? $entry['graph'] : 'unknown';
             $graphhead = isset($entry['text']) ? $entry['text'] : 'unknown';
             $contents .= '<div class="overlib-box">';
