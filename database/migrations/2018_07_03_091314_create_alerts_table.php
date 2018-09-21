@@ -22,6 +22,7 @@ class CreateAlertsTable extends Migration
             $table->integer('open');
             $table->text('note')->nullable();
             $table->timestamp('timestamp')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
+            $table->text('info');
             $table->unique(['device_id','rule_id'], 'unique_alert');
         });
     }
