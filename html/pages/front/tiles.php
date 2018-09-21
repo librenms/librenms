@@ -604,9 +604,9 @@ if (strpos($dash_config, 'globe') !== false) {
         });
         if( widget_id > 0 && widget_settings != {} ) {
             $.ajax({
-                type: 'POST',
-                url: 'ajax_form.php',
-                data: {type: 'widget-settings', id: widget_id, settings: widget_settings},
+                type: 'PUT',
+                url: 'ajax/form/widget-settings/' + widget_id,
+                data: {settings: widget_settings},
                 dataType: "json",
                 success: function (data) {
                     if( data.status == "ok" ) {
@@ -648,16 +648,21 @@ if (strpos($dash_config, 'globe') !== false) {
                     $("#widget_title_"+id).html(data.title);
                     $("#widget_body_"+id).html(data.html);
                     if (settings) {
-                        var $dg = $("#device_group");
+                        var $dg = $("#device_group-" + id);
                         $dg.select2({
                             theme: "bootstrap",
                             dropdownAutoWidth : true,
                             width: "auto",
                             allowClear: true,
-                            placeholder: "All Devices",
+                            placeholder: "<?php echo __('none'); ?>",
                             ajax: {
                                 url: 'ajax/select/device-group',
                                 delay: 200
+                            },
+                            language: {
+                                noResults: function() {
+                                    return "<?php echo __('No device groups'); ?>";
+                                }
                             }
                         });
                         if (data.settings.device_group) {
@@ -673,7 +678,7 @@ if (strpos($dash_config, 'globe') !== false) {
                 if (data.responseJSON.error) {
                     $("#widget_body_"+id).html('<div class="alert alert-info">' + data.responseJSON.error + '</div>');
                 } else {
-                    $("#widget_body_"+id).html('<div class="alert alert-info">Problem with backend</div>');
+                    $("#widget_body_"+id).html('<div class="alert alert-info"><?php echo __('Problem with backend'); ?></div>');
                 }
             }
         });

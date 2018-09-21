@@ -40,6 +40,10 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         Route::post('set_resolution', 'ResolutionController@set');
         Route::resource('location', 'LocationController', ['only' => ['update', 'destroy']]);
 
+        Route::group(['prefix' => 'form', 'namespace' => 'Form'], function () {
+            Route::resource('widget-settings', 'WidgetSettingsController');
+        });
+
         Route::group(['prefix' => 'select', 'namespace' => 'Select'], function () {
             Route::get('device', 'DeviceController');
             Route::get('device-group', 'DeviceGroupController');

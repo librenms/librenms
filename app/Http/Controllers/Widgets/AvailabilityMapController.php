@@ -37,17 +37,19 @@ class AvailabilityMapController
     public function __invoke(Request $request)
     {
         $title = 'Availability Map';
-        $widget = UserWidget::find($request->get('id'));
+        $id = $request->get('id');
+        $widget = UserWidget::find($id);
         $settings = collect($widget->settings);
 
         if ($request->get('settings')) {
             $data = [
+                'id' => $id,
                 'title' => $settings->get('title'),
                 'tile_size' => $settings->get('tile_size'),
                 'color_only_select' => $settings->get('color_only_select'),
                 'show_disabled_and_ignored' => $settings->get('show_disabled_and_ignored'),
                 'mode_select' => $settings->get('mode_select'),
-                'device_group' => $settings->get('device_group'),
+                'device_group' => DeviceGroup::find($settings->get('device_group')),
             ];
 
             return $this->formatResponse($title, 'widgets.settings.availability-map', $data, $settings);
