@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Widgets;
 
 use App\Models\Device;
+use App\Models\DeviceGroup;
 use App\Models\UserWidget;
 use DB;
 use Illuminate\Http\Request;
@@ -37,22 +38,34 @@ class AvailabilityMapController
     {
         $title = 'Availability Map';
         $widget = UserWidget::find($request->get('id'));
+        $settings = collect($widget->settings);
 
         if ($request->get('settings')) {
             $data = [
-                'widget_settings' => $widget->settings,
+                'title' => $settings->get('title'),
+                'tile_size' => $settings->get('tile_size'),
+                'color_only_select' => $settings->get('color_only_select'),
+                'show_disabled_and_ignored' => $settings->get('show_disabled_and_ignored'),
+                'mode_select' => $settings->get('mode_select'),
+                'device_group' => $settings->get('device_group'),
             ];
 
-            return $this->formatResponse($title, 'widgets.settings.availability-map', $data);
+            return $this->formatResponse($title, 'widgets.settings.availability-map', $data, $settings);
         }
 
-        $device_query = Device::hasAccess($request->user())
-            ->select('device_id', 'hostname', 'sysName', 'status', 'uptime');
-        if (!$widget->settings['show_disabled_and_ignored']) {
-            $device_query->where('disabled');
+        // filter for by device group or show all
+        if ($group_id = $settings->get('device_group')) {
+            $device_query = DeviceGroup::find($group_id)->devices();
+        } else {
+            $device_query = Device::hasAccess($request->user());
         }
-        $devices = $device_query->get();
 
+        if (!$settings->get('show_disabled_and_ignored')) {
+            $device_query->where('disabled', 0);
+        }
+        $devices = $device_query->select('devices.device_id', 'hostname', 'sysName', 'status', 'uptime')->get();
+
+        // count status
         $uptime_warn = Config::get('uptime_warning', 84600);
         $totals = ['warn' => 0, 'up' => 0, 'down' => 0];
         foreach ($devices as $device) {
@@ -70,15 +83,16 @@ class AvailabilityMapController
 
         $data = compact('devices', 'totals');
 
-        return $this->formatResponse($title, 'widgets.availability-map', $data);
+        return $this->formatResponse($title, 'widgets.availability-map', $data, $settings);
     }
 
-    private function formatResponse($title, $view, $data)
+    private function formatResponse($title, $view, $data, $settings)
     {
         return response()->json([
             'status' => 'ok',
             'title' => $title,
             'html' => view($view, $data)->__toString(),
+            'settings' => $settings,
         ]);
     }
 }

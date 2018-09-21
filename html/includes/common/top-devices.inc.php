@@ -20,8 +20,8 @@
 
 use LibreNMS\Authentication\LegacyAuth;
 
-$top_query = $widget_settings['top_query'] ?: 'traffic';
-$sort_order = $widget_settings['sort_order'];
+$top_query = $settings['top_query'] ?: 'traffic';
+$sort_order = $settings['sort_order'];
 
 $selected_sort_asc = '';
 $selected_sort_desc = '';
@@ -85,10 +85,10 @@ switch ($top_query) {
         break;
 }
 
-$widget_settings['device_count']  = $widget_settings['device_count'] > 0 ? $widget_settings['device_count'] : 5;
-$widget_settings['time_interval'] = $widget_settings['time_interval'] > 0 ? $widget_settings['time_interval'] : 15;
+$settings['device_count']  = $settings['device_count'] > 0 ? $settings['device_count'] : 5;
+$settings['time_interval'] = $settings['time_interval'] > 0 ? $settings['time_interval'] : 15;
 
-if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
+if (defined('SHOW_SETTINGS') || empty($settings)) {
     $common_output[] = '
     <form class="form" onsubmit="widget_settings(this); return false;">
         <div class="form-group">
@@ -96,7 +96,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                 <label for="title" class="control-label availability-map-widget-header">Widget title</label>
             </div>
             <div class="col-sm-6">
-                <input type="text" class="form-control" name="title" placeholder="Custom title for widget" value="' . htmlspecialchars($widget_settings['title']) . '">
+                <input type="text" class="form-control" name="title" placeholder="Custom title for widget" value="' . htmlspecialchars($settings['title']) . '">
             </div>
         </div>
         <div class="form-group">
@@ -131,7 +131,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                 <label for="graph_type" class="control-label availability-map-widget-header">Number of Devices</label>
             </div>
             <div class="col-sm-6">
-                <input class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" name="device_count" id="input_count_' . $unique_id . '" value="' . $widget_settings['device_count'] . '">
+                <input class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" name="device_count" id="input_count_' . $unique_id . '" value="' . $settings['device_count'] . '">
             </div>
         </div>
         <div class="form-group">
@@ -139,7 +139,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                 <label for="graph_type" class="control-label availability-map-widget-header">Time interval (minutes)</label>
             </div>
             <div class="col-sm-6">
-                <input class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" name="time_interval" id="input_time_' . $unique_id . '" value="' . $widget_settings['time_interval'] . '">
+                <input class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" name="time_interval" id="input_time_' . $unique_id . '" value="' . $settings['time_interval'] . '">
             </div>
         </div>
         <div class="form-group">
@@ -149,9 +149,9 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
         </div>
     </form>';
 } else {
-    $interval = $widget_settings['time_interval'];
+    $interval = $settings['time_interval'];
     (integer)$interval_seconds = ($interval * 60);
-    (integer)$device_count = $widget_settings['device_count'];
+    (integer)$device_count = $settings['device_count'];
 
     $common_output[] = '<h4>Top ' . $device_count . ' devices (last ' . $interval . ' minutes)</h4>';
 

@@ -42,6 +42,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
 
         Route::group(['prefix' => 'select', 'namespace' => 'Select'], function () {
             Route::get('device', 'DeviceController');
+            Route::get('device-group', 'DeviceGroupController');
             Route::get('eventlog', 'EventlogController');
             Route::get('syslog', 'SyslogController');
         });

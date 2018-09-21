@@ -647,6 +647,23 @@ if (strpos($dash_config, 'globe') !== false) {
                 if (data.status == 'ok') {
                     $("#widget_title_"+id).html(data.title);
                     $("#widget_body_"+id).html(data.html);
+                    if (settings) {
+                        var $dg = $("#device_group");
+                        $dg.select2({
+                            theme: "bootstrap",
+                            dropdownAutoWidth : true,
+                            width: "auto",
+                            allowClear: true,
+                            placeholder: "All Devices",
+                            ajax: {
+                                url: 'ajax/select/device-group',
+                                delay: 200
+                            }
+                        });
+                        if (data.settings.device_group) {
+                            $dg.val(data.settings.device_group).trigger('change');
+                        }
+                    }
                 }
                 else {
                     $("#widget_body_"+id).html('<div class="alert alert-info">' + data.message + '</div>');

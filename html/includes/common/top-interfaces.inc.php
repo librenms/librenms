@@ -27,25 +27,25 @@
 
 use LibreNMS\Authentication\LegacyAuth;
 
-if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
+if (defined('SHOW_SETTINGS') || empty($settings)) {
     $common_output[] = '
 <form class="form-horizontal" onsubmit="widget_settings(this); return false;">
   <div class="form-group">
     <label for="interface_count" class="col-sm-5 control-label">Number of Interfaces: </label>
     <div class="col-sm-7">
-      <input class="form-control" type="number" min="0" step="1" name="interface_count" id="input_count_'.$unique_id.'" placeholder="ie. 5" value="'.$widget_settings['interface_count'].'">
+      <input class="form-control" type="number" min="0" step="1" name="interface_count" id="input_count_'.$unique_id.'" placeholder="ie. 5" value="'.$settings['interface_count'].'">
     </div>
   </div>
   <div class="form-group">
     <label for="time_interval" class="col-sm-5 control-label">Last Polled within (minutes): </label>
     <div class="col-sm-7">
-      <input class="form-control" type="number" min="5" step="1" name="time_interval" id="input_time_'.$unique_id.'" placeholder="ie. 15" value="'.$widget_settings['time_interval'].'">
+      <input class="form-control" type="number" min="5" step="1" name="time_interval" id="input_time_'.$unique_id.'" placeholder="ie. 15" value="'.$settings['time_interval'].'">
     </div>
   </div>
   <div class="form-group">
     <label for="interface_filter" class="col-sm-5 control-label">Interface Type: </label>
     <div class="col-sm-7">
-      <input class="form-control" name="interface_filter" id="input_filter_'.$unique_id.'" placeholder="Any" value="'.$widget_settings['interface_filter'].'">
+      <input class="form-control" name="interface_filter" id="input_filter_'.$unique_id.'" placeholder="Any" value="'.$settings['interface_filter'].'">
     </div>
   </div>
   <div class="form-group">
@@ -98,10 +98,10 @@ $(function() {
 </style>
     ';
 } else {
-    $interval = $widget_settings['time_interval'];
+    $interval = $settings['time_interval'];
     (integer) $lastpoll_seconds = ($interval * 60) ?: 300;
-    (integer) $interface_count = $widget_settings['interface_count'] ?: 5;
-    $params = ['lastpoll' => $lastpoll_seconds, 'count' => $interface_count, 'filter1' => ($widget_settings['interface_filter']?:(int)1), 'filter2' => ($widget_settings['interface_filter']?:(int)1)];
+    (integer) $interface_count = $settings['interface_count'] ?: 5;
+    $params = ['lastpoll' => $lastpoll_seconds, 'count' => $interface_count, 'filter1' => ($settings['interface_filter']?:(int)1), 'filter2' => ($settings['interface_filter']?:(int)1)];
     if (!LegacyAuth::user()->hasGlobalRead()) {
         $params['user1'] = LegacyAuth::id();
         $params['user2'] = LegacyAuth::id();

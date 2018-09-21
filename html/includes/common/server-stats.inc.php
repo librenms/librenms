@@ -2,13 +2,13 @@
 
 use LibreNMS\Authentication\LegacyAuth;
 
-$device_id = $widget_settings['device'];
-$column = $widget_settings['columnsize'];
+$device_id = $settings['device'];
+$column = $settings['columnsize'];
 
-if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
-    $cur_col_size = isset($widget_settings['columnsize']) ? $widget_settings['columnsize'] : '';
-    $cur_dev = isset($widget_settings['device']) ? $widget_settings['device'] : '';
-    $cur_title = isset($widget_settings['title']) ? $widget_settings['title'] : '';
+if (defined('SHOW_SETTINGS') || empty($settings)) {
+    $cur_col_size = isset($settings['columnsize']) ? $settings['columnsize'] : '';
+    $cur_dev = isset($settings['device']) ? $settings['device'] : '';
+    $cur_title = isset($settings['title']) ? $settings['title'] : '';
     $common_output[] = '
     <form class="form" onsubmit="widget_settings(this); return false;">
         <div class="form-group">
