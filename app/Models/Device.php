@@ -307,9 +307,9 @@ class Device extends BaseModel
         $ignore = $this->ignore;
         $disabled = $this->disabled;
         if ($disabled == 1) {
-            return 'teal';
+            return 'info';
         } elseif ($ignore == 1) {
-            return 'yellow';
+            return 'warn';
         } elseif ($status == 0) {
             return 'danger';
         } else {

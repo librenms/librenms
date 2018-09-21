@@ -25,12 +25,60 @@
 
 namespace App\Http\Controllers\Widgets;
 
+use App\Models\Device;
+use App\Models\UserWidget;
+use DB;
 use Illuminate\Http\Request;
+use LibreNMS\Config;
 
 class AvailabilityMapController
 {
     public function __invoke(Request $request)
     {
-        // TODO: Implement __invoke() method.
+        $title = 'Availability Map';
+        $widget = UserWidget::find($request->get('id'));
+
+        if ($request->get('settings')) {
+            $data = [
+                'widget_settings' => $widget->settings,
+            ];
+
+            return $this->formatResponse($title, 'widgets.settings.availability-map', $data);
+        }
+
+        $device_query = Device::hasAccess($request->user())
+            ->select('device_id', 'hostname', 'sysName', 'status', 'uptime');
+        if (!$widget->settings['show_disabled_and_ignored']) {
+            $device_query->where('disabled');
+        }
+        $devices = $device_query->get();
+
+        $uptime_warn = Config::get('uptime_warning', 84600);
+        $totals = ['warn' => 0, 'up' => 0, 'down' => 0];
+        foreach ($devices as $device) {
+            if ($device->status == 1) {
+                if (($device->uptime < $uptime_warn) && ($device->uptime != 0)) {
+                    $totals['warn']++;
+                } else {
+                    $totals['up']++;
+                }
+            } else {
+                $totals['down']++;
+            }
+        }
+        $data['totals'] = $totals;
+
+        $data = compact('devices', 'totals');
+
+        return $this->formatResponse($title, 'widgets.availability-map', $data);
+    }
+
+    private function formatResponse($title, $view, $data)
+    {
+        return response()->json([
+            'status' => 'ok',
+            'title' => $title,
+            'html' => view($view, $data)->__toString(),
+        ]);
     }
 }
