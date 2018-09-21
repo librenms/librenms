@@ -14,18 +14,18 @@ class Ird extends OS implements WirelessFrequencyDiscovery
         return array(
             new WirelessSensor(
                 'frequency',
-                $this->getDeviceId(),.
-                $lnbfrequency_oid,.
-                'lnbfrequency',.
-                1,.
+                $this->getDeviceId(),
+                $lnbfrequency_oid,
+                'lnbfrequency',
+                1,
                 'LNB Frequency'
             ),
             new WirelessSensor(
                 'frequency',.
-                $this->getDeviceId(),.
+                $this->getDeviceId(),
                 $satfrequency_oid,.
-                'satfrequency',.
-                1,.
+                'satfrequency',
+                1,
                 'Satellite Frequency'
             ),
         );
