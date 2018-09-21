@@ -31,14 +31,14 @@ class CreateWirelessSensorsTable extends Migration
             $table->double('sensor_limit_low')->nullable();
             $table->double('sensor_limit_low_warn')->nullable();
             $table->boolean('sensor_alert')->default(1);
-            $table->enum('sensor_custom', array('No','Yes'))->default('No');
+            $table->enum('sensor_custom', ['No', 'Yes'])->default('No');
             $table->string('entPhysicalIndex', 16)->nullable();
             $table->string('entPhysicalIndex_measured', 16)->nullable();
             $table->timestamp('lastupdate')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->text('sensor_oids');
             $table->integer('access_point_id')->nullable();
         });
-   }
+    }
 
     /**
      * Reverse the migrations.

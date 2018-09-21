@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateStpTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -32,7 +31,8 @@ class CreateStpTable extends Migration
             $table->smallInteger('bridgeMaxAge');
             $table->smallInteger('bridgeHelloTime');
             $table->smallInteger('bridgeForwardDelay');
-        });}
+        });
+    }
 
     /**
      * Reverse the migrations.
