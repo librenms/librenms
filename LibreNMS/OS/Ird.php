@@ -23,7 +23,7 @@ class Ird extends OS implements WirelessFrequencyDiscovery
             new WirelessSensor(
                 'frequency',.
                 $this->getDeviceId(),
-                $satfrequency_oid,.
+                $satfrequency_oid,
                 'satfrequency',
                 1,
                 'Satellite Frequency'
