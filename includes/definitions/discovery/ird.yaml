@@ -20,20 +20,6 @@ modules:
                      descr: 'Eb/N0'
                      index: 'tunerEbNo.{{ $index }}'
                      divisor: 10
-         frequency:
-             data:
-                -
-                     oid: lnbFrequency
-                     num_oid: .1.3.6.1.4.1.1070.3.1.1.104.3.1.
-                     descr: 'LNB Freqency'
-                     index: 'lnbFrequency.{{ &index }}'
-                     multiplier: 1000000
-                -
-                     oid: satFrequency
-                     num_oid: .1.3.6.1.4.1.1070.3.1.1.104.3.2.
-                     descr: 'Satellite Frequency'
-                     index: 'satFrequency.{{ $index }}'
-                     multiplier: 1000000
          signal:
              data:
                 -
