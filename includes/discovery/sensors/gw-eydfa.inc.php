@@ -39,39 +39,42 @@ foreach (explode("\n", $oids) as $data) {
         $divisor = 1000;
         $descr = 'BIAS Pump - ' . $index;
         $num_oid = '.1.3.6.1.4.1.17409.1.11.4.1.2.' . $index;
+        $sensor_index = 'oaPumpBIAS' . $index;
+        $value = $value / $divisor;
         if (is_numeric($value)) {
             $low_limit = snmp_get($device, 'analogAlarmLOLO.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
             $low_warn = snmp_get($device, 'analogAlarmLO.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
             $high_warn = snmp_get($device, 'analogAlarmHI.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
             $high_limit = snmp_get($device, 'analogAlarmHIHI.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
         }
-        $sensor_index = str_replace(' ', '', $descr);
         discover_sensor($valid['sensor'], 'current', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
     }
     if ($split_oid[0] == "oaPumpTEC" && $index = 1) { // Current - A
         $divisor = 100;
         $descr = 'TEC Pump - ' . $index;
         $num_oid = '.1.3.6.1.4.1.17409.1.11.4.1.3.' . $index;
+        $value = $value / $divisor;
         if (is_numeric($value)) {
             $low_limit = snmp_get($device, 'analogAlarmLOLO.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
             $low_warn = snmp_get($device, 'analogAlarmLO.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
             $high_warn = snmp_get($device, 'analogAlarmHI.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
             $high_limit = snmp_get($device, 'analogAlarmHIHI.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
         }
-        $sensor_index = str_replace(' ', '', $descr);
+        $sensor_index = 'oaPumpTEC' . $index;
         discover_sensor($valid['sensor'], 'current', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
     }
     if ($split_oid[0] == "oaPumpTemp" && $index = 1) { // Temperature - C
         $divisor = 10;
         $descr = 'Temperature Pump - ' . $index;
         $num_oid = '.1.3.6.1.4.1.17409.1.11.4.1.4.' . $index;
+        $value = $value / $divisor;
         if (is_numeric($value)) {
             $low_limit = snmp_get($device, 'analogAlarmLOLO.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
             $low_warn = snmp_get($device, 'analogAlarmLO.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
             $high_warn = snmp_get($device, 'analogAlarmHI.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
             $high_limit = snmp_get($device, 'analogAlarmHIHI.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
         }
-        $sensor_index = str_replace(' ', '', $descr);
+        $sensor_index = 'oaPumpTemp' . $index;
         discover_sensor($valid['sensor'], 'temperature', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
     }
     unset($oids, $split_oid, $index, $divisor, $descr, $low_limit, $low_warn, $high_warn, $sensor_index);
@@ -101,7 +104,8 @@ foreach (explode("\n", $oids) as $data) {
             $high_warn = snmp_get($device, 'analogAlarmHI.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
             $high_limit = snmp_get($device, 'analogAlarmHIHI.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
         }
-        $sensor_index = str_replace(' ', '', $descr);
+        $sensor_index = 'oaDCPowerVoltage'.$index;
+        $value = $value / $divisor;
         discover_sensor($valid['sensor'], 'voltage', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
     }
 }
@@ -121,7 +125,7 @@ if (is_numeric($value)) {
     $high_warn = snmp_get($device, 'analogAlarmHI.12.1.3.6.1.4.1.17409.1.3.1.13.0', '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB');
     $high_limit = snmp_get($device, 'analogAlarmHIHI.12.1.3.6.1.4.1.17409.1.3.1.13.0', '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB');
 }
-$sensor_index = str_replace(' ', '', $descr);
+$sensor_index = 'commonDeviceInternalTemperature.1';
 discover_sensor($valid['sensor'], 'temperature', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, 1, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
 
 unset($num_oid, $value, $descr, $low_limit, $low_warn, $high_warn, $sensor_index);
@@ -140,7 +144,8 @@ if (is_numeric($value)) {
     $high_warn = snmp_get($device, 'analogAlarmHI.11' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
     $high_limit = snmp_get($device, 'analogAlarmHIHI.11' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
 }
-$sensor_index = str_replace(' ', '', $descr);
+$value = $value / $divisor;
+$sensor_index = 'oaOutputOpticalPower.0';
 discover_sensor($valid['sensor'], 'dbm', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
 
 unset($num_oid, $value, $divisor, $descr, $low_limit, $low_warn, $high_warn, $sensor_index);
@@ -159,7 +164,8 @@ if (is_numeric($value)) {
     $high_warn = snmp_get($device, 'analogAlarmHI.11' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
     $high_limit = snmp_get($device, 'analogAlarmHIHI.11' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
 }
-$sensor_index = str_replace(' ', '', $descr);
+$value = $value / $divisor;
+$sensor_index = 'oaInputOpticalPower.0';
 discover_sensor($valid['sensor'], 'dbm', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
 
 unset($num_oid, $value, $divisor, $descr, $low_limit, $low_warn, $high_warn, $sensor_index);
@@ -181,7 +187,7 @@ $n = 1;
 foreach ($oids as $oid) {
     $value = snmp_get($device, $oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB');
     $descr = 'Power Supply ' . $n;
-    $sensor_index = str_replace(' ', '', $descr);
+    $sensor_index = 'PowerSupplyState' . $n;
     discover_sensor($valid['sensor'], 'state', $device, $oid, $sensor_index, $state_name, $descr, 1, 1, null, null, null, null, $value, 'snmp');
     create_sensor_to_state_index($device, $state_name, $sensor_index);
     $n++;
