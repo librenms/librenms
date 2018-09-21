@@ -86,11 +86,11 @@ class SyslogController extends TableController
 
         return [
             'timestamp' => $syslog->timestamp,
-            'level' => $syslog->level,
+            'level' => htmlentities($syslog->level),
             'device_id' => $device ? \LibreNMS\Util\Url::deviceLink($device, $device->shortDisplayName()) : '',
             'program' => htmlentities($syslog->program),
             'msg' => htmlentities($syslog->msg),
-            'priority' => $syslog->priority,
+            'priority' => htmlentities($syslog->priority),
         ];
     }
 }
