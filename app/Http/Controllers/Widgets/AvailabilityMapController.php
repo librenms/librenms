@@ -28,32 +28,43 @@ namespace App\Http\Controllers\Widgets;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\UserWidget;
-use DB;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
 
-class AvailabilityMapController
+class AvailabilityMapController extends WidgetController
 {
-    public function __invoke(Request $request)
+    public $title = 'Availability Map';
+    public $settings_view = 'widgets.settings.availability-map';
+    public $view = '';
+
+    public function title(UserWidget $widget_settings)
     {
-        $title = 'Availability Map';
+        $settings = $widget_settings->settings;
+        return isset($settings['title']) ? $settings['title'] : $this->title;
+    }
+
+    public function getSettingsView(Request $request)
+    {
         $id = $request->get('id');
         $widget = UserWidget::find($id);
         $settings = collect($widget->settings);
 
-        if ($request->get('settings')) {
-            $data = [
-                'id' => $id,
-                'title' => $settings->get('title'),
-                'tile_size' => $settings->get('tile_size'),
-                'color_only_select' => $settings->get('color_only_select'),
-                'show_disabled_and_ignored' => $settings->get('show_disabled_and_ignored'),
-                'mode_select' => $settings->get('mode_select'),
-                'device_group' => DeviceGroup::find($settings->get('device_group')),
-            ];
+        $data = [
+            'id' => $id,
+            'title' => $settings->get('title'),
+            'tile_size' => $settings->get('tile_size'),
+            'color_only_select' => $settings->get('color_only_select'),
+            'show_disabled_and_ignored' => $settings->get('show_disabled_and_ignored'),
+            'mode_select' => $settings->get('mode_select'),
+            'device_group' => DeviceGroup::find($settings->get('device_group')),
+        ];
 
-            return $this->formatResponse($title, 'widgets.settings.availability-map', $data, $settings);
-        }
+        return view('widgets.settings.availability-map', $data);
+    }
+
+    public function getView(Request $request)
+    {
+        $settings = $this->getSettings();
 
         // filter for by device group or show all
         if ($group_id = $settings->get('device_group')) {
@@ -83,9 +94,7 @@ class AvailabilityMapController
         }
         $data['totals'] = $totals;
 
-        $data = compact('devices', 'totals');
-
-        return $this->formatResponse($title, 'widgets.availability-map', $data, $settings);
+        return view('widgets.availability-map', compact('devices', 'totals'));
     }
 
     private function formatResponse($title, $view, $data, $settings)

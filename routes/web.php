@@ -59,10 +59,9 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         });
 
         Route::group(['prefix' => 'dash', 'namespace' => 'Widgets'], function () {
+            Route::post('alerts', 'AlertsController');
             Route::post('availability-map', 'AvailabilityMapController');
-            Route::get('availability-map', 'AvailabilityMapController');
             Route::post('placeholder', 'PlaceholderController');
-            Route::get('placeholder', 'PlaceholderController');
         });
     });
 

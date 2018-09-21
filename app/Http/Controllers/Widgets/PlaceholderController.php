@@ -25,17 +25,14 @@
 
 namespace App\Http\Controllers\Widgets;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class PlaceholderController extends Controller
+class PlaceholderController extends WidgetController
 {
-    public function __invoke(Request $request)
+    public $title = 'Placeholder';
+
+    public function getView(Request $request)
     {
-        return response()->json([
-            'status' => 'ok',
-            'title' => 'Placeholder',
-            'html' => (string)view('widgets.placeholder'),
-            ]);
+        return view('widgets.placeholder');
     }
 }
