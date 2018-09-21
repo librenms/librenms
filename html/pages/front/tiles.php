@@ -636,9 +636,8 @@ if (strpos($dash_config, 'globe') !== false) {
         }
         $.ajax({
             type: 'POST',
-            url: 'ajax_dash.php',
+            url: 'ajax/dash/' + data_type,
             data: {
-                type: data_type,
                 id: id,
                 dimensions: {x:$("#widget_body_"+id).innerWidth()-50, y:$("#widget_body_"+id).innerHeight()-50},
                 settings:settings

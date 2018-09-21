@@ -52,6 +52,12 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::post('location', 'LocationController');
             Route::post('syslog', 'SyslogController');
         });
+
+        Route::group(['prefix' => 'dash', 'namespace' => 'Widgets'], function () {
+            Route::post('availability-map', 'AvailabilityMapController');
+            Route::post('placeholder', 'PlaceholderController');
+            Route::get('placeholder', 'PlaceholderController');
+        });
     });
 
     // Debugbar routes need to be here because of catch-all
