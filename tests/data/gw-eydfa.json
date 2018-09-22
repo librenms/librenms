@@ -25,7 +25,11 @@
                     "sysObjectID": ".1.3.6.1.4.1.17409.1.11",
                     "sysDescr": "GW-6420-WDM",
                     "sysContact": "<private>",
+<<<<<<< HEAD
                     "version": "V3.1.0",
+=======
+                    "version": null,
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "hardware": "GW-6420-WDM",
                     "features": null,
                     "location": "<private>",
@@ -45,12 +49,20 @@
                     "sensor_class": "current",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.17409.1.11.4.1.2.1",
+<<<<<<< HEAD
                     "sensor_index": "oaPumpBIAS1",
+=======
+                    "sensor_index": "BIASPump-1",
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_type": "gw-eydfa",
                     "sensor_descr": "BIAS Pump - 1",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
+<<<<<<< HEAD
                     "sensor_current": 0.54100000000000004,
+=======
+                    "sensor_current": 541,
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_limit": 0.90000000000000002,
                     "sensor_limit_warn": 0.80000000000000004,
                     "sensor_limit_low": 0.080000000000000002,
@@ -68,12 +80,20 @@
                     "sensor_class": "current",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.17409.1.11.4.1.2.2",
+<<<<<<< HEAD
                     "sensor_index": "oaPumpBIAS2",
+=======
+                    "sensor_index": "BIASPump-2",
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_type": "gw-eydfa",
                     "sensor_descr": "BIAS Pump - 2",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
+<<<<<<< HEAD
                     "sensor_current": 8.2400000000000002,
+=======
+                    "sensor_current": 8240,
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_limit": 15,
                     "sensor_limit_warn": 10,
                     "sensor_limit_low": 0.080000000000000002,
@@ -91,12 +111,21 @@
                     "sensor_class": "current",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.17409.1.11.4.1.3.1",
+<<<<<<< HEAD
                     "sensor_index": "oaPumpTEC1",
                     "sensor_type": "gw-eydfa",
                     "sensor_descr": "TEC Pump - 1",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.28000000000000003,
+=======
+                    "sensor_index": "TECPump-1",
+                    "sensor_type": "gw-eydfa",
+                    "sensor_descr": "TEC Pump - 1",
+                    "sensor_divisor": 100,
+                    "sensor_multiplier": 0,
+                    "sensor_current": 28,
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_limit": 2,
                     "sensor_limit_warn": 1.5,
                     "sensor_limit_low": -2,
@@ -114,12 +143,20 @@
                     "sensor_class": "dbm",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.17409.1.11.3.0",
+<<<<<<< HEAD
                     "sensor_index": "oaInputOpticalPower.0",
+=======
+                    "sensor_index": "InputPower",
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_type": "gw-eydfa",
                     "sensor_descr": "Input Power",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
+<<<<<<< HEAD
                     "sensor_current": 3.5,
+=======
+                    "sensor_current": 35,
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_limit": 10,
                     "sensor_limit_warn": 8,
                     "sensor_limit_low": -10,
@@ -137,12 +174,20 @@
                     "sensor_class": "dbm",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.17409.1.11.2.0",
+<<<<<<< HEAD
                     "sensor_index": "oaOutputOpticalPower.0",
+=======
+                    "sensor_index": "PerOutputPower",
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_type": "gw-eydfa",
                     "sensor_descr": "Per Output Power",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
+<<<<<<< HEAD
                     "sensor_current": 20.300000000000001,
+=======
+                    "sensor_current": 203,
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_limit": 27,
                     "sensor_limit_warn": 26,
                     "sensor_limit_low": 10,
@@ -160,7 +205,11 @@
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.17409.1.1.2.1.4.11.1.3.6.1.4.1.17409.1.11.100.0.2",
+<<<<<<< HEAD
                     "sensor_index": "PowerSupplyState1",
+=======
+                    "sensor_index": "PowerSupply1",
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_type": "PowerSupplyState",
                     "sensor_descr": "Power Supply 1",
                     "sensor_divisor": 1,
@@ -183,7 +232,11 @@
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.17409.1.1.2.1.4.11.1.3.6.1.4.1.17409.1.11.101.0.2",
+<<<<<<< HEAD
                     "sensor_index": "PowerSupplyState2",
+=======
+                    "sensor_index": "PowerSupply2",
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_type": "PowerSupplyState",
                     "sensor_descr": "Power Supply 2",
                     "sensor_divisor": 1,
@@ -206,7 +259,11 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.17409.1.3.3.2.2.1.12.1",
+<<<<<<< HEAD
                     "sensor_index": "commonDeviceInternalTemperature.1",
+=======
+                    "sensor_index": "InternalTemp",
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_type": "gw-eydfa",
                     "sensor_descr": "Internal Temp",
                     "sensor_divisor": 1,
@@ -229,12 +286,21 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.17409.1.11.4.1.4.1",
+<<<<<<< HEAD
                     "sensor_index": "oaPumpTemp1",
                     "sensor_type": "gw-eydfa",
                     "sensor_descr": "Temperature Pump - 1",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 25.300000000000001,
+=======
+                    "sensor_index": "TemperaturePump-1",
+                    "sensor_type": "gw-eydfa",
+                    "sensor_descr": "Temperature Pump - 1",
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 0,
+                    "sensor_current": 253,
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_limit": 35,
                     "sensor_limit_warn": 30,
                     "sensor_limit_low": 15,
@@ -252,12 +318,20 @@
                     "sensor_class": "voltage",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.17409.1.11.7.1.2.1",
+<<<<<<< HEAD
                     "sensor_index": "oaDCPowerVoltage1",
+=======
+                    "sensor_index": "DC+5V-1",
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_type": "gw-eydfa",
                     "sensor_descr": "DC +5V - 1",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
+<<<<<<< HEAD
                     "sensor_current": 4.7999999999999998,
+=======
+                    "sensor_current": 48,
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_limit": 6.5,
                     "sensor_limit_warn": 6,
                     "sensor_limit_low": 3.5,
@@ -302,7 +376,11 @@
                     "sensor_class": "current",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.17409.1.11.4.1.2.1",
+<<<<<<< HEAD
                     "sensor_index": "oaPumpBIAS1",
+=======
+                    "sensor_index": "BIASPump-1",
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_type": "gw-eydfa",
                     "sensor_descr": "BIAS Pump - 1",
                     "sensor_divisor": 1000,
@@ -316,7 +394,11 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
+<<<<<<< HEAD
                     "sensor_prev": null,
+=======
+                    "sensor_prev": 541,
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "user_func": null,
                     "state_name": null
                 },
@@ -325,7 +407,11 @@
                     "sensor_class": "current",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.17409.1.11.4.1.2.2",
+<<<<<<< HEAD
                     "sensor_index": "oaPumpBIAS2",
+=======
+                    "sensor_index": "BIASPump-2",
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_type": "gw-eydfa",
                     "sensor_descr": "BIAS Pump - 2",
                     "sensor_divisor": 1000,
@@ -339,7 +425,11 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
+<<<<<<< HEAD
                     "sensor_prev": null,
+=======
+                    "sensor_prev": 8240,
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "user_func": null,
                     "state_name": null
                 },
@@ -348,11 +438,19 @@
                     "sensor_class": "current",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.17409.1.11.4.1.3.1",
+<<<<<<< HEAD
                     "sensor_index": "oaPumpTEC1",
                     "sensor_type": "gw-eydfa",
                     "sensor_descr": "TEC Pump - 1",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
+=======
+                    "sensor_index": "TECPump-1",
+                    "sensor_type": "gw-eydfa",
+                    "sensor_descr": "TEC Pump - 1",
+                    "sensor_divisor": 100,
+                    "sensor_multiplier": 0,
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_current": 0.28000000000000003,
                     "sensor_limit": 2,
                     "sensor_limit_warn": 1.5,
@@ -362,7 +460,11 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
+<<<<<<< HEAD
                     "sensor_prev": null,
+=======
+                    "sensor_prev": 28,
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "user_func": null,
                     "state_name": null
                 },
@@ -371,7 +473,11 @@
                     "sensor_class": "dbm",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.17409.1.11.3.0",
+<<<<<<< HEAD
                     "sensor_index": "oaInputOpticalPower.0",
+=======
+                    "sensor_index": "InputPower",
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_type": "gw-eydfa",
                     "sensor_descr": "Input Power",
                     "sensor_divisor": 10,
@@ -385,7 +491,11 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
+<<<<<<< HEAD
                     "sensor_prev": null,
+=======
+                    "sensor_prev": 35,
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "user_func": null,
                     "state_name": null
                 },
@@ -394,7 +504,11 @@
                     "sensor_class": "dbm",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.17409.1.11.2.0",
+<<<<<<< HEAD
                     "sensor_index": "oaOutputOpticalPower.0",
+=======
+                    "sensor_index": "PerOutputPower",
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_type": "gw-eydfa",
                     "sensor_descr": "Per Output Power",
                     "sensor_divisor": 10,
@@ -408,7 +522,11 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
+<<<<<<< HEAD
                     "sensor_prev": null,
+=======
+                    "sensor_prev": 203,
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "user_func": null,
                     "state_name": null
                 },
@@ -417,7 +535,11 @@
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.17409.1.1.2.1.4.11.1.3.6.1.4.1.17409.1.11.100.0.2",
+<<<<<<< HEAD
                     "sensor_index": "PowerSupplyState1",
+=======
+                    "sensor_index": "PowerSupply1",
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_type": "PowerSupplyState",
                     "sensor_descr": "Power Supply 1",
                     "sensor_divisor": 1,
@@ -440,7 +562,11 @@
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.17409.1.1.2.1.4.11.1.3.6.1.4.1.17409.1.11.101.0.2",
+<<<<<<< HEAD
                     "sensor_index": "PowerSupplyState2",
+=======
+                    "sensor_index": "PowerSupply2",
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_type": "PowerSupplyState",
                     "sensor_descr": "Power Supply 2",
                     "sensor_divisor": 1,
@@ -463,7 +589,11 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.17409.1.3.3.2.2.1.12.1",
+<<<<<<< HEAD
                     "sensor_index": "commonDeviceInternalTemperature.1",
+=======
+                    "sensor_index": "InternalTemp",
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_type": "gw-eydfa",
                     "sensor_descr": "Internal Temp",
                     "sensor_divisor": 1,
@@ -486,11 +616,19 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.17409.1.11.4.1.4.1",
+<<<<<<< HEAD
                     "sensor_index": "oaPumpTemp1",
                     "sensor_type": "gw-eydfa",
                     "sensor_descr": "Temperature Pump - 1",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
+=======
+                    "sensor_index": "TemperaturePump-1",
+                    "sensor_type": "gw-eydfa",
+                    "sensor_descr": "Temperature Pump - 1",
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 0,
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_current": 25.300000000000001,
                     "sensor_limit": 35,
                     "sensor_limit_warn": 30,
@@ -500,7 +638,11 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
+<<<<<<< HEAD
                     "sensor_prev": null,
+=======
+                    "sensor_prev": 253,
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "user_func": null,
                     "state_name": null
                 },
@@ -509,7 +651,11 @@
                     "sensor_class": "voltage",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.17409.1.11.7.1.2.1",
+<<<<<<< HEAD
                     "sensor_index": "oaDCPowerVoltage1",
+=======
+                    "sensor_index": "DC+5V-1",
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "sensor_type": "gw-eydfa",
                     "sensor_descr": "DC +5V - 1",
                     "sensor_divisor": 10,
@@ -523,7 +669,11 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
+<<<<<<< HEAD
                     "sensor_prev": null,
+=======
+                    "sensor_prev": 48,
+>>>>>>> 357ad152bdfe86450c95255cde13bdafb501d960
                     "user_func": null,
                     "state_name": null
                 }
