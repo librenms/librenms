@@ -48,55 +48,55 @@ modules:
                     value: rectifierRectifiersActive
                     num_oid: .1.3.6.1.4.1.12148.9.5.2.
                     state_name: rectifierRectifiersActive
-                    descr:
+                    descr: Rectifiers active
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: 1 rectifier active }
-                        - { value: 2, generic: 3, graph: 0, descr: 2 rectifiers active }
-                        - { value: 3, generic: 3, graph: 0, descr: 3 rectifiers active }
-                        - { value: 4, generic: 3, graph: 0, descr: 4 rectifiers active }
-                        - { value: 5, generic: 3, graph: 0, descr: 5 rectifiers active }
-                        - { value: 6, generic: 3, graph: 0, descr: 6 rectifiers active }
-                        - { value: 7, generic: 3, graph: 0, descr: 7 rectifiers active }
-                        - { value: 8, generic: 3, graph: 0, descr: 8 rectifiers active }
-                        - { value: 9, generic: 3, graph: 0, descr: 9 rectifiers active }
-                        - { value: 10, generic: 3, graph: 0, descr: 10 rectifiers active }
-                        - { value: 11, generic: 3, graph: 0, descr: 11 rectifiers active }
-                        - { value: 12, generic: 3, graph: 0, descr: 12 rectifiers active }
-                        - { value: 13, generic: 3, graph: 0, descr: 13 rectifiers active }
-                        - { value: 14, generic: 3, graph: 0, descr: 14 rectifiers active }
-                        - { value: 15, generic: 3, graph: 0, descr: 15 rectifiers active }
-                        - { value: 16, generic: 3, graph: 0, descr: 16 rectifiers active }
-                        - { value: 17, generic: 3, graph: 0, descr: 17 rectifiers active }
-                        - { value: 18, generic: 3, graph: 0, descr: 18 rectifiers active }
-                        - { value: 19, generic: 3, graph: 0, descr: 19 rectifiers active }
-                        - { value: 20, generic: 3, graph: 0, descr: 20 rectifiers active }
+                        - { value: 1, generic: 3, graph: 0, descr: 1 }
+                        - { value: 2, generic: 3, graph: 0, descr: 2 }
+                        - { value: 3, generic: 3, graph: 0, descr: 3 }
+                        - { value: 4, generic: 3, graph: 0, descr: 4 }
+                        - { value: 5, generic: 3, graph: 0, descr: 5 }
+                        - { value: 6, generic: 3, graph: 0, descr: 6 }
+                        - { value: 7, generic: 3, graph: 0, descr: 7 }
+                        - { value: 8, generic: 3, graph: 0, descr: 8 }
+                        - { value: 9, generic: 3, graph: 0, descr: 9 }
+                        - { value: 10, generic: 3, graph: 0, descr: 10 }
+                        - { value: 11, generic: 3, graph: 0, descr: 11 }
+                        - { value: 12, generic: 3, graph: 0, descr: 12 }
+                        - { value: 13, generic: 3, graph: 0, descr: 13 }
+                        - { value: 14, generic: 3, graph: 0, descr: 14 }
+                        - { value: 15, generic: 3, graph: 0, descr: 15 }
+                        - { value: 16, generic: 3, graph: 0, descr: 16 }
+                        - { value: 17, generic: 3, graph: 0, descr: 17 }
+                        - { value: 18, generic: 3, graph: 0, descr: 18 }
+                        - { value: 19, generic: 3, graph: 0, descr: 19 }
+                        - { value: 20, generic: 3, graph: 0, descr: 20 }
                 -
                     oid: rectifier
                     value: rectifierInstalledRectifiers
                     num_oid: .1.3.6.1.4.1.12148.9.5.1.
                     state_name: rectifierInstalledRectifiers
-                    descr:
+                    descr: Rectifiers installed
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: 1 rectifier installed }
-                        - { value: 2, generic: 3, graph: 0, descr: 2 rectifiers installed }
-                        - { value: 3, generic: 3, graph: 0, descr: 3 rectifiers installed }
-                        - { value: 4, generic: 3, graph: 0, descr: 4 rectifiers installed }
-                        - { value: 5, generic: 3, graph: 0, descr: 5 rectifiers installed }
-                        - { value: 6, generic: 3, graph: 0, descr: 6 rectifiers installed }
-                        - { value: 7, generic: 3, graph: 0, descr: 7 rectifiers installed }
-                        - { value: 8, generic: 3, graph: 0, descr: 8 rectifiers installed }
-                        - { value: 9, generic: 3, graph: 0, descr: 9 rectifiers installed }
-                        - { value: 10, generic: 3, graph: 0, descr: 10 rectifiers installed }
-                        - { value: 11, generic: 3, graph: 0, descr: 11 rectifiers installed }
-                        - { value: 12, generic: 3, graph: 0, descr: 12 rectifiers installed }
-                        - { value: 13, generic: 3, graph: 0, descr: 13 rectifiers installed }
-                        - { value: 14, generic: 3, graph: 0, descr: 14 rectifiers installed }
-                        - { value: 15, generic: 3, graph: 0, descr: 15 rectifiers installed }
-                        - { value: 16, generic: 3, graph: 0, descr: 16 rectifiers installed }
-                        - { value: 17, generic: 3, graph: 0, descr: 17 rectifiers installed }
-                        - { value: 18, generic: 3, graph: 0, descr: 18 rectifiers installed }
-                        - { value: 19, generic: 3, graph: 0, descr: 19 rectifiers installed }
-                        - { value: 20, generic: 3, graph: 0, descr: 20 rectifiers installed }
+                        - { value: 1, generic: 3, graph: 0, descr: 1 }
+                        - { value: 2, generic: 3, graph: 0, descr: 2 }
+                        - { value: 3, generic: 3, graph: 0, descr: 3 }
+                        - { value: 4, generic: 3, graph: 0, descr: 4 }
+                        - { value: 5, generic: 3, graph: 0, descr: 5 }
+                        - { value: 6, generic: 3, graph: 0, descr: 6 }
+                        - { value: 7, generic: 3, graph: 0, descr: 7 }
+                        - { value: 8, generic: 3, graph: 0, descr: 8 }
+                        - { value: 9, generic: 3, graph: 0, descr: 9 }
+                        - { value: 10, generic: 3, graph: 0, descr: 10 }
+                        - { value: 11, generic: 3, graph: 0, descr: 11 }
+                        - { value: 12, generic: 3, graph: 0, descr: 12 }
+                        - { value: 13, generic: 3, graph: 0, descr: 13 }
+                        - { value: 14, generic: 3, graph: 0, descr: 14 }
+                        - { value: 15, generic: 3, graph: 0, descr: 15 }
+                        - { value: 16, generic: 3, graph: 0, descr: 16 }
+                        - { value: 17, generic: 3, graph: 0, descr: 17 }
+                        - { value: 18, generic: 3, graph: 0, descr: 18 }
+                        - { value: 19, generic: 3, graph: 0, descr: 19 }
+                        - { value: 20, generic: 3, graph: 0, descr: 20 }
                 -
                     oid: rectifierStatusEntry
                     value: rectifierStatusStatus
@@ -145,64 +145,56 @@ modules:
                     descr: Battery bank
                     divisor: 100
                 -
-                    oid: batteryBanksEntry
-                    value: batteryBanksSymmetry1deltaVoltage
+                    oid: batteryBanksSymmetry1deltaVoltage
                     num_oid: .1.3.6.1.4.1.12148.9.3.19.3.1.4.
                     index: 'batteryBanksSymmetry1deltaVoltage.{{ $index }}'
                     descr: ΔV Battery banks symmetry 1
                     divisor: 100
                     skip_value_lt: 1
                 -
-                    oid: batteryBanksEntry
-                    value: batteryBanksSymmetry2deltaVoltage
+                    oid: batteryBanksSymmetry2deltaVoltage
                     num_oid: .1.3.6.1.4.1.12148.9.3.19.3.1.7.
                     index: 'batteryBanksSymmetry2deltaVoltage.{{ $index }}'
                     descr: ΔV Battery banks symmetry 2
                     divisor: 100
                     skip_value_lt: 1
                 -
-                    oid: batteryBanksEntry
-                    value: batteryBanksSymmetry3deltaVoltage
+                    oid: batteryBanksSymmetry3deltaVoltage
                     num_oid: .1.3.6.1.4.1.12148.9.3.19.3.1.10.
                     index: 'batteryBanksSymmetry3deltaVoltage.{{ $index }}'
                     descr: ΔV Battery banks symmetry 3
                     divisor: 100
                     skip_value_lt: 1
                 -
-                    oid: batteryBanksEntry
-                    value: batteryBanksSymmetry4deltaVoltage
+                    oid: batteryBanksSymmetry4deltaVoltage
                     num_oid: .1.3.6.1.4.1.12148.9.3.19.3.1.13.
                     index: 'batteryBanksSymmetry4deltaVoltage.{{ $index }}'
                     descr: ΔV Battery banks symmetry 4
                     divisor: 100
                     skip_value_lt: 1
                 -
-                    oid: batteryBanksEntry
-                    value: batteryBanksSymmetry5deltaVoltage
+                    oid: batteryBanksSymmetry5deltaVoltage
                     num_oid: .1.3.6.1.4.1.12148.9.3.19.3.1.16.
                     index: 'batteryBanksSymmetry5deltaVoltage.{{ $index }}'
                     descr: ΔV Battery banks symmetry 5
                     divisor: 100
                     skip_value_lt: 1
                 -
-                    oid: batteryBanksEntry
-                    value: batteryBanksSymmetry6deltaVoltage
+                    oid: batteryBanksSymmetry6deltaVoltage
                     num_oid: .1.3.6.1.4.1.12148.9.3.19.3.1.19.
                     index: 'batteryBanksSymmetry6deltaVoltage.{{ $index }}'
                     descr: ΔV Battery banks symmetry 6
                     divisor: 100
                     skip_value_lt: 1
                 -
-                    oid: batteryBanksEntry
-                    value: batteryBanksSymmetry7deltaVoltage
+                    oid: batteryBanksSymmetry7deltaVoltage
                     num_oid: .1.3.6.1.4.1.12148.9.3.19.3.1.22.
                     index: 'batteryBanksSymmetry7deltaVoltage.{{ $index }}'
                     descr: ΔV Battery banks symmetry 7
                     divisor: 100
                     skip_value_lt: 1
                 -
-                    oid: batteryBanksEntry
-                    value: batteryBanksSymmetry8deltaVoltage
+                    oid: batteryBanksSymmetry8deltaVoltage
                     num_oid: .1.3.6.1.4.1.12148.9.3.19.3.1.25.
                     index: 'batteryBanksSymmetry8deltaVoltage.{{ $index }}'
                     descr: ΔV Battery banks symmetry 8
