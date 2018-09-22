@@ -118,7 +118,9 @@ class User extends BaseValidation
             $folders_string = implode(' ', $folders);
             $incorrect = exec("find $folders_string -group $lnms_groupname ! -perm -g=w");
             if (!empty($incorrect)) {
-                $validator->fail("Some folders have incorrect file permissions", $fix);
+                $validator->result(ValidationResult::fail(
+                    'Some folders have incorrect file permissions, this may cause issues.'
+                )->setFix($fix)->setList('Files', explode(PHP_EOL, $incorrect)));
             }
         } else {
             $validator->warn("You don't have \$config['user'] set, this most likely needs to be set to librenms");
