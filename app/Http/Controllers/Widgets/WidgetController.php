@@ -47,7 +47,7 @@ abstract class WidgetController extends Controller
      */
     public function getSettingsView(Request $request)
     {
-        return view('widgets.settings.none');
+        return view('widgets.settings.base');
     }
 
     public function __invoke(Request $request)

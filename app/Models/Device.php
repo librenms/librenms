@@ -301,19 +301,21 @@ class Device extends BaseModel
     /**
      * @return string
      */
-    public function statusColour()
+    public function statusName()
     {
-        $status = $this->status;
-        $ignore = $this->ignore;
-        $disabled = $this->disabled;
-        if ($disabled == 1) {
-            return 'info';
-        } elseif ($ignore == 1) {
-            return 'warn';
-        } elseif ($status == 0) {
-            return 'danger';
+        if ($this->disabled == 1) {
+            return 'disabled';
+        } elseif ($this->ignore == 1) {
+            return 'ignore';
+        } elseif ($this->status == 0) {
+            return 'down';
         } else {
-            return 'success';
+            $warning_time = \LibreNMS\Config::get('uptime_warning', 84600);
+            if ($this->uptime < $warning_time && $this->uptime != 0) {
+                return 'warn';
+            }
+
+            return 'up';
         }
     }
 

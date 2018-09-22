@@ -1,4 +1,6 @@
-<form class="form" onsubmit="widget_settings(this); return false;">
+@extends('widgets.settings.base')
+
+@section('form')
     <div class="form-group">
         <label for="title-{{ $id }}" class="col-sm-4 control-label availability-map-widget-header">@lang('Widget title')</label>
         <div class="col-sm-8">
@@ -7,23 +9,18 @@
         </div>
     </div>
 
-    @config('webui.availability_map_compact')
-
     <div class="form-group">
-        <label for="tile_size-{{ $id }}" class="col-sm-4 control-label availability-map-widget-header">@lang('Tile size')</label>
+        <label for="type-{{ $id }}" class="col-sm-4 control-label availability-map-widget-header">@lang('Display type')</label>
         <div class="col-sm-8">
-            <input type="text" class="form-control" name="tile_size" id="tile_size-{{ $id }}" placeholder="@lang('Tile size')"
-                   value="{{ $tile_size }}">
+            <select class="form-control" name="type" id="type-{{ $id }}" onchange="toggle_availability_type(this, {{ $id }});">
+                <option value="0" {{ $type == 0 ? 'selected' : ''}}>@lang('boxes')</option>
+                <option value="1" {{ $type == 1 ? 'selected' : ''}}>@lang('compact')</option>
+            </select>
         </div>
     </div>
 
-    @endconfig
-
-    @notconfig('webui.availability_map_compact')
-
-    <div class="form-group">
-        <label for="color_only_select-{{ $id }}"
-               class="col-sm-4 control-label availability-map-widget-header">@lang('Uniform Tiles')</label>
+    <div class="form-group" id="color_only_select-group-{{ $id }}" style="display: {{ $type == 0 ? 'block' : 'none' }};">
+        <label for="color_only_select-{{ $id }}" class="col-sm-4 control-label availability-map-widget-header">@lang('Uniform Tiles')</label>
         <div class="col-sm-8">
             <select class="form-control" name="color_only_select" id="color_only_select-{{ $id }}">
                 <option value="1" {{ $color_only_select ? 'selected' : ''}}>@lang('yes')</option>
@@ -32,11 +29,15 @@
         </div>
     </div>
 
-    @endconfig
+    <div class="form-group" id="tile_size-group-{{ $id }}" style="display: {{ $type == 1 ? 'block' : 'none' }};">
+        <label for="tile_size-{{ $id }}" class="col-sm-4 control-label availability-map-widget-header">@lang('Tile size')</label>
+        <div class="col-sm-8">
+            <input type="text" class="form-control" name="tile_size" id="tile_size-{{ $id }}" placeholder="@lang('Tile size')" value="{{ $tile_size }}">
+        </div>
+    </div>
 
     <div class="form-group">
-        <label for="show_disabled_and_ignored-{{ $id }}"
-               class="col-sm-4 control-label availability-map-widget-header">@lang('Disabled/ignored')</label>
+        <label for="show_disabled_and_ignored-{{ $id }}" class="col-sm-4 control-label availability-map-widget-header">@lang('Disabled/ignored')</label>
         <div class="col-sm-8">
             <select class="form-control" name="show_disabled_and_ignored" id="show_disabled_and_ignored-{{ $id }}">
                 <option value="1" {{ $show_disabled_and_ignored ? 'selected' : ''}}>@lang('yes')</option>
@@ -46,8 +47,7 @@
     </div>
 
     <div class="form-group">
-        <label for="mode_select-{{ $id }}"
-               class="col-sm-4 control-label availability-map-widget-header">@lang('Mode select')</label>
+        <label for="mode_select-{{ $id }}" class="col-sm-4 control-label availability-map-widget-header">@lang('Mode select')</label>
         <div class="col-sm-8">
             <select class="form-control" name="mode_select" id="mode_select-{{ $id }}">
                 <option value="0" {{ $mode_select == 0 ? 'selected' : '' }}>@lang('only devices')</option>
@@ -61,8 +61,7 @@
 
 
     <div class="form-group">
-        <label for="device_group-{{ $id }}"
-               class="col-sm-4 control-label availability-map-widget-header">@lang('Device group')</label>
+        <label for="device_group-{{ $id }}" class="col-sm-4 control-label availability-map-widget-header">@lang('Device group')</label>
         <div class="col-sm-8">
             <select class="form-control" name="device_group" id="device_group-{{ $id }}">
                 @if($device_group)
@@ -71,12 +70,18 @@
             </select>
         </div>
     </div>
+@endsection
 
-
-    <br style="clear:both;" />
-    <div class="form-group">
-        <div class="col-sm-2 col-sm-offset-2">
-            <button type="submit" class="btn btn-default">Set</button>
-        </div>
-    </div>
-</form>
+@section('javascript')
+    <script type="text/javascript">
+        function toggle_availability_type(el, id) {
+            if (el.value == 0) {
+                $('#tile_size-group-' + id).hide();
+                $('#color_only_select-group-' + id).show();
+            } else {
+                $('#tile_size-group-' + id).show();
+                $('#color_only_select-group-' + id).hide();
+            }
+        }
+    </script>
+@endsection

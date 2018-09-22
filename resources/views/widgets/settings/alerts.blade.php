@@ -1,4 +1,6 @@
-<form class="form" onsubmit="widget_settings(this); return false;">
+@extends('widgets.settings.base')
+
+@section('form')
     <div class="form-group row">
         <label for="acknowledged-{{ $id }}" class="control-label col-sm-5 availability-map-widget-header">@lang('Show acknowledged'):</label>
         <div class="col-sm-7">
@@ -70,9 +72,4 @@
         </div>
     </div>
 
-    <div class="form-group">
-        <div class="col-sm-12">
-            <button type="submit" class="btn btn-default">Set</button>
-        </div>
-    </div>
-</form>
+@endsection
