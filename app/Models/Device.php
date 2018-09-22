@@ -182,7 +182,8 @@ class Device extends BaseModel
      * @param User $user
      * @return bool
      */
-    public function canAccess($user) {
+    public function canAccess($user)
+    {
         if (!$user) {
             return false;
         }

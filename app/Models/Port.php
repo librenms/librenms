@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use DB;
-use LibreNMS\Config;
+use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Util\Rewrite;
 
 class Port extends BaseModel
@@ -22,27 +22,27 @@ class Port extends BaseModel
     {
         $os = $this->device->os;
 
-        if (Config::getOsSetting($os, 'ifname')) {
+        if (\LibreNMS\Config::getOsSetting($os, 'ifname')) {
             $label = $this->ifName;
-        } elseif (Config::getOsSetting($os, 'ifalias')) {
+        } elseif (\LibreNMS\Config::getOsSetting($os, 'ifalias')) {
             $label = $this->ifAlias;
         }
 
         if (empty($label)) {
             $label = $this->ifDescr;
 
-            if (Config::getOsSetting($os, 'ifindex')) {
+            if (\LibreNMS\Config::getOsSetting($os, 'ifindex')) {
                 $label .= " $this->ifIndex";
             }
         }
 
-        foreach ((array)Config::get('rewrite_if', []) as $src => $val) {
+        foreach ((array)\LibreNMS\Config::get('rewrite_if', []) as $src => $val) {
             if (str_i_contains($label, $src)) {
                 $label = $val;
             }
         }
 
-        foreach ((array)Config::get('rewrite_if_regexp', []) as $reg => $val) {
+        foreach ((array)\LibreNMS\Config::get('rewrite_if_regexp', []) as $reg => $val) {
             $label = preg_replace($reg.'i', $val, $label);
         }
 
@@ -98,6 +98,10 @@ class Port extends BaseModel
 
     // ---- Query scopes ----
 
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
     public function scopeIsDeleted($query)
     {
         return $query->where([
@@ -105,6 +109,10 @@ class Port extends BaseModel
         ]);
     }
 
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
     public function scopeIsNotDeleted($query)
     {
         return $query->where([
@@ -112,6 +120,10 @@ class Port extends BaseModel
         ]);
     }
 
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
     public function scopeIsUp($query)
     {
         return $query->where([
@@ -121,6 +133,10 @@ class Port extends BaseModel
         ]);
     }
 
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
     public function scopeIsDown($query)
     {
         return $query->where([
@@ -131,6 +147,10 @@ class Port extends BaseModel
         ]);
     }
 
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
     public function scopeIsIgnored($query)
     {
         return $query->where([
@@ -139,6 +159,10 @@ class Port extends BaseModel
         ]);
     }
 
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
     public function scopeIsDisabled($query)
     {
         return $query->where([
@@ -148,9 +172,14 @@ class Port extends BaseModel
         ]);
     }
 
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
     public function scopeHasErrors($query)
     {
         return $query->where(function ($query) {
+            /** @var Builder $query */
             $query->where('ifInErrors_delta', '>', 0)
                 ->orWhere('ifOutErrors_delta', '>', 0);
         });

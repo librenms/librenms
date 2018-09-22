@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Util;
 
-
 class Rewrite
 {
     public static function normalizeIfType($type)
