@@ -26,6 +26,7 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\Authentication\LegacyAuth;
 
 /**
  * Add a new device group
@@ -213,7 +214,11 @@ function GetDevicesFromGroup($group_id, $nested = false, $full = '')
  */
 function GetDeviceGroups()
 {
-    return dbFetchRows('SELECT * FROM device_groups ORDER BY name');
+    if (LegacyAuth::user()->hasGlobalRead()) {
+        return dbFetchRows('SELECT * FROM device_groups ORDER BY name');
+    } else {
+        return dbFetchRows('SELECT * FROM device_groups AS G, device_groups_perms AS P WHERE G.id = P.group_id AND P.user_id = ? ORDER BY G.name', array(LegacyAuth::id()));
+    }
 }//end GetDeviceGroups()
 
 /**
