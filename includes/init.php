@@ -160,10 +160,17 @@ if (module_selected('auth', $init_modules) ||
         $config['allow_unauth_graphs'] != true
     )
 ) {
+    require_once '../includes/device-groups.inc.php';
     // populate the permissions cache TODO: remove?
     $permissions = [];
 
     $user_id = LegacyAuth::id();
+    foreach (dbFetchRows("SELECT * FROM device_groups_perms WHERE user_id = '" . $user_id . "'") as $group) {
+        foreach (GetDevicesFromGroup($group['group_id']) as $device) {
+            $permissions['device'][$device] = 1;
+        }
+    }
+
     foreach (dbFetchColumn('SELECT device_id FROM devices_perms WHERE user_id=?', [$user_id]) as $device_id) {
         $permissions['device'][$device_id] = 1;
     }

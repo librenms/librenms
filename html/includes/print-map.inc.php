@@ -28,9 +28,7 @@ if (!empty($device['hostname'])) {
 }
 
 if (!LegacyAuth::user()->hasGlobalRead()) {
-    $join_sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `D1`.`device_id` = `DP`.`device_id`';
-    $sql  .= ' AND `DP`.`user_id`=?';
-    $sql_array[] = LegacyAuth::id();
+    $sql  .= ' AND `D1`.`device_id` IN (' . join(',', array_keys($permissions['devices'])) . ')';
 }
 
 $devices_by_id = array();

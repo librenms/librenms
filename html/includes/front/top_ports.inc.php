@@ -32,9 +32,8 @@ if (LegacyAuth::user()->hasGlobalRead()) {
 } else {
     $query   = "
         SELECT *, I.ifInOctets_rate + I.ifOutOctets_rate as total
-        FROM ports as I, devices as d,
-        `devices_perms` AS `P`, `ports_perms` AS `PP`
-        WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `d`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `d`.`device_id`)) AND
+        FROM ports as I, devices as d, `ports_perms` AS `PP`
+        WHERE ((`d`.`device_id` IN (" . join(',', array_keys($permissions['devices'])) . ")) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `d`.`device_id`)) AND
         d.device_id = I.device_id
         AND unix_timestamp() - I.poll_time < $seconds
         AND ( I.ifInOctets_rate > 0
@@ -43,7 +42,6 @@ if (LegacyAuth::user()->hasGlobalRead()) {
         LIMIT $top
         ";
     $param[] = array(
-        LegacyAuth::id(),
         LegacyAuth::id(),
     );
 }//end if

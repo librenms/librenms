@@ -298,6 +298,8 @@ function get_device()
 
 function list_devices()
 {
+    global $permissions;
+
     // This will return a list of devices
     $order = $_GET['order'];
     $type  = $_GET['type'];
@@ -353,8 +355,7 @@ function list_devices()
 
 
     if (!LegacyAuth::user()->hasGlobalRead()) {
-        $sql .= " AND `d`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-        $param[] = LegacyAuth::id();
+        $sql .= " AND `d`.`device_id` IN (" . join(',', array_keys($permissions['devices'])) . ")";
     }
     $devices = array();
     $dev_query = "SELECT $select FROM `devices` AS d $join WHERE $sql GROUP BY d.`hostname` ORDER BY $order";
@@ -583,8 +584,7 @@ function list_cbgp()
         $sql_params[] = $device_id;
     }
     if (!LegacyAuth::user()->hasGlobalRead()) {
-        $sql .= " AND `bgpPeers_cbgp`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-        $sql_params[] = LegacyAuth::id();
+        $sql .= " AND `bgpPeers_cbgp`.`device_id` IN (" . join(',', array_keys($permissions['devices'])) . ")";
     }
 
     $bgp_counters = array();
@@ -980,8 +980,7 @@ function get_all_ports()
     $params = array();
     $sql = '';
     if (!LegacyAuth::user()->hasGlobalRead()) {
-        $sql = ' AND (device_id IN (SELECT device_id FROM devices_perms WHERE user_id = ?) OR port_id IN (SELECT port_id FROM ports_perms WHERE user_id = ?))';
-        array_push($params, LegacyAuth::id());
+        $sql = ' AND (device_id IN (' . join(',', array_keys($permissions['devices'])) . ') OR port_id IN (SELECT port_id FROM ports_perms WHERE user_id = ?))';
         array_push($params, LegacyAuth::id());
     }
     $ports = dbFetchRows("SELECT $columns FROM `ports` WHERE `deleted` = 0 $sql", $params);
@@ -1051,7 +1050,7 @@ function list_alerts()
             $sql .= ' AND `R`.severity=?';
         }
     }
-    
+
     $order = $_GET['order'] ?: "timestamp desc";
     $sql .= ' ORDER BY A.'.$order;
 
@@ -1875,8 +1874,7 @@ function list_vrf()
         $sql_params = array($vrfname);
     }
     if (!LegacyAuth::user()->hasGlobalRead()) {
-        $sql .= " AND `vrfs`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-        $sql_params[] = LegacyAuth::id();
+        $sql .= " AND `vrfs`.`device_id` IN (" . join(',', array_keys($permissions['devices'])) . ")";
     }
 
     $vrfs       = array();
@@ -1948,8 +1946,7 @@ function list_vlans()
         $sql_params[] = $device_id;
     }
     if (!LegacyAuth::user()->hasGlobalRead()) {
-        $sql .= " AND `vlans`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-        $sql_params[] = LegacyAuth::id();
+        $sql .= " AND `vlans`.`device_id` IN (" . join(',', array_keys($permissions['devices'])) . ")";
     }
 
     $vlans       = array();

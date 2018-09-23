@@ -181,14 +181,14 @@ var greenMarker = L.AwesomeMarkers.icon({
             $param = $status_select;
         } else {
         // Normal user - grab devices that user has permissions to
-            $sql = "SELECT DISTINCT(`devices`.`device_id`) as `device_id`,`devices`.`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng`
-                    FROM `devices_perms`, `devices`
+            $sql = "SELECT `device_id`,`devices`.`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng`
+                    FROM `devices`
                     LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
                     WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`devices`.`location` REGEXP '\[[0-9\.\, ]+\]'))
-                    AND `devices`.`device_id` = `devices_perms`.`device_id`
-                    AND `devices_perms`.`user_id` = ? AND `status` IN " . dbGenPlaceholders(count($status_select)) .
-                    " ORDER BY `status` ASC, `hostname`";
-            $param = array_merge([LegacyAuth::id()], $status_select);
+                    AND `device_id` IN (" . join(',', array_keys($permissions['devices'])) . ")
+                    AND `status` IN " . dbGenPlaceholders(count($status_select)) . "
+                    ORDER BY `status` ASC, `hostname`";
+            $param = $status_select;
         }
 
         foreach (dbFetchRows($sql, $param) as $map_devices) {

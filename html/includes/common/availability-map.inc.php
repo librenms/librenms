@@ -174,8 +174,7 @@ if (defined('SHOW_SETTINGS')) {
         $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`os`, `D`.`icon`, `D`.`ignore`, `D`.`disabled` FROM `devices` AS `D`';
 
         if (!LegacyAuth::user()->hasGlobalRead()) {
-            $sql .= ' , `devices_perms` AS P WHERE D.`device_id` = P.`device_id` AND P.`user_id` = ? AND ';
-            $param = [LegacyAuth::id()];
+            $sql .= 'WHERE D.`device_id` IN (' . join(',', array_keys($permissions['devices'])) . ') AND ';
         } else {
             $sql .= ' WHERE ';
             $param = [];
@@ -255,12 +254,10 @@ if (defined('SHOW_SETTINGS')) {
     if (($mode == 1 || $mode == 2) && ($config['show_services'] != 0)) {
         if (LegacyAuth::user()->hasGlobalRead()) {
             $service_query = 'select `S`.`service_type`, `S`.`service_id`, `S`.`service_desc`, `S`.`service_status`, `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`os`, `D`.`icon` from services S, devices D where `S`.`device_id` = `D`.`device_id` ORDER BY '.$serviceOrderBy.';';
-            $service_par = array();
         } else {
-            $service_query = 'select `S`.`service_type`, `S`.`service_id`, `S`.`service_desc`, `S`.`service_status`, `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`os`, `D`.`icon` from services S, devices D, devices_perms P where `S`.`device_id` = `D`.`device_id` AND D.device_id = P.device_id AND P.user_id = ? ORDER BY '.$serviceOrderBy.';';
-            $service_par = array(LegacyAuth::id());
+            $service_query = 'select `S`.`service_type`, `S`.`service_id`, `S`.`service_desc`, `S`.`service_status`, `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`os`, `D`.`icon` from services S, devices D where `S`.`device_id` = `D`.`device_id` AND `D`.`device_id` IN (' . join(',', array_keys($permissions['devices'])) . ') ORDER BY '.$serviceOrderBy.';';
         }
-        $services = dbFetchRows($service_query, $service_par);
+        $services = dbFetchRows($service_query);
         if (count($services) > 0) {
             foreach ($services as $service) {
                 if ($service['service_status'] == '0') {

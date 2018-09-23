@@ -252,18 +252,17 @@ if ($format == "graph") {
         $features = "SELECT `features` FROM `devices` AS D WHERE 1 GROUP BY `features` ORDER BY `features`";
         $types = "SELECT `type` FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`";
     } else {
-        $os = "SELECT `os` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `os` ORDER BY `os`";
-        $ver = "SELECT `version` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `version` ORDER BY `version`";
-        $platform = "SELECT `hardware` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `hardware` ORDER BY `hardware`";
-        $features = "SELECT `features` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `features` ORDER BY `features`";
-        $types = "SELECT `type` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `type` ORDER BY `type`";
-        $param[] = LegacyAuth::id();
+        $os = "SELECT `os` FROM `devices` WHERE `device_id` IN (" . join(array_keys($permissions['device']), ',') . ") GROUP BY `os` ORDER BY `os`";
+        $ver = "SELECT `version` FROM `devices` WHERE `device_id` IN (" . join(array_keys($permissions['device']), ',') . ") GROUP BY `version` ORDER BY `version`";
+        $platform = "SELECT `hardware` FROM `devices` WHERE `device_id` IN (" . join(array_keys($permissions['device']), ',') . ") GROUP BY `hardware` ORDER BY `hardware`";
+        $features = "SELECT `features` FROM `devices` WHERE `device_id` IN (" . join(array_keys($permissions['device']), ',') . ") GROUP BY `features` ORDER BY `features`";
+        $types = "SELECT `type` FROM `devices` WHERE `device_id` IN (" . join(array_keys($permissions['device']), ',') . ") GROUP BY `type` ORDER BY `type`";
     }
 
 
     $os_options = "<select name='os' id='os' class='form-control input-sm'>";
     $os_options .= "<option value=''>All OSes</option>";
-    foreach (dbFetch($os, $param) as $data) {
+    foreach (dbFetch($os) as $data) {
         if ($data['os']) {
             $tmp_os = clean_bootgrid($data['os']);
             if ($tmp_os == $vars['os']) {
@@ -278,7 +277,7 @@ if ($format == "graph") {
 
     $ver_options = "<select name='version' id='version' class='form-control input-sm'>";
     $ver_options .= "<option value=''>All Versions</option>";
-    foreach (dbFetch($ver, $param) as $data) {
+    foreach (dbFetch($ver) as $data) {
         if ($data['version']) {
             $tmp_version = clean_bootgrid($data['version']);
             if ($tmp_version == $vars['version']) {
@@ -294,7 +293,7 @@ if ($format == "graph") {
 
     $platform_options = "<select name='hardware' id='hardware' class='form-control input-sm'>";
     $platform_options .= "<option value=''>All Platforms</option>";
-    foreach (dbFetch($platform, $param) as $data) {
+    foreach (dbFetch($platform) as $data) {
         if ($data['hardware']) {
             $tmp_hardware = clean_bootgrid($data['hardware']);
             if ($tmp_hardware == $vars['hardware']) {
@@ -310,7 +309,7 @@ if ($format == "graph") {
 
     $features_options = "<select name='features' id='features' class='form-control input-sm'>";
     $features_options .= "<option value=''>All Featuresets</option>";
-    foreach (dbFetch($features, $param) as $data) {
+    foreach (dbFetch($features) as $data) {
         if ($data['features']) {
             $tmp_features = clean_bootgrid($data['features']);
             if ($tmp_features == $vars['features']) {
@@ -342,7 +341,7 @@ if ($format == "graph") {
 
     $types_options = "<select name='type' id='type' class='form-control input-sm'>";
     $types_options .= "<option value=''>All Device Types</option>";
-    foreach (dbFetch($types, $param) as $data) {
+    foreach (dbFetch($types) as $data) {
         if ($data['type']) {
             if ($data['type'] == $vars['type']) {
                 $type_selected = 'selected';

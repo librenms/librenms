@@ -515,6 +515,13 @@ device_groups:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     name: { Name: name, Columns: [name], Unique: true, Type: BTREE }
+device_groups_perms:
+  Columns:
+    - { Field: user_id, Type: int(11), 'Null': false, Extra: '' }
+    - { Field: group_id, Type: int(11), 'Null': false, Extra: '' }
+    - { Field: access_level, Type: int(4), 'Null': false, Extra: '', Default: '0' }
+  Indexes:
+    user_id: { Name: user_id, Columns: [user_id], Unique: false, Type: BTREE }
 device_group_device:
   Columns:
     - { Field: device_group_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }

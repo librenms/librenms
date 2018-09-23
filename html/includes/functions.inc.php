@@ -14,6 +14,8 @@
 
 use LibreNMS\Authentication\LegacyAuth;
 
+require_once '../includes/device-groups.inc.php';
+
 /**
  * Compare $t with the value of $vars[$v], if that exists
  * @param string $v Name of the var to test
@@ -432,6 +434,12 @@ function print_graph_popup($graph_array)
 function permissions_cache($user_id)
 {
     $permissions = array();
+    foreach (dbFetchRows("SELECT * FROM device_groups_perms WHERE user_id = '" . $user_id . "'") as $group) {
+        foreach (GetDevicesFromGroup($group['group_id']) as $device) {
+            $permissions['device'][$device] = 1;
+        }
+    }
+
     foreach (dbFetchRows("SELECT * FROM devices_perms WHERE user_id = '" . $user_id . "'") as $device) {
         $permissions['device'][$device['device_id']] = 1;
     }
@@ -880,13 +888,15 @@ function devclass($device)
 
 function getlocations()
 {
+    global $permissions;
+
     $locations = array();
 
     // Fetch regular locations
     if (LegacyAuth::user()->hasGlobalRead()) {
         $rows = dbFetchRows('SELECT location FROM devices AS D GROUP BY location ORDER BY location');
     } else {
-        $rows = dbFetchRows('SELECT location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? GROUP BY location ORDER BY location', array(LegacyAuth::id()));
+        $rows = dbFetchRows('SELECT location FROM devices WHERE `device_id` IN (' . join(',', array_keys($permissions['device'])) . ') GROUP BY location ORDER BY location');
     }
 
     foreach ($rows as $row) {

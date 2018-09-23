@@ -123,8 +123,7 @@ $(function() {
             FROM ports
             INNER JOIN devices ON ports.device_id = devices.device_id
             LEFT JOIN ports_perms ON ports.port_id = ports_perms.port_id
-            LEFT JOIN devices_perms ON devices.device_id = devices_perms.device_id
-            WHERE ( ports_perms.user_id = :user1 || devices_perms.user_id = :user2 )
+            WHERE ( ports_perms.user_id = :user || devices.device_id IN (' . join(',', array_keys($permissions['devices'])) . ') )
             AND unix_timestamp() - ports.poll_time <= :lastpoll
             AND ( ports.ifType = :filter1 || 1 = :filter2 )
             AND ( ports.ifInOctets_rate > 0 || ports.ifOutOctets_rate > 0 )

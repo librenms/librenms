@@ -30,9 +30,7 @@ $where = [];
 $params = [];
 
 if (!LegacyAuth::user()->hasGlobalRead()) {
-    $query .= ' LEFT JOIN `devices_perms` USING (`device_id`)';
-    $where = '`devices_perms`.`user_id`=?';
-    $params[] = LegacyAuth::id();
+    $where[] = '`devices_id` IN (' . join(',', array_keys($permissions['devices'])) . ')';
 }
 
 if (!empty($_REQUEST['search'])) {

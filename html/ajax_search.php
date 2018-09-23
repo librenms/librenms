@@ -48,7 +48,7 @@ if (isset($_REQUEST['search'])) {
             if (LegacyAuth::user()->hasGlobalRead()) {
                 $results = dbFetchRows("SELECT * FROM `devices` WHERE `hostname` LIKE '%".$search."%' OR `location` LIKE '%".$search."%' OR `sysName` LIKE '%".$search."%' OR `purpose` LIKE '%".$search."%' OR `notes` LIKE '%".$search."%' ORDER BY hostname LIMIT ".$limit);
             } else {
-                $results = dbFetchRows("SELECT * FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND (`hostname` LIKE '%".$search."%' OR `location` LIKE '%".$search."%') ORDER BY hostname LIMIT ".$limit, array(LegacyAuth::id()));
+                $results = dbFetchRows("SELECT * FROM `devices` WHERE `device_id` IN (" . join(',', array_keys($permissions['device'])) . ") AND (`hostname` LIKE '%".$search."%' OR `location` LIKE '%".$search."%') ORDER BY hostname LIMIT ".$limit);
             }
 
             if (count($results)) {
@@ -73,7 +73,7 @@ if (isset($_REQUEST['search'])) {
                     if (LegacyAuth::user()->hasGlobalRead()) {
                         $num_ports = dbFetchCell('SELECT COUNT(*) FROM `ports` WHERE device_id = ?', array($result['device_id']));
                     } else {
-                        $num_ports = dbFetchCell('SELECT COUNT(*) FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND `I`.`device_id` = `D`.`device_id` AND device_id = ?', array(LegacyAuth::id(), $result['device_id']));
+                        $num_ports = dbFetchCell('SELECT COUNT(*) FROM `ports` AS `I`, `devices` AS `D` WHERE `D`.`device_id` IN (' . join(',', array_keys($permissions['device'])) . ') AND `I`.`device_id` = `D`.`device_id` AND device_id = ?', array($result['device_id']));
                     }
 
                     $device[] = array(
@@ -98,7 +98,7 @@ if (isset($_REQUEST['search'])) {
             if (LegacyAuth::user()->hasGlobalRead()) {
                 $results = dbFetchRows("SELECT `ports`.*,`devices`.* FROM `ports` LEFT JOIN `devices` ON  `ports`.`device_id` =  `devices`.`device_id` WHERE `ifAlias` LIKE '%".$search."%' OR `ifDescr` LIKE '%".$search."%' OR `ifName` LIKE '%".$search."%' ORDER BY ifDescr LIMIT ".$limit);
             } else {
-                $results = dbFetchRows("SELECT DISTINCT(`I`.`port_id`), `I`.*, `D`.`hostname` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` AND (`ifAlias` LIKE '%".$search."%' OR `ifDescr` LIKE '%".$search."%' OR `ifName` LIKE '%".$search."%') ORDER BY ifDescr LIMIT ".$limit, array(LegacyAuth::id(), LegacyAuth::id()));
+                $results = dbFetchRows("SELECT DISTINCT(`I`.`port_id`), `I`.*, `D`.`hostname` FROM `ports` AS `I`, `devices` AS `D`, `ports_perms` AS `PP` WHERE ((`D`.`device_id` IN (" . join(',', array_keys($permissions['device'])) . ")) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` AND (`ifAlias` LIKE '%".$search."%' OR `ifDescr` LIKE '%".$search."%' OR `ifName` LIKE '%".$search."%') ORDER BY ifDescr LIMIT ".$limit, array(LegacyAuth::id(), LegacyAuth::id()));
             }
 
             if (count($results)) {
@@ -144,7 +144,7 @@ if (isset($_REQUEST['search'])) {
             if (LegacyAuth::user()->hasGlobalRead()) {
                 $results = dbFetchRows("SELECT `bgpPeers`.*,`devices`.* FROM `bgpPeers` LEFT JOIN `devices` ON  `bgpPeers`.`device_id` =  `devices`.`device_id` WHERE `astext` LIKE '%".$search."%' OR `bgpPeerIdentifier` LIKE '%".$search."%' OR `bgpPeerRemoteAs` LIKE '%".$search."%' ORDER BY `astext` LIMIT ".$limit);
             } else {
-                $results = dbFetchRows("SELECT `bgpPeers`.*,`D`.* FROM `bgpPeers`, `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND  `bgpPeers`.`device_id`=`D`.`device_id` AND  (`astext` LIKE '%".$search."%' OR `bgpPeerIdentifier` LIKE '%".$search."%' OR `bgpPeerRemoteAs` LIKE '%".$search."%') ORDER BY `astext` LIMIT ".$limit, array(LegacyAuth::id()));
+                $results = dbFetchRows("SELECT `bgpPeers`.*,`D`.* FROM `bgpPeers`, `devices` AS `D` WHERE `D`.`device_id` IN (" . join(',', array_keys($permissions['device'])) . ") AND  `bgpPeers`.`device_id`=`D`.`device_id` AND  (`astext` LIKE '%".$search."%' OR `bgpPeerIdentifier` LIKE '%".$search."%' OR `bgpPeerRemoteAs` LIKE '%".$search."%') ORDER BY `astext` LIMIT ".$limit);
             }
 
             if (count($results)) {
@@ -194,7 +194,7 @@ if (isset($_REQUEST['search'])) {
             if (LegacyAuth::user()->hasGlobalRead()) {
                 $results = dbFetchRows("SELECT * FROM `applications` INNER JOIN `devices` ON devices.device_id = applications.device_id WHERE `app_type` LIKE '%".$search."%' OR `hostname` LIKE '%".$search."%' ORDER BY hostname LIMIT ".$limit);
             } else {
-                $results = dbFetchRows("SELECT * FROM `applications` INNER JOIN `devices` AS `D` ON `D`.`device_id` = `applications`.`device_id` INNER JOIN `devices_perms` AS `P` ON `P`.`device_id` = `D`.`device_id` WHERE `P`.`user_id` = ? AND (`app_type` LIKE '%".$search."%' OR `hostname` LIKE '%".$search."%') ORDER BY hostname LIMIT ".$limit, array(LegacyAuth::id()));
+                $results = dbFetchRows("SELECT * FROM `applications` INNER JOIN `devices` AS `D` ON `D`.`device_id` = `applications`.`device_id` WHERE `device_id` IN (" . join(',', array_keys($permissions['device'])) . ") AND (`app_type` LIKE '%".$search."%' OR `hostname` LIKE '%".$search."%') ORDER BY hostname LIMIT ".$limit);
             }
 
             if (count($results)) {
@@ -235,7 +235,7 @@ if (isset($_REQUEST['search'])) {
             if (LegacyAuth::user()->hasGlobalRead()) {
                 $results = dbFetchRows("SELECT * FROM `munin_plugins` INNER JOIN `devices` ON devices.device_id = munin_plugins.device_id WHERE `mplug_type` LIKE '%".$search."%' OR `mplug_title` LIKE '%".$search."%' OR `hostname` LIKE '%".$search."%' ORDER BY hostname LIMIT ".$limit);
             } else {
-                $results = dbFetchRows("SELECT * FROM `munin_plugins` INNER JOIN `devices` AS `D` ON `D`.`device_id` = `munin_plugins`.`device_id` INNER JOIN `devices_perms` AS `P` ON `P`.`device_id` = `D`.`device_id` WHERE `P`.`user_id` = ? AND (`mplug_type` LIKE '%".$search."%' OR `mplug_title` LIKE '%".$search."%' OR `hostname` LIKE '%".$search."%') ORDER BY hostname LIMIT ".$limit, array(LegacyAuth::id()));
+                $results = dbFetchRows("SELECT * FROM `munin_plugins` INNER JOIN `devices` AS `D` ON `D`.`device_id` = `munin_plugins`.`device_id` WHERE `D`.`device_id` IN (" . join(',', array_keys($permissions['device'])) . ") AND (`mplug_type` LIKE '%".$search."%' OR `mplug_title` LIKE '%".$search."%' OR `hostname` LIKE '%".$search."%') ORDER BY hostname LIMIT ".$limit, array(LegacyAuth::id()));
             }
 
             if (count($results)) {
@@ -276,7 +276,7 @@ if (isset($_REQUEST['search'])) {
             if (LegacyAuth::user()->hasGlobalRead()) {
                 $results = dbFetchRows("SELECT `ports`.ifType FROM `ports` WHERE `ifType` LIKE '%".$search."%' GROUP BY ifType ORDER BY ifType LIMIT ".$limit);
             } else {
-                $results = dbFetchRows("SELECT `I`.ifType FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` AND (`ifType` LIKE '%".$search."%') GROUP BY ifType ORDER BY ifType LIMIT ".$limit, array(LegacyAuth::id(), LegacyAuth::id()));
+                $results = dbFetchRows("SELECT `I`.ifType FROM `ports` AS `I`, `devices` AS `D`, `ports_perms` AS `PP` WHERE (`D`.`device_id` IN (" . join(',', array_keys($permissions['device'])) . ") OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` AND (`ifType` LIKE '%".$search."%') GROUP BY ifType ORDER BY ifType LIMIT ".$limit, array(LegacyAuth::id()));
             }
             if (count($results)) {
                 $found   = 1;

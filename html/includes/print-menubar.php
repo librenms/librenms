@@ -12,7 +12,7 @@ $if_alerts        = dbFetchCell("SELECT COUNT(port_id) FROM `ports` WHERE `ifOpe
 if (Auth::user()->hasGlobalRead()) {
     $links['count']        = dbFetchCell("SELECT COUNT(*) FROM `links`");
 } else {
-    $links['count']       = dbFetchCell("SELECT COUNT(*) FROM `links` AS `L`, `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND `L`.`local_device_id` = `D`.`device_id`", array(Auth::id()));
+    $links['count']       = dbFetchCell("SELECT COUNT(*) FROM `links` AS `L`, `devices` AS `D` WHERE `D`.`device_id` IN (" . join(',', array_keys($permissions['devices'])) . ") AND `L`.`local_device_id` = `D`.`device_id`");
 }
 
 if (isset($config['enable_bgp']) && $config['enable_bgp']) {
@@ -148,8 +148,7 @@ $param = array();
 if (Auth::user()->hasGlobalRead()) {
     $sql = "SELECT `type`,COUNT(`type`) AS total_type FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`";
 } else {
-    $sql = "SELECT `type`,COUNT(`type`) AS total_type FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `type` ORDER BY `type`";
-    $param[] = Auth::id();
+    $sql = "SELECT `type`,COUNT(`type`) AS total_type FROM `devices` WHERE `device_id` IN (" . join(',', array_keys($permissions['device'])) . ") GROUP BY `type` ORDER BY `type`";
 }
 
 $device_types = dbFetchRows($sql, $param);
@@ -859,4 +858,3 @@ $('#gsearch').bind('typeahead:open', function(ev, suggestion) {
     $('#gsearch').addClass('search-box');
 });
 </script>
-

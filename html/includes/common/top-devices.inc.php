@@ -175,8 +175,8 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
         } else {
             $query = '
             SELECT *, sum(p.ifInOctets_rate + p.ifOutOctets_rate) as total
-            FROM ports as p, devices as d, `devices_perms` AS `P`
-            WHERE `P`.`user_id` = :user AND `P`.`device_id` = `d`.`device_id` AND
+            FROM ports as p, devices as d
+            WHERE `d`.`device_id` IN (' . join(',', array_keys($permissions['devices'])) . ') AND
             d.device_id = p.device_id
             AND unix_timestamp() - p.poll_time < :interval 
             AND ( p.ifInOctets_rate > 0
@@ -194,10 +194,9 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       ORDER BY `uptime` ' . $sort_order . ' 
                       LIMIT :count';
         } else {
-            $query = 'SELECT `uptime`, `hostname`, `last_polled`, `d`.`device_id`, `d`.`sysName`
-                      FROM `devices` as `d`, `devices_perms` AS `P`
-                      WHERE  `P`.`user_id` = :user
-                      AND `P`.`device_id` = `d`.`device_id`
+            $query = 'SELECT `uptime`, `hostname`, `last_polled`, `device_id`, `sysName`
+                      FROM `devices`
+                      WHERE  `device_id` IN (' . join(',', array_keys($permissions['devices'])) . ')
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval
                       ORDER BY `uptime` ' . $sort_order . ' 
                       LIMIT :count';
@@ -210,12 +209,11 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       ORDER BY `last_ping_timetaken` ' . $sort_order . ' 
                       LIMIT :count';
         } else {
-            $query = 'SELECT `last_ping_timetaken`, `hostname`, `last_polled`, `d`.`device_id`, `d`.`sysName`
-                      FROM `devices` as `d`, `devices_perms` AS `P` 
-                      WHERE `P`.`user_id` = :user 
-                      AND `P`.`device_id` = `d`.`device_id` 
-                      AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
-                      ORDER BY `last_ping_timetaken` ' . $sort_order . ' 
+            $query = 'SELECT `last_ping_timetaken`, `hostname`, `last_polled`, `device_id`, `sysName`
+                      FROM `devices`
+                      WHERE `device_id` IN (' . join(',', array_keys($permissions['devices'])) . ')
+                      AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval
+                      ORDER BY `last_ping_timetaken` ' . $sort_order . '
                       LIMIT :count';
         }
     } elseif ($top_query === 'cpu') {
@@ -229,8 +227,9 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       LIMIT :count';
         } else {
             $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, avg(`processor_usage`) as `cpuload`, `d`.`sysName`
-                      FROM `processors` AS procs, `devices` AS `d`, `devices_perms` AS `P`
-					  WHERE `P`.`user_id` = :user AND `P`.`device_id` = `procs`.`device_id` AND `P`.`device_id` = `d`.`device_id` 
+                      FROM `processors` AS procs, `devices` AS `d`
+					  WHERE `P`.`device_id` = `d`.`device_id`
+                      AND `d`.`device_id` IN (' . join(',', array_keys($permissions['devices'])) . ')
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval
                       GROUP BY `procs`.`device_id`, `d`.`hostname`, `d`.`last_polled`, `d`.`sysName`
                       ORDER BY `cpuload` ' . $sort_order . '
@@ -247,8 +246,9 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       LIMIT :count';
         } else {
             $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, `mempool_perc`, `d`.`sysName`
-                      FROM `mempools` as `mem`, `devices` as `d`, `devices_perms` AS `P`
-                      WHERE `P`.`user_id` = :user AND `P`.`device_id` = `mem`.`device_id` AND `P`.`device_id` = `d`.`device_id` 
+                      FROM `mempools` as `mem`, `devices` as `d`
+                      WHERE `d`.`device_id` = `mem`.`device_id`
+                      AND `d`.`device_id` IN (' . join(',', array_keys($permissions['devices'])) . ')
                       AND `mempool_descr` IN (\'Physical memory\',\'Memory\')
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
                       ORDER BY `mempool_perc` ' . $sort_order . '
@@ -265,8 +265,9 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       LIMIT :count';
         } else {
             $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, `storage_perc`, `d`.`sysName`, `storage_descr`, `storage_perc_warn`, `storage_id`
-                      FROM `storage` as `disk`, `devices` as `d`, `devices_perms` AS `P`
-                      WHERE `P`.`user_id` = :user AND `P`.`device_id` = `disk`.`device_id` AND `P`.`device_id` = `d`.`device_id` 
+                      FROM `storage` as `disk`, `devices` as `d`
+                      WHERE `d`.`device_id` = `disk`.`device_id`
+                      AND `d`.`device_id` IN (' . join(',', array_keys($permissions['devices'])) . ')
                       AND `d`.`type` = \'server\'
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
                       ORDER BY `storage_perc` ' . $sort_order . '
@@ -275,17 +276,16 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
     } elseif ($top_query === 'poller') {
         if (LegacyAuth::user()->hasGlobalRead()) {
             $query = 'SELECT `last_polled_timetaken`, `hostname`, `last_polled`, `device_id`, `sysName`
-                      FROM `devices` 
-                      WHERE unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
-                      ORDER BY `last_polled_timetaken` ' . $sort_order . ' 
+                      FROM `devices`
+                      WHERE unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval
+                      ORDER BY `last_polled_timetaken` ' . $sort_order . '
                       LIMIT :count';
         } else {
-            $query = 'SELECT `last_polled_timetaken`, `hostname`, `last_polled`, `d`.`device_id`, `d`.`sysName`
-                      FROM `devices` as `d`, `devices_perms` AS `P` 
-                      WHERE `P`.`user_id` = :user 
-                      AND `P`.`device_id` = `d`.`device_id` 
-                      AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
-                      ORDER BY `last_polled_timetaken` ' . $sort_order . ' 
+            $query = 'SELECT `last_polled_timetaken`, `hostname`, `last_polled`, `device_id`, `sysName`
+                      FROM `devices`
+                      WHERE `device_id` IN (' . join(',', array_keys($permissions['devices'])) . ')
+                      AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval
+                      ORDER BY `last_polled_timetaken` ' . $sort_order . '
                       LIMIT :count';
         }
     }

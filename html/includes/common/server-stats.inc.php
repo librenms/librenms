@@ -27,12 +27,10 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                 <select id="device" name="device" class="form-control">';
     if (LegacyAuth::user()->hasGlobalRead()) {
         $sql = "SELECT `devices`.`device_id`, `hostname` FROM `devices` WHERE disabled = 0 AND `type` = 'server' ORDER BY `hostname` ASC";
-        $param = array();
     } else {
-        $sql = "SELECT `devices`.`device_id`, `hostname` FROM `devices` LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id` WHERE disabled = 0 AND `type` = 'server' AND `DP`.`user_id`=? ORDER BY `hostname` ASC";
-        $param = array(LegacyAuth::id());
+        $sql = "SELECT `devices`.`device_id`, `hostname` FROM `devices` WHERE `device_id` IN (" . join(',', array_keys($permissions['devices'])) . ") AND disabled = 0 AND `type` = 'server' AND `DP`.`user_id`=? ORDER BY `hostname` ASC";
     }
-    foreach (dbFetchRows($sql, $param) as $dev) {
+    foreach (dbFetchRows($sql) as $dev) {
         if ($dev['device_id'] == $cur_dev) {
             $selected = 'selected';
         } else {

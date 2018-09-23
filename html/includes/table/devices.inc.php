@@ -21,9 +21,7 @@ $param = array();
 $sql = ' FROM `devices`';
 
 if (!LegacyAuth::user()->hasGlobalRead()) {
-    $sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
-    $where .= ' AND `DP`.`user_id`=?';
-    $param[] = LegacyAuth::id();
+    $where .= ' AND `devices`.`device_id` IN (' . join(array_keys($permissions['device']), ',') . ')';
 }
 
 if (!empty($vars['location'])) {

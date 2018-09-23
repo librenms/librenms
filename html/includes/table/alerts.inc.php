@@ -87,9 +87,7 @@ if (isset($searchPhrase) && !empty($searchPhrase)) {
 $sql = ' FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`';
 
 if (!LegacyAuth::user()->hasGlobalRead()) {
-    $sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
-    $where .= ' AND `DP`.`user_id`=?';
-    $param[] = LegacyAuth::id();
+    $where .= ' AND `devices`.`device_id` IN (' . join(',', array_keys($permissions['devices'])) . ')';
 }
 
 $sql .= "  RIGHT JOIN `alert_rules` ON `alerts`.`rule_id`=`alert_rules`.`id` WHERE $where";

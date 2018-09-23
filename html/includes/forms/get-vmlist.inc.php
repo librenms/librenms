@@ -22,9 +22,8 @@ $vm_query = "SELECT v.vmwVmDisplayName AS vmname, v.vmwVmState AS powerstat, v.d
 
 $param = [];
 if (!LegacyAuth::user()->hasGlobalRead()) {
-    $vm_query .= ' LEFT JOIN devices_perms AS DP ON d.device_id = DP.device_id';
-    $uidwhere = ' AND DP.user_id = ?';
-    $uid = [LegacyAuth::id()];
+    $uidwhere = ' AND d.device_id IN (' . join(',', array_keys($permissions['devices'])) . ')';
+    $uid = [];
 } else {
     $uidwhere = '';
     $uid = [];

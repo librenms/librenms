@@ -6,9 +6,7 @@ use LibreNMS\Authentication\LegacyAuth;
 $param = array();
 
 if (!LegacyAuth::user()->hasGlobalRead()) {
-    $perms_sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `D`.`device_id` = `DP`.`device_id`';
-    $where     .= ' AND `DP`.`user_id`=?';
-    $param[]    = array(LegacyAuth::id());
+    $where     .= ' AND `D`.`device_id` IN (' . join(',', array_keys($permissions['devices'])) . ')';
 }
 
 list($address,$prefix) = explode('/', $vars['address']);

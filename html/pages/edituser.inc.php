@@ -17,6 +17,18 @@ if (!LegacyAuth::user()->isAdmin()) {
         $user_data = LegacyAuth::get()->getUser($vars['user_id']);
         echo '<p><h2>'.$user_data['realname']."</h2><a href='edituser/'>Change...</a></p>";
         // Perform actions if requested
+        if ($vars['action'] == 'delgroupperm') {
+            if (dbFetchCell('SELECT COUNT(*) FROM device_groups_perms WHERE `group_id` = ? AND `user_id` = ?', array($vars['group_id'], $vars['user_id']))) {
+                dbDelete('device_groups_perms', '`group_id` =  ? AND `user_id` = ?', array($vars['group_id'], $vars['user_id']));
+            }
+        }
+
+        if ($vars['action'] == 'addgroupperm') {
+            if (!dbFetchCell('SELECT COUNT(*) FROM device_groups_perms WHERE `group_id` = ? AND `user_id` = ?', array($vars['group_id'], $vars['user_id']))) {
+                dbInsert(array('group_id' => $vars['group_id'], 'user_id' => $vars['user_id']), 'device_groups_perms');
+            }
+        }
+
         if ($vars['action'] == 'deldevperm') {
             if (dbFetchCell('SELECT COUNT(*) FROM devices_perms WHERE `device_id` = ? AND `user_id` = ?', array($vars['device_id'], $vars['user_id']))) {
                 dbDelete('devices_perms', '`device_id` =  ? AND `user_id` = ?', array($vars['device_id'], $vars['user_id']));
@@ -54,6 +66,57 @@ if (!LegacyAuth::user()->isAdmin()) {
         }
 
         echo '<div class="row">
+        <div class="col-md-4">';
+
+        // Display groups this users has access to
+        echo '<h3>Groups Access</h3>';
+
+        echo "<div class='panel panel-default panel-condensed'>
+            <table class='table table-hover table-condensed table-striped'>
+              <tr>
+                <th>Group</th>
+                <th>Action</th>
+              </tr>";
+
+        $device_groups_perms = dbFetchRows('SELECT * from device_groups_perms as P, device_groups as G WHERE `user_id` = ? AND G.id = P.group_id', array($vars['user_id']));
+        $group_access_list = array();
+        $access_list = array();
+        foreach ($device_groups_perms as $device_groups_perm) {
+            echo '<tr><td><strong>'.$device_groups_perm['name']."</td><td> <a href='edituser/action=delgroupperm/user_id=".$vars['user_id'].'/group_id='.$device_groups_perm['group_id']."'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a></strong></td></tr>";
+            $group_access_list[] = $device_groups_perm['group_id'];
+            $access_list         = array_merge($access_list, GetDevicesFromGroup($device_groups_perm['group_id']));
+            $permdone            = 'yes';
+        }
+
+        echo '</table>
+        </div>';
+
+        if (!$permdone) {
+            echo 'None Configured';
+        }
+
+        // Display groups this user doesn't have access to
+        echo '<h4>Grant access to new groups</h4>';
+        echo "<form class='form-inline' role='form' method='post' action=''>
+          <input type='hidden' value='".$vars['user_id']."' name='user_id'>
+          <input type='hidden' value='edituser' name='page'>
+          <input type='hidden' value='addgroupperm' name='action'>
+          <div class='form-group'>
+            <label class='sr-only' for='group_id'>Group</label>
+            <select name='group_id' id='group_id' class='form-control'>";
+
+        $groups = dbFetchRows('SELECT * FROM `device_groups` ORDER BY name');
+        foreach ($groups as $group) {
+            if (!in_array($group['id'], $group_access_list)) {
+                echo "<option value='".$group['id']."'>".$group['name'].'</option>';
+            }
+        }
+
+        echo "</select>
+        </div>
+        <button type='submit' class='btn btn-default' name='Submit'>Add</button></form>";
+
+        echo '</div>
            <div class="col-md-4">';
 
         // Display devices this users has access to
@@ -69,8 +132,10 @@ if (!LegacyAuth::user()->isAdmin()) {
         $device_perms = dbFetchRows('SELECT * from devices_perms as P, devices as D WHERE `user_id` = ? AND D.device_id = P.device_id', array($vars['user_id']));
         foreach ($device_perms as $device_perm) {
             echo '<tr><td><strong>'.format_hostname($device_perm)."</td><td> <a href='edituser/action=deldevperm/user_id=".$vars['user_id'].'/device_id='.$device_perm['device_id']."'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a></strong></td></tr>";
-            $access_list[] = $device_perm['device_id'];
-            $permdone      = 'yes';
+            if (!in_array($device_perm['device_id'], $access_list)) {
+                $access_list[] = $device_perm['device_id'];
+            }
+            $permdone = 'yes';
         }
 
         echo '</table>
@@ -92,14 +157,7 @@ if (!LegacyAuth::user()->isAdmin()) {
 
         $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY hostname');
         foreach ($devices as $device) {
-            unset($done);
-            foreach ($access_list as $ac) {
-                if ($ac == $device['device_id']) {
-                    $done = 1;
-                }
-            }
-
-            if (!$done) {
+            if (!in_array($device['device_id'], $access_list)) {
                 echo "<option value='".$device['device_id']."'>".format_hostname($device, $device['hostname']).'</option>';
             }
         }
@@ -153,14 +211,7 @@ if (!LegacyAuth::user()->isAdmin()) {
           <option value=''>Select a device</option>";
 
         foreach ($devices as $device) {
-            unset($done);
-            foreach ($access_list as $ac) {
-                if ($ac == $device['device_id']) {
-                    $done = 1;
-                }
-            }
-
-            if (!$done) {
+            if (!in_array($device['device_id'], $access_list)) {
                 echo "<option value='".$device['device_id']."'>".format_hostname($device, $device['hostname']).'</option>';
             }
         }
@@ -195,6 +246,7 @@ if (!LegacyAuth::user()->isAdmin()) {
               <th>Action</th>
             </tr>";
 
+        $bill_access_list = array();
         foreach ($bill_perms as $bill_perm) {
             echo '<tr>
               <td>
@@ -225,14 +277,7 @@ if (!LegacyAuth::user()->isAdmin()) {
 
         $bills = dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_name`');
         foreach ($bills as $bill) {
-            unset($done);
-            foreach ($bill_access_list as $ac) {
-                if ($ac == $bill['bill_id']) {
-                    $done = 1;
-                }
-            }
-
-            if (!$done) {
+            if (!in_array($bill['bill_id'], $bill_access_list)) {
                 echo "<option value='".$bill['bill_id']."'>".$bill['bill_name'].'</option>';
             }
         }

@@ -58,7 +58,7 @@ if (!empty($filter_device)) {
     if (LegacyAuth::user()->hasGlobalRead()) {
         $results = dbFetchRows("SELECT `hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`");
     } else {
-        $results = dbFetchRows("SELECT `D`.`hostname` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `hostname` ORDER BY `hostname`", array(LegacyAuth::id()));
+        $results = dbFetchRows("SELECT `hostname` FROM `devices` WHERE `device_id` IN (" . join(',', array_keys($permissions['devices'])) . ") GROUP BY `hostname` ORDER BY `hostname`");
     }
 
     foreach ($results as $data) {
