@@ -580,9 +580,9 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
         if ($snmpver === "v3") {
             // Try each set of parameters from config
             foreach ($config['snmp']['v3'] as $v3) {
-                $device = deviceArray($host, null, $snmpver, $port, $transport, $v3, $port_assoc_mode);
+                $device = deviceArray($host, null, $snmpver, $port, $transport, $v3, $port_assoc_mode, $additional);
                 if ($force_add === true || isSNMPable($device)) {
-                    return createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $force_add);
+                    return createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $force_add, $additional);
                 } else {
                     $host_unreachable_exception->addReason("SNMP $snmpver: No reply with credentials " . $v3['authname'] . "/" . $v3['authlevel']);
                 }
@@ -590,10 +590,10 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
         } elseif ($snmpver === "v2c" || $snmpver === "v1") {
             // try each community from config
             foreach ($config['snmp']['community'] as $community) {
-                $device = deviceArray($host, $community, $snmpver, $port, $transport, null, $port_assoc_mode);
+                $device = deviceArray($host, $community, $snmpver, $port, $transport, null, $port_assoc_mode, $additional);
 
                 if ($force_add === true || isSNMPable($device)) {
-                    return createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $force_add);
+                    return createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $force_add, $additional);
                 } else {
                     $host_unreachable_exception->addReason("SNMP $snmpver: No reply with community $community");
                 }
@@ -610,12 +610,15 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     throw $host_unreachable_exception;
 }
 
-function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $port_assoc_mode = 'ifIndex')
+function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $port_assoc_mode = 'ifIndex', $additional = array())
 {
     $device = array();
     $device['hostname'] = $host;
     $device['port'] = $port;
     $device['transport'] = $transport;
+
+    $device['jump_user'] = array_key_exists('jump_user', $additional) ? $additional['jump_user'] : null;
+    $device['jump_hostname'] = array_key_exists('jump_hostname', $additional) ? $additional['jump_hostname'] : null;
 
     /* Get port_assoc_mode id if neccessary
      * We can work with names of IDs here */
@@ -816,6 +819,8 @@ function createHost(
         'status_reason' => '',
         'port_association_mode' => $port_assoc_mode,
         'snmp_disable' => $additional['snmp_disable'] ? $additional['snmp_disable'] : 0,
+        'jump_hostname' => array_key_exists('jump_hostname', $additional) ? $additional['jump_hostname'] : null,
+        'jump_user' => array_key_exists('jump_user', $additional) ? $additional['jump_user'] : null,
     );
 
     $device = array_merge($device, $v3);  // merge v3 settings

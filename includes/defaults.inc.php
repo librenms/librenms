@@ -982,3 +982,7 @@ $config['bad_disk_regexp'] = [];
 
 // Snmptrap logging: none, unhandled, all
 $config['snmptraps']['eventlog'] = 'unhandled';
+
+// Jump Host
+$config['jump_cmd'] = '/bin/ssh';
+$config['jump_args'] = '-oControlMaster=auto -oControlPath=/tmp/ssh_mux_\\%h_\\%p_\\%r -oControlPersist=1m -oBatchMode=yes -oStrictHostKeyChecking=yes -oConnectTimeout=10 -l';

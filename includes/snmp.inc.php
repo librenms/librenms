@@ -182,6 +182,15 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
         $cmd .= ' 2>/dev/null';
     }
 
+    if ($device['jump_hostname'] && $device['jump_user']) {
+        $cmd = sprintf('%s %s %s %s -- %s', Config::get('jump_cmd'),
+                                            Config::get('jump_args'),
+                                            $device['jump_user'],
+                                            $device['jump_hostname'],
+                                            $cmd
+                                           );
+    }
+
     return $cmd;
 } // end gen_snmp_cmd()
 
@@ -294,6 +303,11 @@ function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = nul
     $data = trim(external_exec($cmd), "\" \n\r");
 
     recordSnmpStatistic('snmpgetnext', $time_start);
+
+    if ($device['jump_hostname'] && jump_error_check()) {
+        return false;
+    }
+
     if (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data)) {
         return false;
     } elseif ($data || $data === '0') {
@@ -1402,4 +1416,18 @@ function get_device_max_repeaters($device)
 function oid_is_numeric($oid)
 {
     return (bool)preg_match('/^[.\d]+$/', $oid);
+}
+
+/**
+ * Check if the jump host connection has errored out - returns 'true' if an error is found
+ *
+ * @param string $data
+ * @return bool
+ */
+function jump_error_check($data) {
+    if (preg_match('/(Connection closed by remote host|Could not resolve hostname|Operation timed out|Host key verification failed)/i', $data)) {
+        return true;
+    }
+
+    return false;
 }

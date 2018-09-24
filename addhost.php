@@ -16,7 +16,7 @@ use LibreNMS\Exceptions\HostUnreachableException;
 $init_modules = array();
 require __DIR__ . '/includes/init.php';
 
-$options = getopt('Pbg:p:f::');
+$options = getopt('j:Pbg:p:f::');
 
 if (isset($options['g']) && $options['g'] >= 0) {
     $cmd = array_shift($argv);
@@ -65,6 +65,22 @@ if (isset($options['b'])) {
     $cmd = array_shift($argv);
     array_shift($argv);
     array_unshift($argv, $cmd);
+}
+
+if (isset($options['j'])) {
+    $cmd = array_shift($argv);
+    array_shift($argv);
+    array_shift($argv);
+    array_unshift($argv, $cmd);
+
+    $jump = explode('@', $options['j']);
+
+    if (count($jump === 2)) {
+        $jump_user = $jump[0];
+        $jump_hostname = $jump[1];
+    } else {
+        printf("Invalid jump host descriptor '%s' (please specify as 'user@host')", $options['j']);
+    }
 }
 
 if (!empty($argv[1])) {
@@ -188,6 +204,11 @@ if (!empty($argv[1])) {
         }
     }//end if
 
+    if (isset($options['j'])) {
+        $additional['jump_user'] = $jump_user;
+        $additional['jump_hostname'] = $jump_hostname;
+    }
+
     try {
         $device_id = addHost($host, $snmpver, $port, $transport, $poller_group, $force_add, $port_assoc_mode, $additional);
         $device = device_by_id_cache($device_id);
@@ -223,6 +244,9 @@ if (!empty($argv[1])) {
         Valid port assoc modes are: ' . join(', ', $valid_assoc_modes) . '
     -b Add the host with SNMP if it replies to it, otherwise only ICMP.
     -P Add the host with only ICMP, no SNMP or OS discovery.
+
+    Experimental:
+      -j <user@host.example.org> Use a jump host to poll the system - target sytem *must* have librenms MIBs, net-snmp, and fping.
 
     %rRemember to run discovery for the host afterwards.%n
 '
