@@ -475,6 +475,8 @@ devices:
     - { Field: notes, Type: text, 'Null': true, Extra: '' }
     - { Field: port_association_mode, Type: int(11), 'Null': false, Extra: '', Default: '1' }
     - { Field: max_depth, Type: int(11), 'Null': false, Extra: '', Default: '0' }
+    - { Field: jump_user, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: jump_hostname, Type: varchar(255), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [device_id], Unique: true, Type: BTREE }
     status: { Name: status, Columns: [status], Unique: false, Type: BTREE }
