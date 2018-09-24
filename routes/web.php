@@ -33,11 +33,13 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         Route::post('set_resolution', 'ResolutionController@set');
 
         Route::group(['prefix' => 'select', 'namespace' => 'Select'], function () {
-            Route::get('syslog', 'SyslogController');
             Route::get('device', 'DeviceController');
+            Route::get('eventlog', 'EventlogController');
+            Route::get('syslog', 'SyslogController');
         });
 
         Route::group(['prefix' => 'table', 'namespace' => 'Table'], function () {
+            Route::post('eventlog', 'EventlogController');
             Route::post('syslog', 'SyslogController');
         });
     });
