@@ -62,6 +62,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::post('alerts', 'AlertsController');
             Route::post('availability-map', 'AvailabilityMapController');
             Route::post('placeholder', 'PlaceholderController');
+            Route::post('top-devices', 'TopDevicesController');
         });
     });
 

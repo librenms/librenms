@@ -34,6 +34,7 @@ abstract class WidgetController extends Controller
 {
     protected $show_settings = false;
     public $title = 'Widget'; // sets the title for this widget, use title() function if you need to dynamically generate
+    private $settings = null;
 
     /**
      * @param Request $request
@@ -68,10 +69,12 @@ abstract class WidgetController extends Controller
 
     public function getSettings()
     {
-        $widget = UserWidget::findOrFail(\Request::get('id'));
-        $settings = collect($widget->settings);
+        if (is_null($this->settings)) {
+            $widget = UserWidget::findOrFail(\Request::get('id'));
+            $this->settings = collect($widget->settings);
+        }
 
-        return $settings;
+        return $this->settings;
     }
 
     private function formatResponse($view, $title, $settings, $status = 'ok')

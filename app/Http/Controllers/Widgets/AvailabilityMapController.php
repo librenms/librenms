@@ -44,26 +44,6 @@ class AvailabilityMapController extends WidgetController
         return isset($settings['title']) ? $settings['title'] : $this->title;
     }
 
-    public function getSettingsView(Request $request)
-    {
-        $id = $request->get('id');
-        $widget = UserWidget::find($id);
-        $settings = collect($widget->settings);
-
-        $data = [
-            'id' => $id,
-            'title' => $settings->get('title'),
-            'type' => $this->typeSetting($settings),
-            'tile_size' => $settings->get('tile_size', 12),
-            'color_only_select' => $settings->get('color_only_select', 0),
-            'show_disabled_and_ignored' => $settings->get('show_disabled_and_ignored', 0),
-            'mode_select' => $settings->get('mode_select'),
-            'device_group' => DeviceGroup::find($settings->get('device_group')),
-        ];
-
-        return view('widgets.settings.availability-map', $data);
-    }
-
     public function getView(Request $request)
     {
         $settings = $this->getSettings();
@@ -93,6 +73,24 @@ class AvailabilityMapController extends WidgetController
         ];
 
         return view('widgets.availability-map', $data);
+    }
+
+    public function getSettingsView(Request $request)
+    {
+        $settings = $this->getSettings();
+
+        $data = [
+            'id' => $request->get('id'),
+            'title' => $settings->get('title'),
+            'type' => $this->typeSetting($settings),
+            'tile_size' => $settings->get('tile_size', 12),
+            'color_only_select' => $settings->get('color_only_select', 0),
+            'show_disabled_and_ignored' => $settings->get('show_disabled_and_ignored', 0),
+            'mode_select' => $settings->get('mode_select'),
+            'device_group' => DeviceGroup::find($settings->get('device_group')),
+        ];
+
+        return view('widgets.settings.availability-map', $data);
     }
 
     private function typeSetting($settings)
