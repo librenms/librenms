@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use DB;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -173,6 +174,27 @@ class Device extends BaseModel
         }
 
         return $name;
+    }
+
+    /**
+     * Check if user can access this device.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function canAccess($user)
+    {
+        if (!$user) {
+            return false;
+        }
+
+        if ($user->hasGlobalRead()) {
+            return true;
+        }
+
+        return DB::table('devices_perms')
+            ->where('user_id', $user->user_id)
+            ->where('device_id', $this->device_id)->exists();
     }
 
     public function formatUptime($short = false)
