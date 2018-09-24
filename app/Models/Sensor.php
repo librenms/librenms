@@ -64,4 +64,9 @@ class Sensor extends BaseModel
     {
         return $this->belongsTo('App\Models\Device', 'device_id');
     }
+
+    public function events()
+    {
+        return $this->morphMany(Eventlog::class, 'events', 'type', 'reference');
+    }
 }

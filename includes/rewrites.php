@@ -1,6 +1,8 @@
 <?php
 
 
+use LibreNMS\Util\Rewrite;
+
 function rewrite_location($location)
 {
     // FIXME -- also check the database for rewrites?
@@ -1004,59 +1006,13 @@ function rewrite_generic_hardware($hardware)
 
 function fixiftype($type)
 {
-    $rewrite_iftype = array(
-        '/^frameRelay$/'             => 'Frame Relay',
-        '/^ethernetCsmacd$/'         => 'Ethernet',
-        '/^softwareLoopback$/'       => 'Loopback',
-        '/^tunnel$/'                 => 'Tunnel',
-        '/^propVirtual$/'            => 'Virtual Int',
-        '/^ppp$/'                    => 'PPP',
-        '/^ds1$/'                    => 'DS1',
-        '/^pos$/'                    => 'POS',
-        '/^sonet$/'                  => 'SONET',
-        '/^slip$/'                   => 'SLIP',
-        '/^mpls$/'                   => 'MPLS Layer',
-        '/^l2vlan$/'                 => 'VLAN Subif',
-        '/^atm$/'                    => 'ATM',
-        '/^aal5$/'                   => 'ATM AAL5',
-        '/^atmSubInterface$/'        => 'ATM Subif',
-        '/^propPointToPointSerial$/' => 'PtP Serial',
-    );
-
-    $type = array_preg_replace($rewrite_iftype, $type);
-
-    return ($type);
+    return Rewrite::normalizeIfType($type);
 }
 
 
 function fixifName($inf)
 {
-    $rewrite_ifname = array(
-        'ether'                                          => 'Ether',
-        'gig'                                            => 'Gig',
-        'fast'                                           => 'Fast',
-        'ten'                                            => 'Ten',
-        '-802.1q vlan subif'                             => '',
-        '-802.1q'                                        => '',
-        'bvi'                                            => 'BVI',
-        'vlan'                                           => 'Vlan',
-        'tunnel'                                         => 'Tunnel',
-        'serial'                                         => 'Serial',
-        '-aal5 layer'                                    => ' aal5',
-        'null'                                           => 'Null',
-        'atm'                                            => 'ATM',
-        'port-channel'                                   => 'Port-Channel',
-        'dial'                                           => 'Dial',
-        'hp procurve switch software loopback interface' => 'Loopback Interface',
-        'control plane interface'                        => 'Control Plane',
-        'loop'                                           => 'Loop',
-        'bundle-ether'                                   => 'Bundle-Ether',
-    );
-
-    $inf = strtolower($inf);
-    $inf = array_str_replace($rewrite_ifname, $inf);
-
-    return $inf;
+    return Rewrite::normalizeIfName($inf);
 }
 
 
