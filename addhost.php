@@ -75,7 +75,7 @@ if (isset($options['j'])) {
 
     $jump = explode('@', $options['j']);
 
-    if (count($jump === 2)) {
+    if (count($jump) === 2) {
         $jump_user = $jump[0];
         $jump_hostname = $jump[1];
     } else {

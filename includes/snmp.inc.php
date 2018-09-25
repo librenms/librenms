@@ -183,12 +183,14 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
     }
 
     if ($device['jump_hostname'] && $device['jump_user']) {
-        $cmd = sprintf('%s %s %s %s -- %s', Config::get('jump_cmd'),
-                                            Config::get('jump_args'),
-                                            $device['jump_user'],
-                                            $device['jump_hostname'],
-                                            $cmd
-                                           );
+        $cmd = sprintf(
+            '%s %s %s %s -- %s',
+            Config::get('jump_cmd'),
+            Config::get('jump_args'),
+            $device['jump_user'],
+            $device['jump_hostname'],
+            $cmd
+        );
     }
 
     return $cmd;
@@ -304,7 +306,7 @@ function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = nul
 
     recordSnmpStatistic('snmpgetnext', $time_start);
 
-    if ($device['jump_hostname'] && jump_error_check()) {
+    if ($device['jump_hostname'] && jump_error_check($data)) {
         return false;
     }
 
@@ -1424,7 +1426,8 @@ function oid_is_numeric($oid)
  * @param string $data
  * @return bool
  */
-function jump_error_check($data) {
+function jump_error_check($data)
+{
     if (preg_match('/(Connection closed by remote host|Could not resolve hostname|Operation timed out|Host key verification failed)/i', $data)) {
         return true;
     }
