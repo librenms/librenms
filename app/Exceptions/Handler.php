@@ -37,19 +37,9 @@ class Handler extends ExceptionHandler
 
     protected function convertExceptionToResponse(Exception $e)
     {
-        if ($e instanceof QueryException) {
-            // connect exception, convert to our standard connection exception
-            if (config('app.debug')) {
-                // get message form PDO exception, it doesn't contain the query
-                $message = $e->getMessage();
-            } else {
-                $message = $e->getPrevious()->getMessage();
-            }
-
-            if (in_array($e->getCode(), [1044, 1045, 2002])) {
-                throw new DatabaseConnectException($message, $e->getCode(), $e);
-            }
-            return response('Unhandled MySQL Error [' . $e->getCode() . "] $message");
+        // handle database exceptions
+        if ($db_response = $this->dbExceptionToResponse($e)) {
+            return $db_response;
         }
 
         // check for exceptions relating to not being able to write to the filesystem
@@ -79,5 +69,29 @@ class Handler extends ExceptionHandler
         }
 
         return redirect()->guest(route('login'));
+    }
+
+    protected function dbExceptionToResponse(Exception $e)
+    {
+        if ($e instanceof QueryException) {
+            // connect exception, convert to our standard connection exception
+            if (config('app.debug')) {
+                // get message form PDO exception, it doesn't contain the query
+                $message = $e->getMessage();
+            } else {
+                $message = $e->getPrevious()->getMessage();
+            }
+
+            if (in_array($e->getCode(), [1044, 1045, 2002])) {
+                // this Exception has it's own render function
+                throw new DatabaseConnectException($message, $e->getCode(), $e);
+            }
+            return response()->view('errors.generic', [
+                'title' => 'Unhandled MySQL Error [' . $e->getCode() . ']',
+                'content' => $message
+            ]);
+        }
+
+        return false;
     }
 }
