@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use App\Checks;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\QueryException;
@@ -49,6 +50,11 @@ class Handler extends ExceptionHandler
                 throw new DatabaseConnectException($message, $e->getCode(), $e);
             }
             return response('Unhandled MySQL Error [' . $e->getCode() . "] $message");
+        }
+
+        // check for exceptions relating to not being able to write to the filesystem
+        if ($output = Checks::filePermissionsException($e)) {
+            return $output;
         }
 
         // show helpful response if debugging, otherwise print generic error so we don't leak information
