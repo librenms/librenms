@@ -140,7 +140,7 @@ class Checks
     /**
      * Check exception for errors related to not being able to write to the filesystem
      *
-     * @param $e
+     * @param \Exception $e
      * @return bool|SymfonyResponse
      */
     public static function filePermissionsException($e)
