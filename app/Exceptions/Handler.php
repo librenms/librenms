@@ -53,8 +53,8 @@ class Handler extends ExceptionHandler
         }
 
         // check for exceptions relating to not being able to write to the filesystem
-        if ($output = Checks::filePermissionsException($e)) {
-            return $output;
+        if ($fs_response = Checks::filePermissionsException($e)) {
+            return $fs_response;
         }
 
         // show helpful response if debugging, otherwise print generic error so we don't leak information
