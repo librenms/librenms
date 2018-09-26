@@ -198,7 +198,9 @@ class Checks
             Config::get('rrd_dir', base_path('rrd')),
         ];
 
-        $mk_dirs = array_filter($mkdirs, 'file_exists');
+        $mk_dirs = array_filter($mkdirs, function ($file) {
+            return !file_exists($file);
+        });
 
         if (!empty($mk_dirs)) {
             $commands[] = 'sudo mkdir -p ' . implode(' ', $mk_dirs);
