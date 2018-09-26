@@ -180,8 +180,16 @@ class Checks
         $user = config('librenms.user');
         $group = config('librenms.group');
         $install_dir = base_path();
+        $commands = [];
+        $dirs = [
+            base_path('bootstrap/cache'),
+            base_path('storage'),
+            Config::get('log_dir', base_path('logs')),
+            Config::get('rrd_dir', base_path('rrd')),
+        ];
 
-        $mk_dirs = [
+        // check if folders are missing
+        $mkdirs = [
             base_path('bootstrap/cache'),
             base_path('storage/framework/sessions'),
             base_path('storage/framework/views'),
@@ -190,25 +198,22 @@ class Checks
             Config::get('rrd_dir', base_path('rrd')),
         ];
 
-        $dirs = [
-            base_path('bootstrap/cache'),
-            base_path('storage'),
-            Config::get('log_dir', base_path('logs')),
-            Config::get('rrd_dir', base_path('rrd')),
-        ];
+        $mk_dirs = array_filter($mkdirs, 'file_exists');
 
-        $commands = [
-            'sudo mkdir -p ' . implode(' ', $mk_dirs),
-            "sudo chown -R $user:$group $install_dir",
-            'sudo setfacl -d -m g::rwx ' . implode(' ', $dirs),
-            'sudo chmod -R ug=rwX ' . implode(' ', $dirs),
-        ];
+        if (!empty($mk_dirs)) {
+            $commands[] = 'sudo mkdir -p ' . implode(' ', $mk_dirs);
+        }
+
+        // always print chwon/setfacl/chmod commands
+        $commands[] = "sudo chown -R $user:$group $install_dir";
+        $commands[] = 'sudo setfacl -d -m g::rwx ' . implode(' ', $dirs);
+        $commands[] = 'sudo chmod -R ug=rwX ' . implode(' ', $dirs);
 
         // check if webserver is in the librenms group
         $current_groups = explode(' ', trim(exec('groups')));
         if (!in_array($group, $current_groups)) {
             $current_user = trim(exec('whoami'));
-            $chown_commands[] = "usermod -a -G $group $current_user";
+            $commands[] = "usermod -a -G $group $current_user";
         }
 
         // selinux:
