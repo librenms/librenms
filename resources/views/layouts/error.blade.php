@@ -66,6 +66,10 @@
 
 <div class="container">
     @yield('content')
+
+    <hr class="separator"/>
+
+    <p>@lang("If you need additional help, you can find how to get help at") <a href="https://docs.librenms.org/Support">https://docs.librenms.org/Support</a>.</p>
 </div>
 </body>
 </html>
