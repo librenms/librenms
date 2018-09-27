@@ -1,4 +1,6 @@
 <?php
 
 
-Route::any('legacy_ajax_dash', 'LegacyController@dash');
+Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
+    Route::any('legacy_ajax_dash', 'LegacyController@dash');
+});
