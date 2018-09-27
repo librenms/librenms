@@ -227,7 +227,7 @@ function check_service($command)
     d_echo("Request:  $safe_command\n");
 
     // Run the command and return its response.
-    exec($safe_command, $response_array, $status);
+    exec('LC_NUMERIC="C" ' . $safe_command, $response_array, $status);
 
     // exec returns an array, lets implode it back to a string.
     $response_string = implode("\n", $response_array);
