@@ -102,8 +102,7 @@ class Url
         if ($overlib == 0) {
             $link = $contents;
         } else {
-            // escape quotes
-            $contents = str_replace(["'", '"'], "\'", $contents);
+            $contents = self::escapeBothQuotes($contents);
             $link = Url::overlibLink($url, $text, $contents, $class);
         }
 
@@ -245,6 +244,22 @@ class Url
         return $output;
     }
 
+    public static function overlibContent($graph_array, $text)
+    {
+        $overlib_content = '<div class=overlib><span class=overlib-text>' . $text . '</span><br />';
+
+        $now = Carbon::now();
+
+        foreach ([1, 7, 30, 365] as $days) {
+            $graph_array['from'] = $now->subDays($days)->timestamp;
+            $overlib_content .= self::escapeBothQuotes(self::graphTag($graph_array));
+        }
+
+        $overlib_content .= '</div>';
+
+        return $overlib_content;
+    }
+
     /**
      * Generate minigraph image url
      *
@@ -320,5 +335,10 @@ class Url
         }
 
         return "interface-upup";
+    }
+
+    private static function escapeBothQuotes($string)
+    {
+        return str_replace(["'", '"'], "\'", $string);
     }
 }

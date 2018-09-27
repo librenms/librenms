@@ -26,15 +26,19 @@
 namespace App\Http\Controllers\Widgets;
 
 use App\Models\Device;
+use App\Models\Mempool;
 use App\Models\Port;
 use App\Models\Processor;
 use Auth;
 use Carbon\Carbon;
-use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
+use LibreNMS\Util\Colors;
+use LibreNMS\Util\Html;
+use LibreNMS\Util\StringHelpers;
+use LibreNMS\Util\Url;
 
 class TopDevicesController extends WidgetController
 {
@@ -129,10 +133,10 @@ class TopDevicesController extends WidgetController
         $settings = $this->getSettings();
         
         return $query->with(['device' => function ($query) {
-                $query->select('device_id', 'hostname', 'sysName');
-            }])->select('device_id')
-            ->where('devices.poll_time', '>', Carbon::now()->subMinutes($settings->get('time_interval', 15)))
-            ->groupBy(['device_id'])
+                $query->select('devices.device_id', 'devices.hostname', 'devices.sysName');
+            }])->select('devices.device_id')
+            ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings->get('time_interval', 15)))
+            ->groupBy(['devices.device_id'])
             ->limit($settings->get('device_count', 5));
     }
 
@@ -159,63 +163,17 @@ class TopDevicesController extends WidgetController
     {
         $now = Carbon::now();
         return [
-            \LibreNMS\Util\Url::deviceLink($device, $device->shortDisplayName()),
-            \LibreNMS\Util\Url::deviceLink($device, \LibreNMS\Util\Url::minigraphImage(
+            Url::deviceLink($device, $device->shortDisplayName()),
+            Url::deviceLink($device, Url::minigraphImage(
                 $device,
                 $now->subDay()->timestamp,
                 $now->timestamp,
                 $graph_type,
                 'no',
                 150,
-                21
+                210
             ), $graph_params, 0, 0, 0),
         ];
-    }
-
-    private function getInfo($type)
-    {
-        $info = [
-            'traffic' => [
-                'header' => 'Traffic',
-                'graph_type' => 'device_bits',
-                'graph_params' => [],
-            ],
-            'uptime' => [
-                'header' => 'Uptime',
-                'graph_type' => 'device_uptime',
-                'graph_params' => ['tab' => 'graphs', 'group' => 'system'],
-            ],
-            'ping' => [
-                'header' => 'Response time',
-                'graph_type' => 'device_ping_perf',
-                'graph_params' => ['tab' => 'graphs', 'group' => 'poller'],
-            ],
-            'cpu' => [
-                'header' => 'CPU Load',
-                'graph_type' => 'device_processor',
-                'graph_params' => ['tab' => 'health', 'metric' => 'processor'],
-            ],
-            'ram' => [
-                'header' => 'Memory usage',
-                'graph_type' => 'device_mempool',
-                'graph_params' => ['tab' => 'health', 'metric' => 'mempool'],
-            ],
-            'poller' => [
-                'header' => 'Poller duration',
-                'graph_type' => 'device_poller_perf',
-                'graph_params' => ['tab' => 'graphs', 'group' => 'poller'],
-            ],
-            'storage' => [
-                'header' => 'Disk usage',
-                'graph_type' => 'device_storage',
-                'graph_params' => ['tab' => 'health', 'metric' => 'storage'],
-            ]
-        ];
-
-        $result = $info['$type'];
-        $result['type'] = $type;
-
-        return $result;
     }
 
     private function getUptimeData($sort)
@@ -253,5 +211,82 @@ class TopDevicesController extends WidgetController
         });
 
         return $this->formatData('CPU Load', $results);
+    }
+
+    private function getMemoryData($sort)
+    {
+        /** @var Builder $query */
+        $query = $this->withDeviceQuery(Mempool::hasAccess(Auth::user()))
+            ->orderBy('mempool_perc', $sort);
+
+        $results = $query->get()->map(function ($port) {
+            return $this->standardRow($port->device, 'device_mempool', ['tab' => 'health', 'metric' => 'mempool']);
+        });
+
+        return $this->formatData('Memory usage', $results);
+    }
+
+    private function getPollerData($sort)
+    {
+        /** @var Builder $query */
+        $query = $this->deviceQuery()->orderBy('last_polled_timetaken', $sort);
+
+        $results = $query->get()->map(function ($port) {
+            return $this->standardRow($port->device, 'device_poller_perf', ['tab' => 'graphs', 'group' => 'poller']);
+        });
+
+        return $this->formatData('Poller duration', $results);
+    }
+
+    private function getStorageData($sort)
+    {
+        $settings = $this->getSettings();
+        $now = Carbon::now();
+
+        /** @var Builder $query */
+        $query = \App\Models\Storage::hasAccess(Auth::user())->with(['device' => function ($query) {
+                $query->select('devices.device_id', 'devices.hostname', 'devices.sysName');
+            }])
+            ->leftJoin('devices', 'storage.device_id', 'devices.device_id')
+            ->select('storage.device_id', 'storage_id', 'storage_descr', 'storage_perc', 'storage_perc_warn')
+            ->where('devices.last_polled', '>', $now->subMinutes($settings->get('time_interval', 15)))
+            ->orderBy('storage_perc', $sort)
+            ->limit($settings->get('device_count', 5));
+
+
+        $results = $query->get()->map(function ($storage) use ($now) {
+            $device = $storage->device;
+
+            $graph_array = [
+                'height' => 100,
+                'width' => 210,
+                'to' => $now->timestamp,
+                'from' => $now->subDay()->timestamp,
+                'id' => $storage->storage_id,
+                'type' => 'device_storage',
+                'legend' => 'no',
+            ];
+            $overlib_content = Url::overlibContent($graph_array, $device->displayName() . ' - ' . $storage->storage_descr);
+
+            $link_array = $graph_array;
+            $link_array['page'] = 'graphs';
+            unset($link_array['height'], $link_array['width'], $link_array['legend']);
+            $link = Url::generate($link_array);
+
+            $percent = $storage->storage_perc;
+            $background = Colors::percentage($percent, $storage->storage_perc_warn);
+
+            return [
+                Url::deviceLink($device, $device->shortDisplayName()),
+                StringHelpers::shortenText($storage->storage_descr, 50),
+                Url::overlibLink(
+                    $link,
+                    Html::percentageBar(150, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']),
+                    $overlib_content
+                )
+            ];
+        });
+
+        return $this->formatData(['Storage Device', 'Disk usage'], $results);
     }
 }

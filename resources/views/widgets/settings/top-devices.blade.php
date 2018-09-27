@@ -25,8 +25,8 @@
         <label for="sort_order-{{ $id }}" class="control-label col-sm-6 availability-map-widget-header">@lang('Sort order')</label>
         <div class="col-sm-6">
             <select class="form-control" name="sort_order" id="sort_order-{{ $id }}">
-                <option value="asc" {{ $top_query == 'asc' ? 'selected' : '' }}>@lang('Ascending')</option>
-                <option value="desc" {{ $top_query == 'desc' ? 'selected' : '' }}>@lang('Descending')</option>
+                <option value="asc" {{ $sort_order == 'asc' ? 'selected' : '' }}>@lang('Ascending')</option>
+                <option value="desc" {{ $sort_order == 'desc' ? 'selected' : '' }}>@lang('Descending')</option>
             </select>
         </div>
     </div>

@@ -2,7 +2,11 @@
 /**
  * Html.php
  *
+<<<<<<< HEAD
  * Helper functions to generate html snippets
+=======
+ * -Description-
+>>>>>>> All types initial implementation.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -94,5 +98,27 @@ class Html
         }
 
         return $graph_data;
+    }
+
+    public static function percentageBar($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background)
+    {
+        if ($percent > '100') {
+            $size_percent = '100';
+        } else {
+            $size_percent = $percent;
+        }
+
+        $output = '
+        <div style="width:'.$width.'px; height:'.$height.'px; position: relative;">
+        <div class="progress" style="min-width: 2em; background-color:#'.$right_background.'; height:'.$height.'px;margin-bottom:-'.$height.'px;">
+        <div class="progress-bar" role="progressbar" aria-valuenow="'.$size_percent.'" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width:'.$size_percent.'%; background-color: #'.$left_background.';">
+        </div>
+        </div>
+        <b style="padding-left: 2%; position: absolute; top: 0; left: 0;color:#'.$left_colour.';">'.$left_text.'</b>
+        <b style="padding-right: 2%; position: absolute; top: 0; right: 0;color:#'.$right_colour.';">'.$right_text.'</b>
+        </div>
+        ';
+
+        return $output;
     }
 }
