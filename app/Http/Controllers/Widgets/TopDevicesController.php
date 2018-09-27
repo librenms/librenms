@@ -114,6 +114,7 @@ class TopDevicesController extends WidgetController
 
     /**
      * @param Builder $query
+     * @param string $left_table
      * @return Builder
      */
     private function withDeviceQuery($query, $left_table)
@@ -127,7 +128,7 @@ class TopDevicesController extends WidgetController
             ->select("$left_table.device_id")
             ->leftJoin('devices', "$left_table.device_id", 'devices.device_id')
             ->groupBy("$left_table.device_id")
-            ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings->get('time_interval', 15)))
+            ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings->get('time_interval', 15)));
     }
 
     /**
@@ -212,16 +213,8 @@ class TopDevicesController extends WidgetController
 
     private function getProcessorData($sort)
     {
-        $settings = $this->getSettings();
-
         /** @var Builder $query */
-        $query = Processor::hasAccess(Auth::user())->with(['device' => function ($query) {
-            $query->select('device_id', 'hostname', 'sysName', 'status');
-        }])
-            ->select('processors.device_id')
-            ->leftJoin('devices', 'processors.device_id', 'devices.device_id')
-            ->groupBy('processors.device_id')
-            ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings->get('time_interval', 15)))
+        $query = $this->withDeviceQuery(Processor::hasAccess(Auth::user()), (new Processor)->getTable())
             ->orderByRaw('AVG(`processor_usage`) ' . $sort);
 
         $results = $query->get()->map(function ($port) {
@@ -233,16 +226,8 @@ class TopDevicesController extends WidgetController
 
     private function getMemoryData($sort)
     {
-        $settings = $this->getSettings();
-
         /** @var Builder $query */
-        $query = Mempool::hasAccess(Auth::user())->with(['device' => function ($query) {
-            $query->select('device_id', 'hostname', 'sysName', 'status');
-        }])
-            ->select('mempools.device_id')
-            ->leftJoin('devices', 'mempools.device_id', 'devices.device_id')
-            ->groupBy('mempools.device_id')
-            ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings->get('time_interval', 15)))
+        $query = $this->withDeviceQuery(Mempool::hasAccess(Auth::user()), (new Mempool)->getTable())
             ->orderBy('mempool_perc', $sort);
 
         $results = $query->get()->map(function ($port) {
@@ -270,7 +255,7 @@ class TopDevicesController extends WidgetController
 
         /** @var Builder $query */
         $query = Storage::hasAccess(Auth::user())->with(['device' => function ($query) {
-                $query->select('devices.device_id', 'devices.hostname', 'devices.sysName');
+                $query->select('device_id', 'hostname', 'sysName', 'status');
             }])
             ->leftJoin('devices', 'storage.device_id', 'devices.device_id')
             ->select('storage.device_id', 'storage_id', 'storage_descr', 'storage_perc', 'storage_perc_warn')
