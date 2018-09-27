@@ -29,6 +29,7 @@ use App\Models\Device;
 use App\Models\Mempool;
 use App\Models\Port;
 use App\Models\Processor;
+use App\Models\Storage;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -98,19 +99,6 @@ class TopDevicesController extends WidgetController
         return view('widgets.settings.top-devices', $data);
     }
 
-    private function getTrafficData($sort)
-    {
-        /** @var Builder $query */
-        $query = $this->withDeviceQuery(Port::hasAccess(Auth::user()))
-            ->orderByRaw('SUM(ifInOctets_rate + ifOutOctets_rate) ' . $sort);
-
-        $results = $query->get()->map(function ($port) {
-            return $this->standardRow($port->device, 'device_bits');
-        });
-
-        return $this->formatData('Traffic', $results);
-    }
-
     /**
      * @param array|string $headers
      * @param Collection $rows
@@ -128,16 +116,18 @@ class TopDevicesController extends WidgetController
      * @param Builder $query
      * @return Builder
      */
-    private function withDeviceQuery($query)
+    private function withDeviceQuery($query, $left_table)
     {
         $settings = $this->getSettings();
-        
+
+        /** @var Builder $query */
         return $query->with(['device' => function ($query) {
-                $query->select('devices.device_id', 'devices.hostname', 'devices.sysName');
-            }])->select('devices.device_id')
+            $query->select('device_id', 'hostname', 'sysName', 'status');
+        }])
+            ->select("$left_table.device_id")
+            ->leftJoin('devices', "$left_table.device_id", 'devices.device_id')
+            ->groupBy("$left_table.device_id")
             ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings->get('time_interval', 15)))
-            ->groupBy(['devices.device_id'])
-            ->limit($settings->get('device_count', 5));
     }
 
     /**
@@ -148,8 +138,8 @@ class TopDevicesController extends WidgetController
     {
         $settings = $this->getSettings();
 
-        return Device::hasAccess(Auth::user())->select('device_id', 'hostname', 'sysName')
-            ->where('devices.poll_time', '>', Carbon::now()->subMinutes($settings->get('time_interval', 15)))
+        return Device::hasAccess(Auth::user())->select('device_id', 'hostname', 'sysName', 'status')
+            ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings->get('time_interval', 15)))
             ->limit($settings->get('device_count', 5));
     }
 
@@ -161,19 +151,39 @@ class TopDevicesController extends WidgetController
      */
     private function standardRow($device, $graph_type, $graph_params = [])
     {
-        $now = Carbon::now();
         return [
             Url::deviceLink($device, $device->shortDisplayName()),
             Url::deviceLink($device, Url::minigraphImage(
                 $device,
-                $now->subDay()->timestamp,
-                $now->timestamp,
+                Carbon::now()->subDays(1)->timestamp,
+                Carbon::now()->timestamp,
                 $graph_type,
                 'no',
                 150,
-                210
+                21
             ), $graph_params, 0, 0, 0),
         ];
+    }
+
+    private function getTrafficData($sort)
+    {
+        $settings = $this->getSettings();
+
+        /** @var Builder $query */
+        $query = Port::hasAccess(Auth::user())->with(['device' => function ($query) {
+            $query->select('device_id', 'hostname', 'sysName', 'status');
+        }])
+            ->select('device_id')
+            ->groupBy('device_id')
+            ->where('poll_time', '>', Carbon::now()->subMinutes($settings->get('time_interval', 15)))
+            ->orderByRaw('SUM(ifInOctets_rate + ifOutOctets_rate) ' . $sort)
+            ->limit($settings->get('device_count', 5));
+
+        $results = $query->get()->map(function ($port) {
+            return $this->standardRow($port->device, 'device_bits');
+        });
+
+        return $this->formatData('Traffic', $results);
     }
 
     private function getUptimeData($sort)
@@ -181,8 +191,8 @@ class TopDevicesController extends WidgetController
         /** @var Builder $query */
         $query = $this->deviceQuery()->orderBy('uptime', $sort);
 
-        $results = $query->get()->map(function ($port) {
-            return $this->standardRow($port->device, 'device_uptime', ['tab' => 'graphs', 'group' => 'system']);
+        $results = $query->get()->map(function ($device) {
+            return $this->standardRow($device, 'device_uptime', ['tab' => 'graphs', 'group' => 'system']);
         });
 
         return $this->formatData('Uptime', $results);
@@ -193,8 +203,8 @@ class TopDevicesController extends WidgetController
         /** @var Builder $query */
         $query = $this->deviceQuery()->orderBy('last_ping_timetaken', $sort);
 
-        $results = $query->get()->map(function ($port) {
-            return $this->standardRow($port->device, 'device_ping_perf', ['tab' => 'graphs', 'group' => 'poller']);
+        $results = $query->get()->map(function ($device) {
+            return $this->standardRow($device, 'device_ping_perf', ['tab' => 'graphs', 'group' => 'poller']);
         });
 
         return $this->formatData('Response time', $results);
@@ -202,8 +212,16 @@ class TopDevicesController extends WidgetController
 
     private function getProcessorData($sort)
     {
+        $settings = $this->getSettings();
+
         /** @var Builder $query */
-        $query = $this->withDeviceQuery(Processor::hasAccess(Auth::user()))
+        $query = Processor::hasAccess(Auth::user())->with(['device' => function ($query) {
+            $query->select('device_id', 'hostname', 'sysName', 'status');
+        }])
+            ->select('processors.device_id')
+            ->leftJoin('devices', 'processors.device_id', 'devices.device_id')
+            ->groupBy('processors.device_id')
+            ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings->get('time_interval', 15)))
             ->orderByRaw('AVG(`processor_usage`) ' . $sort);
 
         $results = $query->get()->map(function ($port) {
@@ -215,8 +233,16 @@ class TopDevicesController extends WidgetController
 
     private function getMemoryData($sort)
     {
+        $settings = $this->getSettings();
+
         /** @var Builder $query */
-        $query = $this->withDeviceQuery(Mempool::hasAccess(Auth::user()))
+        $query = Mempool::hasAccess(Auth::user())->with(['device' => function ($query) {
+            $query->select('device_id', 'hostname', 'sysName', 'status');
+        }])
+            ->select('mempools.device_id')
+            ->leftJoin('devices', 'mempools.device_id', 'devices.device_id')
+            ->groupBy('mempools.device_id')
+            ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings->get('time_interval', 15)))
             ->orderBy('mempool_perc', $sort);
 
         $results = $query->get()->map(function ($port) {
@@ -231,8 +257,8 @@ class TopDevicesController extends WidgetController
         /** @var Builder $query */
         $query = $this->deviceQuery()->orderBy('last_polled_timetaken', $sort);
 
-        $results = $query->get()->map(function ($port) {
-            return $this->standardRow($port->device, 'device_poller_perf', ['tab' => 'graphs', 'group' => 'poller']);
+        $results = $query->get()->map(function ($device) {
+            return $this->standardRow($device, 'device_poller_perf', ['tab' => 'graphs', 'group' => 'poller']);
         });
 
         return $this->formatData('Poller duration', $results);
@@ -241,27 +267,26 @@ class TopDevicesController extends WidgetController
     private function getStorageData($sort)
     {
         $settings = $this->getSettings();
-        $now = Carbon::now();
 
         /** @var Builder $query */
-        $query = \App\Models\Storage::hasAccess(Auth::user())->with(['device' => function ($query) {
+        $query = Storage::hasAccess(Auth::user())->with(['device' => function ($query) {
                 $query->select('devices.device_id', 'devices.hostname', 'devices.sysName');
             }])
             ->leftJoin('devices', 'storage.device_id', 'devices.device_id')
             ->select('storage.device_id', 'storage_id', 'storage_descr', 'storage_perc', 'storage_perc_warn')
-            ->where('devices.last_polled', '>', $now->subMinutes($settings->get('time_interval', 15)))
+            ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings->get('time_interval', 15)))
             ->orderBy('storage_perc', $sort)
             ->limit($settings->get('device_count', 5));
 
 
-        $results = $query->get()->map(function ($storage) use ($now) {
+        $results = $query->get()->map(function ($storage) {
             $device = $storage->device;
 
             $graph_array = [
                 'height' => 100,
                 'width' => 210,
-                'to' => $now->timestamp,
-                'from' => $now->subDay()->timestamp,
+                'to' => Carbon::now()->timestamp,
+                'from' => Carbon::now()->subDay()->timestamp,
                 'id' => $storage->storage_id,
                 'type' => 'device_storage',
                 'legend' => 'no',
