@@ -25,11 +25,14 @@
 
 namespace App\Http\Controllers\Widgets;
 
+use App\Models\Port;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class TopInterfacesController extends WidgetController
 {
+    public $title = 'Top Interfaces';
 
     /**
      * @param Request $request
@@ -38,6 +41,21 @@ class TopInterfacesController extends WidgetController
     public function getView(Request $request)
     {
         $data = $this->settingsWithDefaults();
+
+        $query = Port::hasAccess($request->user())->with(['device' => function ($query) {
+            $query->select('device_id', 'hostname', 'sysName', 'status');
+        }])
+            ->select('port_id', 'device_id', 'ifName', 'ifDescr', 'ifAlias')
+            ->groupBy('port_id', 'device_id', 'ifName', 'ifDescr', 'ifAlias')
+            ->where('poll_time', '>', Carbon::now()->subMinutes($data['time_interval']))
+            ->orderByRaw('SUM(ifInOctets_rate + ifOutOctets_rate) DESC')
+            ->limit($data['interface_count']);
+
+        if ($data['interface_filter']) {
+            $query->where('ifType', '=', $data['interface_filter']);
+        }
+
+        $data['ports'] = $query->get();
 
         return view('widgets.top-interfaces', $data);
     }

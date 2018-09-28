@@ -176,6 +176,33 @@ class Url
         return self::generate(['page' => 'device', 'device' => $port->device_id, 'tab' => 'port', 'port' => $port->port_id], $vars);
     }
 
+    /**
+     * @param Port $port
+     * @return string
+     */
+    public static function portThumbnail($port)
+    {
+        $graph_array = [
+            'port_id' => $port->port_id,
+            'graph_type' => 'port_bits',
+            'from' => Carbon::now()->subDay()->timestamp,
+            'to' => Carbon::now()->timestamp,
+            'width' => 150,
+            'height' => 21,
+        ];
+
+        return self::portImage($graph_array);
+    }
+
+    public static function portImage($args)
+    {
+        if (empty($args['bg'])) {
+            $args['bg'] = 'FFFFFF00';
+        }
+
+        return "<img src='graph.php?type=" . $args['graph_type'] . '&amp;id=' . $args['port_id'] . '&amp;from=' . $args['from'] . '&amp;to=' . $args['to'] . '&amp;width=' . $args['width'] . '&amp;height=' . $args['height'] . '&amp;bg=' . $args['bg'] . "'>";
+    }
+
     public static function generate($vars, $new_vars = [])
     {
         $vars = array_merge($vars, $new_vars);

@@ -10,9 +10,11 @@
         </thead>
         <tbody>
         @foreach($ports as $port)
-            <td class="text-left">{{ \LibreNMS\Util\Url::deviceLink($port->device, $port->device->shortDisplayName()) }}</td>
-            <td class="text-left">{{ \LibreNMS\Util\Url::portLink($port, $port->shortLabel()) }}</td>
-            <td class="text-left">{{ \LibreNMS\Util\Url::portLink($port, \LibreNMS\Util\Url::portThumbnail($port)) }}</td>
+            <tr>
+                <td class="text-left">{!! \LibreNMS\Util\Url::deviceLink($port->device, $port->device->shortDisplayName()) !!}</td>
+                <td class="text-left">{!! \LibreNMS\Util\Url::portLink($port, $port->getShortLabel()) !!}</td>
+                <td class="text-left">{!! \LibreNMS\Util\Url::portLink($port, \LibreNMS\Util\Url::portThumbnail($port)) !!}</td>
+            </tr>
         @endforeach
         </tbody>
     </table>

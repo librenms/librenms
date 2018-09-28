@@ -103,6 +103,7 @@ class Rewrite
             'serviceinstance'     => 'SI',
             'dwdm'                => 'DWDM',
             'bundle-ether'        => 'BE',
+            'bridge-aggregation'  => 'BA',
         ];
 
         return str_ireplace(array_keys($rewrite_shortif), array_values($rewrite_shortif), $name);
