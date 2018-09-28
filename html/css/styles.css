@@ -2067,6 +2067,11 @@ label {
   line-height:34px;
 }
 
+.dashboard-graph, .dashboard-graph img {
+  height: 100%;
+  width: 100%;
+}
+
 .nav > li > a {
   padding-left: 10px;
   padding-right: 5px;

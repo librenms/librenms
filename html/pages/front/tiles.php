@@ -639,7 +639,7 @@ if (strpos($dash_config, 'globe') !== false) {
             url: 'ajax/dash/' + data_type,
             data: {
                 id: id,
-                dimensions: {x:$("#widget_body_"+id).innerWidth()-50, y:$("#widget_body_"+id).innerHeight()-50},
+                dimensions: {x:$("#widget_body_"+id).width(), y:$("#widget_body_"+id).height()},
                 settings:settings
             },
             dataType: "json",
