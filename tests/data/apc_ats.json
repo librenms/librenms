@@ -11,7 +11,7 @@
                     "hardware": null,
                     "features": null,
                     "location": null,
-                    "os": "apc-ats",
+                    "os": "apc",
                     "type": "power",
                     "serial": null,
                     "icon": "apc.svg"
@@ -29,7 +29,7 @@
                     "hardware": "AP4423",
                     "features": null,
                     "location": "<private>",
-                    "os": "apc-ats",
+                    "os": "apc",
                     "type": "power",
                     "serial": "<private>",
                     "icon": "apc.svg"
