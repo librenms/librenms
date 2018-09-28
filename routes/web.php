@@ -49,6 +49,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::get('device-group', 'DeviceGroupController');
             Route::get('eventlog', 'EventlogController');
             Route::get('syslog', 'SyslogController');
+            Route::get('port', 'PortController');
         });
 
         Route::group(['prefix' => 'table', 'namespace' => 'Table'], function () {
@@ -63,6 +64,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::post('availability-map', 'AvailabilityMapController');
             Route::post('placeholder', 'PlaceholderController');
             Route::post('top-devices', 'TopDevicesController');
+            Route::post('top-interfaces', 'TopInterfacesController');
         });
     });
 

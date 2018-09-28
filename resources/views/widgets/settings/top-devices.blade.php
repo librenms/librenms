@@ -37,7 +37,7 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="time_interval-{{ $id }}" class="control-label col-sm-6 availability-map-widget-header">@lang('Time interval (minutes)')</label>
+        <label for="time_interval-{{ $id }}" class="control-label col-sm-6 availability-map-widget-header">@lang('Last Polled (minutes)')</label>
         <div class="col-sm-6">
             <input class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" name="time_interval" id="time_interval-{{ $id }}" value="{{ $time_interval }}">
         </div>
