@@ -70,10 +70,10 @@ abstract class DeviceSummaryController extends WidgetController
             'down' => Port::hasAccess($user)->isDown()->count(),
             'ignored' => Port::hasAccess($user)->isIgnored()->count(),
             'shutdown' => Port::hasAccess($user)->isShutdown()->count(),
-            'errored' => $data->get('summary_errors') ? Port::hasAccess($user)->hasErrors()->count() : -1,
+            'errored' => $data['summary_errors'] ? Port::hasAccess($user)->hasErrors()->count() : -1,
         ];
 
-        if ($data->get('show_services')) {
+        if ($data['show_services']) {
             $data['services'] = [
                 'count' => Service::hasAccess($user)->count(),
                 'up' => Service::hasAccess($user)->isUp()->count(),

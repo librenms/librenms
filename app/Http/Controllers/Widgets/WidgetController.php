@@ -72,13 +72,18 @@ abstract class WidgetController extends Controller
         return $this->formatResponse($view, $title, $settings);
     }
 
+    /**
+     * Get the settings (with defaults applied)
+     *
+     * @return array
+     */
     public function getSettings()
     {
         if (is_null($this->settings)) {
             $id = \Request::get('id');
             $widget = UserWidget::findOrFail($id);
-            $this->settings = collect($this->defaults)->merge($widget->settings);
-            $this->settings->put('id', $id);
+            $this->settings = array_replace($this->defaults, (array)$widget->settings);
+            $this->settings['id'] = $id;
         }
 
         return $this->settings;

@@ -47,6 +47,7 @@ class AvailabilityMapController extends WidgetController
             'color_only_select' => 0,
             'show_disabled_and_ignored' => 0,
             'mode_select' => 0,
+            'device_group' => 0,
         ];
     }
 
@@ -65,12 +66,15 @@ class AvailabilityMapController extends WidgetController
         $services = [];
         $services_totals = [];
 
-        if ($data->mode_select == 0 || $data->mode_select == 2) {
-            list($devices, $device_totals) = $this->getDevices($request, $data);
+        $mode = $data['mode_select'];
+        if ($mode == 0 || $mode == 2) {
+            list($devices, $device_totals) = $this->getDevices($request);
         }
-        if ($data->mode_select > 0) {
-            list($services, $services_totals) = $this->getServices($request, $data);
+        if ($mode > 0) {
+            list($services, $services_totals) = $this->getServices($request);
         }
+
+        $data['device'] = Device::first();
 
         $data['devices'] = $devices;
         $data['device_totals'] = $device_totals;
@@ -85,26 +89,27 @@ class AvailabilityMapController extends WidgetController
     public function getSettingsView(Request $request)
     {
         $settings = $this->getSettings();
-        $settings['device_group'] = DeviceGroup::find($settings->get('device_group'));
+        $settings['device_group'] = DeviceGroup::find($settings['device_group']);
 
         return view('widgets.settings.availability-map', $settings);
     }
 
     /**
      * @param Request $request
-     * @param $settings
      * @return array
      */
-    private function getDevices(Request $request, $settings)
+    private function getDevices(Request $request)
     {
+        $settings = $this->getSettings();
+
         // filter for by device group or show all
-        if ($group_id = $settings->get('device_group')) {
+        if ($group_id = $settings['device_group']) {
             $device_query = DeviceGroup::find($group_id)->devices()->hasAccess($request->user());
         } else {
             $device_query = Device::hasAccess($request->user());
         }
 
-        if (!$settings->get('show_disabled_and_ignored')) {
+        if (!$settings['show_disabled_and_ignored']) {
             $device_query->where('disabled', 0);
         }
         $devices = $device_query->select('devices.device_id', 'hostname', 'sysName', 'status', 'uptime')->get();
@@ -140,10 +145,12 @@ class AvailabilityMapController extends WidgetController
         return [$devices, $totals];
     }
 
-    private function getServices($request, $settings)
+    private function getServices($request)
     {
+        $settings = $this->getSettings();
+
         // filter for by device group or show all
-        if ($group_id = $settings->get('device_group')) {
+        if ($group_id = $settings['device_group']) {
             $services_query = DeviceGroup::find($group_id)->services()->hasAccess($request->user());
         } else {
             $services_query = Service::hasAccess($request->user());
@@ -172,5 +179,4 @@ class AvailabilityMapController extends WidgetController
         }
         return [$services, $totals];
     }
-
 }
