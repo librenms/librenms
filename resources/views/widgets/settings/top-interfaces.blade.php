@@ -2,19 +2,19 @@
 
 @section('form')
     <div class="form-group">
-        <label for="interface_count-{{ $id }}" class="control-label col-sm-6 availability-map-widget-header">@lang('Number of interfaces'):</label>
+        <label for="interface_count-{{ $id }}" class="control-label col-sm-6">@lang('Number of interfaces'):</label>
         <div class="col-sm-6">
             <input class="form-control" type="number" min="1" step="1" name="interface_count" id="interface_count-{{ $id }}" value="{{ $interface_count }}">
         </div>
     </div>
     <div class="form-group">
-        <label for="time_interval-{{ $id }}" class="control-label col-sm-6 availability-map-widget-header">@lang('Last polled (minutes)'):</label>
+        <label for="time_interval-{{ $id }}" class="control-label col-sm-6">@lang('Last polled (minutes)'):</label>
         <div class="col-sm-6">
             <input class="form-control" type="number" min="1" step="1" name="time_interval" id="time_interval-{{ $id }}" value="{{ $time_interval }}">
         </div>
     </div>
     <div class="form-group">
-        <label for="interface_filter-{{ $id }}" class="col-sm-6 control-label availability-map-widget-header">@lang('Interface type'):</label>
+        <label for="interface_filter-{{ $id }}" class="col-sm-6 control-label">@lang('Interface type'):</label>
         <div class="col-sm-6">
             <select class="form-control" id="interface_filter-{{ $id }}" name="interface_filter">
                 @if($interface_filter)

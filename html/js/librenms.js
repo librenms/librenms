@@ -441,3 +441,28 @@ function http_fallback(link) {
     window.open(url, '_blank');
     return false;
 }
+
+function init_select2(selector, type, placeholder, data, selected) {
+    var $select = $(selector);
+    $select.select2({
+        theme: "bootstrap",
+        dropdownAutoWidth : true,
+        width: "auto",
+        allowClear: true,
+        placeholder: placeholder,
+        ajax: {
+            url: 'ajax/select/' + type,
+            delay: 200,
+            data: function(params) {
+                data.term = params.term;
+                data.page = params.page || 1;
+                return data;
+            }
+        }
+    });
+
+    if (selected) {
+        $select.val(selected);
+        $select.trigger('change');
+    }
+}

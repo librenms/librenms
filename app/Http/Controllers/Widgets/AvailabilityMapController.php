@@ -38,64 +38,56 @@ class AvailabilityMapController extends WidgetController
     public $settings_view = 'widgets.settings.availability-map';
     public $view = '';
 
-    public function title(UserWidget $widget_settings)
+    public function __construct()
     {
-        $settings = $widget_settings->settings;
+        $this->defaults = [
+            'title' => null,
+            'type' => (int)Config::get('webui.availability_map_compact', 0),
+            'tile_size' => 12,
+            'color_only_select' => 0,
+            'show_disabled_and_ignored' => 0,
+            'mode_select' => 0,
+        ];
+    }
+
+    public function title(UserWidget $widget)
+    {
+        $settings = $widget->settings;
         return isset($settings['title']) ? $settings['title'] : $this->title;
     }
 
     public function getView(Request $request)
     {
-        $settings = $this->getSettings();
+        $data = $this->getSettings();
 
         $devices = [];
         $device_totals = [];
         $services = [];
         $services_totals = [];
 
-        $mode = $settings->get('mode_select', 0);
-        if ($mode == 0 || $mode == 2) {
-            list($devices, $device_totals) = $this->getDevices($request, $settings);
+        if ($data->mode_select == 0 || $data->mode_select == 2) {
+            list($devices, $device_totals) = $this->getDevices($request, $data);
         }
-        if ($mode > 0) {
-            list($services, $services_totals) = $this->getServices($request, $settings);
+        if ($data->mode_select > 0) {
+            list($services, $services_totals) = $this->getServices($request, $data);
         }
 
-        $data = [
-            'devices' => $devices,
-            'device_totals' => $device_totals,
-            'services' => $services,
-            'services_totals' => $services_totals,
-            'type' => $this->typeSetting($settings),
-            'tile_size' => $settings->get('tile_size', 12),
-            'color_only' => $settings->get('color_only_select', 0),
-            'show_disabled_and_ignored' => $settings->get('show_disabled_and_ignored', 0),
-        ];
+        $data['devices'] = $devices;
+        $data['device_totals'] = $device_totals;
+        $data['services'] = $services;
+        $data['services_totals'] = $services_totals;
 
         return view('widgets.availability-map', $data);
     }
 
+
+
     public function getSettingsView(Request $request)
     {
         $settings = $this->getSettings();
+        $settings['device_group'] = DeviceGroup::find($settings->get('device_group'));
 
-        $data = [
-            'id' => $request->get('id'),
-            'title' => $settings->get('title'),
-            'type' => $this->typeSetting($settings),
-            'tile_size' => $settings->get('tile_size', 12),
-            'color_only_select' => $settings->get('color_only_select', 0),
-            'show_disabled_and_ignored' => $settings->get('show_disabled_and_ignored', 0),
-            'mode_select' => $settings->get('mode_select'),
-            'device_group' => DeviceGroup::find($settings->get('device_group')),
-        ];
-
-        return view('widgets.settings.availability-map', $data);
-    }
-
-    private function typeSetting($settings)
-    {
-        return $settings->get('type', (int)Config::get('webui.availability_map_compact', 0));
+        return view('widgets.settings.availability-map', $settings);
     }
 
     /**

@@ -2,13 +2,13 @@
 
 @section('form')
     <div class="form-group">
-        <label for="title-{{ $id }}" class="control-label col-sm-6 availability-map-widget-header">@lang('Widget title')</label>
+        <label for="title-{{ $id }}" class="control-label col-sm-6availability-map-widget-header">@lang('Widget title')</label>
         <div class="col-sm-6">
             <input type="text" class="form-control" name="title" id="title-{{ $id }}" placeholder="@lang('Custom title')" value="{{ $title }}">
         </div>
     </div>
     <div class="form-group">
-        <label for="top_query-{{ $id }}" class="control-label col-sm-6 availability-map-widget-header">@lang('Top query')</label>
+        <label for="top_query-{{ $id }}" class="control-label col-sm-6">@lang('Top query')</label>
         <div class="col-sm-6">
             <select class="form-control" name="top_query" id="top_query-{{ $id }}">
                 <option value="traffic" {{ $top_query == 'traffic' ? 'selected' : '' }}>@lang('Traffic')</option>
@@ -22,7 +22,7 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="sort_order-{{ $id }}" class="control-label col-sm-6 availability-map-widget-header">@lang('Sort order')</label>
+        <label for="sort_order-{{ $id }}" class="control-label col-sm-6">@lang('Sort order')</label>
         <div class="col-sm-6">
             <select class="form-control" name="sort_order" id="sort_order-{{ $id }}">
                 <option value="asc" {{ $sort_order == 'asc' ? 'selected' : '' }}>@lang('Ascending')</option>
@@ -31,13 +31,13 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="device_count-{{ $id }}" class="control-label col-sm-6 availability-map-widget-header">@lang('Number of Devices')</label>
+        <label for="device_count-{{ $id }}" class="control-label col-sm-6">@lang('Number of Devices')</label>
         <div class="col-sm-6">
             <input class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" name="device_count" id="device_count-{{ $id }}" value="{{ $device_count }}">
         </div>
     </div>
     <div class="form-group">
-        <label for="time_interval-{{ $id }}" class="control-label col-sm-6 availability-map-widget-header">@lang('Last Polled (minutes)')</label>
+        <label for="time_interval-{{ $id }}" class="control-label col-sm-6">@lang('Last Polled (minutes)')</label>
         <div class="col-sm-6">
             <input class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" name="time_interval" id="time_interval-{{ $id }}" value="{{ $time_interval }}">
         </div>

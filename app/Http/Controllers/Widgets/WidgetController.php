@@ -32,8 +32,13 @@ use Illuminate\View\View;
 
 abstract class WidgetController extends Controller
 {
-    protected $show_settings = false;
-    public $title = 'Widget'; // sets the title for this widget, use title() function if you need to dynamically generate
+    /** @var string sets the title for this widget, use title() function if you need to dynamically generate */
+    protected $title = 'Widget';
+
+    /** @var array Set default values for settings */
+    protected $defaults = [];
+
+    private $show_settings = false;
     private $settings = null;
 
     /**
@@ -70,8 +75,10 @@ abstract class WidgetController extends Controller
     public function getSettings()
     {
         if (is_null($this->settings)) {
-            $widget = UserWidget::findOrFail(\Request::get('id'));
-            $this->settings = collect($widget->settings);
+            $id = \Request::get('id');
+            $widget = UserWidget::findOrFail($id);
+            $this->settings = collect($this->defaults)->merge($widget->settings);
+            $this->settings->put('id', $id);
         }
 
         return $this->settings;

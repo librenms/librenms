@@ -1,6 +1,6 @@
 <?php
 /**
- * PlaceholderController.php
+ * DeviceSummaryHoriz.php
  *
  * -Description-
  *
@@ -26,13 +26,16 @@
 namespace App\Http\Controllers\Widgets;
 
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
-class PlaceholderController extends WidgetController
+class DeviceSummaryHorizController extends DeviceSummaryController
 {
-    protected $title = 'Placeholder';
-
+    /**
+     * @param Request $request
+     * @return View
+     */
     public function getView(Request $request)
     {
-        return view('widgets.placeholder');
+        return view('widgets.device-summary-horiz', $this->getData($request));
     }
 }

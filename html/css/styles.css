@@ -2063,6 +2063,10 @@ label {
   line-height:34px;
 }
 
+.dashboard-widget-settings label {
+  line-height:34px;
+}
+
 .nav > li > a {
   padding-left: 10px;
   padding-right: 5px;

@@ -32,7 +32,12 @@ use Illuminate\View\View;
 
 class TopInterfacesController extends WidgetController
 {
-    public $title = 'Top Interfaces';
+    protected $title = 'Top Interfaces';
+    protected $defaults = [
+        'interface_count' => 5,
+        'time_interval' => 15,
+        'interface_filter' => null,
+    ];
 
     /**
      * @param Request $request
@@ -40,7 +45,7 @@ class TopInterfacesController extends WidgetController
      */
     public function getView(Request $request)
     {
-        $data = $this->settingsWithDefaults();
+        $data = $this->getSettings();
 
         $query = Port::hasAccess($request->user())->with(['device' => function ($query) {
             $query->select('device_id', 'hostname', 'sysName', 'status');
@@ -63,20 +68,7 @@ class TopInterfacesController extends WidgetController
 
     public function getSettingsView(Request $request)
     {
-        $data = $this->settingsWithDefaults();
-        $data['id'] = $request->get('id');
-
-        return view('widgets.settings.top-interfaces', $data);
+        return view('widgets.settings.top-interfaces', $this->getSettings());
     }
 
-    private function settingsWithDefaults()
-    {
-        $settings = $this->getSettings();
-
-        return [
-            'interface_count' => $settings->get('interface_count', 5),
-            'time_interval' => $settings->get('time_interval', 15),
-            'interface_filter' => $settings->get('interface_filter'),
-        ];
-    }
 }

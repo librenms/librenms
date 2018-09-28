@@ -14,7 +14,7 @@
             <th data-column-id="hostname">Hostname</th>
             <th data-column-id="ack_ico" data-sortable="false">ACK</th>
             <th data-column-id="notes" data-sortable="false">Notes</th>
-            <th data-column-id="proc" data-sortable="false" data-visible="{{ $settings->get('proc') ? 'true' : 'false' }}">URL</th>
+            <th data-column-id="proc" data-sortable="false" data-visible="{{ $proc ? 'true' : 'false' }}">URL</th>
         </tr>
         </thead>
     </table>
@@ -26,13 +26,13 @@
         {
             return {
                 id: "alerts",
-                acknowledged: '{{ $settings->get('acknowledged') }}',
-                fired: '{{ $settings->get('fired') }}',
-                in_severity: '{{ $settings->get('in_severity') }}',
-                group: '{{ $settings->get('group') }}',
-                proc: '{{ $settings->get('proc') }}',
-                sort: '{{ $settings->get('sort') }}',
-                device_id: '{{ $settings->get('device') }}'
+                acknowledged: '{{ $acknowledged }}',
+                fired: '{{ $fired }}',
+                min_severity: '{{ $min_severity }}',
+                group: '{{ $group }}',
+                proc: '{{ $proc }}',
+                sort: '{{ $sort }}',
+                device_id: '{{ $device }}'
             }
         },
         url: "ajax_table.php",

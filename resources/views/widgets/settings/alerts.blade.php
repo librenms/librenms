@@ -2,7 +2,7 @@
 
 @section('form')
     <div class="form-group row">
-        <label for="acknowledged-{{ $id }}" class="control-label col-sm-5 availability-map-widget-header">@lang('Show acknowledged'):</label>
+        <label for="acknowledged-{{ $id }}" class="control-label col-sm-5">@lang('Show acknowledged'):</label>
         <div class="col-sm-7">
             <select class="form-control" name="acknowledged" id="acknowledged-{{ $id }}">
                 <option value="">@lang('not filtered')</option>
@@ -12,7 +12,7 @@
         </div>
     </div>
     <div class="form-group row">
-        <label for="fired" class="control-label col-sm-5 availability-map-widget-header">@lang('Show only fired'):</label>
+        <label for="fired" class="control-label col-sm-5">@lang('Show only fired'):</label>
         <div class="col-sm-7">
             <select class="form-control" name="fired">
                 <option value="">@lang('not filtered')</option>
@@ -21,7 +21,7 @@
         </div>
     </div>
     <div class="form-group row">
-        <label for="min_severity-{{ $id }}" class="control-label col-sm-5 availability-map-widget-header">@lang('Displayed severity'):</label>
+        <label for="min_severity-{{ $id }}" class="control-label col-sm-5">@lang('Displayed severity'):</label>
         <div class="col-sm-7">
             <select class="form-control" name="min_severity" id="min_severity-{{ $id }}">
                 <option value="">@lang('any severity')</option>
@@ -32,7 +32,7 @@
         </div>
     </div>
     <div class="form-group row">
-        <label for="state-{{ $id }}" class="control-label col-sm-5 availability-map-widget-header">@lang('State'):</label>
+        <label for="state-{{ $id }}" class="control-label col-sm-5">@lang('State'):</label>
         <div class="col-sm-7">
             <select class="form-control" name="state" id="state-{{ $id }}">
                 <option value="">@lang('any state')</option>
@@ -44,7 +44,7 @@
     </div>
     <div class="form-group">
         <label for="device_group-{{ $id }}"
-               class="col-sm-5 control-label availability-map-widget-header">@lang('Device group')</label>
+               class="col-sm-5 control-label">@lang('Device group')</label>
         <div class="col-sm-7">
             <select class="form-control" name="group" id="device_group-{{ $id }}">
                 @if($device_group)
@@ -54,7 +54,7 @@
         </div>
     </div>
     <div class="form-group row">
-        <label for="proc-{{ $id }}" class="control-label col-sm-5 availability-map-widget-header">@lang('Show Procedure field'):</label>
+        <label for="proc-{{ $id }}" class="control-label col-sm-5">@lang('Show Procedure field'):</label>
         <div class="col-sm-7">
             <select class="form-control" name="proc" id="proc-{{ $id }}">
                 <option value="1" {{ $proc == 1 ? 'selected' : '' }}>@lang('show')</option>
@@ -63,7 +63,7 @@
         </div>
     </div>
     <div class="form-group row">
-        <label for="sort-{{ $id }}" class="control-label col-sm-5 availability-map-widget-header">@lang('Sort alerts by'):</label>
+        <label for="sort-{{ $id }}" class="control-label col-sm-5">@lang('Sort alerts by'):</label>
         <div class="col-sm-7">
             <select class="form-control" name="sort" id="sort-{{ $id }}">
                 <option value="" {{ $sort == 1 ? 'selected' : '' }}>@lang('timestamp, descending')</option>
@@ -71,4 +71,10 @@
             </select>
         </div>
     </div>
+@endsection
+
+@section('javascript')
+    <script type="text/javascript">
+        init_select2('#device_group-{{ $id }}', 'device-group', 'All Alerts', {}, {{ $group ?: 0 }});
+    </script>
 @endsection

@@ -151,6 +151,15 @@ class Port extends BaseModel
      * @param Builder $query
      * @return Builder
      */
+    public function scopeIsShutdown($query)
+    {
+        return $query->where('ifAdminStatus', 'down');
+    }
+
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
     public function scopeIsIgnored($query)
     {
         return $query->where([

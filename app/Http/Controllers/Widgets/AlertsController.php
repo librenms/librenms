@@ -30,20 +30,27 @@ use Illuminate\Http\Request;
 
 class AlertsController extends WidgetController
 {
-    public $title = 'Alerts';
+    protected $title = 'Alerts';
+    protected $defaults = [
+        'device' => null,
+        'acknowledged' => null,
+        'fired' => null,
+        'min_severity' => null,
+        'state' => null,
+        'group' => null,
+        'proc' => 0,
+        'sort' => 1,
+    ];
 
     public function getView(Request $request)
     {
-        $id = $request->get('id');
-        $settings = $this->getSettings();
-
-        return view('widgets.alerts', compact('id', 'settings'));
+        return view('widgets.alerts', $this->getSettings());
     }
 
     public function getSettingsView(Request $request)
     {
-        $settings = $this->getSettings();
-        $severities = [
+        $data = $this->getSettings();
+        $data['severities'] = [
             // alert_rules.status is enum('ok','warning','critical')
             'ok' => 1,
             'warning' => 2,
@@ -52,7 +59,7 @@ class AlertsController extends WidgetController
             'warning only' => 5,
             'critical only' => 6,
         ];
-        $states = [
+        $data['states'] = [
             // divined from librenms/alerts.php
             'recovered' => '0',
             'alerted' => '1',
@@ -60,19 +67,7 @@ class AlertsController extends WidgetController
             'worse' => '3',
             'better' => '4',
         ];
-
-        $data = [
-            'id' => $request->get('id'),
-            'acknowledged' => $settings->get('acknowledged'),
-            'fired' => $settings->get('fired'),
-            'severities' => $severities,
-            'min_severity' => $settings->get('min_severity'),
-            'states' => $states,
-            'state' => $settings->get('state'),
-            'device_group' => DeviceGroup::find($settings->get('group')),
-            'proc' => $settings->get('proc'),
-            'sort' => $settings->get('sort'),
-        ];
+        $data['device_group'] = DeviceGroup::find($data->get('group'));
 
         return view('widgets.settings.alerts', $data);
     }

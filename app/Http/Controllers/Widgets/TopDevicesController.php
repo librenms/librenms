@@ -43,7 +43,14 @@ use LibreNMS\Util\Url;
 
 class TopDevicesController extends WidgetController
 {
-    public $title = 'Top Devices';
+    protected $title = 'Top Devices';
+    protected $defaults = [
+        'title' => null,
+        'top_query' => 'traffic',
+        'sort_order' => 'asc',
+        'device_count' => 5,
+        'time_interval' => 15,
+    ];
 
     /**
      * @param Request $request
@@ -52,9 +59,9 @@ class TopDevicesController extends WidgetController
     public function getView(Request $request)
     {
         $settings = $this->getSettings();
-        $sort = $settings->get('sort_order', 'asc');
-        
-        switch($settings->get('top_query', 'traffic')) {
+        $sort = $settings->sort_order;
+
+        switch($settings->top_query) {
             case 'traffic':
                 $data = $this->getTrafficData($sort);
                 break;
@@ -85,18 +92,7 @@ class TopDevicesController extends WidgetController
 
     public function getSettingsView(Request $request)
     {
-        $settings = $this->getSettings();
-
-        $data = [
-            'id' => $request->get('id'),
-            'title' => $request->get('title'),
-            'top_query' => $settings->get('top_query', 'traffic'),
-            'sort_order' => $settings->get('sort_order'),
-            'device_count' => $settings->get('device_count', 5),
-            'time_interval' => $settings->get('time_interval', 15),
-        ];
-
-        return view('widgets.settings.top-devices', $data);
+        return view('widgets.settings.top-devices', $this->getSettings());
     }
 
     /**
@@ -128,7 +124,7 @@ class TopDevicesController extends WidgetController
             ->select("$left_table.device_id")
             ->leftJoin('devices', "$left_table.device_id", 'devices.device_id')
             ->groupBy("$left_table.device_id")
-            ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings->get('time_interval', 15)));
+            ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings->time_interval));
     }
 
     /**
@@ -140,7 +136,7 @@ class TopDevicesController extends WidgetController
         $settings = $this->getSettings();
 
         return Device::hasAccess(Auth::user())->select('device_id', 'hostname', 'sysName', 'status')
-            ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings->get('time_interval', 15)))
+            ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings->time_interval))
             ->limit($settings->get('device_count', 5));
     }
 
@@ -176,7 +172,7 @@ class TopDevicesController extends WidgetController
         }])
             ->select('device_id')
             ->groupBy('device_id')
-            ->where('poll_time', '>', Carbon::now()->subMinutes($settings->get('time_interval', 15)))
+            ->where('poll_time', '>', Carbon::now()->subMinutes($settings->time_interval))
             ->orderByRaw('SUM(ifInOctets_rate + ifOutOctets_rate) ' . $sort)
             ->limit($settings->get('device_count', 5));
 
@@ -259,9 +255,9 @@ class TopDevicesController extends WidgetController
             }])
             ->leftJoin('devices', 'storage.device_id', 'devices.device_id')
             ->select('storage.device_id', 'storage_id', 'storage_descr', 'storage_perc', 'storage_perc_warn')
-            ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings->get('time_interval', 15)))
+            ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings->time_interval))
             ->orderBy('storage_perc', $sort)
-            ->limit($settings->get('device_count', 5));
+            ->limit($settings->device_count);
 
 
         $results = $query->get()->map(function ($storage) {
