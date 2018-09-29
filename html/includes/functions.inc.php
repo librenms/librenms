@@ -54,99 +54,15 @@ function data_uri($file, $mime)
 }//end data_uri()
 
 
+/**
+ * Convert string to nice case, mostly used for applications
+ *
+ * @param $item
+ * @return mixed|string
+ */
 function nicecase($item)
 {
-    switch ($item) {
-        case 'dbm':
-            return 'dBm';
-
-        case 'entropy':
-            return 'Random entropy';
-
-        case 'mysql':
-            return ' MySQL';
-
-        case 'powerdns':
-            return 'PowerDNS';
-
-        case 'bind':
-            return 'BIND';
-
-        case 'nfs-stats':
-            return 'NFS Stats';
-
-        case 'nfs-v3-stats':
-            return 'NFS v3 Stats';
-
-        case 'nfs-server':
-            return 'NFS Server';
-
-        case 'ntp':
-            return 'NTP';
-
-        case 'ntp-client':
-            return 'NTP Client';
-
-        case 'ntp-server':
-            return 'NTP Server';
-
-        case 'os-updates':
-            return 'OS Updates';
-
-        case 'smart':
-            return 'SMART';
-
-        case 'powerdns-recursor':
-            return 'PowerDNS Recursor';
-
-        case 'powerdns-dnsdist':
-            return 'PowerDNS dnsdist';
-
-        case 'dhcp-stats':
-            return 'DHCP Stats';
-
-        case 'ups-nut':
-            return 'UPS nut';
-
-        case 'ups-apcups':
-            return 'UPS apcups';
-
-        case 'gpsd':
-            return 'GPSD';
-
-        case 'exim-stats':
-            return 'EXIM Stats';
-
-        case 'fbsd-nfs-client':
-            return 'FreeBSD NFS Client';
-
-        case 'fbsd-nfs-server':
-            return 'FreeBSD NFS Server';
-
-        case 'php-fpm':
-            return 'PHP-FPM';
-
-        case 'opengridscheduler':
-            return 'Open Grid Scheduler';
-
-        case 'sdfsinfo':
-            return 'SDFS info';
-
-        case 'pi-hole':
-            return 'Pi-hole';
-
-        case 'freeradius':
-            return 'FreeRADIUS';
-
-        case 'zfs':
-            return 'ZFS';
-
-        case 'asterisk':
-            return 'Asterisk';
-
-        default:
-            return ucfirst($item);
-    }
+    return \LibreNMS\Util\StringHelpers::niceCase($item);
 }//end nicecase()
 
 

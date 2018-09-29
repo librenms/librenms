@@ -723,9 +723,7 @@ function c_echo($string, $enabled = true)
  */
 function is_mib_graph($type, $subtype)
 {
-    global $config;
-    return isset($config['graph_types'][$type][$subtype]['section']) &&
-        $config['graph_types'][$type][$subtype]['section'] == 'mib';
+    return \LibreNMS\Util\Graph::isMibGraph($type, $subtype);
 } // is_mib_graph
 
 

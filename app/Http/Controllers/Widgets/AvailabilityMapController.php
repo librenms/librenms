@@ -51,9 +51,9 @@ class AvailabilityMapController extends WidgetController
         ];
     }
 
-    public function title(UserWidget $widget)
+    public function title()
     {
-        $settings = $widget->settings;
+        $settings = $this->getSettings();
         return isset($settings['title']) ? $settings['title'] : $this->title;
     }
 

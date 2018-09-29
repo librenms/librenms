@@ -252,6 +252,18 @@ class Device extends BaseModel
     }
 
     /**
+     * Get list of enabled graphs for this device.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function graphs()
+    {
+        return DB::table('device_graphs')
+            ->where('device_id', $this->device_id)
+            ->pluck('graph');
+    }
+
+    /**
      * Update the max_depth field based on parents
      * Performs SQL query, so make sure all parents are saved first
      *

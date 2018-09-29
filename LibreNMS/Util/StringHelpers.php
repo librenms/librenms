@@ -42,4 +42,40 @@ class StringHelpers
 
         return $string;
     }
+
+    public static function niceCase($string)
+    {
+        $replacements = [
+            'dbm' => 'dBm',
+            'entropy' => 'Random entropy',
+            'mysql' => 'MySQL',
+            'powerdns' => 'PowerDNS',
+            'bind' => 'BIND',
+            'nfs-stats' => 'NFS Stats',
+            'nfs-v3-stats' => 'NFS v3 Stats',
+            'nfs-server' => 'NFS Server',
+            'ntp' => 'NTP',
+            'ntp-client' => 'NTP Client',
+            'ntp-server' => 'NTP Server',
+            'os-updates' => 'OS Updates',
+            'smart' => 'SMART',
+            'powerdns-recursor' => 'PowerDNS Recursor',
+            'powerdns-dnsdist' => 'PowerDNS dnsdist',
+            'dhcp-stats' => 'DHCP Stats',
+            'ups-nut' => 'UPS nut',
+            'ups-apcups' => 'UPS apcups',
+            'gpsd' => 'GPSD',
+            'exim-stats' => 'EXIM Stats',
+            'fbsd-nfs-client' => 'FreeBSD NFS Client',
+            'fbsd-nfs-server' => 'FreeBSD NFS Server',
+            'php-fpm' => 'PHP-FPM',
+            'opengridscheduler' => 'Open Grid Scheduler',
+            'sdfsinfo' => 'SDFS info',
+            'freeradius' => 'FreeRADIUS',
+            'pi-hole' => 'pi-hole',
+            'zfs' => 'ZFS',
+        ];
+
+        return isset($replacements[$string]) ? $replacements[$string] : ucfirst($string);
+    }
 }

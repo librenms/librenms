@@ -34,6 +34,24 @@ use LibreNMS\Util\Url;
 class GraphController extends WidgetController
 {
     protected $title = 'Graph';
+    protected $defaults = [
+        "title" => null,
+        "graph_type" => null,
+        "graph_range" => 'oneday',
+        "graph_device" => null,
+        "graph_port" => null,
+        "graph_application" => null,
+        "graph_munin" => null,
+        "graph_custom" => null,
+        "graph_manual" => null,
+        "graph_bill" => null,
+    ];
+
+    public function title()
+    {
+        $settings = $this->getSettings();
+        return isset($settings['title']) ? $settings['title'] : $this->title;
+    }
 
     public function getSettingsView(Request $request)
     {
@@ -46,25 +64,23 @@ class GraphController extends WidgetController
      */
     public function getView(Request $request)
     {
-//        array:11 [
-//          "title" => ""
-//          "graph_type" => "port_bits"
-//          "graph_range" => "onehour"
-//          "graph_device" => ""
-//          "graph_port" => "{"name":"enp4s0","description":"Broadcom Limited NetLink BCM57781 Gigabit Ethernet PCIe","hostname":"amorbis","port_id":2}"
-//          "graph_application" => ""
-//          "graph_munin" => ""
-//          "graph_custom" => ""
-//          "graph_manual" => ""
-//          "graph_bill" => ""
-//          "id" => "9"
-//        ]
+        $settings = $this->getSettings();
 
+        if (starts_with($settings['graph_type'], 'port_')) {
+            $graph_image = $this->getPortGraph($request);
+        }
+
+        return view('widgets.graph', compact('graph_image'));
+    }
+
+    private function getPortGraph(Request $request)
+    {
         $settings = $this->getSettings();
         $dimensions = $request->get('dimensions');
 
         $port_data = json_decode($settings['graph_port'], true);
         $port = Port::find(is_array($port_data) ? $port_data['port_id'] : $settings['graph_port']);
+        $time_offset = \LibreNMS\Util\Time::legacyTimeSpecToSecs($settings['graph_range']);
 
         $graph_array = [
             'type' => $settings['graph_type'] ?: 'port_bits',
@@ -72,12 +88,10 @@ class GraphController extends WidgetController
             'width' => $dimensions['x'],
             'height' => $dimensions['y'],
             'to' => Carbon::now()->timestamp,
-            'from' => Carbon::now()->subDay()->timestamp, // graph_range
+            'from' => Carbon::now()->subSeconds($time_offset)->timestamp,
             'id' => $port->port_id,
         ];
         $graph = Url::graphTag($graph_array);
-        $graph_image = Url::portLink($port, $graph);
-
-        return view('widgets.graph', compact('graph_image'));
+        return Url::portLink($port, $graph);
     }
 }
