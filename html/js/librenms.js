@@ -452,7 +452,7 @@ function init_select2(selector, type, placeholder, data, selected) {
         placeholder: placeholder,
         ajax: {
             url: 'ajax/select/' + type,
-            delay: 200,
+            delay: 150,
             data: function(params) {
                 data.term = params.term;
                 data.page = params.page || 1;

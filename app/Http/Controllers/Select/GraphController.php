@@ -28,6 +28,7 @@ namespace App\Http\Controllers\Select;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\StringHelpers;
 
@@ -42,11 +43,47 @@ class GraphController extends Controller
     public function __invoke(Request $request)
     {
         $data = [];
+        $search = $request->get('term');
 
         foreach (Graph::getTypes() as $type) {
+            $graphs = $this->filterTypeGraphs(collect(Graph::getSubtypes($type)), $type, $search);
+
+            if ($graphs->isNotEmpty()) {
+                $data[] = [
+                    'text' => StringHelpers::niceCase($type),
+                    'children' => $graphs->map(function ($graph) use ($type) {
+                        return $this->formatGraph($type, $graph);
+                    })->values()
+                ];
+            }
+        }
+
+        $aggregators = $this->filterTypeGraphs(collect([
+            'transit' => 'Transit',
+            'peering' => 'Peering',
+            'transpeer' => 'Transit + Peering',
+            'core' => 'Core',
+            'custom' => 'Custom Descr',
+            'manual' => 'Manual Descr',
+        ]), 'aggregators', $search);
+        if ($aggregators->isNotEmpty()) {
             $data[] = [
-                "text" => StringHelpers::niceCase($type),
-                "children" => collect(Graph::getSubtypes($type))->map()
+                'text' => 'Aggregators',
+                'children' => $aggregators->map(function ($text, $id) {
+                    return compact('id', 'text');
+                })->values()
+            ];
+        }
+
+        $billing = $this->filterTypeGraphs(collect([
+            'bill_bits' => 'Bill Bits'
+        ]), 'bill', $search);
+        if ($billing->isNotEmpty()) {
+            $data[] = [
+                'text' => 'Bill',
+                'children' => $billing->map(function ($text, $id) {
+                    return compact('id', 'text');
+                })->values()
             ];
         }
 
@@ -56,8 +93,56 @@ class GraphController extends Controller
         ]);
     }
 
-    private function format_graph($type, $subtype)
+    private function formatGraph($top, $graph)
     {
-        $display_type = is_mib_graph($type, $avail_type) ? $avail_type : nicecase($avail_type);
+        $text = $graph;
+        if (str_contains('_', $graph)) {
+            list($type, $subtype) = explode('_', $graph, 2);
+        } else  {
+            $type = $graph;
+            $subtype = '';
+        }
+
+        if (!Graph::isMibGraph($type, $subtype)) {
+            $text = ucwords($top . ' ' . str_replace(['_', '-'], ' ', $text));
+        }
+
+        return [
+            'id' => $top . '_' . $graph,
+            'text' => $text,
+        ];
+    }
+
+    /**
+     * @param Collection $graphs
+     * @param string $type
+     * @param string $search
+     * @return Collection
+     */
+    private function filterTypeGraphs($graphs, $type, $search)
+    {
+        $search = strtolower($search);
+
+        if ($search) {
+            $terms = preg_split('/[ _-]/', $search, 2);
+            $first = array_shift($terms);
+
+            if (str_contains($type, $first)) {
+                // search matches type, show all unless there are more terms.
+                if (!empty($terms)) {
+                    $sub_search = array_shift($terms);
+                    $graphs = $graphs->filter(function($graph) use ($sub_search) {
+                        return str_contains(strtolower($graph), $sub_search);
+                    });
+                }
+            } else {
+                // if the type matches, don't filter the sub values
+                $graphs = $graphs->filter(function($graph) use ($search) {
+                    return str_contains(strtolower($graph), $search);
+                });
+            }
+        }
+
+        return $graphs;
     }
 }

@@ -25,26 +25,29 @@
 
 namespace App\Http\Controllers\Widgets;
 
+use App\Models\Device;
 use App\Models\Port;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use LibreNMS\Util\Graph;
 use LibreNMS\Util\Url;
 
 class GraphController extends WidgetController
 {
     protected $title = 'Graph';
     protected $defaults = [
-        "title" => null,
-        "graph_type" => null,
-        "graph_range" => 'oneday',
-        "graph_device" => null,
-        "graph_port" => null,
-        "graph_application" => null,
-        "graph_munin" => null,
-        "graph_custom" => null,
-        "graph_manual" => null,
-        "graph_bill" => null,
+        'title' => null,
+        'graph_type' => null,
+        'graph_range' => 'oneday',
+        'graph_legend' => 'yes',
+        'graph_device' => null,
+        'graph_port' => null,
+        'graph_application' => null,
+        'graph_munin' => null,
+        'graph_custom' => null,
+        'graph_manual' => null,
+        'graph_bill' => null,
     ];
 
     public function title()
@@ -55,7 +58,17 @@ class GraphController extends WidgetController
 
     public function getSettingsView(Request $request)
     {
-        return view('widgets.settings.graph', $this->getSettings());
+        $data = $this->getSettings();
+
+        // format display name for selected item
+        $type_parts = explode('_', $data['graph_type']);
+        $primary = array_shift($type_parts);
+        $secondary = implode('_', $type_parts);
+        $name = $primary  . ' ' . (Graph::isMibGraph($primary, $secondary) ? $secondary : implode(' ', $type_parts));
+
+        $data['graph_text'] = ucwords($name);
+
+        return view('widgets.settings.graph', $data);
     }
 
     /**
@@ -66,11 +79,18 @@ class GraphController extends WidgetController
     {
         $settings = $this->getSettings();
 
+        $data = [
+            'graph_image' => ''
+        ];
+
         if (starts_with($settings['graph_type'], 'port_')) {
-            $graph_image = $this->getPortGraph($request);
+            $data['graph_image'] = $this->getPortGraph($request);
+        } elseif(starts_with($settings['graph_type'], 'device_')) {
+            $data['graph_image'] = $this->getDeviceGraph($request);
         }
 
-        return view('widgets.graph', compact('graph_image'));
+
+        return view('widgets.graph', $data);
     }
 
     private function getPortGraph(Request $request)
@@ -80,11 +100,15 @@ class GraphController extends WidgetController
 
         $port_data = json_decode($settings['graph_port'], true);
         $port = Port::find(is_array($port_data) ? $port_data['port_id'] : $settings['graph_port']);
+        if (!$port) {
+            return __('Port not found');
+        }
+
         $time_offset = \LibreNMS\Util\Time::legacyTimeSpecToSecs($settings['graph_range']);
 
         $graph_array = [
             'type' => $settings['graph_type'] ?: 'port_bits',
-            'legend' => 'yes',
+            'legend' => $settings['graph_legend'],
             'width' => $dimensions['x'],
             'height' => $dimensions['y'],
             'to' => Carbon::now()->timestamp,
@@ -93,5 +117,31 @@ class GraphController extends WidgetController
         ];
         $graph = Url::graphTag($graph_array);
         return Url::portLink($port, $graph);
+    }
+
+    private function getDeviceGraph(Request $request)
+    {
+        $settings = $this->getSettings();
+        $dimensions = $request->get('dimensions');
+
+        $device_data = json_decode($settings['graph_device'], true);
+        $device = Device::find(is_array($device_data) ? $device_data['device_id'] : $settings['graph_device']);
+        if (!$device) {
+            return __('Device not found');
+        }
+
+        $time_offset = \LibreNMS\Util\Time::legacyTimeSpecToSecs($settings['graph_range']);
+
+        $graph_array = [
+            'type' => $settings['graph_type'] ?: 'device_bits',
+            'legend' => $settings['graph_legend'],
+            'width' => $dimensions['x'],
+            'height' => $dimensions['y'],
+            'to' => Carbon::now()->timestamp,
+            'from' => Carbon::now()->subSeconds($time_offset)->timestamp,
+            'id' => $device ? $device->device_id : 0,
+        ];
+        $graph = Url::graphTag($graph_array);
+        return Url::deviceLink($device, $graph);
     }
 }
