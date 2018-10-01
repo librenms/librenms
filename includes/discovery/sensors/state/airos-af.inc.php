@@ -81,7 +81,7 @@ if (is_numeric($gps)) {
     if ($state_index_id !== null) {
         $states = array(
             array($state_index_id, 'off', 1, 1, 1),
-            array($state_index_id, 'on', 1, 4, 0),
+            array($state_index_id, 'on', 1, 2, 0),
         );
 
         foreach ($states as $value) {
