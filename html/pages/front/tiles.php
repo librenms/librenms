@@ -653,8 +653,12 @@ if (strpos($dash_config, 'globe') !== false) {
                     $("#widget_body_"+id).html('<div class="alert alert-info">' + data.message + '</div>');
                 }
             },
-            error: function () {
-                $("#widget_body_"+id).html('<div class="alert alert-info">Problem with backend</div>');
+            error: function (data) {
+                if (data.responseJSON.error) {
+                    $("#widget_body_"+id).html('<div class="alert alert-info">' + data.responseJSON.error + '</div>');
+                } else {
+                    $("#widget_body_"+id).html('<div class="alert alert-info">Problem with backend</div>');
+                }
             }
         });
     }

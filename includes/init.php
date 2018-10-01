@@ -93,13 +93,7 @@ if (module_selected('alerts', $init_modules)) {
 }
 
 if (module_selected('laravel', $init_modules)) {
-    // make sure Laravel isn't already booted
-    if (!class_exists('App') || !App::isBooted()) {
-        define(LARAVEL_START, microtime(true));
-        $app = require_once $install_dir . '/bootstrap/app.php';
-        $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-        $kernel->bootstrap();
-    }
+    \LibreNMS\Util\Laravel::bootCli();
 }
 
 if (!module_selected('nodb', $init_modules)) {
