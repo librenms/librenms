@@ -21,4 +21,14 @@ class LegacyController extends Controller
     {
         include base_path('html/legacy_api_v0.php');
     }
+
+    public function dash()
+    {
+        ob_start();
+        include base_path('html/legacy/ajax_dash.php');
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        return response($output, 200, ['Content-Type' => 'application/json']);
+    }
 }
