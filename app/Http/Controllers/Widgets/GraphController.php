@@ -25,6 +25,7 @@
 
 namespace App\Http\Controllers\Widgets;
 
+use App\Models\Application;
 use App\Models\Device;
 use App\Models\Port;
 use Carbon\Carbon;
@@ -67,10 +68,16 @@ class GraphController extends WidgetController
         $name = $primary  . ' ' . (Graph::isMibGraph($primary, $secondary) ? $secondary : implode(' ', $type_parts));
 
         // format display for selected port
-        if ($data['graph_port']) {
+        if ($primary == 'port' && $data['graph_port']) {
             $port = Port::find($data['graph_port']);
-            $data['port_text'] = $port ? $port->getLabel() : 'Port does not exist';
         }
+        $data['port_text'] = isset($port) ? $port->getLabel() : __('Port does not exist');
+
+
+        if ($primary == 'application' && $data['graph_application']) {
+            $app = Application::find($data['graph_application']);
+        }
+        $data['application_text'] = isset($app) ? $app->displayName() . ' - ' . $app->device->displayName() : __('App does not exist');
 
         $data['graph_text'] = ucwords($name);
 

@@ -444,6 +444,17 @@ function http_fallback(link) {
 
 function init_select2(selector, type, placeholder, data, selected) {
     var $select = $(selector);
+
+    // allow function to be assigned to pass data
+    var data_function = function(params) {
+        data.term = params.term;
+        data.page = params.page || 1;
+        return data;
+    };
+    if ($.isFunction(data)) {
+        data_function = data;
+    }
+
     $select.select2({
         theme: "bootstrap",
         dropdownAutoWidth : true,
@@ -453,11 +464,7 @@ function init_select2(selector, type, placeholder, data, selected) {
         ajax: {
             url: 'ajax/select/' + type,
             delay: 150,
-            data: function(params) {
-                data.term = params.term;
-                data.page = params.page || 1;
-                return data;
-            }
+            data: data_function
         }
     });
 
