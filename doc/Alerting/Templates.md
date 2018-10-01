@@ -54,7 +54,7 @@ Placeholders are special variables that if used within the template will be repl
 - Rule Builder (the actual rule) (use `{!! $alert->builder !!}`): `$alert->builder`
 - Alert-ID: `$alert->id`
 - Unique-ID: `$alert->uid`
-- Faults, Only available on alert (`$alert->state != 0`), must be iterated in a foreach (`@foreach ($alert->faults as $key => $value) @endforeach`). Holds all available information about the Fault, accessible in the format `$value['Column']`, for example: `$value['ifDescr']`. Special field `$value['string']` has most Identification-information (IDs, Names, Descrs) as single string, this is the equivalent of the default used.
+- Faults, Only available on alert (`$alert->state != 0`), must be iterated in a foreach (`@foreach ($alert->faults as $key => $value) @endforeach`). Holds all available information about the Fault, accessible in the format `$value['Column']`, for example: `$value['ifDescr']`. Special field `$value['string']` has most Identification-information (IDs, Names, Descrs) as single string, this is the equivalent of the default used and must be encased in `{{ }}`
 - State: `$alert->state`
 - Severity: `$alert->severity`
 - Rule: `$alert->rule`
@@ -156,7 +156,11 @@ Features: {{ $alert->features }}
 Purpose: {{ $alert->purpose }}
 Notes: {{ $alert->notes }}
 
-Server: {{ $alert->sysName }} @foreach ($alert->faults as $key => $value)Mount Point: $value['storage_descr'] Percent Utilized: $value['storage_perc']@endforeach
+Server: {{ $alert->sysName }} 
+@foreach ($alert->faults as $key => $value)
+Mount Point: {{ $value['storage_descr'] }}
+Percent Utilized: {{ $value['storage_perc'] }}
+@endforeach
 ```
 
 Temperature Sensors:
@@ -177,10 +181,10 @@ Notes: {{ $alert->notes }}
 Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
 @if ($alert->faults) Faults:
 @foreach ($faults as $key => $value)
-#{{ $key }}: Temperature: $value['sensor_current']°C
+#{{ $key }}: Temperature: {{ $value['sensor_current'] }} °C
 ** @php echo ($value['sensor_current']-$value['sensor_limit']); @endphp°C over limit
-Previous Measurement: $value['sensor_prev']°C
-High Temperature Limit: $value['sensor_limit']°C
+Previous Measurement: {{ $value['sensor_prev'] }} °C
+High Temperature Limit: {{ $value['sensor_limit'] }} °C
 @endforeach
 @endif
 ```
