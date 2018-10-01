@@ -67,7 +67,7 @@ class AlertsController extends WidgetController
             'worse' => '3',
             'better' => '4',
         ];
-        $data['device_group'] = DeviceGroup::find($data->get('group'));
+        $data['device_group'] = DeviceGroup::find($data['group']);
 
         return view('widgets.settings.alerts', $data);
     }

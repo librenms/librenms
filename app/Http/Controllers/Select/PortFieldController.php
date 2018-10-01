@@ -1,6 +1,6 @@
 <?php
 /**
- * PortController.php
+ * PortFieldController.php
  *
  * -Description-
  *
@@ -27,7 +27,7 @@ namespace App\Http\Controllers\Select;
 
 use App\Models\Port;
 
-class PortController extends SelectController
+class PortFieldController extends SelectController
 {
     /**
      * Defines validation rules (will override base validation rules for select2 responses too)
@@ -37,6 +37,7 @@ class PortController extends SelectController
     protected function rules()
     {
         return [
+            'field' => 'required|in:ifType',
             'device' => 'nullable|int',
         ];
     }
@@ -49,7 +50,7 @@ class PortController extends SelectController
      */
     protected function searchFields($request)
     {
-        return (array)$request->get('field', ['ifAlias', 'ifName', 'ifDescr', 'devices.hostname', 'devices.sysName']);
+        return [$request->get('field')];
     }
 
     /**
@@ -62,33 +63,12 @@ class PortController extends SelectController
     {
         /** @var \Illuminate\Database\Eloquent\Builder $query */
         $query = Port::hasAccess($request->user())
-            ->with(['device' => function ($query) {
-                $query->select('device_id', 'hostname', 'sysName');
-            }])
-            ->select('ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr')
-            ->groupBy(['ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr']);
-
-        if ($request->get('term')) {
-            // join with devices for searches
-            $query->leftJoin('devices', 'devices.device_id', 'ports.device_id');
-        }
+            ->select($request->get('field'))->distinct();
 
         if ($device_id = $request->get('device')) {
             $query->where('ports.device_id', $device_id);
         }
 
         return $query;
-    }
-
-    public function formatItem($port)
-    {
-        /** @var Port $port */
-        $label = $port->getShortLabel();
-        $description = ($label == $port->ifAlias ? '' : ' - ' . $port->ifAlias);
-
-        return [
-            'id' => $port->port_id,
-            'text' => $label . ' - ' . $port->device->shortDisplayName() . $description,
-        ];
     }
 }

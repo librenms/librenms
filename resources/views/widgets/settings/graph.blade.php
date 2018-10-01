@@ -62,6 +62,6 @@
 @section('javascript')
     <script type="text/javascript">
         init_select2('#graph_type-{{ $id }}', 'graph', 'Select a graph', {}, '{{ $graph_type ?: "" }}');
-        init_select2('#graph_port-{{ $id }}', 'port', 'Select a port', {}, {{ $graph_port ?: 0 }});
+        init_select2('#graph_port-{{ $id }}', 'port', 'Select a port', {limit: 100}, {{ $graph_port ?: 0 }});
     </script>
 @endsection

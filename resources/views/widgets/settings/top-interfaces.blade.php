@@ -35,7 +35,7 @@
             allowClear: true,
             placeholder: "All Ports",
             ajax: {
-                url: 'ajax/select/port',
+                url: 'ajax/select/port-field',
                 delay: 200,
                 data: function(params) {
                     return {
