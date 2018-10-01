@@ -25,6 +25,9 @@
 
 namespace App\Http\Controllers\Select;
 
+use App\Models\Port;
+use Illuminate\Contracts\Pagination\Paginator;
+
 class PortController extends SelectController
 {
     /**
@@ -32,10 +35,10 @@ class PortController extends SelectController
      *
      * @return array
      */
-    public function rules()
+    protected function rules()
     {
         return [
-            'field' => 'required|in:ifType',
+            'field' => 'nullable|in:ifType',
             'device' => 'nullable|int',
         ];
     }
@@ -46,9 +49,9 @@ class PortController extends SelectController
      * @param \Illuminate\Http\Request $request
      * @return array
      */
-    public function searchFields($request)
+    protected function searchFields($request)
     {
-        return [$request->get('field')];
+        return (array)$request->get('field', ['ifAlias', 'ifName', 'ifDescr', 'devices.hostname', 'devices.sysName']);
     }
 
     /**
@@ -57,16 +60,54 @@ class PortController extends SelectController
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    public function baseQuery($request)
+    protected function baseQuery($request)
     {
         /** @var \Illuminate\Database\Eloquent\Builder $query */
-        $query = \App\Models\Port::hasAccess($request->user())
-            ->select($request->get('field'))->distinct();
+        $query = Port::hasAccess($request->user());
+
+        if ($field = $request->get('field')) {
+            $query->select($field)->distinct();
+        } else {
+            $query->with(['device' => function ($query) {
+                $query->select('device_id', 'hostname', 'sysName');
+            }])->leftJoin('devices', 'devices.device_id', 'ports.device_id')
+                ->select('ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr')
+            ->groupBy(['ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr']);
+        }
 
         if ($device_id = $request->get('device')) {
-            $query->where('device_id', $device_id);
+            $query->where('ports.device_id', $device_id);
         }
 
         return $query;
+    }
+
+    /**
+     * @param Paginator $paginator
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function formatResponse($paginator)
+    {
+        return response()->json([
+            'results' => collect($paginator->items())->groupBy('ports.device_id')->map([$this, 'formatItem'])->values(),
+            'pagination' => ['more' => $paginator->hasMorePages()]
+        ]);
+    }
+
+    public function formatItem($data)
+    {
+        if ($data instanceof Port) {
+            return parent::formatItem($data);
+        }
+
+        return [
+            'text' => $data->first()->device->displayName(),
+            'children' => $data->map(function ($port) {
+                return [
+                    'id' => $port->port_id,
+                    'text' => $port->getLabel(),
+                ];
+            })->values(),
+        ];
     }
 }

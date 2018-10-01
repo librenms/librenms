@@ -29,12 +29,12 @@ use App\Models\DeviceGroup;
 
 class DeviceGroupController extends SelectController
 {
-    public function searchFields($request)
+    protected function searchFields($request)
     {
         return ['name'];
     }
 
-    public function baseQuery($request)
+    protected function baseQuery($request)
     {
         return DeviceGroup::hasAccess($request->user())->select('id', 'name');
     }

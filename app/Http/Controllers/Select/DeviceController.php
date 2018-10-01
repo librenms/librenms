@@ -29,12 +29,12 @@ use App\Models\Device;
 
 class DeviceController extends SelectController
 {
-    public function searchFields($request)
+    protected function searchFields($request)
     {
         return ['hostname', 'sysName'];
     }
 
-    public function baseQuery($request)
+    protected function baseQuery($request)
     {
         return Device::hasAccess($request->user())->select('device_id', 'hostname', 'sysName');
     }

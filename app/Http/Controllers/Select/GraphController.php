@@ -38,15 +38,20 @@ class GraphController extends Controller
         'limit' => 'int',
         'page' => 'int',
         'term' => 'nullable|string',
+        'device' => 'nullable|int',
     ];
 
     public function __invoke(Request $request)
     {
+        $this->validate($request, $this->rules);
+
         $data = [];
         $search = $request->get('term');
+        $device_id = $request->get('device');
+        $device = $device_id ? Device::find($device_id) : null;
 
         foreach (Graph::getTypes() as $type) {
-            $graphs = $this->filterTypeGraphs(collect(Graph::getSubtypes($type)), $type, $search);
+            $graphs = $this->filterTypeGraphs(collect(Graph::getSubtypes($type, $device)), $type, $search);
 
             if ($graphs->isNotEmpty()) {
                 $data[] = [
@@ -98,7 +103,7 @@ class GraphController extends Controller
         $text = $graph;
         if (str_contains('_', $graph)) {
             list($type, $subtype) = explode('_', $graph, 2);
-        } else  {
+        } else {
             $type = $graph;
             $subtype = '';
         }
@@ -131,13 +136,13 @@ class GraphController extends Controller
                 // search matches type, show all unless there are more terms.
                 if (!empty($terms)) {
                     $sub_search = array_shift($terms);
-                    $graphs = $graphs->filter(function($graph) use ($sub_search) {
+                    $graphs = $graphs->filter(function ($graph) use ($sub_search) {
                         return str_contains(strtolower($graph), $sub_search);
                     });
                 }
             } else {
                 // if the type matches, don't filter the sub values
-                $graphs = $graphs->filter(function($graph) use ($search) {
+                $graphs = $graphs->filter(function ($graph) use ($search) {
                     return str_contains(strtolower($graph), $search);
                 });
             }

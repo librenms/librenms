@@ -50,7 +50,7 @@
         <div class="col-sm-8">
             <select class="form-control" id="graph_port-{{ $id }}" name="graph_port" required>
                 @if($graph_port)
-                    <option value="{{ $graph_port }}">{{ 'FIXME' }}</option>
+                    <option value="{{ $graph_port }}">{{ $port_text }}</option>
                 @endif
             </select>
         </div>

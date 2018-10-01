@@ -60,11 +60,17 @@ class GraphController extends WidgetController
     {
         $data = $this->getSettings();
 
-        // format display name for selected item
+        // format display name for selected graph type
         $type_parts = explode('_', $data['graph_type']);
         $primary = array_shift($type_parts);
         $secondary = implode('_', $type_parts);
         $name = $primary  . ' ' . (Graph::isMibGraph($primary, $secondary) ? $secondary : implode(' ', $type_parts));
+
+        // format display for selected port
+        if ($data['graph_port']) {
+            $port = Port::find($data['graph_port']);
+            $data['port_text'] = $port ? $port->getLabel() : 'Port does not exist';
+        }
 
         $data['graph_text'] = ucwords($name);
 
