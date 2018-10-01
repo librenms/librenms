@@ -25,7 +25,9 @@
 
 namespace App\Models;
 
-class Bill extends BaseModel
+use Illuminate\Database\Eloquent\Model;
+
+class Bill extends Model
 {
     public $timestamps = false;
     protected $primaryKey = 'bill_id';
@@ -34,13 +36,18 @@ class Bill extends BaseModel
 
     public function scopeHasAccess($query, User $user)
     {
-        return $this->hasDeviceAccess($query, $user);
+        if ($user->hasGlobalRead()) {
+            return $query;
+        }
+
+        return $query->join('bill_perms', 'bill_perms.bill_id', "bills.bill_id")
+            ->where('bill_perms.user_id', $user->user_id);
     }
 
     // ---- Define Relationships ----
 
-    public function device()
+    public function ports()
     {
-        return $this->belongsTo('App\Models\Device', 'device_id');
+        return $this->belongsToMany('App\Models\Port', 'bill_ports', 'bill_id', 'bill_id');
     }
 }
