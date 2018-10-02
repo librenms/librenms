@@ -25,7 +25,7 @@
                     @foreach($devices as $device)
                         <tr>
                             <td><span class="alert-status {{ $device->status ? 'label-success' : 'label-danger' }}"></span></td>
-                            <td><img src="{{ $device->icon }}" width="32px" height="32px"></td>
+                            <td><img src="{{ asset($device->icon) }}" width="32px" height="32px"></td>
                             <td class="device-name">{{ $device->displayName() }}</td>
                             <td>{{ $device->hardware }} {{ $device->features }}</td>
                             <td>{{ $device->formatUptime(true) }}<br>{{ substr($device->location, 0, 32) }}</td>
