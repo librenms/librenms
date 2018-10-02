@@ -252,7 +252,7 @@ class GitHub
     public function createChangelog($write = true)
     {
         $previous_release = $this->getRelease($this->from);
-        if (is_null($this->pr)) {
+        if (!is_null($this->pr)) {
             $this->getPullRequest();
         }
 
