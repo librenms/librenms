@@ -32,6 +32,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\OS;
 
 class Ray extends OS implements
@@ -39,7 +40,8 @@ class Ray extends OS implements
     WirelessFrequencyDiscovery,
     WirelessPowerDiscovery,
     WirelessRssiDiscovery,
-    WirelessSnrDiscovery
+    WirelessSnrDiscovery,
+    WirelessRateDiscovery    
 {
     /**
      * Discover processors.
@@ -118,6 +120,21 @@ class Ray extends OS implements
         $oid = '.1.3.6.1.4.1.33555.1.3.2.2'; // RAY-MIB::snr.0
         return array(
             new WirelessSensor('snr', $this->getDeviceId(), $oid, 'racom', 1, 'CINR', null, 1, 10),
+        );
+    }
+    /**
+     * Discover wireless RATE.  This is in bps. Type is rate.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessRate()
+    {
+        $oid_bitrate = '.1.3.6.1.4.1.33555.1.2.1.13'; // RAY-MIB::netBitrate
+        $oid_maxbitrate = '.1.3.6.1.4.1.33555.1.2.1.14'; // RAY-MIB::maxNetBitrate
+        return array(
+            new WirelessSensor('rate', $this->getDeviceId(), $oid_bitrate, 'racom-netBitrate', 1, 'Net Bitrate', null, 1000, 1),
+            new WirelessSensor('rate', $this->getDeviceId(), $oid_maxbitrate, 'racom-maxNetBitrate', 2, 'Net Bitrate', null, 1000, 1),
         );
     }
 }
