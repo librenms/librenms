@@ -65,7 +65,7 @@ class EventlogController extends TableController
     {
         return [
             'datetime' => $this->formatDatetime($eventlog),
-            'device_id' => Url::deviceLink($eventlog->device, $eventlog->device->shortDisplayName()),
+            'device_id' => $eventlog->device ? Url::deviceLink($eventlog->device, $eventlog->device->shortDisplayName()) : null,
             'type' => $this->formatType($eventlog),
             'message' => htmlspecialchars($eventlog->message),
             'username' => $eventlog->username ?: 'System',
