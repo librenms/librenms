@@ -45,7 +45,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     });
 
     // Debugbar routes need to be here because of catch-all
-    if (config('app.env') !== 'production' && config('app.debug')) {
+    if (config('app.env') !== 'production' && config('app.debug') && config('debugbar.enabled') !== false) {
         Route::get('/_debugbar/assets/stylesheets', [
             'as' => 'debugbar-css',
             'uses' => '\Barryvdh\Debugbar\Controllers\AssetController@css'

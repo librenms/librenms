@@ -32,6 +32,8 @@ class AppServiceProvider extends ServiceProvider
         Log::getMonolog()->popHandler(); // remove existing errorlog logger
         Log::useFiles(Config::get('log_file', base_path('logs/librenms.log')), 'error');
 
+        // Set root url according to user's settings
+        \URL::forceRootUrl(\Config::get('app.url'));
 
         // Blade directives (Yucky because of < L5.5)
         Blade::directive('config', function ($key) {
