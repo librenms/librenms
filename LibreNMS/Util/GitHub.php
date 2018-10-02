@@ -241,19 +241,25 @@ class GitHub
             'draft' => false,
         ]));
 
-        return $release->status_code == 200;
+        return $release->status_code == 201;
     }
 
     /**
      * Function to control the creation of creating a change log.
      * @param bool $write
+     * @throws \Exception
      */
     public function createChangelog($write = true)
     {
         $previous_release = $this->getRelease($this->from);
-        if (!is_null($this->pr)) {
+        if (is_null($this->pr)) {
             $this->getPullRequest();
         }
+
+        if (!isset($previous_release['published_at'])) {
+            throw new \Exception("Could not find previous release tag.");
+        }
+
         $this->getPullRequests($previous_release['published_at']);
         $this->buildChangeLog();
         $this->formatChangeLog();

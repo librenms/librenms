@@ -49,20 +49,24 @@ class Release extends Command
         $token = getenv('GH_TOKEN') ?: $this->secret('Enter a GitHub Token?');
 
         $this->info("Creating release $tag.....");
-        $gh = new GitHub($tag, $from, $file, $token, $pr);
-        $gh->createChangelog();
-        $this->info("Changelog generated for $tag");
+        try {
+            $gh = new GitHub($tag, $from, $file, $token, $pr);
+            $gh->createChangelog();
+            $this->info("Changelog generated for $tag");
 
-        if ($this->confirm('Do you want to view the generated Changelog?')) {
-            echo $gh->getMarkdown();
-        }
-
-        if ($this->confirm("Do you want to create the release $tag on GitHub?")) {
-            if ($gh->createRelease()) {
-                $this->info('Release created.');
-            } else {
-                $this->error('Failed to create release, check github to see what was completed.');
+            if ($this->confirm('Do you want to view the generated Changelog?')) {
+                echo $gh->getMarkdown();
             }
+
+            if ($this->confirm("Do you want to create the release $tag on GitHub?")) {
+                if ($gh->createRelease()) {
+                    $this->info('Release created.');
+                } else {
+                    $this->error('Failed to create release, check github to see what was completed.');
+                }
+            }
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
         }
     }
 }
