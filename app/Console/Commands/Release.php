@@ -39,8 +39,6 @@ class Release extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
     public function handle()
     {
@@ -60,8 +58,11 @@ class Release extends Command
         }
 
         if ($this->confirm("Do you want to create the release $tag on GitHub?")) {
-            //$gh->createRelease();
-            $this->error('Unsupported right now');
+            if ($gh->createRelease()) {
+                $this->info('Release created.');
+            } else {
+                $this->error('Failed to create release, check github to see what was completed.');
+            }
         }
     }
 }
