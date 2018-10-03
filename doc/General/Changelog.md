@@ -143,11 +143,6 @@ A big thank you to the following 27 contributors this last month:
 * Sanitize data in dashboard add/edit/delete ([#9171](https://github.com/librenms/librenms/pull/9171)) - [murrant](https://github.com/murrant)
 
 
-##1.44
-*(2018-10-02)*
-
-
-
 ##1.43
 *(2018-08-30)*
 
