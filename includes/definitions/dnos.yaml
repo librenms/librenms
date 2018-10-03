@@ -13,6 +13,7 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.6027.1.
+            - .1.3.6.1.4.1.674.11000.
         sysDescr_except:
             - Force10 Operating System
             - Force10 Networks Real Time Operating System Software
