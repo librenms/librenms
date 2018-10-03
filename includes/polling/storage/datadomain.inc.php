@@ -44,4 +44,3 @@ $storage['units']       = 1073741824;
 $storage['size']        = $entry['fileSystemSpaceSize'] * $storage['units'];
 $storage['free']        = $entry['fileSystemSpaceAvail'] * $storage['units'];
 $storage['used']        = $entry['fileSystemSpaceUsed'] * $storage['units'];
-

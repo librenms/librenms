@@ -29,4 +29,3 @@ if ($device['os'] == 'datadomain') {
     }
     unset($fstype, $descr, $total, $used, $units, $ddos_storage);
 }
-
