@@ -73,7 +73,7 @@ if (!empty($vars['type'])) {
     }
 }
 
-if (!empty($vars['state'])) {
+if (isset($vars['state']) && $vars['state'] !== "") {
     $sql .= ' AND status= ?';
     if (is_numeric($vars['state'])) {
         $param[] = $vars['state'];
