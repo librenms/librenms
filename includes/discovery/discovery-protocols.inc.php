@@ -154,6 +154,39 @@ if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) 
         }
     }//end foreach
     echo PHP_EOL;
+} elseif (($device['os'] == 'timos') && Config::get('autodiscovery.xdp') === true) {
+    echo ' TIMETRA-LLDP-MIB: ';
+    $lldp_array  = snmpwalk_group($device, 'tmnxLldpRemoteSystemsData', 'TIMETRA-LLDP-MIB');
+    foreach ($lldp_array as $key => $lldp) {
+        $ifIndex = key($lldp['tmnxLldpRemPortId']);
+        $MacIndex = key($lldp['tmnxLldpRemPortId'][$ifIndex]);
+        $RemIndex = key($lldp['tmnxLldpRemPortId'][$ifIndex][$MacIndex]);
+        $interface = get_port_by_ifIndex($device['device_id'], $ifIndex);
+        $remote_device_id = find_device_id($lldp['tmnxLldpRemSysName'][$ifIndex][$MacIndex][$RemIndex]);
+
+        if (!$remote_device_id &&
+            is_valid_hostname($lldp['tmnxLldpRemSysName'][$ifIndex][$MacIndex][$RemIndex]) &&
+            !can_skip_discovery($lldp['tmnxLldpRemSysName'][$ifIndex][$MacIndex][$RemIndex], $lldp['tmnxLldpRemSysDesc'][$ifIndex][$MacIndex][$RemIndex])
+        ) {
+            $remote_device_id = discover_new_device($lldp['tmnxLldpRemSysName'][$ifIndex][$MacIndex][$RemIndex], $device, 'LLDP', $interface);
+        }
+
+        if ($interface['port_id'] && $lldp['tmnxLldpRemSysName'][$ifIndex][$MacIndex][$RemIndex] && $lldp['tmnxLldpRemPortId'][$ifIndex][$MacIndex][$RemIndex]) {
+            $remote_port_id = find_port_id($lldp['tmnxLldpRemPortDesc'][$ifIndex][$MacIndex][$RemIndex], $lldp['tmnxLldpRemPortId'][$ifIndex][$MacIndex][$RemIndex], $remote_device_id);
+            discover_link(
+                $interface['port_id'],
+                'lldp',
+                $remote_port_id,
+                $lldp['tmnxLldpRemSysName'][$ifIndex][$MacIndex][$RemIndex],
+                $lldp['tmnxLldpRemPortId'][$ifIndex][$MacIndex][$RemIndex],
+                null,
+                $lldp['tmnxLldpRemSysDesc'][$ifIndex][$MacIndex][$RemIndex],
+                $device['device_id'],
+                $remote_device_id
+            );
+        }
+    }//end foreach
+    echo PHP_EOL;
 } elseif (Config::get('autodiscovery.xdp') === true) {
     echo ' LLDP-MIB: ';
     $lldp_array  = snmpwalk_group($device, 'lldpRemTable', 'LLDP-MIB', 3);
