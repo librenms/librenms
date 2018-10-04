@@ -646,3 +646,8 @@ $config['ipmi_unit']['Watts']     = 'power';
 $config['ipmi_unit']['Amps']      = 'current';
 $config['ipmi_unit']['percent']   = 'load';
 $config['ipmi_unit']['discrete']  = '';
+
+// F5 BIGIP APM graphs
+$config['graph_types']['device']['apm_sessions']['section']      = 'system';
+$config['graph_types']['device']['apm_sessions']['order']        = '0';
+$config['graph_types']['device']['apm_sessions']['descr']        = 'Active Sessions';
