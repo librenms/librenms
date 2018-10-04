@@ -17,30 +17,12 @@ if (!is_array($storage_cache['ddos-storage'])) {
     d_echo($storage_cache);
 }
 
-$iind = 0;
-$storage_cache_temp = array();
+foreach ($storage_cache['ddos-storage'] as $fsentry) {
 
-d_echo($storage);
-
-foreach ($storage_cache['ddos-storage'] as $index => $ventry) {
-    if (!array_key_exists('fileSystemResourceName', $ventry)) {
-        continue;
-    }
-    if (is_int($index)) {
-        $iind = $index;
-    } else {
-        $arrindex = explode(".", $index);
-        $iind = (int)(end($arrindex))+0;
-    }
-    if (is_int($iind)) {
-        $storage_cache_temp[$iind] = $ventry;
+    if ($fsentry['fileSystemResourceName'] == "/data: post-comp") {
+        $storage['units']       = 1073741824;
+        $storage['size']        = $fsentry['fileSystemSpaceSize'] * $storage['units'];
+        $storage['free']        = $fsentry['fileSystemSpaceAvail'] * $storage['units'];
+        $storage['used']        = $fsentry['fileSystemSpaceUsed'] * $storage['units'];
     }
 }
-d_echo($storage_cache_temp);
-
-$entry = $storage_cache_temp[$storage['storage_index']];
-
-$storage['units']       = 1073741824;
-$storage['size']        = $entry['fileSystemSpaceSize'] * $storage['units'];
-$storage['free']        = $entry['fileSystemSpaceAvail'] * $storage['units'];
-$storage['used']        = $entry['fileSystemSpaceUsed'] * $storage['units'];
