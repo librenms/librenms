@@ -130,7 +130,7 @@ class AvailabilityMapController extends WidgetController
                 if (($device->uptime < $uptime_warn) && ($device->uptime != 0)) {
                     $totals['warn']++;
                     $device->stateName = 'warn';
-                    $device->labelClass = 'label-warn';
+                    $device->labelClass = 'label-warning';
                 } else {
                     $totals['up']++;
                     $device->stateName = 'up';
