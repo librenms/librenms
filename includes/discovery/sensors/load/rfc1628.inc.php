@@ -5,7 +5,7 @@ echo 'RFC1628 ';
 $load_data = snmpwalk_group($device, 'upsOutputPercentLoad', 'UPS-MIB');
 
 foreach ($load_data as $index => $data) {
-    $load_oid = ".1.3.6.1.2.1.33.1.4.4.1.5.$index".".0";
+    $load_oid = ".1.3.6.1.2.1.33.1.4.4.1.5.".$index.".0";
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'load', $load_oid);
     $descr = 'Percentage load';
     if (count($load_data) > 1) {
