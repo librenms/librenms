@@ -22,7 +22,7 @@ if ($device['os'] == 'vrp') {
                 if (empty($descr)) {
                     $descr = $entry['hwEntityBomEnDesc'];
                 }
-		$descr    .= " Memory";
+                $descr    .= " Memory";
                 $usage     = $entry['hwEntityMemUsage'];
                 if (!strstr($descr, 'No') && !strstr($usage, 'No') && $descr != '') {
                     discover_mempool($valid_mempool, $device, $index, 'vrp', $descr, '1', null, null);
