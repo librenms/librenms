@@ -26,13 +26,16 @@
 namespace App\Http\Controllers\Widgets;
 
 use App\Models\Application;
+use App\Models\Bill;
 use App\Models\Device;
+use App\Models\MuninPlugin;
 use App\Models\Port;
 use App\Models\UserWidget;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use LibreNMS\Util\Graph;
+use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
 
 class GraphController extends WidgetController
@@ -55,7 +58,47 @@ class GraphController extends WidgetController
     public function title()
     {
         $settings = $this->getSettings();
-        return !empty($settings['title']) ? $settings['title'] : $this->title;
+
+        if (!empty($settings['title'])) {
+            return $settings['title'];
+        }
+
+        // automatic title
+        $type = $this->getGraphType();
+        if ($type == 'device') {
+            $device = Device::find($settings['graph_device']);
+            return ($device ? $device->displayName() : 'Device') . ' / ' . $settings['graph_type'];
+        } elseif ($type == 'aggregate') {
+            return 'Overall ' . $this->getGraphType(false) . ' Bits (' . $settings['graph_range'] . ')';
+        } elseif ($type == 'port') {
+            if ($port = Port::find($settings['graph_port'])) {
+                return $port->device->displayName() . ' / ' . $port->getShortLabel() . ' / ' . $settings['graph_type'];
+            }
+        } elseif ($type == 'application') {
+            if ($application = Application::find($settings['graph_application'])) {
+                return $application->device->displayName() . ' / ' . $application->app_type . ' / ' . $settings['graph_type'];
+            }
+        } elseif ($type == 'bill') {
+            if ($bill = Bill::find($settings['graph_bill'])) {
+                return $bill->device->displayName() . ' / ' . $bill->bill_name . ' / ' . $settings['graph_type'];
+            }
+        } elseif ($type == 'munin') {
+            if ($munin = MuninPlugin::find($settings['graph_munin'])) {
+                return $munin->device->displayName() . ' / ' . $munin->mplug_type . ' / ' . $settings['graph_type'];
+            }
+        }
+
+        if (empty($widget_settings['title'])) {
+            $widget_settings['title']      = $widget_settings['graph_'.$type]['hostname']." / ".$widget_settings['graph_'.$type]['name']." / ".$widget_settings['graph_type'];
+        }
+
+        // fall back for types where we couldn't find the item
+        if ($settings['graph_type']) {
+            return 'Device / ' . ucfirst($type) . ' / ' . $settings['graph_type'];
+        }
+
+
+        return $this->title;
     }
 
     public function getSettingsView(Request $request)
@@ -92,19 +135,53 @@ class GraphController extends WidgetController
     {
         $settings = $this->getSettings();
 
-        $data = [
-            'graph_image' => ''
-        ];
+        // get type
+        $type = $this->getGraphType();
 
-        if (starts_with($settings['graph_type'], 'port_')) {
-            $data['graph_image'] = $this->getPortGraph($request);
-        } elseif(starts_with($settings['graph_type'], 'device_')) {
-            $data['graph_image'] = $this->getDeviceGraph($request);
+        if ($type == 'device') {
+            $param = 'device='.$settings['graph_device'];
+        } elseif ($type == 'application') {
+            $param = 'id='.$settings['graph_application'];
+        } elseif ($type == 'munin') {
+            if ($mplug = MuninPlugin::find($settings['graph_munin'])) {
+                $param = 'device='.$mplug->device_id.'&plugin='.$mplug->mplug_type;
+            }
+        } elseif ($type == 'aggregate') {
+            $aggregate_type = $this->getGraphType(false);
+            if ($aggregate_type == 'custom') {
+                $aggregate_type = $settings['graph_custom'];
+            }
+
+            $ports = get_ports_from_type($aggregate_type);
+            foreach ($ports as $port) {
+                $tmp[] = $port['port_id'];
+            }
+            $param  = 'id='.implode(',', $tmp);
+            $settings['graph_type'] = 'multiport_bits_separate';
+        } else {
+            $param = 'id='.$settings['graph_'.$type];
         }
 
+        $data = $settings;
+        $data['param'] = $param;
+        $data['dimensions'] = $request->get('dimensions');
+        $data['from'] = Carbon::now()->subSeconds(Time::legacyTimeSpecToSecs($settings['graph_range']))->timestamp;
+        $data['to'] = Carbon::now()->timestamp;
 
         return view('widgets.graph', $data);
     }
+
+    private function getGraphType($summarize = true)
+    {
+        $type = explode('_', $this->getSettings()['graph_type'], 2)[0];
+
+        if ($summarize && in_array($type, ['transit', 'peering', 'core', 'custom'])) {
+            return 'aggregate';
+        }
+
+        return $type;
+    }
+
 
     private function getPortGraph(Request $request)
     {
