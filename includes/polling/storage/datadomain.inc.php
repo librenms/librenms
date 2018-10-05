@@ -18,7 +18,6 @@ if (!is_array($storage_cache['ddos-storage'])) {
 }
 
 foreach ($storage_cache['ddos-storage'] as $fsentry) {
-
     if ($fsentry['fileSystemResourceName'] == "/data: post-comp") {
         $storage['units']       = 1073741824;
         $storage['size']        = $fsentry['fileSystemSpaceSize'] * $storage['units'];
