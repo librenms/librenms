@@ -442,7 +442,7 @@ function http_fallback(link) {
     return false;
 }
 
-function init_select2(selector, type, placeholder, data, selected) {
+function init_select2(selector, type, data, selected) {
     var $select = $(selector);
 
     // allow function to be assigned to pass data
@@ -460,7 +460,6 @@ function init_select2(selector, type, placeholder, data, selected) {
         dropdownAutoWidth : true,
         width: "auto",
         allowClear: true,
-        placeholder: placeholder,
         ajax: {
             url: 'ajax/select/' + type,
             delay: 150,

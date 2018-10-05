@@ -66,10 +66,8 @@ class GraphController extends Controller
         $aggregators = $this->filterTypeGraphs(collect([
             'transit' => 'Transit',
             'peering' => 'Peering',
-            'transpeer' => 'Transit + Peering',
             'core' => 'Core',
-            'custom' => 'Custom Descr',
-            'manual' => 'Manual Descr',
+            'custom' => 'Custom',
         ]), 'aggregators', $search);
         if ($aggregators->isNotEmpty()) {
             $data[] = [

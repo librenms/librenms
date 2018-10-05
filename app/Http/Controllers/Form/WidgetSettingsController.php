@@ -33,6 +33,8 @@ class WidgetSettingsController extends Controller
 {
     public function update(Request $request, $widget_settings)
     {
+        $this->validate($request, ['settings' => 'array']);
+
         $widget = UserWidget::with('dashboard')->findOrFail($widget_settings);
         $widget_settings = (array)$request->get('settings', []);
 

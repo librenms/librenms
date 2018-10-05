@@ -28,6 +28,7 @@ namespace App\Http\Controllers\Widgets;
 use App\Models\Application;
 use App\Models\Device;
 use App\Models\Port;
+use App\Models\UserWidget;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -46,7 +47,7 @@ class GraphController extends WidgetController
         'graph_port' => null,
         'graph_application' => null,
         'graph_munin' => null,
-        'graph_custom' => null,
+        'graph_custom' => [],
         'graph_manual' => null,
         'graph_bill' => null,
     ];
@@ -54,7 +55,7 @@ class GraphController extends WidgetController
     public function title()
     {
         $settings = $this->getSettings();
-        return isset($settings['title']) ? $settings['title'] : $this->title;
+        return !empty($settings['title']) ? $settings['title'] : $this->title;
     }
 
     public function getSettingsView(Request $request)
@@ -72,7 +73,6 @@ class GraphController extends WidgetController
             $port = Port::find($data['graph_port']);
         }
         $data['port_text'] = isset($port) ? $port->getLabel() : __('Port does not exist');
-
 
         if ($primary == 'application' && $data['graph_application']) {
             $app = Application::find($data['graph_application']);
@@ -156,5 +156,48 @@ class GraphController extends WidgetController
         ];
         $graph = Url::graphTag($graph_array);
         return Url::deviceLink($device, $graph);
+    }
+
+    public function getSettings()
+    {
+        if (is_null($this->settings)) {
+            $id = \Request::get('id');
+            $widget = UserWidget::findOrFail($id);
+            $settings = array_replace($this->defaults, (array)$widget->settings);
+            $settings['id'] = $id;
+
+            // legacy data conversions
+            if ($settings['graph_type'] == 'manual') {
+                $settings['graph_type'] = 'custom';
+                $settings['graph_custom'] = explode(',', $settings['graph_manual']);
+            }
+            if ($settings['graph_type'] == 'transpeer') {
+                $settings['graph_type'] = 'custom';
+                $settings['graph_custom'] = ['transit', 'peer'];
+            }
+
+            $settings['graph_device'] = $this->convertLegacySettingId($settings['graph_device'], 'device_id');
+            $settings['graph_port'] = $this->convertLegacySettingId($settings['graph_port'], 'port_id');
+            $settings['graph_application'] = $this->convertLegacySettingId($settings['graph_application'], 'app_id');
+            $settings['graph_munin'] = $this->convertLegacySettingId($settings['graph_munin'], 'mplug_id');
+            $settings['graph_bill'] = $this->convertLegacySettingId($settings['graph_device'], 'graph_bill');
+
+            $settings['graph_custom'] = (array)$settings['graph_custom'];
+
+
+            $this->settings = $settings;
+        }
+
+        return $this->settings;
+    }
+
+    private function convertLegacySettingId($setting, $key)
+    {
+        if ($setting && !is_numeric($setting)) {
+            $data = json_decode($setting, true);
+            return isset($data[$key]) ? $data[$key] : 0;
+        }
+
+        return $setting;
     }
 }

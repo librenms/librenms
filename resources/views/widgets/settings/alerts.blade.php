@@ -46,7 +46,7 @@
         <label for="device_group-{{ $id }}"
                class="col-sm-5 control-label">@lang('Device group')</label>
         <div class="col-sm-7">
-            <select class="form-control" name="group" id="device_group-{{ $id }}">
+            <select class="form-control" name="group" id="device_group-{{ $id }}" data-placeholder="@lang('All alerts')">
                 @if($device_group)
                     <option value="{{ $device_group->id }}" selected> {{ $device_group->name }} </option>
                 @endif
@@ -75,6 +75,6 @@
 
 @section('javascript')
     <script type="text/javascript">
-        init_select2('#device_group-{{ $id }}', 'device-group', 'All Alerts', {}, {{ $group ?: 0 }});
+        init_select2('#device_group-{{ $id }}', 'device-group', {}, {{ $group ?: 0 }});
     </script>
 @endsection

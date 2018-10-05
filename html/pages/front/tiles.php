@@ -591,10 +591,21 @@ if (strpos($dash_config, 'globe') !== false) {
     function widget_settings(data) {
         var widget_settings = {};
         var widget_id = 0;
-        datas = $(data).serializeArray();
+        var datas = $(data).serializeArray();
         for( var field in datas ) {
-            widget_settings[datas[field].name] = datas[field].value;
+            var name = datas[field].name;
+            if (name.endsWith('[]')) {
+                name = name.slice(0, -2);
+                if (widget_settings[name]) {
+                    widget_settings[name].push(datas[field].value);
+                } else {
+                    widget_settings[name] = [datas[field].value];
+                }
+            } else {
+                widget_settings[name] = datas[field].value;
+            }
         }
+
         $('.gridster').find('div[id^=widget_body_]').each(function() {
             if(this.contains(data)) {
                 widget_id = $(this).parent().attr('id');

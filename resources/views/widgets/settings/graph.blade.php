@@ -10,7 +10,7 @@
     <div class="form-group">
         <label for="graph_type-{{ $id }}" class="col-sm-4 control-label">@lang('Graph type')</label>
         <div class="col-sm-8">
-            <select class="form-control" id="graph_type-{{ $id }}" name="graph_type" required onchange="switch_graph_type{{ $id }}(this.value);">
+            <select class="form-control" id="graph_type-{{ $id }}" name="graph_type" required data-placeholder="@lang('Select a graph')" onchange="switch_graph_type{{ $id }}(this.value);">
                 @if($graph_type)
                     <option value="{{ $graph_type }}">{{ $graph_text }}</option>
                 @endif
@@ -48,7 +48,7 @@
     <div class="form-group graph_select_extra-{{ $id }}" id="graph_select_device-{{ $id }}" style="display: none;">
         <label for="graph_device-{{ $id }}" class="col-sm-4 control-label">@lang('Device')</label>
         <div class="col-sm-8">
-            <select class="form-control" id="graph_device-{{ $id }}" name="graph_device">
+            <select class="form-control" id="graph_device-{{ $id }}" name="graph_device" data-placeholder="@lang('Select a device')">
                 @if($graph_device)
                     <option value="{{ $graph_device }}">{{ $device_text }}</option>
                 @endif
@@ -58,7 +58,7 @@
     <div class="form-group graph_select_extra-{{ $id }}" id="graph_select_port-{{ $id }}" style="display: none;">
         <label for="graph_port-{{ $id }}" class="col-sm-4 control-label">@lang('Port')</label>
         <div class="col-sm-8">
-            <select class="form-control" id="graph_port-{{ $id }}" name="graph_port">
+            <select class="form-control" id="graph_port-{{ $id }}" name="graph_port" data-placeholder="@lang('Select a port')">
             @if($graph_port)
                     <option value="{{ $graph_port }}">{{ $port_text }}</option>
                 @endif
@@ -68,7 +68,7 @@
     <div class="form-group graph_select_extra-{{ $id }}" id="graph_select_application-{{ $id }}" style="display: none;">
         <label for="graph_application-{{ $id }}" class="col-sm-4 control-label">@lang('Application')</label>
         <div class="col-sm-8">
-            <select class="form-control" id="graph_application-{{ $id }}" name="graph_application">
+            <select class="form-control" id="graph_application-{{ $id }}" name="graph_application" data-placeholder="@lang('Select an application')">
             @if($graph_application)
                     <option value="{{ $graph_application }}">{{ $application_text }}</option>
                 @endif
@@ -78,7 +78,7 @@
     <div class="form-group graph_select_extra-{{ $id }}" id="graph_select_munin-{{ $id }}" style="display: none;">
         <label for="graph_munin-{{ $id }}" class="col-sm-4 control-label">@lang('Munin plugin')</label>
         <div class="col-sm-8">
-            <select class="form-control" id="graph_munin-{{ $id }}" name="graph_munin">
+            <select class="form-control" id="graph_munin-{{ $id }}" name="graph_munin" data-placeholder="@lang('Select a Munin plugin')">
             @if($graph_munin)
                     <option value="{{ $graph_munin }}">{{ $munin_text }}</option>
                 @endif
@@ -88,23 +88,32 @@
     <div class="form-group graph_select_extra-{{ $id }}" id="graph_select_bill-{{ $id }}" style="display: none;">
         <label for="graph_bill-{{ $id }}" class="col-sm-4 control-label">@lang('Bill')</label>
         <div class="col-sm-8">
-            <select class="form-control" id="graph_bill-{{ $id }}" name="graph_bill">
+            <select class="form-control" id="graph_bill-{{ $id }}" name="graph_bill" data-placeholder="@lang('Select a bill')">
             @if($graph_bill)
                     <option value="{{ $graph_bill }}">{{ $bill_text }}</option>
                 @endif
             </select>
         </div>
     </div>
-
+    <div class="form-group graph_select_extra-{{ $id }}" id="graph_select_custom-{{ $id }}" style="display: none;">
+        <label for="graph_custom-{{ $id }}" class="col-sm-4 control-label">@lang('Custom Aggregator(s)')</label>
+        <div class="col-sm-8">
+            <select class="form-control" id="graph_custom-{{ $id }}" name="graph_custom[]" data-tags="true" multiple="multiple" data-placeholder="@lang('Select or add one or more')">
+                @foreach($graph_custom as $custom)
+                    <option value="{{ $custom }}" selected>{{ ucwords($custom) }}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
 
 @endsection
 
 @section('javascript')
     <script type="text/javascript">
-        init_select2('#graph_type-{{ $id }}', 'graph', '@lang('Select a graph')', {}, '{{ $graph_type ?: "" }}');
-        init_select2('#graph_device-{{ $id }}', 'device', '@lang('Select a device')', {limit: 100}, {{ $graph_device ?: 0 }});
-        init_select2('#graph_port-{{ $id }}', 'port', '@lang('Select a port')', {limit: 100}, {{ $graph_port ?: 0 }});
-        init_select2('#graph_application-{{ $id }}', 'application', '@lang('Select an application')', function (params) {
+        init_select2('#graph_type-{{ $id }}', 'graph', {}, '{{ $graph_type ?: "" }}');
+        init_select2('#graph_device-{{ $id }}', 'device', {limit: 100}, {{ $graph_device ?: 0 }});
+        init_select2('#graph_port-{{ $id }}', 'port', {limit: 100}, {{ $graph_port ?: 0 }});
+        init_select2('#graph_application-{{ $id }}', 'application', function (params) {
             var graph_type = $('#graph_type-{{ $id }}').val().split('_');
             graph_type.shift();
             return {
@@ -114,14 +123,15 @@
                 page: params.page || 1
             };
         }, {{ $graph_application ?: 0 }});
-        init_select2('#graph_munin-{{ $id }}', 'munin', '@lang('Select a Munin plugin')', {limit: 100}, {{ $graph_munin ?: 0 }});
-        init_select2('#graph_bill-{{ $id }}', 'bill', '@lang('Select a bill')', {limit: 100}, {{ $graph_bill ?: 0 }});
+        init_select2('#graph_munin-{{ $id }}', 'munin', {limit: 100}, {{ $graph_munin ?: 0 }});
+        init_select2('#graph_bill-{{ $id }}', 'bill', {limit: 100}, {{ $graph_bill ?: 0 }});
+        init_select2('#graph_custom-{{ $id }}', 'graph-aggregate', {}, 0);
 
         function switch_graph_type{{ $id }}(data) {
-            $(".graph_select_extra-{{ $id }}").hide();
-            if (data !== undefined && data !== "") {
-                var type = data.split("_").shift();
-                $("#graph_select_" + type + "-{{ $id }}").show();
+            $('.graph_select_extra-{{ $id }}').hide();
+            if (data !== undefined && data !== '') {
+                var type = data.split('_').shift();
+                $('#graph_select_' + type + '-{{ $id }}').show();
             }
         }
     </script>

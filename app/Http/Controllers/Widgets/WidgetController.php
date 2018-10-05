@@ -39,7 +39,7 @@ abstract class WidgetController extends Controller
     protected $defaults = [];
 
     private $show_settings = false;
-    private $settings = null;
+    protected $settings = null;
 
     /**
      * @param Request $request
