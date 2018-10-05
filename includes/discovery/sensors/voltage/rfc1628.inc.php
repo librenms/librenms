@@ -27,8 +27,9 @@ if (is_numeric($battery_volts)) {
 
 $output_volts = snmpwalk_group($device, 'upsOutputVoltage', 'UPS-MIB');
 foreach ($output_volts as $index => $data) {
-    $volt_oid = ".1.3.6.1.2.1.33.1.4.4.1.2.$index";
+    $volt_oid = ".1.3.6.1.2.1.33.1.4.4.1.2.".$index.".0";
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'voltage', $volt_oid);
+    $divisor = 10;
     $descr = 'Output';
     if (count($output_volts) > 1) {
         $descr .= " Phase $index";
@@ -48,14 +49,15 @@ foreach ($output_volts as $index => $data) {
         null,
         null,
         null,
-        $data['upsOutputVoltage'] / $divisor
+        $data['upsOutputVoltage'][$index] / $divisor
     );
 }
 
 $input_volts = snmpwalk_group($device, 'upsInputVoltage', 'UPS-MIB');
 foreach ($input_volts as $index => $data) {
-    $volt_oid = ".1.3.6.1.2.1.33.1.3.3.1.3.$index";
+    $volt_oid = ".1.3.6.1.2.1.33.1.3.3.1.3.$index.0";
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'voltage', $volt_oid);
+    $divisor = 10;
     $descr = 'Input';
     if (count($input_volts) > 1) {
         $descr .= " Phase $index";
@@ -75,14 +77,15 @@ foreach ($input_volts as $index => $data) {
         null,
         null,
         null,
-        $data['upsInputVoltage'] / $divisor
+        $data['upsInputVoltage'][$index] / $divisor
     );
 }
 
 $bypass_volts = snmpwalk_group($device, 'upsBypassVoltage', 'UPS-MIB');
 foreach ($bypass_volts as $index => $data) {
-    $volt_oid = ".1.3.6.1.2.1.33.1.5.3.1.2.$index";
+    $volt_oid = ".1.3.6.1.2.1.33.1.5.3.1.2.$index.0";
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'voltage', $volt_oid);
+    $divisor = 10;
     $descr = 'Bypass';
     if (count($bypass_volts) > 1) {
         $descr .= " Phase $index";
@@ -102,7 +105,7 @@ foreach ($bypass_volts as $index => $data) {
         null,
         null,
         null,
-        $data['upsBypassVoltage'] / $divisor
+        $data['upsBypassVoltage'][$index] / $divisor
     );
 }
 
