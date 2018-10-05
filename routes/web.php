@@ -62,6 +62,11 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         ]);
     }
 
+    // demo helper
+    Route::get('demo', function () {
+        return redirect('/');
+    });
+
     // Legacy routes
     Route::any('/{path?}', 'LegacyController@index')->where('path', '.*');
 });
