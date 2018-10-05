@@ -11,9 +11,7 @@ foreach ($load_data as $index => $data) {
     if (count($load_data) > 1) {
         $descr .= " $index";
     }
-    d_echo ($divisor);
-    d_echo ($index);
-    d_echo ($data['upsOutputPercentLoad']);
+
     discover_sensor(
         $valid['sensor'],
         'load',
