@@ -80,16 +80,12 @@ class GraphController extends WidgetController
             }
         } elseif ($type == 'bill') {
             if ($bill = Bill::find($settings['graph_bill'])) {
-                return $bill->device->displayName() . ' / ' . $bill->bill_name . ' / ' . $settings['graph_type'];
+                return 'Bill: ' . $bill->bill_name;
             }
         } elseif ($type == 'munin') {
             if ($munin = MuninPlugin::find($settings['graph_munin'])) {
                 return $munin->device->displayName() . ' / ' . $munin->mplug_type . ' / ' . $settings['graph_type'];
             }
-        }
-
-        if (empty($widget_settings['title'])) {
-            $widget_settings['title']      = $widget_settings['graph_'.$type]['hostname']." / ".$widget_settings['graph_'.$type]['name']." / ".$widget_settings['graph_type'];
         }
 
         // fall back for types where we couldn't find the item
@@ -121,6 +117,11 @@ class GraphController extends WidgetController
             $app = Application::find($data['graph_application']);
         }
         $data['application_text'] = isset($app) ? $app->displayName() . ' - ' . $app->device->displayName() : __('App does not exist');
+
+        if ($primary == 'bill' && $data['graph_bill']) {
+            $bill = Bill::find($data['graph_bill']);
+        }
+        $data['bill_text'] = isset($bill) ? $bill->bill_name : __('Bill does not exist');
 
         $data['graph_text'] = ucwords($name);
 
@@ -182,59 +183,6 @@ class GraphController extends WidgetController
         return $type;
     }
 
-
-    private function getPortGraph(Request $request)
-    {
-        $settings = $this->getSettings();
-        $dimensions = $request->get('dimensions');
-
-        $port_data = json_decode($settings['graph_port'], true);
-        $port = Port::find(is_array($port_data) ? $port_data['port_id'] : $settings['graph_port']);
-        if (!$port) {
-            return __('Port not found');
-        }
-
-        $time_offset = \LibreNMS\Util\Time::legacyTimeSpecToSecs($settings['graph_range']);
-
-        $graph_array = [
-            'type' => $settings['graph_type'] ?: 'port_bits',
-            'legend' => $settings['graph_legend'],
-            'width' => $dimensions['x'],
-            'height' => $dimensions['y'],
-            'to' => Carbon::now()->timestamp,
-            'from' => Carbon::now()->subSeconds($time_offset)->timestamp,
-            'id' => $port->port_id,
-        ];
-        $graph = Url::graphTag($graph_array);
-        return Url::portLink($port, $graph);
-    }
-
-    private function getDeviceGraph(Request $request)
-    {
-        $settings = $this->getSettings();
-        $dimensions = $request->get('dimensions');
-
-        $device_data = json_decode($settings['graph_device'], true);
-        $device = Device::find(is_array($device_data) ? $device_data['device_id'] : $settings['graph_device']);
-        if (!$device) {
-            return __('Device not found');
-        }
-
-        $time_offset = \LibreNMS\Util\Time::legacyTimeSpecToSecs($settings['graph_range']);
-
-        $graph_array = [
-            'type' => $settings['graph_type'] ?: 'device_bits',
-            'legend' => $settings['graph_legend'],
-            'width' => $dimensions['x'],
-            'height' => $dimensions['y'],
-            'to' => Carbon::now()->timestamp,
-            'from' => Carbon::now()->subSeconds($time_offset)->timestamp,
-            'id' => $device ? $device->device_id : 0,
-        ];
-        $graph = Url::graphTag($graph_array);
-        return Url::deviceLink($device, $graph);
-    }
-
     public function getSettings()
     {
         if (is_null($this->settings)) {
@@ -257,7 +205,7 @@ class GraphController extends WidgetController
             $settings['graph_port'] = $this->convertLegacySettingId($settings['graph_port'], 'port_id');
             $settings['graph_application'] = $this->convertLegacySettingId($settings['graph_application'], 'app_id');
             $settings['graph_munin'] = $this->convertLegacySettingId($settings['graph_munin'], 'mplug_id');
-            $settings['graph_bill'] = $this->convertLegacySettingId($settings['graph_device'], 'graph_bill');
+            $settings['graph_bill'] = $this->convertLegacySettingId($settings['graph_bill'], 'bill_id');
 
             $settings['graph_custom'] = (array)$settings['graph_custom'];
 

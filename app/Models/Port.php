@@ -56,7 +56,7 @@ class Port extends BaseModel
      */
     public function getShortLabel()
     {
-        return Rewrite::shortenIfName(Rewrite::normalizeIfName($this->getLabel()));
+        return Rewrite::shortenIfName(Rewrite::normalizeIfName($this->ifName ?: $this->ifDescr));
     }
 
     /**
