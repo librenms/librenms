@@ -131,8 +131,8 @@ if ($config['map']['engine'] == 'leaflet') {
         if (empty($widget_settings['status']) && $widget_settings['status'] != '0') {
             $widget_settings['status'] = '0,1';
         }
-        $map_init = "[" . $init_lat . ", " . $init_lng . "], " . sprintf("%01.0f", $init_zoom);
-        $temp_output .= 'var map = L.map(\'leaflet-map\').setView('.$map_init.');
+        $map_init = "[" . $init_lat . ", " . $init_lng . "], " . sprintf("%01.1f", $init_zoom);
+        $temp_output .= 'var map = L.map(\'leaflet-map\', { zoomSnap: 0.1 } ).setView('.$map_init.');
 L.tileLayer(\'//'.$config['leaflet']['tile_url'].'/{z}/{x}/{y}.png\', {
     attribution: \'&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors\'
 }).addTo(map);
