@@ -371,6 +371,9 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                 if (typeof extra.recovery == 'undefined') {
                     extra.recovery = true;
                 }
+                if (typeof extra.options == 'undefined') {
+                    extra.options = new Array();
+                }
                 if (typeof extra.options.override_query == 'undefined') {
                     extra.options.override_query = false;
                 }
