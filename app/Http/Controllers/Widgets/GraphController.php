@@ -36,7 +36,6 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\Time;
-use LibreNMS\Util\Url;
 
 class GraphController extends WidgetController
 {
@@ -93,7 +92,6 @@ class GraphController extends WidgetController
             return 'Device / ' . ucfirst($type) . ' / ' . $settings['graph_type'];
         }
 
-
         return $this->title;
     }
 
@@ -107,7 +105,12 @@ class GraphController extends WidgetController
         $secondary = implode('_', $type_parts);
         $name = $primary  . ' ' . (Graph::isMibGraph($primary, $secondary) ? $secondary : implode(' ', $type_parts));
 
-        // format display for selected port
+        // format display for selected items
+        if ($primary == 'device' && $data['graph_device']) {
+            $device = Device::find($data['graph_device']);
+        }
+        $data['device_text'] = isset($device) ? $device->displayName() : __('Device does not exist');
+
         if ($primary == 'port' && $data['graph_port']) {
             $port = Port::find($data['graph_port']);
         }
@@ -122,6 +125,11 @@ class GraphController extends WidgetController
             $bill = Bill::find($data['graph_bill']);
         }
         $data['bill_text'] = isset($bill) ? $bill->bill_name : __('Bill does not exist');
+
+        if ($primary == 'munin' && $data['graph_munin']) {
+            $mplug = MuninPlugin::with('device')->find($data['graph_munin']);
+        }
+        $data['munin_text'] = isset($mplug) ? $mplug->device->displayName() . ' - ' . $mplug->mplug_type : __('Munin plugin does not exist');
 
         $data['graph_text'] = ucwords($name);
 

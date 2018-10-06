@@ -53,6 +53,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::get('graph', 'GraphController');
             Route::get('graph-aggregate', 'GraphAggregateController');
             Route::get('syslog', 'SyslogController');
+            Route::get('munin', 'MuninPluginController');
             Route::get('port', 'PortController');
             Route::get('port-field', 'PortFieldController');
         });
