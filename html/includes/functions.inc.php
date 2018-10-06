@@ -1636,31 +1636,16 @@ function get_disks_with_smart($device, $app_id)
  */
 function get_dashboards($user_id = null)
 {
+    $user = is_null($user_id) ? Auth::user() : \App\Models\User::find($user_id);
     $default = get_user_pref('dashboard');
-    $dashboards = dbFetchRows(
-        "SELECT * FROM `dashboards` WHERE dashboards.access > 0 || dashboards.user_id = ?",
-        array(is_null($user_id) ? LegacyAuth::id() : $user_id)
-    );
 
-    $usernames = array(
-        LegacyAuth::id() => LegacyAuth::user()->username
-    );
+    return \App\Models\Dashboard::allAvailable($user)->with('user')->get()->map(function ($dashboard) use ($default) {
+        $dash = $dashboard->toArray();
+        $dash['username'] = $dashboard->user ? $dashboard->user->username : '';
+        $dash['default'] = $default == $dashboard->dashboard_id;
 
-    $result = array();
-    foreach ($dashboards as $dashboard) {
-        $duid = $dashboard['user_id'];
-        if (!isset($usernames[$duid])) {
-            $user = LegacyAuth::get()->getUser($duid);
-            $usernames[$duid] = $user['username'];
-        }
-
-        $dashboard['username'] = $usernames[$duid];
-        $dashboard['default'] = $dashboard['dashboard_id'] == $default;
-
-        $result[$dashboard['dashboard_id']] = $dashboard;
-    }
-
-    return $result;
+        return $dash;
+    })->keyBy('dashboard_id')->all();
 }
 
 /**
