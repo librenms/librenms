@@ -433,6 +433,17 @@ Click on 'Add Telegram config' and put your chat id and token into the relevant 
 | Chat ID | 34243432 |
 | Token | 3ed32wwf235234 |
 
+## Twilio SMS
+Twilio will send your alert via SMS.  From your Twilio account you will need your account SID, account token and your Twilio SMS phone number that you would like to send the alerts from.
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| SID | ACxxxxxxxxxxxxxxxxxxxxxxxxxxxx |
+| Token | 7xxxx573acxxxbc2xxx308d6xxx652d32 |
+| Twilio SMS Number | 8888778660 |
+
 ## VictorOps
 VictorOps provide a webHook url to make integration extremely simple. To get the URL required login to your VictorOps 
 account and go to:
