@@ -117,7 +117,7 @@ foreach ($bypass_volts as $index => $data) {
         null,
         null,
         null,
-        $data['upsBypassVoltage'][$index] / $divisor
+        $data['upsBypassVoltage'] / $divisor
     );
 }
 
