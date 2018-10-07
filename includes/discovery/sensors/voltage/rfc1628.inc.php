@@ -2,9 +2,9 @@
 
 echo 'RFC1628 ';
 
-$battery_volts = snmp_get($device, 'upsBatteryVoltage', '-OqvU', 'UPS-MIB');
+$battery_volts = snmp_get($device, 'upsBatteryVoltage.0', '-OqvU', 'UPS-MIB');
 if (is_numeric($battery_volts)) {
-    $volt_oid = '.1.3.6.1.2.1.33.1.2.5';
+    $volt_oid = '.1.3.6.1.2.1.33.1.2.5.0';
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'voltage', $volt_oid);
 
     discover_sensor(
