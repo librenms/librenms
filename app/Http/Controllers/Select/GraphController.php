@@ -68,6 +68,7 @@ class GraphController extends Controller
             'peering' => 'Peering',
             'core' => 'Core',
             'custom' => 'Custom',
+            'ports' => 'Manual Ports'
         ]), 'aggregators', $search);
         if ($aggregators->isNotEmpty()) {
             $data[] = [

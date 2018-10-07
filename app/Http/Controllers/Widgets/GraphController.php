@@ -34,6 +34,7 @@ use App\Models\UserWidget;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use LibreNMS\Config;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\Time;
 
@@ -49,6 +50,7 @@ class GraphController extends WidgetController
         'graph_port' => null,
         'graph_application' => null,
         'graph_munin' => null,
+        'graph_ports' => [],
         'graph_custom' => [],
         'graph_manual' => null,
         'graph_bill' => null,
@@ -146,6 +148,7 @@ class GraphController extends WidgetController
 
         // get type
         $type = $this->getGraphType();
+        $param = '';
 
         if ($type == 'device') {
             $param = 'device='.$settings['graph_device'];
@@ -161,11 +164,27 @@ class GraphController extends WidgetController
                 $aggregate_type = $settings['graph_custom'];
             }
 
-            $ports = get_ports_from_type($aggregate_type);
-            foreach ($ports as $port) {
-                $tmp[] = $port['port_id'];
+            if ($aggregate_type == 'ports') {
+                $port_ids = $settings['graph_ports'];
+            } else {
+                $port_types = collect((array)$aggregate_type)->map(function ($type) {
+                    // check for config definitions
+                    if (Config::has("{$type}_descr")) {
+                        return Config::get("{$type}_descr", []);
+                    }
+
+                    return $type;
+                })->flatten();
+
+                $port_ids = Port::hasAccess($request->user())->where(function ($query) use ($port_types) {
+                    foreach ($port_types as $port_type) {
+                        $port_type = str_replace('@', '%', $port_type);
+                        $query->orWhere('port_descr_type', 'LIKE', $port_type);
+                    }
+                })->pluck('port_id');
             }
-            $param  = 'id='.implode(',', $tmp);
+
+            $param = 'id=' . implode(',', $port_ids);
             $settings['graph_type'] = 'multiport_bits_separate';
         } else {
             $param = 'id='.$settings['graph_'.$type];
@@ -184,7 +203,7 @@ class GraphController extends WidgetController
     {
         $type = explode('_', $this->getSettings()['graph_type'], 2)[0];
 
-        if ($summarize && in_array($type, ['transit', 'peering', 'core', 'custom'])) {
+        if ($summarize && in_array($type, ['transit', 'peering', 'core', 'ports', 'custom'])) {
             return 'aggregate';
         }
 
