@@ -5,7 +5,7 @@ namespace App\Models;
 class Sensor extends BaseModel
 {
     public $timestamps = false;
-    protected $primaryKey = 'sensors_id';
+    protected $primaryKey = 'sensor_id';
 
     protected static $icons = array(
         'fanspeed' => 'tachometer',
