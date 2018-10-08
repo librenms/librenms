@@ -2072,6 +2072,12 @@ label {
   width: 100%;
 }
 
+.dashboard-image {
+  margin: 2px;
+  height: 100%;
+  width: auto;
+}
+
 .nav > li > a {
   padding-left: 10px;
   padding-right: 5px;
