@@ -434,6 +434,7 @@ Click on 'Add Telegram config' and put your chat id and token into the relevant 
 | Token | 3ed32wwf235234 |
 
 ## Twilio SMS
+
 Twilio will send your alert via SMS.  From your Twilio account you will need your account SID, account token and your Twilio SMS phone number that you would like to send the alerts from.  Twilio's APIs are located at: https://www.twilio.com/docs/api?filter-product=sms
 
 **Example:**

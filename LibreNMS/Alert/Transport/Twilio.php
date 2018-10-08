@@ -50,12 +50,11 @@ class Twilio extends Transport
         curl_setopt($curl, CURLOPT_USERPWD, $params["sid"]. ":" . $params["token"]);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $post);
         
-        $ret = curl_exec($curl);
+        curl_exec($curl);
 
-        if (curl_getinfo($curl,CURLINFO_RESPONSE_CODE)) {
-           return true;
+        if (curl_getinfo($curl, CURLINFO_RESPONSE_CODE)) {
+            return true;
         }
-        
     }
 
     public static function configTemplate()
