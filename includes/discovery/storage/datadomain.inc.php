@@ -12,20 +12,18 @@
  * @author     Abel Laura <abel.laura@gmail.com>
 */
 
-if ($device['os'] == 'datadomain') {
-    $ddos_storage = snmpwalk_cache_oid($device, 'fileSystemSpaceTable', null, 'DATA-DOMAIN-MIB', 'datadomain');
-    if (is_array($ddos_storage)) {
-        foreach ($ddos_storage as $storage) {
-            $index = $storage['fileSystemResourceIndex'];
-            $fstype = $storage['fileSystemResourceTier'];
-            $descr = $storage['fileSystemResourceName'];
-            $units = 1073741824;
-            $total = $storage['fileSystemSpaceSize'] * $units;
-            $used = $storage['fileSystemSpaceUsed'] * $units;
-            if ($descr == "/data: post-comp") {
-                discover_storage($valid_storage, $device, $index, $fstype, 'datadomain', $descr, $total, $units, $used);
-            }
+$ddos_storage = snmpwalk_cache_oid($device, 'fileSystemSpaceTable', null, 'DATA-DOMAIN-MIB', 'datadomain');
+if (is_array($ddos_storage)) {
+    foreach ($ddos_storage as $storage) {
+        $index = $storage['fileSystemResourceIndex'];
+        $fstype = $storage['fileSystemResourceTier'];
+        $descr = $storage['fileSystemResourceName'];
+        $units = 1073741824;
+        $total = $storage['fileSystemSpaceSize'] * $units;
+        $used = $storage['fileSystemSpaceUsed'] * $units;
+        if ($descr == "/data: post-comp") {
+            discover_storage($valid_storage, $device, $index, $fstype, 'datadomain', $descr, $total, $units, $used);
         }
     }
-    unset($fstype, $descr, $total, $used, $units, $ddos_storage);
 }
+unset($fstype, $descr, $total, $used, $units, $ddos_storage);
