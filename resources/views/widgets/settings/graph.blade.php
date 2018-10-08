@@ -105,6 +105,16 @@
             </select>
         </div>
     </div>
+    <div class="form-group graph_select_extra-{{ $id }}" id="graph_select_ports-{{ $id }}" style="display: none;">
+        <label for="graph_ports-{{ $id }}" class="col-sm-4 control-label">@lang('Ports')</label>
+        <div class="col-sm-8">
+            <select class="form-control" id="graph_ports-{{ $id }}" name="graph_ports[]" multiple="multiple" data-placeholder="@lang('Select one or more')">
+                @foreach($graph_ports as $port)
+                    <option value="{{ $port->port_id }}" selected>{{ $port->device->shortDisplayName() . ' - ' . $port->getShortLabel() }}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
 
 @endsection
 
@@ -125,7 +135,8 @@
         }, {{ $graph_application ?: 0 }});
         init_select2('#graph_munin-{{ $id }}', 'munin', {limit: 100}, {{ $graph_munin ?: 0 }});
         init_select2('#graph_bill-{{ $id }}', 'bill', {limit: 100}, {{ $graph_bill ?: 0 }});
-        init_select2('#graph_custom-{{ $id }}', 'graph-aggregate', {}, 0);
+        init_select2('#graph_custom-{{ $id }}', 'graph-aggregate', {}, false);
+        init_select2('#graph_ports-{{ $id }}', 'port', {limit: 100}, {{ $graph_port_ids }});
 
         function switch_graph_type{{ $id }}(data) {
             $('.graph_select_extra-{{ $id }}').hide();

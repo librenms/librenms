@@ -133,6 +133,14 @@ class GraphController extends WidgetController
         }
         $data['munin_text'] = isset($mplug) ? $mplug->device->displayName() . ' - ' . $mplug->mplug_type : __('Munin plugin does not exist');
 
+        $data['graph_ports'] = Port::whereIn('port_id', $data['graph_ports'])
+            ->select('ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr')
+            ->with(['device' => function ($query) {
+                $query->select('device_id', 'hostname', 'sysName');
+            }])->get();
+
+        $data['graph_port_ids'] = $data['graph_ports']->pluck('port_id')->toJson();
+
         $data['graph_text'] = ucwords($name);
 
         return view('widgets.settings.graph', $data);
@@ -181,7 +189,7 @@ class GraphController extends WidgetController
                         $port_type = str_replace('@', '%', $port_type);
                         $query->orWhere('port_descr_type', 'LIKE', $port_type);
                     }
-                })->pluck('port_id');
+                })->pluck('port_id')->all();
             }
 
             $param = 'id=' . implode(',', $port_ids);
@@ -235,6 +243,7 @@ class GraphController extends WidgetController
             $settings['graph_bill'] = $this->convertLegacySettingId($settings['graph_bill'], 'bill_id');
 
             $settings['graph_custom'] = (array)$settings['graph_custom'];
+            $settings['graph_ports'] = (array)$settings['graph_ports'];
 
 
             $this->settings = $settings;
