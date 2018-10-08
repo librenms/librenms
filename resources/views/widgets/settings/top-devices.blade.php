@@ -2,7 +2,7 @@
 
 @section('form')
     <div class="form-group">
-        <label for="title-{{ $id }}" class="control-label col-sm-6availability-map-widget-header">@lang('Widget title')</label>
+        <label for="title-{{ $id }}" class="control-label col-sm-6">@lang('Widget title')</label>
         <div class="col-sm-6">
             <input type="text" class="form-control" name="title" id="title-{{ $id }}" placeholder="@lang('Custom title')" value="{{ $title }}">
         </div>

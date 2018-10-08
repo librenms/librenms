@@ -52,6 +52,12 @@ class TopDevicesController extends WidgetController
         'time_interval' => 15,
     ];
 
+    public function title()
+    {
+        $settings = $this->getSettings();
+        return isset($settings['title']) ? $settings['title'] : $this->title;
+    }
+
     /**
      * @param Request $request
      * @return View

@@ -71,6 +71,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::post('component-status', 'ComponentStatusController');
             Route::post('device-summary-horiz', 'DeviceSummaryHorizController');
             Route::post('device-summary-vert', 'DeviceSummaryVertController');
+            Route::post('eventlog', 'EventlogController');
             Route::post('generic-graph', 'GraphController');
             Route::post('generic-image', 'ImageController');
             Route::post('placeholder', 'PlaceholderController');
