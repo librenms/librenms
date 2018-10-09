@@ -11,13 +11,11 @@ echo "<div style='margin: 10px;'>";
 
 $pagetitle[] = 'Edit user';
 
-/** @var User $user */
-
 if (! Auth::user()->hasGlobalAdmin()) {
     include 'includes/error-no-perm.inc.php';
 } else {
     if ($vars['user_id'] && !$vars['edit']) {
-
+        /** @var User $user */
         $user = User::all()->where('user_id', $vars['user_id'])->first();
         $user_data = $user->toArray(); // for compatibility with current code
 
