@@ -63,18 +63,20 @@ class User extends BaseValidation
         // Let's test the user configured if we have it
         if (Config::has('user')) {
             $dir = Config::get('install_dir');
+            $log_dir = Config::get('log_dir', "$dir/logs");
+            $rrd_dir = Config::get('rrd_dir', "$dir/rrd");
 
             // generic fix
             $fix = "sudo chown -R $lnms_username:$lnms_groupname $dir\n" .
-                "sudo setfacl -d -m g::rwx $dir/rrd $dir/logs $dir/bootstrap/cache/ $dir/storage/\n" .
-                "sudo chmod -R ug=rwX $dir/rrd $dir/logs $dir/bootstrap/cache/ $dir/storage/\n";
+                "sudo setfacl -d -m g::rwx $rrd_dir $log_dir $dir/bootstrap/cache/ $dir/storage/\n" .
+                "sudo chmod -R ug=rwX $rrd_dir $log_dir $dir/bootstrap/cache/ $dir/storage/\n";
 
             $find_result = rtrim(`find $dir \! -user $lnms_username -o \! -group $lnms_groupname 2> /dev/null`);
             if (!empty($find_result)) {
                 // Ignore files created by the webserver
                 $ignore_files = array(
-                    "$dir/logs/error_log",
-                    "$dir/logs/access_log",
+                    "$log_dir/error_log",
+                    "$log_dir/access_log",
                     "$dir/bootstrap/cache/",
                     "$dir/storage/framework/cache/",
                     "$dir/storage/framework/sessions/",
@@ -106,8 +108,8 @@ class User extends BaseValidation
 
             // check folder permissions
             $folders = [
-                'rrd' => Config::get('rrd_dir'),
-                'log' => Config::get('log_dir'),
+                'rrd' => $rrd_dir,
+                'log' => $log_dir,
                 'bootstrap' => "$dir/bootstrap/cache/",
                 'storage' => "$dir/storage/",
                 'cache' => "$dir/storage/framework/cache/",
