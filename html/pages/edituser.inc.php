@@ -248,8 +248,8 @@ if (! Auth::user()->hasGlobalAdmin()) {
           <button type='submit' class='btn btn-default' name='Submit' value='Add'>Add</button>
         </form>
         </div>";
-    } elseif ($vars['edit']) {
-        if ($user->isDemoUser()) {
+    } elseif ($vars['user_id'] && $vars['edit']) {
+        if (LegacyAuth::user()->isDemoUser()) {
             demo_account();
         } else {
             if (!empty($vars['new_level'])) {
