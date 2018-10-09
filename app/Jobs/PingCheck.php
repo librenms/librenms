@@ -249,7 +249,7 @@ class PingCheck implements ShouldQueue
                 $device->status_reason = $device->status ? '' : 'icmp';
                 $type = $device->status ? 'up' : 'down';
                 log_event('Device status changed to ' . ucfirst($type) . " from icmp check.", $device->toArray(), $type);
-                
+
                 echo "Device $device->hostname changed status to $type, running alerts\n";
                 RunRules($device->device_id);
             }
