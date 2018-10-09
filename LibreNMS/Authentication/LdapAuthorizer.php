@@ -292,7 +292,8 @@ class LdapAuthorizer extends AuthorizerBase
         ];
     }
 
-    private function connect() {
+    private function connect()
+    {
         if ($this->ldap_connection) {
             return;
         }
@@ -330,7 +331,7 @@ class LdapAuthorizer extends AuthorizerBase
         if ((Config::has('auth_ldap_binduser') || Config::has('auth_ldap_binddn')) && Config::has('auth_ldap_bindpassword')) {
             $username = Config::get('auth_ldap_binddn', $this->getFullDn(Config::get('auth_ldap_binduser')));
             $password = Config::get('auth_ldap_bindpassword');
-        } elseif($username) {
+        } elseif ($username) {
             $username = $this->getFullDn($username);
         }
 
