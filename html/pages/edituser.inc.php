@@ -247,7 +247,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         </form>
         </div>";
     } elseif ($vars['user_id'] && $vars['edit']) {
-        if (LegacyAuth::user()->isDemoUser()) {
+        if (Auth::user()->isDemo()) {
             demo_account();
         } else {
             if (!empty($vars['new_level'])) {
@@ -268,7 +268,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
                 }
             }
 
-            $users_details = LegacyAuth::get()->getUser($vars['user_id']);
+            $users_details = User::all()->where('user_id', $vars['user_id'])->first()->toArray();
             if (!empty($users_details)) {
                 if (!empty($vars['dashboard']) && $vars['dashboard'] != $users_details['dashboard']) {
                     set_user_pref('dashboard', $vars['dashboard']);
