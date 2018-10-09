@@ -19,27 +19,35 @@ use LibreNMS\Alert\Transport;
 
 class Twilio extends Transport
 {
+    public function deliverAlert($obj, $opts)
+    {
+        $twilio_opts['sid']  = $this->config['twilio-sid'];
+        $twilio_opts['token'] = $this->config['twilio-token'];
+        $twilio_opts['sender'] = $this->config['twilio-sender'];
+        $twilio_opts['to']    = $this->config['twilio-to'];
+        return $this->contacttwilio($obj, $twilio_opts);
+    }
+    
     public static function contactTwilio($obj, $opts)
     {
-        $params = array(
+        $params = [
             'sid' => $opts['sid'],
             'token' => $opts['token'],
             'phone' => $opts['to'],
             'text' => $obj['title'],
             'sender' => $opts['sender'],
-        );
+        ];
 
         $url    = 'https://api.twilio.com/2010-04-01/Accounts/' . $params['sid'] . '/Messages.json';
 
-        $data = array(
+        $data = [
             'From' => $params['sender'],
             'Body' => $params['text'],
             'To' => $params['phone'],
-        );
+        ];
         $post = http_build_query($data);
 
         $curl   = curl_init($url);
-
 
         // set_curl_proxy($curl);
 
