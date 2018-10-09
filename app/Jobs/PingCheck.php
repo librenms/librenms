@@ -251,9 +251,12 @@ class PingCheck implements ShouldQueue
                 log_event('Device status changed to ' . ucfirst($type) . " from icmp check.", $device->toArray(), $type);
 
                 echo "Device $device->hostname changed status to $type, running alerts\n";
-                RunRules($device->device_id);
             }
             $device->save();
+
+            if ($device->isDirty('status')) {
+                RunRules($device->device_id);
+            }
 
             // add data to rrd
             data_update($device->toArray(), 'ping-perf', $this->rrd_tags, ['ping' => $device->last_ping_timetaken]);
