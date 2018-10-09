@@ -10,6 +10,8 @@
                 <th data-column-id="ipv4_address">IPv4 Address</th>
                 <th data-column-id="interface">Port</th>
                 <th data-column-id="vlan">Vlan</th>
+                <th data-column-id="description">Description</th>
+                <th data-column-id="dnsname">DNS Name</th>
             </tr>
         </thead>
     </table>
@@ -29,22 +31,22 @@ var grid = $("#fdb-search").bootgrid({
                 "<option value=\"\">All Devices</option>"+
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 // Select the devices only with FDB tables
 $sql = 'SELECT D.device_id AS device_id, `hostname` FROM `ports_fdb` AS F, `ports` AS P, `devices` AS D';
 
 $param = array();
-if (!Auth::user()->hasGlobalRead()) {
+if (!LegacyAuth::user()->hasGlobalRead()) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `D`.`device_id` = `DP`.`device_id`';
     $where  .= ' AND `DP`.`user_id`=?';
-    $param[] = Auth::id();
+    $param[] = LegacyAuth::id();
 }
 
 $sql .= " WHERE F.port_id = P.port_id AND P.device_id = D.device_id $where GROUP BY `D`.`device_id`, `D`.`hostname` ORDER BY `hostname`";
 foreach (dbFetchRows($sql, $param) as $data) {
     echo '"<option value=\"'.$data['device_id'].'\""+';
-    if ($data['device_id'] == $_POST['device_id']) {
+    if ($data['device_id'] == $vars['device_id']) {
         echo '" selected "+';
     }
 
@@ -57,7 +59,7 @@ foreach (dbFetchRows($sql, $param) as $data) {
                 "<select name=\"searchby\" id=\"searchby\" class=\"form-control input-sm\">"+
                 "<option value=\"mac\" "+
 <?php
-if ($_POST['searchby'] == 'mac') {
+if ($vars['searchby'] == 'mac') {
     echo '" selected "+';
 }
 ?>
@@ -65,15 +67,31 @@ if ($_POST['searchby'] == 'mac') {
                 ">MAC Address</option>"+
                 "<option value=\"ip\" "+
 <?php
-if ($_POST['searchby'] == 'ip') {
+if ($vars['searchby'] == 'ip') {
     echo '" selected "+';
 }
 ?>
 
                 ">IP Address</option>"+
+                "<option value=\"dnsname\" "+
+<?php
+if ($vars['searchby'] == 'dnsname') {
+    echo '" selected "+';
+}
+?>
+
+                ">DNS Name</option>"+
+                "<option value=\"description\" "+
+<?php
+if ($vars['searchby'] == 'description') {
+    echo '" selected "+';
+}
+?>
+
+                ">Description</option>"+
                 "<option value=\"vlan\" "+
 <?php
-if ($_POST['searchby'] == 'vlan') {
+if ($vars['searchby'] == 'vlan') {
     echo '" selected "+';
 }
 ?>
@@ -84,7 +102,7 @@ if ($_POST['searchby'] == 'vlan') {
                 "<div class=\"form-group\">"+
                 "<input type=\"text\" name=\"searchPhrase\" id=\"address\" value=\""+
 <?php
-echo '"'.$_POST['searchPhrase'].'"+';
+echo '"'.$vars['searchPhrase'].'"+';
 ?>
 
                 "\" class=\"form-control input-sm\" placeholder=\"Value\" />"+
@@ -97,9 +115,9 @@ echo '"'.$_POST['searchPhrase'].'"+';
     {
         return {
             id: "fdb-search",
-            device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>',
-            searchby: '<?php echo mres($_POST['searchby']); ?>',
-            searchPhrase: '<?php echo mres($_POST['searchPhrase']); ?>'
+            device_id: '<?php echo $vars['device_id']; ?>',
+            searchby: '<?php echo $vars['searchby']; ?>',
+            searchPhrase: '<?php echo $vars['searchPhrase']; ?>'
         };
     },
     url: "ajax_table.php"

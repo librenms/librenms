@@ -7,7 +7,6 @@ over:
 discovery:
     - sysDescr_regex: '/Brother NC-.*(h|w),/'
 discovery_modules:
-    toner: 1
+    toner: true
 poller_modules:
-    toner: 1
-
+    toner: true

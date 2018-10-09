@@ -137,8 +137,8 @@ DAEMON=/usr/bin/rrdcached
 WRITE_TIMEOUT=1800
 WRITE_JITTER=1800
 WRITE_THREADS=4
-BASE_PATH=/mnt/librenms/rrd/db
-JOURNAL_PATH=/mnt/librenms/rrd/journal/
+BASE_PATH=/opt/librenms/rrd/
+JOURNAL_PATH=/var/lib/rrdcached/journal/
 PIDFILE=/var/run/rrdcached.pid
 SOCKFILE=/var/run/rrdcached.sock
 SOCKGROUP=librenms
@@ -147,12 +147,17 @@ DAEMON_USER=librenms
 BASE_OPTIONS="-B -F -R"
 ```
 
-3. Restart the rrdcached service
+3. Fix permissions
+```bash
+chown librenms:librenms /var/lib/rrdcached/journal/
+```
+
+4. Restart the rrdcached service
 ```bash
     systemctl restart rrdcached.service
 ```
 
-4. Edit /opt/librenms/config.php to include:
+5. Edit /opt/librenms/config.php to include:
 
 For local RRDCached server
 ```php

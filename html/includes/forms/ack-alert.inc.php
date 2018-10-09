@@ -23,14 +23,15 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
 header('Content-type: application/json');
 
-$alert_id = $vars['alert_id'];
-$state    = $vars['state'];
-$ack_msg  = $vars['ack_msg'];
+$alert_id    = $vars['alert_id'];
+$state       = $vars['state'];
+$ack_msg     = $vars['ack_msg'];
+$until_clear = $vars['ack_until_clear'];
 
 $status = 'error';
 
@@ -49,16 +50,31 @@ if (!is_numeric($alert_id)) {
         $open  = 1;
     }
 
-    $username = Auth::user()->username;
-    $data = ['state' => $state, 'open' => $open];
+    if ($until_clear === 'true') {
+        $until_clear = true;
+    } else {
+        $until_clear = false;
+    }
+
+    $info = json_encode([
+        'until_clear' => $until_clear,
+    ]);
+
+    $username = LegacyAuth::user()->username;
+    $data = [
+        'state' => $state,
+        'open' => $open,
+        'info' => $info,
+    ];
+
     $note = dbFetchCell('SELECT note FROM alerts WHERE id=?', [$alert_id]);
     if (!empty($note)) {
         $note .= PHP_EOL;
     }
     $data['note'] = $note . date(Config::get('dateformat.long')) . " - $state_descr ($username) $ack_msg";
 
-    if (dbUpdate($data, 'alerts', 'id=?', array($alert_id)) >= 0) {
-        if ($state === 2) {
+    if (dbUpdate($data, 'alerts', 'id=?', [$alert_id]) >= 0) {
+        if (in_array($state, [2, 22])) {
             $alert_info = dbFetchRow("SELECT `alert_rules`.`name`,`alerts`.`device_id` FROM `alert_rules` LEFT JOIN `alerts` ON `alerts`.`rule_id` = `alert_rules`.`id` WHERE `alerts`.`id` = ?", [$alert_id]);
             log_event("$username acknowledged alert {$alert_info['name']}", $alert_info['device_id'], 'alert', 2, $alert_id);
         }

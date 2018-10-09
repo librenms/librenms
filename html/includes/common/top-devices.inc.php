@@ -18,9 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
-$top_query = $widget_settings['top_query'];
+$top_query = $widget_settings['top_query'] ?: 'traffic';
 $sort_order = $widget_settings['sort_order'];
 
 $selected_sort_asc = '';
@@ -155,10 +155,12 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
 
     $common_output[] = '<h4>Top ' . $device_count . ' devices (last ' . $interval . ' minutes)</h4>';
 
-    $params = array('user' => Auth::id(), 'interval' => array($interval_seconds), 'count' => array($device_count));
-
+    $params = ['interval' => $interval_seconds, 'count' => $device_count];
+    if (!LegacyAuth::user()->hasGlobalRead()) {
+        $params['user'] = LegacyAuth::id();
+    }
     if ($top_query === 'traffic') {
-        if (Auth::user()->hasGlobalRead()) {
+        if (LegacyAuth::user()->hasGlobalRead()) {
             $query = '
             SELECT *, sum(p.ifInOctets_rate + p.ifOutOctets_rate) as total
             FROM ports as p, devices as d
@@ -185,7 +187,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             ';
         }
     } elseif ($top_query === 'uptime') {
-        if (Auth::user()->hasGlobalRead()) {
+        if (LegacyAuth::user()->hasGlobalRead()) {
             $query = 'SELECT `uptime`, `hostname`, `last_polled`, `device_id`, `sysName` 
                       FROM `devices` 
                       WHERE unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
@@ -201,7 +203,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       LIMIT :count';
         }
     } elseif ($top_query === 'ping') {
-        if (Auth::user()->hasGlobalRead()) {
+        if (LegacyAuth::user()->hasGlobalRead()) {
             $query = 'SELECT `last_ping_timetaken`, `hostname`, `last_polled`, `device_id`, `sysName`
                       FROM `devices` 
                       WHERE unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
@@ -217,7 +219,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       LIMIT :count';
         }
     } elseif ($top_query === 'cpu') {
-        if (Auth::user()->hasGlobalRead()) {
+        if (LegacyAuth::user()->hasGlobalRead()) {
             $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, avg(`processor_usage`) as `cpuload`, `d`.`sysName`
                       FROM `processors` AS `procs`, `devices` AS `d` 
                       WHERE `d`.`device_id` = `procs`.`device_id` 
@@ -235,7 +237,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       LIMIT :count';
         }
     } elseif ($top_query === 'ram') {
-        if (Auth::user()->hasGlobalRead()) {
+        if (LegacyAuth::user()->hasGlobalRead()) {
             $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, `mempool_perc`, `d`.`sysName`
                       FROM `mempools` as `mem`, `devices` as `d`
                       WHERE `d`.`device_id` = `mem`.`device_id`
@@ -253,7 +255,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       LIMIT :count';
         }
     } elseif ($top_query === 'storage') {
-        if (Auth::user()->hasGlobalRead()) {
+        if (LegacyAuth::user()->hasGlobalRead()) {
             $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, `storage_perc`, `d`.`sysName`, `storage_descr`, `storage_perc_warn`, `storage_id`
                       FROM `storage` as `disk`, `devices` as `d`
                       WHERE `d`.`device_id` = `disk`.`device_id`
@@ -271,7 +273,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       LIMIT :count';
         }
     } elseif ($top_query === 'poller') {
-        if (Auth::user()->hasGlobalRead()) {
+        if (LegacyAuth::user()->hasGlobalRead()) {
             $query = 'SELECT `last_polled_timetaken`, `hostname`, `last_polled`, `device_id`, `sysName`
                       FROM `devices` 
                       WHERE unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 

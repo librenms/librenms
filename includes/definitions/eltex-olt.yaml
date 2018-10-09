@@ -1,5 +1,5 @@
 os: eltex-olt
-text: Eltex OLT
+text: 'Eltex OLT'
 type: network
 icon: eltex
 over:

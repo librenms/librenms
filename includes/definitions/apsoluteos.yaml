@@ -1,5 +1,5 @@
 os: apsoluteos
-text: 'ApsoluteOS'
+text: ApsoluteOS
 type: network
 icon: radware
 group: radware

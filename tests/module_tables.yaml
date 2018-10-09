@@ -4,25 +4,33 @@ applications:
     application_metrics:
         excluded_fields: [app_id]
         joins:
-            - { custom: 'INNER JOIN (SELECT app_id, app_type FROM applications WHERE `device_id`=?) I USING (app_id)' }
+            - { custom: 'INNER JOIN (SELECT app_id, app_type FROM applications WHERE `device_id`=?) I USING (app_id)', select: ['app_type'] }
         custom_where: ''
+        order_by: metric
 arp-table:
     ipv4_mac:
         excluded_fields: [device_id, port_id]
         order_by: ipv4_mac.context_name, ipv4_mac.ipv4_address, ipv4_mac.mac_address
 bgp-peers:
-    devices:
-        included_fields: [bgpLocalAs]
     bgpPeers:
         excluded_fields: [device_id, bgpPeer_id]
+        joins:
+        - { left: bgpPeers.device_id, right: devices.device_id, select: [bgpLocalAs] }
     bgpPeers_cbgp:
         excluded_fields: [device_id]
+fdb-table:
+    ports_fdb:
+        excluded_fields: [device_id, ports_fdb_id, port_id, vlan_id]
+        joins:
+            - { left: ports_fdb.port_id, right: ports.port_id, select: [ifIndex] }
+            - { left: ports_fdb.vlan_id, right: vlans.vlan_id, select: [vlan_vlan] }
+        order_by: ports.ifIndex, vlans.vlan_vlan, ports_fdb.mac_address
 mempools:
     mempools:
         excluded_fields: [device_id, mempool_id]
 ports:
     ports:
-        excluded_fields: [device_id, port_id, poll_time, poll_period]
+        excluded_fields: [device_id, port_id, poll_time, poll_period, ifVrf]
         joins:
             - { left: ports.port_id, right: ports_statistics.port_id }
         order_by: ports.ifIndex, ports.ifDescr, ports.ifName
@@ -60,6 +68,11 @@ vlans:
     ports_vlans:
         excluded_fields: [port_vlan_id, device_id, port_id]
         order_by: vlan, baseport
+vrf:
+    vrfs:
+        excluded_fields: [vrf_id, device_id]
+        joins:
+            - { custom: "JOIN (SELECT ifVrf, GROUP_CONCAT(ifIndex ORDER BY ifIndex ASC SEPARATOR ',') as ifIndices FROM ports GROUP BY ifVrf) p ON p.ifVrf = vrfs.vrf_id", select: ["p.ifIndices"] }
 wireless:
     wireless_sensors:
         excluded_fields: [device_id, sensor_id, access_point_id, lastupdate]

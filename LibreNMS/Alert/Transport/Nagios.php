@@ -23,28 +23,42 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Nagios implements Transport
+class Nagios extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
+        if (empty($this->config)) {
+            return $this->deliverAlertOld($obj, $opts);
+        }
+        $opts = $this->config['nagios-fifo'];
+        return $this->contactNagios($obj, $opts);
+    }
+
+    public function deliverAlertOld($obj, $opts)
+    {
+        return $this->contactNagios($obj, $opts);
+    }
+
+    public static function contactNagios($obj, $opts)
+    {
         /*
-        host_perfdata_file_template=
-        [HOSTPERFDATA]\t
-        $TIMET$\t
-        $HOSTNAME$\t
-        HOST\t
-        $HOSTSTATE$\t
-        $HOSTEXECUTIONTIME$\t
-        $HOSTLATENCY$\t
-        $HOSTOUTPUT$\t
-        $HOSTPERFDATA$
-        */
+         host_perfdata_file_template=
+         [HOSTPERFDATA]\t
+         $TIMET$\t
+         $HOSTNAME$\t
+         HOST\t
+         $HOSTSTATE$\t
+         $HOSTEXECUTIONTIME$\t
+         $HOSTLATENCY$\t
+         $HOSTOUTPUT$\t
+         $HOSTPERFDATA$
+         */
 
         $format = '';
         $format .= "[HOSTPERFDATA]\t";
-        $format .= $obj['timestamp'] . "\t";
+        $format .= strtotime($obj['timestamp']) . "\t";
         $format .= $obj['hostname'] . "\t";
         $format .= md5($obj['rule']) . "\t"; //FIXME: Better entity
         $format .= ($obj['state'] ? $obj['severity'] : "ok") . "\t";
@@ -54,5 +68,22 @@ class Nagios implements Transport
         $format .= "NULL"; //FIXME: What's the HOSTPERFDATA equivalent for LibreNMS? Oo
         $format .= "\n";
         return file_put_contents($opts, $format);
+    }
+
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'Nagios FIFO',
+                    'name' => 'nagios-fifo',
+                    'descr' => 'Nagios compatible FIFO',
+                    'type' => 'text',
+                ],
+            ],
+            'validation' => [
+                'nagios-fifo' => 'required',
+            ]
+        ];
     }
 }

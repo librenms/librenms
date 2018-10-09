@@ -2,7 +2,7 @@ os: deltaups
 text: 'Delta UPS'
 type: power
 icon: delta
-rfc1628_compat: 1
+rfc1628_compat: true
 mib_dir:
     - delta
 discovery:

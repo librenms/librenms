@@ -31,7 +31,7 @@ Disable polling (and discovery) modules that you do not need. You can do this gl
 
 Disable OSPF polling
 ```php
-$config['poller_modules']['ospf'] = 0;
+$config['poller_modules']['ospf'] = false;
 ```
 
 You can disable modules globally then re-enable the module per device or the opposite way. For a list of modules please see

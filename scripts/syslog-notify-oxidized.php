@@ -6,17 +6,6 @@ require __DIR__ . '/../includes/init.php';
 
 use LibreNMS\Config;
 
-function oxidized_node_update($hostname, $msg, $username = 'not_provided')
-{
-    // Work around https://github.com/rack/rack/issues/337
-    $msg = str_replace("%", "", $msg);
-    $postdata = ["user" => $username, "msg" => $msg];
-    $oxidized_url = Config::get('oxidized.url');
-    if (!empty($oxidized_url)) {
-        Requests::put("$oxidized_url/node/next/$hostname", [], json_encode($postdata), ['proxy' => get_proxy()]);
-    }
-}//end oxidized_node_update()
-
 $hostname = $argv[1];
 $os = $argv[2];
 $msg = $argv[3];
@@ -31,4 +20,8 @@ if (preg_match('/(SYS-(SW[0-9]+-)?5-CONFIG_I|VSHD-5-VSHD_SYSLOG_CONFIG_I): Confi
     oxidized_node_update($hostname, $msg, $matches['user']);
 } elseif (preg_match('/HWCM\/4\/CFGCHANGE/', $msg, $matches)) { //Huawei VRP devices CFGCHANGE syslog
     oxidized_node_update($hostname, $msg);
+} elseif (preg_match('/UI_COMMIT: User \\\\\'(?P<user>.+?)\\\\\' .*/', $msg, $matches)) {
+    oxidized_node_update($hostname, $msg, $matches['user']);
+} elseif (preg_match('/IMI.+.Startup-config saved on .+ by (?P<user>.+) via .*/', $msg, $matches)) {
+         oxidized_node_update($hostname, $msg, $matches['user']); //Alliedware Plus devices. Requires at least V5.4.8-2.1
 }

@@ -35,13 +35,10 @@ exit
 
     vim /etc/mysql/mariadb.conf.d/50-server.cnf
 
-> NOTE: Whilst we are working on ensuring LibreNMS is compatible with MySQL strict mode, for now, please disable this after mysql is installed.
-
 Within the `[mysqld]` section please add:
 
 ```bash
 innodb_file_per_table=1
-sql-mode=""
 lower_case_table_names=0
 ```
     systemctl restart mysql
@@ -125,6 +122,10 @@ LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large an
 Now head to the web installer and follow the on-screen instructions.
 
     http://librenms.example.com/install.php
+
+The web installer might prompt you to create a `config.php` file in your librenms install location manually, copying the content displayed on-screen to the file. If you have to do this, please remember to set the permissions on config.php after you copied the on-screen contents to the file. Run:
+
+    chown librenms:librenms /opt/librenms/config.php
 
 ### Final steps
 

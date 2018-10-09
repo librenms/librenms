@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Config;
+
 unset($vars['page']);
 
 // Setup here
@@ -40,6 +42,15 @@ if (!$auth) {
 } else {
     if (isset($config['graph_types'][$type][$subtype]['descr'])) {
         $title .= " :: " . $config['graph_types'][$type][$subtype]['descr'];
+    } elseif ($type == "device" && $subtype == "collectd") {
+        $title .= " :: " . ucfirst($subtype) . " :: " . $vars['c_plugin'];
+        if (isset($vars['c_plugin_instance'])) {
+            $title .= " - " . $vars['c_plugin_instance'];
+        }
+        $title .= " - " . $vars['c_type'];
+        if (isset($vars['c_type_instance'])) {
+            $title .= " - " . $vars['c_type_instance'];
+        }
     } else {
         $title .= " :: " . ucfirst($subtype);
     }
@@ -149,7 +160,12 @@ if (!$auth) {
     echo generate_graph_js_state($graph_array);
 
     echo('<div style="width: '.$graph_array['width'].'; margin: auto;"><center>');
-    echo generate_lazy_graph_tag($graph_array);
+    if (Config::get('webui.dynamic_graphs', false) === true) {
+        echo generate_dynamic_graph_js($graph_array);
+        echo generate_dynamic_graph_tag($graph_array);
+    } else {
+        echo generate_lazy_graph_tag($graph_array);
+    }
     echo("</center></div>");
 
     if (isset($config['graph_descr'][$vars['type']])) {

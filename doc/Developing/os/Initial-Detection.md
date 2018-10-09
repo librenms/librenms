@@ -68,17 +68,17 @@ mib_dir:
 
 ```yaml
 poller_modules:
-    cisco-ace-serverfarms: 0
-    cisco-ace-loadbalancer: 0
+    cisco-ace-serverfarms: false
+    cisco-ace-loadbalancer: false
 ```
 
 `discovery_modules`: This is the list of discovery modules to either enable (1) or disable (0). Check `includes/defaults.inc.php` to see which modules are enabled/disabled by default.
 
 ```yaml
 discovery_modules:
-     cisco-cef: 1
-     cisco-sla: 1
-     cisco-mac-accounting: 0
+     cisco-cef: true
+     cisco-sla: true
+     cisco-mac-accounting: false
 ```
 
 

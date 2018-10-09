@@ -1,0 +1,82 @@
+	DELL-NETWORKING-SMI DEFINITIONS ::= BEGIN 
+	--  This module provides authoritative 
+	--  definitions for Dell Networking OS MIB.
+	--
+	--  This module will be extended, as needed.
+	--
+	IMPORTS
+		MODULE-IDENTITY,enterprises,
+		OBJECT-IDENTITY 
+			FROM SNMPv2-SMI; 
+
+	dellNet  MODULE-IDENTITY
+
+	LAST-UPDATED "200706151200Z"   -- June 15, 2007 12:00:00 GMT
+	ORGANIZATION
+	  "Dell Inc"
+	CONTACT-INFO
+          "http://www.dell.com/support"
+
+	DESCRIPTION
+	   "The Structure of Management Information for
+	    the Dell Networking OS."
+
+	-- Revision history.
+	REVISION     "200706151200Z"   -- June 15, 2007 12:00:00 GMT
+	DESCRIPTION
+		"Added dellNetModules."
+
+	REVISION     "0010100000Z"
+	DESCRIPTION
+		"Initial version of this MIB module."
+	::= { enterprises 6027 }	-- assigned by IANA
+
+
+	dellNetProducts OBJECT-IDENTITY
+		STATUS	current
+		DESCRIPTION
+			"Dell Networking OS Products' OID."
+		::= { dellNet 1 }
+
+	dellNetCommon OBJECT-IDENTITY
+		STATUS	current
+		DESCRIPTION
+			"All Dell Networking OS shared TEXTTUAL-CONVENTION 
+			 definitions"
+		::= { dellNet 2 }
+
+	dellNetMgmt OBJECT-IDENTITY
+		STATUS	current
+		DESCRIPTION
+			"dellNetMgmt is the main subtree for Dell Networking OS
+			 mib development."
+		::= { dellNet 3 }
+
+	dellNetModules OBJECT-IDENTITY
+		STATUS	current
+		DESCRIPTION
+			"dellNetModules provides a root object identifier
+			 from which MODULE-IDENTITY values may be based."
+		::= { dellNet 4 }
+
+	dellNetExperiment OBJECT-IDENTITY
+		STATUS	current
+		DESCRIPTION
+			"dellNetExperiment provides a root object identifier
+			from which experimental mibs may be temporarily
+			based.  mibs are typicially based here if they
+			fall in one of two categories
+			1) are IETF work-in-process mibs which have not
+			been assigned a permanent object identifier by
+			the IANA.
+			2) are Dell Networking OS work-in-process which has not been
+			assigned a permanent object identifier by the
+			Dell Networking OS assigned number authority, typicially because
+			the mib is not ready for deployment.
+
+			NOTE WELL:  support for mibs in the dellNetExperiment
+			subtree will be deleted when a permanent object
+			identifier assignment is made."
+		::= { dellNet 20 }
+
+	END

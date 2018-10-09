@@ -1,0 +1,202 @@
+-- *****************************************************************
+-- Meru Networks Enterprise Specific MIB
+--
+-- Copyright (c) 2005 by Meru Networks
+-- All rights reserved
+--
+-- *****************************************************************
+
+MERU-SYSLOG-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE, 
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY,
+    enterprises, 
+    Counter32, 
+    Counter64, 
+    Gauge32, 
+    TimeTicks, 
+    IpAddress, 
+    Integer32
+        FROM SNMPv2-SMI
+    Ipv6Address
+        FROM IPV6-TC
+    TEXTUAL-CONVENTION, 
+    TimeInterval, 
+    TimeStamp,
+    DateAndTime, 
+    TruthValue, 
+    DisplayString, 
+    MacAddress, 
+    RowStatus
+        FROM SNMPv2-TC
+    mwDiagnostics
+        FROM MERU-SMI
+    ;
+
+  mwSyslog  MODULE-IDENTITY
+    LAST-UPDATED "200506050000Z"
+    ORGANIZATION "Meru Networks"
+    CONTACT-INFO "support@merunetworks.com"
+    DESCRIPTION
+        "This MIB defines all the managed objects used to manage the Meru WLAN 
+         Syslog infrastructure"
+    ::= { mwDiagnostics 2 } 
+  
+    
+  
+  mwSyslogTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwSyslogEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Syslog "
+    ::= { mwSyslog 1 }
+
+  mwSyslogEntry  OBJECT-TYPE
+    SYNTAX MwSyslogEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Syslog "
+    INDEX {  mwSyslogTableIndex  }
+    ::= { mwSyslogTable 1 }
+
+  MwSyslogEntry  ::=  SEQUENCE { 
+       mwSyslogTableIndex                                          Integer32, 
+       mwSysloglinenb                                              Unsigned32,
+       mwSyslogrecord                                              DisplayString,
+       mwSyslogpriority                                            DisplayString,
+       mwSyslogmnemonic                                            DisplayString,
+       mwSyslogtimestamp                                           DateAndTime 
+  }
+   
+   
+  mwSyslogTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwSyslogEntry 1 }
+
+  mwSysloglinenb  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Line"
+    ::= { mwSyslogEntry    2 }
+
+  mwSyslogrecord  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Record"
+    ::= { mwSyslogEntry    3 }
+
+  mwSyslogpriority  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Priority"
+    ::= { mwSyslogEntry    4 }
+
+  mwSyslogmnemonic  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Mnemonic"
+    ::= { mwSyslogEntry    5 }
+
+  mwSyslogtimestamp  OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Time"
+    ::= { mwSyslogEntry    6 }
+
+  mwLogTransferTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwLogTransferEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Syslog Table "
+    ::= { mwSyslog 2 }
+
+  mwLogTransferEntry  OBJECT-TYPE
+    SYNTAX MwLogTransferEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Syslog Table "
+    INDEX {  mwLogTransferTableIndex  }
+    ::= { mwLogTransferTable 1 }
+
+  MwLogTransferEntry  ::=  SEQUENCE { 
+       mwLogTransferTableIndex                                     Integer32, 
+       mwLogTransfersize                                           Unsigned32,
+       mwLogTransfernblines                                        Unsigned32,
+       mwLogTransferlastaccess                                     DateAndTime,
+       mwLogTransferlastrecord                                     DisplayString,
+       mwLogTransferdescription                                    DisplayString 
+  }
+   
+   
+  mwLogTransferTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwLogTransferEntry 1 }
+
+  mwLogTransfersize  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Size(KB)"
+    ::= { mwLogTransferEntry    2 }
+
+  mwLogTransfernblines  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes #Lines"
+    ::= { mwLogTransferEntry    3 }
+
+  mwLogTransferlastaccess  OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Last Accessed"
+    ::= { mwLogTransferEntry    4 }
+
+  mwLogTransferlastrecord  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Last Record"
+    ::= { mwLogTransferEntry    5 }
+
+  mwLogTransferdescription  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Facility Name"
+    ::= { mwLogTransferEntry    6 }
+
+  
+END
+   

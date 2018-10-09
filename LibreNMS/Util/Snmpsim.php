@@ -151,7 +151,12 @@ class Snmpsim
      */
     private function getCmd($with_log = true)
     {
-        $cmd = "snmpsimd.py --data-dir={$this->snmprec_dir} --agent-udpv4-endpoint={$this->ip}:{$this->port}";
+        $cmd = Config::locateBinary('snmpsimd');
+        if (!is_executable($cmd)) {
+            $cmd = Config::locateBinary('snmpsimd.py');
+        }
+
+        $cmd .= " --data-dir={$this->snmprec_dir} --agent-udpv4-endpoint={$this->ip}:{$this->port}";
 
         if (is_null($this->log)) {
             $cmd .= " --logging-method=null";

@@ -338,7 +338,15 @@
                         <li><a href="{{ url('preferences') }}"><i class="fa fa-cog fa-fw fa-lg" aria-hidden="true"></i> My Settings</a></li>
                         <li><a href="{{ url('notifications') }}"><span class="badge count-notif">{{ $notification_count }}</span> Notifications</a></li>
                         <li role="presentation" class="divider"></li>
-                        <li><a href="{{ url('logout') }}"><i class="fa fa-sign-out fa-fw fa-lg" aria-hidden="true"></i> Logout</a></li>
+                        <li>
+                            <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                <i class="fa fa-sign-out fa-fw fa-lg" aria-hidden="true"></i> @lang('Logout')
+                            </a>
+
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                {{ csrf_field() }}
+                            </form>
+                        </li>
                     </ul>
                 </li>
                 <li class="dropdown">
@@ -348,11 +356,13 @@
                         <li><a href="{{ url('settings') }}"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> Global Settings</a></li>
                         <li><a href="{{ url('validate') }}"><i class="fa fa-check-circle fa-fw fa-lg" aria-hidden="true"></i> Validate Config</a></li>
                         <li role="presentation" class="divider"></li>
-                        @if(\LibreNMS\Authentication\Auth::get()->canManageUsers())
-                            <li><a href="{{ url('edituser') }}"><i class="fa fa-user-circle-o fa-fw fa-lg" aria-hidden="true"></i> Edit User</a></li>
-                            <li><a href="{{ url('authlog') }}"><i class="fa fa-shield fa-fw fa-lg" aria-hidden="true"></i> Auth History</a></li>
-                            <li role="presentation" class="divider"></li>
+                        @if(\LibreNMS\Authentication\LegacyAuth::get()->canManageUsers())
+                            <li><a href="{{ url('adduser') }}"><i class="fa fa-user-plus fa-fw fa-lg" aria-hidden="true"></i> Add User</a></li>
+                            <li><a href="{{ url('deluser') }}"><i class="fa fa-user-times fa-fw fa-lg" aria-hidden="true"></i> Remove User</a></li>
                         @endif
+                        <li><a href="{{ url('edituser') }}"><i class="fa fa-user-circle-o fa-fw fa-lg" aria-hidden="true"></i> Edit User</a></li>
+                        <li><a href="{{ url('authlog') }}"><i class="fa fa-shield fa-fw fa-lg" aria-hidden="true"></i> Auth History</a></li>
+                        <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a href="#"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a>
                             <ul class="dropdown-menu scrollable-menu">
@@ -499,7 +509,7 @@
             valueKey: 'name',
             templates: {
                 header: '<h5><strong>&nbsp;BGP Sessions</strong></h5>',
-                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small>@{{{bgp_image}}} @{{name}} - @{{hostname}}<br />AS@{{localas}} -> AS@{{remoteas}}</small></a></p>')
+                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small>@{{bgp_image}} @{{name}} - @{{hostname}}<br />AS@{{localas}} -> AS@{{remoteas}}</small></a></p>')
             }
         });
     $('#gsearch').bind('typeahead:open', function(ev, suggestion) {

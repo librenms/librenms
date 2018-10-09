@@ -125,7 +125,7 @@ while (isset($lines[$int])) {
         'selective'=>$selective
     );
 
-    $metrics[$disk] = $metrics;
+    $metrics[$disk] = $fields;
     $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
     data_update($device, 'app', $tags, $fields);
 

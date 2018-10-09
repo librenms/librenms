@@ -13,7 +13,7 @@ if (!is_array($mempool_cache['vrp'])) {
     d_echo($mempool_cache);
 }
 
-$entry = $mempool_cache['vrp'][$mempool[mempool_index]];
+$entry = $mempool_cache['vrp'][$mempool['mempool_index']];
 
 if ($entry['hwEntityMemSize'] < 0) {
     $entry['hwEntityMemSize'] = ($entry['hwEntityMemSize'] * -1);

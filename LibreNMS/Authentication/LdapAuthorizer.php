@@ -21,12 +21,21 @@ class LdapAuthorizer extends AuthorizerBase
                     return true;
                 } else {
                     foreach ($ldap_groups as $ldap_group) {
-                        $ldap_comparison = ldap_compare(
-                            $connection,
-                            $ldap_group,
-                            Config::get('auth_ldap_groupmemberattr', 'memberUid'),
-                            $this->getMembername($username)
-                        );
+                        if (Config::get('auth_ldap_userdn') === true) {
+                            $ldap_comparison = ldap_compare(
+                                $connection,
+                                $ldap_group,
+                                Config::get('auth_ldap_groupmemberattr', 'memberUid'),
+                                $this->getFullDn($username)
+                            );
+                        } else {
+                            $ldap_comparison = ldap_compare(
+                                $connection,
+                                $ldap_group,
+                                Config::get('auth_ldap_groupmemberattr', 'memberUid'),
+                                $this->getMembername($username)
+                            );
+                        }
                         if ($ldap_comparison === true) {
                             return true;
                         }
@@ -42,21 +51,6 @@ class LdapAuthorizer extends AuthorizerBase
         }
 
         throw new AuthenticationException();
-    }
-
-
-    public function reauthenticate($sess_id, $token)
-    {
-        $sess_id = clean($sess_id);
-        $token = clean($token);
-
-        list($username, $hash) = explode('|', $token);
-
-        if (!$this->userExists($username, true)) {
-            throw new AuthenticationException();
-        }
-
-        return $this->checkRememberMe($sess_id, $token);
     }
 
     public function userExists($username, $throw_exception = false)
@@ -99,7 +93,11 @@ class LdapAuthorizer extends AuthorizerBase
             if (count($group_names) > 1) {
                 $ldap_group_filter = "(|{$ldap_group_filter})";
             }
-            $filter = "(&{$ldap_group_filter}(" . trim(Config::get('auth_ldap_groupmemberattr', 'memberUid')) . "=" . $this->getMembername($username) . "))";
+            if (Config::get('auth_ldap_userdn') === true) {
+                $filter = "(&{$ldap_group_filter}(" . trim(Config::get('auth_ldap_groupmemberattr', 'memberUid')) . "=" . $this->getFullDn($username) . "))";
+            } else {
+                $filter = "(&{$ldap_group_filter}(" . trim(Config::get('auth_ldap_groupmemberattr', 'memberUid')) . "=" . $this->getMembername($username) . "))";
+            }
             $search = ldap_search($connection, Config::get('auth_ldap_groupbase'), $filter);
             $entries = ldap_get_entries($connection, $search);
 
@@ -196,7 +194,7 @@ class LdapAuthorizer extends AuthorizerBase
     public function getUser($user_id)
     {
         foreach ($this->getUserlist() as $user) {
-            if ($user['user_id'] === $user_id) {
+            if ((int)$user['user_id'] === (int)$user_id) {
                 return $user;
             }
         }
@@ -345,7 +343,7 @@ class LdapAuthorizer extends AuthorizerBase
         return [
             'username' => $entry['uid'][0],
             'realname' => $entry['cn'][0],
-            'user_id' => $entry[$uid_attr][0],
+            'user_id' => (int)$entry[$uid_attr][0],
             'email' => $entry[Config::get('auth_ldap_emailattr', 'mail')][0],
             'level' => $this->getUserlevel($entry['uid'][0]),
         ];

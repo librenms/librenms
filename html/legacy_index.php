@@ -11,7 +11,6 @@
  *
  */
 
-use LibreNMS\Authentication\Auth;
 use LibreNMS\Config;
 
 if (empty($_SERVER['PATH_INFO'])) {
@@ -22,44 +21,14 @@ if (empty($_SERVER['PATH_INFO'])) {
     }
 }
 
-if (strpos($_SERVER['REQUEST_URI'], "debug")) {
-    $debug = true;
-    ini_set('display_errors', 0);
-    ini_set('display_startup_errors', 1);
-    ini_set('log_errors', 1);
-    ini_set('error_reporting', E_ALL);
-    set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-        global $php_debug;
-        $php_debug[] = array('errno' => $errno, 'errstr' => $errstr, 'errfile' => $errfile, 'errline' => $errline);
-    });
-    register_shutdown_function(function () {
-        $last_error = error_get_last();
-        if ($last_error['type'] == 1) {
-            $log_error = array($last_error['type'], $last_error['message'], $last_error['file'], $last_error['line']);
-            print_r($log_error);
-        }
-    });
-    $sql_debug = array();
-    $php_debug = array();
-} else {
-    $debug = false;
-    ini_set('display_errors', 0);
-    ini_set('display_startup_errors', 0);
-    ini_set('log_errors', 0);
-    ini_set('error_reporting', 0);
-}
 
 // Set variables
 $msg_box = array();
-// Check for install.inc.php
-if (!file_exists('../config.php') && $_SERVER['PATH_INFO'] != '/install.php') {
-    // no config.php does so let's redirect to the install
-    header("Location: {$config['base_url']}/install.php");
-    exit;
-}
 
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
+
+set_debug(str_contains($_SERVER['REQUEST_URI'], 'debug'));
 
 LibreNMS\Plugins::start();
 
@@ -68,7 +37,6 @@ $runtime_start = microtime(true);
 ob_start();
 
 ini_set('allow_url_fopen', 0);
-ini_set('display_errors', 0);
 
 if (strstr($_SERVER['REQUEST_URI'], 'widescreen=yes')) {
     $_SESSION['widescreen'] = 1;
@@ -131,6 +99,7 @@ if (empty($config['favicon'])) {
   <link href="css/MarkerCluster.Default.css" rel="stylesheet" type="text/css" />
   <link href="css/leaflet.awesome-markers.css" rel="stylesheet" type="text/css" />
   <link href="css/select2.min.css" rel="stylesheet" type="text/css" />
+  <link href="css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
   <link href="css/query-builder.default.min.css" rel="stylesheet" type="text/css" />
   <link href="<?php echo($config['stylesheet']);  ?>?ver=291727421" rel="stylesheet" type="text/css" />
   <link href="css/<?php echo $config['site_style']; ?>.css?ver=632417642" rel="stylesheet" type="text/css" />
@@ -213,33 +182,13 @@ if (isset($devel) || isset($vars['devel'])) {
     echo("</pre>");
 }
 
-if (Auth::check()) {
-    // Authenticated. Print a page.
-    if (isset($vars['page']) && !strstr("..", $vars['page']) &&  is_file("pages/" . $vars['page'] . ".inc.php")) {
-        require "pages/" . $vars['page'] . ".inc.php";
-    } else {
-        if (isset($config['front_page']) && is_file($config['front_page'])) {
-            require $config['front_page'];
-        } else {
-            require 'pages/front/default.php';
-        }
-    }
+if (isset($vars['page']) && !strstr("..", $vars['page']) &&  is_file("pages/" . $vars['page'] . ".inc.php")) {
+    require "pages/" . $vars['page'] . ".inc.php";
 } else {
-    // Not Authenticated. Show status page if enabled
-    if ($config['public_status'] === true) {
-        if (isset($vars['page']) && strstr("login", $vars['page'])) {
-            require 'pages/logon.inc.php';
-        } else {
-            echo '<div id="public-status">';
-            require 'pages/public.inc.php';
-            echo '</div>';
-            echo '<div id="public-logon" style="display:none;">';
-            echo '<div class="well"><h3>Logon<button class="btn btn-default" type="submit" style="float:right;" id="ToggleStatus">Status</button></h3></div>';
-            require 'pages/logon.inc.php';
-            echo '</div>';
-        }
+    if (isset($config['front_page']) && is_file($config['front_page'])) {
+        require $config['front_page'];
     } else {
-        require 'pages/logon.inc.php';
+        require 'pages/front/default.php';
     }
 }
 ?>
@@ -302,47 +251,16 @@ echo('<h5>Powered by <a href="' . $config['project_home'] . '" target="_blank" r
 <?php
 }
 
-// Pre-flight checks
-$rrd_dir = Config::get('rrd_dir');
-if (!is_dir($rrd_dir)) {
-    $msg_box[] = ['type' => 'error', 'message' => "RRD Log Directory is missing ($rrd_dir).  Graphing may fail."];
-}
-
-$temp_dir = Config::get('temp_dir');
-if (!is_dir($temp_dir)) {
-    $msg_box[] = ['type' => 'error', 'message' => "Temp Directory is missing ($temp_dir).  Graphing may fail."];
-} elseif (!is_writable($temp_dir)) {
-    $msg_box[] = ['type' => 'error', 'message' => "Temp Directory is not writable ($temp_dir).  Graphing may fail."];
-}
-
-if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `last_polled` <= DATE_ADD(NOW(), INTERVAL - 15 minute) AND `ignore` = 0 AND `disabled` = 0 AND status = 1", array()) > 0) {
-    $msg_box[] = ['type' => 'warning', 'message' => "<a href=\"poll-log/filter=unpolled/\">It appears as though you have some devices that haven't completed polling within the last 15 minutes, you may want to check that out :)</a>",'title' => 'Devices unpolled'];
-}
-
-foreach (dbFetchRows('SELECT `notifications`.* FROM `notifications` WHERE NOT exists( SELECT 1 FROM `notifications_attribs` WHERE `notifications`.`notifications_id` = `notifications_attribs`.`notifications_id` AND `notifications_attribs`.`user_id` = ?) AND `severity` > 1', array(Auth::id())) as $notification) {
-    $msg_box[] = [
-        'type' => 'error',
-        'message' => "<a href='notifications/'>${notification['body']}</a>",
-        'title' => $notification['title']
-    ];
-}
-
 if (is_array($msg_box)) {
-    echo("<script>
+    echo "<script>
         toastr.options.timeout = 10;
         toastr.options.extendedTimeOut = 20;
-    ");
-    foreach ($msg_box as $message) {
-        $message['type'] = mres($message['type']);
-        $message['message'] = mres($message['message']);
-        $message['title'] = mres($message['title']);
-        echo "toastr.".$message['type']."('".$message['message']."','".$message['title']."');\n";
-    }
-    echo("</script>");
-}
+        </script>
+    ";
 
-if (is_array($sql_debug) && is_array($php_debug) && Auth::check()) {
-    require_once "includes/print-debug.php";
+    foreach ($msg_box as $message) {
+        Toastr::add($message['type'], $message['message'], $message['title']);
+    }
 }
 
 if ($no_refresh !== true && $config['page_refresh'] != 0) {
@@ -409,6 +327,8 @@ if ($no_refresh !== true && $config['page_refresh'] != 0) {
      });
 </script>');
 }
+
+echo Toastr::render();
 
 ?>
 </body>

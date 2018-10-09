@@ -13,14 +13,12 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Authentication\Auth;
+use App\Models\Device;
 
 $no_refresh = true;
-$param = array();
-
-if ($vars['action'] == 'expunge' && Auth::user()->hasGlobalAdmin()) {
-    dbQuery('TRUNCATE TABLE `eventlog`');
-    print_message('Event log truncated');
+$param = [];
+if ($device_id = (int)Request::get('device')) {
+    $device = Device::find($device_id);
 }
 
 $pagetitle[] = 'Eventlog';
@@ -41,45 +39,73 @@ $pagetitle[] = 'Eventlog';
     $('.actionBar').append(
         '<div class="pull-left">' +
         '<form method="post" action="" class="form-inline" role="form" id="result_form">' +
+        <?php
+        if (!isset($vars['fromdevice'])) {
+        ?>
         '<div class="form-group">' +
         '<label><strong>Device&nbsp;&nbsp;</strong></label>' +
-        '<select name="device" id="device" class="form-control input-sm">' +
+        '<select name="device" id="device" class="form-control">' +
         '<option value="">All Devices</option>' +
         <?php
-        foreach (get_all_devices() as $data) {
-            if (device_permitted($data['device_id'])) {
-                echo "'<option value=\"" . $data['device_id'] . "\"";
-                if ($data['device_id'] == $_POST['device']) {
-                    echo ' selected';
-                }
-
-                echo ">" . format_hostname($data) . "</option>' + ";
-            }
+        if ($device instanceof Device) {
+            echo "'<option value=$device->device_id>" . $device->displayName() . "</option>' +";
         }
         ?>
         '</select>' +
         '</div>&nbsp;&nbsp;&nbsp;&nbsp;' +
+        <?php
+        } else {
+            echo "'&nbsp;&nbsp;<input type=\"hidden\" name=\"device\" id=\"device\" value=\"" . $device_id . "\">' + ";
+        }
+        ?>
         '<div class="form-group"><label><strong>Type&nbsp;&nbsp;</strong></label>' +
         '<select name="eventtype" id="eventtype" class="form-control input-sm">' +
         '<option value="">All types</option>' +
         <?php
-
-        foreach (dbFetchColumn("SELECT `type` FROM `eventlog` GROUP BY `type`") as $type) {
-            echo "'<option value=\"" . $type . "\"";
-            if ($type === $_POST['eventtype']) {
-                echo " selected";
-            }
-            echo ">" . $type . "</option>' + ";
+        if ($type = Request::get('eventtype')) {
+            $js_type = addcslashes(htmlentities($type), "'");
+            echo "'<option value=\"$js_type\">$js_type</option>' +";
         }
-
         ?>
         '</select>' +
         '</div>&nbsp;&nbsp;' +
-        '<button type="submit" class="btn btn-default input-sm">Filter</button>' +
+        '<button type="submit" class="btn btn-default">Filter</button>' +
         '</form>' +
         '</div>'
     );
+
+    <?php if (!isset($vars['fromdevice'])) { ?>
+    $("#device").select2({
+        theme: 'bootstrap',
+        dropdownAutoWidth : true,
+        width: "auto",
+        allowClear: true,
+        placeholder: "All Devices",
+        ajax: {
+            url: 'ajax/select/device',
+            delay: 200
+        }
+    })<?php echo $device_id ? ".val($device_id).trigger('change');" : ''; ?>;
+    <?php } ?>
+
+    $("#eventtype").select2({
+        theme: 'bootstrap',
+        dropdownAutoWidth : true,
+        width: "auto",
+        allowClear: true,
+        placeholder: "All Types",
+        ajax: {
+            url: 'ajax/select/eventlog',
+            delay: 200,
+            data: function(params) {
+                return {
+                    field: "type",
+                    device: $('#device').val(),
+                    term: params.term,
+                    page: params.page || 1
+                }
+            }
+        }
+    })<?php echo Request::get('eventtype') ? ".val('" . addcslashes(Request::get('eventtype'), "'") . "').trigger('change');" : ''; ?>;
+
 </script>
-
-
-

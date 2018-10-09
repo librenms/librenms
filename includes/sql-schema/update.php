@@ -18,18 +18,10 @@ use LibreNMS\Exceptions\LockException;
 use LibreNMS\Util\FileLock;
 use LibreNMS\Util\MemcacheLock;
 
-global $database_link;
-
 if (!isset($init_modules) && php_sapi_name() == 'cli') {
     // Not called from within discovery, let's load up the necessary stuff.
-    $init_modules = array('nodb');
+    $init_modules = [];
     require realpath(__DIR__ . '/../..') . '/includes/init.php';
-    try {
-        dbConnect();
-    } catch (DatabaseConnectException $e) {
-        echo $e->getMessage() . PHP_EOL;
-        exit;
-    }
 }
 
 $return = 0;
@@ -60,9 +52,7 @@ try {
             echo 'Step #' . $step++ . ' ...' . PHP_EOL;
 
             if (!empty($line)) {
-                $creation = dbQuery($line);
-                if (!$creation) {
-                    echo 'WARNING: Cannot execute query (' . $line . '): ' . mysqli_error($database_link) . "\n";
+                if (!dbQuery($line)) {
                     $return = 1;
                 }
             }
@@ -99,10 +89,9 @@ try {
                             d_echo("$line \n");
 
                             if ($line[0] != '#') {
-                                if (!mysqli_query($database_link, $line)) {
+                                if (!dbQuery($line)) {
                                     $return = 2;
                                     $err++;
-                                    d_echo(mysqli_error($database_link) . PHP_EOL);
                                 }
                             }
                         }

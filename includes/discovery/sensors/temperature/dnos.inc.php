@@ -33,3 +33,19 @@ if (is_array($oids)) {
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'ftos-sseries', $descr, '1', '1', null, null, null, null, $current);
     }
 }
+
+// Force10 M-Series
+// DELL-NETWORKING-CHASSIS-MIB::dellNetStackUnitTemp.1 = Gauge32: 67
+// DELL-NETWORKING-CHASSIS-MIB::dellNetStackUnitModelId.1 = INTEGER: m-MXL(25)
+echo 'FTOS M-Series ';
+
+$oids = snmpwalk_cache_oid($device, 'dellNetStackUnitTemp', array(), 'DELL-NETWORKING-CHASSIS-MIB', 'dnos');
+
+if (is_array($oids)) {
+    foreach ($oids as $index => $entry) {
+        $descr   = 'Unit '.$index;
+        $oid     = '.1.3.6.1.4.1.6027.3.26.1.3.4.1.13.'.$index;
+        $current = $entry['dellNetStackUnitTemp'];
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'dnos', $descr, '1', '1', null, null, null, null, $current);
+    }
+}

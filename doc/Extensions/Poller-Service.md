@@ -1,41 +1,136 @@
 source: Extensions/Poller-Service.md
 # Poller Service
 
-# WARNING: THIS IS HIGHLY EXPERIMENTAL AND MAY NOT WORK
+> Status: BETA
 
-The Poller service is an alternative to polling and discovery cron jobs and provides support for distributed polling without memcache. It is multi-threaded and runs continuously discovering and polling devices with the oldest data attempting to honor the polling frequency configured in `config.php`. This service replaces all the required cron jobs except for `/opt/librenms/daily.sh` and `/opt/librenms/alerts.php`.
+The new poller service (`librenms-service.py`) replaces the old poller service (`poller-service.py`), improving its reliability. It's mostly compatible with the old service, but testing is recommended before switching over.
 
-Configure the maximum number of threads for the service in `$config['poller_service_workers']`. Configure the minimum desired polling frequency in `$config['poller_service_poll_frequency']` and the minimum desired discovery frequency in `$config['poller_service_discover_frequency']`. The service will not poll or discover devices which have data newer than this this configured age in seconds. Configure how frequently the service will attempt to poll devices which are down in `$config['poller_service_down_retry']`. If you have enough pollers that the worker threads run out of work, the service will query looking for devices every `$config['poller_service_retry_query']` seconds.
+If you are currently using the old poller service, it's strongly recommended that you migrate away - it has a serious defect under certain versions of mysql/mariadb, and may be inadvertently DoS'ing your devices. The new service does not have this issue,
 
-The poller service is designed to gracefully degrade. If not all devices can be polled within the configured frequency, the service will continuously poll devices refreshing as frequently as possible using the configured number of threads.
+Make sure you uninstall the old poller service before deploying the new one.
 
-The service logs to syslog. A loglevel of INFO will print status updates every 5 minutes. Loglevel of DEBUG will print updates on every device as it is scanned.
+## External Requirements
+#### A recent version of Python
+The poller service won't work under Python 2.7+; some features require behaviour only found in Python3.4+.
 
-## Configuration
-```php
-// Poller-Service settings
-$config['poller_service_loglevel']                       = "INFO";
-$config['poller_service_workers']                        = 16;
-$config['poller_service_poll_frequency']                 = 300;
-$config['poller_service_discover_frequency']             = 21600;
-$config['poller_service_down_retry']                     = 60;
-$config['poller_service_retry_query']                    = 1;
-$config['poller_service_single_connection']              = false;
+#### Python modules
+ - PyMySQL is recommended as it requires no C compiler to install. MySQLclient can also be used, but does require compilation.
+ - python-dotenv .env loader
+ - redis-py (if using distributed polling)
+
+These can be obtained from your OS package manager, or from PyPI with the below commands. (You ma)
+```bash
+pip3 install -r requirements.txt
 ```
 
-## Distributed Polling
-Distributed polling is possible, and uses the same configuration options as are described for traditional distributed polling, except that the memcached options are not necessary. The database must be accessible from the distributed pollers, and properly configured. Remote access to the RRD directory must also be configured as described in the Distributed Poller documentation. Memcache is not required. Concurrency is managed using mysql GET_LOCK to ensure that devices are only being polled by one device at at time. The poller service is compatible with poller groups.
+#### Redis (distributed polling only)
+If you want to use distributed polling, you'll need a redis instance to coordinate the nodes. It's recommeded that you do not share the redis database with any other system - by default, redis supports up to 16 databases (numbered 0-15).
 
-## Multi-Master MySQL considerations
-Because locks are not replicated in Multi-Master MySQL configurations, if you are using such a configuration, you will need to make sure that all pollers are using the same MySQL server.
+It's strongly recommended that you deploy a resilient cluster of redis systems, and use redis-sentinel.
 
-## Single Connection
-If you are running MariaDB 10.2 or newer, you can tell poller-service to use a single mysql connection for managing locks by setting `$config['poller_service_single_connection']` to `true`. *DO NOT* configure this for any version of MariaDB less than 10.2 or any version of MySQL.
+#### MySQL
+You should already have this, but the pollers do need access to the SQL database. The poller service runs much faster and more aggressively than the standard poller, so keep an eye on the number of open connections and other important health metrics.
+
+## Configuration
+
+Connection settings are required in `.env`. The `.env` file is generated after composer install and APP_KEY and NODE_ID are set.
+
+```dotenv
+#APP_KEY=   #Required, generated by composer install
+#NODE_ID=   #Required, generated by composer install
+
+DB_HOST=localhost
+DB_DATABASE=librenms
+DB_USERNAME=librenms
+DB_PASSWORD=
+```
+
+### Distributed Polling Configuration
+
+Once you have your redis database set up, configure it in the .env file on each node.
+
+```dotenv
+REDIS_HOST=127.0.0.1
+#REDIS_DB=0
+#REDIS_PASSWORD=
+#REDIS_PORT=6379
+```
+
+### Basic Configuration
+
+Additional configuration settings can be set in `config.php` or directly into the database.
+
+The defaults are shown here - it's recommended that you at least tune the number of workers.
+
+```php
+$config['service_poller_workers']              = 24;     # Processes spawned for polling
+$config['service_services_workers']            = 8;      # Processes spawned for service polling
+$config['service_discovery_workers']           = 16;     # Processes spawned for discovery
+
+
+//Optional Settings
+$config['service_poller_frequency']            = 300;    # Seconds between polling attempts       
+$config['service_services_frequency']          = 300;    # Seconds between service polling attempts
+$config['service_discovery_frequency']         = 21600;  # Seconds between discovery runs 
+$config['service_billing_frequency']           = 300;    # Seconds between billing calculations
+$config['service_billing_calculate_frequency'] = 60;     # Billing interval 
+$config['service_poller_down_retry']           = 60;     # Seconds between failed polling attempts
+$config['service_loglevel']                    = 'INFO'; # Must be one of 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
+$config['service_update_frequency']            = 86400;  # Seconds between LibreNMS update checks 
+```
+
+There are also some SQL options, but these should be inherited from your LibreNMS web UI configuration.
+
+Logs are sent to the system logging service (usually `journald` or `rsyslog`) - see https://docs.python.org/3/library/logging.html#logging-levels for the options available.
+
+
+
+You should not rely on the password for the security of your system. See https://redis.io/topics/security
+
+```php
+distributed_poller                             = true;  # Set to true to enable distributed polling
+distributed_poller_name                        = null;  # Uniquely identifies the poller instance
+distributed_poller_group                       = 0;     # Which group to poll
+```
+
+## Cron Scripts
+Once the poller service is installed, the cron scripts used by LibreNMS are no longer required and must be removed.
 
 ## Service Installation
-### Upstart
-An upstart configuration file can be found in `scripts/librenms-poller-service.conf`. To install run `cp /opt/librenms/scripts/librenms-poller-service.conf /etc/init/librenms-poller-service.conf`. The service will start on boot and can be started manually by running `start librenms-poller-service`. If you receive an error that the service does not exist, run `initctl reload-configuration`. The service is configured to run as the user `librenms` and will fail if that user does not exist.
-### LSB
-An LSB init script can be found in `scripts/librenms-poller-service.init`. To install run `cp /opt/librenms/scripts/librenms-poller-service.init /etc/init.d/librenms-poller-service && update-rc.d librenms-poller-service defaults`.
+A systemd unit file is provided - the sysv and upstart init scripts could also be used with a little modification.
+
 ### systemd
-A systemd unit file can be found in `scripts/librenms-poller-service.service`. To install run `cp /opt/librenms/scripts/librenms-poller-service.service /etc/systemd/system/librenms-poller-service.service && systemctl enable --now librenms-poller-service.service`.
+A systemd unit file can be found in `misc/librenms.service`. To install run `cp /opt/librenms/misc/librenms.service /etc/systemd/system/librenms.service && systemctl enable --now librenms.service`
+
+## OS-Specific Instructions
+
+### RHEL/CentOS
+To get the poller service running under python3.4+ on RHEL-derivatives with minimal fuss, you can use the software collections build:
+
+First, enable SCL's on your system:
+
+#### CentOS 7
+```
+# yum install centos-release-scl
+```
+
+#### RHEL 7
+```
+# subscription-manager repos --enable rhel-server-rhscl-7-rpms
+```
+
+Then install and configure the runtime and service:
+
+```
+# yum install rh-python36 epel-release
+# yum install redis
+# vi /opt/librenms/config.php
+# vi /etc/redis.conf
+# systemctl enable --now redis.service
+# scl enable rh-python36 bash
+# pip install pymysql redis
+# cp /opt/librenms/misc/librenms.service.scl /etc/systemd/system/librenms.service
+# systemctl enable --now librenms.service
+```
+
+If you want to use another version of python 3, change `rh-python36` in the unit file and the commands above to match the name of the replacement scl.

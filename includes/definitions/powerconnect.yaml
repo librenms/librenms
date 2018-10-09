@@ -1,6 +1,6 @@
 os: powerconnect
 text: 'Dell PowerConnect'
-ifname: 1
+ifname: true
 type: network
 icon: dell
 over:

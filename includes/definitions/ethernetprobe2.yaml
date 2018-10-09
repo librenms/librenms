@@ -1,5 +1,5 @@
 os: ethernetprobe2
-text: Atal Ethernetprobe2
+text: 'Atal Ethernetprobe2'
 type: environment
 icon: atal
 mib_dir:

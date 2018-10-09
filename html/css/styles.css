@@ -2147,7 +2147,8 @@ label {
 }
 
 .device-table-icon img {
-    width: 32px;
+  width: 32px;
+  max-height: 32px;
 }
 
 .device-icon img {
@@ -2171,6 +2172,7 @@ label {
   display: inline-block;
   width: 7px;
   min-height: 27px;
+  height: 32px;
 }
 
 .device-services-page {
@@ -2198,4 +2200,8 @@ label {
 /* Workaround for https://github.com/select2/select2/issues/291 */
 .select2-selection--multiple .select2-search--inline .select2-search__field {
   width: auto !important;
+}
+
+.toast-top-right {
+  top: 34px;
 }

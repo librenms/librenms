@@ -12,3 +12,5 @@ if ($matches['hardware']) {
 if ($matches['version']) {
     $version = $matches['version'];
 }
+
+$serial = snmp_get($device, 'serialnum.1.1', '-Ovq', 'OMNITRON-MIB');

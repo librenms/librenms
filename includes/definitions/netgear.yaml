@@ -1,7 +1,7 @@
 os: netgear
 text: 'Netgear ProSafe'
 type: network
-ifname: 1
+ifname: true
 bad_if:
     - cpu
 over:

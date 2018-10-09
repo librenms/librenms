@@ -11,17 +11,18 @@
  *
  */
 
-use LibreNMS\Authentication\Auth;
-
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-ini_set('log_errors', 1);
-ini_set('error_reporting', E_ALL);
+use LibreNMS\Authentication\LegacyAuth;
 
 $links = 1;
 
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
+
+$options = getopt('d::');
+
+if (set_debug(isset($options['d']))) {
+    echo "DEBUG!\n";
+}
 
 if (strpos($_SERVER['REQUEST_URI'], 'anon')) {
     $anon = 1;
@@ -51,7 +52,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
             graph [bgcolor=transparent];
 ';
 
-    if (!Auth::check()) {
+    if (!LegacyAuth::check()) {
         $map .= "\"Not authenticated\" [fontsize=20 fillcolor=\"lightblue\", URL=\"/\" shape=box3d]\n";
     } else {
         $loc_count = 1;
@@ -221,7 +222,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
     }
     echo $img;
 } else {
-    if (Auth::check()) {
+    if (LegacyAuth::check()) {
         // FIXME level 10 only?
         echo '<center>
                   <object width=1200 height=1000 data="'. $config['base_url'] . '/map.php?format=svg" type="image/svg+xml"></object>

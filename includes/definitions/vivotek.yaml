@@ -1,5 +1,5 @@
 os: vivotek
-text: Vivotek Camera
+text: 'Vivotek Camera'
 type: camera
 over:
     - { graph: device_bits, text: 'Device Traffic' }

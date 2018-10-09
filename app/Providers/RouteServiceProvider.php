@@ -35,11 +35,24 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function map()
     {
+        $this->mapLegacyRoutes();
+
         $this->mapApiRoutes();
 
         $this->mapWebRoutes();
 
         //
+    }
+
+    /**
+     * Define legacy routes for the application.
+     * Only initializing minimal middleware: Cookies and Session.
+     */
+    protected function mapLegacyRoutes()
+    {
+        Route::middleware('minimal')
+            ->namespace($this->namespace)
+            ->group(base_path('routes/legacy.php'));
     }
 
     /**

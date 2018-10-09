@@ -6,11 +6,10 @@ over:
     - { graph: device_toner, text: Toner }
 discovery:
     - sysDescr:
-        - Samsung C
-        - Samsung S
-        - Samsung ML
+        - 'Samsung C'
+        - 'Samsung S'
+        - 'Samsung ML'
 discovery_modules:
-    toner: 1
+    toner: true
 poller_modules:
-    toner: 1
-
+    toner: true

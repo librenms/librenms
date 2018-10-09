@@ -8,11 +8,11 @@ discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.47307
 discovery_modules:
-    bgp-peers: 0
-    stp: 0
+    bgp-peers: false
+    stp: false
 poller_modules:
-    bgp-peers: 0
-    services: 0
-    storage: 0
+    bgp-peers: false
+    services: false
+    storage: false
 over:
     - { graph: device_bits, text: Traffic }

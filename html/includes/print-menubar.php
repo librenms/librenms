@@ -1,7 +1,7 @@
 <?php
 // FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\ObjectCache;
 
@@ -75,7 +75,7 @@ if ($config['title_image']) {
           </li>
           <li class="dropdown-submenu">
             <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> Plugins</a>
-            <ul class="dropdown-menu scrollable-menu">
+            <ul class="dropdown-menu">
                 <?php
                 \LibreNMS\Plugins::call('menu');
 
@@ -214,6 +214,11 @@ if (Auth::user()->hasGlobalAdmin()) {
     }
 
     echo '<li><a href="'.generate_url(array('page'=>'device-dependencies')).'"><i class="fa fa-group fa-fw fa-lg"></i> Device Dependencies</a></li>';
+
+    $vm_count = dbFetchCell('SELECT COUNT(id) from `vminfo`');
+    if ($vm_count > 0) {
+        echo '<li><a href="'.generate_url(array('page'=>'vminfo')).'"><i class="fa fa-cog fa-fw fa-lg"></i> Virtual Machines</a></li>';
+    }
 
      echo '
             <li role="presentation" class="divider"></li>
@@ -606,6 +611,7 @@ if ($alerts['active_count'] > 0) {
                     <li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><i class="fa fa-list fa-fw fa-lg" aria-hidden="true"></i> Alert Rules</a></li>
                     <li><a href="<?php echo(generate_url(array('page'=>'alert-schedule'))); ?>"><i class="fa fa-calendar fa-fw fa-lg" aria-hidden="true"></i> Scheduled Maintenance</a></li>
                     <li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><i class="fa fa-file fa-fw fa-lg" aria-hidden="true"></i> Alert Templates</a></li>
+                    <li><a href="<?php echo(generate_url(array('page'=>'alert-transports'))); ?>"><i class="fa fa-bus fa-fw fa-lg" aria-hidden="true"></i> Alert Transports</a></li>
                 <?php } ?>
           </ul>
       </li>
@@ -646,8 +652,16 @@ if (empty($notifications['count']) && empty($notifications['sticky_count'])) {
 <?php
 
 if (Auth::check()) {
-    echo('
-           <li><a href="logout/"><i class="fa fa-sign-out fa-fw fa-lg" aria-hidden="true"></i> Logout</a></li>');
+    echo '<li><a href="';
+    echo route('logout');
+    echo '" onclick="event.preventDefault(); document.getElementById(\'logout-form\').submit();">';
+    echo ' <i class="fa fa-sign-out fa-fw fa-lg" aria-hidden="true"></i> ';
+    echo __('Logout');
+    echo '</a><form id="logout-form" action="';
+    echo route('logout');
+    echo '" method="POST" style="display: none;">';
+    echo csrf_field();
+    echo '</form></li>';
 }
 ?>
          </ul>
@@ -665,7 +679,7 @@ if (Auth::user()->hasGlobalAdmin()) {
           <li role="presentation" class="divider"></li>
 
 <?php if (Auth::user()->hasGlobalAdmin()) {
-    if (Auth::get()->canManageUsers()) {
+    if (LegacyAuth::get()->canManageUsers()) {
         echo('
            <li><a href="adduser/"><i class="fa fa-user-plus fa-fw fa-lg" aria-hidden="true"></i> Add User</a></li>
            <li><a href="deluser/"><i class="fa fa-user-times fa-fw fa-lg" aria-hidden="true"></i> Remove User</a></li>

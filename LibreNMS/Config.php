@@ -315,6 +315,18 @@ class Config
     }
 
     /**
+     * Serialise the whole configuration to json for use in external processes.
+     *
+     * @return string
+     */
+    public static function json_encode()
+    {
+        global $config;
+
+        return json_encode($config);
+    }
+
+    /**
      * merge the database config with the global config
      * Global config overrides db
      */
@@ -439,7 +451,7 @@ class Config
         self::deprecatedVariable('rrdgraph_real_95th', 'rrdgraph_real_percentile');
         self::deprecatedVariable('fping_options.millisec', 'fping_options.interval');
         self::deprecatedVariable('discovery_modules.cisco-vrf', 'discovery_modules.vrf');
-
+        self::deprecatedVariable('oxidized.group', 'oxidized.maps.group');
 
         // make sure we have full path to binaries in case PATH isn't set
         foreach (array('fping', 'fping6', 'snmpgetnext', 'rrdtool') as $bin) {

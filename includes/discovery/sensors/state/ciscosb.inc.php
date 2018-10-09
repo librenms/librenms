@@ -2,7 +2,7 @@
 /*
  * LibreNMS
  *
- * Copyright (c) 2017 Søren Friis Rosiak <sorenrosiak@gmail.com> 
+ * Copyright (c) 2017 Søren Friis Rosiak <sorenrosiak@gmail.com>
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
@@ -37,9 +37,9 @@ if (is_array($temp)) {
     }
 
     foreach ($temp as $index => $entry) {
-        $port_descr = get_port_by_index_cache($device, str_replace('1.', '', $index));
+        $port_descr = get_port_by_index_cache($device['device_id'], str_replace('1.', '', $index));
         $descr = $port_descr['ifDescr'] . ' Suspended Status';
-        if (str_contains($descr, 'ethernet')) {
+        if (str_contains($descr, ['ethernet','Ethernet'])) {
             //Discover Sensors
             discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, $descr, '1', '1', null, null, null, null, $temp[$index]['swIfOperSuspendedStatus'], 'snmp', $index);
 

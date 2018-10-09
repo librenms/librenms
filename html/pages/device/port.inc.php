@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 if (!isset($vars['view'])) {
     $vars['view'] = 'graphs';
@@ -50,13 +50,13 @@ echo '</table></div>';
 
 $pos = strpos(strtolower($ifname), 'vlan');
 if ($pos !== false) {
-    $broke = yes;
+    $broke = 'yes';
 }
 
 $pos = strpos(strtolower($ifname), 'loopback');
 
 if ($pos !== false) {
-    $broke = yes;
+    $broke = 'yes';
 }
 
 echo "<div style='clear: both;'>";
@@ -102,6 +102,11 @@ $components = $component->getComponents($device['device_id'], $options);
 $components = $components[$device['device_id']];        // We only care about our device id.
 if (count($components) > 0) {
     $menu_options['cbqos'] = 'CBQoS';
+}
+
+if (LibreNMS\Plugins::countHooks('port_container')) {
+    // Checking if any plugin implements the port_container. If yes, allow to display the menu_option
+    $menu_options['plugins'] = 'Plugins';
 }
 
 $sep = '';
@@ -233,7 +238,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '".$port['port_i
     }
 }//end if
 
-if (Auth::user()->hasGlobalAdmin() && $config['enable_billing'] == 1) {
+if (LegacyAuth::user()->hasGlobalAdmin() && $config['enable_billing'] == 1) {
     $bills = dbFetchRows("SELECT `bill_id` FROM `bill_ports` WHERE `port_id`=?", array($port['port_id']));
     if (count($bills) === 1) {
         echo "<span style='float: right;'><a href='" . generate_url(array('page' => 'bill','bill_id' => $bills[0]['bill_id'])) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> View Bill</a></span>";

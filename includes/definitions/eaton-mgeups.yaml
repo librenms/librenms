@@ -3,7 +3,7 @@ text: 'Eaton MGE UPS'
 group: ups
 type: power
 icon: eaton
-rfc1628_compat: 1
+rfc1628_compat: true
 mib_dir:
     - mge
 over:

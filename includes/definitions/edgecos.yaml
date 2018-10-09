@@ -2,7 +2,7 @@ os: edgecos
 text: Edgecore
 type: network
 icon: edge-core
-ifname: 1
+ifname: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
@@ -10,6 +10,7 @@ over:
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.259.6.10.94
+        - .1.3.6.1.4.1.259.8.1.11
         - .1.3.6.1.4.1.259.10.1.45.103
         - .1.3.6.1.4.1.259.10.1.24.104
         - .1.3.6.1.4.1.259.10.1.24.103

@@ -41,6 +41,11 @@ $app->singleton(
     App\Exceptions\Handler::class
 );
 
+$app->configureMonologUsing(function (Monolog\Logger $logger) use ($app) {
+    $path = $app->basePath(config('app.log'));
+    $logger->pushHandler(new \Monolog\Handler\StreamHandler($path));
+});
+
 /*
 |--------------------------------------------------------------------------
 | Return The Application

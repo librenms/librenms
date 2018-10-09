@@ -1,0 +1,138 @@
+-- *****************************************************************
+-- Meru Networks Enterprise Specific MIB
+--
+-- Copyright (c) 2005 by Meru Networks
+-- All rights reserved
+--
+-- *****************************************************************
+
+MERU-CONFIG-LICENSE-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE, 
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY,
+    enterprises, 
+    Counter32, 
+    Counter64, 
+    Gauge32, 
+    TimeTicks, 
+    IpAddress, 
+    Integer32
+        FROM SNMPv2-SMI
+    Ipv6Address
+        FROM IPV6-TC
+    TEXTUAL-CONVENTION, 
+    TimeInterval, 
+    TimeStamp,
+    DateAndTime, 
+    TruthValue, 
+    DisplayString, 
+    MacAddress, 
+    RowStatus
+        FROM SNMPv2-TC
+    mwConfiguration
+        FROM MERU-SMI
+    MwlSofwControllerType,
+    MwlLicenseType
+        FROM MERU-TC;
+
+  mwConfigLicense  MODULE-IDENTITY
+    LAST-UPDATED "200506050000Z"
+    ORGANIZATION "Meru Networks"
+    CONTACT-INFO "support@merunetworks.com"
+    DESCRIPTION
+        "This MIB defines all the managed objects used to manage the Meru WLAN 
+         Licensing Configuration infrastructure"
+    ::= { mwConfiguration 11 } 
+  
+    
+  
+  mwLicenseTemplateTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwLicenseTemplateEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes License Table "
+    ::= { mwConfigLicense 1 }
+
+  mwLicenseTemplateEntry  OBJECT-TYPE
+    SYNTAX MwLicenseTemplateEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes License Table "
+    INDEX {  mwLicenseTemplateTableIndex  }
+    ::= { mwLicenseTemplateTable 1 }
+
+  MwLicenseTemplateEntry  ::=  SEQUENCE { 
+       mwLicenseTemplateTableIndex                                 Integer32, 
+       mwLicenseTemplateExpiryDate                                 DateAndTime,
+       mwLicenseTemplateFeatureName                                DisplayString,
+       mwLicenseTemplateLicenseType                                MwlLicenseType,
+       mwLicenseTemplateNumOfLicenses                              Unsigned32,
+       mwLicenseTemplateControllerType                             MwlSofwControllerType,
+       mwLicenseTemplateLicensesInUsed                             Unsigned32 
+  }
+   
+   
+  mwLicenseTemplateTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwLicenseTemplateEntry 1 }
+
+  mwLicenseTemplateExpiryDate  OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Expiry Date (MM/DD/YYYY)"
+    ::= { mwLicenseTemplateEntry    2 }
+
+  mwLicenseTemplateFeatureName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Feature Name"
+    ::= { mwLicenseTemplateEntry    3 }
+
+  mwLicenseTemplateLicenseType  OBJECT-TYPE
+    SYNTAX MwlLicenseType
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes License Type"
+    ::= { mwLicenseTemplateEntry    4 }
+
+  mwLicenseTemplateNumOfLicenses  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total Number"
+    ::= { mwLicenseTemplateEntry    5 }
+
+  mwLicenseTemplateControllerType  OBJECT-TYPE
+    SYNTAX MwlSofwControllerType
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller Type"
+    ::= { mwLicenseTemplateEntry    6 }
+
+  mwLicenseTemplateLicensesInUsed  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Licenses In-Use"
+    ::= { mwLicenseTemplateEntry    7 }
+
+  
+END
+   

@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Device;
 
+use LibreNMS\Config;
 use LibreNMS\Interfaces\Discovery\DiscoveryModule;
 use LibreNMS\Interfaces\Polling\PollerModule;
 use LibreNMS\OS;
@@ -268,9 +269,18 @@ class Sensor implements DiscoveryModule, PollerModule
     {
         $table = static::$table;
 
+        $query = "SELECT * FROM `$table` WHERE `device_id` = ?";
+        $params = [$os->getDeviceId()];
+
+        $submodules = Config::get('poller_submodules.wireless', []);
+        if (!empty($submodules)) {
+            $query .= " AND `sensor_class` IN " . dbGenPlaceholders(count($submodules));
+            $params = array_merge($params, $submodules);
+        }
+
         // fetch and group sensors, decode oids
         $sensors = array_reduce(
-            dbFetchRows("SELECT * FROM `$table` WHERE `device_id` = ?", array($os->getDeviceId())),
+            dbFetchRows($query, $params),
             function ($carry, $sensor) {
                 $sensor['sensor_oids'] = json_decode($sensor['sensor_oids']);
                 $carry[$sensor['sensor_class']][] = $sensor;
@@ -294,7 +304,7 @@ class Sensor implements DiscoveryModule, PollerModule
         }
 
         // pre-fetch all standard sensors
-        $standard_sensors = call_user_func_array('array_merge', $sensors);
+        $standard_sensors = collect($sensors)->flatten(1)->all();
         $pre_fetch = self::fetchSnmpData($os->getDevice(), $standard_sensors);
 
         // poll standard sensors

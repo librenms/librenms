@@ -48,7 +48,7 @@ if (is_numeric($_GET['interval'])) {
     $time_interval=1;      //Refresh time Interval
 }
 
-$fetch_link = "data.php?id=".$_GET[id];
+$fetch_link = "data.php?id=".$_GET['id'];
 
 //SVG attributes
 $attribs['axis']='fill="black" stroke="black"';

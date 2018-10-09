@@ -98,6 +98,10 @@ if (isset($options['v'])) {
     $variant = $options['variant'];
 }
 
+if (str_contains($variant, '_')) {
+    exit("Variant name cannot contain an underscore (_).\n");
+}
+
 echo "OS: $target_os\n";
 echo "Module(s): $modules_input\n";
 if ($variant) {
@@ -119,6 +123,7 @@ try {
 
 
     echo "Capturing Data: ";
+    update_os_cache(true); // Force update of OS Cache
     $capture->captureFromDevice($device['device_id'], true, $prefer_new_snmprec);
 } catch (InvalidModuleException $e) {
     echo $e->getMessage() . PHP_EOL;

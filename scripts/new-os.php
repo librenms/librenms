@@ -9,14 +9,7 @@ $options = getopt('h:o:t:v:d::');
 if ($options['h'] && $options['o'] && $options['t'] && $options['v']) {
     $type = $options['t'];
     $vendor = $options['v'];
-    if (isset($options['d'])) {
-        $debug = true;
-        $vdebug = true;
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        ini_set('log_errors', 1);
-        ini_set('error_reporting', 1);
-    }
+    set_debug(isset($options['d']));
 
     $device_id = ctype_digit($options['h']) ? $options['h'] : getidbyname($options['h']);
     $device = device_by_id_cache($device_id);

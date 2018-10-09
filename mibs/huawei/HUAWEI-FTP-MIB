@@ -1,0 +1,266 @@
+-- =================================================================
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: File Transfer Protocol(FTP) mib
+-- Reference:   huawei enterprise mib
+-- Version:     V1.03           
+-- History:     V1.0  zhouyao, 2008-09-28, publish 
+--                   V1.01  Wang Feng,2014-04-14,Add nodes for wlan npe trusted host
+--                  V1.02  dingzanfei,2014-08-15,Add nodes for switch notify
+-- =================================================================
+
+HUAWEI-FTP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hwDatacomm            
+            FROM HUAWEI-MIB            
+        OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+            FROM SNMPv2-CONF            
+        IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE           
+            FROM SNMPv2-SMI            
+        RowStatus, DisplayString            
+            FROM SNMPv2-TC;
+    
+
+    hwFtp MODULE-IDENTITY 
+        LAST-UPDATED "201605260900Z"        -- April 21, 2016 at 09:00 GMT
+        ORGANIZATION
+            "Huawei Technologies Co.,Ltd."
+        CONTACT-INFO 
+            "Huawei Industrial Base
+              Bantian, Longgang
+               Shenzhen 518129
+               People's Republic of China
+               Website: http://www.huawei.com
+               Email: support@huawei.com
+             "
+        DESCRIPTION 
+            "V1.00
+             The HUAWEI-FTP-MIB which contains objects manages the FTP server and FTP client configuration. 
+            "
+
+        REVISION "201605260900Z"        
+            DESCRIPTION 
+                "Modified to Add nodes for ftp user login failed alarm."
+
+        REVISION "201404210900Z"        
+            DESCRIPTION 
+                "Modified to Add nodes for wlan npe trusted host."
+
+        REVISION "201408151600Z"        
+            DESCRIPTION 
+                "Modified to Add switch notify."
+
+        ::= { hwDatacomm 166 }
+
+--
+-- Node definitions
+--
+    hwFtpObjects OBJECT IDENTIFIER ::= { hwFtp 1 }                                                                  
+    
+    hwFtpServer OBJECT IDENTIFIER ::= { hwFtpObjects 1 }  
+
+    hwFtpServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "The object specifies whether the FTP server is enable. Default value is 2."
+            ::= { hwFtpServer 1 }      
+
+     hwFtpHostPermit OBJECT IDENTIFIER ::= { hwFtpServer 2 }
+		
+     hwFtpHostPermitTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwFtpHostPermitEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+		"This object indicates trusted host table."
+            ::= { hwFtpHostPermit 1 }
+		
+	
+     hwFtpHostPermitEntry OBJECT-TYPE
+            SYNTAX HwFtpHostPermitEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+		"This object indicates trusted the entry of trusted host table."
+            INDEX { hwFtpHostPermitIndex }
+            ::= { hwFtpHostPermitTable 1 }
+		
+     HwFtpHostPermitEntry ::=
+            SEQUENCE { 
+                hwFtpHostPermitIndex
+                Integer32,
+                hwFtpHostPermitIpAddress
+                IpAddress,
+                hwFtpHostPermitMaskAddress
+                IpAddress,
+                hwFtpHostPermitInformation
+                OCTET STRING,
+                hwFtpHostPermitRowState
+                RowStatus
+                }
+
+     hwFtpHostPermitIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..7)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+		"The value of this object identifies the index of trusted host table."
+            ::= { hwFtpHostPermitEntry 1 }
+		
+     hwFtpHostPermitIpAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+		"The value of this object identifies ip address of trusted host."
+            ::= { hwFtpHostPermitEntry 2 }
+			
+     hwFtpHostPermitMaskAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+		"The value of this object identifies mask address of trusted host."
+            ::= { hwFtpHostPermitEntry 3 }		
+	
+     hwFtpHostPermitInformation OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..127))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+		"The value of this object identifies the description of trusted host."
+            ::= { hwFtpHostPermitEntry 4 }
+			
+     hwFtpHostPermitRowState OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+		"This object identifies the status of a row."
+            ::= { hwFtpHostPermitEntry 5 }
+	             
+    hwFtpUpperThreshold OBJECT-TYPE
+        SYNTAX Integer32 (1..2147483647)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "The object specifies the threshold of FTP users"
+        ::= { hwFtpServer 3 } 
+        
+    hwFtpLowerThreshold OBJECT-TYPE
+        SYNTAX Integer32 (1..2147483647)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "The object specifies the resune threshold of FTP users"
+        ::= { hwFtpServer 4 } 
+
+    -- 1.3.6.1.4.1.2011.5.25.166.1.1.5
+    hwFtpMibTrapObjects OBJECT IDENTIFIER ::= { hwFtpServer 5 }
+         -- 1.3.6.1.4.1.2011.5.25.166.1.1.5.1
+         hwFtpUserLoginFailedTimes OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+              "Login failed times in the statistic period"
+            ::= { hwFtpMibTrapObjects 1 }
+
+         -- 1.3.6.1.4.1.2011.5.25.166.1.1.5.2            
+        hwFtpUserLoginStatisticPeriod OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+              "Statistic period to count login failed times"
+            ::= { hwFtpMibTrapObjects 2 }
+
+ 
+-- Conformance information            
+
+        hwFtpNotification OBJECT IDENTIFIER ::= { hwFtp 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.166.2.1
+        hwFtpNumThreshold NOTIFICATION-TYPE
+            OBJECTS { hwFtpUpperThreshold }
+            STATUS current
+            DESCRIPTION 
+                "This object indicates the alarm reported when the number of FTP users exceed 
+                the threshold. "
+            ::= { hwFtpNotification 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.166.2.2
+        hwFtpNumThresholdResume NOTIFICATION-TYPE
+            OBJECTS { hwFtpLowerThreshold }
+            STATUS current
+            DESCRIPTION 
+                "This object indicates the alarm reported when the number of FTP users fell below 
+                the threshold. "
+            ::= { hwFtpNotification 2 }    
+
+        -- 1.3.6.1.4.1.2011.5.25.166.2.3
+        hwFtpLoginFailed NOTIFICATION-TYPE
+            OBJECTS { hwFtpUserLoginFailedTimes, hwFtpUserLoginStatisticPeriod }
+            STATUS current
+            DESCRIPTION
+                "When users failed to login ftp server too frequently, login fail times and statistics period are reported."
+            ::= { hwFtpNotification 3 }
+
+        -- 1.3.6.1.4.1.2011.5.25.166.2.4
+        hwFtpLoginFailedClear NOTIFICATION-TYPE
+            OBJECTS { hwFtpUserLoginFailedTimes, hwFtpUserLoginStatisticPeriod }
+            STATUS current
+            DESCRIPTION
+                "When users failed to login ftp server infrequently, login fail times and statistics period are cleared."
+            ::= { hwFtpNotification 4 }               
+                      
+-- Conformance information       
+     
+        -- 1.3.6.1.4.1.2011.5.25.166.3
+        hwFtpMIBConformance OBJECT IDENTIFIER ::= { hwFtp 3 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.166.3.1
+        hwFtpMIBCompliances OBJECT IDENTIFIER ::= { hwFtpMIBConformance 1 }
+
+        -- 1.3.6.1.4.1.2011.5.25.166.3.1.1
+        hwFtpMIBCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for systems supporting 
+                the HUAWEI-FTP-MIB."
+            MODULE HUAWEI-FTP-MIB
+                MANDATORY-GROUPS { hwFtpServerGroup }
+            ::= { hwFtpMIBCompliances 1 }
+
+        -- 1.3.6.1.4.1.2011.5.25.166.3.2
+        hwFtpMIBGroups OBJECT IDENTIFIER ::= { hwFtpMIBConformance 2 }   
+
+        -- 1.3.6.1.4.1.2011.5.25.166.3.2.1
+        hwFtpServerGroup OBJECT-GROUP
+            OBJECTS { hwFtpServerEnable }
+            STATUS current
+            DESCRIPTION 
+                "The FTP server attribute group."
+            ::= { hwFtpMIBGroups 1 }            
+  
+
+        -- 1.3.6.1.4.1.2011.5.25.166.3.2.2
+        hwFtpNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwFtpNumThreshold, hwFtpNumThresholdResume, hwFtpLoginFailed, hwFtpLoginFailedClear }
+            STATUS current
+            DESCRIPTION 
+                "The collection of notifications in the module."
+            ::= { hwFtpMIBGroups 2 }     
+        
+END
+
+--
+-- HUAWEI-FTP-MIB.mib
+--

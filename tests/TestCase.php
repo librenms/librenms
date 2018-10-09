@@ -43,8 +43,9 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     public function dbSetUp()
     {
         if (getenv('DBTEST')) {
-            dbConnect();
-            dbBeginTransaction();
+            \LibreNMS\DB\Eloquent::boot();
+            \LibreNMS\DB\Eloquent::setStrictMode();
+            \LibreNMS\DB\Eloquent::DB()->beginTransaction();
         } else {
             $this->markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
         }
@@ -53,7 +54,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     public function dbTearDown()
     {
         if (getenv('DBTEST')) {
-            dbRollbackTransaction();
+            \LibreNMS\DB\Eloquent::DB()->rollBack();
         }
     }
 

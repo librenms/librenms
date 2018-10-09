@@ -23,11 +23,29 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Playsms implements Transport
+class Playsms extends Transport
 {
     public function deliverAlert($obj, $opts)
+    {
+        if (empty($this->config)) {
+            return $this->deliverAlertOld($obj, $opts);
+        }
+        $playsms_opts['url']   = $this->config['playsms-url'];
+        $playsms_opts['user']  = $this->config['playsms-user'];
+        $playsms_opts['token'] = $this->config['playsms-token'];
+        $playsms_opts['from']  = $this->config['playsms-from'];
+        $playsms_opts['to']    = preg_split('/([,\r\n]+)/', $this->config['playsms-mobiles']);
+        return $this->contactPlaysms($obj, $playsms_opts);
+    }
+
+    public function deliverAlertOld($obj, $opts)
+    {
+        return $this->contactPlaysms($obj, $opts);
+    }
+
+    public static function contactPlaysms($obj, $opts)
     {
         $data = array("u" => $opts['user'], "h" => $opts['token'], "to" => implode(',', $opts['to']), "msg" => $obj['title']);
         if (!empty($opts['from'])) {
@@ -43,11 +61,52 @@ class Playsms implements Transport
         $ret  = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code > 202) {
-            if ($debug) {
-                var_dump($ret);
-            }
-            return false;
+            return var_dump($ret);
         }
         return true;
+    }
+
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'PlaySMS URL',
+                    'name' => 'playsms-url',
+                    'descr' => 'PlaySMS URL',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'User',
+                    'name' => 'playsms-user',
+                    'descr' => 'PlaySMS User',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Token',
+                    'name' => 'playsms-token',
+                    'descr' => 'PlaySMS Token',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'From',
+                    'name' => 'playsms-from',
+                    'descr' => 'PlaySMS From',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Mobiles',
+                    'name' => 'playsms-mobiles',
+                    'descr' => 'PlaySMS Mobiles, can be new line or comma separated',
+                    'type' => 'textarea',
+                ],
+            ],
+            'validation' => [
+                'playsms-url'     => 'required|url',
+                'playsms-user'    => 'required|string',
+                'playsms-token'   => 'required|string',
+                'playsms-mobiles' => 'required',
+            ]
+        ];
     }
 }

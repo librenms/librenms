@@ -30,8 +30,8 @@ pages:
       - Installing LibreNMS: Installation/index.md
       - Ubuntu VM Image: Installation/Ubuntu-image.md
       - CentOS VM Image: Installation/CentOS-image.md
-      - Ubuntu 16.04 (Nginx): Installation/Installation-Ubuntu-1604-Nginx.md
-      - Ubuntu 16.04 (Apache): Installation/Installation-Ubuntu-1604-Apache.md
+      - Ubuntu 18.04 (Nginx): Installation/Installation-Ubuntu-1804-Nginx.md
+      - Ubuntu 18.04 (Apache): Installation/Installation-Ubuntu-1804-Apache.md
       - CentOS 7 (Nginx): Installation/Installation-CentOS-7-Nginx.md
       - CentOS 7 (Apache): Installation/Installation-CentOS-7-Apache.md
       - Migrating from Observium: Installation/Migrating-from-Observium.md
@@ -53,6 +53,8 @@ pages:
       - Extensions/Dashboards.md
   - 5. Advanced Setup:
       - Support/1-Minute-Polling.md
+      - Fast Ping Checking: Extensions/Fast-Ping-Check.md
+      - Support/Environment-Variables.md
       - Configuration docs: Support/Configuration.md
       - Authentication Options: Extensions/Authentication.md
       - Two-Factor Auth: Extensions/Two-Factor-Auth.md
@@ -74,6 +76,7 @@ pages:
       - Nagios Plugins: Extensions/Services.md
       - Extensions/NFSen.md
       - Extensions/Oxidized.md
+      - Extensions/Rancid.md
       - Extensions/PeeringDB.md
       - Extensions/Proxmox.md
       - Storing Metrics:
@@ -97,12 +100,15 @@ pages:
       - API/Bills.md
       - API/ARP.md
       - API/Services.md
+      - API/System.md
       - API/Logs.md
   - 8. Alerting:
       - Intro: Alerting/index.md
+      - Alerting/Introduction.md
       - Alerting/Rules.md
       - Alerting/Templates.md
       - Alerting/Transports.md
+      - Alerting/Creating-Transport.md
       - Alerting/Entities.md
       - Alerting/Macros.md
       - Alerting/Testing.md
@@ -141,6 +147,7 @@ pages:
           - Developing/os/Custom-Graphs.md
           - Developing/os/Settings.md
           - Developing/Sensor-State-Support.md
+      - Developing/SNMP-Traps.md
       - Developing/Dynamic-Config.md
       - Developing/Merging-Pull-Requests.md
       - Developing/Creating-Release.md
@@ -152,16 +159,25 @@ pages:
           - Intro: Support/Device-Notes/index.md
           - Carel pCOweb: Support/Device-Notes/Carel-pCOweb-Devices.md
   - hidden:
+      - Alerting/Old_Templates.md
       - API/API-Docs.md
       - Installation/Installing-LibreNMS.md
       - Extensions/Alerting.md
       - Extensions/Email-Alerting.md
       - Parsing Port Descriptions: Extensions/Port-Description-Parser.md
+      - Extensions/InfluxDB.md
+      - Extensions/Graphite.md
+      - Extensions/OpenTSDB.md
+      - Extensions/Prometheus.md
       - Extensions/RRDCached-Security.md
+      - General/Contributing.md
       - General/Credits.md
       - Installation/Installation-Ubuntu-1404-Nginx.md
       - Installation/Installation-Ubuntu-1404-Apache.md
       - Installation/Installation-Ubuntu-1404-Lighttpd.md
+      - Ubuntu 16.04 (Nginx): Installation/Installation-Ubuntu-1604-Nginx.md
+      - Ubuntu 16.04 (Apache): Installation/Installation-Ubuntu-1604-Apache.md
       - Installation/Installation-CentOS-6-Apache-Nginx.md
       - Installation/Installation-(Debian-Ubuntu).md
       - Installation/Installation-(RHEL-CentOS).md
+      - Support/Support-New-OS.md

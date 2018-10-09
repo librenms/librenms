@@ -1,0 +1,490 @@
+-- ============================================================================
+-- Copyright (C) 2011 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description:  The mib is used for configuring time range. 
+--               When configuring the ACL rule, if you need to specify the time 
+--               for the ACL rule to take effect, you need to run this command 
+--               to configure a time range before specifying the time. After that,
+--               you can specify the time for an ACL to take effect by referring
+--               the time range name when configuring the ACL rule.
+-- Reference:  
+-- Version: V1.01
+-- ============================================================================
+
+  HUAWEI-TRNG-MIB DEFINITIONS ::= BEGIN
+ 
+    IMPORTS     
+        TimeTicks, IpAddress, Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY,
+	NOTIFICATION-TYPE
+	    FROM SNMPv2-SMI
+        OBJECT-GROUP, MODULE-COMPLIANCE     
+            FROM SNMPv2-CONF  
+        TruthValue, DateAndTime, RowStatus      
+            FROM SNMPv2-TC
+        hwDatacomm      
+            FROM HUAWEI-MIB;
+        
+        hwTRNG MODULE-IDENTITY 
+        LAST-UPDATED "201103220000Z"    
+        ORGANIZATION 
+            "Huawei Technologies Co.,Ltd."
+        CONTACT-INFO                                        
+            "Huawei Industrial Base
+             Bantian, Longgang
+             Shenzhen 518129
+             People's Republic of China
+             Website: http://www.huawei.com
+             Email: support@huawei.com
+            "                                      
+        DESCRIPTION 
+            "The mib is used for configuring time range.
+            When configuring the ACL rule, if you need to specify the time 
+            for the ACL rule to take effect, you need to run this command 
+            to configure a time range before specifying the time. After that,
+            you can specify the time for an ACL to take effect by referring
+            the time range name when configuring the ACL rule."  
+          
+        -- Revision history
+        REVISION     "201103220000Z"  
+        DESCRIPTION  "V1.01, modified the description of hwTimerangePeriodicEndTimes.
+		              modified the description of hwTrngCreateTimerangeTable, 
+                      hwTrngAbsoluteTable and hwTrngPeriodicTable .
+					  modified the errors of the MIB file.
+					  modified the description of leaves.
+					  modified the datatype definition and the format of the MIB script."
+          
+        REVISION    "200304110000Z"    
+        DESCRIPTION "V1.00, initial revision of this MIB module."         
+          
+        ::= { hwDatacomm 13 }
+  
+    -- 1.3.6.1.4.1.2011.5.25.13.1
+    hwTRNGMibObjects OBJECT IDENTIFIER ::= { hwTRNG 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.1
+    hwTrngCreateTimerangeTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwTrngCreateTimerangeEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Describes a time range. 
+             When configuring an ACL rule, set its effective time. To do so, configurate a time range first. 
+             After the configuration, the effective time is specified by referencing the time range 
+             when an ACL rule is being configured.
+             An ACL time range can be a relative time range and an absolute time range. 
+             The index of this table is hwTrngIndex.
+            "
+        ::= { hwTRNGMibObjects 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.1.1
+    hwTrngCreateTimerangeEntry OBJECT-TYPE
+        SYNTAX HwTrngCreateTimerangeEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Describes a time range. 
+             When configuring an ACL rule, set its effective time. To do so, configurate a time range first. 
+             After the configuration, the effective time is specified by referencing the time range 
+             when an ACL rule is being configured.
+             An ACL time range can be a relative time range and an absolute time range. 
+             The index of this entry is hwTrngIndex.
+            "
+        INDEX { hwTrngIndex }
+        ::= { hwTrngCreateTimerangeTable 1 }
+    
+    HwTrngCreateTimerangeEntry ::=
+        SEQUENCE { 
+          hwTrngIndex
+            Integer32,
+          hwTrngName
+            OCTET STRING,
+          hwTrngValidFlag
+            TruthValue,
+          hwTrngCreateRowStatus
+            RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.1.1.1.1
+    hwTrngIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..256)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Uniquely identifies a time range.
+             Range: 1-256
+            "
+        ::= { hwTrngCreateTimerangeEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.1.1.2
+    hwTrngName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..32))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Indicates the character string of a time range name. 
+             It is used to identify different time ranges. 
+             The character string consists of 1-32 characters of letters and digits. 
+             No other characters can be included.
+            "
+        ::= { hwTrngCreateTimerangeEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.1.1.3
+    hwTrngValidFlag OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Describes whether the current time range is valid, that is, 
+             whether the current time is within the specified time range. 
+             Options:
+             1. true(1)  -if the current time is within the specified time range, 
+                          the value is true(1), which indicates validity.
+             2. false(2) -if the current time is not within the specified time range, 
+                          the value is false(2), which indicates invalidity. 
+            "
+        ::= { hwTrngCreateTimerangeEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.1.1.4
+    hwTrngCreateRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION       
+            "Indicates the row status. 
+             Options:
+             1. active(1)      -when this leaf is queried, the value is fixed to active(1).
+             2. createAndGo(4) -add a time range
+             3. destroy(6)     -delete a time range
+             It is used for adding or deleting a time range. 
+             To add a time range, you must bind hwTrngName 
+             and set hwTrngCreateRowStatus to createAndGo(4). 
+             To delete a time range, set hwTrngCreateRowStatus to destroy(6). 
+             When this leaf is queried, the value is fixed to active(1).
+            "
+        ::= { hwTrngCreateTimerangeEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.2
+    hwTrngAbsoluteTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwTrngAbsoluteEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Describes an absolute time range. 
+             An absolute time range refers to the time range without a period. 
+             The time range is active from the specified start time and date to the end time and date. 
+             Otherwise, the time range is inactive.
+             The indexes of this table are hwTrngAbsoluteNameIndex and hwTrngAbsoluteSubIndex. 
+            "
+        ::= { hwTRNGMibObjects 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.2.1
+    hwTrngAbsoluteEntry OBJECT-TYPE
+        SYNTAX HwTrngAbsoluteEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Describes an absolute time range. 
+             An absolute time range refers to the time range without a period. 
+             The time range is active from the specified start time and date to the end time and date. 
+             Otherwise, the time range is inactive.
+             The indexes of this entry are hwTrngAbsoluteNameIndex and hwTrngAbsoluteSubIndex. 
+            "
+
+        INDEX { hwTrngAbsoluteNameIndex, hwTrngAbsoluteSubIndex }
+        ::= { hwTrngAbsoluteTable 1 }
+    
+    HwTrngAbsoluteEntry ::=
+        SEQUENCE { 
+          hwTrngAbsoluteNameIndex
+            Integer32,
+          hwTrngAbsoluteSubIndex
+            Integer32,
+          hwTimerangeAbsoluteStartTime
+            DateAndTime,
+          hwTimerangeAbsoluteEndTime
+            DateAndTime,
+          hwTimerangeAbsolueRowStatus
+            RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.1.2.1.1
+    hwTrngAbsoluteNameIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..256)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Uniquely identifies a time range.
+             Range: 1-256
+             The specified time range must be created in hwTrngCreateTimerangeTable. 
+            "     
+        ::= { hwTrngAbsoluteEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.2.1.2
+    hwTrngAbsoluteSubIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..12)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Uniquely identifies an absolute time range.
+             Range: 1-12 
+            "
+        ::= { hwTrngAbsoluteEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.2.1.3
+    hwTimerangeAbsoluteStartTime OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Indicates the start time of an absolute time range.
+             It is an 8-byte hexadecimal numeral, where, the first two bytes indicate the year, 
+             the third byte indicates the month, the fourth byte indicates the day, 
+             the fifth byte indicates the hour, the six byte indicates the minute, 
+             and the seventh and eighth digits are reserved, which are filled in 0.
+             For example, if the start time is 2010-1-10,8:10, 
+             the value is presented as 0x07 0xDA 0x01 0x0A 0x08 0x0A 0x00 0x00. 
+             The time range that the device can identify is 1970/01/01 00:00-2099/12/31 23:59. 
+             Therefore, the time value must be within the time range. 
+            "
+        ::= { hwTrngAbsoluteEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.2.1.4
+    hwTimerangeAbsoluteEndTime OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-create      
+        STATUS current
+        DESCRIPTION
+            "Indicates the end time of an absolute time range. 
+             The format is the same as that of hwTrngAbsoluteStartTime. 
+             The value of the end time must be larger than that of the start time. 
+             If the value is not specified, the system uses 2099/12/31 23:59 by default. 
+            "
+        ::= { hwTrngAbsoluteEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.2.1.5
+    hwTimerangeAbsolueRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Indicates the row status. 
+             Options:     
+             1. active(1)      -when this leaf is queried, the value is fixed to active(1).
+             2. createAndGo(4) -add an absolute time range
+             3. destroy(6)     -delete an absolute time range
+             It is used for adding or deleting an absolute time range. 
+             To add an absolute time range, enter hwTrngAbsoluteStartTime and 
+             set hwTrngAbsolueRowStatus to createAndGo(4). 
+             hwTrngAbsoluteEndTime is optional. 
+             To delete an absolute time range, set hwTrngAbsolueRowStatus to destroy(6). 
+             When this leaf is queried, the value is fixed to active(1). 
+            "
+        ::= { hwTrngAbsoluteEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.3
+    hwTrngPeriodicTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwTrngPeriodicEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Describes a relative time range. 
+             A relative time range refers to the time range with a period. 
+             When a time range is already created, only the specific time is specified 
+             but the date is set to a day from Monday to Sunday. 
+             The time range is active at the specified time and date. 
+             Otherwise, the time range is inactive. 
+             The indexes of this table are hwTrngPeriodicNameIndex and hwTrngPeriodicSubIndex. 
+            "
+        ::= { hwTRNGMibObjects 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.3.1
+    hwTrngPeriodicEntry OBJECT-TYPE
+        SYNTAX HwTrngPeriodicEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Describes a relative time range.
+             A relative time range refers to the time range with a period. 
+             When a time range is already created, only the specific time is specified 
+             but the date is set to a day from Monday to Sunday. 
+             The time range is active at the specified time and date. 
+             Otherwise, the time range is inactive. 
+             The indexes of this entry are hwTrngPeriodicNameIndex and hwTrngPeriodicSubIndex. 
+            "        
+        INDEX { hwTrngPeriodicNameIndex, hwTrngPeriodicSubIndex }
+        ::= { hwTrngPeriodicTable 1 }
+    
+    HwTrngPeriodicEntry ::=
+        SEQUENCE { 
+          hwTrngPeriodicNameIndex
+            Integer32,
+          hwTrngPeriodicSubIndex
+            Integer32,
+          hwTrngPeriodicDayofWeek
+            Integer32,
+          hwTimerangePeriodicStartTime
+            DateAndTime,
+          hwTimerangePeriodicEndTime
+            DateAndTime,
+          hwTimerangePeriodicRowStatus
+            RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.13.1.3.1.1
+    hwTrngPeriodicNameIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..256)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Uniquely identifies a relative time range.
+             Range: 1-256  
+             The specified time range must be created in hwTrngCreateTimerangeTable. 
+            "
+        ::= { hwTrngPeriodicEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.3.1.2
+    hwTrngPeriodicSubIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..32)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Uniquely identifies a relative time range.
+             Range: 1-32
+            "
+        ::= { hwTrngPeriodicEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.3.1.3
+    hwTrngPeriodicDayofWeek OBJECT-TYPE
+        SYNTAX Integer32 (0..127)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Indicates the day of week within the periodic time range. 
+             The values are as follows: 
+             Sunday: 0x01
+             Monday: 0x02
+             Tuesday: 0x04
+             Wednesday: 0x08
+             Thursday: 0x10
+             Friday: 0x20
+             Saturday: 0x40
+             If the value is set to Sunday and Monday, 
+             perform the | operation to the values of Sunday and Monday, 
+             and the value is 0x03, and so on.
+            "
+        ::= { hwTrngPeriodicEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.3.1.4
+    hwTimerangePeriodicStartTime OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Indicates the start time of a periodic time range.
+             The format is the same as that of hwTrngAbsoluteStartTime in hwTrngAbsoluteTable. 
+             The periodic time needs only the hour and minute values, 
+             and thus only the fifth and sixth bytes are used, where, 
+             the fifth byte indicates the hour value of the 
+             start time and the sixth byte indicates the minute value. 
+             Other bytes are reserved and are filled in 0.
+             For example, if the start time is 08:30, 
+             the value is presented as 0x00 0x00 0x00 0x00 0x08 0x1E 0x00 0x00. 
+             The time must be from 00:00 to 24:00. 
+            "       
+        ::= { hwTrngPeriodicEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.3.1.5
+    hwTimerangePeriodicEndTime OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Indicates the end time of a periodic time range. 
+             The format is the same as that of hwTrngPeriodicStartTime. 
+             The value of the end time must be larger than that of the start time. 
+             The value must be from 00:00 to 24:00. 
+             The 7th byte is used only in the case of 23: 59: 60 to indicate the time 24: 00.
+            "
+        ::= { hwTrngPeriodicEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.1.3.1.6
+    hwTimerangePeriodicRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Indicates the row status.
+             Options:    
+             1. active(1)      -when this leaf is queried, the value is fixed to active(1).
+             2. createAndGo(4) -add a relative time range
+             3. destroy(6)     -delete a relative time range
+             It is used for adding or deleting a relative time range. 
+             To add a relative time range, enter hwTrngPeriodicStartTime and hwTrngPeriodicEndTime, 
+             and set hwTrngPeriodicRowStatus to createAndGo(4). 
+             To delete a relative time range, set hwTrngAbsolueRowStatus to destroy(6). 
+             When this leaf is queried, the value is fixed to active(1).
+            "
+        ::= { hwTrngPeriodicEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.3
+    hwTRNGMibConformance OBJECT IDENTIFIER ::= { hwTRNG 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.3.1
+    hwTRNGMibCompliances OBJECT IDENTIFIER ::= { hwTRNGMibConformance 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.3.1.1
+    hwTRNGMibCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION 
+            "The compliance statement for entities which 
+             implement the Huawei Time-range MIB."
+        MODULE 
+        MANDATORY-GROUPS { hwTRNGGroup }
+        OBJECT hwTrngCreateRowStatus
+        SYNTAX INTEGER
+          {
+               active(1),
+               createAndGo(4),
+               destroy(6)
+          }
+        DESCRIPTION 
+            "The status of createAndWait, notInservice and notReady are not required."
+        OBJECT hwTimerangeAbsolueRowStatus
+        SYNTAX INTEGER
+          { 
+               active(1),
+               createAndGo(4),
+               destroy(6)
+          }
+        DESCRIPTION 
+            "The status of createAndWait, notInservice and notReady are not required."
+        OBJECT hwTimerangePeriodicRowStatus
+        SYNTAX INTEGER
+          {
+               active(1),
+               createAndGo(4),
+               destroy(6)
+          }
+       DESCRIPTION 
+           "The status of createAndWait, notInservice and notReady are not required."
+        ::= { hwTRNGMibCompliances 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.3.2
+    hwTRNGMibGroups OBJECT IDENTIFIER ::= { hwTRNGMibConformance 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.13.3.2.1
+    hwTRNGGroup OBJECT-GROUP
+        OBJECTS { 
+        	  hwTrngName, hwTrngValidFlag, hwTrngCreateRowStatus, hwTimerangeAbsoluteStartTime, hwTimerangeAbsoluteEndTime, 
+            hwTimerangeAbsolueRowStatus, hwTrngPeriodicDayofWeek, hwTimerangePeriodicStartTime, hwTimerangePeriodicEndTime, hwTimerangePeriodicRowStatus
+           }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing mandatory time-range information."
+        ::= { hwTRNGMibGroups 1 }    
+  
+  END
+
+--
+-- HUAWEI-TRNG-MIB.mib
+--

@@ -3,28 +3,30 @@
  * voltages for raspberry pi
  * requires snmp extend agent script from librenms-agent
  */
-$sensor_type = "rasbperry_volts";
-$oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.';
-for ($volt = 2; $volt < 6; $volt++) {
-    switch ($volt) {
-        case "2":
-            $descr = "Core";
+if (!empty($pre_cache['raspberry_pi_sensors'])) {
+    $sensor_type = "rasbperry_volts";
+    $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.';
+    for ($volt = 2; $volt < 6; $volt++) {
+        switch ($volt) {
+            case "2":
+                $descr = "Core";
+                break;
+            case "3":
+                $descr = "SDRAMc";
+                break;
+            case "4":
+                $descr = "SDRAMi";
+                break;
+            case "5":
+                $descr = "SDRAMp";
+                break;
+        }
+        $value = current($pre_cache['raspberry_pi_sensors']["raspberry." . $volt]);
+        if (is_numeric($value)) {
+            discover_sensor($valid['sensor'], 'voltage', $device, $oid . $volt, $volt, $sensor_type, $descr, '1', '1', null, null, null, null, $value);
+        } else {
             break;
-        case "3":
-            $descr = "SDRAMc";
-            break;
-        case "4":
-            $descr = "SDRAMi";
-            break;
-        case "5":
-            $descr = "SDRAMp";
-            break;
-    }
-    $value = current($pre_cache['raspberry_pi_sensors']["raspberry.".$volt]);
-    if (is_numeric($value)) {
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid.$volt, $volt, $sensor_type, $descr, '1', '1', null, null, null, null, $value);
-    } else {
-        break;
+        }
     }
 }
 
@@ -75,11 +77,15 @@ if (preg_match("/(Linux).+(ntc)/", $device['sysDescr'])) {
     $descr = 'AC IN voltage';
     $index = '116.2';
     $value = snmp_get($device, $oid.$index, '-Oqv');
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid.$index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+    if (is_numeric($value)) {
+        discover_sensor($valid['sensor'], 'voltage', $device, $oid.$index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+    }
     $descr = 'VBUS voltage';
     $index = '116.4';
     $value = snmp_get($device, $oid.$index, '-Oqv');
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid.$index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+    if (is_numeric($value)) {
+        discover_sensor($valid['sensor'], 'voltage', $device, $oid.$index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+    }
     $lowlimit     = 2.75;
     $lowwarnlimit = 2.8;
     $warnlimit    = 4.2;
@@ -87,7 +93,9 @@ if (preg_match("/(Linux).+(ntc)/", $device['sysDescr'])) {
     $descr = 'Battery voltage';
     $index = '116.6';
     $value = snmp_get($device, $oid.$index, '-Oqv');
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid.$index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+    if (is_numeric($value)) {
+        discover_sensor($valid['sensor'], 'voltage', $device, $oid.$index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+    }
 }
 
 $oids = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.117.112.115.45.110.117.116.4';

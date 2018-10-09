@@ -19,6 +19,12 @@ if ($device['os'] == 'junos') {
         $entity_array = snmpwalk_cache_twopart_oid($device, 'entAliasMappingIdentifier', $entity_array, 'ENTITY-MIB:IF-MIB');
     }
 }
+if ($device['os'] == 'vrp') {
+    echo ' hwEntityBoardType';
+    $entity_array = snmpwalk_cache_oid($device, 'hwEntityBoardType', $entity_array, 'ENTITY-MIB:HUAWEI-ENTITY-EXTENT-MIB');
+    echo ' hwEntityBomEnDesc';
+    $entity_array = snmpwalk_cache_oid($device, 'hwEntityBomEnDesc', $entity_array, 'ENTITY-MIB:HUAWEI-ENTITY-EXTENT-MIB');
+}
 
 foreach ($entity_array as $entPhysicalIndex => $entry) {
     if ($device['os'] == 'junos') {
@@ -59,6 +65,23 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
         $entPhysicalAlias        = $entry['tmnxHwAlias'];
         $entPhysicalAssetID      = $entry['tmnxHwAssetID'];
         $entPhysicalIndex = str_replace('.', '', $entPhysicalIndex);
+    } elseif ($device['os'] == 'vrp') {
+        //Add some details collected in the VRP Entity Mib
+        $entPhysicalDescr        = $entry['hwEntityBomEnDesc'];
+        $entPhysicalContainedIn  = $entry['entPhysicalContainedIn'];
+        $entPhysicalClass        = $entry['entPhysicalClass'];
+        $entPhysicalName         = $entry['entPhysicalName'];
+        $entPhysicalSerialNum    = $entry['entPhysicalSerialNum'];
+        $entPhysicalModelName    = $entry['hwEntityBoardType'];
+        $entPhysicalMfgName      = $entry['entPhysicalMfgName'];
+        $entPhysicalVendorType   = $entry['entPhysicalVendorType'];
+        $entPhysicalParentRelPos = $entry['entPhysicalParentRelPos'];
+        $entPhysicalHardwareRev  = $entry['entPhysicalHardwareRev'];
+        $entPhysicalFirmwareRev  = $entry['entPhysicalFirmwareRev'];
+        $entPhysicalSoftwareRev  = $entry['entPhysicalSoftwareRev'];
+        $entPhysicalIsFRU        = $entry['entPhysicalIsFRU'];
+        $entPhysicalAlias        = $entry['entPhysicalAlias'];
+        $entPhysicalAssetID      = $entry['entPhysicalAssetID'];
     } else {
         $entPhysicalDescr        = $entry['entPhysicalDescr'];
         $entPhysicalContainedIn  = $entry['entPhysicalContainedIn'];

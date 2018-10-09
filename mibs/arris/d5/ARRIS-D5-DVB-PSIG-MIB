@@ -1,0 +1,336 @@
+ARRIS-D5-DVB-PSIG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DisplayString
+        FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    arrisD5UEQam
+        FROM ARRIS-MIB;
+
+    d5DvbCasPsigMuxMib  MODULE-IDENTITY
+        LAST-UPDATED "201002240000Z" -- 24th Feb 2010
+        ORGANIZATION "Arris International"
+        CONTACT-INFO
+            "   Network Management
+                Postal: Arris International.
+                        4300 Cork Airport Business Park
+                        Cork Airport, Kinsale Road
+                        Cork, Ireland.
+                Tel:    +353 21 7305 800
+                Fax:    +353 21 4321 972"
+
+        DESCRIPTION
+            "This MIB manages the PSIG interface software on the Arris D5 WAN."
+        ::= { arrisD5UEQam 9 }
+
+
+    d5DvbCasPsigMuxObjects OBJECT IDENTIFIER ::= { d5DvbCasPsigMuxMib 1 }
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- PSIG interface table
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    d5DvbCasPsigTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5DvbCasPsigEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This table stores the PSIG interfaces on the MUX(D5)"
+        ::= { d5DvbCasPsigMuxObjects 1 }
+
+        d5DvbCasPsigEntry OBJECT-TYPE
+            SYNTAX     D5DvbCasPsigEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                ""	
+            INDEX { d5PsigName }
+            ::= { d5DvbCasPsigTable 1 }
+
+        D5DvbCasPsigEntry ::= SEQUENCE {
+            d5PsigName                    DisplayString,
+            d5PsigTcpPort                 Unsigned32,
+            d5PsigSrcIp                   IpAddress,
+            d5PsigRowStatus               RowStatus,
+            d5PsigSessionNum              Unsigned32,
+            d5PsigNumChannels             Unsigned32,
+            d5PsigNumStreams              Unsigned32,
+            d5PsigNumSections             Unsigned32
+        }
+
+            d5PsigName   OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "DVB psig name to be used to identify psig locally."
+                ::= { d5DvbCasPsigEntry 1 }
+
+            d5PsigTcpPort   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "Tcp port over which connection with Psig is to be established."
+                ::= { d5DvbCasPsigEntry 2 }
+
+            d5PsigSrcIp   OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "IP source address of Psig."
+                ::= { d5DvbCasPsigEntry 3 }
+            
+            d5PsigRowStatus  OBJECT-TYPE
+                SYNTAX      RowStatus
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The RowStatus for controlling entries in this table."
+                ::= { d5DvbCasPsigEntry 4 }
+            
+            d5PsigSessionNum  OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Session-number of this PSIG interface"
+                ::= { d5DvbCasPsigEntry 5 }
+            
+            d5PsigNumChannels  OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The total number channels configured on this PSIG interface"
+                ::= { d5DvbCasPsigEntry 6 }
+            
+            d5PsigNumStreams  OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The total number of streams configured on this PSIG interface"
+                ::= { d5DvbCasPsigEntry 7 }
+            
+            d5PsigNumSections  OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The total number of sections configured on this PSIG interface"
+                ::= { d5DvbCasPsigEntry 8 }
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- PSIG channel table
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    d5DvbCasPsigChannelTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5DvbCasPsigChannel
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This table stores status information for PSIG channels that are
+                 configured on the PSIG interfaces of the MUX(D5)"
+        ::= { d5DvbCasPsigMuxObjects 2 }
+
+        d5DvbCasPsigChannel OBJECT-TYPE
+            SYNTAX     D5DvbCasPsigChannel
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""	
+            INDEX { d5PsigChanPsigName,d5PsigChanChannelId }
+            ::= { d5DvbCasPsigChannelTable 1 }
+
+        D5DvbCasPsigChannel ::= SEQUENCE {
+            d5PsigChanPsigName      DisplayString,
+            d5PsigChanChannelId     Unsigned32,
+            d5PsigChanNetworkId     Unsigned32,
+            d5PsigChanTsId          Unsigned32,
+            d5PsigChanTcpPort       Unsigned32,
+            d5PsigChanNumStreams    Unsigned32
+        }
+
+            d5PsigChanPsigName   OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "DVB psig name to be used to identify psig locally."
+                ::= { d5DvbCasPsigChannel 1 }
+
+            d5PsigChanChannelId   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Channel identifier reference for the PSIG channel connection."
+                ::= { d5DvbCasPsigChannel 2 }
+
+            d5PsigChanNetworkId   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "NetworkId which is referenced by the PSIG channel connection."
+                ::= { d5DvbCasPsigChannel 3 }
+
+            d5PsigChanTsId   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "TransportStreamId which is referenced by the PSIG channel connection."
+                ::= { d5DvbCasPsigChannel 4 }
+
+            d5PsigChanTcpPort   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Tcp port over which PSIG channel connection is established."
+                ::= { d5DvbCasPsigChannel 5 }
+
+            d5PsigChanNumStreams  OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The total number of streams configured on the PSIG channel connection."
+                ::= { d5DvbCasPsigChannel 6 }
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- PSIG stream table
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    d5DvbCasPsigStreamTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5DvbCasPsigStream
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This table stores status information for PSIG streams that are
+                 configured on the PSIG interfaces of the MUX(D5)"
+        ::= { d5DvbCasPsigMuxObjects 3 }
+
+        d5DvbCasPsigStream OBJECT-TYPE
+            SYNTAX     D5DvbCasPsigStream
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""	
+            INDEX { d5PsigStrPsigName,d5PsigStrChannelId,d5PsigStrPid }
+            ::= { d5DvbCasPsigStreamTable 1 }
+
+        D5DvbCasPsigStream ::= SEQUENCE {
+            d5PsigStrPsigName      DisplayString,
+            d5PsigStrChannelId     Unsigned32,
+            d5PsigStrPid           Unsigned32,
+            d5PsigStrStreamId      Unsigned32,
+            d5PsigStrNetworkId     Unsigned32,
+            d5PsigStrTsId          Unsigned32,
+            d5PsigStrTcpPort       Unsigned32,
+            d5PsigStrNumSections   Unsigned32
+        }
+
+            d5PsigStrPsigName   OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "DVB psig name to be used to identify psig locally."
+                ::= { d5DvbCasPsigStream 1 }
+
+            d5PsigStrChannelId   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Channel identifier reference for the PSIG stream."
+                ::= { d5DvbCasPsigStream 2 }
+
+            d5PsigStrPid   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "PID which is referenced by the PSIG stream."
+                ::= { d5DvbCasPsigStream 3 }
+
+            d5PsigStrStreamId   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "stream identifier reference for the PSIG stream."
+                ::= { d5DvbCasPsigStream 4 }
+
+            d5PsigStrNetworkId   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "NetworkId which is referenced by the PSIG stream connection."
+                ::= { d5DvbCasPsigStream 5 }
+
+            d5PsigStrTsId   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "TransportStreamId which is referenced by the PSIG stream connection."
+                ::= { d5DvbCasPsigStream 6 }
+
+            d5PsigStrTcpPort   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Tcp port over which PSIG stream connection is established."
+                ::= { d5DvbCasPsigStream 7 }
+
+            d5PsigStrNumSections  OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The total number of sections configured on the PSIG stream."
+                ::= { d5DvbCasPsigStream 8 }
+
+
+    d5DvbCasPsigGlobalConfigObjects OBJECT IDENTIFIER ::= { d5DvbCasPsigMuxObjects 4 }
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- PSIG : Global configuration settings
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    d5DvbCasPsigGlobalConfigGroup OBJECT IDENTIFIER ::= { d5DvbCasPsigGlobalConfigObjects 1 }
+
+            d5DvbCasPsigMaxChannels   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Maximum number of PSIG channels which can concurrently supported
+                    across all interfaces on the MUX(D5)."
+                ::= { d5DvbCasPsigGlobalConfigGroup 1 }
+
+            d5DvbCasPsigMaxStreams   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Maximum number of PSIG streams which can concurrently supported
+                    on a single PSIG channel."
+                ::= { d5DvbCasPsigGlobalConfigGroup 2 }
+
+            d5DvbCasPsigMaxSections   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Maximum number of sections which can concurrently supported
+                    on a single PSIG stream."
+                ::= { d5DvbCasPsigGlobalConfigGroup 3 }
+
+END

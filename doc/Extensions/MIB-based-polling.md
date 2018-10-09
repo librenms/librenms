@@ -23,7 +23,7 @@ using the script `contrib/convert-mib-graphs.sh`.  Failure to do so will
 result in your data collection silently stopping.
 
 MIB-based polling is disabled by default; you must set
-    `$config['poller_modules']['mib'] = 1;`
+    `$config['poller_modules']['mib'] = true;`
 in `config.php` to enable it.
 
 ## Preparation ##
@@ -147,7 +147,7 @@ graph.
 
 ## Configuration
 ### Main Configuration
-In `/opt/librenms/config.php` add `$config['poller_modules']['mib'] = 1;` to enable MIB polling globally.
+In `/opt/librenms/config.php` add `$config['poller_modules']['mib'] = true;` to enable MIB polling globally.
 Alternatively you can enable MIB polling per device by enabling it within the modules section for the specific device.
 
 ### Discovery

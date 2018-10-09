@@ -17,7 +17,7 @@ To access any of the token end points you will be required to authenticate using
 
 ## Endpoints
 
-Whilst this documentation will describe and show examples of the end points, we've designed the API so you should be able to traverse through it without know any of the available API routes.
+Whilst this documentation will describe and show examples of the end points, we've designed the API so you should be able to traverse through it without knowing any of the available API routes.
 
 You can do this by first calling `/api/v0`:
 
@@ -47,7 +47,7 @@ curl -X POST -d '{"hostname":"localhost.localdomain","version":"v1","community":
 
 ## Output
 
-Output from the API currently is via two output types.
+Output from the API currently is via two output types:
 
   - JSON Most API responses will output json. As show in the example for calling the API endpoint.
   - PNG This is for when the request is for an image such as a graph for a switch port.
@@ -66,3 +66,4 @@ Output from the API currently is via two output types.
 - [ARP](ARP.md)
 - [Services](Services.md)
 - [Logs](Logs.md)
+- [System](System.md)

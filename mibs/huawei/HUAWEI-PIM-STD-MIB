@@ -1,0 +1,4010 @@
+-- ============================================================================
+-- Copyright (C) 2016 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI-PIM-STD-MIB.my , this MIB module for management of 
+--              the Protocol Independent Multicast (PIM) protocols for PIM routers.
+-- Reference:  
+-- Version: V2.06
+-- History:
+--    created by wangyanwei 63315 2007-04-24
+--    
+-- ============================================================================
+
+HUAWEI-PIM-STD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, mib-2,
+    NOTIFICATION-TYPE, Unsigned32,
+    Counter32, Counter64, Gauge32,
+    TimeTicks                        FROM SNMPv2-SMI        -- [RFC2578] 
+    TimeStamp                        FROM SNMPv2-TC         -- [Add by yuyunfu 54617]
+    TEXTUAL-CONVENTION,
+    RowStatus, TruthValue, DisplayString,
+    StorageType                      FROM SNMPv2-TC         -- [RFC2579]
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP               FROM SNMPv2-CONF       -- [RFC2580]
+    InterfaceIndexOrZero,
+    InterfaceIndex                   FROM IF-MIB            -- [RFC2863]
+    InetAddressType,
+    InetAddressPrefixLength,
+    InetAddress, InetVersion         FROM INET-ADDRESS-MIB  -- [RFC4001]
+    IANAipRouteProtocol              FROM IANA-RTPROTO-MIB  -- [RTPROTO]
+    hwDatacomm                       FROM HUAWEI-MIB;
+
+hwMcast      OBJECT IDENTIFIER      ::= { hwDatacomm 149 }
+
+hwPimStdMib MODULE-IDENTITY
+    LAST-UPDATED  "201611090000Z" -- 9 Nov 2016
+    ORGANIZATION
+            "Huawei Technologies Co.,Ltd."
+    CONTACT-INFO
+            "Huawei Industrial Base
+              Bantian, Longgang
+               Shenzhen 518129
+               People's Republic of China
+               Website: http://www.huawei.com
+               Email: support@huawei.com
+             "
+    DESCRIPTION
+            "The MIB module for management of PIM routers.
+
+            Huawei Technologies co.,Ltd . Supplementary information may
+            be available at:
+            http://www.huawei.com"
+
+    REVISION     "201611090000Z" -- 9 Nov 2016
+    DESCRIPTION  "Modify the description of hwPimNotificationLimitType."
+    
+    REVISION     "201605260000Z" -- 26 May 2016
+    DESCRIPTION  "1.Add hwPimGlobalTypeSGThresholdExceed.
+                                   2.Add hwPimGlobalTypeSGThresholdExceedClear.
+                                   3.Add hwPimGlobalTypeSGExceed.
+                                   4.Add hwPimGlobalTypeSGExceedClear.
+                                  "
+
+    REVISION     "201407010000Z" -- 1 July 2014
+    DESCRIPTION  "1.Modify the description of  hwPimStarGThresholdExceed.
+                                   2.Modify the description of  hwPimStarGThresholdExceedClear.
+                                   3.Modify the description of  hwPimStarGExceedClear.
+                                   4.Modify the description of  hwPimSGThresholdExceed.
+                                   5.Modify the description of  hwPimSGThresholdExceedClear.
+                                   6.Modify the description of  hwPimSGExceedClear.
+                                  "
+
+    REVISION     "201406200000Z" -- 20 Jun 2014
+    DESCRIPTION  "1.Add hwPimStarGThresholdExceed trap.
+                                   2.Add hwPimStarGThresholdExceedClear trap.
+                                   3.Add hwPimStarGExceed trap.
+                                   4.Add hwPimStarGExceedClear trap.
+                                   5.Add hwPimSGThresholdExceed trap.
+                                   6.Add hwPimSGThresholdExceedClear trap.
+                                   7.Add hwPimSGExceed trap.
+                                   8.Add hwPimSGExceedClear trap.
+                                  "
+    REVISION     "201305060000Z" -- 6 May 2013
+    DESCRIPTION  "Modify the description of hwPimNeighborLoss."
+    REVISION     "200704240000Z" -- 24 April 2007
+    DESCRIPTION  "The initial revision of this Mib module."
+    ::= { hwMcast 4 }
+
+HWPimMode ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "The PIM mode in which a group is operating.
+
+            none(1)      The group is not using PIM, which may be the
+                         case if, for example, it is a link-local or
+                         unroutable group address.
+
+            ssm(2)       Source-Specific Multicast (SSM) with PIM Sparse
+                         Mode.
+
+            asm(3)       Any Source Multicast (ASM), with PIM Sparse
+                         Mode.
+
+            bidir(4)     Bi-directional PIM.
+
+            dm(5)        PIM Dense Mode.
+
+            other(6)     Any other PIM mode."
+
+    SYNTAX     INTEGER {
+                  none(1),
+                  ssm(2),
+                  asm(3),
+                  bidir(4),
+                  dm(5),
+                  other(6)
+               }
+
+HWPimGroupMappingOriginType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "The mechanism by which a PIM group mapping was learned.
+
+            fixed(1)     Link-local or unroutable group mappings.
+
+            configRp(2)  Local static RP configuration.
+
+            configSsm(3) Local SSM Group configuration.
+
+            bsr(4)       The PIM Bootstrap Router (BSR) mechanism.
+
+            autoRp(5)    Auto-RP mechanism.
+
+            embedded(6)  The Embedded-RP mechanism where the RP address
+                         is embedded in the multicast group address.
+
+            other(7)     Any other mechanism."
+
+    REFERENCE "RFC 3596, RFC 3956 and I-D.ietf-pim-sm-bsr"
+    SYNTAX     INTEGER {
+                  fixed(1),
+                  configRp(2),
+                  configSsm(3),
+                  bsr(4),
+                  autoRp(5),
+                  embedded(6),
+                  other(7)
+               }
+
+HWPimCtlMsgState ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "The PIM control message state.
+
+            recv(1)      The PIM control message has been received.
+
+            sent(2)      The PIM control message has been sent.
+
+            invalid(3)   The invalid PIM control message has been received.
+
+            filter(4)    The PIM control message has been filtered."
+
+    SYNTAX     INTEGER {
+                  recv(1),
+                  sent(2),
+                  invalid(3),
+                  filter(4)
+               }
+
+hwPimNotifications OBJECT IDENTIFIER ::= { hwPimStdMib 0 }
+hwPim              OBJECT IDENTIFIER ::= { hwPimStdMib 1 }
+
+hwPimKeepalivePeriod OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The duration of the Keepalive Timer.  This is the period
+            during which the PIM router will maintain (S,G) state in the
+            absence of explicit (S,G) local membership or (S,G) join
+            messages received to maintain it.  This timer period is
+            called the Keepalive_Period in the PIM-SM specification.  It
+            is called the SourceLifetime in the PIM-DM specification.
+
+            The storage type of this object is determined by
+            hwPimDeviceConfigStorageType.
+            DEFVAL { 210 }"
+    REFERENCE "RFC 4601 section 4.11"
+    ::= { hwPim 14 }
+
+hwPimRegisterSuppressionTime OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The duration of the Register Suppression Timer.  This is
+            the period during which a PIM Designated Router (DR) stops
+            sending Register-encapsulated data to the Rendezvous Point
+            (RP) after receiving a Register-Stop message.  This object
+            is used to run timers both at the DR and at the RP.  This
+            timer period is called the Register_Suppression_Time in the
+            PIM-SM specification.
+
+            The storage type of this object is determined by
+            hwPimDeviceConfigStorageType.
+        DEFVAL { 60 }"
+    REFERENCE "RFC 4601 section 4.11"
+    ::= { hwPim 15 }
+
+hwPimStarGEntries OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of entries in the hwPimStarGTable."
+    ::= { hwPim 16 }
+
+hwPimStarGIEntries OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of entries in the hwPimStarGITable."
+    ::= { hwPim 17 }
+
+hwPimSGEntries OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of entries in the hwPimSGTable."
+    ::= { hwPim 18 }
+
+hwPimSGIEntries OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of entries in the hwPimSGITable."
+    ::= { hwPim 19 }
+
+hwPimSGRptEntries OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of entries in the hwPimSGRptTable."
+    ::= { hwPim 20 }
+
+hwPimSGRptIEntries OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of entries in the hwPimSGRptITable."
+    ::= { hwPim 21 }
+
+hwPimOutAsserts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of Asserts sent by this router.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, for example
+            when the device is rebooted."
+    REFERENCE "RFC 4601 section 4.6"
+    ::= { hwPim 22 }
+
+hwPimInAsserts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of Asserts received by this router.  Asserts
+            are multicast to all routers on a network.  This counter is
+            incremented by all routers that receive an assert, not only
+            those routers that are contesting the assert.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, for example
+            when the device is rebooted."
+    REFERENCE "RFC 4601 section 4.6"
+    ::= { hwPim 23 }
+
+hwPimLastAssertInterface OBJECT-TYPE
+    SYNTAX     InterfaceIndexOrZero
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The interface on which this router most recently sent or
+            received an assert, or zero if this router has not sent or
+            received an assert."
+    REFERENCE "RFC 4601 section 4.6"
+    ::= { hwPim 24 }
+
+hwPimLastAssertGroupAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address type of the multicast group address in the most
+            recently sent or received assert.  If this router has not
+            sent or received an assert then this object is set to
+            unknown(0)."
+    ::= { hwPim 25 }
+
+hwPimLastAssertGroupAddress OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The multicast group address in the most recently sent or
+            received assert.  The InetAddressType is given by the
+            hwPimLastAssertGroupAddressType object."
+    ::= { hwPim 26 }
+
+hwPimLastAssertSourceAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address type of the multicast source address in the
+            most recently sent or received assert.  If the most recent
+            assert was (*,G), or if this router has not sent or received
+            an assert, then this object is set to unknown(0)."
+    ::= { hwPim 27 }
+
+hwPimLastAssertSourceAddress OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The multicast source address in the most recently sent or
+            received assert.  The InetAddressType is given by the
+            hwPimLastAssertSourceAddressType object."
+    ::= { hwPim 28 }
+
+hwPimNeighborLossNotificationPeriod OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The minimum time that must elapse between hwPimNeighborLoss
+            notifications originated by this router.  The maximum value
+            65535 represents an 'infinite' time, in which case no
+            hwPimNeighborLoss notifications are ever sent.
+
+            The storage type of this object is determined by
+            hwPimDeviceConfigStorageType.
+        DEFVAL { 0 }"
+    ::= { hwPim 29 }
+
+hwPimNeighborLossCount OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of neighbor loss events that have occurred.
+
+            This counter is incremented when the neighbor timer expires.
+
+            This counter is incremented whenever a hwPimNeighborLoss
+            notification would be generated.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, for example
+            when the device is rebooted."
+    REFERENCE "RFC 4601 section 4.3.2"
+    ::= { hwPim 30 }
+
+hwPimInvalidRegisterNotificationPeriod OBJECT-TYPE
+    SYNTAX     Unsigned32 (10..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The minimum time that must elapse between
+            hwPimInvalidRegister notifications originated by this router.
+            The default value of 65535 represents an 'infinite' time, in
+            which case no hwPimInvalidRegister notifications are ever
+            sent.
+
+            The non-zero minimum allowed value provides resilience
+            against propagation of denial-of-service attacks from the
+            data and control planes to the network management plane.
+
+            The storage type of this object is determined by
+            hwPimDeviceConfigStorageType.
+        DEFVAL { 65535 }"
+    ::= { hwPim 31 }
+
+hwPimInvalidRegisterMsgsRcvd OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of invalid PIM Register messages that have been
+            received by this device.
+
+            A PIM Register message is invalid if either
+
+            o the destination address of the Register message does not
+            match the Group to RP mapping on this device, or
+
+            o this device believes the group address to be within an
+            SSM address range, but this Register implies ASM usage.
+
+            These conditions can occur transiently while RP mapping
+            changes propagate through the network.  If this counter is
+            incremented repeatedly over several minutes, then there is a
+            persisting configuration error that requires correction.
+
+            The active Group to RP mapping on this device is specified
+            by the object hwPimGroupMappingPimMode.  If there is no such
+            mapping, then the object hwPimGroupMappingPimMode is absent.
+            The RP address contained in the invalid Register is
+            hwPimInvalidRegisterRp.
+
+            Multicast data carried by invalid Register messages is
+            discarded.  The discarded data is from a source directly
+            connected to hwPimInvalidRegisterOrigin, and is addressed to
+            hwPimInvalidRegisterGroup.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, for example
+            when the device is rebooted."
+    REFERENCE "RFC 4601 section 4.4.2, RFC 3569 and
+               I-D.ietf-mboned-ip-mcast-mib ipMcastSsmRangeTable"
+    ::= { hwPim 32 }
+
+hwPimInvalidRegisterAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address type stored in hwPimInvalidRegisterOrigin,
+            hwPimInvalidRegisterGroup and hwPimInvalidRegisterRp.
+
+            If no unexpected Register messages have been received, then
+            this object is set to unknown(0)."
+    ::= { hwPim 33 }
+
+hwPimInvalidRegisterOrigin OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The source address of the last unexpected Register message
+            received by this device."
+    ::= { hwPim 34 }
+
+hwPimInvalidRegisterGroup OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The IP multicast group address to which the last unexpected
+            Register message received by this device was addressed."
+    ::= { hwPim 35 }
+
+hwPimInvalidRegisterRp OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The RP address to which the last unexpected Register
+            message received by this device was delivered."
+    ::= { hwPim 36 }
+
+hwPimInvalidJoinPruneNotificationPeriod OBJECT-TYPE
+    SYNTAX     Unsigned32 (10..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The minimum time that must elapse between
+            hwPimInvalidJoinPrune notifications originated by this router.
+            The default value of 65535 represents an 'infinite' time, in
+            which case no hwPimInvalidJoinPrune notifications are ever
+            sent.
+
+            The non-zero minimum allowed value provides resilience
+            against propagation of denial-of-service attacks from the
+            control plane to the network management plane.
+
+            The storage type of this object is determined by
+            hwPimDeviceConfigStorageType.
+        DEFVAL { 65535 }"
+    ::= { hwPim 37 }
+
+hwPimInvalidJoinPruneMsgsRcvd OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of invalid PIM Join/Prune messages that have
+            been received by this device.
+
+            A PIM Join/Prune message is invalid if either
+
+            o the Group to RP mapping specified by this message does not
+            match the Group to RP mapping on this device, or
+
+            o this device believes the group address to be within an
+            SSM address range, but this Join/Prune (*,G) or (S,G,rpt)
+            implies ASM usage.
+
+            These conditions can occur transiently while RP mapping
+            changes propagate through the network.  If this counter is
+            incremented repeatedly over several minutes, then there is a
+            persisting configuration error that requires correction.
+
+            The active Group to RP mapping on this device is specified
+            by the object hwPimGroupMappingPimMode.  If there is no such
+            mapping, then the object hwPimGroupMappingPimMode is absent.
+            The RP address contained in the invalid Join/Prune is
+            hwPimInvalidJoinPruneRp.
+
+            Invalid Join/Prune messages are discarded.  This may result
+            in loss of multicast data affecting listeners downstream of
+            hwPimInvalidJoinPruneOrigin, for multicast data addressed to
+            hwPimInvalidJoinPruneGroup.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, for example
+            when the device is rebooted."
+    REFERENCE "RFC 4601 section 4.5.2, RFC 3569 and
+               I-D.ietf-mboned-ip-mcast-mib ipMcastSsmRangeTable"
+    ::= { hwPim 38 }
+
+hwPimInvalidJoinPruneAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address type stored in hwPimInvalidJoinPruneOrigin,
+            hwPimInvalidJoinPruneGroup and hwPimInvalidJoinPruneRp.
+
+            If no unexpected Join/Prune messages have been received,
+            this object is set to unknown(0)."
+    ::= { hwPim 39 }
+
+hwPimInvalidJoinPruneOrigin OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The source address of the last unexpected Join/Prune
+            message received by this device."
+    ::= { hwPim 40 }
+
+hwPimInvalidJoinPruneGroup OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The IP multicast group address carried in the last
+            unexpected Join/Prune message received by this device."
+    ::= { hwPim 41 }
+
+hwPimInvalidJoinPruneRp OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The RP address carried in the last unexpected Join/Prune
+            message received by this device."
+    ::= { hwPim 42 }
+
+hwPimRpMappingNotificationPeriod OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The minimum time that must elapse between
+            hwPimRpMappingChange notifications originated by this router.
+            The default value of 65535 represents an 'infinite' time, in
+            which case no hwPimRpMappingChange notifications are ever
+            sent.
+
+            The storage type of this object is determined by
+            hwPimDeviceConfigStorageType.
+        DEFVAL { 65535 }"
+    ::= { hwPim 43 }
+
+hwPimRpMappingChangeCount OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of changes to active RP mappings on this device.
+
+            Information about active RP mappings is available in
+            hwPimGroupMappingTable.  Only changes to active mappings cause
+            this counter to be incremented.  That is, changes that
+            modify the hwPimGroupMappingEntry with the highest precedence
+            for a group (lowest value of hwPimGroupMappingPrecedence).
+
+            Such changes may result from manual configuration of this
+            device, or from automatic RP mapping discovery methods
+            including the PIM Bootstrap Router (BSR) mechanism.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, for example
+            when the device is rebooted."
+    REFERENCE "I-D.ietf-pim-sm-bsr"
+    ::= { hwPim 44 }
+
+hwPimInterfaceElectionNotificationPeriod OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The minimum time that must elapse between
+            hwPimInterfaceElection notifications originated by this
+            router.  The default value of 65535 represents an 'infinite'
+            time, in which case no hwPimInterfaceElection notifications
+            are ever sent.
+
+            The storage type of this object is determined by
+            hwPimDeviceConfigStorageType.
+        DEFVAL { 65535 }"
+    ::= { hwPim 45 }
+
+hwPimInterfaceElectionWinCount OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of times this device has been elected DR or DF
+            on any interface.
+
+            Elections occur frequently on newly-active interfaces, as
+            triggered Hellos establish adjacencies.  This counter is not
+            incremented for elections on an interface until the first
+            periodic Hello has been sent.  If this router is the DR or
+            DF at the time of sending the first periodic Hello after
+            interface activation, then this counter is incremented
+            (once) at that time.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, for example
+            when the device is rebooted."
+    REFERENCE "RFC 4601 section 4.3.2 and
+               I-D.ietf-pim-bidir section 3.5.2"
+    ::= { hwPim 46 }
+
+hwPimRefreshInterval OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The interval between successive State Refresh messages sent
+            by an Originator.  This timer period is called the
+            RefreshInterval in the PIM-DM specification.  This object is
+            used only by PIM-DM.
+
+            The storage type of this object is determined by
+            hwPimDeviceConfigStorageType.
+        DEFVAL { 60 }"
+    REFERENCE "RFC 3973 section 4.8"
+    ::= { hwPim 47 }
+
+hwPimDeviceConfigStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The storage type used for the global PIM configuration of
+            this device, comprised of the objects listed below.  If this
+            storage type takes the value 'permanent', write-access to
+            the listed objects need not be allowed.
+
+            The objects described by this storage type are:
+            hwPimKeepalivePeriod, hwPimRegisterSuppressionTime,
+            hwPimNeighborLossNotificationPeriod,
+            hwPimInvalidRegisterNotificationPeriod,
+            hwPimInvalidJoinPruneNotificationPeriod,
+            hwPimRpMappingNotificationPeriod,
+            hwPimInterfaceElectionNotificationPeriod,
+            hwPimRefreshInterval,
+            hwPimNeighborAddNotificationPeriod.
+        DEFVAL { nonVolatile }"
+    ::= { hwPim 48 }
+
+hwPimNeighborAddCount OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of new neighbor found events that have occurred.
+
+            This counter is incremented when the new neighbor is come up.
+
+            This counter is incremented whenever a hwPimNeighborLoss
+            notification would be generated.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, for example
+            when the device is rebooted."
+    REFERENCE "RFC 4601 section 4.3.2"
+    ::= { hwPim 49 }
+        
+hwPimNeighborAddNotificationPeriod OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The minimum time that must elapse between
+            hwPimNeighborAdd notifications originated by this
+            router.  The maximum value 65535 represents an 'infinite'
+            time, in which case no hwPimNeighborAdd notifications
+            are ever sent.
+
+            The storage type of this object is determined by
+            hwPimDeviceConfigStorageType.
+        DEFVAL { 0 }"
+    ::= { hwPim 50 }
+         
+hwPimGRStartTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+            "The time when PIM entered GR state."
+    ::= { hwPim 51 }    
+
+hwPimGRInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (90..3600)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+            "The minimum PIM GR period.
+        DEFVAL { 120 }"  
+    ::= { hwPim 52 }
+
+hwPimGREndTime OBJECT-TYPE
+    SYNTAX      TimeStamp                   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+            "The time when PIM left the GR state."
+    ::= { hwPim 53 }
+hwPimMrtLimitAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The address type of the multicast group address."
+    ::= { hwPim 54 }  
+hwPimMrtLimitSource OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The source address of the entry."
+    ::= { hwPim 55 }
+hwPimMrtLimitGroup OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The group address of the entry."
+    ::= { hwPim 56 }
+hwPimInstanceID OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The Instance ID of the trap."
+    ::= { hwPim 57 }
+hwPimInstanceName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The instance name of the trap."
+    ::= { hwPim 60 }
+hwPimNeighborNotificationReason OBJECT-TYPE
+    SYNTAX     INTEGER {
+                         holdTimeExpired(1),
+                         notReceiveHelloForALongTime(2),
+                         interfaceIsDown(3),
+                         receiveHelloAgain(4),
+                         neighbourIsDeleted(5),
+                         alarmTimeOut(6),
+                         receiveHelloHoldTimeZero(7),
+                         bfdSessionDown(8),
+                         userOperation(9),
+                         alarmClear(100)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+             "The reason for trap sending:
+             1:holdTime expired;
+             2:Not receive hello for a long time;
+             3:Interface is down;
+             4:Receive Hello again;
+             5:neighbour is deleted;
+             6:Alarm time out;
+             7:Receive Hello HoldTime is Zero;
+             8:Bfd Session is Down;
+             9:User Operation;
+             100:Alarm Clear"
+    ::= { hwPim 61 }
+
+hwPimNotificationAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The address type of the multicast group address."
+    ::= { hwPim 62 }	
+	
+hwPimStarGCurrentCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..262144)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The current number of PIM (*, G) entries of all instances." 
+    ::= { hwPim 63 }
+
+hwPimStarGTotalCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..262144)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The total number of PIM (*, G) entries of all instances." 
+    ::= { hwPim 64 }
+
+hwPimStarGThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The threshold value of PIM (*, G) uppper limit(%)." 
+    ::= { hwPim 65 }	
+
+hwPimSGCurrentCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..262144)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The current number of PIM (S, G) entries of all instances." 
+    ::= { hwPim 66 }
+
+hwPimSGTotalCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..262144)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The total number of PIM (S, G) entries of all instances." 
+    ::= { hwPim 67 }
+
+hwPimSGThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The threshold value of PIM (S, G) uppper limit(%)." 
+    ::= { hwPim 68 }	
+	
+hwPimNotificationSrcAddr OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The source address of the entry."
+    ::= { hwPim 69 }
+    
+hwPimNotificationGrpAddr OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The group address of the entry."
+    ::= { hwPim 70 }	
+    
+hwPimNotificationTypeCurrentCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..262144)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The current number of PIM specified type entries of all instances." 
+    ::= { hwPim 71 }
+
+hwPimNotificationTypeTotalCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..262144)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The total number of PIM specified type entries of all instances." 
+    ::= { hwPim 72 }
+
+hwPimNotificationTypeLimit  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The threshold value of PIM specified type uppper limit(%)." 
+    ::= { hwPim 73 }    
+     
+hwPimNotificationLimitType OBJECT-TYPE
+    SYNTAX     INTEGER {
+                         sMStarG(1),
+                         sMSG(2),
+	   dMStarG(3),
+	   dMSG(4),
+	   bidirPimStarG(5)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+             "The limit type:
+             1:SM star-group;
+             2:SM source-group;
+             3:DM star-group;
+             4:DM source-group;
+             5:bidirPim star-group"
+    ::= { hwPim 74 }   
+   
+ 
+hwPimNotificationLimitUpperThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)  
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The upper threshold value of PIM specified type alarm(%)." 
+    ::= { hwPim 75 }    
+      
+hwPimNotificationLimitLowerThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)  
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The lower threshold value of PIM specified type alarm(%)." 
+    ::= { hwPim 76 }  
+ 
+hwPimNotificationLimitReasonType  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                         entryDeleted(1),
+                         configurationChanged(2),
+                         alarmClear(100)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+             "The reason for trap sending:
+             1:entry is deleted;
+             2:configuration is changed;
+             100:Alarm Clear"  
+    ::= { hwPim 77 }    
+    
+hwPimNotificationThresholdReasonType  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                         entryCreated(1),
+                         configurationChanged(100)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+             "The reason for trap sending:
+             1:entry is created;
+             100:configuration is changed"  
+    ::= { hwPim 78 }
+
+hwPimNotificationThresholdClearReasonType  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                         entryDeleted(1),
+                         configurationChanged(2),
+                         alarmClear(100)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+             "The reason for trap sending:
+             1:entry is deleted;
+             2:configuration is changed;
+             100:Alarm Clear"  
+    ::= { hwPim 79 }
+          
+hwPimInterfaceTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwPimInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the router's PIM interfaces.
+            PIM is enabled on all interfaces listed in this table."
+    ::= { hwPim 1 }
+
+hwPimInterfaceEntry OBJECT-TYPE
+    SYNTAX     HwPimInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the hwPimInterfaceTable.  This
+            entry is preserved on agent restart."
+    INDEX      { hwPimInterfaceIfIndex,
+                 hwPimInterfaceIpVersion }
+    ::= { hwPimInterfaceTable 1 }
+
+HwPimInterfaceEntry ::= SEQUENCE {
+    hwPimInterfaceIfIndex              InterfaceIndex,
+    hwPimInterfaceIpVersion            InetVersion,
+    hwPimInterfaceAddressType          InetAddressType,
+    hwPimInterfaceAddress              InetAddress,
+    hwPimInterfaceGenerationIdValue    Unsigned32,
+    hwPimInterfaceDr                   InetAddress,
+    hwPimInterfaceDrPriority           Unsigned32,
+    hwPimInterfaceDrPriorityEnabled    TruthValue,
+    hwPimInterfaceHelloInterval        Unsigned32,
+    hwPimInterfaceTrigHelloInterval    Unsigned32,
+    hwPimInterfaceHelloHoldtime        Unsigned32,
+    hwPimInterfaceJoinPruneInterval    Unsigned32,
+    hwPimInterfaceJoinPruneHoldtime    Unsigned32,
+    hwPimInterfaceDfElectionRobustness Unsigned32,
+    hwPimInterfaceLanDelayEnabled      TruthValue,
+    hwPimInterfacePropagationDelay     Unsigned32,
+    hwPimInterfaceOverrideInterval     Unsigned32,
+    hwPimInterfaceEffectPropagDelay    Unsigned32,
+    hwPimInterfaceEffectOverrideIvl    Unsigned32,
+    hwPimInterfaceSuppressionEnabled   TruthValue,
+    hwPimInterfaceBidirCapable         TruthValue,
+    hwPimInterfaceDomainBorder         TruthValue,
+    hwPimInterfaceStubInterface        TruthValue,
+    hwPimInterfacePruneLimitInterval   Unsigned32,
+    hwPimInterfaceGraftRetryInterval   Unsigned32,
+    hwPimInterfaceSrPriorityEnabled    TruthValue,
+    hwPimInterfaceStatus               RowStatus,
+    hwPimInterfaceStorageType          StorageType,
+    hwPimInterfaceName                 DisplayString
+}
+
+hwPimInterfaceIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of this PIM interface."
+    ::= { hwPimInterfaceEntry 1 }
+
+hwPimInterfaceIpVersion OBJECT-TYPE
+    SYNTAX     InetVersion
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The IP version of this PIM interface.  A physical interface
+            may be configured in multiple modes concurrently, e.g. IPv4
+            and IPv6, however the traffic is considered to be logically
+            separate."
+    ::= { hwPimInterfaceEntry 2 }
+
+hwPimInterfaceAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address type of this PIM interface."
+    ::= { hwPimInterfaceEntry 3 }
+
+hwPimInterfaceAddress OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (4|8|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The primary IP address of this router on this PIM
+            interface.  The InetAddressType is given by the
+            hwPimInterfaceAddressType object."
+    REFERENCE "RFC 4601 sections 4.1.6, 4.3.1-4.3.4 and 4.5.1"
+    ::= { hwPimInterfaceEntry 4 }
+
+hwPimInterfaceGenerationIdValue OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The value of the Generation ID this router inserted in the
+            last PIM Hello message it sent on this interface."
+    REFERENCE "RFC 4601 section 4.3.1"
+    ::= { hwPimInterfaceEntry 5 }
+
+hwPimInterfaceDr OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (4|8|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The primary IP address of the Designated Router on this PIM
+            interface.  The InetAddressType is given by the
+            hwPimInterfaceAddressType object."
+    REFERENCE "RFC 4601 section 4.3"
+    ::= { hwPimInterfaceEntry 6 }
+
+hwPimInterfaceDrPriority OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The Designated Router Priority value inserted into the DR
+            Priority option on this interface.  Numerically higher
+            values for this object indicate higher priorities."
+    REFERENCE "RFC 4601 section 4.3.2"
+    DEFVAL { 1 }
+    ::= { hwPimInterfaceEntry 7 }
+
+hwPimInterfaceDrPriorityEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Evaluates to TRUE if all routers on this interface are
+            using the DR Priority option."
+    REFERENCE "RFC 4601 section 4.3.2"
+    ::= { hwPimInterfaceEntry 8 }
+
+hwPimInterfaceHelloInterval OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..18000)
+    UNITS      "seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The frequency at which PIM Hello messages are transmitted
+            on this interface.  This object corresponds to the
+            'Hello_Period' timer value defined in the PIM-SM
+            specification.  A value of zero represents an 'infinite'
+            interval, and indicates that periodic PIM Hello messages
+            should not be sent on this interface."
+    REFERENCE "RFC 4601 section 9"
+    DEFVAL { 30 }
+    ::= { hwPimInterfaceEntry 9 }
+
+hwPimInterfaceTrigHelloInterval OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..60)
+    UNITS      "seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The maximum time before this router sends a triggered PIM
+            Hello message on this interface.  This object corresponds to
+            the 'Trigered_Hello_Delay' timer value defined in the PIM-SM
+            specification.  A value of zero has no special meaning and
+            indicates that triggered PIM Hello messages should always be
+            sent immediately."
+    REFERENCE "RFC 4601 section 4.11"
+    DEFVAL { 5 }
+    ::= { hwPimInterfaceEntry 10 }
+
+hwPimInterfaceHelloHoldtime OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The value set in the Holdtime field of PIM Hello messages
+            transmitted on this interface.  A value of 65535 represents
+            an 'infinite' holdtime.  Implementations are recommended
+            to use a holdtime that is 3.5 times the value of
+            hwPimInterfaceHelloInterval, or 65535 if
+            hwPimInterfaceHelloInterval is set to zero."
+    REFERENCE "RFC 4601 sections 4.3.2 and 4.9.2"
+    DEFVAL { 105 }
+    ::= { hwPimInterfaceEntry 11 }
+
+hwPimInterfaceJoinPruneInterval OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..18000)
+    UNITS      "seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The frequency at which this router sends PIM Join/Prune
+            messages on this PIM interface.  This object corresponds to
+            the 't_periodic' timer value defined in the PIM-SM
+            specification.  A value of zero represents an 'infinite'
+            interval, and indicates that periodic PIM Join/Prune
+            messages should not be sent on this interface."
+    REFERENCE "RFC 4601 section 4.11"
+    DEFVAL { 60 }
+    ::= { hwPimInterfaceEntry 12 }
+
+hwPimInterfaceJoinPruneHoldtime OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The value inserted into the Holdtime field of a PIM
+            Join/Prune message sent on this interface.  A value of 65535
+            represents an 'infinite' holdtime.  Implementations are
+            recommended to use a holdtime that is 3.5 times the value of
+            hwPimInterfaceJoinPruneInterval, or 65535 if
+            hwPimInterfaceJoinPruneInterval is set to zero.  PIM-DM
+            implementations are recommended to use the value of
+            hwPimInterfacePruneLimitInterval."
+    REFERENCE "RFC 4601 sections 4.5.3 and 4.9.5"
+    DEFVAL { 210 }
+    ::= { hwPimInterfaceEntry 13 }
+
+hwPimInterfaceDfElectionRobustness OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The minimum number of PIM DF-Election messages that must be
+            lost in order for DF election on this interface to fail."
+    DEFVAL { 3 }
+    ::= { hwPimInterfaceEntry 14 }
+
+hwPimInterfaceLanDelayEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Evaluates to TRUE if all routers on this interface are
+            using the LAN Prune Delay option."
+    REFERENCE "RFC 4601 sections 4.3.3 and 4.9.2"
+    ::= { hwPimInterfaceEntry 15 }
+
+hwPimInterfacePropagationDelay OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..32767)
+    UNITS      "milliseconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The expected propagation delay between PIM routers on this
+            network or link.
+
+            This router inserts this value into the Propagation_Delay
+            field of the LAN Prune Delay option in the PIM Hello
+            messages sent on this interface.  Implementations should
+            enforce a lower bound on the permitted values for this
+            object to allow for scheduling and processing delays within
+            the local router."
+    DEFVAL { 500 }
+    ::= { hwPimInterfaceEntry 16 }
+
+hwPimInterfaceOverrideInterval OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "milliseconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The value this router inserts into the Override_Interval
+            field of the LAN Prune Delay option in the PIM Hello
+            messages it sends on this interface.
+
+            When overriding a prune, PIM routers pick a random timer
+            duration up to the value of this object.  The more PIM
+            routers that are active on a network, the more likely it is
+            that the prune will be overridden after a small proportion
+            of this time has elapsed.
+
+            The more PIM routers are active on this network, the larger
+            this object should be to obtain an optimal spread of prune
+            override latencies."
+    REFERENCE "RFC 4601 section 4.3.3"
+    DEFVAL { 2500 }
+    ::= { hwPimInterfaceEntry 17 }
+
+hwPimInterfaceEffectPropagDelay OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..32767)
+    UNITS      "milliseconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The Effective Propagation Delay on this interface.  This
+            object is always 500 if hwPimInterfaceLanDelayEnabled is
+            FALSE."
+    REFERENCE "RFC 4601 section 4.3.3"
+    ::= { hwPimInterfaceEntry 18 }
+
+hwPimInterfaceEffectOverrideIvl OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "milliseconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The Effective Override Interval on this interface.  This
+            object is always 2500 if hwPimInterfaceLanDelayEnabled is
+            FALSE."
+    REFERENCE "RFC 4601 section 4.3.3"
+    ::= { hwPimInterfaceEntry 19 }
+
+hwPimInterfaceSuppressionEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Whether join suppression is enabled on this interface.
+            This object is always TRUE if hwPimInterfaceLanDelayEnabled is
+            FALSE."
+    REFERENCE "RFC 4601 section 4.3.3"
+    ::= { hwPimInterfaceEntry 20 }
+
+hwPimInterfaceBidirCapable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Evaluates to TRUE if all routers on this interface are
+            using the Bidirectional-PIM Capable option."
+    REFERENCE "I-D.ietf-pim-bidir section 3.2 and 3.7.4"
+    ::= { hwPimInterfaceEntry 21 }
+
+hwPimInterfaceDomainBorder OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "Whether or not this interface is a PIM domain border.  This
+            includes acting as a border for PIM Bootstrap Router (BSR)
+            messages, if the BSR mechanism is in use."
+    DEFVAL { false }
+    ::= { hwPimInterfaceEntry 22 }
+
+hwPimInterfaceStubInterface OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "Whether this interface is a 'stub interface'.  If this
+            object is set to TRUE, then no PIM packets are sent out this
+            interface, and any received PIM packets are ignored.
+
+            Setting this object to TRUE is a security measure for
+            interfaces towards untrusted hosts.  This allows an
+            interface to be configured for use with IGMP (Internet Group
+            Management Protocol) or MLD (Multicast Listener Discovery)
+            only, which protects the PIM router from forged PIM messages
+            on the interface.
+
+            To communicate with other PIM routers using this interface,
+            this object must remain set to FALSE.
+
+            Changing the value of this object while the interface is
+            operational causes the interface to be deactivated and
+            then reactivated."
+    REFERENCE "RFC 3376, RFC 3810"
+    DEFVAL { false }
+    ::= { hwPimInterfaceEntry 23 }
+
+hwPimInterfacePruneLimitInterval OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The minimum interval that must transpire between two
+            successive Prunes sent by a router.  This object corresponds
+            to the 't_limit' timer value defined in the PIM-DM
+            specification.  This object is used only by PIM-DM."
+    REFERENCE "RFC 3973 section 4.8"
+    DEFVAL { 60 }
+    ::= { hwPimInterfaceEntry 24 }
+
+hwPimInterfaceGraftRetryInterval OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The minimum interval that must transpire between two
+            successive Grafts sent by a router.  This object corresponds
+            to the 'Graft_Retry_Period' timer value defined in the
+            PIM-DM specification.  This object is used only by PIM-DM."
+    REFERENCE "RFC 3973 section 4.8"
+    DEFVAL { 3 }
+    ::= { hwPimInterfaceEntry 25 }
+
+hwPimInterfaceSrPriorityEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Evaluates to TRUE if all routers on this interface are
+            using the State Refresh option.  This object is used only by
+            PIM-DM."
+    ::= { hwPimInterfaceEntry 26 }
+
+hwPimInterfaceStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The status of this entry.  Creating the entry enables PIM
+            on the interface; destroying the entry disables PIM on the
+            interface.
+
+            This status object can be set to active(1) without setting
+            any other columnar objects in this entry.
+
+            All writeable objects in this entry can be modified when the
+            status of this entry is active(1)."
+    ::= { hwPimInterfaceEntry 27 }
+
+hwPimInterfaceStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The storage type for this row.  Rows having the value
+            'permanent' need not allow write-access to any columnar
+            objects in the row."
+       DEFVAL { nonVolatile }
+    ::= { hwPimInterfaceEntry 28 }
+
+hwPimInterfaceName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(1..64))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The name of this PIM interface."
+    ::= { hwPimInterfaceEntry 29 }
+hwPimNeighborTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwPimNeighborEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the router's PIM neighbors."
+    ::= { hwPim 2 }
+
+hwPimNeighborEntry OBJECT-TYPE
+    SYNTAX     HwPimNeighborEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the hwPimNeighborTable."
+    INDEX      { hwPimNeighborIfIndex,
+                 hwPimNeighborAddressType,
+                 hwPimNeighborAddress }
+    ::= { hwPimNeighborTable 1 }
+
+HwPimNeighborEntry ::= SEQUENCE {
+    hwPimNeighborIfIndex              InterfaceIndex,
+    hwPimNeighborAddressType          InetAddressType,
+    hwPimNeighborAddress              InetAddress,
+    hwPimNeighborGenerationIdPresent  TruthValue,
+    hwPimNeighborGenerationIdValue    Unsigned32,
+    hwPimNeighborUpTime               TimeTicks,
+    hwPimNeighborExpiryTime           TimeTicks,
+    hwPimNeighborDrPriorityPresent    TruthValue,
+    hwPimNeighborDrPriority           Unsigned32,
+    hwPimNeighborLanPruneDelayPresent TruthValue,
+    hwPimNeighborTBit                 TruthValue,
+    hwPimNeighborPropagationDelay     Unsigned32,
+    hwPimNeighborOverrideInterval     Unsigned32,
+    hwPimNeighborBidirCapable         TruthValue,
+    hwPimNeighborSrCapable            TruthValue,
+    hwPimNeighborIfName               DisplayString
+}
+
+hwPimNeighborIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The value of ifIndex for the interface used to reach this
+            PIM neighbor."
+    ::= { hwPimNeighborEntry 1 }
+
+hwPimNeighborAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The address type of this PIM neighbor."
+    ::= { hwPimNeighborEntry 2 }
+
+hwPimNeighborAddress OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (4|8|16|20))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The primary IP address of this PIM neighbor.  The
+            InetAddressType is given by the hwPimNeighborAddressType
+            object."
+    ::= { hwPimNeighborEntry 3 }
+
+hwPimNeighborGenerationIdPresent OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Evaluates to TRUE if this neighbor is using the Generation
+            ID option."
+    REFERENCE "RFC 4601 section 4.3.1"
+    ::= { hwPimNeighborEntry 4 }
+
+hwPimNeighborGenerationIdValue OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The value of the Generation ID from the last PIM Hello
+            message received from this neighbor.  This object is always
+            zero if hwPimNeighborGenerationIdPresent is FALSE."
+    REFERENCE "RFC 4601 section 4.3.1"
+    ::= { hwPimNeighborEntry 5 }
+
+hwPimNeighborUpTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time since this PIM neighbor (last) became a neighbor
+            of the local router."
+    ::= { hwPimNeighborEntry 6 }
+
+hwPimNeighborExpiryTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The minimum time remaining before this PIM neighbor will
+            be aged out.  The value zero indicates that this PIM
+            neighbor will never be aged out."
+    ::= { hwPimNeighborEntry 7 }
+
+hwPimNeighborDrPriorityPresent OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Evaluates to TRUE if this neighbor is using the DR Priority
+            option."
+    REFERENCE "RFC 4601 section 4.3.2"
+    ::= { hwPimNeighborEntry 8 }
+
+hwPimNeighborDrPriority OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The value of the Designated Router Priority from the last
+            PIM Hello message received from this neighbor.  This object
+            is always zero if hwPimNeighborDrPriorityPresent is FALSE."
+    REFERENCE "RFC 4601 section 4.3.2"
+    ::= { hwPimNeighborEntry 9 }
+
+hwPimNeighborLanPruneDelayPresent OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Evaluates to TRUE if this neighbor is using the LAN Prune
+            Delay option."
+    REFERENCE "RFC 4601 section 4.3.3"
+    ::= { hwPimNeighborEntry 10 }
+
+hwPimNeighborTBit OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Whether the T bit was set in the LAN Prune Delay option
+            received from this neighbor.  The T bit specifies the
+            ability of the neighbor to disable join suppression.  This
+            object is always TRUE if hwPimNeighborLanPruneDelayPresent is
+            FALSE."
+    REFERENCE "RFC 4601 section 4.3.3"
+    ::= { hwPimNeighborEntry 11 }
+
+hwPimNeighborPropagationDelay OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..32767)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The value of the Propagation_Delay field of the LAN Prune
+            Delay option received from this neighbor.  This object is
+            always zero if hwPimNeighborLanPruneDelayPresent is FALSE."
+    REFERENCE "RFC 4601 section 4.3.3"
+    ::= { hwPimNeighborEntry 12 }
+
+hwPimNeighborOverrideInterval OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The value of the Override_Interval field of the LAN Prune
+            Delay option received from this neighbor.  This object is
+            always zero if hwPimNeighborLanPruneDelayPresent is FALSE."
+    REFERENCE "RFC 4601 section 4.3.3"
+    ::= { hwPimNeighborEntry 13 }
+
+hwPimNeighborBidirCapable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Evaluates to TRUE if this neighbor is using the
+            Bidirectional-PIM Capable option."
+    REFERENCE "I-D.ietf-pim-bidir section 3.2 and 3.7.4"
+    ::= { hwPimNeighborEntry 14 }
+
+hwPimNeighborSrCapable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Evaluates to TRUE if this neighbor is using the State
+            Refresh Capable option.  This object is used only by
+            PIM-DM."
+    REFERENCE "RFC 3973 section 4.3.4"
+    ::= { hwPimNeighborEntry 15 }
+
+hwPimNeighborIfName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(1..64))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The name for the interface used to reach this
+            PIM neighbor."
+    ::= { hwPimNeighborEntry 16 }
+    
+hwPimNbrSecAddressTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwPimNbrSecAddressEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the secondary addresses
+            advertised by each PIM neighbor (on a subset of the rows of
+            the hwPimNeighborTable defined above)."
+    REFERENCE "RFC 4601 section 4.3.4"
+    ::= { hwPim 3 }
+
+hwPimNbrSecAddressEntry OBJECT-TYPE
+    SYNTAX     HwPimNbrSecAddressEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the hwPimNbrSecAddressTable."
+    INDEX      { hwPimNbrSecAddressIfIndex,
+                 hwPimNbrSecAddressType,
+                 hwPimNbrSecAddressPrimary,
+                 hwPimNbrSecAddress }
+    ::= { hwPimNbrSecAddressTable 1 }
+
+HwPimNbrSecAddressEntry ::= SEQUENCE {
+    hwPimNbrSecAddressIfIndex InterfaceIndex,
+    hwPimNbrSecAddressType    InetAddressType,
+    hwPimNbrSecAddressPrimary InetAddress,
+    hwPimNbrSecAddress        InetAddress
+}
+
+hwPimNbrSecAddressIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The value of ifIndex for the interface used to reach this
+            PIM neighbor."
+    ::= { hwPimNbrSecAddressEntry 1 }
+
+hwPimNbrSecAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The address type of this PIM neighbor."
+    ::= { hwPimNbrSecAddressEntry 2 }
+
+hwPimNbrSecAddressPrimary OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (4|8|16|20))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The primary IP address of this PIM neighbor.  The
+            InetAddressType is given by the hwPimNbrSecAddressType
+            object."
+    ::= { hwPimNbrSecAddressEntry 3 }
+
+hwPimNbrSecAddress OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (4|8|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The secondary IP address of this PIM neighbor.  The
+            InetAddressType is given by the hwPimNbrSecAddressType
+            object."
+    ::= { hwPimNbrSecAddressEntry 4 }
+
+
+hwPimStarGTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwPimStarGEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the non-interface specific
+            (*,G) state that PIM has."
+    REFERENCE "RFC 4601 section 4.1.3"
+    ::= { hwPim 4 }
+
+hwPimStarGEntry OBJECT-TYPE
+    SYNTAX     HwPimStarGEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the hwPimStarGTable."
+    INDEX      { hwPimStarGAddressType,
+                 hwPimStarGGrpAddress }
+    ::= { hwPimStarGTable 1 }
+
+HwPimStarGEntry ::= SEQUENCE {
+    hwPimStarGAddressType             InetAddressType,
+    hwPimStarGGrpAddress              InetAddress,
+    hwPimStarGUpTime                  TimeTicks,
+    hwPimStarGPimMode                 HWPimMode,
+    hwPimStarGRpAddressType           InetAddressType,
+    hwPimStarGRpAddress               InetAddress,
+    hwPimStarGPimModeOrigin           HWPimGroupMappingOriginType,
+    hwPimStarGRpIsLocal               TruthValue,
+    hwPimStarGUpstreamJoinState       INTEGER,
+    hwPimStarGUpstreamJoinTimer       TimeTicks,
+    hwPimStarGUpstreamNeighborType    InetAddressType,
+    hwPimStarGUpstreamNeighbor        InetAddress,
+    hwPimStarGRpfIfIndex              InterfaceIndexOrZero,
+    hwPimStarGRpfNextHopType          InetAddressType,
+    hwPimStarGRpfNextHop              InetAddress,
+    hwPimStarGRpfRouteProtocol        IANAipRouteProtocol,
+    hwPimStarGRpfRouteAddress         InetAddress,
+    hwPimStarGRpfRoutePrefixLength    InetAddressPrefixLength,
+    hwPimStarGRpfRouteMetricPref      Unsigned32,
+    hwPimStarGRpfRouteMetric          Unsigned32
+}
+
+hwPimStarGAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The address type of this multicast group."
+    ::= { hwPimStarGEntry 1 }
+
+hwPimStarGGrpAddress OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (4|8|16|20))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The multicast group address.  The InetAddressType is given
+            by the hwPimStarGAddressType object."
+    ::= { hwPimStarGEntry 2 }
+
+hwPimStarGUpTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time since this entry was created by the local router."
+    ::= { hwPimStarGEntry 3 }
+
+hwPimStarGPimMode OBJECT-TYPE
+    SYNTAX     HWPimMode { asm(3), bidir(4) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Whether this entry represents an ASM (Any Source Multicast,
+            used with PIM-SM) or BIDIR-PIM group."
+    ::= { hwPimStarGEntry 4 }
+
+hwPimStarGRpAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address type of the Rendezvous Point (RP), or
+            unknown(0) if the RP address is unknown."
+    ::= { hwPimStarGEntry 5 }
+
+hwPimStarGRpAddress OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address of the Rendezvous Point (RP) for the group.
+            The InetAddressType is given by the hwPimStarGRpAddressType."
+    ::= { hwPimStarGEntry 6 }
+
+hwPimStarGPimModeOrigin OBJECT-TYPE
+    SYNTAX     HWPimGroupMappingOriginType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The mechanism by which the PIM mode and RP for the group
+            were learned."
+    ::= { hwPimStarGEntry 7 }
+
+hwPimStarGRpIsLocal OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Whether the local router is the RP for the group."
+    ::= { hwPimStarGEntry 8 }
+
+hwPimStarGUpstreamJoinState OBJECT-TYPE
+    SYNTAX     INTEGER {
+                  notJoined (1),
+                  joined (2)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Whether the local router should join the RP tree for the
+            group.  This corresponds to the state of the upstream (*,G)
+            state machine in the PIM-SM specification."
+    REFERENCE "RFC 4601 section 4.5.6"
+    ::= { hwPimStarGEntry 9 }
+
+hwPimStarGUpstreamJoinTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time remaining before the local router next sends a
+            periodic (*,G) Join message on hwPimStarGRpfIfIndex.  This
+            timer is called the (*,G) Upstream Join Timer in the PIM-SM
+            specification.  This object is zero if the timer is not
+            running."
+    REFERENCE "RFC 4601 section 4.10"
+    ::= { hwPimStarGEntry 10 }
+
+hwPimStarGUpstreamNeighborType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The primary address type of the upstream neighbor, or
+            unknown(0) if the upstream neighbor address is unknown or is
+            not a PIM neighbor."
+    ::= { hwPimStarGEntry 11 }
+
+hwPimStarGUpstreamNeighbor OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The primary address of the neighbor on hwPimStarGRpfIfIndex
+            that the local router is sending periodic (*,G) Join
+            messages to.  The InetAddressType is given by the
+            hwPimStarGUpstreamNeighborType object.  This address is called
+            RPF'(*,G) in the PIM-SM specification."
+    REFERENCE "RFC 4601 section 4.1.6"
+    ::= { hwPimStarGEntry 12 }
+
+hwPimStarGRpfIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndexOrZero
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The value of ifIndex for the RPF interface towards the RP,
+            or zero if the RPF interface is unknown."
+    ::= { hwPimStarGEntry 13 }
+
+hwPimStarGRpfNextHopType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address type of the RPF next hop towards the RP, or
+            unknown(0) if the RPF next hop is unknown."
+    ::= { hwPimStarGEntry 14 }
+
+hwPimStarGRpfNextHop OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address of the RPF next hop towards the RP.  The
+            InetAddressType is given by the hwPimStarGRpfNextHopType
+            object.  This address is called MRIB.next_hop(RP(G))
+            in the PIM-SM specification."
+    REFERENCE "RFC 4601 section 4.5.5"
+    ::= { hwPimStarGEntry 15 }
+
+hwPimStarGRpfRouteProtocol OBJECT-TYPE
+    SYNTAX     IANAipRouteProtocol
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The routing mechanism via which the route used to find the
+            RPF interface towards the RP was learned."
+    ::= { hwPimStarGEntry 16 }
+
+hwPimStarGRpfRouteAddress OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The IP address which when combined with the corresponding
+            value of hwPimStarGRpfRoutePrefixLength identifies the route
+            used to find the RPF interface towards the RP.  The
+            InetAddressType is given by the hwPimStarGRpfNextHopType
+            object.
+
+            This address object is only significant up to
+            hwPimStarGRpfRoutePrefixLength bits.  The remainder of the
+            address bits are zero."
+    ::= { hwPimStarGEntry 17 }
+
+hwPimStarGRpfRoutePrefixLength OBJECT-TYPE
+    SYNTAX     InetAddressPrefixLength
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The prefix length which when combined with the
+            corresponding value of hwPimStarGRpfRouteAddress identifies
+            the route used to find the RPF interface towards the RP.
+            The InetAddressType is given by the hwPimStarGRpfNextHopType
+            object."
+    ::= { hwPimStarGEntry 18 }
+
+hwPimStarGRpfRouteMetricPref OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The metric preference of the route used to find the RPF
+            interface towards the RP."
+    ::= { hwPimStarGEntry 19 }
+
+hwPimStarGRpfRouteMetric OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The routing metric of the route used to find the RPF
+            interface towards the RP."
+    ::= { hwPimStarGEntry 20 }
+
+
+hwPimStarGITable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwPimStarGIEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the interface-specific (*,G)
+            state that PIM has."
+    REFERENCE "RFC 4601 section 4.1.3"
+    ::= { hwPim 5 }
+
+hwPimStarGIEntry OBJECT-TYPE
+    SYNTAX     HwPimStarGIEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the hwPimStarGITable."
+    INDEX      { hwPimStarGAddressType,
+                 hwPimStarGGrpAddress,
+                 hwPimStarGIIfIndex }
+    ::= { hwPimStarGITable 1 }
+
+HwPimStarGIEntry ::= SEQUENCE {
+    hwPimStarGIIfIndex                 InterfaceIndex,
+    hwPimStarGIUpTime                  TimeTicks,
+    hwPimStarGILocalMembership         TruthValue,
+    hwPimStarGIJoinPruneState          INTEGER,
+    hwPimStarGIPrunePendingTimer       TimeTicks,
+    hwPimStarGIJoinExpiryTimer         TimeTicks,
+    hwPimStarGIAssertState             INTEGER,
+    hwPimStarGIAssertTimer             TimeTicks,
+    hwPimStarGIAssertWinnerAddressType InetAddressType,
+    hwPimStarGIAssertWinnerAddress     InetAddress,
+    hwPimStarGIAssertWinnerMetricPref  Unsigned32,
+    hwPimStarGIAssertWinnerMetric      Unsigned32
+}
+
+hwPimStarGIIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex of the interface that this entry corresponds
+            to."
+    ::= { hwPimStarGIEntry 1 }
+
+hwPimStarGIUpTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time since this entry was created by the local router."
+    ::= { hwPimStarGIEntry 2 }
+
+hwPimStarGILocalMembership OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Whether the local router has (*,G) local membership on this
+            interface (resulting from a mechanism such as IGMP or MLD).
+            This corresponds to local_receiver_include(*,G,I) in the
+            PIM-SM specification."
+    REFERENCE "RFC 3376, RFC 3810, RFC 4601 section 4.1.6"
+    ::= { hwPimStarGIEntry 3 }
+
+hwPimStarGIJoinPruneState OBJECT-TYPE
+    SYNTAX     INTEGER {
+                  noInfo (1),
+                  join (2),
+                  prunePending (3)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The state resulting from (*,G) Join/Prune messages
+            received on this interface.  This corresponds to the state
+            of the downstream per-interface (*,G) state machine in the
+            PIM-SM specification."
+    REFERENCE "RFC 4601 section 4.5.2"
+    ::= { hwPimStarGIEntry 4 }
+
+hwPimStarGIPrunePendingTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time remaining before the local router acts on a (*,G)
+            Prune message received on this interface, during which the
+            router is waiting to see whether another downstream router
+            will override the Prune message.  This timer is called the
+            (*,G) Prune-Pending Timer in the PIM-SM specification.  This
+            object is zero if the timer is not running."
+    REFERENCE "RFC 4601 section 4.5.1"
+    ::= { hwPimStarGIEntry 5 }
+
+hwPimStarGIJoinExpiryTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time remaining before (*,G) Join state for this
+            interface expires.  This timer is called the (*,G) Join
+            Expiry Timer in the PIM-SM specification.  This object is
+            zero if the timer is not running.  A value of 'FFFFFFFF'h
+            indicates an infinite expiry time."
+    REFERENCE "RFC 4601 section 4.10"
+    ::= { hwPimStarGIEntry 6 }
+
+hwPimStarGIAssertState OBJECT-TYPE
+    SYNTAX     INTEGER {
+                  noInfo (1),
+                  iAmAssertWinner (2),
+                  iAmAssertLoser (3)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The (*,G) Assert state for this interface.  This
+            corresponds to the state of the per-interface (*,G) Assert
+            state machine in the PIM-SM specification.  If
+            hwPimStarGPimMode is 'bidir', this object must be 'noInfo'."
+    REFERENCE "RFC 4601 section 4.6.2"
+    ::= { hwPimStarGIEntry 7 }
+
+hwPimStarGIAssertTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "If hwPimStarGIAssertState is 'iAmAssertWinner', this is the
+            time remaining before the local router next sends a (*,G)
+            Assert message on this interface.  If hwPimStarGIAssertState
+            is 'iAmAssertLoser', this is the time remaining before the
+            (*,G) Assert state expires.  If hwPimStarGIAssertState is
+            'noInfo', this is zero.  This timer is called the (*,G)
+            Assert Timer in the PIM-SM specification."
+    REFERENCE "RFC 4601 section 4.6.2"
+    ::= { hwPimStarGIEntry 8 }
+
+hwPimStarGIAssertWinnerAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "If hwPimStarGIAssertState is 'iAmAssertLoser', this is the
+            address type of the assert winner; otherwise, this object is
+            unknown(0)."
+    ::= { hwPimStarGIEntry 9 }
+
+hwPimStarGIAssertWinnerAddress OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "If hwPimStarGIAssertState is 'iAmAssertLoser', this is the
+            address of the assert winner.  The InetAddressType is given
+            by the hwPimStarGIAssertWinnerAddressType object."
+    ::= { hwPimStarGIEntry 10 }
+
+hwPimStarGIAssertWinnerMetricPref OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "If hwPimStarGIAssertState is 'iAmAssertLoser', this is the
+            metric preference of the route to the RP advertised by the
+            assert winner; otherwise, this object is zero."
+    ::= { hwPimStarGIEntry 11 }
+
+hwPimStarGIAssertWinnerMetric OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "If hwPimStarGIAssertState is 'iAmAssertLoser', this is the
+            routing metric of the route to the RP advertised by the
+            assert winner; otherwise, this object is zero."
+    ::= { hwPimStarGIEntry 12 }
+
+
+hwPimSGTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwPimSGEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the non-interface specific
+            (S,G) state that PIM has."
+    REFERENCE "RFC 4601 section 4.1.4"
+    ::= { hwPim 6 }
+
+hwPimSGEntry OBJECT-TYPE
+    SYNTAX     HwPimSGEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the hwPimSGTable."
+    INDEX      { hwPimSGAddressType,
+                 hwPimSGGrpAddress,
+                 hwPimSGSrcAddress }
+    ::= { hwPimSGTable 1 }
+
+HwPimSGEntry ::= SEQUENCE {
+    hwPimSGAddressType               InetAddressType,
+    hwPimSGGrpAddress                InetAddress,
+    hwPimSGSrcAddress                InetAddress,
+    hwPimSGUpTime                    TimeTicks,
+    hwPimSGPimMode                   HWPimMode,
+    hwPimSGUpstreamJoinState         INTEGER,
+    hwPimSGUpstreamJoinTimer         TimeTicks,
+    hwPimSGUpstreamNeighbor          InetAddress,
+    hwPimSGRpfIfIndex                InterfaceIndexOrZero,
+    hwPimSGRpfNextHopType            InetAddressType,
+    hwPimSGRpfNextHop                InetAddress,
+    hwPimSGRpfRouteProtocol          IANAipRouteProtocol,
+    hwPimSGRpfRouteAddress           InetAddress,
+    hwPimSGRpfRoutePrefixLength      InetAddressPrefixLength,
+    hwPimSGRpfRouteMetricPref        Unsigned32,
+    hwPimSGRpfRouteMetric            Unsigned32,
+    hwPimSGSptBit                    TruthValue,
+    hwPimSGKeepaliveTimer            TimeTicks,
+    hwPimSGDrRegisterState           INTEGER,
+    hwPimSGDrRegisterStopTimer       TimeTicks,
+    hwPimSGRpRegisterPmbrAddressType InetAddressType,
+    hwPimSGRpRegisterPmbrAddress     InetAddress,
+    hwPimSGUpstreamPruneState        INTEGER,
+    hwPimSGUpstreamPruneLimitTimer   TimeTicks,
+    hwPimSGOriginatorState           INTEGER,
+    hwPimSGSourceActiveTimer         TimeTicks,
+    hwPimSGStateRefreshTimer         TimeTicks
+}
+
+hwPimSGAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The address type of the source and multicast group for this
+            entry."
+    ::= { hwPimSGEntry 1 }
+
+hwPimSGGrpAddress OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (4|8|16|20))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The multicast group address for this entry.  The
+            InetAddressType is given by the hwPimSGAddressType object."
+    ::= { hwPimSGEntry 2 }
+
+hwPimSGSrcAddress OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (4|8|16|20))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The source address for this entry.  The InetAddressType is
+            given by the hwPimSGAddressType object."
+    ::= { hwPimSGEntry 3 }
+
+hwPimSGUpTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time since this entry was created by the local router."
+    ::= { hwPimSGEntry 4 }
+
+hwPimSGPimMode OBJECT-TYPE
+    SYNTAX     HWPimMode { ssm(2), asm(3) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Whether hwPimSGGrpAddress is an SSM (Source Specific
+            Multicast, used with PIM-SM) or ASM (Any Source Multicast,
+            used with PIM-SM) group."
+    REFERENCE "RFC 4601 section 4.5.2, RFC 3569 and
+               I-D.ietf-mboned-ip-mcast-mib ipMcastSsmRangeTable"
+    ::= { hwPimSGEntry 5 }
+
+hwPimSGUpstreamJoinState OBJECT-TYPE
+    SYNTAX     INTEGER {
+                  notJoined (1),
+                  joined (2)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Whether the local router should join the shortest-path tree
+            for the source and group represented by this entry.  This
+            corresponds to the state of the upstream (S,G) state machine
+            in the PIM-SM specification."
+    REFERENCE "RFC 4601 section 4.5.7"
+    ::= { hwPimSGEntry 6 }
+
+hwPimSGUpstreamJoinTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time remaining before the local router next sends a
+            periodic (S,G) Join message on hwPimSGRpfIfIndex.  This timer
+            is called the (S,G) Upstream Join Timer in the PIM-SM
+            specification.  This object is zero if the timer is not
+            running."
+    REFERENCE "RFC 4601 section 4.10 and 4.11"
+    ::= { hwPimSGEntry 7 }
+
+hwPimSGUpstreamNeighbor OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (4|8|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The primary address of the neighbor on hwPimSGRpfIfIndex that
+            the local router is sending periodic (S,G) Join messages to.
+            This is zero if the RPF next hop is unknown or is not a
+            PIM neighbor.  The InetAddressType is given by the
+            hwPimSGAddressType object.  This address is called RPF'(S,G)
+            in the PIM-SM specification."
+    REFERENCE "RFC 4601 section 4.1.6"
+    ::= { hwPimSGEntry 8 }
+
+hwPimSGRpfIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndexOrZero
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The value of ifIndex for the RPF interface towards the
+            source, or zero if the RPF interface is unknown."
+    ::= { hwPimSGEntry 9 }
+
+hwPimSGRpfNextHopType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address type of the RPF next hop towards the source, or
+            unknown(0) if the RPF next hop is unknown."
+    ::= { hwPimSGEntry 10 }
+
+hwPimSGRpfNextHop OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (4|8|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address of the RPF next hop towards the source.  The
+            InetAddressType is given by the hwPimSGRpfNextHopType.  This
+            address is called MRIB.next_hop(S) in the PIM-SM
+            specification."
+    REFERENCE "RFC 4601 section 4.5.5"
+    ::= { hwPimSGEntry 11 }
+
+hwPimSGRpfRouteProtocol OBJECT-TYPE
+    SYNTAX     IANAipRouteProtocol
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The routing mechanism via which the route used to find the
+            RPF interface towards the source was learned."
+    ::= { hwPimSGEntry 12 }
+
+hwPimSGRpfRouteAddress OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (4|8|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The IP address which when combined with the corresponding
+            value of hwPimSGRpfRoutePrefixLength identifies the route used
+            to find the RPF interface towards the source.  The
+            InetAddressType is given by the hwPimSGRpfNextHopType object.
+
+            This address object is only significant up to
+            hwPimSGRpfRoutePrefixLength bits.  The remainder of the
+            address bits are zero."
+    ::= { hwPimSGEntry 13 }
+
+hwPimSGRpfRoutePrefixLength OBJECT-TYPE
+    SYNTAX     InetAddressPrefixLength
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The prefix length which when combined with the
+            corresponding value of hwPimSGRpfRouteAddress identifies the
+            route used to find the RPF interface towards the source.
+            The InetAddressType is given by the hwPimSGRpfNextHopType
+            object."
+    ::= { hwPimSGEntry 14 }
+
+hwPimSGRpfRouteMetricPref OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The metric preference of the route used to find the RPF
+            interface towards the source."
+    ::= { hwPimSGEntry 15 }
+
+hwPimSGRpfRouteMetric OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The routing metric of the route used to find the RPF
+            interface towards the source."
+    ::= { hwPimSGEntry 16 }
+
+hwPimSGSptBit OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Whether the SPT bit is set; and therefore whether
+            forwarding is taking place on the shortest-path tree."
+    ::= { hwPimSGEntry 17 }
+
+hwPimSGKeepaliveTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time remaining before, in the absence of explicit (S,G)
+            local membership or (S,G) Join messages received to maintain
+            it, this (S,G) state expires.  This timer is called the
+            (S,G) Keepalive Timer in the PIM-SM specification."
+    REFERENCE "RFC 4601 section 4.1.4"
+    ::= { hwPimSGEntry 18 }
+
+hwPimSGDrRegisterState OBJECT-TYPE
+    SYNTAX     INTEGER {
+                  noInfo (1),
+                  join (2),
+                  joinPending (3),
+                  prune (4)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Whether the local router should encapsulate (S,G) data
+            packets in Register messages and send them to the RP.  This
+            corresponds to the state of the per-(S,G) Register state
+            machine in the PIM-SM specification.  This object is always
+            'noInfo' unless hwPimSGPimMode is 'asm'."
+    REFERENCE "RFC 4601 section 4.4.1"
+    ::= { hwPimSGEntry 19 }
+
+hwPimSGDrRegisterStopTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "If hwPimSGDrRegisterState is 'prune', this is the time
+            remaining before the local router sends a Null-Register
+            message to the RP.  If hwPimSGDrRegisterState is
+            'joinPending', this is the time remaining before the local
+            router resumes encapsulating data packets and sending them
+            to the RP.  Otherwise, this is zero.  This timer is called
+            the Register-Stop Timer in the PIM-SM specification."
+    REFERENCE "RFC 4601 section 4.4"
+    ::= { hwPimSGEntry 20 }
+
+hwPimSGRpRegisterPmbrAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address type of the first PIM Multicast Border Router
+            to send a Register message with the Border bit set.  This
+            object is unknown(0) if the local router is not the RP for
+            the group."
+    ::= { hwPimSGEntry 21 }
+    
+hwPimSGRpRegisterPmbrAddress OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The IP address of the first PIM Multicast Border Router to
+            send a Register message with the Border bit set.  The
+            InetAddressType is given by the
+            hwPimSGRpRegisterPmbrAddressType object."
+    ::= { hwPimSGEntry 22 }
+
+hwPimSGUpstreamPruneState OBJECT-TYPE
+    SYNTAX     INTEGER {
+                  forwarding (1),
+                  ackpending (2),
+                  pruned (3)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Whether the local router has pruned itself from the tree.
+            This corresponds to the state of the upstream prune (S,G)
+            state machine in the PIM-DM specification.  This object is
+            used only by PIM-DM."
+    REFERENCE "RFC 3973 section 4.4.1"
+    ::= { hwPimSGEntry 23 }
+
+hwPimSGUpstreamPruneLimitTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time remaining before the local router may send a (S,G)
+            Prune message on hwPimSGRpfIfIndex.  This timer is called the
+            (S,G) Prune Limit Timer in the PIM-DM specification.  This
+            object is zero if the timer is not running.  This object is
+            used only by PIM-DM."
+    REFERENCE "RFC 2973 section 4.8"
+    ::= { hwPimSGEntry 24 }
+
+hwPimSGOriginatorState OBJECT-TYPE
+    SYNTAX     INTEGER {
+                  notOriginator (1),
+                  originator (2)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Whether the router is an originator for an (S,G) message
+            flow.  This corresponds to the state of the per-(S,G)
+            Originator state machine in the PIM-DM specification.  This
+            object is used only by PIM-DM."
+    REFERENCE "RFC 3973 section 4.5.2"
+    ::= { hwPimSGEntry 25 }
+
+hwPimSGSourceActiveTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "If hwPimSGOriginatorState is 'originator', this is the time
+            remaining before the local router reverts to a notOriginator
+            state.  Otherwise, this is zero.  This timer is called the
+            Source Active Timer in the PIM-DM specification.  This
+            object is used only by PIM-DM."
+    REFERENCE "RFC 3973 section 4.8"
+    ::= { hwPimSGEntry 26 }
+
+hwPimSGStateRefreshTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "If hwPimSGOriginatorState is 'originator', this is the time
+            remaining before the local router sends a State Refresh
+            message.  Otherwise, this is zero.  This timer is called the
+            State Refresh Timer in the PIM-DM specification.  This
+            object is used only by PIM-DM."
+    REFERENCE "RFC 3973 section 4.8"
+    ::= { hwPimSGEntry 27 }
+
+
+hwPimSGITable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwPimSGIEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the interface-specific (S,G)
+            state that PIM has."
+    REFERENCE "RFC 4601 section 4.1.4"
+    ::= { hwPim 7 }
+
+hwPimSGIEntry OBJECT-TYPE
+    SYNTAX     HwPimSGIEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the hwPimSGITable."
+    INDEX      { hwPimSGAddressType,
+                 hwPimSGGrpAddress,
+                 hwPimSGSrcAddress,
+                 hwPimSGIIfIndex }
+    ::= { hwPimSGITable 1 }
+
+HwPimSGIEntry ::= SEQUENCE {
+    hwPimSGIIfIndex                 InterfaceIndex,
+    hwPimSGIUpTime                  TimeTicks,
+    hwPimSGILocalMembership         TruthValue,
+    hwPimSGIJoinPruneState          INTEGER,
+    hwPimSGIPrunePendingTimer       TimeTicks,
+    hwPimSGIJoinExpiryTimer         TimeTicks,
+    hwPimSGIAssertState             INTEGER,
+    hwPimSGIAssertTimer             TimeTicks,
+    hwPimSGIAssertWinnerAddressType InetAddressType,
+    hwPimSGIAssertWinnerAddress     InetAddress,
+    hwPimSGIAssertWinnerMetricPref  Unsigned32,
+    hwPimSGIAssertWinnerMetric      Unsigned32
+}
+
+hwPimSGIIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex of the interface that this entry corresponds
+            to."
+    ::= { hwPimSGIEntry 1 }
+
+hwPimSGIUpTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time since this entry was created by the local router."
+    ::= { hwPimSGIEntry 2 }
+
+hwPimSGILocalMembership OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Whether the local router has (S,G) local membership on this
+            interface (resulting from a mechanism such as IGMP or MLD).
+            This corresponds to local_receiver_include(S,G,I) in the
+            PIM-SM specification."
+    REFERENCE "RFC 3376, RFC 3810, RFC 4601 sections 4.1.6, 4.6.1 and
+              4.6.2"
+    ::= { hwPimSGIEntry 3 }
+
+hwPimSGIJoinPruneState OBJECT-TYPE
+    SYNTAX     INTEGER {
+                  noInfo (1),
+                  join (2),
+                  prunePending (3)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The state resulting from (S,G) Join/Prune messages
+            received on this interface.  This corresponds to the state
+            of the downstream per-interface (S,G) state machine in the
+            PIM-SM and PIM-DM specification."
+    REFERENCE "RFC 4601 section 4.5.3 and RFC 3973 section 4.4.2"
+    ::= { hwPimSGIEntry 4 }
+
+hwPimSGIPrunePendingTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time remaining before the local router acts on an (S,G)
+            Prune message received on this interface, during which the
+            router is waiting to see whether another downstream router
+            will override the Prune message.  This timer is called the
+            (S,G) Prune-Pending Timer in the PIM-SM specification.  This
+            object is zero if the timer is not running."
+    REFERENCE "RFC 4601 section 4.5.3 and 4.5.4"
+    ::= { hwPimSGIEntry 5 }
+
+hwPimSGIJoinExpiryTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time remaining before (S,G) Join state for this
+            interface expires.  This timer is called the (S,G) Join
+            Expiry Timer in the PIM-SM specification.  This object is
+            zero if the timer is not running.  A value of 'FFFFFFFF'h
+            indicates an infinite expiry time.  This timer is called the
+            (S,G) Prune Timer in the PIM-DM specification."
+    REFERENCE "RFC 4601 section 4.10 and RFC 3973 section 4.8"
+    ::= { hwPimSGIEntry 6 }
+
+hwPimSGIAssertState OBJECT-TYPE
+    SYNTAX     INTEGER {
+                  noInfo (1),
+                  iAmAssertWinner (2),
+                  iAmAssertLoser (3)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The (S,G) Assert state for this interface.  This
+            corresponds to the state of the per-interface (S,G) Assert
+            state machine in the PIM-SM specification."
+    REFERENCE "RFC 4601 section 4.6.1"
+    ::= { hwPimSGIEntry 7 }
+
+hwPimSGIAssertTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "If hwPimSGIAssertState is 'iAmAssertWinner', this is the time
+            remaining before the local router next sends a (S,G) Assert
+            message on this interface.  If hwPimSGIAssertState is
+            'iAmAssertLoser', this is the time remaining before the
+            (S,G) Assert state expires.  If hwPimSGIAssertState is
+            'noInfo', this is zero.  This timer is called the (S,G)
+            Assert Timer in the PIM-SM specification."
+    REFERENCE "RFC 4601 section 4.6.1"
+    ::= { hwPimSGIEntry 8 }
+
+hwPimSGIAssertWinnerAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "If hwPimSGIAssertState is 'iAmAssertLoser', this is the
+            address type of the assert winner; otherwise, this object is
+            unknown(0)."
+    ::= { hwPimSGIEntry 9 }
+
+hwPimSGIAssertWinnerAddress OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "If hwPimSGIAssertState is 'iAmAssertLoser', this is the
+            address of the assert winner.  The InetAddressType is given
+            by the hwPimSGIAssertWinnerAddressType object."
+    ::= { hwPimSGIEntry 10 }
+
+hwPimSGIAssertWinnerMetricPref OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "If hwPimSGIAssertState is 'iAmAssertLoser', this is the
+            metric preference of the route to the source advertised by
+            the assert winner; otherwise, this object is zero."
+    ::= { hwPimSGIEntry 11 }
+
+hwPimSGIAssertWinnerMetric OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "If hwPimSGIAssertState is 'iAmAssertLoser', this is the
+            routing metric of the route to the source advertised by the
+            assert winner; otherwise, this object is zero."
+    ::= { hwPimSGIEntry 12 }
+
+
+hwPimSGRptTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwPimSGRptEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the non-interface specific
+            (S,G,rpt) state that PIM has."
+    REFERENCE "RFC 4601 section 4.1.5"
+    ::= { hwPim 8 }
+
+hwPimSGRptEntry OBJECT-TYPE
+    SYNTAX     HwPimSGRptEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the hwPimSGRptTable."
+    INDEX      { hwPimStarGAddressType,
+                 hwPimStarGGrpAddress,
+                 hwPimSGRptSrcAddress }
+    ::= { hwPimSGRptTable 1 }
+
+HwPimSGRptEntry ::= SEQUENCE {
+    hwPimSGRptSrcAddress             InetAddress,
+    hwPimSGRptUpTime                 TimeTicks,
+    hwPimSGRptUpstreamPruneState     INTEGER,
+    hwPimSGRptUpstreamOverrideTimer  TimeTicks
+}
+
+hwPimSGRptSrcAddress OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (4|8|16|20))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The source address for this entry.  The InetAddressType is
+            given by the hwPimStarGAddressType object."
+    ::= { hwPimSGRptEntry 1 }
+
+hwPimSGRptUpTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time since this entry was created by the local router."
+    ::= { hwPimSGRptEntry 2 }
+
+hwPimSGRptUpstreamPruneState OBJECT-TYPE
+    SYNTAX     INTEGER {
+                  rptNotJoined (1),
+                  pruned (2),
+                  notPruned (3)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Whether the local router should prune the source off the RP
+            tree.  This corresponds to the state of the upstream
+            (S,G,rpt) state machine for triggered messages in the PIM-SM
+            specification."
+    REFERENCE "RFC 4601 section 4.5.9"
+    ::= { hwPimSGRptEntry 3 }
+
+hwPimSGRptUpstreamOverrideTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time remaining before the local router sends a
+            triggered (S,G,rpt) Join message on hwPimStarGRpfIfIndex.
+            This timer is called the (S,G,rpt) Upstream Override Timer
+            in the PIM-SM specification.  This object is zero if the
+            timer is not running."
+    REFERENCE "RFC 4601 section 4.5.9"
+    ::= { hwPimSGRptEntry 4 }
+
+
+hwPimSGRptITable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwPimSGRptIEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the interface-specific
+            (S,G,rpt) state that PIM has."
+    REFERENCE "RFC 4601 section 4.1.5"
+    ::= { hwPim 9 }
+
+hwPimSGRptIEntry OBJECT-TYPE
+    SYNTAX     HwPimSGRptIEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the hwPimSGRptITable."
+    INDEX      { hwPimStarGAddressType,
+                 hwPimStarGGrpAddress,
+                 hwPimSGRptSrcAddress,
+                 hwPimSGRptIIfIndex }
+    ::= { hwPimSGRptITable 1 }
+
+HwPimSGRptIEntry ::= SEQUENCE {
+    hwPimSGRptIIfIndex            InterfaceIndex,
+    hwPimSGRptIUpTime             TimeTicks,
+    hwPimSGRptILocalMembership    TruthValue,
+    hwPimSGRptIJoinPruneState     INTEGER,
+    hwPimSGRptIPrunePendingTimer  TimeTicks,
+    hwPimSGRptIPruneExpiryTimer   TimeTicks
+}
+
+hwPimSGRptIIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex of the interface that this entry corresponds
+            to."
+    ::= { hwPimSGRptIEntry 1 }
+
+hwPimSGRptIUpTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time since this entry was created by the local router."
+    ::= { hwPimSGRptIEntry 2 }
+
+hwPimSGRptILocalMembership OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Whether the local router has both (*,G) include local
+            membership and (S,G) exclude local membership on this
+            interface (resulting from a mechanism such as IGMP or MLD).
+            This corresponds to local_receiver_exclude(S,G,I) in the
+            PIM-SM specification."
+    REFERENCE "RFC 3376, RFC 3810, RFC 4601 section 4.1.6"
+    ::= { hwPimSGRptIEntry 3 }
+
+hwPimSGRptIJoinPruneState OBJECT-TYPE
+    SYNTAX     INTEGER {
+                  noInfo (1),
+                  prune (2),
+                  prunePending (3)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The state resulting from (S,G,rpt) Join/Prune messages
+            received on this interface.  This corresponds to the state
+            of the downstream per-interface (S,G,rpt) state machine in
+            the PIM-SM specification."
+    REFERENCE "RFC 4601 section 4.5.4"
+    ::= { hwPimSGRptIEntry 4 }
+
+hwPimSGRptIPrunePendingTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time remaining before the local router starts pruning
+            this source off the RP tree.  This timer is called the
+            (S,G,rpt) Prune-Pending Timer in the PIM-SM specification.
+            This object is zero if the timer is not running."
+    REFERENCE "RFC 4601 section 4.5.4"
+    ::= { hwPimSGRptIEntry 5 }
+
+hwPimSGRptIPruneExpiryTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time remaining before (S,G,rpt) Prune state for this
+            interface expires.  This timer is called the (S,G,rpt)
+            Prune Expiry Timer in the PIM-SM specification.  This object
+            is zero if the timer is not running.  A value of 'FFFFFFFF'h
+            indicates an infinite expiry time."
+    REFERENCE "RFC 4601 section 4.5.4"
+    ::= { hwPimSGRptIEntry 6 }
+
+
+hwPimGroupMappingTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwPimGroupMappingEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing mappings from multicast
+            group prefixes to the PIM mode and RP address to use for
+            groups within that group prefix.
+
+            Rows in this table are created for a variety of reasons,
+            indicated by the value of the hwPimGroupMappingOrigin object.
+
+            -  Rows with a hwPimGroupMappingOrigin value of 'fixed' are
+               created automatically by the router at startup, to
+               correspond to the well-defined prefixes of link-local and
+               unroutable group addresses.  These rows are never
+               destroyed.
+
+            -  Rows with a hwPimGroupMappingOrigin value of 'embedded' are
+               created by the router to correspond to group prefixes
+               that are to be treated as being in Embedded-RP format.
+
+            -  Rows with a hwPimGroupMappingOrigin value of 'configRp' are
+               created and destroyed as a result of rows in the
+               pimStaticRPTable being created and destroyed.
+
+            -  Rows with a hwPimGroupMappingOrigin value of 'configSsm'
+               are created and destroyed as a result of configuration of
+               SSM address ranges to the local router.
+
+            -  Rows with a hwPimGroupMappingOrigin value of 'bsr' are
+               created as a result of running the PIM Bootstrap Router
+               (BSR) mechanism.  If the local router is not the elected
+               BSR, these rows are created to correspond to group
+               prefixes in the PIM Bootstrap messages received from the
+               elected BSR.  If the local router is the elected BSR,
+               these rows are created to correspond to group prefixes in
+               the PIM Bootstrap messages that the local router sends.
+               In either case, these rows are destroyed when the group
+               prefixes are timed out by the BSR mechanism.
+
+            -  Rows with a hwPimGroupMappingOrigin value of 'other' are
+               created and destroyed according to some other mechanism
+               not specified here.
+
+            Given the collection of rows in this table at any point in
+            time, the PIM mode and RP address to use for a particular
+            group is determined using the following algorithm.
+
+            1. From the set of all rows, the subset whose group prefix
+               contains the group in question are selected.
+
+            2. If there are no such rows, the behavior is undefined.
+
+            3. From the selected subset of rows, the subset that have
+               the greatest value of hwPimGroupMappingGrpPrefixLength are
+               selected.
+
+            4. If there are multiple selected rows, and a subset are
+               defined by pimStaticRPTable (hwPimGroupMappingOrigin value
+               of 'configRp') with pimStaticRPOverrideDynamic set to
+               TRUE, then this subset is selected.
+
+            5. If there are still multiple selected rows, the subset
+               that have the highest precedence (the lowest numerical
+               value for hwPimGroupMappingPrecedence) are selected.
+
+            6. If there are still multiple selected rows, the row
+               selected is implementation dependent; the implementation
+               might or might not apply the PIM hash function to select
+               the row.
+
+            7. The group mode to use is given by the value of
+               hwPimGroupMappingPimMode from the single selected row; the
+               RP to use is given by the value of
+               hwPimGroupMappingRpAddress, unless hwPimGroupMappingOrigin is
+               'embedded', in which case the RP is extracted from the
+               group address in question."
+    REFERENCE "RFC 4601 section 3.7, RFC 3956 and RFC 4610"
+    ::= { hwPim 13 }
+
+hwPimGroupMappingEntry OBJECT-TYPE
+    SYNTAX     HwPimGroupMappingEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the hwPimGroupMappingTable."
+    INDEX      { hwPimGroupMappingOrigin,
+                 hwPimGroupMappingAddressType,
+                 hwPimGroupMappingGrpAddress,
+                 hwPimGroupMappingGrpPrefixLength,
+                 hwPimGroupMappingRpAddressType,
+                 hwPimGroupMappingRpAddress }
+    ::= { hwPimGroupMappingTable 1 }
+
+HwPimGroupMappingEntry ::= SEQUENCE {
+    hwPimGroupMappingOrigin           HWPimGroupMappingOriginType,
+    hwPimGroupMappingAddressType      InetAddressType,
+    hwPimGroupMappingGrpAddress       InetAddress,
+    hwPimGroupMappingGrpPrefixLength  InetAddressPrefixLength,
+    hwPimGroupMappingRpAddressType    InetAddressType,
+    hwPimGroupMappingRpAddress        InetAddress,
+    hwPimGroupMappingPimMode          HWPimMode,
+    hwPimGroupMappingPrecedence       Unsigned32
+}
+
+hwPimGroupMappingOrigin OBJECT-TYPE
+    SYNTAX     HWPimGroupMappingOriginType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The mechanism by which this group mapping was learned."
+    ::= { hwPimGroupMappingEntry 1 }
+
+hwPimGroupMappingAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The address type of the IP multicast group prefix."
+    ::= { hwPimGroupMappingEntry 2 }
+
+hwPimGroupMappingGrpAddress OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (4|8|16|20))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The IP multicast group address which, when combined with
+            hwPimGroupMappingGrpPrefixLength, gives the group prefix for
+            this mapping.  The InetAddressType is given by the
+            hwPimGroupMappingAddressType object.
+
+            This address object is only significant up to
+            hwPimGroupMappingGrpPrefixLength bits.  The remainder of the
+            address bits are zero.  This is especially important for
+            this index field, which is part of the index of this entry.
+            Any non-zero bits would signify an entirely different
+            entry."
+    ::= { hwPimGroupMappingEntry 3 }
+
+hwPimGroupMappingGrpPrefixLength OBJECT-TYPE
+    SYNTAX     InetAddressPrefixLength (4..128)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The multicast group prefix length, which, when combined
+            with hwPimGroupMappingGrpAddress, gives the group prefix for
+            this mapping.  The InetAddressType is given by the
+            hwPimGroupMappingAddressType object.  If
+            hwPimGroupMappingAddressType is 'ipv4' or 'ipv4z', this
+            object must be in the range 4..32.  If
+            hwPimGroupMappingAddressType is 'ipv6' or 'ipv6z', this object
+            must be in the range 8..128."
+    ::= { hwPimGroupMappingEntry 4 }
+
+hwPimGroupMappingRpAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The address type of the RP to be used for groups within
+            this group prefix, or unknown(0) if no RP is to be used or
+            if the RP address is unknown.  This object must be
+            unknown(0) if hwPimGroupMappingPimMode is ssm(2), or if
+            hwPimGroupMappingOrigin is embedded(6)."
+    ::= { hwPimGroupMappingEntry 5 }
+
+hwPimGroupMappingRpAddress OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The IP address of the RP to be used for groups within this
+            group prefix.  The InetAddressType is given by the
+            hwPimGroupMappingRpAddressType object."
+    ::= { hwPimGroupMappingEntry 6 }
+
+hwPimGroupMappingPimMode OBJECT-TYPE
+    SYNTAX     HWPimMode
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The PIM mode to be used for groups in this group prefix."
+    ::= { hwPimGroupMappingEntry 7 }
+
+hwPimGroupMappingPrecedence OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The precedence of this row, used in the algorithm that
+            determines which row applies to a given group address
+            (described above).  Numerically higher values for this
+            object indicate lower precedences, with the value zero
+            denoting the highest precedence.
+
+            The absolute values of this object have a significance only
+            on the local router and do not need to be coordinated with
+            other routers."
+    ::= { hwPimGroupMappingEntry 8 }
+
+hwPimInterfaceCtlMsgCountTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwPimInterfaceCtlMsgCountEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the control message counter
+            of all PIM interfaces."
+    ::= { hwPim 58}
+
+hwPimInterfaceCtlMsgCountEntry OBJECT-TYPE
+    SYNTAX     HwPimInterfaceCtlMsgCountEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the hwPimCtlMsgCountTable.
+            This entry is preserved on agent restart."
+    INDEX      { hwPimInterfaceCtlMsgCountIfIndex,
+                 hwPimInterfaceCtlMsgCountIpVersion,
+                 hwPimInterfaceCtlMsgCountMsgState }
+    ::= { hwPimInterfaceCtlMsgCountTable 1 }
+
+HwPimInterfaceCtlMsgCountEntry ::= SEQUENCE {
+    hwPimInterfaceCtlMsgCountIfIndex              InterfaceIndex,
+    hwPimInterfaceCtlMsgCountIpVersion            InetVersion,  
+    hwPimInterfaceCtlMsgCountMsgState             HWPimCtlMsgState,
+    hwPimInterfaceCtlMsgCountAssert               Unsigned32,    
+    hwPimInterfaceCtlMsgCountHello                Unsigned32,   
+    hwPimInterfaceCtlMsgCountJoinPrune            Unsigned32,    
+    hwPimInterfaceCtlMsgCountBsr                  Unsigned32    
+}
+
+hwPimInterfaceCtlMsgCountIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of this PIM interface."
+    ::= { hwPimInterfaceCtlMsgCountEntry 1 }
+
+hwPimInterfaceCtlMsgCountIpVersion OBJECT-TYPE
+    SYNTAX     InetVersion
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The IP version of this PIM interface.  A physical interface
+            may be configured in multiple modes concurrently, e.g. IPv4
+            and IPv6, however the traffic is considered to be logically
+            separate."
+    ::= { hwPimInterfaceCtlMsgCountEntry 2 }
+    
+hwPimInterfaceCtlMsgCountMsgState OBJECT-TYPE
+    SYNTAX     HWPimCtlMsgState
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The PIM control message state."
+    ::= { hwPimInterfaceCtlMsgCountEntry 3 }
+
+hwPimInterfaceCtlMsgCountAssert OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Assert messages on this interface."
+    ::= { hwPimInterfaceCtlMsgCountEntry 4 }    
+   
+hwPimInterfaceCtlMsgCountHello OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Hello messages on this interface."
+    ::= { hwPimInterfaceCtlMsgCountEntry 5 }    
+    
+hwPimInterfaceCtlMsgCountJoinPrune OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Join/Prune messages on this interface."
+    ::= { hwPimInterfaceCtlMsgCountEntry 6 }
+    
+hwPimInterfaceCtlMsgCountBsr OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM BSR messages on this interface."
+    ::= { hwPimInterfaceCtlMsgCountEntry 7 }  
+
+hwPimGlobalCtlMsgCountTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwPimGlobalCtlMsgCountEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the control message counter on the router."
+    ::= { hwPim 59 }
+
+hwPimGlobalCtlMsgCountEntry OBJECT-TYPE
+    SYNTAX     HwPimGlobalCtlMsgCountEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the hwPimGlobalCtlMsgCountTable.
+            This entry is preserved on agent restart."
+    INDEX      {  hwPimGlobalCtlMsgCountIpVersion,
+              hwPimGlobalCtlMsgCountMsgState }
+    ::= { hwPimGlobalCtlMsgCountTable 1 }
+
+HwPimGlobalCtlMsgCountEntry ::= SEQUENCE { 
+    hwPimGlobalCtlMsgCountIpVersion            InetVersion,   
+    hwPimGlobalCtlMsgCountMsgState             HWPimCtlMsgState,
+    hwPimGlobalCtlMsgCountRegister             Unsigned32,    
+    hwPimGlobalCtlMsgCountRegisterStop         Unsigned32,   
+    hwPimGlobalCtlMsgCountProbe                Unsigned32,    
+    hwPimGlobalCtlMsgCountCrp                  Unsigned32    
+}
+
+hwPimGlobalCtlMsgCountIpVersion OBJECT-TYPE
+    SYNTAX     InetVersion
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The IP version of this PIM instance, e.g. IPv4
+            and IPv6."
+    ::= { hwPimGlobalCtlMsgCountEntry 1 }
+        
+hwPimGlobalCtlMsgCountMsgState OBJECT-TYPE
+    SYNTAX     HWPimCtlMsgState
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The PIM control message state."
+    ::= { hwPimGlobalCtlMsgCountEntry 2 }
+
+hwPimGlobalCtlMsgCountRegister OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Register messages on the router."
+    ::= { hwPimGlobalCtlMsgCountEntry 3 }      
+    
+hwPimGlobalCtlMsgCountRegisterStop OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Register-stop messages on the router."
+    ::= { hwPimGlobalCtlMsgCountEntry 4 }      
+    
+hwPimGlobalCtlMsgCountProbe OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Probe messages on the router."
+    ::= { hwPimGlobalCtlMsgCountEntry 5 }    
+      
+hwPimGlobalCtlMsgCountCrp OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM CRP messages on the router."
+    ::= { hwPimGlobalCtlMsgCountEntry 6 }      
+
+hwPimNeighborLoss NOTIFICATION-TYPE
+    OBJECTS { hwPimNeighborUpTime, 
+              hwPimNeighborIfName,
+              hwPimInstanceID,
+              hwPimInstanceName,
+              hwPimNeighborNotificationReason
+            }
+    STATUS     current
+    DESCRIPTION
+            "A hwPimNeighborLoss notification signifies the loss of an
+            adjacency with a neighbor.  This notification should be
+            generated when the neighbor is lost.
+
+            This notification is generated whenever the counter
+            hwPimNeighborLossCount is incremented, subject
+            to the rate limit specified by
+            hwPimNeighborLossNotificationPeriod."
+    REFERENCE "RFC 4601 section 4.3.2"
+    ::= { hwPimNotifications 1 }
+
+hwPimInvalidRegister NOTIFICATION-TYPE
+    OBJECTS { hwPimGroupMappingPimMode,
+              hwPimInvalidRegisterAddressType,
+              hwPimInvalidRegisterOrigin,
+              hwPimInvalidRegisterGroup,
+              hwPimInvalidRegisterRp,
+              hwPimInstanceID,
+              hwPimInstanceName
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimInvalidRegister notification signifies that an invalid
+            PIM Register message was received by this device.
+
+            This notification is generated whenever the counter
+            hwPimInvalidRegisterMsgsRcvd is incremented, subject to the
+            rate limit specified by
+            hwPimInvalidRegisterNotificationPeriod."
+    REFERENCE "RFC 4601 section 4.4.2"
+    ::= { hwPimNotifications 2 }
+
+hwPimInvalidJoinPrune NOTIFICATION-TYPE
+    OBJECTS { hwPimGroupMappingPimMode,
+              hwPimInvalidJoinPruneAddressType,
+              hwPimInvalidJoinPruneOrigin,
+              hwPimInvalidJoinPruneGroup,
+              hwPimInvalidJoinPruneRp,
+              hwPimNeighborUpTime,
+              hwPimNeighborIfName,
+              hwPimInstanceID,
+              hwPimInstanceName
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimInvalidJoinPrune notification signifies that an
+            invalid PIM Join/Prune message was received by this device.
+
+            This notification is generated whenever the counter
+            hwPimInvalidJoinPruneMsgsRcvd is incremented, subject to the
+            rate limit specified by
+            hwPimInvalidJoinPruneNotificationPeriod."
+    REFERENCE "RFC 4601 section 4.5.2"
+    ::= { hwPimNotifications 3 }
+
+hwPimRpMappingChange NOTIFICATION-TYPE
+    OBJECTS { hwPimGroupMappingPimMode,
+              hwPimGroupMappingPrecedence,
+              hwPimInstanceID,
+              hwPimInstanceName
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimRpMappingChange notification signifies a change to the
+            active RP mapping on this device.
+            This notification is generated whenever the counter
+            hwPimRpMappingChangeCount is incremented, subject to the
+            rate limit specified by
+            pimRPMappingChangeNotificationPeriod."
+    ::= { hwPimNotifications 4 }
+
+hwPimInterfaceElection NOTIFICATION-TYPE
+    OBJECTS { hwPimInterfaceAddressType,
+              hwPimInterfaceAddress,
+              hwPimInterfaceName,
+              hwPimInstanceID,
+              hwPimInstanceName
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimInterfaceElection notification signifies that a new DR
+            or DF has been elected on a network.
+
+            This notification is generated whenever the counter
+            hwPimInterfaceElectionWinCount is incremented, subject to the
+            rate limit specified by
+            hwPimInterfaceElectionNotificationPeriod."
+    REFERENCE "RFC 4601 section 4.3.2 and
+               I-D.ietf-pim-bidir section 3.5.2"
+    ::= { hwPimNotifications 5 }
+
+hwPimNeighborAdd NOTIFICATION-TYPE
+    OBJECTS { hwPimNeighborExpiryTime,
+              hwPimInstanceID,
+              hwPimInstanceName 
+            }
+    STATUS     current
+    DESCRIPTION
+            "A hwPimNeighborAdd notification signifies the new neighbor.  
+            This notification should be generated when receiving the hello 
+            report of a new neighbor.
+
+            This notification is generated whenever the counter
+            hwPimNeighborAddCount is incremented, subject
+            to the rate limit specified by
+            hwPimNeighborAddNotificationPeriod."
+    REFERENCE "RFC 4601 section 4.3.1"
+    ::= { hwPimNotifications 6 }
+
+hwPimGRStart NOTIFICATION-TYPE
+    OBJECTS { hwPimGRStartTime,
+              hwPimGRInterval,
+              hwPimInstanceID
+            }
+    STATUS      obsolete
+    DESCRIPTION
+            "A hwPimGRStart notification signifies that the router enters 
+            the PIM GR state."
+    ::= { hwPimNotifications 7 }
+
+hwPimGREnd NOTIFICATION-TYPE
+    OBJECTS { hwPimGREndTime,
+              hwPimInstanceID
+            }
+    STATUS      obsolete
+    DESCRIPTION
+            "A hwPimGREnd notification signifies that the router leaves 
+            the PIM GR state."
+      ::= { hwPimNotifications 8 }
+hwPimMrtLimit NOTIFICATION-TYPE
+    OBJECTS { hwPimMrtLimitAddressType,
+              hwPimMrtLimitSource,
+              hwPimMrtLimitGroup,
+              hwPimInstanceID,
+              hwPimInstanceName 
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimMrtLimit notification signifies that PIM entries cannot be 
+             created because the upper limit is crossed."
+      ::= { hwPimNotifications 9 }
+     
+hwPimNeighborUnavailable NOTIFICATION-TYPE
+    OBJECTS { hwPimNeighborIfName,
+              hwPimInstanceID,
+              hwPimInstanceName,
+              hwPimNeighborNotificationReason
+            }
+    STATUS     current
+    DESCRIPTION
+            "A hwPimNeighborUnavailable notification signifies that the PIM neighbor is unavailable."
+    ::= { hwPimNotifications 10 }
+    
+hwPimNeighborUnavailableClear NOTIFICATION-TYPE
+    OBJECTS { hwPimNeighborIfName,
+              hwPimInstanceID,
+              hwPimInstanceName,
+              hwPimNeighborNotificationReason
+            }
+    STATUS     current
+    DESCRIPTION
+            "A hwPimNeighborUnavailableClear notification signifies that the PIM neighbor is available."
+    ::= { hwPimNotifications 11 } 
+   
+hwPimMrtLimitClear NOTIFICATION-TYPE
+    OBJECTS { hwPimMrtLimitAddressType,
+              hwPimMrtLimitSource,
+              hwPimMrtLimitGroup,
+              hwPimInstanceID,
+              hwPimInstanceName 
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimMrtLimit notification signifies that PIM entries can created."
+      ::= { hwPimNotifications 12 }
+
+hwPimStarGThresholdExceed NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationAddressType,
+              hwPimStarGCurrentCount,
+              hwPimStarGThreshold,
+              hwPimStarGTotalCount
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimStarGThresholdExceed notification signifies that PIM (*, G) entries count of all instances reached the upper threshold."
+      ::= { hwPimNotifications 13 }
+
+hwPimStarGThresholdExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationAddressType,
+              hwPimStarGCurrentCount,
+              hwPimStarGThreshold,
+              hwPimStarGTotalCount
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimStarGThresholdExceedClear notification signifies that PIM (*, G) entries count of all instances fell below the lower threshold."
+      ::= { hwPimNotifications 14 }
+
+hwPimStarGExceed NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationAddressType,
+              hwPimNotificationSrcAddr,
+              hwPimNotificationGrpAddr,
+              hwPimStarGTotalCount,
+              hwPimInstanceName 
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimStarGExceed notification signifies that PIM (*, G) entries count of all instances reached the limit."
+      ::= { hwPimNotifications 15 }
+
+hwPimStarGExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationAddressType
+                       }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimStarGExceedClear notification signifies that PIM(*, G) entries count of all instances fell below the limit."
+      ::= { hwPimNotifications 16 }
+
+hwPimSGThresholdExceed NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationAddressType,
+              hwPimSGCurrentCount,
+              hwPimSGThreshold,
+              hwPimSGTotalCount
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimSGThresholdExceed notification signifies that PIM (S, G) entries count of all instances reached the upper threshold."
+      ::= { hwPimNotifications 17 }
+
+hwPimSGThresholdExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationAddressType,
+              hwPimSGCurrentCount,
+              hwPimSGThreshold,
+              hwPimSGTotalCount
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimSGThresholdExceedClear notification signifies that PIM (S, G) entries count of all instances fell below the lower threshold."
+      ::= { hwPimNotifications 18 }
+
+hwPimSGExceed NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationAddressType,
+              hwPimNotificationSrcAddr,
+              hwPimNotificationGrpAddr,
+              hwPimSGTotalCount,
+              hwPimInstanceName 
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimSGExceed notification signifies that PIM (S, G) entries count of all instances reached the limit."
+      ::= { hwPimNotifications 19 }
+
+hwPimSGExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationAddressType
+                       }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimSGExceedClear notification signifies that the number of PIM(S, G) entries count of all instances fell below the limit."
+      ::= { hwPimNotifications 20 }
+      
+hwPimGlobalTypeSGThresholdExceed NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationLimitType,
+              hwPimNotificationAddressType,
+              hwPimNotificationTypeTotalCount,
+              hwPimNotificationLimitUpperThreshold,
+              hwPimNotificationThresholdReasonType
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimGlobalTypeSGThresholdExceed notification signifies that PIM specified type entries count of all instances reached the upper threshold."
+      ::= { hwPimNotifications 21 }
+
+hwPimGlobalTypeSGThresholdExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationLimitType,
+              hwPimNotificationAddressType,
+              hwPimNotificationTypeTotalCount,
+              hwPimNotificationLimitLowerThreshold,
+              hwPimNotificationThresholdClearReasonType
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimGlobalTypeSGThresholdExceedClear notification signifies that PIM specified type entries count of all instances fell below the lower threshold."
+      ::= { hwPimNotifications 22 }
+
+hwPimGlobalTypeSGExceed NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationLimitType,
+              hwPimNotificationAddressType,
+              hwPimNotificationTypeTotalCount,
+              hwPimNotificationTypeLimit,
+              hwPimNotificationSrcAddr,
+              hwPimNotificationGrpAddr,
+              hwPimInstanceName 
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimGlobalTypeSGExceed notification signifies that PIM specified type entries count of all instances reached the limit."
+      ::= { hwPimNotifications 23 }
+
+hwPimGlobalTypeSGExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationLimitType,
+              hwPimNotificationAddressType,
+              hwPimNotificationTypeTotalCount,
+              hwPimNotificationTypeLimit,
+              hwPimNotificationSrcAddr,
+              hwPimNotificationGrpAddr,
+              hwPimInstanceName,
+              hwPimNotificationLimitReasonType
+                       }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimGlobalTypeSGExceedClear notification signifies that the number of PIM specified type entries count of all instances fell below the limit."
+      ::= { hwPimNotifications 24 }  
+     
+  
+hwPimMibConformance OBJECT IDENTIFIER ::= { hwPimStdMib 2 }
+hwPimMibCompliances OBJECT IDENTIFIER ::= { hwPimMibConformance 1 }
+hwPimMibGroups      OBJECT IDENTIFIER ::= { hwPimMibConformance 2 }
+
+hwPimMibComplianceAsm MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for PIM-SM MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS { hwPimTopologyGroup,
+                       hwPimSsmGroup,
+                       hwPimRpConfigGroup,
+                       hwPimSmGroup }
+
+      GROUP   hwPimNotificationGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimTuningParametersGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimRouterStatisticsGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimNetMgmtNotificationObjects
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimNetMgmtNotificationGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimDiagnosticsGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimDeviceStorageGroup
+      DESCRIPTION
+          "This group is optional."
+
+    ::= { hwPimMibCompliances 1 }
+
+hwPimMibComplianceBidir MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for Bidir-PIM MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS { hwPimTopologyGroup,
+                       hwPimRpConfigGroup,
+                       hwPimSmGroup,
+                       hwPimBidirGroup }
+
+      GROUP   hwPimNotificationGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimTuningParametersGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimRouterStatisticsGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimNetMgmtNotificationObjects
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimNetMgmtNotificationGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimDiagnosticsGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimDeviceStorageGroup
+      DESCRIPTION
+          "This group is optional."
+
+    ::= { hwPimMibCompliances 2 }
+
+hwPimMibComplianceSsm MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for PIM SSM MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS { hwPimTopologyGroup,
+                       hwPimSsmGroup }
+
+      GROUP   hwPimNotificationGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimTuningParametersGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimRouterStatisticsGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimNetMgmtNotificationObjects
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimNetMgmtNotificationGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimDiagnosticsGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimDeviceStorageGroup
+      DESCRIPTION
+          "This group is optional."
+
+    ::= { hwPimMibCompliances 3 }
+
+hwPimMibComplianceDm MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for PIM-DM MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS { hwPimTopologyGroup,
+                       hwPimSsmGroup,
+                       hwPimRpConfigGroup,
+                       hwPimSmGroup,
+                       hwPimDmGroup }
+
+      GROUP   hwPimNotificationGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimTuningParametersGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimRouterStatisticsGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimNetMgmtNotificationObjects
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimNetMgmtNotificationGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimDiagnosticsGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP   hwPimDeviceStorageGroup
+      DESCRIPTION
+          "This group is optional."
+
+    ::= { hwPimMibCompliances 4 }
+
+
+hwPimTopologyGroup OBJECT-GROUP
+    OBJECTS { hwPimInterfaceAddressType,
+              hwPimInterfaceAddress,
+              hwPimInterfaceGenerationIdValue,
+              hwPimInterfaceDr,
+              hwPimInterfaceDrPriorityEnabled,
+              hwPimInterfaceHelloHoldtime,
+              hwPimInterfaceJoinPruneHoldtime,
+              hwPimInterfaceLanDelayEnabled,
+              hwPimInterfaceEffectPropagDelay,
+              hwPimInterfaceEffectOverrideIvl,
+              hwPimInterfaceSuppressionEnabled,
+              hwPimInterfaceBidirCapable,
+              hwPimNeighborGenerationIdPresent,
+              hwPimNeighborGenerationIdValue,
+              hwPimNeighborUpTime,
+              hwPimNeighborExpiryTime,
+              hwPimNeighborDrPriorityPresent,
+              hwPimNeighborDrPriority,
+              hwPimNeighborLanPruneDelayPresent,
+              hwPimNeighborTBit,
+              hwPimNeighborPropagationDelay,
+              hwPimNeighborOverrideInterval,
+              hwPimNeighborBidirCapable,
+              hwPimNbrSecAddress,
+              hwPimNeighborIfName,
+              hwPimInterfaceName
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of read-only objects used to report local PIM
+            topology."
+    ::= { hwPimMibGroups 1 }
+
+hwPimNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { hwPimNeighborLoss }
+    STATUS  current
+    DESCRIPTION
+            "A collection of notifications for signaling important PIM
+            events."
+    ::= { hwPimMibGroups 2 }
+
+hwPimTuningParametersGroup OBJECT-GROUP
+    OBJECTS { hwPimKeepalivePeriod,
+              hwPimRegisterSuppressionTime,
+              hwPimInterfaceDrPriority,
+              hwPimInterfaceHelloInterval,
+              hwPimInterfaceTrigHelloInterval,
+              hwPimInterfaceJoinPruneInterval,
+              hwPimInterfacePropagationDelay,
+              hwPimInterfaceOverrideInterval,
+              hwPimInterfaceDomainBorder,
+              hwPimInterfaceStubInterface,
+              hwPimInterfaceStatus,
+              hwPimInterfaceStorageType
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of writeable objects used to configure PIM
+            behavior and to tune performance."
+    ::= { hwPimMibGroups 3 }
+
+hwPimRouterStatisticsGroup OBJECT-GROUP
+    OBJECTS { hwPimStarGEntries,
+              hwPimStarGIEntries,
+              hwPimSGEntries,
+              hwPimSGIEntries,
+              hwPimSGRptEntries,
+              hwPimSGRptIEntries
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of statistics global to the PIM router."
+    ::= { hwPimMibGroups 4 }
+
+hwPimSsmGroup OBJECT-GROUP
+    OBJECTS { hwPimSGUpTime,
+              hwPimSGPimMode,
+              hwPimSGUpstreamJoinState,
+              hwPimSGUpstreamJoinTimer,
+              hwPimSGUpstreamNeighbor,
+              hwPimSGRpfIfIndex,
+              hwPimSGRpfNextHopType,
+              hwPimSGRpfNextHop,
+              hwPimSGRpfRouteProtocol,
+              hwPimSGRpfRouteAddress,
+              hwPimSGRpfRoutePrefixLength,
+              hwPimSGRpfRouteMetricPref,
+              hwPimSGRpfRouteMetric,
+              hwPimSGSptBit,
+              hwPimSGKeepaliveTimer,
+              hwPimSGDrRegisterState,
+              hwPimSGDrRegisterStopTimer,
+              hwPimSGRpRegisterPmbrAddressType,
+              hwPimSGRpRegisterPmbrAddress,
+              hwPimSGIUpTime,
+              hwPimSGILocalMembership,
+              hwPimSGIJoinPruneState,
+              hwPimSGIPrunePendingTimer,
+              hwPimSGIJoinExpiryTimer,
+              hwPimSGIAssertState,
+              hwPimSGIAssertTimer,
+              hwPimSGIAssertWinnerAddressType,
+              hwPimSGIAssertWinnerAddress,
+              hwPimSGIAssertWinnerMetricPref,
+              hwPimSGIAssertWinnerMetric
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support management of PIM
+            routers running the PIM SSM (Source Specific Multicast)
+            protocol, in PIM mode SM (Sparse Mode)."
+    ::= { hwPimMibGroups 5 }
+
+hwPimRpConfigGroup OBJECT-GROUP
+    OBJECTS { hwPimGroupMappingPimMode,
+              hwPimGroupMappingPrecedence
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support configuration of RPs
+            (Rendezvous Points) and Group Mappings."
+    ::= { hwPimMibGroups 6 }
+
+hwPimSmGroup OBJECT-GROUP
+    OBJECTS { hwPimStarGUpTime,
+              hwPimStarGPimMode,
+              hwPimStarGRpAddressType,
+              hwPimStarGRpAddress,
+              hwPimStarGPimModeOrigin,
+              hwPimStarGRpIsLocal,
+              hwPimStarGUpstreamJoinState,
+              hwPimStarGUpstreamJoinTimer,
+              hwPimStarGUpstreamNeighborType,
+              hwPimStarGUpstreamNeighbor,
+              hwPimStarGRpfIfIndex,
+              hwPimStarGRpfNextHopType,
+              hwPimStarGRpfNextHop,
+              hwPimStarGRpfRouteProtocol,
+              hwPimStarGRpfRouteAddress,
+              hwPimStarGRpfRoutePrefixLength,
+              hwPimStarGRpfRouteMetricPref,
+              hwPimStarGRpfRouteMetric,
+              hwPimStarGIUpTime,
+              hwPimStarGILocalMembership,
+              hwPimStarGIJoinPruneState,
+              hwPimStarGIPrunePendingTimer,
+              hwPimStarGIJoinExpiryTimer,
+              hwPimStarGIAssertState,
+              hwPimStarGIAssertTimer,
+              hwPimStarGIAssertWinnerAddressType,
+              hwPimStarGIAssertWinnerAddress,
+              hwPimStarGIAssertWinnerMetricPref,
+              hwPimStarGIAssertWinnerMetric,
+              hwPimSGRptUpTime,
+              hwPimSGRptUpstreamPruneState,
+              hwPimSGRptUpstreamOverrideTimer,
+              hwPimSGRptIUpTime,
+              hwPimSGRptILocalMembership,
+              hwPimSGRptIJoinPruneState,
+              hwPimSGRptIPrunePendingTimer,
+              hwPimSGRptIPruneExpiryTimer
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support management of PIM
+            routers running PIM-SM (Sparse Mode).  The groups
+            hwPimSsmGroup and hwPimRpConfigGroup are also required."
+    ::= { hwPimMibGroups 7 }
+
+hwPimBidirGroup OBJECT-GROUP
+    OBJECTS { hwPimInterfaceDfElectionRobustness
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support management of PIM
+            routers running BIDIR mode.  The groups hwPimSsmGroup,
+            hwPimSmGroup and hwPimRpConfigGroup are also required."
+    ::= { hwPimMibGroups 8 }
+
+hwPimNetMgmtNotificationObjects OBJECT-GROUP
+    OBJECTS { hwPimInvalidRegisterNotificationPeriod,
+              hwPimInvalidRegisterMsgsRcvd,
+              hwPimInvalidRegisterAddressType,
+              hwPimInvalidRegisterOrigin,
+              hwPimInvalidRegisterGroup,
+              hwPimInvalidRegisterRp,
+              hwPimInvalidJoinPruneNotificationPeriod,
+              hwPimInvalidJoinPruneMsgsRcvd,
+              hwPimInvalidJoinPruneAddressType,
+              hwPimInvalidJoinPruneOrigin,
+              hwPimInvalidJoinPruneGroup,
+              hwPimInvalidJoinPruneRp,
+              hwPimRpMappingNotificationPeriod,
+              hwPimRpMappingChangeCount,
+              hwPimInterfaceElectionNotificationPeriod,
+              hwPimInterfaceElectionWinCount,
+              hwPimNeighborAddNotificationPeriod,
+              hwPimNeighborAddCount,
+              hwPimGRStartTime,
+              hwPimGRInterval,
+              hwPimGREndTime,
+              hwPimInstanceName,
+              hwPimMrtLimitAddressType,
+              hwPimMrtLimitSource,
+              hwPimMrtLimitGroup,
+              hwPimInstanceID,
+              hwPimInstanceName,
+              hwPimNeighborNotificationReason,
+              hwPimNotificationAddressType,
+              hwPimStarGCurrentCount,
+              hwPimStarGTotalCount,
+              hwPimStarGThreshold,
+              hwPimSGCurrentCount,
+              hwPimSGTotalCount,
+              hwPimSGThreshold,
+              hwPimNotificationSrcAddr,
+              hwPimNotificationGrpAddr
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support notification of PIM
+            network management events."
+    ::= { hwPimMibGroups 11 }
+
+hwPimNetMgmtNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { hwPimInvalidRegister,
+                    hwPimInvalidJoinPrune,
+                    hwPimRpMappingChange,
+                    hwPimInterfaceElection, 
+                    hwPimNeighborAdd,
+                    hwPimGRStart,
+                    hwPimGREnd,
+                    hwPimMrtLimit,
+                    hwPimNeighborUnavailable,
+                    hwPimNeighborUnavailableClear,
+                    hwPimMrtLimitClear,
+                    hwPimStarGThresholdExceed,
+                    hwPimStarGThresholdExceedClear,
+                    hwPimStarGExceed,
+                    hwPimStarGExceedClear,
+                    hwPimSGThresholdExceed,
+                    hwPimSGThresholdExceedClear,
+                    hwPimSGExceed,
+                    hwPimSGExceedClear,
+                    hwPimGlobalTypeSGThresholdExceed,
+                    hwPimGlobalTypeSGThresholdExceedClear,
+                    hwPimGlobalTypeSGExceed,
+                    hwPimGlobalTypeSGExceedClear                    
+                  }
+    STATUS  current
+    DESCRIPTION
+            "A collection of notifications for signaling PIM network
+            management events."
+    ::= { hwPimMibGroups 12 }
+
+hwPimDiagnosticsGroup OBJECT-GROUP
+    OBJECTS { hwPimInAsserts,
+              hwPimOutAsserts,
+              hwPimLastAssertInterface,
+              hwPimLastAssertGroupAddressType,
+              hwPimLastAssertGroupAddress,
+              hwPimLastAssertSourceAddressType,
+              hwPimLastAssertSourceAddress,
+              hwPimNeighborLossNotificationPeriod,
+              hwPimNeighborLossCount
+            }
+    STATUS  current
+    DESCRIPTION
+            "Objects providing additional diagnostics related to a PIM
+            router."
+    ::= { hwPimMibGroups 13 }
+
+hwPimDmGroup OBJECT-GROUP
+    OBJECTS {
+              hwPimRefreshInterval,
+              hwPimInterfacePruneLimitInterval,
+              hwPimInterfaceGraftRetryInterval,
+              hwPimInterfaceSrPriorityEnabled,
+              hwPimNeighborSrCapable,
+              hwPimSGUpstreamPruneState,
+              hwPimSGUpstreamPruneLimitTimer,
+              hwPimSGOriginatorState,
+              hwPimSGSourceActiveTimer,
+              hwPimSGStateRefreshTimer
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects required for management of PIM
+            Dense Mode (PIM-DM) function.  The groups hwPimSsmGroup and
+            hwPimSmGroup are also required."
+    REFERENCE "RFC 3973"
+    ::= { hwPimMibGroups 14 }
+
+hwPimDeviceStorageGroup OBJECT-GROUP
+    OBJECTS { hwPimDeviceConfigStorageType
+            }
+    STATUS  current
+    DESCRIPTION
+            "An object that specifies the volatility of global PIM
+            configuration settings on this device."
+    ::= { hwPimMibGroups 15 }
+
+END

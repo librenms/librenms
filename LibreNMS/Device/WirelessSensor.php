@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Device;
 
+use LibreNMS\Config;
 use LibreNMS\OS;
 
 class WirelessSensor extends Sensor
@@ -105,7 +106,11 @@ class WirelessSensor extends Sensor
 
     public static function runDiscovery(OS $os)
     {
-        foreach (self::getTypes() as $type => $descr) {
+        $types = array_keys(self::getTypes());
+        $submodules = Config::get('discovery_submodules.wireless', $types);
+        $types = array_intersect($types, $submodules);
+
+        foreach ($types as $type) {
             static::discoverType($os, $type);
         }
     }

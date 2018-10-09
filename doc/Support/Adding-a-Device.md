@@ -10,13 +10,13 @@ You have two options for adding a new device into LibreNMS. You can add a device
 Using the command line via ssh you can add a new device by changing to the directory of your LibreNMS install and typing (be sure to put the correct details).
 
 ```bash
-./addhost.php [community] [v1|v2c] [port] [udp|udp6|tcp|tcp6]
+./addhost.php yourhostname [community] [v1|v2c] [port] [udp|udp6|tcp|tcp6]
 ```
 
-As an example, if your device is configured to use the community `my_company` using snmp `v2c` then you would enter:
+As an example, if your device with the name `mydevice.example.com` is configured to use the community `my_company` using snmp `v2c` then you would enter:
 
 ```bash
-./addhost.php my_company v2c
+./addhost.php mydevice.example.com my_company v2c
 ```
 
 > Please note that if the community contains special characters such as `$` then you will need to wrap it in `'`. I.e: `'Pa$$w0rd'`.

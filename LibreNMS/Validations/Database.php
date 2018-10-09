@@ -63,26 +63,12 @@ class Database extends BaseValidation
 
     private function checkMode(Validator $validator)
     {
-        // Test for MySQL Strict mode
-        $strict_mode = dbFetchCell("SELECT @@global.sql_mode");
-        if (str_contains($strict_mode, 'STRICT_TRANS_TABLES')) {
-            //FIXME - Come back to this once other MySQL modes are fixed
-            //$valid->fail('You have MySQL STRICT_TRANS_TABLES enabled, please disable this until full support has been added: https://dev.mysql.com/doc/refman/5.0/en/sql-mode.html');
-        }
-
         // Test for lower case table name support
         $lc_mode = dbFetchCell("SELECT @@global.lower_case_table_names");
         if ($lc_mode != 0) {
             $validator->fail(
                 'You have lower_case_table_names set to 1 or true in mysql config.',
                 'Set lower_case_table_names=0 in your mysql config file in the [mysqld] section.'
-            );
-        }
-
-        if (empty($strict_mode) === false) {
-            $validator->fail(
-                "You have not set sql_mode='' in your mysql config.",
-                "Set sql-mode='' in your mysql config file in the [mysqld] section."
             );
         }
     }
@@ -208,7 +194,7 @@ class Database extends BaseValidation
         if (empty($schema_update)) {
             $validator->ok('Database schema correct');
         } else {
-            $result = ValidationResult::fail("We have detected that your database schema may be wrong, please report the following to us on IRC or the community site (https://t.libren.ms/5gscd):")
+            $result = ValidationResult::fail("We have detected that your database schema may be wrong, please report the following to us on Discord (https://t.libren.ms/discord) or the community site (https://t.libren.ms/5gscd):")
                 ->setFix('Run the following SQL statements to fix.')
                 ->setList('SQL Statements', $schema_update);
             $validator->result($result);
@@ -220,7 +206,8 @@ class Database extends BaseValidation
         $columns = array_map(array($this, 'columnToSql'), $table_schema['Columns']);
         $indexes = array_map(array($this, 'indexToSql'), $table_schema['Indexes']);
 
-        $def = implode(', ', array_merge(array_values($columns), array_values($indexes)));
+        $def = implode(', ', array_merge(array_values((array)$columns), array_values((array)$indexes)));
+        var_dump($def);
 
         return "CREATE TABLE `$table` ($def);";
     }

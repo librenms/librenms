@@ -1,7 +1,7 @@
 os: pixos
 group: cisco
 text: 'Cisco PIX-OS'
-ifname: 1
+ifname: true
 type: firewall
 icon: cisco
 over:
@@ -9,38 +9,38 @@ over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 poller_modules:
-    bgp-peers: 0
-    cisco-asa-firewall: 1
-    cisco-cbqos: 1
-    cisco-cef: 1
-    cisco-mac-accounting: 1
-    cisco-voice: 1
-    cisco-remote-access-monitor: 1
-    cisco-sla: 1
-    cisco-ipsec-flow-monitor: 1
-    cipsec-tunnels: 1
-    cisco-otv: 1
-    hr-mib: 0
-    ipmi: 0
-    ipSystemStats: 0
-    junose-atm-vp: 0
-    netscaler-vsvr: 0
-    ntp: 0
-    ospf: 0
-    stp: 0
-    ucd-diskio: 0
-    ucd-mib: 0
+    bgp-peers: false
+    cisco-asa-firewall: true
+    cisco-cbqos: true
+    cisco-cef: true
+    cisco-mac-accounting: true
+    cisco-voice: true
+    cisco-remote-access-monitor: true
+    cisco-sla: true
+    cisco-ipsec-flow-monitor: true
+    cipsec-tunnels: true
+    cisco-otv: true
+    hr-mib: false
+    ipmi: false
+    ipSystemStats: false
+    junose-atm-vp: false
+    netscaler-vsvr: false
+    ntp: false
+    ospf: false
+    stp: false
+    ucd-diskio: false
+    ucd-mib: false
 discovery_modules:
-    bgp-peers: 0
-    stp: 0
-    cisco-cef: 1
-    cisco-sla: 1
-    cisco-mac-accounting: 1
-    cisco-otv: 1
-    cisco-pw: 1
-    vrf: 1
-    cisco-vrf-lite: 1
+    bgp-peers: false
+    stp: false
+    cisco-cef: true
+    cisco-sla: true
+    cisco-mac-accounting: true
+    cisco-otv: true
+    cisco-pw: true
+    vrf: true
+    cisco-vrf-lite: true
 discovery:
     - sysDescr:
-        - Cisco PIX
-        - Cisco Firewall Services Module
+        - 'Cisco PIX'
+        - 'Cisco Firewall Services Module'

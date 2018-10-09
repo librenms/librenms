@@ -38,7 +38,7 @@ We have support for defining health / sensor discovery using YAML files so that 
 
 > Please note that DISPLAY-HINTS are disabled so ensure you use the correct divisor / multiplier if applicable.
 
-All yaml files are located in `includes/definitions/discovery/$os.yaml`. Defining the information hear is not always 
+All yaml files are located in `includes/definitions/discovery/$os.yaml`. Defining the information here is not always 
 possible and is heavily reliant on vendors being sensible with the MIBs they generate. Only snmp walks are supported 
 and you must provide a sane table that can be traversed and contains all of the data you need. We will use netbotz as 
 an example here.

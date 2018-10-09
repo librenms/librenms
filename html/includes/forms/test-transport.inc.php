@@ -12,14 +12,16 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
 
-$transport = mres($_POST['transport']);
+$transport = $vars['transport'] ?: null;
+$transport_id = $vars['transport_id'] ?: null;
 
 require_once $config['install_dir'].'/includes/alerts.inc.php';
 $tmp = array(dbFetchRow('select device_id,hostname,sysDescr,version,hardware,location from devices order by device_id asc limit 1'));
@@ -37,7 +39,7 @@ $obj = array(
     "faults"    => false,
     "uid"       => "000",
     "severity"  => "critical",
-    "rule"      => "%macros.device = 1",
+    "rule"      => "macros.device = 1",
     "name"      => "Test-Rule",
     "string"      => "#1: test => string;",
     "timestamp" => date("Y-m-d H:i:s"),
@@ -46,18 +48,21 @@ $obj = array(
     "msg"       => "This is a test alert",
 );
 
-$status = 'error';
+$response = ['status' => 'error'];
 
+if ($transport_id) {
+    $transport = dbFetchCell("SELECT `transport_type` FROM `alert_transports` WHERE `transport_id` = ?", [$transport_id]);
+}
 $class  = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport);
 if (class_exists($class)) {
-    $opts = $config['alert']['transports'][$transport];
-    if ($opts) {
-        $instance = new $class;
-        $tmp = $instance->deliverAlert($obj, $opts);
-        if ($tmp) {
-            $status = 'ok';
-        }
+    $opts = Config::get("alert.transports.$transport");
+    $instance = new $class($transport_id);
+    $result = $instance->deliverAlert($obj, $opts);
+    if ($result === true) {
+        $response['status'] = 'ok';
+    } else {
+        $response['message'] = $result;
     }
 }
 header('Content-type: application/json');
-echo _json_encode(array('status' => $status));
+echo json_encode($response);
