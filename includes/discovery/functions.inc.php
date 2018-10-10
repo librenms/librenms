@@ -1034,7 +1034,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                 d_echo("Final sensor value: $value\n");
 
                 if (can_skip_sensor($value, $data, $sensor_options, $raw_data[$index]) === false && is_numeric($value)) {
-                    $oid = $data['num_oid'] . $index;
+                    $oid = str_replace('{{ $index }}', $index, $data['num_oid']);
 
                     // process the description
                     $descr = dynamic_discovery_get_value('descr', $index, $data, $pre_cache);
