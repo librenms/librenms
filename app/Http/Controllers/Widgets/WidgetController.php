@@ -82,7 +82,7 @@ abstract class WidgetController extends Controller
         if (is_null($this->settings)) {
             $id = \Request::get('id');
             $widget = UserWidget::find($id);
-            $this->settings = array_replace($this->defaults, $widget ? $widget->settings : []);
+            $this->settings = array_replace($this->defaults, $widget ? (array)$widget->settings : []);
             $this->settings['id'] = $id;
         }
 

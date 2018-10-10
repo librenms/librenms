@@ -34,9 +34,7 @@ use LibreNMS\Config;
 
 class AvailabilityMapController extends WidgetController
 {
-    public $title = 'Availability Map';
-    public $settings_view = 'widgets.settings.availability-map';
-    public $view = '';
+    protected $title = 'Availability Map';
 
     public function __construct()
     {

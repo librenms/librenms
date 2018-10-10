@@ -75,6 +75,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::post('generic-graph', 'GraphController');
             Route::post('generic-image', 'ImageController');
             Route::post('globe', 'GlobeController');
+            Route::get('globe', 'GlobeController');
             Route::post('placeholder', 'PlaceholderController');
             Route::post('top-devices', 'TopDevicesController');
             Route::post('top-interfaces', 'TopInterfacesController');

@@ -25,86 +25,89 @@
 
 namespace App\Http\Controllers\Widgets;
 
+use App\Models\Device;
+use App\Models\Location;
+use App\Models\Port;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use LibreNMS\Config;
 
 class GlobeController extends WidgetController
 {
+    protected $title = 'Globe';
+
+    public function __construct()
+    {
+        // init defaults we need to check config, so do it in construct
+        $this->defaults = [
+            'markers' => Config::get('frontpage_globe.markers', 'devices'),
+            'region' => Config::get('frontpage_globe.region', 'world'),
+            'resolution' => Config::get('frontpage_globe.resolution', 'countries'),
+        ];
+    }
+
+    public function getSettingsView(Request $request)
+    {
+        return view('widgets.settings.globe', $this->getSettings());
+    }
+
     /**
      * @param Request $request
      * @return View
      */
     public function getView(Request $request)
     {
-        $locations = array();
+        $data = $this->getSettings();
+        $locations = collect();
 
-        $dbl = array();
+        $dbl = Device::hasAccess($request->user())
+            ->select('location')->whereNotNull('location')
+            ->orderBy('location')->groupBy('location')
+            ->pluck('location');
 
-
-
-        // Fetch regular locations
-        if (LegacyAuth::user()->hasGlobalRead()) {
-            $rows = dbFetchRows('SELECT location FROM devices AS D GROUP BY location ORDER BY location');
-        } else {
-            $rows = dbFetchRows('SELECT location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? GROUP BY location ORDER BY location', array(LegacyAuth::id()));
-        }
-
-        foreach ($rows as $row) {
-            // Only add it as a location if it wasn't overridden (and not already there)
-            if ($row['location'] != '') {
-                if (!in_array($row['location'], $locations)) {
-                    $dbl[] = $row['location'];
-                }
-            }
-        }
-
-        sort($dbl);
-
-
-        foreach ($dbl as $location) {
-            $location = mres($location);
-            $devices = array();
-            $devices_down = array();
-            $devices_up = array();
+        foreach (Location::whereIn('location', $dbl)->get() as $location) {
             $count = 0;
-            $down  = 0;
-            foreach (dbFetchRows("SELECT devices.device_id,devices.hostname,devices.status FROM devices LEFT JOIN devices_attribs ON devices.device_id = devices_attribs.device_id WHERE ( devices.location = ? || ( devices_attribs.attrib_type = 'override_sysLocation_string' && devices_attribs.attrib_value = ? ) ) && devices.disabled = 0 && devices.ignore = 0 GROUP BY devices.hostname", array($location,$location)) as $device) {
-                if ($config['frontpage_globe']['markers'] == 'devices' || empty($config['frontpage_globe']['markers'])) {
-                    $devices[] = $device['hostname'];
-                    $count++;
-                    if ($device['status'] == "0") {
-                        $down++;
-                        $devices_down[] = $device['hostname']." DOWN";
-                    } else {
-                        $devices_up[] = $device;
-                    }
-                } elseif ($config['frontpage_globe']['markers'] == 'ports') {
-                    foreach (dbFetchRows("SELECT ifName,ifOperStatus,ifAdminStatus FROM ports WHERE ports.device_id = ? && ports.ignore = 0 && ports.disabled = 0 && ports.deleted = 0", array($device['device_id'])) as $port) {
-                        $count++;
-                        if ($port['ifOperStatus'] == 'down' && $port['ifAdminStatus'] == 'up') {
-                            $down++;
-                            $devices_down[] = $device['hostname']."/".$port['ifName']." DOWN";
-                        } else {
-                            $devices_up[] = $port;
-                        }
-                    }
+            $up = 0;
+            $down_items = collect();
+
+            if ($data['markers'] == 'devices') {
+                $devices = $location->devices();
+                $count = $devices->count();
+                list($devices_down, $devices_up) = $devices->partition(function ($device) {
+                    return $device->status = 0;
+                });
+                $up = $devices_up->count();
+                $down_items = $devices_down->map(function ($device) {
+                    return $device->displayName() . ' DOWN';
+                });
+            } elseif ($data['markers'] == 'ports') {
+                $devices = $location->devicesQuery()->with('ports')->get();
+
+                foreach ($devices as $device) {
+                    list($ports_down, $ports_up) = $device->ports->partition(function ($port) {
+                        return $port->ifOperStatus == 'down' && $port->ifAdminStatus == 'up';
+                    });
+                    $count += $device->ports->count();
+                    $up += $ports_up->count();
+                    $down_items = $ports_down->map(function ($port) use ($device) {
+                        return $device->displayName() . '/' . $port->getShortLabel() . ' DOWN';
+                    });
                 }
             }
-            $pdown = ($down / $count)*100;
-            if ($config['frontpage_globe']['markers'] == 'devices' || empty($config['frontpage_globe']['markers'])) {
-                $devices_down = array_merge(array(count($devices_up). " Devices OK"), $devices_down);
-            } elseif ($config['frontpage_globe']['markers'] == 'ports') {
-                $devices_down = array_merge(array(count($devices_up). " Ports OK"), $devices_down);
-            }
-            $locations[] = "            ['".$location."', ".$pdown.", ".$count.", '".implode(",<br/> ", $devices_down)."']";
+
+            // indicate the number of up items before the itemized down
+            $down_items->prepend($up .  '&nbsp;' . ucfirst($data['markers']) . '&nbsp;OK');
+
+            $locations->push([
+                $location->location,
+                $count ? (1 - $up / $count) * 100 : 0, // percent down
+                $count,
+                $down_items->implode(',<br/> '),
+            ]);
         }
-        $temp_output .= implode(",\n", $locations);
 
-        $map_world = Config::get('frontpage_globe.region', 'world');
-        $map_countries = Config::get('frontpage_globe.resolution', 'countries');
+        $data['locations'] = $locations->toJson();
 
-
-        return view('widgets.globe', compact('locations', 'map_world', 'map_countries'));
+        return view('widgets.globe', $data);
     }
 }
