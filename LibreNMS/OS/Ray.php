@@ -40,8 +40,8 @@ class Ray extends OS implements
     WirelessFrequencyDiscovery,
     WirelessPowerDiscovery,
     WirelessRssiDiscovery,
-    WirelessSnrDiscovery,
-    WirelessRateDiscovery    
+    WirelessRateDiscovery,
+    WirelessSnrDiscovery
 {
     /**
      * Discover processors.
