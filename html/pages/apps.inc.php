@@ -278,6 +278,14 @@ $graphs['asterisk'] = array(
     'channels',
     'sip',
 );
+$graphs['conntrack'] = array(
+    'tcp',
+    'udp',
+    'icmp',
+    'igmp',
+    'other',
+    'total',
+);
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";

@@ -43,6 +43,7 @@ class Application extends BaseModel
 
     protected static $display_name = [
         'bind' => 'BIND',
+        'conntrack' => 'Conntrack',
         'dhcp-stats' => 'DHCP Stats',
         'exim-stats' => 'EXIM Stats',
         'fbsd-nfs-client' => 'FreeBSD NFS Client',

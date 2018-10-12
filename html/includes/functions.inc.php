@@ -144,6 +144,9 @@ function nicecase($item)
         case 'asterisk':
             return 'Asterisk';
 
+        case 'conntrack':
+            return 'Conntrack';
+
         default:
             return ucfirst($item);
     }

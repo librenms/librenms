@@ -238,6 +238,70 @@ extend power-stat /etc/snmp/power-stat.sh
 
 The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
 
+### Conntrack
+
+Conntrack is a module in Netfilter that displays current connection state on your OS. Must-have for routers deployed on Linux OS. 
+More information: https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#THECONNTRACKENTRIES
+
+#### Conntrack data gsthering script
+1. Copy the Perl script to the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/conntrack.pl -O /etc/snmp/conntrack.pl
+```
+
+2. Run `chmod +x /etc/snmp/conntrack.pl`
+
+#### Conntrack Netfilter module
+1. By default, conntrack module is disabled. Enable it by executing: 
+```
+modprobe nf_conntrack
+modprobe nf_conntrack_ipv4
+echo "nf_conntrack" >> /etc/modules
+echo "nf_conntrack_ipv4" >> /etc/modules
+```
+If you use IPv6: 
+```
+modprobe nf_conntrack_ipv6
+echo "nf_conntrack_ipv6" >> /etc/modules
+```
+
+Note the Linux kernel requirement: Linux kernel version must be >= 2.6.18.
+
+2. It is advised to install conntrack-tools package, since it operates faster than plain conntrack file reads: 
+On Debian/Ubuntu: 
+```
+apt-get install conntrack
+```
+On RHEL/CentOS: 
+```
+yum install conntrack-tools
+```
+
+3. You can test the script execution at this stage: 
+```
+/usr/bin/perl /etc/snmp/conntrack.pl
+```
+
+If everything is working fine, you will see conntrack stats displayed. You can also inspect them in `/tmp/conntrack.stat` file. 
+
+#### SNMP Extend
+1. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend conntrack "/bin/cat /tmp/conntrack.stat"
+```
+
+2. Restart snmpd on your host.
+
+The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
+
+#### Cron job
+The file `/tmp/conntrack.stat` must be refreshed at defined interval in order to remain actual. To achieve this, add the following entry in your `/etc/crontab` file: 
+```
+*/5 * * * * root /bin/sleep 290; /usr/bin/perl /etc/snmp/conntrack.pl cron >/dev/null 2>&1
+```
+
+Script will get connection status every 5 minutes, then it will get data and save it into temporary file in /tmp/ directory. You can change directory and name of temporary file in script-settings ($_tempfile), do not forget to change string with extend in the snmpd.conf. 
+
 ### DHCP Stats
 A small shell script that reports current DHCP leases stats.
 
