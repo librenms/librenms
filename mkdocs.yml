@@ -2,7 +2,7 @@ site_name: LibreNMS Docs
 docs_dir: doc
 theme:
   name: null
-  custom_dir: '../librenms_v2'
+  custom_dir: '../theme_v2'
   logo: img/librenms.svg
   language: en
   palette: null
