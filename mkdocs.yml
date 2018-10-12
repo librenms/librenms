@@ -13,6 +13,8 @@ site_url: http://docs.librenms.org
 markdown_extensions:
     - pymdownx.tasklist
     - pymdownx.tilde
+extra_css:
+    - librenms.css
 extra:
     article_nav_top: false
     article_nav_bottom: true

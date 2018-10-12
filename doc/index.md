@@ -1,25 +1,23 @@
-<br />
-<br />
 <div class="row">
     <div class="col-md-4">
         <div class="well">
             <div class="home-header">
               <a href="/Installation/">
-                <i class="fa fa-download fa-2x"></i>
+                <i class="fa fa-download fa-1x"></i>
                 <span> Installing</span>
               </a>
             </div>
             <br />
+            <a href="/Installation/">Installing LibreNMS</a><br />
             <a href="/Installation/Installation-Ubuntu-1804-Nginx/">Ubuntu 18.04 + Nginx</a><br />
             <a href="/Installation/Installation-CentOS-7-Nginx/">CentOS 7 + Nginx</a><br />
-            <a href="/Installation/Migrating-from-Observium/">Migrating from Observium</a><br />
             <a href="/Installation/Installing-LibreNMS/"><strong>More...</strong></a>
         </div>
     </div>
     <div class="col-md-4">
         <div class="well">
             <div class="home-header">
-                <i class="fa fa-plug fa-2x"></i>
+                <i class="fa fa-plug fa-1x"></i>
                 <span> Setup</span>
             </div>
             <br />
@@ -33,7 +31,7 @@
         <div class="well">
             <div class="home-header">
               <a href="/Alerting/">
-                <i class="fa fa-bell fa-2x"></i>
+                <i class="fa fa-bell fa-1x"></i>
                 <span> Alerting</span>
               </a>
             </div>
@@ -50,7 +48,7 @@
         <div class="well">
             <div class="home-header">
               <a href="/API/">
-                <i class="fa fa-connectdevelop fa-2x"></i>
+                <i class="fa fa-connectdevelop fa-1x"></i>
                 <span> API</span>
               </a>
             </div>
@@ -65,7 +63,7 @@
         <div class="well">
             <div class="home-header">
               <a href="/Support/">
-                <i class="fa fa-ambulance fa-2x"></i>
+                <i class="fa fa-ambulance fa-1x"></i>
                 <span> Support</span>
               </a>
             </div>
@@ -80,7 +78,7 @@
         <div class="well">
             <div class="home-header">
               <a href="/Developing/">
-                <i class="fa fa-code-fork fa-2x"></i>
+                <i class="fa fa-code-fork fa-1x"></i>
                 <span> Developing</span>
               </a>
             </div>
