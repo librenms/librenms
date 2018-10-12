@@ -2,6 +2,7 @@
 GH_REPO="@github.com/librenms-docs/librenms-docs.github.io.git"
 FULL_REPO="https://${GH_TOKEN}$GH_REPO"
 THEME_REPO="https://github.com/librenms-docs/theme_v2.git"
+THEME_BRANCH=material
 
 if [ "$EXECUTE_BUILD_DOCS" != "true" ]; then
     echo "Doc build skipped"
@@ -25,14 +26,14 @@ git checkout master
 cd ../
 
 git clone $THEME_REPO
+git checkout $THEME_BRANCH
 
-mkdocs build --clean
+cd out
+mkdocs gh-deploy --config-file ../mkdocs.yml --remote-branch master
 build_result=$?
 
 # Only deploy after merging to master
 if [ "$build_result" == "0" -a "$TRAVIS_PULL_REQUEST" == "false" -a "$TRAVIS_BRANCH" == "master" ]; then
-    cd out
-
     touch .
     git add -A .
     git commit -m "GH-Pages update by travis after $TRAVIS_COMMIT"

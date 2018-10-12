@@ -1,7 +1,13 @@
 site_name: LibreNMS Docs
 docs_dir: doc
-theme_dir: 'theme_v2'
-theme: null
+theme:
+  name: null
+  custom_dir: '../librenms_v2'
+  logo: img/librenms.svg
+  language: en
+  palette: null
+  font: null
+  feature: null
 site_dir: out
 site_url: http://docs.librenms.org
 markdown_extensions:
@@ -10,12 +16,12 @@ markdown_extensions:
 extra_css:
     - librenms.css
 extra:
-    logo: img/librenms.svg
     article_nav_top: false
     article_nav_bottom: true
 site_author: LibreNMS
 site_description: LibreNMS user and developer documentation
-repo_url: https://github.com/librenms/librenms
+repo_url: https://github.com/librenms/librenms/
+edit_uri: edit/master/doc
 repo_name: GitHub
 google_analytics: ['UA-79149977-2', 'docs.librenms.org']
 pages:
