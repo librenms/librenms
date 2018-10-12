@@ -1,0 +1,284 @@
+NSCRTV-HFCEMS-PROPERTY-MIB DEFINITIONS ::= BEGIN
+
+-- *****************************************************************************
+--                           附录C 属性MIB
+-- *****************************************************************************
+
+IMPORTS
+    OBJECT-TYPE
+        FROM RFC-1212
+    propertyIdent
+        FROM NSCRTV-ROOT;
+
+--********************************************************************************************
+--*      模拟属性表
+--********************************************************************************************
+analogPropertyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AnalogPropertyEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "模拟参数属性表。"
+    ::= { propertyIdent 1 }
+
+analogPropertyEntry OBJECT-TYPE
+    SYNTAX AnalogPropertyEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "模拟参数属性表目。
+        OID作为表目的索引，其编码方法是“长度＋OID”。OID的前2个成员“1.3”是按“1”和“3”分
+        别编码，而不是普通OID编码方式(0x2B)。"
+    INDEX { analogParameterOID }
+    ::= { analogPropertyTable 1 }
+
+AnalogPropertyEntry ::= SEQUENCE {
+    analogParameterOID
+        OBJECT IDENTIFIER,
+    alarmEnable
+        OCTET STRING,
+    analogAlarmState
+        INTEGER,
+    analogAlarmHIHI
+        INTEGER,
+    analogAlarmHI
+        INTEGER,
+    analogAlarmLO
+        INTEGER,
+    analogAlarmLOLO
+        INTEGER,
+    analogAlarmDeadband
+        INTEGER
+    }
+
+analogParameterOID OBJECT-TYPE
+    SYNTAX OBJECT IDENTIFIER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "索引。"
+    ::= { analogPropertyEntry 1 }
+
+alarmEnable OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(1))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "告警使能控制字节，对应位为'1'表示允许告警,'0'表示禁止告警
+            Bit 0 : 极低告警使能
+            Bit 1 : 低告警使能
+            Bit 2 : 高告警使能
+            Bit 3 : 极高告警使能
+            Bit 4～7 保留,应为0
+        此对象应保存在非易失性存储器中。"
+    ::= { analogPropertyEntry 2 }
+
+analogAlarmState OBJECT-TYPE
+    SYNTAX INTEGER {
+        aasNominal (1),
+        aasHIHI (2),
+        aasHI (3),
+        aasLO (4),
+        aasLOLO (5)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "参数的当前告警状态。"
+    ::= { analogPropertyEntry 3 }
+
+analogAlarmHIHI OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "极高告警门限HIHI的值。此对象应保存在非易失性存储器中。"
+    ::= { analogPropertyEntry 4 }
+
+analogAlarmHI OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "高告警门限HI的值。此对象应保存在非易失性存储器中。"
+    ::= { analogPropertyEntry 5 }
+
+analogAlarmLO OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "低告警门限LO的值。此对象应保存在非易失性存储器中。"
+    ::= { analogPropertyEntry 6 }
+
+analogAlarmLOLO OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "极低告警门限LOLO的值。此对象应保存在非易失性存储器中。"
+    ::= { analogPropertyEntry 7 }
+
+analogAlarmDeadband OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "告警门限死区的值。告警产生后，参数值应恢复到告警门限
+        内且与告警门限之差的绝对值大于死区值，该告警才能清除。
+        此对象应保存在非易失性存储器中。"
+    ::= { analogPropertyEntry 8 }
+
+
+
+-- *
+-- * 离散属性表
+-- * 离散属性表的记录数量是固定的，每个离散型参数的每一个需要进行告警处理的值在表
+-- * 中均对应一条记录。每个离散型参数在离散属性表中至少对应有一条记录。
+-- * 离散属性表有2个索引：一个是参数标识（OID），另一个是离散告警值（discreteAlarmValue）。
+-- *
+
+discretePropertyTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF DiscretePropertyEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION 
+        "离散属性表。"
+    ::= { propertyIdent 2 }
+
+discretePropertyEntry  OBJECT-TYPE
+    SYNTAX  DiscretePropertyEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION 
+        "离散属性表目。OID的编码方式同模拟属性表。"
+    INDEX   { discreteParameterOID, discreteAlarmValue }
+    ::= { discretePropertyTable 1 }
+
+DiscretePropertyEntry ::= SEQUENCE {
+    discreteParameterOID
+        OBJECT IDENTIFIER,
+    discreteAlarmValue
+        INTEGER,
+    discreteAlarmEnable
+        INTEGER,
+    discreteAlarmState
+        INTEGER
+}
+
+discreteParameterOID  OBJECT-TYPE
+    SYNTAX  OBJECT IDENTIFIER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION 
+        "离散属性表的索引1：参数OID。"
+    ::= { discretePropertyEntry 1 }
+
+discreteAlarmValue  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION 
+        "离散属性表的索引2：参数值。
+        当设备的参数值等于此值，将进行告警处理。"
+    ::= { discretePropertyEntry 2 }
+
+
+discreteAlarmEnable  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        disable (1),
+        enableMajor (2),
+        enableMinor (3)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION 
+        "当告警使能打开(2或3)，允许进行此参数的告警处理。
+        如果告警使能关闭(1)，则告警处理不会进行。
+        此对象缺省值为disable(1)。
+        此对象应保存在非易失性存储器中。"
+    ::= { discretePropertyEntry 3 }
+
+discreteAlarmState  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        dasNominal(1),
+        dasDiscreteMajor(6),
+        dasDiscreteMinor(7)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION 
+        "参数的当前告警状态。"
+    ::= { discretePropertyEntry 4 }
+
+
+-- * 
+-- * 当前告警表包含了NE当前处于"激活"状态的告警项(0项或多项)。
+-- * 虽然模拟属性表和离散属性表中也包括了告警状态信息，但是管理者应遍历全表才能
+-- * 完全确定NE的告警状态，在效率上比较低。而当前告警表的作用就是将这2张表中处于告警
+-- * 状态的那些项进行了汇总，便于管理者进行检索。
+-- * 建议管理者程序使用GetNext命令(从表头OID开始)遍历这张表来获取NE所有的告警信息。
+-- * HFC网络正常工作时，当前告警表的内容为空。
+-- * 
+
+currentAlarmTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF CurrentAlarmEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION 
+        "当前告警表。"
+    ::= { propertyIdent 3 }
+
+currentAlarmEntry  OBJECT-TYPE
+    SYNTAX  CurrentAlarmEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION 
+        "当前告警表目。
+        OID的编码方式同模拟属性表。"
+    INDEX   { currentAlarmOID }
+    ::= { currentAlarmTable 1 }
+
+CurrentAlarmEntry ::= SEQUENCE {
+    currentAlarmOID
+        OBJECT IDENTIFIER,
+    currentAlarmState
+        INTEGER,
+    currentAlarmValue
+        INTEGER
+}
+
+currentAlarmOID  OBJECT-TYPE
+    SYNTAX  OBJECT IDENTIFIER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION 
+        "NE当前处于告警状态的参数OID索引,与属性表中的告警参数OID对应。"
+    ::= { currentAlarmEntry 1 }
+
+currentAlarmState  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        caasHIHI (2),
+        caasHI (3),
+        caasLO (4),
+        caasLOLO (5),
+        caasDiscreteMajor (6),
+        caasDiscreteMinor (7)
+        
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION 
+        "告警参数的当前告警状态。"
+    ::= { currentAlarmEntry 2 }
+             
+currentAlarmValue  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION 
+        "告警参数的值。"
+    ::= { currentAlarmEntry 3 }
+
+--******************************************************************************
+END
