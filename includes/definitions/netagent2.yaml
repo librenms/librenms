@@ -7,3 +7,5 @@ over:
 discovery:
     - sysDescr_regex:
         - '/^NET Agent II/'
+    - sysObjectID:
+        - .1.3.6.1.4.1.935.1.1.1
