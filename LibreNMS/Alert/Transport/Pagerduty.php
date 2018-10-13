@@ -21,6 +21,7 @@
  * @package LibreNMS
  * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
 use GuzzleHttp\Client;
