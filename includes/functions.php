@@ -1134,27 +1134,36 @@ function is_port_valid($port, $device)
     $ifAlias = $port['ifAlias'];
     $ifType  = $port['ifType'];
 
+    // Changed by F.Marton 10102018
+    $ifAdminStatus = $port['ifAdminStatus'];
+    foreach (Config::getCombined($device['os'], 'bad_ifAdminStatus') as $bi) {
+        if ($ifAdminStatus == $bi) {
+            d_echo("ignored $ifName by ifAdminStatus: $ifAdminStatus (matched: $bi)\n");
+            return false;
+        }
+    }
+
     if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if'))) {
         return true;
     }
 
     foreach (Config::getCombined($device['os'], 'bad_if') as $bi) {
         if (str_i_contains($ifDescr, $bi)) {
-            d_echo("ignored by ifDescr: $ifDescr (matched: $bi)\n");
+            d_echo("ignored $ifName by ifDescr: $ifDescr (matched: $bi)\n");
             return false;
         }
     }
 
     foreach (Config::getCombined($device['os'], 'bad_if_regexp') as $bir) {
         if (preg_match($bir ."i", $ifDescr)) {
-            d_echo("ignored by ifDescr: $ifDescr (matched: $bir)\n");
+            d_echo("ignored $ifName by ifDescr: $ifDescr (matched: $bir)\n");
             return false;
         }
     }
 
     foreach (Config::getCombined($device['os'], 'bad_ifname_regexp') as $bnr) {
         if (preg_match($bnr ."i", $ifName)) {
-            d_echo("ignored by ifName: $ifName (matched: $bnr)\n");
+            d_echo("ignored $ifName by ifName: $ifName (matched: $bnr)\n");
             return false;
         }
     }
@@ -1162,14 +1171,14 @@ function is_port_valid($port, $device)
 
     foreach (Config::getCombined($device['os'], 'bad_ifalias_regexp') as $bar) {
         if (preg_match($bar ."i", $ifAlias)) {
-            d_echo("ignored by ifName: $ifAlias (matched: $bar)\n");
+            d_echo("ignored $ifName by ifName: $ifAlias (matched: $bar)\n");
             return false;
         }
     }
 
     foreach (Config::getCombined($device['os'], 'bad_iftype') as $bt) {
         if (str_contains($ifType, $bt)) {
-            d_echo("ignored by ifType: $ifType (matched: $bt )\n");
+            d_echo("ignored $ifName by ifType: $ifType (matched: $bt )\n");
             return false;
         }
     }

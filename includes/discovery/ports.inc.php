@@ -8,6 +8,9 @@ $port_stats = snmpwalk_cache_oid($device, 'ifDescr', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifName', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB');
+$port_stats = snmpwalk_cache_oid($device, 'ifAdminStatus', $port_stats, 'IF-MIB');
+
+
 
 // End Building SNMP Cache Array
 d_echo($port_stats);
