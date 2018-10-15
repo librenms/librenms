@@ -184,10 +184,10 @@ modules:
                     index: 'mtxrWl60GMode.{{ $index }}'
                     state_name: mtxrWl60GMode
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: 'AP Bridge' }
-                        - { value: 2, generic: 0, graph: 1, descr: 'Station Bridge' }
-                        - { value: 3, generic: 0, graph: 1, descr: 'Sniff' }
-                        - { value: 4, generic: 0, graph: 1, descr: 'Bridge' }
+                        - { value: 0, generic: 0, graph: 1, descr: 'AP Bridge' }
+                        - { value: 1, generic: 0, graph: 1, descr: 'Station Bridge' }
+                        - { value: 2, generic: 0, graph: 1, descr: 'Sniff' }
+                        - { value: 3, generic: 0, graph: 1, descr: 'Bridge' }
         power:
             data:
                 -
