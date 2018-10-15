@@ -1146,3 +1146,21 @@ echo "extend zfs /etc/snmp/zfs-linux" >> /etc/snmp/snmpd.conf
 ```
 
 Now restart snmpd and you're all set.
+
+###### CentOS 7
+`zfs-linux` requires python3 >=python3.5.  
+(This does not cover SELinux requirements.)  
+```
+sudo wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs-linux -O /etc/snmp/zfs-linux
+sudo chmod +x /etc/snmp/zfs-linux
+sudo echo "extend zfs /etc/snmp/zfs-linux" >> /etc/snmp/snmpd.conf
+sudo yum install -y centos-release-scl
+sudo yum install -y rh-python35-python
+sudo ln -s /opt/rh/rh-python35/enable /etc/profile.d/rh-python35.sh && source /etc/profile.d/rh-python35.sh #Not strictly nessissary, but useful for debugging (in bash).
+sudo mkdir /etc/systemd/system/snmpd.service.d
+sudo echo '[Service]
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/opt/rh/rh-python35/root/usr/bin
+Environment=LD_LIBRARY_PATH=/opt/rh/rh-python35/root/usr/lib64' > /etc/systemd/system/snmpd.service.d/rh-python35.conf
+sudo systemctl daemon-reload
+sudo systemctl restart snmpd
+```
