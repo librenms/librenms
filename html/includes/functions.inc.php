@@ -1513,7 +1513,7 @@ function get_oxidized_nodes_list()
     foreach ($data as $object) {
         $device = device_by_name($object['name']);
         if (! device_permitted($device['device_id'])) {
-            //user cannot see this device, so let's skip it. 
+            //user cannot see this device, so let's skip it.
             continue;
         }
         $fa_color = $object['status'] == 'success' ? 'success' : 'danger';
@@ -1521,8 +1521,8 @@ function get_oxidized_nodes_list()
         <tr>
         <td>
         " . generate_device_link($device);
-        if ($device['device_id'] == 0) { 
-            echo "(device '" . $object['name'] . "' not in LibreNMS)"; 
+        if ($device['device_id'] == 0) {
+            echo "(device '" . $object['name'] . "' not in LibreNMS)";
         }
         echo "
         </td>
