@@ -47,13 +47,16 @@ If you can't access OpenStreet map directly you can run a local [tile server](ht
 ```php
 $config['leaflet']['tile_url'] = 'localhost.com';
 ```
-### Additional Leaflet config
+### Geocode engine config
 ```php
-$config['map']['engine']                                = "leaflet";
-$config['leaflet']['default_lat']                       = "51.981074";
-$config['leaflet']['default_lng']                       = "5.350342";
-$config['leaflet']['default_zoom']                      = 8;    
-$config['leaflet']['group_radius']                      = 1;    // Device grouping radius in KM default 80KM
+$config['geoloc']['engine'] = "google";
+$config['geoloc']['api_key'] = "abcdefghijklmnopqrstuvwxyz";
+```
+### Offline OpenStreet Map
+If you can't access OpenStreet map directly you can run a local [tile server](http://wiki.openstreetmap.org/wiki/Tile_servers). To specify a different url you can set:
+
+```php
+$config['leaflet']['tile_url'] = 'localhost.com';
 ```
 
 ### Jquery-Mapael config
