@@ -58,7 +58,7 @@ $config['leaflet']['group_radius']                      = 1;    // Device groupi
 
 ### Geocode engine config
 ```php
-$config['geoloc']['engine'] = "google";
+$config['geoloc']['engine'] = "google";// Valid options are google or mapquest
 $config['geoloc']['api_key'] = "abcdefghijklmnopqrstuvwxyz";
 ```
 ### Jquery-Mapael config
