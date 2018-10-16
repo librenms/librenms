@@ -89,25 +89,25 @@ class Routeros extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-            $data = $this->fetchData();
+        $data = $this->fetchData();
        
-            $sensors = array();
+        $sensors = array();
         foreach ($data as $index => $entry) {
             if ($entry['mtxrWlApFreq'] == null) {
                 return $this->discoverSensor(
                     'frequency',
                     'mtxrWl60GFreq',
                     '.1.3.6.1.4.1.14988.1.1.1.8.1.6.'
-                   );
-                } else {
-                  return $this->discoverSensor(
-                      'frequency',
-                      'mtxrWlApFreq',
-                      '.1.3.6.1.4.1.14988.1.1.1.3.1.7.'
+                );
+            } else {
+                    return $this->discoverSensor(
+                        'frequency',
+                        'mtxrWlApFreq',
+                        '.1.3.6.1.4.1.14988.1.1.1.3.1.7.'
                     );
-                }
             }
         }
+    }
     /**
      * Discover wireless Rssi.  This is in Dbm. Type is Dbm.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -182,7 +182,6 @@ class Routeros extends OS implements
         $sensors = array();
         foreach ($data as $index => $entry) {
             if (($entry['mtxrWlApSsid'] !== null)) {
-            
             $sensors[] = new WirelessSensor(
                 $type,
                 $this->getDeviceId(),
@@ -192,8 +191,7 @@ class Routeros extends OS implements
                 'SSID: ' . $entry['mtxrWlApSsid'],
                 $entry[$oid]
                 );
-            }
-             else {
+            } else {
                 $sensors[] = new WirelessSensor(
                     $type,
                     $this->getDeviceId(),
@@ -202,10 +200,9 @@ class Routeros extends OS implements
                     $index,
                     'SSID: ' . $entry['mtxrWl60GSsid'],
                     $entry[$oid]
-                    );
+                );
              }
         }
-        return $sensors;
+       return $sensors;
     }
 }
-
