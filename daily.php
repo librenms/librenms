@@ -259,7 +259,7 @@ if ($options['f'] === 'refresh_alert_rules') {
         $rules = dbFetchRows('SELECT `id`, `rule`, `builder`, `extra` FROM `alert_rules`');
         foreach ($rules as $rule) {
             $rule_options = json_decode($rule['extra'], true);
-            if ($rule_options['override_query'] !== 'on') {
+            if ($rule_options['options']['override_query'] !== 'on') {
                 $data['query'] = GenSQL($rule['rule'], $rule['builder']);
                 if (!empty($data['query'])) {
                     dbUpdate($data, 'alert_rules', 'id=?', array($rule['id']));
