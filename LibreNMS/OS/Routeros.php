@@ -23,6 +23,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 namespace LibreNMS\OS;
+
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -31,6 +32,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\OS;
+
 class Routeros extends OS implements
     WirelessCcqDiscovery,
     WirelessClientsDiscovery,
@@ -86,26 +88,26 @@ class Routeros extends OS implements
      * @return array Sensors
      */
     public function discoverWirelessFrequency()
-        {
-            $data = $this->fetchData();
+    {
+        $data = $this->fetchData();
        
-            $sensors = array();
-            foreach ($data as $index => $entry) {
-                if ($entry['mtxrWlApFreq'] == null) {
-                   return $this->discoverSensor(
-                       'frequency',
-                       'mtxrWl60GFreq',
-                       '.1.3.6.1.4.1.14988.1.1.1.8.1.6.'
-                   );
-        } else{
-                  return $this->discoverSensor(
-                      'frequency',
-                      'mtxrWlApFreq',
-                      '.1.3.6.1.4.1.14988.1.1.1.3.1.7.'
+        $sensors = array();
+        foreach ($data as $index => $entry) {
+            if ($entry['mtxrWlApFreq'] == null) {
+                return $this->discoverSensor(
+                    'frequency',
+                    'mtxrWl60GFreq',
+                    '.1.3.6.1.4.1.14988.1.1.1.8.1.6.'
+                );
+            } else {
+                    return $this->discoverSensor(
+                        'frequency',
+                        'mtxrWlApFreq',
+                        '.1.3.6.1.4.1.14988.1.1.1.3.1.7.'
                     );
-                }
             }
         }
+    }
     /**
      * Discover wireless Rssi.  This is in Dbm. Type is Dbm.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -180,8 +182,6 @@ class Routeros extends OS implements
         $sensors = array();
         foreach ($data as $index => $entry) {
             if (($entry['mtxrWlApSsid'] !== null)) {
-                
-            
             $sensors[] = new WirelessSensor(
                 $type,
                 $this->getDeviceId(),
@@ -190,21 +190,19 @@ class Routeros extends OS implements
                 $index,
                 'SSID: ' . $entry['mtxrWlApSsid'],
                 $entry[$oid]
-            );
-            }
-        
-             else {
-            $sensors[] = new WirelessSensor(
-                $type,
-                $this->getDeviceId(),
-                $num_oid_base . $index,
-                'mikrotik',
-                $index,
-                'SSID: ' . $entry['mtxrWl60GSsid'],
-                $entry[$oid]
-             );
-            }
-          }
-        return $sensors;
+                );
+            } else {
+                $sensors[] = new WirelessSensor(
+                    $type,
+                    $this->getDeviceId(),
+                    $num_oid_base . $index,
+                    'mikrotik',
+                    $index,
+                    'SSID: ' . $entry['mtxrWl60GSsid'],
+                    $entry[$oid]
+                );
+             }
+        }
+       return $sensors;
     }
 }
