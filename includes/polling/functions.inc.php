@@ -569,7 +569,8 @@ function location_to_latlng($device)
                 case "google":
                 default:
                     if ($data['status'] == 'OK') {
-                        $loc = $data['results'][0]['geometry']['location'];
+                            $loc['lat'] = $data['results'][0]['geometry']['location']['lat'];
+                            $loc['lng'] = $data['results'][0]['geometry']['location']['lng'];
                     } else {
                         $bad_loc = true;
                     }
