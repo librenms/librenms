@@ -22,9 +22,7 @@
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 namespace LibreNMS\OS;
-
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -33,7 +31,6 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\OS;
-
 class Routeros extends OS implements
     WirelessCcqDiscovery,
     WirelessClientsDiscovery,
@@ -43,7 +40,6 @@ class Routeros extends OS implements
     WirelessRssiDiscovery
 {
     private $data;
-
     /**
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
@@ -52,14 +48,12 @@ class Routeros extends OS implements
     public function discoverWirelessCcq()
     {
         $data = $this->fetchData();
-
         $sensors = array();
         foreach ($data as $index => $entry) {
             // skip sensors with no data (nv2 should report 1 client, but doesn't report ccq)
-            if (($entry['mtxrWlApClientCount'] > 0 && $entry['mtxrWlApOverallTxCCQ'] == 0)) {
+            if ($entry['mtxrWlApClientCount'] > 0 && $entry['mtxrWlApOverallTxCCQ'] == 0) {
                 continue;
             }
-
             $sensors[] = new WirelessSensor(
                 'ccq',
                 $this->getDeviceId(),
@@ -70,10 +64,8 @@ class Routeros extends OS implements
                 $entry['mtxrWlApOverallTxCCQ']
             );
         }
-
         return $sensors;
     }
-
     /**
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
@@ -87,7 +79,6 @@ class Routeros extends OS implements
             '.1.3.6.1.4.1.14988.1.1.1.3.1.6.'
         );
     }
-
    /**
      * Discover wireless frequency.  This is in MHz. Type is frequency.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -96,30 +87,25 @@ class Routeros extends OS implements
      */
     public function discoverWirelessFrequency()
         {
-        $data = $this->fetchData();
+            $data = $this->fetchData();
        
-        $sensors = array();
-        foreach ($data as $index => $entry)  {
-        if ($entry['mtxrWlApFreq'] == null)  {
-            return $this->discoverSensor(
-            'frequency',
-            'mtxrWl60GFreq',
-            '.1.3.6.1.4.1.14988.1.1.1.8.1.6.'
-        );
+            $sensors = array();
+            foreach ($data as $index => $entry) {
+                if ($entry['mtxrWlApFreq'] == null) {
+                   return $this->discoverSensor(
+                       'frequency',
+                       'mtxrWl60GFreq',
+                       '.1.3.6.1.4.1.14988.1.1.1.8.1.6.'
+                   );
+        } else{
+                  return $this->discoverSensor(
+                      'frequency',
+                      'mtxrWlApFreq',
+                      '.1.3.6.1.4.1.14988.1.1.1.3.1.7.'
+                    );
+                }
+            }
         }
-       
-        else{
-
-         $this->discoverSensor(
-                'frequency',
-                'mtxrWlApFreq',
-                '.1.3.6.1.4.1.14988.1.1.1.3.1.7.'
-            );
-            }
-            }
-    }
-
-
     /**
      * Discover wireless Rssi.  This is in Dbm. Type is Dbm.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -132,9 +118,8 @@ class Routeros extends OS implements
             'rssi',
             'mtxrWl60GRssi',
             '.1.3.6.1.4.1.14988.1.1.1.8.1.12.'
-            );
+        );
     }
-
     /**
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
@@ -148,7 +133,6 @@ class Routeros extends OS implements
             '.1.3.6.1.4.1.14988.1.1.1.3.1.9.'
         );
     }
-
     /**
      * Discover wireless rate. This is in bps. Type is rate.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -158,7 +142,6 @@ class Routeros extends OS implements
     public function discoverWirelessRate()
     {
         $data = $this->fetchData();
-
         $sensors = array();
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
@@ -180,26 +163,20 @@ class Routeros extends OS implements
                 $entry['mtxrWlApRxRate']
             );
         }
-
         return $sensors;
     }
-
     private function fetchData()
     {
         if (is_null($this->data)) {
             $wl60 = snmpwalk_cache_oid($this->getDevice(), 'mtxrWl60GTable', array(), 'MIKROTIK-MIB');
-            $wl  = snmpwalk_cache_oid($this->getDevice(), 'mtxrWlApTable', array(), 'MIKROTIK-MIB');
-           $this->data = $wl60+$wl;
-
+            $wl = snmpwalk_cache_oid($this->getDevice(), 'mtxrWlApTable', array(), 'MIKROTIK-MIB');
+            $this->data = $wl60+$wl;
         }
-
         return $this->data;
     }
-
     private function discoverSensor($type, $oid, $num_oid_base)
     {
         $data = $this->fetchData();
-
         $sensors = array();
         foreach ($data as $index => $entry) {
             if (($entry['mtxrWlApSsid'] !== null)) {
@@ -217,7 +194,6 @@ class Routeros extends OS implements
             }
         
              else {
-
             $sensors[] = new WirelessSensor(
                 $type,
                 $this->getDeviceId(),
