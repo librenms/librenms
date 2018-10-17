@@ -559,12 +559,12 @@ function location_to_latlng($device)
                 case "mapquest":
                     d_echo("Mapquest geocode engine being used\n");
                     $api_key = ($config['geoloc']['api_key']);
-                     if (!empty($api_key)) {
+                    if (!empty($api_key)) {
                         d_echo("Use Mapquest API key: $api_key\n");
                         $api_url = "http://open.mapquestapi.com/geocoding/v1/address?key=$api_key&location=$new_device_location&thumbMaps=false";
-                     } else {
+                    } else {
                         d_echo("No geocode API key set\n");
-                     }
+                    }
                     break;
             }
             $curl_init = curl_init($api_url);
@@ -585,12 +585,12 @@ function location_to_latlng($device)
                     }
                     break;
                 case "mapquest":
-                if ($data['info']['statuscode'] == 0) {
+                    if ($data['info']['statuscode'] == 0) {
                         $loc['lat'] = $data['results'][0]['locations'][0]['latLng']['lat'];
                         $loc['lng'] = $data['results'][0]['locations'][0]['latLng']['lng'];
-                } else {
+                    } else {
                         $bad_loc = true;
-                }
+                    }
             }
             if ($bad_loc === true) {
                 d_echo("Bad lat / lng received\n");
