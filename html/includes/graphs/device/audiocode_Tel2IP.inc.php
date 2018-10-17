@@ -5,16 +5,16 @@ $rrd_filename = rrd_name($device['hostname'], 'audiocode_Tel2IP');
 require 'includes/graphs/common.inc.php';
 
 $stats = array(
-'AttemptedCalls'   => '00cc00',
-'EstablishedCalls' => '006600',
-'BusyCalls'        => 'cc0000',
-'NoAnswerCalls'    => '660000',
-'NoRouteCalls'     => '0066cc',
-'NoMatchCalls'     => '003399',
-'FailCalls'        => 'cc00cc',
-'FaxAttemptedCalls'=> '990099',
-'FaxSuccessCalls'  => '6600cc',
-);
+        'AttemptedCalls'   => '00cc00',
+        'EstablishedCalls' => '006600',
+        'BusyCalls'        => 'cc0000',
+        'NoAnswerCalls'    => '660000',
+        'NoRouteCalls'     => '0066cc',
+        'NoMatchCalls'     => '003399',
+        'FailCalls'        => 'cc00cc',
+        'FaxAttemptedCalls'=> '990099',
+        'FaxSuccessCalls'  => '6600cc',
+        );
 
 $i = 0;
 

@@ -5,8 +5,6 @@ use LibreNMS\RRD\RrdDefinition;
 $oids = 'acSysIdName.0 acSysVersionSoftware.0 acSysIdSerialNumber.0';
 $data = snmp_get_multi($device, $oids, '-OQUs', 'AC-SYSTEM-MIB');
 
-d_echo($data);
-
 $hardware     = $data[0]['acSysIdName'];
 $version      = $data[0]['acSysVersionSoftware'];
 $serial       = $data[0]['acSysIdSerialNumber'];
@@ -20,11 +18,10 @@ foreach ($oids as $oid) {
     $nameRRD = "audiocode_" . preg_replace('#acPerf#', '', $oid);
     $rrd_def = RrdDefinition::make();
     $fields = array();
+
     foreach ((array)($data[0]) as $key => $value) {
-        //d_echo(" -> $key:= $value \n");
         if (preg_match('#Calls$#', $key)) {
             $nameVar = preg_replace('#'.$oid.'#', '', $key);
-            //d_echo(" -> OK for ".$name." := ".$value." \n");
             $rrd_def->addDataset($nameVar, 'COUNTER', 0);
             $fields[$key] = $value;
         }
