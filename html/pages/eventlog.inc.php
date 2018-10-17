@@ -55,7 +55,7 @@ $pagetitle[] = 'Eventlog';
         '</div>&nbsp;&nbsp;&nbsp;&nbsp;' +
         <?php
         } else {
-            echo "'&nbsp;&nbsp;<input type=\"hidden\" name=\"device\" id=\"device\" value=\"" . $device_id . "\">' + ";
+            echo "'&nbsp;&nbsp;<input type=\"hidden\" name=\"device\" id=\"device\" value=\"" . $vars['device'] . "\">' + ";
         }
         ?>
         '<div class="form-group"><label><strong>Type&nbsp;&nbsp;</strong></label>' +
