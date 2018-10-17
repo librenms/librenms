@@ -67,6 +67,9 @@
         "ext-mysqlnd": "*"
     },
     "autoload": {
+        "files": [
+            "app/Helpers/Common.php"
+        ],
         "psr-4": {
             "App\\": "app",
             "LibreNMS\\": "LibreNMS",
