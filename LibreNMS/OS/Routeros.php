@@ -171,8 +171,8 @@ class Routeros extends OS implements
     {
         if (is_null($this->data)) {
             $wl60 = snmpwalk_cache_oid($this->getDevice(), 'mtxrWl60GTable', array(), 'MIKROTIK-MIB');
-            $wl = snmpwalk_cache_oid($this->getDevice(), 'mtxrWlApTable', array(), 'MIKROTIK-MIB');
-            $this->data = $wl60+$wl;
+            $wlap = snmpwalk_cache_oid($this->getDevice(), 'mtxrWlApTable', array(), 'MIKROTIK-MIB');
+            $this->data = $wl60+$wlap;
         }
         return $this->data;
     }
@@ -182,15 +182,15 @@ class Routeros extends OS implements
         $sensors = array();
         foreach ($data as $index => $entry) {
             if (($entry['mtxrWlApSsid'] !== null)) {
-        $sensors[] = new WirelessSensor(
-            $type,
-            $this->getDeviceId(),
-            $num_oid_base . $index,
-            'mikrotik',
-            $index,
-            'SSID: ' . $entry['mtxrWlApSsid'],
-            $entry[$oid]
-            );
+                $sensors[] = new WirelessSensor(
+                $type,
+                $this->getDeviceId(),
+                $num_oid_base . $index,
+                'mikrotik',
+                $index,
+                'SSID: ' . $entry['mtxrWlApSsid'],
+                $entry[$oid]
+        );
             } else {
                 $sensors[] = new WirelessSensor(
                     $type,
