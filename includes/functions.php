@@ -2481,7 +2481,12 @@ function get_device_oid_limit($device)
 {
     global $config;
 
-    $max_oid = $device['snmp_max_oid'];
+    //Some Os only work with specific max_oid values
+    if ((isset($device['os'], $config['os'][$device['os']]['snmp_max_oid']) && $config['os'][$device['os']]['snmp_max_oid'])) {
+        $max_oid = $config['os'][$device['os']]['snmp_max_oid'];
+    } else {
+        $max_oid = $device['snmp_max_oid'];
+    }
 
     if (isset($max_oid) && $max_oid > 0) {
         return $max_oid;
