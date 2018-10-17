@@ -541,6 +541,11 @@ $config['graph_types']['device']['arbos_flows']['section']         = 'graphs';
 $config['graph_types']['device']['arbos_flows']['order']           = '0';
 $config['graph_types']['device']['arbos_flows']['descr']           = 'Accumulative flow count per SP device';
 
+//F5 specific graphs
+$config['graph_types']['device']['apm_sessions']['section']      = 'apm';
+$config['graph_types']['device']['apm_sessions']['order']        = '0';
+$config['graph_types']['device']['apm_sessions']['descr']        = 'Active Sessions';
+
 // Device Types
 $i = 0;
 $config['device_types'][$i]['text'] = 'Servers';
@@ -646,3 +651,7 @@ $config['ipmi_unit']['Watts']     = 'power';
 $config['ipmi_unit']['Amps']      = 'current';
 $config['ipmi_unit']['percent']   = 'load';
 $config['ipmi_unit']['discrete']  = '';
+// F5 BIGIP APM graphs
+$config['graph_types']['device']['apm_sessions']['section']      = 'system';
+$config['graph_types']['device']['apm_sessions']['order']        = '0';
+$config['graph_types']['device']['apm_sessions']['descr']        = 'Active Sessions';
