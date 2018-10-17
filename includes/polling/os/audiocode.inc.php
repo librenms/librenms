@@ -14,31 +14,25 @@ $serial       = $data[0]['acSysIdSerialNumber'];
 $oids = array();
 $oids[] = 'acPerfTel2IP';
 $oids[] = 'acPerfIP2Tel';
-$data =  array();
 
 foreach ($oids as $oid) {
-    $data = snmpwalk_cache_oid($device, $oid, $data, 'AcPerfH323SIPGateway');
-}
-
-//d_echo($data);
-
-foreach ((array)($data[0]) as $key => $value) {
-//    d_echo(" -> $key:= $value \n");
-
-    $name = preg_replace('#acPerf#', '', $key);
-
-    if (preg_match('#Calls$#', $key)) {
-//       d_echo(" -> OK for ".$name." := ".$value." \n");
-        $rrd_def = RrdDefinition::make()->addDataset($key, 'COUNTER', 0);
-
-        $fields = array(
-            $key => $value,
-        );
-
-        $tags = compact('rrd_def');
-        data_update($device, $key, $tags, $fields);
-
-        $graphs[$key] = true;
+    $data = snmpwalk_cache_oid($device, $oid, array(), 'AcPerfH323SIPGateway');
+    $nameRRD = "audiocode_" . preg_replace('#acPerf#', '', $oid);
+    $rrd_def = RrdDefinition::make();
+    $fields = array();
+    foreach ((array)($data[0]) as $key => $value) {
+        //d_echo(" -> $key:= $value \n");
+        if (preg_match('#Calls$#', $key)) {
+            $nameVar = preg_replace('#'.$oid.'#', '', $key);
+            //d_echo(" -> OK for ".$name." := ".$value." \n");
+            $rrd_def->addDataset($nameVar, 'COUNTER', 0);
+            $fields[$key] = $value;
+        }
     }
+    $tags = compact('rrd_def');
+    data_update($device, $nameRRD, $tags, $fields);
+
+    $graphs[$nameRRD] = true;
 }
+
 
