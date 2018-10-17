@@ -67,6 +67,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                                     <option value="smsfeedback-form">SMSFeedback</option>
                                     <option value="syslog-form">Syslog</option>
                                     <option value="telegram-form">Telegram</option>
+                                    <option value="twilio-form">Twilio</option>
                                     <option value="victorops-form">Victorops</option>
                                     <!--Insert more transport type options here has support is added. Value should be: [transport_name]-form -->
                                 </select>
