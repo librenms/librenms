@@ -14,7 +14,6 @@ define('LARAVEL_START', microtime(true));
 |
 */
 
-include __DIR__ . '/../app/Helpers/HelperOverload.php';
 @include __DIR__ . '/../vendor/autoload.php';
 
 if (!class_exists(\App\Checks::class)) {

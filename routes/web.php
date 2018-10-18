@@ -11,11 +11,6 @@
 |
 */
 
-// handle proxy with subdirectory and app without
-if ($appUrl = trim(config('app.url'), '/')) {
-    \URL::forceRootUrl(str_finish(config('app.url'), '/') . config('app.url_suffix'));
-}
-
 // Auth
 Auth::routes();
 
