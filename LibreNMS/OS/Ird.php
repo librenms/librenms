@@ -17,7 +17,7 @@ class Ird extends OS implements
         return array(
             new WirelessSensor('frequency', $this->getDeviceId(), $lnbfrequency_oid, 'lnbfrequency', 1, 'LNB Frequency'),
             new WirelessSensor('frequency', $this->getDeviceId(), $satfrequency_oid, 'satfrequency', 2, 'Satellite Frequency'),
-    );
+        );
     }
     public function discoverWirelessRate()
     {
