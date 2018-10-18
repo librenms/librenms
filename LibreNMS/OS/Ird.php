@@ -6,7 +6,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\OS;
 
-class Ird extends OS implements 
+class Ird extends OS implements
     WirelessFrequencyDiscovery,
     WirelessRateDiscovery
 {
