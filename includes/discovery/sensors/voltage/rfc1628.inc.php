@@ -25,6 +25,7 @@ if (is_numeric($battery_volts)) {
     );
 }
 
+
 $output_volts = snmpwalk_group($device, 'upsOutputVoltage', 'UPS-MIB');
 foreach ($output_volts as $index => $data) {
     $volt_oid = ".1.3.6.1.2.1.33.1.4.4.1.2.$index";
@@ -32,6 +33,13 @@ foreach ($output_volts as $index => $data) {
     $descr = 'Output';
     if (count($output_volts) > 1) {
         $descr .= " Phase $index";
+    }
+
+    $upsOutputVoltage_value = $data['upsOutputVoltage'];
+
+    if (is_array($data['upsOutputVoltage'])) {
+        $upsOutputVoltage_value = $data['upsOutputVoltage'][0];
+        $volt_oid .= ".0";
     }
 
     discover_sensor(
@@ -48,7 +56,7 @@ foreach ($output_volts as $index => $data) {
         null,
         null,
         null,
-        $data['upsOutputVoltage'] / $divisor
+        $upsOutputVoltage_value / $divisor
     );
 }
 
@@ -59,6 +67,13 @@ foreach ($input_volts as $index => $data) {
     $descr = 'Input';
     if (count($input_volts) > 1) {
         $descr .= " Phase $index";
+    }
+    
+    $upsInputVoltage_value = $data['upsInputVoltage'];
+    
+    if (is_array($data['upsInputVoltage'])) {
+        $upsInputVoltage_value = $data['upsInputVoltage'][0];
+        $volt_oid .= ".0";
     }
 
     discover_sensor(
@@ -75,7 +90,7 @@ foreach ($input_volts as $index => $data) {
         null,
         null,
         null,
-        $data['upsInputVoltage'] / $divisor
+        $upsInputVoltage_value / $divisor
     );
 }
 

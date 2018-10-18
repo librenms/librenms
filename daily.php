@@ -256,12 +256,15 @@ if ($options['f'] === 'refresh_alert_rules') {
         }
 
         echo 'Refreshing alert rules queries' . PHP_EOL;
-        $rules = dbFetchRows('SELECT `id`, `rule`, `builder` FROM `alert_rules`');
+        $rules = dbFetchRows('SELECT `id`, `rule`, `builder`, `extra` FROM `alert_rules`');
         foreach ($rules as $rule) {
-            $data['query'] = GenSQL($rule['rule'], $rule['builder']);
-            if (!empty($data['query'])) {
-                dbUpdate($data, 'alert_rules', 'id=?', array($rule['id']));
-                unset($data);
+            $rule_options = json_decode($rule['extra'], true);
+            if ($rule_options['options']['override_query'] !== 'on') {
+                $data['query'] = GenSQL($rule['rule'], $rule['builder']);
+                if (!empty($data['query'])) {
+                    dbUpdate($data, 'alert_rules', 'id=?', array($rule['id']));
+                    unset($data);
+                }
             }
         }
     } catch (LockException $e) {

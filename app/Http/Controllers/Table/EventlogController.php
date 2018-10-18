@@ -58,6 +58,10 @@ class EventlogController extends TableController
             $query->where('type', $type);
         }
 
+        if ($searchPhrase = $request->get('searchPhrase')) {
+            $query->where('message', 'like', '%'.$searchPhrase.'%');
+        }
+
         return $query;
     }
 

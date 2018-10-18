@@ -11,6 +11,11 @@
 |
 */
 
+// handle proxy with subdirectory and app without
+if ($appUrl = trim(config('app.url'), '/')) {
+    \URL::forceRootUrl(str_finish(config('app.url'), '/') . config('app.url_suffix'));
+}
+
 // Auth
 Auth::routes();
 
@@ -61,6 +66,11 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             'uses' => '\Barryvdh\Debugbar\Controllers\OpenController@handler'
         ]);
     }
+
+    // demo helper
+    Route::get('demo', function () {
+        return redirect('/');
+    });
 
     // Legacy routes
     Route::any('/{path?}', 'LegacyController@index')->where('path', '.*');
