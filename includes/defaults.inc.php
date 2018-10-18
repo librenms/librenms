@@ -184,6 +184,8 @@ $config['snmp']['v3'][0]['cryptoalgo'] = 'AES';
 
 // Devices must respond to icmp by default
 $config['icmp_check'] = true;
+// Polling checks icmp first by default
+$config['polling_icmp_check'] = true;
 
 // The amount of time to keep the OS cache
 $config['os_def_cache_time'] = 86400;
