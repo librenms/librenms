@@ -66,3 +66,28 @@ modules:
                          - { descr: PortB, graph: 1, value: 2, generic: 0 }
                          - { descr: PortC, graph: 1, value: 3, generic: 0 }
                          - { descr: PortD, graph: 1, value: 4, generic: 0 }
+                -
+                     oid: linkStatus
+                     num_oid: .1.3.6.1.4.1.1070.3.1.1.104.1.3.4.
+                     descr: Eth Link Status
+                     state_name: linkStatus
+                     states:
+                         - { descr: Off, graph: 1, value: 0, generic: 3 }
+                         - { descr: 10 MB, graph: 1, value: 1, generic: 2 }
+                         - { descr: 100 MB, graph: 1, value: 2, generic: 0 }
+                -
+                     oid: ciSource
+                     num_oid: .1.3.6.1.4.1.1070.3.1.1.104.11.1.
+                     descr: CI Source
+                     state_name: ciSource
+                     states:
+                         - { descr: ASI, graph: 1, value: 0, generic: 0 }
+                         - { descr: Tuner, graph: 1, value: 1, generic: 0 }  
+                -
+                     oid: ciLock
+                     num_oid: .1.3.6.1.4.1.1070.3.1.1.104.11.6.
+                     descr: CI Lock
+                     state_name: ciLock
+                     states:
+                         - { descr: No, graph: 1, value: 0, generic: 3 }
+                         - { descr: Yes, graph: 1, value: 1, generic: 0 }
