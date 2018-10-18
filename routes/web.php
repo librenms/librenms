@@ -52,6 +52,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::get('eventlog', 'EventlogController');
             Route::get('graph', 'GraphController');
             Route::get('graph-aggregate', 'GraphAggregateController');
+            Route::get('graylog-streams', 'GraylogStreamsController');
             Route::get('syslog', 'SyslogController');
             Route::get('munin', 'MuninPluginController');
             Route::get('port', 'PortController');
@@ -62,6 +63,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::post('customers', 'CustomersController');
             Route::post('eventlog', 'EventlogController');
             Route::post('location', 'LocationController');
+            Route::post('graylog', 'GraylogController');
             Route::post('syslog', 'SyslogController');
         });
 
@@ -75,7 +77,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::post('generic-graph', 'GraphController');
             Route::post('generic-image', 'ImageController');
             Route::post('globe', 'GlobeController');
-            Route::get('globe', 'GlobeController');
+            Route::post('graylog', 'GraylogController');
             Route::post('placeholder', 'PlaceholderController');
             Route::post('top-devices', 'TopDevicesController');
             Route::post('top-interfaces', 'TopInterfacesController');

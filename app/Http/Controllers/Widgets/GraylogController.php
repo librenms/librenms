@@ -1,6 +1,6 @@
 <?php
 /**
- * DeviceController.php
+ * GraylogController.php
  *
  * -Description-
  *
@@ -23,39 +23,39 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Http\Controllers\Select;
+namespace App\Http\Controllers\Widgets;
 
 use App\Models\Device;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
-class DeviceController extends SelectController
+class GraylogController extends WidgetController
 {
-    private $id = 'device_id';
+    protected $title = 'Graylog';
+    protected $defaults = [
+        'stream' => null,
+        'device' => null,
+        'range' => null,
+        'limit' => 15,
+    ];
 
-    protected function rules()
+    /**
+     * @param Request $request
+     * @return View
+     */
+    public function getView(Request $request)
     {
-        return [
-            'id' => 'nullable|in:device_id,hostname'
-        ];
+        return view('widgets.graylog', $this->getSettings());
     }
 
-    protected function searchFields($request)
+    public function getSettingsView(Request $request)
     {
-        return ['hostname', 'sysName'];
-    }
+        $data = $this->getSettings();
 
-    protected function baseQuery($request)
-    {
-        $this->id = $request->get('id', 'device_id');
+        if ($data['device']) {
+            $data['device'] = Device::find($data['device']);
+        }
 
-        return Device::hasAccess($request->user())->select('device_id', 'hostname', 'sysName');
-    }
-
-    public function formatItem($device)
-    {
-        /** @var Device $device */
-        return [
-            'id' => $device->{$this->id},
-            'text' => $device->displayName(),
-        ];
+        return view('widgets.settings.graylog', $data);
     }
 }
