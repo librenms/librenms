@@ -76,8 +76,7 @@ if ($vars['searchby'] != 'ip' && $vars['searchby'] != 'dnsname') {
     $sql .= " LEFT JOIN `ipv4_mac` AS `M` USING (`mac_address`)";
 }
 $sql .= $where;
-$sql .= " GROUP BY `device_id`, `port_id`, `mac_address`, `vlan`, `hostname`, `ifAlias`,";
-$sql .= " `ifAdminStatus`, `ifDescr`, `ifOperStatus`, `ifInErrors`, `ifOutErrors`";
+$sql .= " GROUP BY `device_id`, `port_id`, `mac_address`, `vlan`";
 
 // Get most likely endpoint port_id, used to add a visual marker for this element
 // in the list
