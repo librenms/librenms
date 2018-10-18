@@ -222,12 +222,24 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
 {
     $time_start = microtime(true);
 
-    if (is_array($oids)) {
-        $oids = implode(' ', $oids);
+    if ($device['snmpver'] == 'v1') {
+        $oids = explode(" ", $oids);
+        $data = [];
+        foreach ($oids as $oid) {
+            $cmd = gen_snmpget_cmd($device, $oid, $options, $mib, $mibdir);
+            $query = trim(external_exec($cmd));
+            if (!empty($query)) {
+                $data[] = $query;
+            }
+        }
+        $data = implode("\n", $data);
+    } else {
+        if (is_array($oids)) {
+            $oids = implode(' ', $oids);
+        }
+        $cmd = gen_snmpget_cmd($device, $oids, $options, $mib, $mibdir);
+        $data = trim(external_exec($cmd));
     }
-
-    $cmd = gen_snmpget_cmd($device, $oids, $options, $mib, $mibdir);
-    $data = trim(external_exec($cmd));
 
     $array = array();
     $oid = '';
