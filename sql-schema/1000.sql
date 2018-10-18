@@ -1,4 +1,4 @@
-CREATE TABLE migrations (id INT(11) UNSIGNED AUTO_INCREMENT, migration varchar(255), batch INTEGER(5), PRIMARY KEY(id) );
+CREATE TABLE migrations (id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, migration VARCHAR(255) NOT NULL, batch INT NOT NULL);
 INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_access_points_table', 1);
 INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_alert_device_map_table', 1);
 INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_alert_group_map_table', 1);
