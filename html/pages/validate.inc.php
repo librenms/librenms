@@ -90,7 +90,7 @@ foreach ($validator->getAllResults() as $group => $results) {
             if ($result->hasFix()) {
                 echo 'Fix: <code>';
                 foreach ((array)$result->getFix() as $fix) {
-                    echo linkify($result->getFix()) . PHP_EOL;
+                    echo '<br />' . linkify($fix) . PHP_EOL;
                 }
                 echo '</code>';
                 if ($result->hasList()) {
