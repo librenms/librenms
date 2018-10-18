@@ -55,18 +55,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Application URL Suffix
-    |--------------------------------------------------------------------------
-    |
-    | Required when the application is accessed via a proxy using a subdirectory
-    | but the application itself is not accessed via a subdirectory
-    |
-    */
-
-    'url_suffix' => env('APP_URL_SUFFIX'),
-
-    /*
-    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |
