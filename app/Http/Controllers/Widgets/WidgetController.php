@@ -66,8 +66,12 @@ abstract class WidgetController extends Controller
             $view = $this->getView($request);
         }
 
-        $title = __(method_exists($this, 'title') ? app()->call([$this, 'title']) : $this->title);
         $settings = $this->getSettings();
+        if (!empty($settings['title'])) {
+            $title = $settings['title'];
+        } else {
+            $title = __(method_exists($this, 'title') ? app()->call([$this, 'title']) : $this->title);
+        }
 
         return $this->formatResponse($view, $title, $settings);
     }

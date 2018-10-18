@@ -2,7 +2,12 @@
 
 @section('form')
     <div class="form-group">
-        <label for="stream-{{ $id }}" class="control-label">@lang('Device')</label>
+        <label for="title-{{ $id }}" class="control-label">@lang('Widget title')</label>
+        <input type="text" class="form-control" name="title" id="title-{{ $id }}" placeholder="@lang('Default Title')" value="{{ $title }}">
+    </div>
+
+    <div class="form-group">
+        <label for="stream-{{ $id }}" class="control-label">@lang('Stream')</label>
         <select class="form-control" id="stream-{{ $id }}" name="stream" data-placeholder="@lang('All Messages')">
             @if($stream)
                 <option value="{{ $stream }}">{{ $stream }}</option>

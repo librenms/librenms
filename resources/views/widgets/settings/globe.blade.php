@@ -2,6 +2,10 @@
 
 @section('form')
     <div class="form-group">
+        <label for="title-{{ $id }}" class="control-label">@lang('Widget title')</label>
+        <input type="text" class="form-control" name="title" id="title-{{ $id }}" placeholder="@lang('Default Title')" value="{{ $title }}">
+    </div>
+    <div class="form-group">
         <label for="markers-{{ $id }}" class="control-label">@lang('Markers')</label>
         <select class="form-control" id="markers-{{ $id }}" name="markers">
             <option value="devices" {{ $markers == 'devices' ? 'selected' : '' }}>@lang('Devices')</option>

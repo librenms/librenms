@@ -31,16 +31,10 @@ class ImageController extends WidgetController
 {
     protected $title = 'Custom Image';
     protected $defaults = [
-        'image_title' => null,
+        'title' => null,
         'image_url' => null,
         'target_url' => null,
     ];
-
-    public function title()
-    {
-        $settings = $this->getSettings();
-        return isset($settings['image_title']) ? $settings['image_title'] : $this->title;
-    }
 
     public function getView(Request $request)
     {
@@ -64,5 +58,17 @@ class ImageController extends WidgetController
     public function getSettingsView(Request $request)
     {
         return view('widgets.settings.image', $this->getSettings());
+    }
+
+    public function getSettings()
+    {
+        if (is_null($this->settings)) {
+            parent::getSettings();
+            if (!empty($this->settings['image_title'])) {
+                $this->settings['title'] = $this->settings['image_title'];
+            }
+        }
+
+        return $this->settings;
     }
 }

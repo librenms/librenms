@@ -37,12 +37,6 @@ class EventlogController extends WidgetController
         'eventtype' => null,
     ];
 
-    public function title()
-    {
-        $settings = $this->getSettings();
-        return isset($settings['title']) ? $settings['title'] : $this->title;
-    }
-
     public function getSettingsView(Request $request)
     {
         $data = $this->getSettings();
