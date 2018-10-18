@@ -1030,7 +1030,7 @@ function object_is_cached($section, $obj)
  **/
 function can_ping_device($attribs)
 {
-    if (Config::get('icmp_check') && !(isset($attribs['override_icmp_disable']) && $attribs['override_icmp_disable'] == "true")) {
+    if (Config::get('icmp_check') && Config::get('polling_icmp_check') && !(isset($attribs['override_icmp_disable']) && $attribs['override_icmp_disable'] == "true")) {
         return true;
     } else {
         return false;
