@@ -409,7 +409,7 @@ echo '
 
 echo generate_dynamic_config_panel('General alert settings', $config_groups, $general_conf);
 
-echo generate_dynamic_config_panel('Email transport', $config_groups, $mail_conf, 'mail');
+echo generate_dynamic_config_panel('Email options', $config_groups, $mail_conf, 'mail');
 
 echo '<br /><div class="well"><strong class="text-danger">DEPRECATED</strong>: All options below are deprecated, please use the new Alert Transports section under Alerts to configure transports - <a href="https://docs.librenms.org/Alerting/Transports/" target="_blank">docs</a>.</div>';
 
