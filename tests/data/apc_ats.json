@@ -11,7 +11,7 @@
                     "hardware": null,
                     "features": null,
                     "location": null,
-                    "os": "apc-ats",
+                    "os": "apc",
                     "type": "power",
                     "serial": null,
                     "icon": "apc.svg"
@@ -26,10 +26,10 @@
                     "sysDescr": "APC Web/SNMP Management Card (MB:v4.1.0 PF:v6.4.6 PN:apc_hw05_aos_646.bin AF1:v6.4.7 AN1:apc_hw05_ats4g_647.bin MN:AP4423 HR:R01 SN: <private> MD:06/09/2018)",
                     "sysContact": "<private>",
                     "version": "4.1.9",
-                    "hardware": "AP4423",
+                    "hardware": " R01",
                     "features": null,
                     "location": "<private>",
-                    "os": "apc-ats",
+                    "os": "apc",
                     "type": "power",
                     "serial": "<private>",
                     "icon": "apc.svg"

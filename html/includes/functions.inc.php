@@ -1512,11 +1512,19 @@ function get_oxidized_nodes_list()
 
     foreach ($data as $object) {
         $device = device_by_name($object['name']);
+        if (! device_permitted($device['device_id'])) {
+            //user cannot see this device, so let's skip it.
+            continue;
+        }
         $fa_color = $object['status'] == 'success' ? 'success' : 'danger';
         echo "
         <tr>
         <td>
-        " . generate_device_link($device) . "
+        " . generate_device_link($device);
+        if ($device['device_id'] == 0) {
+            echo "(device '" . $object['name'] . "' not in LibreNMS)";
+        }
+        echo "
         </td>
         <td>
         <i class='fa fa-square text-" . $fa_color . "'></i>
@@ -1531,12 +1539,23 @@ function get_oxidized_nodes_list()
         " . $object['group'] . "
         </td>
         <td>
+        ";
+        if (! $device['device_id'] == 0) {
+            echo "
           <button class='btn btn-default btn-sm' name='btn-refresh-node-devId" . $device['device_id'] . "' id='btn-refresh-node-devId" . $device['device_id'] . "' onclick='refresh_oxidized_node(\"" . $device['hostname'] . "\")'>
             <i class='fa fa-refresh'></i>
           </button>
           <a href='" . generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig')) . "'>
             <i class='fa fa-align-justify fa-lg icon-theme'></i>
           </a>
+            ";
+        } else {
+            echo "
+          <button class='btn btn-default btn-sm' disabled name='btn-refresh-node-devId" . $device['device_id'] . "' id='btn-refresh-node-devId" . $device['device_id'] . "'>
+            <i class='fa fa-refresh'></i>
+          </button>";
+        }
+        echo "
         </td>
         </tr>";
     }
@@ -1636,31 +1655,16 @@ function get_disks_with_smart($device, $app_id)
  */
 function get_dashboards($user_id = null)
 {
+    $user = is_null($user_id) ? Auth::user() : \App\Models\User::find($user_id);
     $default = get_user_pref('dashboard');
-    $dashboards = dbFetchRows(
-        "SELECT * FROM `dashboards` WHERE dashboards.access > 0 || dashboards.user_id = ?",
-        array(is_null($user_id) ? LegacyAuth::id() : $user_id)
-    );
 
-    $usernames = array(
-        LegacyAuth::id() => LegacyAuth::user()->username
-    );
+    return \App\Models\Dashboard::allAvailable($user)->with('user')->get()->map(function ($dashboard) use ($default) {
+        $dash = $dashboard->toArray();
+        $dash['username'] = $dashboard->user ? $dashboard->user->username : '';
+        $dash['default'] = $default == $dashboard->dashboard_id;
 
-    $result = array();
-    foreach ($dashboards as $dashboard) {
-        $duid = $dashboard['user_id'];
-        if (!isset($usernames[$duid])) {
-            $user = LegacyAuth::get()->getUser($duid);
-            $usernames[$duid] = $user['username'];
-        }
-
-        $dashboard['username'] = $usernames[$duid];
-        $dashboard['default'] = $dashboard['dashboard_id'] == $default;
-
-        $result[$dashboard['dashboard_id']] = $dashboard;
-    }
-
-    return $result;
+        return $dash;
+    })->keyBy('dashboard_id')->all();
 }
 
 /**

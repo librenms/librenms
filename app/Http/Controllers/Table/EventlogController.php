@@ -40,6 +40,11 @@ class EventlogController extends TableController
         ];
     }
 
+    public function searchFields($request)
+    {
+        return ['message'];
+    }
+
     /**
      * Defines the base query for this resource
      *
