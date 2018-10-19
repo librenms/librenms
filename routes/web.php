@@ -79,6 +79,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::post('globe', 'GlobeController');
             Route::post('graylog', 'GraylogController');
             Route::post('placeholder', 'PlaceholderController');
+            Route::post('notes', 'NotesController');
             Route::post('top-devices', 'TopDevicesController');
             Route::post('top-interfaces', 'TopInterfacesController');
         });
