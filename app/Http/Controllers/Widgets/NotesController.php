@@ -41,6 +41,10 @@ class NotesController extends WidgetController
     {
         $settings = $this->getSettings();
 
+        if (is_null($settings['notes'])) {
+            return $this->getSettingsView($request);
+        }
+
         $purifier_config = [
             'HTML.Allowed'    => 'b,iframe[frameborder|src|width|height],i,ul,ol,li,h1,h2,h3,h4,br,p,pre',
             'HTML.Trusted'    => true,

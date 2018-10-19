@@ -39,6 +39,11 @@ class ImageController extends WidgetController
     public function getView(Request $request)
     {
         $data = $this->getSettings();
+
+        if (is_null($data['image_url'])) {
+            return $this->getSettingsView($request);
+        }
+
         $dimensions = $request->get('dimensions');
         $data['dimensions'] = $dimensions;
 

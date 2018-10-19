@@ -8,7 +8,7 @@
 
     <div class="form-group">
         <label for="image_url-{{ $id }}" class="control-label">@lang('Image URL')</label>
-        <input type="text" class="form-control" name="image_url" id="image_url-{{ $id }}" placeholder="@lang('Image URL')" value="{{ $image_url }}">
+        <input type="text" class="form-control" name="image_url" id="image_url-{{ $id }}" placeholder="@lang('Image URL')" value="{{ $image_url }}" required>
     </div>
 
     <div class="form-group">
