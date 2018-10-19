@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Config;
+
 $i = 0;
 
 foreach (explode(',', $vars['id']) as $ifid) {
@@ -8,8 +10,8 @@ foreach (explode(',', $vars['id']) as $ifid) {
     if (rrdtool_check_rrd_exists($rrd_file)) {
         $port = cleanPort($port);
         $rrd_list[$i]['filename']  = $rrd_file;
-        $rrd_list[$i]['descr']     = $port['hostname'].' '.$port['ifDescr'];
-        $rrd_list[$i]['descr_in']  = $port['hostname'];
+        $rrd_list[$i]['descr']     = (Config::get('force_ip_to_sysname') && $port['sysName'] ? $port['sysName'] : $port['hostname']).' '.$port['ifDescr'];
+        $rrd_list[$i]['descr_in']  = (Config::get('force_ip_to_sysname') && $port['sysName'] ? $port['sysName'] : $port['hostname']);
         $rrd_list[$i]['descr_out'] = makeshortif($port['label']);
         $i++;
     }

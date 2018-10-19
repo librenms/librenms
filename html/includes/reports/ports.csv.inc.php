@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Config;
+
 $param = array();
 
 if (!isset($vars['ignore'])) {
@@ -159,7 +161,7 @@ foreach ($ports as $port) {
         $port['out_rate'] = formatRates(($port['ifOutOctets_rate'] * 8));
         $port             = cleanPort($port, $device);
         $csv[]            = array(
-            $port['hostname'],
+            (Config::get('force_ip_to_sysname') && $port['sysName'] ? $port['sysName'] : $port['hostname']),
             fixIfName($port['label']),
             $speed,
             $port['in_rate'],
