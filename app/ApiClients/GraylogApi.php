@@ -41,13 +41,13 @@ class GraylogApi
         }
 
         if (empty($config)) {
-            $base_url = Config::get('graylog.server');
+            $base_uri = Config::get('graylog.server');
             if ($port = Config::get('graylog.port')) {
-                $base_url .= ':' . $port;
+                $base_uri .= ':' . $port;
             }
 
             $config = [
-                'base_uri' => $base_url,
+                'base_uri' => $base_uri,
                 'auth' => [Config::get('graylog.username'), Config::get('graylog.password')],
                 'headers' => ['Accept' => 'application/json'],
             ];
@@ -58,6 +58,10 @@ class GraylogApi
 
     public function getStreams()
     {
+        if (!$this->isConfigured()) {
+            return [];
+        }
+
         $uri = $this->api_prefix . '/streams';
 
         $response = $this->client->get($uri);
@@ -79,6 +83,10 @@ class GraylogApi
      */
     public function query($query = '*', $range = 0, $limit = 0, $offset = 0, $sort = null, $filter = null)
     {
+        if (!$this->isConfigured()) {
+            return [];
+        }
+
         $uri = Config::get('graylog.base_uri');
         if (!$uri) {
             $uri = $this->api_prefix . '/search/universal/relative';
@@ -128,5 +136,10 @@ class GraylogApi
         }
 
         return implode('&&', $query);
+    }
+
+    public function isConfigured()
+    {
+        return isset($this->client->getConfig()['base_uri']);
     }
 }

@@ -8,8 +8,8 @@
     <div class="form-group">
         <label for="markers-{{ $id }}" class="control-label">@lang('Markers')</label>
         <select class="form-control" id="markers-{{ $id }}" name="markers">
-            <option value="devices" {{ $markers == 'devices' ? 'selected' : '' }}>@lang('Devices')</option>
-            <option value="ports" {{ $markers == 'ports' ? 'selected' : '' }}>@lang('Ports')</option>
+            <option value="devices" @if($markers == 'devices') selected @endif>@lang('Devices')</option>
+            <option value="ports" @if($markers == 'ports') selected @endif>@lang('Ports')</option>
         </select>
     </div>
     <div class="form-group">
@@ -19,9 +19,9 @@
     <div class="form-group">
         <label for="resolution-{{ $id }}-{{ $id }}" class="control-label">@lang('Resolution')</label>
         <select class="form-control" id="resolution-{{ $id }}" name="resolution">
-            <option value="countries" {{ $resolution == 'countries' ? 'selected' : '' }}>@lang('Contries')</option>
-            <option value="provinces" {{ $resolution == 'provinces' ? 'selected' : '' }}>@lang('Provinces')</option>
-            <option value="metros" {{ $resolution == 'metros' ? 'selected' : '' }}>@lang('Metros')</option>
+            <option value="countries" @if($resolution == 'countries') selected @endif>@lang('Contries')</option>
+            <option value="provinces" @if($resolution == 'provinces') selected @endif>@lang('Provinces')</option>
+            <option value="metros" @if($resolution == 'metros') selected @endif>@lang('Metros')</option>
         </select>
     </div>
 @endsection

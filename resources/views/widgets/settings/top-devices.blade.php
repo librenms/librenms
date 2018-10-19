@@ -2,44 +2,34 @@
 
 @section('form')
     <div class="form-group">
-        <label for="title-{{ $id }}" class="control-label col-sm-6">@lang('Widget title')</label>
-        <div class="col-sm-6">
-            <input type="text" class="form-control" name="title" id="title-{{ $id }}" placeholder="@lang('Custom title')" value="{{ $title }}">
-        </div>
+        <label for="title-{{ $id }}" class="control-label">@lang('Widget title')</label>
+        <input type="text" class="form-control" name="title" id="title-{{ $id }}" placeholder="@lang('Default Title')" value="{{ $title }}">
     </div>
     <div class="form-group">
-        <label for="top_query-{{ $id }}" class="control-label col-sm-6">@lang('Top query')</label>
-        <div class="col-sm-6">
-            <select class="form-control" name="top_query" id="top_query-{{ $id }}">
-                <option value="traffic" {{ $top_query == 'traffic' ? 'selected' : '' }}>@lang('Traffic')</option>
-                <option value="uptime" {{ $top_query == 'uptime' ? 'selected' : '' }}>@lang('Uptime')</option>
-                <option value="ping" {{ $top_query == 'ping' ? 'selected' : '' }}>@lang('Response time')</option>
-                <option value="poller" {{ $top_query == 'poller' ? 'selected' : '' }}>@lang('Poller duration')</option>
-                <option value="cpu" {{ $top_query == 'cpu' ? 'selected' : '' }}>@lang('Processor load')</option>
-                <option value="ram" {{ $top_query == 'ram' ? 'selected' : '' }}>@lang('Memory usage')</option>
-                <option value="storage" {{ $top_query == 'storage' ? 'selected' : '' }}>@lang('Disk usage')</option>
-            </select>
-        </div>
+        <label for="top_query-{{ $id }}" class="control-label">@lang('Top query')</label>
+        <select class="form-control" name="top_query" id="top_query-{{ $id }}">
+            <option value="traffic" @if($top_query == 'traffic') selected @endif>@lang('Traffic')</option>
+            <option value="uptime" @if($top_query == 'uptime') selected @endif>@lang('Uptime')</option>
+            <option value="ping" @if($top_query == 'ping') selected @endif>@lang('Response time')</option>
+            <option value="poller" @if($top_query == 'poller') selected @endif>@lang('Poller duration')</option>
+            <option value="cpu" @if($top_query == 'cpu') selected @endif>@lang('Processor load')</option>
+            <option value="ram" @if($top_query == 'ram') selected @endif>@lang('Memory usage')</option>
+            <option value="storage" @if($top_query == 'storage') selected @endif>@lang('Disk usage')</option>
+        </select>
     </div>
     <div class="form-group">
-        <label for="sort_order-{{ $id }}" class="control-label col-sm-6">@lang('Sort order')</label>
-        <div class="col-sm-6">
-            <select class="form-control" name="sort_order" id="sort_order-{{ $id }}">
-                <option value="asc" {{ $sort_order == 'asc' ? 'selected' : '' }}>@lang('Ascending')</option>
-                <option value="desc" {{ $sort_order == 'desc' ? 'selected' : '' }}>@lang('Descending')</option>
-            </select>
-        </div>
+        <label for="sort_order-{{ $id }}" class="control-label">@lang('Sort order')</label>
+        <select class="form-control" name="sort_order" id="sort_order-{{ $id }}">
+            <option value="asc" @if($sort_order == 'asc') selected @endif>@lang('Ascending')</option>
+            <option value="desc" @if($sort_order == 'desc') selected @endif>@lang('Descending')</option>
+        </select>
     </div>
     <div class="form-group">
-        <label for="device_count-{{ $id }}" class="control-label col-sm-6">@lang('Number of Devices')</label>
-        <div class="col-sm-6">
-            <input class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" name="device_count" id="device_count-{{ $id }}" value="{{ $device_count }}">
-        </div>
+        <label for="device_count-{{ $id }}" class="control-label">@lang('Number of Devices')</label>
+        <input class="form-control" name="device_count" id="device_count-{{ $id }}" value="{{ $device_count }}">
     </div>
     <div class="form-group">
-        <label for="time_interval-{{ $id }}" class="control-label col-sm-6">@lang('Last Polled (minutes)')</label>
-        <div class="col-sm-6">
-            <input class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" name="time_interval" id="time_interval-{{ $id }}" value="{{ $time_interval }}">
-        </div>
+        <label for="time_interval-{{ $id }}" class="control-label">@lang('Last Polled (minutes)')</label>
+        <input class="form-control" name="time_interval" id="time_interval-{{ $id }}" value="{{ $time_interval }}">
     </div>
 @endsection

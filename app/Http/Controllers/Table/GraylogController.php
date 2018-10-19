@@ -46,6 +46,12 @@ class GraylogController extends SimpleTableController
 
     public function __invoke(Request $request, GraylogApi $api)
     {
+        if (!$api->isConfigured()) {
+            return response()->json([
+                'error' => 'Graylog is not configured',
+            ], 503);
+        }
+
         $this->validate($request, [
             'stream' => 'nullable|alpha_num',
             'device' => 'nullable|int',

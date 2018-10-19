@@ -32,26 +32,26 @@
     <div class="form-group">
         <label for="range-{{ $id }}" class="control-label">@lang('Time Range')</label>
         <select name="range" id="range-{{ $id }}" class="form-control">
-            <option value="0" {{ $range == 0 ? 'selected' : '' }}>@lang('Search all time')</option>
-            <option value="300" {{ $range == 300 ? 'selected' : '' }}>@lang('Search last 5 minutes')</option>
-            <option value="900" {{ $range == 900 ? 'selected' : '' }}>@lang('Search last 15 minutes')</option>
-            <option value="1800" {{ $range == 1800 ? 'selected' : '' }}>@lang('Search last 30 minutes')</option>
-            <option value="3600" {{ $range == 3600 ? 'selected' : '' }}>@lang('Search last 1 hour')</option>
-            <option value="7200" {{ $range == 7200 ? 'selected' : '' }}>@lang('Search last 2 hours')</option>
-            <option value="28800" {{ $range == 28800 ? 'selected' : '' }}>@lang('Search last 8 hours')</option>
-            <option value="86400" {{ $range == 86400 ? 'selected' : '' }}>@lang('Search last 1 day')</option>
-            <option value="172800" {{ $range == 172800 ? 'selected' : '' }}>@lang('Search last 2 days')</option>
-            <option value="432000" {{ $range == 432000 ? 'selected' : '' }}>@lang('Search last 5 days')</option>
-            <option value="604800" {{ $range == 604800 ? 'selected' : '' }}>@lang('Search last 7 days')</option>
-            <option value="1209600" {{ $range == 1209600 ? 'selected' : '' }}>@lang('Search last 14 days')</option>
-            <option value="2592000" {{ $range == 2592000 ? 'selected' : '' }}>@lang('Search last 30 days')</option>
+            <option value="0" @if($range == 0) selected @endif>@lang('Search all time')</option>
+            <option value="300" @if($range == 300) selected @endif>@lang('Search last 5 minutes')</option>
+            <option value="900" @if($range == 900) selected @endif>@lang('Search last 15 minutes')</option>
+            <option value="1800" @if($range == 1800) selected @endif>@lang('Search last 30 minutes')</option>
+            <option value="3600" @if($range == 3600) selected @endif>@lang('Search last 1 hour')</option>
+            <option value="7200" @if($range == 7200) selected @endif>@lang('Search last 2 hours')</option>
+            <option value="28800" @if($range == 28800) selected @endif>@lang('Search last 8 hours')</option>
+            <option value="86400" @if($range == 86400) selected @endif>@lang('Search last 1 day')</option>
+            <option value="172800" @if($range == 172800) selected @endif>@lang('Search last 2 days')</option>
+            <option value="432000" @if($range == 432000) selected @endif>@lang('Search last 5 days')</option>
+            <option value="604800" @if($range == 604800) selected @endif>@lang('Search last 7 days')</option>
+            <option value="1209600" @if($range == 1209600) selected @endif>@lang('Search last 14 days')</option>
+            <option value="2592000" @if($range == 2592000) selected @endif>@lang('Search last 30 days')</option>
         </select>
     </div>
 @endsection
 
 @section('javascript')
     <script type="application/javascript">
-        init_select2('#device-{{ $id }}', 'device', {limit: 100}, '{{ $device ? $device->device_id : 0 }}');
+        init_select2('#device-{{ $id }}', 'device', {limit: 100}, '{{ $device ? $device->device_id : '' }}');
         init_select2('#stream-{{ $id }}', 'graylog-streams', {}, '{{ $stream }}');
     </script>
 @endsection

@@ -6,8 +6,6 @@
         <input type="text" class="form-control" name="title" id="title-{{ $id }}" placeholder="@lang('Default Title')" value="{{ $title }}">
     </div>
 
-
-
     <div class="form-group">
         <label for="notes-{{ $id }}" class="control-label">@lang('Notes')</label>
         <textarea name="notes" id="notes-{{ $id }}" rows="3" class="form-control">{{ $notes }}</textarea>
