@@ -154,6 +154,12 @@ $csv[] = array(
     'Description',
 );
 foreach ($ports as $port) {
+    if (Config::get('force_ip_to_sysname') && $port['sysName']) {
+        $name = $port['sysName']];
+    } else {
+        $name = $port['hostname'];
+    }
+
     if (port_permitted($port['port_id'], $port['device_id'])) {
         $speed            = humanspeed($port['ifSpeed']);
         $type             = humanmedia($port['ifType']);
@@ -161,7 +167,7 @@ foreach ($ports as $port) {
         $port['out_rate'] = formatRates(($port['ifOutOctets_rate'] * 8));
         $port             = cleanPort($port, $device);
         $csv[]            = array(
-            (Config::get('force_ip_to_sysname') && $port['sysName'] ? $port['sysName'] : $port['hostname']),
+            $name,
             fixIfName($port['label']),
             $speed,
             $port['in_rate'],
