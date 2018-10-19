@@ -67,9 +67,11 @@ class User extends BaseValidation
             $rrd_dir = Config::get('rrd_dir', "$dir/rrd");
 
             // generic fix
-            $fix = "sudo chown -R $lnms_username:$lnms_groupname $dir\n" .
-                "sudo setfacl -d -m g::rwx $rrd_dir $log_dir $dir/bootstrap/cache/ $dir/storage/\n" .
-                "sudo chmod -R ug=rwX $rrd_dir $log_dir $dir/bootstrap/cache/ $dir/storage/\n";
+            $fix = [
+                "sudo chown -R $lnms_username:$lnms_groupname $dir",
+                "sudo setfacl -d -m g::rwx $rrd_dir $log_dir $dir/bootstrap/cache/ $dir/storage/",
+                "sudo chmod -R ug=rwX $rrd_dir $log_dir $dir/bootstrap/cache/ $dir/storage/",
+            ];
 
             $find_result = rtrim(`find $dir \! -user $lnms_username -o \! -group $lnms_groupname 2> /dev/null`);
             if (!empty($find_result)) {
