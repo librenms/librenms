@@ -155,7 +155,7 @@ $csv[] = array(
 );
 foreach ($ports as $port) {
     if (Config::get('force_ip_to_sysname') && $port['sysName']) {
-        $name = $port['sysName']];
+        $name = $port['sysName'];
     } else {
         $name = $port['hostname'];
     }
