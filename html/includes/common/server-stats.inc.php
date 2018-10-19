@@ -53,7 +53,6 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                     <option value="2"'.($cur_col_size == 2 ? ' selected' : ' ').'>2</option>
                     <option value="3"'.($cur_col_size == 3 ? ' selected' : ' ').'>3</option>
                     <option value="4"'.($cur_col_size == 4 ? ' selected' : ' ').'>4</option>
-                    <option value="6"'.($cur_col_size == 6 ? ' selected' : ' ').'>6</option>
                 </select>
             </div>
         </div>
