@@ -10,7 +10,7 @@ foreach (explode(',', $vars['id']) as $ifid) {
     } else {
         $name = $port['hostname'];
     }
-	
+
     $port = dbFetchRow('SELECT * FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', array($ifid));
     $rrd_file = get_port_rrdfile_path($port['hostname'], $ifid);
     if (rrdtool_check_rrd_exists($rrd_file)) {
