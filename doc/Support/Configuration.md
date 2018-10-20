@@ -516,6 +516,7 @@ Examples:
 $config['bad_if'][] = "voip-null";
 $config['bad_iftype'][] = "voiceEncap";
 $config['bad_if_regexp'][] = '/^lo[0-9].*/';    // loopback
+$config['bad_ifAdminStatus'][] = '/down/';  
 ```
 Numerous defaults exist for this array already (see includes/defaults.inc.php for the full list). You can expand this list
 by continuing the array.
@@ -529,6 +530,8 @@ by continuing the array.
 `bad_ifname_regexp` is matched against the ifName value as a regular expression.
 
 `bad_ifalias_regexp` is matched against the ifAlias value as a regular expression.
+
+`bad_ifAdminStatus` is matched against the bad_ifAdminStatus value as a regular expression. 
 
 ### Interfaces that shouldn't be ignored
 
