@@ -264,6 +264,16 @@ class Device extends BaseModel
     }
 
     /**
+     * Get the location for this device.
+     *
+     * @return Location|null
+     */
+    public function location()
+    {
+        return Location::where('location', $this->location)->first();
+    }
+
+    /**
      * Update the max_depth field based on parents
      * Performs SQL query, so make sure all parents are saved first
      *
