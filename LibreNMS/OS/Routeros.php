@@ -22,6 +22,7 @@
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
+
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
@@ -42,6 +43,7 @@ class Routeros extends OS implements
     WirelessRssiDiscovery
 {
     private $data;
+
     /**
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
@@ -56,6 +58,7 @@ class Routeros extends OS implements
             if ($entry['mtxrWlApClientCount'] > 0 && $entry['mtxrWlApOverallTxCCQ'] == 0) {
                 continue;
             }
+
             $sensors[] = new WirelessSensor(
                 'ccq',
                 $this->getDeviceId(),
@@ -81,7 +84,7 @@ class Routeros extends OS implements
             '.1.3.6.1.4.1.14988.1.1.1.3.1.6.'
         );
     }
-   /**
+    /**
      * Discover wireless frequency.  This is in MHz. Type is frequency.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
@@ -100,11 +103,11 @@ class Routeros extends OS implements
                     '.1.3.6.1.4.1.14988.1.1.1.8.1.6.'
                 );
             } else {
-                    return $this->discoverSensor(
-                        'frequency',
-                        'mtxrWlApFreq',
-                        '.1.3.6.1.4.1.14988.1.1.1.3.1.7.'
-                    );
+                return $this->discoverSensor(
+                    'frequency',
+                    'mtxrWlApFreq',
+                    '.1.3.6.1.4.1.14988.1.1.1.3.1.7.'
+                );
             }
         }
     }
@@ -200,7 +203,7 @@ class Routeros extends OS implements
                     $index,
                     'SSID: ' . $entry['mtxrWlApSsid'],
                     $entry[$oid]
-        );
+                );
             } else {
                 $sensors[] = new WirelessSensor(
                     $type,
