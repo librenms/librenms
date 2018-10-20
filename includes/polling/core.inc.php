@@ -79,14 +79,13 @@ foreach (array('sysContact', 'sysObjectID', 'sysName', 'sysDescr') as $elem) {
     }
 }
 
-if ($poll_device['sysLocation'] && $device['location'] != $poll_device['sysLocation'] && $device['override_sysLocation'] == 0) {
-    $update_array['location'] = $poll_device['sysLocation'];
-    $device['location']       = $poll_device['sysLocation'];
-    log_event('Location -> ' . $poll_device['sysLocation'], $device, 'system', 3);
-}
+if ($device['override_sysLocation'] == 0 && $poll_device['sysLocation']) {
+    $location = lookup_location($poll_device['sysLocation']);
 
-if ($config['geoloc']['latlng'] === true) {
-    location_to_latlng($device);
+    if ($location && $device['location_id'] != $location['id']) {
+        $update_array['location_id'] = $location['id'];
+        log_event('Location -> ' . $poll_device['sysLocation'], $device, 'system', 3);
+    }
 }
 
 unset($snmpdata, $uptime_data, $uptime, $tags, $poll_device);

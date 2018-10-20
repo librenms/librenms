@@ -880,27 +880,12 @@ function devclass($device)
 
 function getlocations()
 {
-    $locations = array();
-
-    // Fetch regular locations
     if (LegacyAuth::user()->hasGlobalRead()) {
-        $rows = dbFetchRows('SELECT location FROM devices AS D GROUP BY location ORDER BY location');
-    } else {
-        $rows = dbFetchRows('SELECT location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? GROUP BY location ORDER BY location', array(LegacyAuth::id()));
+        return dbFetchRows('SELECT id, location FROM locations ORDER BY location');
     }
 
-    foreach ($rows as $row) {
-        // Only add it as a location if it wasn't overridden (and not already there)
-        if ($row['location'] != '') {
-            if (!in_array($row['location'], $locations)) {
-                $locations[] = $row['location'];
-            }
-        }
-    }
-
-    sort($locations);
-    return $locations;
-}//end getlocations()
+    return dbFetchRows('SELECT id, L.location FROM devices AS D, locations AS L, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? AND D.location_id = L.id ORDER BY location', [LegacyAuth::id()]);
+}
 
 
 /**

@@ -36,10 +36,11 @@ if (isset($config['branding']) && is_array($config['branding'])) {
     }
 }
 
+$where = '';
+$param = [];
 if (is_numeric($_GET['device']) && isset($_GET['device'])) {
-    $where = 'WHERE device_id = '.mres($_GET['device']);
-} else {
-    $where = '';
+    $where = '&& device_id = ?';
+    $param[] = $_GET['device'];
 }
 
 // FIXME this shit probably needs tidied up.
@@ -57,7 +58,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
     } else {
         $loc_count = 1;
 
-        foreach (dbFetch("SELECT * from devices ".$where) as $device) {
+        foreach (dbFetch("SELECT *, locations.location from devices,locations WHERE devices.location_id = locations.id ".$where, $param) as $device) {
             if ($device) {
                 $links = dbFetch("SELECT * from ports AS I, links AS L WHERE I.device_id = ? AND L.local_port_id = I.port_id ORDER BY L.remote_hostname", array($device['device_id']));
                 if (count($links)) {

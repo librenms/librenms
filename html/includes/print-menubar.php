@@ -191,7 +191,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                     <ul class="dropdown-menu scrollable-menu">
                 ');
                 foreach ($locations as $location) {
-                    echo('            <li><a href="devices/location=' . urlencode($location) . '/"><i class="fa fa-building fa-fw fa-lg" aria-hidden="true"></i> ' . $location . ' </a></li>');
+                    echo('            <li><a href="devices/location=' . $location['id'] . '/"><i class="fa fa-building fa-fw fa-lg" aria-hidden="true"></i> ' . htmlentities($location['location']) . ' </a></li>');
                 }
                 echo('
                     </ul>
