@@ -16,3 +16,6 @@ discovery:
             - .1.3.6.1.4.1.705.1
         sysDescr_regex_except:
             - '/^Eaton ATS/'
+            - '/^Galaxy/'
+            - '/^GALAXY/'
+            - '/^MGE Galaxy/'
