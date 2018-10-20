@@ -80,6 +80,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::post('graylog', 'GraylogController');
             Route::post('placeholder', 'PlaceholderController');
             Route::post('notes', 'NotesController');
+            Route::post('server-stats', 'ServerStatsController');
             Route::post('top-devices', 'TopDevicesController');
             Route::post('top-interfaces', 'TopInterfacesController');
         });

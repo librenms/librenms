@@ -98,7 +98,7 @@ abstract class WidgetController extends Controller
         return response()->json([
             'status' => $status,
             'title' => __($title),
-            'html' => (string)$view,
+            'html' => is_string($view) ? $view : $view->__toString(),
             'settings' => $settings,
         ]);
     }
