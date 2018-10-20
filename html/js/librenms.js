@@ -472,3 +472,13 @@ function init_select2(selector, type, data, selected) {
         $select.trigger('change');
     }
 }
+
+var jsfilesadded = [];
+function loadjs(filename, func){
+    if (jsfilesadded.indexOf(filename) < 0) {
+        $.getScript(filename, func);
+        jsfilesadded.push(filename);
+    } else {
+        func();
+    }
+}

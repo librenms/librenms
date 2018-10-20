@@ -228,9 +228,6 @@ if (empty($vars['bare']) || $vars['bare'] == "no") {
   <hr>
 </div>
 <?php } //End Vars['bare'] If
-if (strpos($dash_config, 'globe') !== false) {
-    echo "<script src='https://www.google.com/jsapi'></script>";
-}
 ?>
 <script src="js/jquery.gridster.min.js"></script>
 
