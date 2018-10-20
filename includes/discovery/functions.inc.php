@@ -853,7 +853,8 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
             return 1;
         }
     } elseif ($device['os'] == 'eaton-mgeups') {
-        if ($sensor_type == 'voltage') {
+        if ($sensor_type == 'voltage' && $device['sysObjectID'] == '.1.3.6.1.4.1.705.1.2') {
+            //Galaxy
             return 10;
         }
     }
