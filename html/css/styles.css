@@ -2073,7 +2073,7 @@ label {
 }
 
 .dashboard-image {
-  margin: 2px;
+  padding: 2px;
   height: 100%;
   width: auto;
 }
