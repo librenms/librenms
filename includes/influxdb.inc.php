@@ -52,6 +52,9 @@ function influx_update($device, $measurement, $tags, $fields)
             $tmp_tags[$k] = $v;
         }
         foreach ($fields as $k => $v) {
+            if ($k == 'time') {
+                $k = 'rtime';
+            }
             $tmp_fields[$k] = force_influx_data($v);
             if ($tmp_fields[$k] === null) {
                 unset($tmp_fields[$k]);
