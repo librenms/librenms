@@ -41,13 +41,18 @@ class Location extends Model
         parent::boot();
 
         static::creating(function (Location $location) {
-            if (is_null($location->lat) || is_null($location->lng)) {
+            if (!$location->hasCoordinates()) {
                 $location->parseCoordinates();
             }
         });
     }
 
     // ---- Helper Functions ----
+
+    public function hasCoordinates()
+    {
+        return !(is_null($this->lat) || is_null($this->lng));
+    }
 
     protected function parseCoordinates()
     {
