@@ -39,7 +39,7 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
                         </div>
                         <div class="form-group">
                             <label for="rules_list">Attach template to rules: </label>
-                            <select id="rules_list" name="rules_list" class="form-control" multiple data-live-search="true" data-max-options="10"></select>
+                            <select id="rules_list" name="rules_list" class="form-control" multiple data-live-search="true"></select>
                         </div>
                         <div class="form-group">
                             <label for="title">Alert title: </label>
