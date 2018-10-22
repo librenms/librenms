@@ -25,6 +25,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Location extends Model
@@ -32,6 +33,9 @@ class Location extends Model
     public $fillable = ['location', 'lat', 'lng'];
     const CREATED_AT = null;
     const UPDATED_AT = 'timestamp';
+
+    private static $location_regex = '/\[\s*(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))\s*,\s*(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))\s*\]/';
+
 
     /**
      * Set up listeners for this Model
@@ -49,11 +53,19 @@ class Location extends Model
 
     // ---- Helper Functions ----
 
+    /**
+     * Checks if this location has resolved latitude and longitude.
+     *
+     * @return bool
+     */
     public function hasCoordinates()
     {
         return !(is_null($this->lat) || is_null($this->lng));
     }
 
+    /**
+     * Call geocoding API to resolve latitude and longitude.
+     */
     public function lookupCoordinates()
     {
         if ($this->location) {
@@ -63,15 +75,42 @@ class Location extends Model
         }
     }
 
+    /**
+     * Remove encoded GPS for nicer display
+     *
+     * @return string
+     */
+    public function display()
+    {
+        return trim(preg_replace(self::$location_regex, '', $this->location)) ?: $this->location;
+    }
+
     protected function parseCoordinates()
     {
-        $lat_regex = '(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))';
-        $lng_regex = '(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))';
-        $regex = '/\[\s*' . $lat_regex . '\s*,\s*' . $lng_regex . '\s*\]/';
-
-        if (preg_match($regex, $this->location, $parsed)) {
+        if (preg_match(self::$location_regex, $this->location, $parsed)) {
             $this->fill($parsed);
         }
+    }
+
+    // ---- Query scopes ----
+
+    /**
+     * @param Builder $query
+     * @param User $user
+     * @return Builder
+     */
+    public function scopeHasAccess($query, $user)
+    {
+        if ($user->hasGlobalRead()) {
+            return $query;
+        }
+
+        $ids = Device::hasAccess($user)
+            ->distinct()
+            ->whereNotNull('location_id')
+            ->pluck('location_id');
+
+        return $query->whereIn('id', $ids);
     }
 
     // ---- Define Relationships ----
