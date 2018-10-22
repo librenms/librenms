@@ -604,6 +604,7 @@ function location_to_latlng($location)
                     $api_url = "http://open.mapquestapi.com/geocoding/v1/address?key=$api_key&location=$new_device_location&thumbMaps=false";
                 } else {
                     d_echo("No geocode API key set\n");
+                    return $location;
                 }
                 break;
         }
