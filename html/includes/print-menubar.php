@@ -187,7 +187,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 echo('
                     <li role="presentation" class="divider"></li>
                     <li class="dropdown-submenu">
-                    <a href="#"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> Geo Locations</a>
+                    <a href="locations"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> Geo Locations</a>
                     <ul class="dropdown-menu scrollable-menu">
                 ');
                 foreach ($locations as $location) {
