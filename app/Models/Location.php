@@ -33,6 +33,33 @@ class Location extends Model
     const CREATED_AT = null;
     const UPDATED_AT = 'timestamp';
 
+    /**
+     * Initialize this class
+     */
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function (Location $location) {
+            if (is_null($location->lat) || is_null($location->lng)) {
+                $location->parseCoordinates();
+            }
+        });
+    }
+
+    // ---- Helper Functions ----
+
+    protected function parseCoordinates()
+    {
+        $lat_regex = '(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))';
+        $lng_regex = '(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))';
+        $regex = '/\[\s*' . $lat_regex . '\s*,\s*' . $lng_regex . '\s*\]/';
+
+        if (preg_match($regex, $this->location, $parsed)) {
+            $this->fill($parsed);
+        }
+    }
+
     // ---- Define Relationships ----
 
     public function devices()

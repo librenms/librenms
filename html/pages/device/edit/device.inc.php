@@ -20,7 +20,7 @@ if ($_POST['editing']) {
 
         if ($override_sysLocation) {
             if ($override_sysLocation_string) {
-                $location = Location::firstOrCreate(['location' => $override_sysLocation_string], parse_location($override_sysLocation_string) ?: []);
+                $location = Location::firstOrCreate(['location' => $override_sysLocation_string]);
                 $device_model->location()->associate($location);
             } else {
                 $device_model->location()->dissociate();
