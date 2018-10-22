@@ -34,7 +34,7 @@ class Location extends Model
     const CREATED_AT = null;
     const UPDATED_AT = 'timestamp';
 
-    private static $location_regex = '/\[\s*(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))\s*,\s*(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))\s*\]/';
+    private $location_regex = '/\[\s*(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))\s*,\s*(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))\s*\]/';
 
 
     /**
@@ -82,12 +82,12 @@ class Location extends Model
      */
     public function display()
     {
-        return trim(preg_replace(self::$location_regex, '', $this->location)) ?: $this->location;
+        return trim(preg_replace($this->location_regex, '', $this->location)) ?: $this->location;
     }
 
     protected function parseCoordinates()
     {
-        if (preg_match(self::$location_regex, $this->location, $parsed)) {
+        if (preg_match($this->location_regex, $this->location, $parsed)) {
             $this->fill($parsed);
         }
     }
