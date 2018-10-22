@@ -604,14 +604,14 @@ location /nginx-status {
 ##### SNMP Extend
 1. Download the script onto the desired host.
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/nginx-stats -O /etc/snmp/nginx-stats
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/nginx -O /etc/snmp/nginx
 ```
 
-2. Run `chmod +x /etc/snmp/nginx-stats`
+2. Run `chmod +x /etc/snmp/nginx`
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend nginx /etc/snmp/nginx-stats
+extend nginx /etc/snmp/nginx
 ```
 4. Restart snmpd on your host
 
@@ -638,14 +638,14 @@ A shell script that gets stats from ntp client.
 ##### SNMP Extend
 1. Download the script onto the desired host.
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/ntp-client.sh -O /etc/snmp/ntp-client.sh
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/ntp-client -O /etc/snmp/ntp-client
 ```
 
-2. Run `chmod +x /etc/snmp/ntp-client.sh`
+2. Run `chmod +x /etc/snmp/ntp-client`
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend ntp-client /etc/snmp/ntp-client.sh
+extend ntp-client /etc/snmp/ntp-client
 ```
 
 4. Restart snmpd on your host
@@ -717,14 +717,14 @@ For pacman users automatically refreshing the database, it is recommended you us
 ##### SNMP Extend
 1. Download the script onto the desired host.
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/os-updates.sh -O /etc/snmp/os-updates.sh
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/osupdate -O /etc/snmp/osupdate
 ```
 
-2. Run `chmod +x /etc/snmp/os-updates.sh`
+2. Run `chmod +x /etc/snmp/osupdate`
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend osupdate /etc/snmp/os-updates.sh
+extend osupdate /etc/snmp/osupdate
 ```
 
 4. Restart snmpd on your host
@@ -736,15 +736,15 @@ The application should be auto-discovered as described at the top of the page. I
 
 ### PHP-FPM
 #### SNMP Extend
-1. Copy the shell script, phpfpm-sp, to the desired host. `wget https://github.com/librenms/librenms-agent/raw/master/snmp/phpfpm-sp -O /etc/snmp/phpfpm-sp`
+1. Copy the shell script, phpfpmsp, to the desired host. `wget https://github.com/librenms/librenms-agent/raw/master/snmp/phpfpmsp -O /etc/snmp/phpfpmsp`
 
-2. Run `chmod +x /etc/snmp/phpfpm-sp`
+2. Run `chmod +x /etc/snmp/phpfpmsp`
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend phpfpmsp /etc/snmp/phpfpm-sp
+extend phpfpmsp /etc/snmp/phpfpmsp
 ```
-5. Edit /etc/snmp/phpfpm-sp to include the status URL for the PHP-FPM pool you are monitoring.
+5. Edit /etc/snmp/phpfpmsp to include the status URL for the PHP-FPM pool you are monitoring.
 
 6. Restart snmpd on your host
 
@@ -1124,6 +1124,7 @@ The application should be auto-discovered as described at the top of the page. I
 ### ZFS
 
 ##### SNMP Extend
+`zfs-linux` requires python3 >=python3.5.
 
 The installation steps are:
 

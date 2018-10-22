@@ -110,7 +110,7 @@ class QueryBuilderFilter implements \JsonSerializable
 
                 $field = "$table.$column";
 
-                if (ends_with($column, ['_perc', '_current'])) {
+                if (ends_with($column, ['_perc', '_current', '_usage', '_perc_warn'])) {
                     $this->filter[$field] = [
                         'id' => $field,
                         'type' => 'string',

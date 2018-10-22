@@ -40,6 +40,11 @@ class EventlogController extends TableController
         ];
     }
 
+    public function searchFields($request)
+    {
+        return ['message'];
+    }
+
     /**
      * Defines the base query for this resource
      *
@@ -56,10 +61,6 @@ class EventlogController extends TableController
 
         if ($type = $request->get('eventtype')) {
             $query->where('type', $type);
-        }
-
-        if ($searchPhrase = $request->get('searchPhrase')) {
-            $query->where('message', 'like', '%'.$searchPhrase.'%');
         }
 
         return $query;
