@@ -12,10 +12,8 @@ $oids = array(
     "cempMemPoolFree.$oid",
     "cempMemPoolLargestFree.$oid",
 );
-$HCdata = snmp_get_multi_oid($device, $HCoids, '-OUQ', 'CISCO-ENHANCED-MEMPOOL-MIB');
-if (count($HCdata) >= 2) {
-    $data = $HCdata;
-} else {
+$data = snmp_get_multi_oid($device, $HCoids, '-OUQ', 'CISCO-ENHANCED-MEMPOOL-MIB');
+if (count($data) < 2) {
     $data = snmp_get_multi_oid($device, $oids, '-OUQ', 'CISCO-ENHANCED-MEMPOOL-MIB');
 }
 list($mempool['used'], $mempool['free'], $mempool['largestfree']) = array_values($data);
