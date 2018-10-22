@@ -70,37 +70,37 @@ $('#alert-template').on('show.bs.modal', function (event) {
             $('#name').prop("disabled",true);
         }
         $('#create-template').text('Update template');
-        $.ajax({
-            type: "POST",
-            url: "ajax_form.php",
-            data: { type: "parse-alert-template", template_id: template_id },
-            dataType: "json",
-            success: function(output) {
-                $('#template').val(output['template']);
-                $('#name').val(output['name']);
-                $('#title').val(output['title']);
-                $('#title_rec').val(output['title_rec']);
-                var selected_rules = [];
-                $.each(output.rules, function(i, rule) {
-                    var ruleElem = $('<option>', {
-                        value: rule.id,
-                        text : rule.name
-                    });
-                    if (rule.selected) {
-                        selected_rules.push(parseInt(rule.id));
-                    } else if (rule.used !== '') {
-                        ruleElem.data('subtext', '<span class="label label-default">Used in template "' + rule.used + '"</span>').prop("disabled", true);
-                    }
-                    $('#rules_list').append(ruleElem);
-                });
-                $('#rules_list').selectpicker('deselectAll').selectpicker('val', selected_rules);
-                if(output['template'].indexOf("{/if}")>=0){
-                    toastr.info('The old template syntax is no longer supported. Please see https://docs.librenms.org/Alerting/Old_Templates/');
-                    $('#convert-template').show();
-                }
-            }
-        });
     }
+    $.ajax({
+        type: "POST",
+        url: "ajax_form.php",
+        data: { type: "parse-alert-template", template_id: template_id },
+        dataType: "json",
+        success: function(output) {
+            $('#template').val(output['template']);
+            $('#name').val(output['name']);
+            $('#title').val(output['title']);
+            $('#title_rec').val(output['title_rec']);
+            var selected_rules = [];
+            $.each(output.rules, function(i, rule) {
+                var ruleElem = $('<option>', {
+                    value: rule.id,
+                    text : rule.name
+                });
+                if (rule.selected) {
+                    selected_rules.push(parseInt(rule.id));
+                } else if (rule.used !== '') {
+                    ruleElem.data('subtext', '<span class="label label-default">Used in template "' + rule.used + '"</span>').prop("disabled", true);
+                }
+                $('#rules_list').append(ruleElem);
+            });
+            $('#rules_list').selectpicker('deselectAll').selectpicker('val', selected_rules);
+            if(output['template'].indexOf("{/if}")>=0){
+                toastr.info('The old template syntax is no longer supported. Please see https://docs.librenms.org/Alerting/Old_Templates/');
+                $('#convert-template').show();
+            }
+        }
+    });
 });
 
 $('#alert-template').on('hide.bs.modal', function(event) {
