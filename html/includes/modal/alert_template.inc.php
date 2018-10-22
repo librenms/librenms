@@ -39,11 +39,7 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
                         </div>
                         <div class="form-group">
                             <label for="rules_list">Attach template to rules: </label>
-                            <select id="rules_list" name="rules_list" class="form-control" multiple data-live-search="true" data-max-options="10">
-                            <?php foreach (dbFetchRows("SELECT `id`,`rule`,`name` FROM `alert_rules`", array()) as $rule) {
-                                echo '<option value="' . $rule['id'] . '" data-subtext="' . $rule['name'] . '">' . $rule['id'] . '</option>';
-                            } ?>
-                            </select>
+                            <select id="rules_list" name="rules_list" class="form-control" multiple data-live-search="true" data-max-options="10"></select>
                         </div>
                         <div class="form-group">
                             <label for="title">Alert title: </label>
@@ -67,7 +63,6 @@ $('#alert-template').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
     var template_id = $('#template_id').val();
     var default_template = $('#default_template').val();
-    $('#rules_list').selectpicker('deselectAll');
 
     if(template_id != null && template_id != '') {
         if(default_template == "1") {
@@ -86,10 +81,19 @@ $('#alert-template').on('show.bs.modal', function (event) {
                 $('#title').val(output['title']);
                 $('#title_rec').val(output['title_rec']);
                 var selected_rules = [];
-                $.each(output.rule_id, function(i, elem) {
-                    selected_rules.push(parseInt(elem));
+                $.each(output.rules, function(i, rule) {
+                    var ruleElem = $('<option>', {
+                        value: rule.id,
+                        text : rule.name
+                    });
+                    if (rule.selected) {
+                        selected_rules.push(parseInt(rule.id));
+                    } else if (rule.used !== '') {
+                        ruleElem.data('subtext', '<span class="label label-default">Used in template "' + rule.used + '"</span>').prop("disabled", true);
+                    }
+                    $('#rules_list').append(ruleElem);
                 });
-                $('#rules_list').selectpicker('val', selected_rules);
+                $('#rules_list').selectpicker('deselectAll').selectpicker('val', selected_rules);
                 if(output['template'].indexOf("{/if}")>=0){
                     toastr.info('The old template syntax is no longer supported. Please see https://docs.librenms.org/Alerting/Old_Templates/');
                     $('#convert-template').show();
@@ -105,7 +109,7 @@ $('#alert-template').on('hide.bs.modal', function(event) {
     $('#line').val('');
     $('#value').val('');
     $('#name').val('');
-    $('#rules_list').selectpicker('deselectAll');
+    $('#rules_list').find('option').remove().end().selectpicker('destroy');
     $('#create-template').text('Create template');
     $('#default-template').val('0');
     $('#reset-default').remove();
@@ -160,7 +164,7 @@ function alertTemplateAjaxOps(template, name, template_id, title, title_rec, rul
     $.ajax({
         type: "POST",
         url: "ajax_form.php",
-        data: { type: "alert-templates", template: template, name: name, template_id: template_id, title: title, title_rec: title_rec, rule_id: rules},
+        data: { type: "alert-templates", template: template, name: name, template_id: template_id, title: title, title_rec: title_rec, rules: rules},
         dataType: "json",
         success: function(output) {
             if(output.status == 'ok') {

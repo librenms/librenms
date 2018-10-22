@@ -24,8 +24,15 @@ $template_id = ($vars['template_id']);
 if (is_numeric($template_id) && $template_id > 0) {
     $template = dbFetchRow('SELECT * FROM `alert_templates` WHERE `id` = ? LIMIT 1', array($template_id));
     $rules = [];
-    foreach (dbFetchRows('SELECT `alert_rule_id` FROM `alert_template_map` WHERE `alert_templates_id` = ?', array($template_id)) as $rule) {
-        $rules[] = $rule['alert_rule_id'];
+    foreach (dbFetchRows("SELECT `id`,`rule`,`name` FROM `alert_rules`", array()) as $rule) {
+        $is_selected = dbFetchCell("SELECT `alert_templates_id` FROM `alert_template_map` WHERE `alert_rule_id` = ? AND `alert_templates_id` = ?", [$rule['id'], $template_id]);
+        $is_available = dbFetchCell("SELECT `alert_templates_id` FROM `alert_template_map` WHERE `alert_rule_id` = ?", [$rule['id']]);
+        $rules[] = [
+            'id' => $rule['id'],
+            'name' => $rule['name'],
+            'selected' => $is_selected,
+            'used' => isset($is_available) ? dbFetchCell("SELECT `name` FROM `alert_templates` WHERE `id` = ?", [$is_available]) : '',
+        ];
     }
     $output   = array(
         'template'  => $template['template'],
@@ -33,7 +40,7 @@ if (is_numeric($template_id) && $template_id > 0) {
         'title'     => $template['title'],
         'title_rec' => $template['title_rec'],
         'type'      => $template['type'],
-        'rule_id'   => $rules
+        'rules'     => $rules
     );
     header('Content-type: application/json');
     echo _json_encode($output);

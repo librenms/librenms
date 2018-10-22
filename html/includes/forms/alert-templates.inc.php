@@ -68,7 +68,7 @@ if (isset($vars['template']) && empty(view(['template' => $vars['template']], []
     if ($status == 'ok') {
         $alertRulesOk = true;
         dbDelete('alert_template_map', 'alert_templates_id = ?', array($template_id));
-        $rules = explode(',', $vars['rule_id']);
+        $rules = explode(',', $vars['rules']);
         if ($rules !== false) {
             foreach ($rules as $rule_id) {
                 if (!dbInsert(array('alert_rule_id' => $rule_id, 'alert_templates_id' => $template_id), 'alert_template_map')) {
