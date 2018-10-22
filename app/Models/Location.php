@@ -54,6 +54,15 @@ class Location extends Model
         return !(is_null($this->lat) || is_null($this->lng));
     }
 
+    public function lookupCoordinates()
+    {
+        if ($this->location) {
+            /** @var \LibreNMS\Interfaces\Geocoder $api */
+            $api = app(\LibreNMS\Interfaces\Geocoder::class);
+            $this->fill($api->getCoordinates($this->location));
+        }
+    }
+
     protected function parseCoordinates()
     {
         $lat_regex = '(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))';
