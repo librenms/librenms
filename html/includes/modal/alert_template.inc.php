@@ -38,6 +38,14 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
                             <textarea class="form-control" id="template" name="template" rows="15"></textarea>
                         </div>
                         <div class="form-group">
+                            <label for="rules_list">Attach template to rules: </label>
+                            <select id="rules_list" name="rules_list" class="form-control" multiple data-live-search="true" data-max-options="10">
+                            <?php foreach (dbFetchRows("SELECT `id`,`rule`,`name` FROM `alert_rules`", array()) as $rule) {
+                                echo '<option value="' . $rule['id'] . '" data-subtext="' . $rule['name'] . '">' . $rule['id'] . '</option>';
+                            } ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="title">Alert title: </label>
                             <input type="text" class="form-control input-sm" id="title" name="title" placeholder="Alert Title">
                         </div>
@@ -53,12 +61,13 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
         </div>
     </div>
 </div>
-<script>
 
+<script type="text/javascript">
 $('#alert-template').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
     var template_id = $('#template_id').val();
     var default_template = $('#default_template').val();
+    $('#rules_list').selectpicker('deselectAll');
 
     if(template_id != null && template_id != '') {
         if(default_template == "1") {
@@ -76,6 +85,11 @@ $('#alert-template').on('show.bs.modal', function (event) {
                 $('#name').val(output['name']);
                 $('#title').val(output['title']);
                 $('#title_rec').val(output['title_rec']);
+                var selected_rules = [];
+                $.each(output.rule_id, function(i, elem) {
+                    selected_rules.push(parseInt(elem));
+                });
+                $('#rules_list').selectpicker('val', selected_rules);
                 if(output['template'].indexOf("{/if}")>=0){
                     toastr.info('The old template syntax is no longer supported. Please see https://docs.librenms.org/Alerting/Old_Templates/');
                     $('#convert-template').show();
@@ -91,6 +105,7 @@ $('#alert-template').on('hide.bs.modal', function(event) {
     $('#line').val('');
     $('#value').val('');
     $('#name').val('');
+    $('#rules_list').selectpicker('deselectAll');
     $('#create-template').text('Create template');
     $('#default-template').val('0');
     $('#reset-default').remove();
@@ -101,12 +116,19 @@ $('#alert-template').on('hide.bs.modal', function(event) {
 
 $('#create-template').click('', function(e) {
     e.preventDefault();
+
+    var rules_items = [];
+    $('#rules_list :selected').each(function(i, selectedElement) {
+        rules_items.push($(selectedElement).val());
+    });
+
     var template = $("#template").val();
     var template_id = $("#template_id").val();
     var name = $("#name").val();
     var title = $("#title").val();
     var title_rec = $("#title_rec").val();
-    alertTemplateAjaxOps(template, name, template_id, title, title_rec);
+
+    alertTemplateAjaxOps(template, name, template_id, title, title_rec, rules_items.join(','));
 });
 
 $('#convert-template').click('', function(e) {
@@ -134,24 +156,20 @@ $('#convert-template').click('', function(e) {
     });
 });
 
-function alertTemplateAjaxOps(template, name, template_id, title, title_rec)
-{
+function alertTemplateAjaxOps(template, name, template_id, title, title_rec, rules) {
     $.ajax({
         type: "POST",
         url: "ajax_form.php",
-        data: { type: "alert-templates", template: template, name: name, template_id: template_id, title: title, title_rec: title_rec},
+        data: { type: "alert-templates", template: template, name: name, template_id: template_id, title: title, title_rec: title_rec, rule_id: rules},
         dataType: "json",
         success: function(output) {
-            console.log(output);
             if(output.status == 'ok') {
                 toastr.success(output.message);
                 $("#alert-template").modal('hide');
-
                 if(template_id != null && template_id != '') {
                     $('#templatetable tbody tr').each(function (i, row) {
                         if ($(row).children().eq(0).text() == template_id) {
                             $(row).children().eq(1).text(name);
-                            // We found our match so stop looping through the table
                             return false;
                         }
                     });
@@ -167,7 +185,5 @@ function alertTemplateAjaxOps(template, name, template_id, title, title_rec)
             toastr.error('An error occurred updating this alert template.');
         }
     });
-
 }
-
 </script>

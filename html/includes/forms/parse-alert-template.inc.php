@@ -23,12 +23,17 @@ $template_id = ($vars['template_id']);
 
 if (is_numeric($template_id) && $template_id > 0) {
     $template = dbFetchRow('SELECT * FROM `alert_templates` WHERE `id` = ? LIMIT 1', array($template_id));
+    $rules = [];
+    foreach (dbFetchRows('SELECT `alert_rule_id` FROM `alert_template_map` WHERE `alert_templates_id` = ?', array($template_id)) as $rule) {
+        $rules[] = $rule['alert_rule_id'];
+    }
     $output   = array(
         'template'  => $template['template'],
         'name'      => $template['name'],
         'title'     => $template['title'],
         'title_rec' => $template['title_rec'],
         'type'      => $template['type'],
+        'rule_id'   => $rules
     );
     header('Content-type: application/json');
     echo _json_encode($output);
