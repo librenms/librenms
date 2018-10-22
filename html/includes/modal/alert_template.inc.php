@@ -35,7 +35,7 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
                         </div>
                         <div class="form-group">
                             <label for="template">Template: </label>
-                            <textarea class="form-control" id="template" name="template" rows="15"></textarea>
+                            <textarea class="form-control" id="template" name="template" style="font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;" rows="15"></textarea>
                         </div>
                         <div class="form-group">
                             <label for="rules_list">Attach template to rules: </label>
