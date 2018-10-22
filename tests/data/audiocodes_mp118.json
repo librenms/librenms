@@ -11,10 +11,10 @@
                     "hardware": null,
                     "features": null,
                     "location": null,
-                    "os": "audiocode",
+                    "os": "audiocodes",
                     "type": "network",
                     "serial": null,
-                    "icon": "audiocode.png"
+                    "icon": "audiocodes.png"
                 }
             ]
         },
@@ -29,10 +29,10 @@
                     "hardware": "MP-118 FXS",
                     "features": null,
                     "location": "<private>",
-                    "os": "audiocode",
+                    "os": "audiocodes",
                     "type": "network",
                     "serial": "10512508",
-                    "icon": "audiocode.png"
+                    "icon": "audiocodes.png"
                 }
             ]
         }

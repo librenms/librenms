@@ -511,12 +511,12 @@ $config['graph_types']['device']['bluecoat_http_server_connections_idle']['order
 $config['graph_types']['device']['bluecoat_http_server_connections_idle']['descr']    = 'HTTP Server Connections Idle';
 
 // audiocode graphs
-$config['graph_types']['device']['audiocode_IP2Tel']['section']  = 'audiocode';
-$config['graph_types']['device']['audiocode_IP2Tel']['order']    = '0';
-$config['graph_types']['device']['audiocode_IP2Tel']['descr']    = 'IP to Tel Call stats';
-$config['graph_types']['device']['audiocode_Tel2IP']['section']  = 'audiocode';
-$config['graph_types']['device']['audiocode_Tel2IP']['order']    = '0';
-$config['graph_types']['device']['audiocode_Tel2IP']['descr']    = 'Tel to IP Call stats';
+$config['graph_types']['device']['audiocodes_IP2Tel']['section']  = 'audiocodes';
+$config['graph_types']['device']['audiocodes_IP2Tel']['order']    = '0';
+$config['graph_types']['device']['audiocodes_IP2Tel']['descr']    = 'IP to Tel Call stats';
+$config['graph_types']['device']['audiocodes_Tel2IP']['section']  = 'audiocodes';
+$config['graph_types']['device']['audiocodes_Tel2IP']['order']    = '0';
+$config['graph_types']['device']['audiocodes_Tel2IP']['descr']    = 'Tel to IP Call stats';
 
 
 

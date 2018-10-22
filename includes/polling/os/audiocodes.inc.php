@@ -15,7 +15,7 @@ $oids[] = 'acPerfIP2Tel';
 
 foreach ($oids as $oid) {
     $data = snmpwalk_cache_oid($device, $oid, array(), 'AcPerfH323SIPGateway');
-    $nameRRD = "audiocode_" . preg_replace('#acPerf#', '', $oid);
+    $nameRRD = "audiocodes_" . preg_replace('#acPerf#', '', $oid);
     $rrd_def = RrdDefinition::make();
     $fields = array();
 
@@ -27,9 +27,10 @@ foreach ($oids as $oid) {
         }
     }
     $tags = compact('rrd_def');
-    data_update($device, $nameRRD, $tags, $fields);
 
-    $graphs[$nameRRD] = true;
+    if (count($fields) > 0) {
+        //we collected some data, so let's save it
+        data_update($device, $nameRRD, $tags, $fields);
+        $graphs[$nameRRD] = true;
+    }
 }
-
-

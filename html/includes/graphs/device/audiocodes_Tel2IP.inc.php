@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'audiocode_Tel2IP');
+$rrd_filename = rrd_name($device['hostname'], 'audiocodes_Tel2IP');
 
 require 'includes/graphs/common.inc.php';
 
