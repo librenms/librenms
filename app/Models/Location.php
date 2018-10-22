@@ -34,7 +34,7 @@ class Location extends Model
     const UPDATED_AT = 'timestamp';
 
     /**
-     * Initialize this class
+     * Set up listeners for this Model
      */
     public static function boot()
     {

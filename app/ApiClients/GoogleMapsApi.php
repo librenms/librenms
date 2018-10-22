@@ -62,16 +62,18 @@ class GoogleMapsApi implements Geocoder
             return [];
         }
 
+        $api_key = Config::get('geoloc.api_key');
+        if (!$api_key) {
+            Log::debug('Google Maps API key missing, set geoloc.api_key');
+            return [];
+        }
+
         $options = [
             'query' => [
+                'key' => $api_key,
                 'address' => $address,
             ]
         ];
-
-        if ($api_key = Config::get('geoloc.api_key')) {
-            Log::debug("Use Google API key: $api_key\n");
-            $options['query']['key'] = $api_key;
-        }
 
         try {
             $response = $this->client->get($this->geocoding_uri, $options);
