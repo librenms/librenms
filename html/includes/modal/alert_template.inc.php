@@ -39,7 +39,7 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
                         </div>
                         <div class="form-group">
                             <label for="rules_list">Attach template to rules: </label>
-                            <select id="rules_list" name="rules_list" class="form-control" multiple data-live-search="true"></select>
+                            <select id="rules_list" name="rules_list[]" class="form-control" multiple="multiple"></select>
                         </div>
                         <div class="form-group">
                             <label for="title">Alert title: </label>
@@ -86,15 +86,33 @@ $('#alert-template').on('show.bs.modal', function (event) {
                 var ruleElem = $('<option>', {
                     value: rule.id,
                     text : rule.name
-                });
+                }).attr('data-usedby', '');
                 if (rule.selected) {
                     selected_rules.push(parseInt(rule.id));
                 } else if (rule.used !== '') {
-                    ruleElem.data('subtext', '<span class="label label-default">Used in template "' + rule.used + '"</span>').prop("disabled", true);
+                    ruleElem.attr('data-usedby', rule.used).prop("disabled", true);
                 }
                 $('#rules_list').append(ruleElem);
             });
-            $('#rules_list').selectpicker('deselectAll').selectpicker('val', selected_rules);
+            $('#rules_list').select2({
+                theme: "bootstrap",
+                dropdownAutoWidth : true,
+                width: "auto",
+                allowClear: true,
+                placeholder: "Nothing selected",
+                templateResult: function(data) {
+                    if (data.id && data.element.dataset.usedby !== '') {
+                        return $(
+                            '<span>' + data.text + ' <span class="label label-default">Used in template "' + data.element.dataset.usedby + '"</span></span>'
+                        );
+                    } else if (data.id && data.selected) {
+                        return $(
+                            '<span><i class="fa fa-check"></i> ' + data.text + '</span>'
+                        );
+                    }
+                    return data.text;
+                }
+            }).val(selected_rules).trigger("change");
             if(output['template'].indexOf("{/if}")>=0){
                 toastr.info('The old template syntax is no longer supported. Please see https://docs.librenms.org/Alerting/Old_Templates/');
                 $('#convert-template').show();
@@ -109,7 +127,7 @@ $('#alert-template').on('hide.bs.modal', function(event) {
     $('#line').val('');
     $('#value').val('');
     $('#name').val('');
-    $('#rules_list').find('option').remove().end().selectpicker('destroy');
+    $('#rules_list').find('option').remove().end().select2('destroy');
     $('#create-template').text('Create template');
     $('#default-template').val('0');
     $('#reset-default').remove();

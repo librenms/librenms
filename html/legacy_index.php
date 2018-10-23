@@ -86,7 +86,6 @@ if (empty($config['favicon'])) {
   <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
   <link href="css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
   <link href="css/bootstrap-switch.min.css" rel="stylesheet" type="text/css" />
-  <link href="css/bootstrap-select.min.css" rel="stylesheet" type="text/css" />
   <link href="css/toastr.min.css" rel="stylesheet" type="text/css" />
   <link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
   <link href="css/jquery.bootgrid.min.css" rel="stylesheet" type="text/css" />
@@ -115,7 +114,6 @@ foreach ((array)$config['webui']['custom_css'] as $custom_css) {
   <script src="js/bootstrap.min.js"></script>
   <script src="js/bootstrap-hover-dropdown.min.js"></script>
   <script src="js/bootstrap-switch.min.js"></script>
-  <script src="js/bootstrap-select.min.js"></script>
   <script src="js/hogan-2.0.0.js"></script>
   <script src="js/jquery.cycle2.min.js"></script>
   <script src="js/moment.min.js"></script>
