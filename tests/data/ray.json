@@ -32,7 +32,7 @@
                     "os": "ray",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "ray.svg"
+                    "icon": "ray.png"
                 }
             ]
         },
@@ -50,7 +50,7 @@
                     "os": "ray",
                     "type": "wireless",
                     "serial": "9879015",
-                    "icon": "ray.svg"
+                    "icon": "ray.png"
                 }
             ]
         }
