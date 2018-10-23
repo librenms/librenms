@@ -10,8 +10,10 @@ PBI-4000P-5000P-MIB	DEFINITIONS ::= BEGIN
 			FROM SNMPv2-TC
 		DisplayString
 			FROM RFC1213-MIB
-		basicInfo, mg
+		basicInfo
 			FROM PBI-MGSYSTEM-MIB
+		mg
+			FROM PBI-MAIN-MIB
 		MODULE-IDENTITY, OBJECT-TYPE, Integer32, enterprises
 			FROM SNMPv2-SMI;
 
