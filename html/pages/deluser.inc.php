@@ -1,33 +1,34 @@
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 echo '<div style="margin: 10px;">';
 
-if (!Auth::user()->isAdmin()) {
+if (!LegacyAuth::user()->isAdmin()) {
     include 'includes/error-no-perm.inc.php';
 } else {
     echo '<h3>Delete User</h3>';
 
     $pagetitle[] = 'Delete user';
 
-    if (Auth::get()->canManageUsers()) {
+    if (LegacyAuth::get()->canManageUsers()) {
         if ($vars['action'] == 'del') {
-            $delete_username = dbFetchCell('SELECT username FROM users WHERE user_id = ?', array($vars['id']));
+            $id = (int)$vars['id'];
+            $user = LegacyAuth::get()->getUser($id);
 
             if ($vars['confirm'] == 'yes') {
-                if (Auth::get()->deleteUser($vars['id']) >= 0) {
-                    print_message('<div class="infobox">User "'.$delete_username.'" deleted!');
+                if (LegacyAuth::get()->deleteUser($id) >= 0) {
+                    print_message('<div class="infobox">User "'.$user['username'].'" deleted!');
                 } else {
-                    print_error('Error deleting user "'.$delete_username.'"!');
+                    print_error('Error deleting user "'.$user['username'].'"!');
                 }
             } else {
-                print_error('You have requested deletion of the user "'.$delete_username.'". This action can not be reversed.<br /><a class="btn btn-danger" href="deluser/action=del/id='.$vars['id'].'/confirm=yes">Click to confirm</a>');
+                print_error('You have requested deletion of the user "'.$user['username'].'". This action can not be reversed.<br /><a class="btn btn-danger" href="deluser/action=del/id='.$id.'/confirm=yes">Click to confirm</a>');
             }
         }
 
         // FIXME v mysql query should be replaced by authmodule
-        $userlist = dbFetchRows('SELECT * FROM `users`');
+        $userlist = LegacyAuth::get()->getUserlist();
 
         echo '
             <form role="form" class="form-horizontal" method="GET" action="">

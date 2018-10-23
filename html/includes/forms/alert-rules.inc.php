@@ -24,11 +24,11 @@
  */
 
 use LibreNMS\Alerting\QueryBuilderParser;
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 header('Content-type: application/json');
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     die(json_encode([
         'status' => 'error',
         'message' => 'ERROR: You need to be admin',
@@ -38,8 +38,18 @@ if (!Auth::user()->hasGlobalAdmin()) {
 $status = 'ok';
 $message = '';
 
-$builder_json = $_POST['builder_json'];
-$query        = QueryBuilderParser::fromJson($builder_json)->toSql();
+$builder_json   = $vars['builder_json'];
+$override_query = $vars['override_query'];
+
+$options = [
+    'override_query' => $override_query,
+];
+
+if ($override_query === 'on') {
+    $query = $vars['adv_query'];
+} else {
+    $query = QueryBuilderParser::fromJson($builder_json)->toSql();
+}
 $rule_id      = $_POST['rule_id'];
 $count        = mres($_POST['count']);
 $delay        = mres($_POST['delay']);
@@ -79,6 +89,7 @@ $extra = array(
     'invert'   => $invert,
     'interval' => $interval_sec,
     'recovery' => $recovery,
+    'options'  => $options,
 );
 
 $extra_json = json_encode($extra);
@@ -194,10 +205,10 @@ if (is_numeric($rule_id) && $rule_id > 0) {
 
     // Remove old mappings
     if (!empty($t_del)) {
-        dbDelete('alert_transport_map', 'target_type="single" AND transport_or_group_id IN (?)', array(array(implode(',', $t_del))));
+        dbDelete('alert_transport_map', 'target_type="single" AND transport_or_group_id IN ' . dbGenPlaceholders(count($t_del)), $t_del);
     }
     if (!empty($g_del)) {
-        dbDelete('alert_transport_map', 'target_type="group" AND transport_or_group_id IN (?)', array(array(implode(',', $g_del))));
+        dbDelete('alert_transport_map', 'target_type="group" AND transport_or_group_id IN ' . dbGenPlaceholders(count($g_del)), $g_del);
     }
 }
 

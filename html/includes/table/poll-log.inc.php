@@ -1,18 +1,18 @@
 <?php
 
 use LibreNMS\Config;
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $sql = ' FROM `devices` AS D ';
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     $sql .= ", devices_perms AS P ";
 }
 
 $sql .= " LEFT JOIN `poller_groups` ON `D`.`poller_group`=`poller_groups`.`id`";
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    $sql .= " WHERE D.device_id = P.device_id AND P.user_id = '".Auth::id()."' AND D.ignore = '0'";
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
+    $sql .= " WHERE D.device_id = P.device_id AND P.user_id = '".LegacyAuth::id()."' AND D.ignore = '0'";
 } else {
     $sql .= ' WHERE 1';
 }
@@ -22,7 +22,7 @@ if (isset($searchPhrase) && !empty($searchPhrase)) {
 }
 
 if ($vars['type'] == "unpolled") {
-    $overdue = (int)(Config::get('rrd_step', 300) * 1.2);
+    $overdue = (int)(Config::get('rrd.step', 300) * 1.2);
     $sql .= " AND `last_polled` <= DATE_ADD(NOW(), INTERVAL - $overdue SECOND)";
 }
 
@@ -70,4 +70,4 @@ $output = array(
     'rows'     => $response,
     'total'    => $total,
 );
-echo _json_encode($output);
+echo json_encode($output);

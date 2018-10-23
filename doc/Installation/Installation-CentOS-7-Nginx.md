@@ -168,7 +168,7 @@ Then run these commands
     firewall-cmd --zone public --add-service https
     firewall-cmd --permanent --zone public --add-service https
 
-#### Configure snmpd
+### Configure snmpd
 
     cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
 

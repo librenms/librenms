@@ -226,6 +226,7 @@ class ModuleTestHelper
      *
      * @param array $modules
      * @return array
+     * @throws InvalidModuleException
      */
     public static function findOsWithData($modules = [])
     {
@@ -253,11 +254,15 @@ class ModuleTestHelper
                 continue;  // no test data for selected modules
             }
 
-            $os_list[$base_name] = [
-                $os,
-                $variant,
-                self::resolveModuleDependencies($valid_modules),
-            ];
+            try {
+                $os_list[$base_name] = [
+                    $os,
+                    $variant,
+                    self::resolveModuleDependencies($valid_modules),
+                ];
+            } catch (InvalidModuleException $e) {
+                throw new InvalidModuleException("Invalid module " . $e->getMessage() . " in $os $variant");
+            }
         }
 
         return $os_list;
@@ -504,6 +509,10 @@ class ModuleTestHelper
         try {
             Config::set('snmp.community', [$this->file_name]);
             $device_id = addHost($snmpsim->getIp(), 'v2c', $snmpsim->getPort());
+
+            // disable to block normal pollers
+            dbUpdate(['disabled' => 1], 'devices', 'device_id=?', [$device_id]);
+
             $this->qPrint("Added device: $device_id\n");
         } catch (\Exception $e) {
             echo $this->file_name . ': ' . $e->getMessage() . PHP_EOL;

@@ -12,9 +12,9 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
@@ -28,7 +28,7 @@ $device_id = $vars['device_id'];
 if (is_numeric($service_id) && $service_id > 0) {
     // Need to edit.
     $update = array('service_desc' => $desc, 'service_ip' => $ip, 'service_param' => $param);
-    if (edit_service($update, $service_id)) {
+    if (is_numeric(edit_service($update, $service_id))) {
         $status = array('status' =>0, 'message' => 'Modified Service: <i>'.$service_id.': '.$type.'</i>');
     } else {
         $status = array('status' =>1, 'message' => 'ERROR: Failed to modify service: <i>'.$service_id.'</i>');

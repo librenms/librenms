@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $no_refresh = true;
 
@@ -270,7 +270,7 @@ if (isset($_GET['account']) && isset($_GET['service_key']) && isset($_GET['servi
     set_config_name('alert.pagerduty.service', $_GET['service_name']);
 }
 
-if (isset($vars['del_pagerduty']) && $vars['del_pagerduty'] == true && Auth::user()->hasGlobalAdmin()) {
+if (isset($vars['del_pagerduty']) && $vars['del_pagerduty'] == true && LegacyAuth::user()->hasGlobalAdmin()) {
     set_config_name('alert.transports.pagerduty', '');
     set_config_name('alert.pagerduty.account', '');
     set_config_name('alert.pagerduty.service', '');
@@ -329,6 +329,11 @@ $general_conf = array(
           'descr'              => 'Updates to contact email addresses not honored',
           'type'               => 'checkbox',
     ),
+    [
+        'name'                 => 'alert.ack_until_clear',
+        'descr'                => 'Default acknowledge until alert clears option',
+        'type'                 => 'checkbox',
+    ]
 );
 
 $mail_conf = array(
@@ -398,13 +403,15 @@ $mail_conf = array(
 );
 
 echo '
-<div class="well"><strong>DEPRECATED</strong>: Please use the new Alert Transports section under Alerts to configure transports - <a href="https://docs.librenms.org/Alerting/Transports/" target="_blank">docs</a>.</div>
 <div class="panel-group" id="accordion">
     <form class="form-horizontal" role="form" action="" method="post">
 ';
 
 echo generate_dynamic_config_panel('General alert settings', $config_groups, $general_conf);
-echo generate_dynamic_config_panel('Email transport', $config_groups, $mail_conf, 'mail');
+
+echo generate_dynamic_config_panel('Email options', $config_groups, $mail_conf, 'mail');
+
+echo '<br /><div class="well"><strong class="text-danger">DEPRECATED</strong>: All options below are deprecated, please use the new Alert Transports section under Alerts to configure transports :: <a href="https://docs.librenms.org/Alerting/Transports/" target="_blank">Docs <i class="fa fa-book fa-1x"></i></a></div>';
 
 echo '
         <div class="panel panel-default">

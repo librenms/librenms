@@ -79,12 +79,24 @@ foreach ($files as $file) {
     }
 
     $rrd_info = shell_exec("$rrdtool info $file");
-    preg_match('/step = (\d+)/', $rrd_info, $matches);
+    preg_match('/step = (\d+)/', $rrd_info, $step_matches);
 
-    if ($matches[1] == $step) {
-        d_echo("Skipping $file, step is already $step.\n");
-        $skipped++;
-        continue;
+    if ($step_matches[1] == $step) {
+        preg_match_all('/minimal_heartbeat = (\d+)/', $rrd_info, $heartbeat_matches);
+        try {
+            foreach ($heartbeat_matches[1] as $ds_heartbeat) {
+                if ($ds_heartbeat != $heartbeat) {
+                    throw new Exception("Mismatched heartbeat. {$ds_heartbeat} != $heartbeat");
+                }
+            }
+            // all heartbeats ok
+
+            d_echo("Skipping $file, step is already $step.\n");
+            $skipped++;
+            continue;
+        } catch (Exception $e) {
+            echo $e->getMessage() . PHP_EOL;
+        }
     }
 
     echo "Converting $file: ";

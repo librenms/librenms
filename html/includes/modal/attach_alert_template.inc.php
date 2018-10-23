@@ -3,6 +3,7 @@
  * LibreNMS
  *
  * Copyright (c) 2014 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk/fa>
+ * Copyright (c) 2018 TheGreatDoc <https://github.com/thegreatdoc/>
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -11,9 +12,9 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
@@ -32,11 +33,17 @@ if (!Auth::user()->hasGlobalAdmin()) {
                     <div class="form-group">
                         <label for="rules_list">Select rules</label>
                         <select multiple="multiple" class="form-control" id="rules_list" name="rules_list" size="10">
-                            <option></option>
+                            <option>--Clear Rules--</option>
 <?php
 
 foreach (dbFetchRows("SELECT `id`,`rule`,`name` FROM `alert_rules`", array()) as $rule) {
-    echo '<option value="'.$rule['id'].'">'.$rule['name'].'</option>';
+    $is_avail = dbFetchCell("SELECT `alert_templates_id` FROM `alert_template_map` WHERE `alert_rule_id` = ?", [$rule['id']]);
+    if (!isset($is_avail)) {
+        echo '<option value="' . $rule['id'] . '">' . $rule['name'] . '</option>';
+    } else {
+        $template = dbFetchCell("SELECT `name` FROM `alert_templates` WHERE `id` = ?", [$is_avail]);
+        echo '<option value="' . $rule['id'] . '" disabled>' . $rule['name'] . ' - Used in template: ' . $template . '</option>';
+    }
 }
 ?>
                         </select>
@@ -69,6 +76,7 @@ $('#attach-alert-template').on('show.bs.modal', function(e) {
             $.each( output.rule_id, function( i, elem) {
                 elem = parseInt(elem);
                 selected_items.push(elem);
+                $("#rules_list option[value='"+ elem + "']").attr('disabled', false);
             });
             $('#rules_list').val(selected_items);
         }
@@ -92,17 +100,29 @@ $('#alert-template-attach').click('', function(event) {
         type: 'POST',
         url: 'ajax_form.php',
         data: { type: "attach-alert-template", template_id: template_id, rule_id: rules },
-        dataType: "html",
-        success: function(msg) {
-            if(msg.indexOf("ERROR:") <= -1) {
-                toastr.success(msg);
+        dataType: "json",
+        success: function(data) {
+            if (data.status == 'ok') {
+                toastr.success(data.message);
                 $("#attach-alert-template").modal('hide');
+                $.each( data.old_rules, function(index, itemData){
+                    if (itemData != "--Clear Rules--") {
+                        $("#rules_list option[value=" + itemData + "]").prop('disabled', false).text(data.rule_name[index]);
+                    }
+                });
+                $.each( data.new_rules, function(index, itemData){
+                    if (itemData != "--Clear Rules--") {
+                        $("#rules_list option[value=" + itemData + "]").prop('disabled', true).text(data.nrule_name[index] + ' - Used in template:' + data.template_name[index]);
+                    }
+                });
             } else {
-                $('#template_error').html('<div class="alert alert-danger">'+msg+'</div>');
+                //$('#template_error').html('<div class="alert alert-danger">'+msg+'</div>');
+                toastr.error(data.message);
             }
         },
-        error: function() {
-            $("#template_error").html('<div class="alert alert-danger">The alert rules could not be attached to this template.</div>');
+        error: function(data) {
+            //$("#template_error").html('<div class="alert alert-danger">The alert rules could not be attached to this template.</div>');
+            toastr.error(data.message);
         }
     });
 });

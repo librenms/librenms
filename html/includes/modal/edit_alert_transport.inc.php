@@ -11,10 +11,10 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
-if (Auth::user()->hasGlobalAdmin()) {
+if (LegacyAuth::user()->hasGlobalAdmin()) {
 ?>
 <!--Modal for adding or updating an alert transport -->
     <div class="modal fade" id="edit-alert-transport" tabindex="-1" role="dialog"
@@ -50,11 +50,13 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <option value="hipchat-form">Hipchat</option>
                                     <option value="irc-form">IRC</option>
                                     <option value="jira-form">Jira</option>
+                                    <option value="kayako-form">Kayako Classic</option>
                                     <option value="mail-form" selected>Mail</option>
                                     <option value="msteams-form">Microsoft Teams</option>
                                     <option value="nagios-form">Nagios</option>
                                     <option value="opsgenie-form">OpsGenie</option>
                                     <option value="osticket-form">osTicket</option>
+                                    <option value="pagerduty-form">PagerDuty</option>
                                     <option value="hue-form">Phillips Hue</option>
                                     <option value="playsms-form">PlaySMS</option>
                                     <option value="pushbullet-form">Pushbullet</option>
@@ -62,8 +64,10 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <option value="rocket-form">Rocket.chat</option>
                                     <option value="slack-form">Slack</option>
                                     <option value="smseagle-form">SMSEagle</option>
+                                    <option value="smsfeedback-form">SMSFeedback</option>
                                     <option value="syslog-form">Syslog</option>
                                     <option value="telegram-form">Telegram</option>
+                                    <option value="twilio-form">Twilio</option>
                                     <option value="victorops-form">Victorops</option>
                                     <!--Insert more transport type options here has support is added. Value should be: [transport_name]-form -->
                                 </select>
@@ -100,37 +104,51 @@ foreach (scandir($transport_dir) as $transport) {
     $tmp = call_user_func($class.'::configTemplate');
     
     foreach ($tmp['config'] as $item) {
-        echo '<div class="form-group" title="'.$item['descr'].'">';
-        echo '<label for="'.$item['name'].'" class="col-sm-3 col-md-2 control-label">'.$item['title'].': </label>';
-        if ($item['type'] == 'text') {
-            echo '<div class="col-sm-9 col-md-10">';
-            echo '<input type="'.$item['type'].'" id="'.$item['name'].'" name="'.$item['name'].'" class="form-control" ';
-            if ($item['required']) {
-                echo 'required>';
-            } else {
-                echo '>';
+        if ($item['type'] !== 'hidden') {
+            echo '<div class="form-group" title="' . $item['descr'] . '">';
+            echo '<label for="' . $item['name'] . '" class="col-sm-3 col-md-2 control-label">' . $item['title'] . ': </label>';
+            if ($item['type'] == 'text') {
+                echo '<div class="col-sm-9 col-md-10">';
+                echo '<input type="' . $item['type'] . '" id="' . $item['name'] . '" name="' . $item['name'] . '" class="form-control" ';
+                if ($item['required']) {
+                    echo 'required>';
+                } else {
+                    echo '>';
+                }
+                echo '</div>';
+            } elseif ($item['type'] == 'checkbox') {
+                echo '<div class="col-sm-2">';
+                echo '<input type="checkbox" name="' . $item['name'] . '" id="' . $item['name'] . '">';
+                echo '</div>';
+                $switches[$item['name']] = $item['default'];
+            } elseif ($item['type'] == 'select') {
+                echo '<div class="col-sm-3">';
+                echo '<select name="' . $item['name'] . '" id="' . $item['name'] . '" class="form-control">';
+                foreach ($item['options'] as $descr => $opt) {
+                    echo '<option value="' . $opt . '">' . $descr . '</option>';
+                }
+                echo '</select>';
+                echo '</div>';
+            } elseif ($item['type'] === 'textarea') {
+                echo '<div class="col-sm-9 col-md-10">';
+                echo '<textarea name="' . $item['name'] . '" id="' . $item['name'] . '" class="form-control" placeholder="' . $item['descr'] . '">';
+                echo '</textarea>';
+                echo '</div>';
+            } elseif ($item['type'] === 'oauth') {
+                $class = isset($item['class']) ? $item['class'] : 'btn-success';
+                $callback = urlencode(url()->current() . '/?oauthtransport=' . $transport);
+                $url = $item['url'] . $callback;
+
+                echo '<a class="btn btn-oauth ' . $class . '"';
+                echo '" href="' . $url . '" data-base-url="' . $url . '">';
+                if (isset($item['icon'])) {
+                    echo '<img src="' . asset('images/transports/' . $item['icon']) . '"  width="24" height="24"> ';
+                }
+                echo $item['descr'];
+                echo '</a>';
             }
-            echo '</div>';
-        } elseif ($item['type'] == 'checkbox') {
-            echo '<div class="col-sm-2">';
-            echo '<input type="checkbox" name="'.$item['name'].'" id="'.$item['name'].'">';
-            echo '</div>';
-            $switches[$item['name']] = $item['default'];
-        } elseif ($item['type'] == 'select') {
-            echo '<div class="col-sm-3">';
-            echo '<select name="'.$item['name'].'" id="'.$item['name'].'" class="form-control">';
-            foreach ($item['options'] as $descr => $opt) {
-                echo '<option value="'.$opt.'">'.$descr.'</option>';
-            }
-            echo '</select>';
-            echo '</div>';
-        } elseif ($item['type'] === 'textarea') {
-            echo '<div class="col-sm-9 col-md-10">';
-            echo '<textarea name="' . $item['name'] . '" id="' . $item['name'] . '" class="form-control" placeholder="'.$item['descr'].'">';
-            echo '</textarea>';
             echo '</div>';
         }
-        echo '</div>';
     }
     echo '<div class="form-group">';
     echo '<div class="col-sm-12 text-center">';
@@ -233,6 +251,10 @@ foreach (scandir($transport_dir) as $transport) {
                 }
             });
         }
+
+        $(".btn-oauth").click(function (e) {
+            this.href = $(this).data('base-url') + '%26id=' + $("#transport_id").val();
+        });
 
         // Save alert transport
         $(".btn-save").on("click", function (e) {

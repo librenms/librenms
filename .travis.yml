@@ -6,10 +6,11 @@ matrix:
   fast_finish: true
   include:
   - php: 7.2
+    env: SKIP_STYLE_CHECK=1
   - php: 7.1
-    env: SKIP_STYLE_CHECK=1
+    env: SKIP_UNIT_CHECK=1
   - php: 7.0
-    env: SKIP_STYLE_CHECK=1
+    env: SKIP_STYLE_CHECK=1 SKIP_UNIT_CHECK=1
   - php: 5.6
     env: SKIP_STYLE_CHECK=1 EXECUTE_BUILD_DOCS=true
 #  - php: hhvm
@@ -38,9 +39,12 @@ after_failure:
   - tail /tmp/snmpsimd.log
 
 script:
+  - set -e
+  - export FILES=$(git diff --diff-filter=d --name-only master | tr '\n' ' '|sed 's/,*$//g')
   - php scripts/pre-commit.php -q -l
   - php scripts/pre-commit.php -q -s
-  - php scripts/pre-commit.php -q -u --db --snmpsim --fail-fast
+  - php scripts/pre-commit.php -u --db --snmpsim --fail-fast
   - bash -n daily.sh
   - pylint -E poller-wrapper.py discovery-wrapper.py
   - bash scripts/deploy-docs.sh
+  - set +e

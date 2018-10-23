@@ -203,8 +203,8 @@ function record_sensor_data($device, $all_sensors)
         if ($sensor['sensor_class'] == 'state' && $prev_sensor_value != $sensor_value) {
             $trans = array_column(
                 dbFetchRows(
-                    "SELECT `state_translations`.`state_value`, `state_translations`.`state_descr` FROM `sensors_to_state_indexes` LEFT JOIN `state_translations` USING (`state_index_id`) WHERE `sensors_to_state_indexes`.`sensor_id`=? AND `state_translations`.`state_value` IN ($sensor_value,$prev_sensor_value)",
-                    array($sensor['sensor_id'])
+                    "SELECT `state_translations`.`state_value`, `state_translations`.`state_descr` FROM `sensors_to_state_indexes` LEFT JOIN `state_translations` USING (`state_index_id`) WHERE `sensors_to_state_indexes`.`sensor_id`=? AND `state_translations`.`state_value` IN (?,?)",
+                    [$sensor['sensor_id'], $sensor_value, $prev_sensor_value]
                 ),
                 'state_descr',
                 'state_value'
@@ -297,7 +297,16 @@ function poll_device($device, $force_module = false)
                 $start_memory = memory_get_usage();
                 $module_start = microtime(true);
                 echo "\n#### Load poller module $module ####\n";
-                include "includes/polling/$module.inc.php";
+
+                try {
+                    include "includes/polling/$module.inc.php";
+                } catch (Exception $e) {
+                    // isolate module exceptions so they don't disrupt the polling process
+                    echo $e->getTraceAsString() .PHP_EOL;
+                    c_echo("%rError in $module module.%n " . $e->getMessage() . PHP_EOL);
+                    logfile("Error in $module module. " . $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL);
+                }
+
                 $module_time = microtime(true) - $module_start;
                 $module_mem  = (memory_get_usage() - $start_memory);
                 printf("\n>> Runtime for poller module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
@@ -547,6 +556,16 @@ function location_to_latlng($device)
                         $api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=$new_device_location";
                     }
                     break;
+                case "mapquest":
+                    d_echo("Mapquest geocode engine being used\n");
+                    $api_key = ($config['geoloc']['api_key']);
+                    if (!empty($api_key)) {
+                        d_echo("Use Mapquest API key: $api_key\n");
+                        $api_url = "http://open.mapquestapi.com/geocoding/v1/address?key=$api_key&location=$new_device_location&thumbMaps=false";
+                    } else {
+                        d_echo("No geocode API key set\n");
+                    }
+                    break;
             }
             $curl_init = curl_init($api_url);
             set_curl_proxy($curl_init);
@@ -565,6 +584,13 @@ function location_to_latlng($device)
                         $bad_loc = true;
                     }
                     break;
+                case "mapquest":
+                    if ($data['info']['statuscode'] == 0) {
+                        $loc['lat'] = $data['results'][0]['locations'][0]['latLng']['lat'];
+                        $loc['lng'] = $data['results'][0]['locations'][0]['latLng']['lng'];
+                    } else {
+                        $bad_loc = true;
+                    }
             }
             if ($bad_loc === true) {
                 d_echo("Bad lat / lng received\n");

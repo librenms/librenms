@@ -14,15 +14,20 @@ if (isset($options['t']) && isset($options['h']) && isset($options['r'])) {
 
     $template_id = $options['t'];
     $device_id = ctype_digit($options['h']) ? $options['h'] : getidbyname($options['h']);
-    $rule_id = $options['r'];
+    $rule_id = (int)$options['r'];
+
+    $where = 'alerts.device_id=' . $device_id . ' && alerts.rule_id=' . $rule_id;
     if (isset($options['s'])) {
-        $alert = dbFetchRow('SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 && alert_log.state=? ORDER BY alert_log.id DESC LIMIT 1', array($device_id, $rule_id, intval($options['s'])));
+        $where .= ' alerts.state=' . (int)$options['s'];
     }
-    if (!isset($alert)) {
-        $alert = dbFetchRow('SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($device_id, $rule_id));
+
+    $alerts = loadAlerts($where);
+    if (empty($alerts)) {
+        echo "No alert found, make sure to select an active alert.\n";
+        exit(2);
     }
-    $alert['details'] = json_decode(gzuncompress($alert['details']), true);
-    $obj = DescribeAlert($alert);
+
+    $obj = DescribeAlert($alerts[0]);
     if (isset($options['p'])) {
         $obj['transport'] = $options['p'];
     }

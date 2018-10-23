@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\DatabaseConnectException;
+use Request;
 
 include_once __DIR__ . '/../../includes/dbFacile.php';
 
@@ -30,7 +32,6 @@ class AppServiceProvider extends ServiceProvider
         Log::getMonolog()->popHandler(); // remove existing errorlog logger
         Log::useFiles(Config::get('log_file', base_path('logs/librenms.log')), 'error');
 
-
         // Blade directives (Yucky because of < L5.5)
         Blade::directive('config', function ($key) {
             return "<?php if (\LibreNMS\Config::get(($key))): ?>";
@@ -48,6 +49,8 @@ class AppServiceProvider extends ServiceProvider
             return "<?php endif; ?>";
         });
 
+        $this->configureMorphAliases();
+
         // Development service providers
         if ($this->app->environment() !== 'production') {
             if (class_exists(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class)) {
@@ -55,7 +58,10 @@ class AppServiceProvider extends ServiceProvider
             }
 
             if (config('app.debug') && class_exists(\Barryvdh\Debugbar\ServiceProvider::class)) {
-                $this->app->register(\Barryvdh\Debugbar\ServiceProvider::class);
+                // disable debugbar for api routes
+                if (!Request::is('api/*')) {
+                    $this->app->register(\Barryvdh\Debugbar\ServiceProvider::class);
+                }
             }
         }
     }
@@ -68,5 +74,13 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         //
+    }
+
+    private function configureMorphAliases()
+    {
+        Relation::morphMap([
+            'interface' => \App\Models\Port::class,
+            'sensor' => \App\Models\Sensor::class,
+        ]);
     }
 }

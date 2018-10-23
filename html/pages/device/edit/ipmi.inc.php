@@ -1,9 +1,9 @@
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 if ($_POST['editing']) {
-    if (Auth::user()->hasGlobalAdmin()) {
+    if (LegacyAuth::user()->hasGlobalAdmin()) {
         $ipmi_hostname = mres($_POST['ipmi_hostname']);
         $ipmi_username = mres($_POST['ipmi_username']);
         $ipmi_password = mres($_POST['ipmi_password']);

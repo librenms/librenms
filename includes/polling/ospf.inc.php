@@ -42,7 +42,12 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
         ->where(['device_id' => $device['device_id'], 'context_name' => $device['context_name']])
         ->whereNotIn('id', $ospf_instances->pluck('id'))->delete();
 
-    echo $ospf_instances->count();
+    $instance_count = $ospf_instances->count();
+    echo $instance_count;
+    if ($instance_count == 0) {
+        // if there are no instances, don't check for areas, neighbors, and ports
+        return;
+    }
 
     echo ' Areas: ';
 
@@ -78,10 +83,10 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
     foreach ($ospf_ports_poll as $ospf_port_id => $ospf_port) {
         // find port_id
         if ($ospf_port['ospfAddressLessIf']) {
-            $ospf_port['port_id'] = $device_model->ports()->where('ifIndex', $ospf_port['ospfAddressLessIf'])->value('port_id');
+            $ospf_port['port_id'] = (int)$device_model->ports()->where('ifIndex', $ospf_port['ospfAddressLessIf'])->value('port_id');
         } else {
             // FIXME force same device ?
-            $ospf_port['port_id'] = Ipv4Address::query()
+            $ospf_port['port_id'] = (int)Ipv4Address::query()
                 ->where('ipv4_address', $ospf_port['ospfIfIpAddress'])
                 ->where('context_name', $device['context_name'])
                 ->value('port_id');
@@ -137,27 +142,30 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
 
 unset($device['context_name'], $vrfs_lite_cisco, $vrf_lite);
 
-// Create device-wide statistics RRD
-$rrd_def = RrdDefinition::make()
-    ->addDataset('instances', 'GAUGE', 0, 1000000)
-    ->addDataset('areas', 'GAUGE', 0, 1000000)
-    ->addDataset('ports', 'GAUGE', 0, 1000000)
-    ->addDataset('neighbours', 'GAUGE', 0, 1000000);
+if ($instance_count) {
+    // Create device-wide statistics RRD
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('instances', 'GAUGE', 0, 1000000)
+        ->addDataset('areas', 'GAUGE', 0, 1000000)
+        ->addDataset('ports', 'GAUGE', 0, 1000000)
+        ->addDataset('neighbours', 'GAUGE', 0, 1000000);
 
-$fields = [
-    'instances'   => $ospf_instances->count(),
-    'areas'       => $ospf_areas->count(),
-    'ports'       => $ospf_ports->count(),
-    'neighbours'  => $ospf_neighbours->count(),
-];
+    $fields = [
+        'instances'   => $instance_count,
+        'areas'       => $ospf_areas->count(),
+        'ports'       => $ospf_ports->count(),
+        'neighbours'  => $ospf_neighbours->count(),
+    ];
 
-$tags = compact('rrd_def');
-data_update($device, 'ospf-statistics', $tags, $fields);
+    $tags = compact('rrd_def');
+    data_update($device, 'ospf-statistics', $tags, $fields);
+}
 
 echo PHP_EOL;
 
 unset(
     $ospf_instances,
+    $instance_count,
     $ospf_areas,
     $ospf_ports,
     $ospf_neighbours,

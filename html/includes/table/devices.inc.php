@@ -13,17 +13,17 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $where = 1;
 $param = array();
 
 $sql = ' FROM `devices`';
 
-if (!Auth::user()->hasGlobalRead()) {
+if (!LegacyAuth::user()->hasGlobalRead()) {
     $sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
     $where .= ' AND `DP`.`user_id`=?';
-    $param[] = Auth::id();
+    $param[] = LegacyAuth::id();
 }
 
 if (!empty($vars['location'])) {
@@ -73,7 +73,7 @@ if (!empty($vars['type'])) {
     }
 }
 
-if (!empty($vars['state'])) {
+if (isset($vars['state']) && $vars['state'] !== "") {
     $sql .= ' AND status= ?';
     if (is_numeric($vars['state'])) {
         $param[] = $vars['state'];
@@ -172,7 +172,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
                 <div class="col-xs-1"><a href="' . generate_device_url($device, array('tab' => 'alerts')) . '"> <i class="fa fa-exclamation-circle fa-lg icon-theme" title="View alerts"></i></a></div>
     ';
 
-    if (Auth::user()->hasGlobalAdmin()) {
+    if (LegacyAuth::user()->hasGlobalAdmin()) {
         $actions .= '<div class="col-xs-1"><a href="' . generate_device_url($device, array('tab' => 'edit')) . '"> <i class="fa fa-pencil fa-lg icon-theme" title="Edit device"></i></a></div>';
     }
 
@@ -186,7 +186,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
                     ';
     if (isset($config['gateone']['server'])) {
         if ($config['gateone']['use_librenms_user'] == true) {
-                    $actions .= '<div class="col-xs-1"><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . Auth::user()->username . '@' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device['hostname'] . '"></i></a></div>';
+                    $actions .= '<div class="col-xs-1"><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . LegacyAuth::user()->username . '@' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device['hostname'] . '"></i></a></div>';
         } else {
                     $actions .= '<div class="col-xs-1"><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device['hostname'] . '"></i></a></div>';
         }

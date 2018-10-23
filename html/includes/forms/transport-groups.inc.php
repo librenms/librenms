@@ -23,11 +23,11 @@
  * @author     Vivia Nguyen-Tran <vivia@ualberta.ca>
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 header('Content-type: application/json');
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     die(json_encode([
         'status' => 'error',
         'message' => 'You need to be admin'
@@ -86,7 +86,7 @@ if (empty($name)) {
 
         // Remove old transport group members
         if (!empty($remove)) {
-            dbDelete('transport_group_transport', 'transport_group_id=? AND `transport_id` IN (?)', array($group_id, array(implode(',', $remove))));
+            dbDelete('transport_group_transport', 'transport_group_id=? AND `transport_id` IN ' . dbGenPlaceholders(count($remove)), array_merge([$group_id], $remove));
         }
         $message = 'Updated alert transport group';
     } else {

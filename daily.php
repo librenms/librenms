@@ -238,8 +238,8 @@ if ($options['f'] === 'purgeusers') {
             foreach (dbFetchRows("SELECT DISTINCT(`user`) FROM `authlog` WHERE `datetime` >= DATE_SUB(NOW(), INTERVAL ? DAY)", array($purge)) as $user) {
                 $users[] = $user['user'];
             }
-            $del_users = '"'.implode('","', $users).'"';
-            if (dbDelete('users', "username NOT IN ($del_users)", array($del_users))) {
+
+            if (dbDelete('users', "username NOT IN " . dbGenPlaceholders(count($users)), $users)) {
                 echo "Removed users that haven't logged in for $purge days";
             }
         }
@@ -256,12 +256,15 @@ if ($options['f'] === 'refresh_alert_rules') {
         }
 
         echo 'Refreshing alert rules queries' . PHP_EOL;
-        $rules = dbFetchRows('SELECT `id`, `rule`, `builder` FROM `alert_rules`');
+        $rules = dbFetchRows('SELECT `id`, `rule`, `builder`, `extra` FROM `alert_rules`');
         foreach ($rules as $rule) {
-            $data['query'] = GenSQL($rule['rule'], $rule['builder']);
-            if (!empty($data['query'])) {
-                dbUpdate($data, 'alert_rules', 'id=?', array($rule['id']));
-                unset($data);
+            $rule_options = json_decode($rule['extra'], true);
+            if ($rule_options['options']['override_query'] !== 'on') {
+                $data['query'] = GenSQL($rule['rule'], $rule['builder']);
+                if (!empty($data['query'])) {
+                    dbUpdate($data, 'alert_rules', 'id=?', array($rule['id']));
+                    unset($data);
+                }
             }
         }
     } catch (LockException $e) {

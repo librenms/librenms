@@ -16,7 +16,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
@@ -1672,10 +1672,16 @@ function fahrenheit_to_celsius($value, $scale = 'fahrenheit')
     return sprintf('%.02f', $value);
 }
 
+/**
+ * Converts uW to dBm
+ * $value must be positive
+ *
+ */
 function uw_to_dbm($value)
 {
     return 10 * log10($value / 1000);
 }
+
 /**
  * @param $value
  * @param null $default
@@ -1750,7 +1756,7 @@ function get_user_pref($name, $default = null, $user_id = null)
     }
 
     if (is_null($user_id)) {
-        $user_id = Auth::id();
+        $user_id = LegacyAuth::id();
     }
 
     $pref = dbFetchCell(
@@ -1779,7 +1785,7 @@ function set_user_pref($name, $value, $user_id = null)
 {
     global $user_prefs;
     if (is_null($user_id)) {
-        $user_id = Auth::id();
+        $user_id = LegacyAuth::id();
     }
 
     $pref = array(
