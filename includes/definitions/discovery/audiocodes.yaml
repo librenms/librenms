@@ -14,7 +14,7 @@ modules:
                 -
                     oid: acAnalogFxsFxoTable
                     value: acAnalogFxsFxoHookState
-                    num_oid: .1.3.6.1.4.1.5003.9.10.1.4.1.1.18
+                    num_oid: .1.3.6.1.4.1.5003.9.10.1.4.1.1.18.
                     descr: 'FXO {{ $index }} ({{ $callerDisplayCallerDisplay }}, {{ $channelsStartingPhoneNum }})'
                     index: 'hookStatus{{ $index }}'
                     state_name: acAnalogFxsFxoHookState
@@ -29,7 +29,7 @@ modules:
                 -
                     oid: acAnalogFxsFxoTable
                     value: acAnalogFxsFxoHookState
-                    num_oid: .1.3.6.1.4.1.5003.9.10.1.4.1.1.18
+                    num_oid: .1.3.6.1.4.1.5003.9.10.1.4.1.1.18.
                     descr: 'FXS {{ $index }} ({{ $callerDisplayCallerDisplay }}, {{ $channelsStartingPhoneNum }})'
                     index: 'hookStatus{{ $index }}'
                     state_name: acAnalogFxsFxoHookState
@@ -44,7 +44,7 @@ modules:
                 -
                     oid: acAnalogFxsFxoTable
                     value: acAnalogFxsFxoHookState
-                    num_oid: .1.3.6.1.4.1.5003.9.10.1.4.1.1.18
+                    num_oid: .1.3.6.1.4.1.5003.9.10.1.4.1.1.18.
                     descr: 'E&M {{ $index }} ({{ $callerDisplayCallerDisplay }}, {{ $channelsStartingPhoneNum }})'
                     index: 'hookStatus{{ $index }}'
                     state_name: acAnalogFxsFxoHookState
@@ -59,7 +59,7 @@ modules:
                 -
                     oid: acTrunkTable
                     value: acTrunkAdministrativeState
-                    num_oid: .1.3.6.1.4.1.5003.9.10.9.1.1.1.1.1.2
+                    num_oid: .1.3.6.1.4.1.5003.9.10.9.1.1.1.1.1.2.
                     descr: 'Trunk {{ $index }} AdminStatus ({{ $acTrunkDialPlanName }})'
                     index: 'trunkAdminStatus{{ $index }}'
                     state_name: acTrunkAdministrativeState
@@ -69,7 +69,7 @@ modules:
                 -
                     oid: acTrunkTable
                     value: acTrunkProtocolType
-                    num_oid: .1.3.6.1.4.1.5003.9.10.9.1.1.1.1.1.3
+                    num_oid: .1.3.6.1.4.1.5003.9.10.9.1.1.1.1.1.3.
                     descr: 'Trunk {{ $index }} Type ({{ $acTrunkDialPlanName }})'
                     index: 'trunkProtocolType{{ $index }}'
                     state_name: acTrunkProtocolType
@@ -122,7 +122,7 @@ modules:
                 -
                     oid: dsx1ConfigTable
                     value: dsx1LineStatus
-                    num_oid: .1.3.6.1.2.1.10.18.6.1.10
+                    num_oid: .1.3.6.1.2.1.10.18.6.1.10.
                     descr: 'DS1 Status ({{ $dsx1CircuitIdentifier }}){{ $index }}'
                     index: 'DS1status{{ $index }}'
                     high_limit: 1
@@ -132,7 +132,7 @@ modules:
                 -
                     oid: dsx1ConfigTable
                     value: dsx1LoopbackConfig
-                    num_oid: .1.3.6.1.2.1.10.18.6.1.9
+                    num_oid: .1.3.6.1.2.1.10.18.6.1.9.
                     descr: 'DS1 LoopbackConfig ({{ $dsx1CircuitIdentifier }}){{ $index }}'
                     index: 'DS1loopback{{ $index }}'
                     state_name: dsx1LoopbackConfig
@@ -146,7 +146,7 @@ modules:
                 -
                     oid: acPMTrunkUtilizationTable
                     value: acPMTrunkUtilizationVal
-                    num_oid: .1.3.6.1.4.1.5003.10.10.2.21.
+                    num_oid: .1.3.6.1.4.1.5003.10.10.2.21.1.3.
                     descr: 'Trunk Utilization {{ $index }})'
                     index: 'trunkUtilization{{ $index }}'
                     high_limit: 10000
