@@ -62,7 +62,7 @@ $rrd_options .= " 'COMMENT:Seconds                 Cur     Min     Max      Avg\
 foreach ($modules as $index => $module) {
     $color = $colors[$index % count($colors)];
 
-    $rrd_options .= " AREA:$module#$color:'" . rrdtool_escape($module, 16) ."'";
+    $rrd_options .= " AREA:$module#$color:'" . rrdtool_escape($module, 16) ."':STACK";
 
     $rrd_options .= " GPRINT:$module:LAST:%6.2lf  GPRINT:$module:MIN:%6.2lf";
     $rrd_options .= " GPRINT:$module:MAX:%6.2lf  'GPRINT:$module:AVERAGE:%6.2lf\\n'";
