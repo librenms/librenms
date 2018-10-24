@@ -1,4 +1,4 @@
-mib: AC-ANALOG-MIB:AcGateway:AC-PSTN-MIB:DS1-MIB
+mib: AC-ANALOG-MIB:AcGateway:AC-PSTN-MIB:DS1-MIB:AC-PM-PSTN-MIB
 modules:
     sensors:
         pre-cache:
@@ -139,11 +139,11 @@ modules:
                     state_name: dsx1LoopbackConfig
                     states:
                         - { descr: No Loop , graph: 0, value: 1 , generic: 0 }
-                        - { descr: Payload Loop , graph: 0, value: 2 , generic: 0 }
-                        - { descr: Line Loop , graph: 0, value: 3 , generic: 0 }
-                        - { descr: Other Loop , graph: 0, value: 4 , generic: 0 }
-                        - { descr: Inward Loop , graph: 0, value: 5 , generic: 0 }
-                        - { descr: Dual Loop , graph: 0, value: 6 , generic: 0 }
+                        - { descr: Payload Loop , graph: 0, value: 2 , generic: 3 }
+                        - { descr: Line Loop , graph: 0, value: 3 , generic: 3 }
+                        - { descr: Other Loop , graph: 0, value: 4 , generic: 3 }
+                        - { descr: Inward Loop , graph: 0, value: 5 , generic: 3 }
+                        - { descr: Dual Loop , graph: 0, value: 6 , generic: 3 }
                 -
                     oid: acPMTrunkUtilizationTable
                     value: acPMTrunkUtilizationVal
@@ -155,4 +155,20 @@ modules:
                     state_name: acTrunkUtilization
                     states:
                         - { descr: DummyValue , graph: 0, value: -1 , generic: 0 }
-
+                -
+                    oid: acTrunkStatusTable
+                    value: acTrunkStatusAlarm
+                    num_oid: .1.3.6.1.4.1.5003.9.10.9.2.1.1.1.7.
+                    descr: 'Trunk Status {{ $index }})'
+                    index: 'trunkStatus{{ $index }}'
+                    high_limit: {{ $acPMTrunkUtilizationAttributesHighThreshold }}
+                    low_limit: -1
+                    state_name: acTrunkUtilization
+                    states:
+                        - { descr: Disabled , graph: 0, value: 0 , generic: 3 }
+                        - { descr: Active , graph: 0, value: 1 , generic: 0 }
+                        - { descr: LosLof , graph: 0, value: 2 , generic: 2 }
+                        - { descr: Ais , graph: 0, value: 3 , generic: 2 }
+                        - { descr: Rai , graph: 0, value: 4 , generic: 2 }
+                        - { descr: DChannel , graph: 0, value: 5 , generic: 2 }
+                        - { descr: LowerLayerDown , graph: 0, value: 6 , generic: 2 }
