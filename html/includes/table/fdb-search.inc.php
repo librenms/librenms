@@ -56,15 +56,14 @@ if (isset($vars['searchPhrase']) && !empty($vars['searchPhrase'])) {
         $desc_search = '%' . $search . '%';
         $where  .= ' AND `P`.`ifAlias` LIKE ?';
         $param[] = $desc_search;
-    } elseif ((isset($vars['searchby']) && $vars['searchby'] == 'mac') ||
-        (!is_numeric($search) || $search > 4096)
-    ) {
+    } elseif (isset($vars['searchby']) && $vars['searchby'] == 'mac') {
         $where  .= ' AND `F`.`mac_address` LIKE ?';
         $param[] = $mac_search;
     } else {
-        $where  .= ' AND (`V`.`vlan_vlan` = ? OR `F`.`mac_address` LIKE ?)';
+        $where  .= ' AND (`V`.`vlan_vlan` = ? OR `F`.`mac_address` LIKE ? OR `P`.`ifAlias` LIKE ?)';
         $param[] = (int)$search;
         $param[] = $mac_search;
+        $param[] = '%' . $search . '%';
     }
 }
 
