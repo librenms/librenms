@@ -155,7 +155,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             self::sync(
                 $os->getDeviceId(),
                 $processors,
-                array('device_id', 'processor_index', 'processor_type'),
+                array('device_id', 'processor_index', 'processor_type', 'processor_perc_warn'),
                 array('processor_usage')
             );
         }
