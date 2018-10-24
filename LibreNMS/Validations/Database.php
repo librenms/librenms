@@ -25,7 +25,10 @@
 
 namespace LibreNMS\Validations;
 
+use Carbon\Carbon;
+use Carbon\CarbonInterval;
 use LibreNMS\Config;
+use LibreNMS\DB\Eloquent;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 use Symfony\Component\Yaml\Yaml;
@@ -39,6 +42,7 @@ class Database extends BaseValidation
         }
 
         $this->checkMode($validator);
+        $this->checkTime($validator);
 
         // check database schema version
         $current = get_db_schema();
@@ -59,6 +63,23 @@ class Database extends BaseValidation
 
         $this->checkCollation($validator);
         $this->checkSchema($validator);
+    }
+
+    private function checkTime(Validator $validator)
+    {
+        $raw_time = Eloquent::DB()->selectOne(Eloquent::DB()->raw('SELECT NOW() as time'))->time;
+        $db_time = new Carbon($raw_time);
+        $php_time = Carbon::now();
+
+        $diff = $db_time->diffAsCarbonInterval($php_time);
+
+        if ($diff->compare(CarbonInterval::minute(1)) > 0) {
+            $message = "Time between this server and the mysql database is off\n";
+            $message .= " Mysql time " . $db_time->toDateTimeString() . PHP_EOL;
+            $message .= " PHP time " . $php_time->toDateTimeString() . PHP_EOL;
+
+            $validator->fail($message);
+        }
     }
 
     private function checkMode(Validator $validator)
