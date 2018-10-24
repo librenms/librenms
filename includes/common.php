@@ -1141,7 +1141,7 @@ function version_info($remote = false)
 {
     global $config;
     $output = array();
-    if (check_git_exists() === true) {
+    if (is_git_install() && check_git_exists()) {
         if ($remote === true && $config['update_channel'] == 'master') {
             $api = curl_init();
             set_curl_proxy($api);
@@ -1715,6 +1715,11 @@ function set_numeric($value, $default = 0)
         $value = $default;
     }
     return $value;
+}
+
+function is_git_install()
+{
+    return file_exists(Config::get('install_dir') . '/.git');
 }
 
 function check_git_exists()
