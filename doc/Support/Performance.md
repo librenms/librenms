@@ -27,6 +27,8 @@ MySQL crashes or your server does but it provides an amazing difference in IO us
 
 ### Polling modules
 
+Review the graph of poller module time take under device > graphs > poller to see what modules are consuming poller time.
+
 Disable polling (and discovery) modules that you do not need. You can do this globally in `config.php` like:
 
 Disable OSPF polling
