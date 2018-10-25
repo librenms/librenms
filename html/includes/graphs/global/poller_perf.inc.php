@@ -32,16 +32,7 @@ require 'includes/graphs/common.inc.php';
 $cdef = [];
 $suffix = '';
 
-$db_devices = Device::pluck('hostname');
-
-$devices = [];
-$count = count($db_devices);
-for ($i = 0; $i < 500; $i++) {
-    $devices[] = $db_devices[$i % $count];
-}
-
-
-foreach ($devices as $index => $hostname) {
+foreach (Device::pluck('hostname') as $index => $hostname) {
     $rrd_filename = rrd_name($hostname, 'poller-perf');
     if (rrdtool_check_rrd_exists($rrd_filename)) {
         $rrd_options .= " DEF:pollerRaw$index=$rrd_filename:poller:AVERAGE";
