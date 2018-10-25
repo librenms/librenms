@@ -14,6 +14,7 @@
 
 $no_refresh = true;
 
+
 echo '<ul class="nav nav-tabs">';
 
 $poll_tabs = [
@@ -39,9 +40,11 @@ $poll_tabs[] = [
     'icon' => 'fa-file-text',
 ];
 
+$current_tab = isset($vars['tab']) ? str_replace('/', '', $vars['tab']) : 'pollers';
+
 foreach ($poll_tabs as $tab) {
     $taburl = strtolower($tab['name']);
-    echo '<li role="presentation" ' . ($vars['tab'] == $taburl ? ' class="active"' : '') . '><a href="';
+    echo '<li role="presentation" ' . ($current_tab == $taburl ? ' class="active"' : '') . '><a href="';
     echo generate_url(['page' => 'pollers', 'tab' => $taburl]);
     echo '"><i class="fa ' . $tab['icon'] . ' fa-lg icon-theme" aria-hidden="true"></i> ' . $tab['name'];
     echo '</a></li>';
@@ -49,6 +52,4 @@ foreach ($poll_tabs as $tab) {
 
 echo '</ul>';
 
-if (isset($vars['tab'])) {
-    include_once 'pages/pollers/'.str_replace('/', '', $vars['tab']).'.inc.php';
-}
+include_once 'pages/pollers/'.$current_tab.'.inc.php';

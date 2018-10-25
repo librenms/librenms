@@ -22,7 +22,7 @@ $pagetitle[] = 'Poll Performance';
 </div>
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">Total Module Poller Time</h3>
+        <h3 class="panel-title">Total Poller Time Per Module</h3>
     </div>
     <div class="panel-body">
         <?php

@@ -700,7 +700,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                     <li><a href="pollers/tab=groups/"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Groups</a></li>');
     }
     echo '    <li><a href="pollers/tab=performance/"><i class="fa fa-line-chart fa-fw fa-lg" aria-hidden="true"></i> Performance</a></li>';
-    echo '    <li><a href="poll-log/"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> History</a></li>';
+    echo '    <li><a href="pollers/tab=log/"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> History</a></li>';
     echo ('
                </ul>
            </li>

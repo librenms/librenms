@@ -44,8 +44,8 @@ if (isset($vars['filter'])) {
 
     searchbar = "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
         "<div class=\"col-sm-8 actionBar\"><span class=\"pull-left\">"+
-        "<a href='<?php echo generate_url(array('page' => 'poll-log')); ?>' class='btn btn-primary btn-sm'>All devices</a> "+
-        "<a href='<?php echo generate_url(array('page' => 'poll-log', 'filter' => 'unpolled')); ?>' class='btn btn-danger btn-sm'>Unpolled devices</a>"+
+        "<a href='<?php echo generate_url(['page' => 'pollers', 'tab' => 'log']); ?>' class='btn btn-primary btn-sm <?php echo $vars['filter'] == 'unpolled' ? '' : 'active' ?>'>All devices</a> "+
+        "<a href='<?php echo generate_url(['page' => 'pollers', 'tab' => 'log', 'filter' => 'unpolled']); ?>' class='btn btn-danger btn-sm <?php echo $vars['filter'] == 'unpolled' ? 'active' : '' ?>'>Unpolled devices</a>"+
         "</div><div class=\"col-sm-4 actionBar\"><p class=\"{{css.search}}\"></p><p class=\"{{css.actions}}\"></p></div>";
 
     var grid = $("#poll-log").bootgrid({
