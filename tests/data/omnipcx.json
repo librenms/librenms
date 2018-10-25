@@ -11,7 +11,7 @@
                     "hardware": null,
                     "features": null,
                     "location": null,
-                    "os": "alcatel-omnipcx",
+                    "os": "omnipcx",
                     "type": "server",
                     "serial": null,
                     "icon": "alcatellucent.svg"
@@ -29,7 +29,7 @@
                     "hardware": null,
                     "features": null,
                     "location": null,
-                    "os": "alcatel-omnipcx",
+                    "os": "omnipcx",
                     "type": "server",
                     "serial": null,
                     "icon": "alcatellucent.svg"
