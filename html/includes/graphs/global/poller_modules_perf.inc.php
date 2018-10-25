@@ -42,7 +42,10 @@ foreach ($modules as $module_index => $module) {
     foreach ($hostnames as $index => $hostname) {
         $rrd_filename = rrd_name($hostname, ['poller-perf', $module]);
         if (rrdtool_check_rrd_exists($rrd_filename)) {
-            $rrd_options .= " DEF:$module$index=$rrd_filename:poller:AVERAGE";
+            $rrd_options .= " DEF:{$module}Raw$index=$rrd_filename:poller:AVERAGE";
+            // change undefined to 0
+            $rrd_options .= " CDEF:$module$index={$module}Raw$index,UN,0,{$module}Raw$index,IF";
+
             $cdef[] = $module . $index . $suffix;
             $suffix = ',+';
         }

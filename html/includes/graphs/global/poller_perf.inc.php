@@ -44,7 +44,9 @@ for ($i = 0; $i < 500; $i++) {
 foreach ($devices as $index => $hostname) {
     $rrd_filename = rrd_name($hostname, 'poller-perf');
     if (rrdtool_check_rrd_exists($rrd_filename)) {
-        $rrd_options .= " DEF:poller$index=$rrd_filename:poller:AVERAGE";
+        $rrd_options .= " DEF:pollerRaw$index=$rrd_filename:poller:AVERAGE";
+        // change undefined to 0
+        $rrd_options .= " CDEF:poller$index=pollerRaw$index,UN,0,pollerRaw$index,IF";
         $cdef[] = 'poller' . $index . $suffix;
         $suffix = ',+';
     }
