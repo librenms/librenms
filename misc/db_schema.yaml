@@ -452,6 +452,7 @@ devices:
     - { Field: hardware, Type: text, 'Null': true, Extra: '' }
     - { Field: features, Type: text, 'Null': true, Extra: '' }
     - { Field: location, Type: text, 'Null': true, Extra: '' }
+    - { Field: location_id, Type: int(11), 'Null': true, Extra: '' }
     - { Field: os, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: status, Type: tinyint(1), 'Null': false, Extra: '', Default: '0' }
     - { Field: status_reason, Type: varchar(50), 'Null': false, Extra: '' }
@@ -771,12 +772,13 @@ loadbalancer_vservers:
 locations:
   Columns:
     - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
-    - { Field: location, Type: text, 'Null': false, Extra: '' }
-    - { Field: lat, Type: 'double(10,6)', 'Null': false, Extra: '' }
-    - { Field: lng, Type: 'double(10,6)', 'Null': false, Extra: '' }
+    - { Field: location, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: lat, Type: 'double(10,6)', 'Null': true, Extra: '' }
+    - { Field: lng, Type: 'double(10,6)', 'Null': true, Extra: '' }
     - { Field: timestamp, Type: datetime, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    locations_location_uindex: { Name: locations_location_uindex, Columns: [location], Unique: true, Type: BTREE }
 mac_accounting:
   Columns:
     - { Field: ma_id, Type: int(11), 'Null': false, Extra: auto_increment }
@@ -858,6 +860,13 @@ mibdefs:
     - { Field: last_modified, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [module, mib, object_type], Unique: true, Type: BTREE }
+migrations:
+  Columns:
+    - { Field: id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: migration, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: batch, Type: int(11), 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 munin_plugins:
   Columns:
     - { Field: mplug_id, Type: int(11), 'Null': false, Extra: auto_increment }

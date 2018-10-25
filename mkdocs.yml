@@ -1,12 +1,13 @@
 site_name: LibreNMS Docs
 docs_dir: doc
 theme:
-  name: null
-  custom_dir: '../theme_v2'
+  name: 'material'
   logo: img/librenms.svg
   language: en
   palette: null
-  font: null
+  font:
+    text: 'Roboto'
+    code: 'Roboto Mono'
   feature: null
 site_dir: out
 site_url: http://docs.librenms.org
@@ -14,6 +15,7 @@ markdown_extensions:
     - pymdownx.tasklist
     - pymdownx.tilde
 extra_css:
+    - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css
     - librenms.css
 extra:
     article_nav_top: false

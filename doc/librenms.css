@@ -1,27 +1,15 @@
-body {
-    background-image:none !important;
-}
+/* larger logo */
+.md-logo>img { width:36px; height:36px }
+.md-logo { padding-top: 0; }
 
-/* limit the height of dropdown menus */
-.dropdown-menu {
-    max-height: 400px !important;
-    overflow-x: hidden !important;
-}
-
-/* push down the content when the header flows to two lines */
-.bs-sidebar {
-    margin-top: 45px;
-}
-
-/* hide the menu called hidden, used to generate unlinked docs */
-#dropdown-hidden {
-    display: none;
-}
-
-/* avoid scrollbar on mobile (default 360px) */
-.navbar-collapse {
-    max-height: 385px;
-}
+/* theme adjustment */
+/*.md-typeset a { color: #2fa4e7; }*/
+.md-hero { background-color: #000000; }
+.md-header { background-color: #000000; }
+.md-tabs { background-color: #000000; }
+.md-nav__link:active, .md-nav__link--active {  color: #da223a; }
+.md-nav__link:focus, .md-nav__link:hover { color: #da223a; }
+/*html .md-nav--primary .md-nav__title--site { background-color: #000000; }*/
 
 /* size and align the headers on the home screen */
 .home-header {
