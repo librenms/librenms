@@ -80,7 +80,7 @@ modules:
                 -
                     oid: cpqHeResMem2ModuleTable
                     value: cpqHeResMem2ModuleCondition
-                    num_oid:  .1.3.6.1.4.1.232.6.2.14.13.1.20.
+                    num_oid:  '.1.3.6.1.4.1.232.6.2.14.13.1.20.{{ $index }}'
                     descr: cpqHeResMem2ModuleHwLocation
                     index: 'cpqHeResMem2ModuleCondition.{{ $index }}'
                     state_name: cpqHeResMem2ModuleCondition
@@ -92,7 +92,7 @@ modules:
                 -
                     oid: cpqDaCntlrTable
                     value: cpqDaCntlrCondition
-                    num_oid:  .1.3.6.1.4.1.232.3.2.2.1.1.6.
+                    num_oid:  '.1.3.6.1.4.1.232.3.2.2.1.1.6.{{ $index }}'
                     descr: 'Array Controller Slot#{{ $cpqDaCntlrSlot }}'
                     index: 'cpqDaCntlrCondition.{{ $index }}'
                     state_name: cpqDaCntlrCondition
@@ -104,7 +104,7 @@ modules:
                 -
                     oid: cpqDaLogDrvTable
                     value: cpqDaLogDrvCondition
-                    num_oid:  .1.3.6.1.4.1.232.3.2.3.1.1.11.
+                    num_oid:  '.1.3.6.1.4.1.232.3.2.3.1.1.11.{{ $index }}'
                     descr: 'Logical Drive #{{ $cpqDaLogDrvIndex }}'
                     index: 'cpqDaLogDrvCondition.{{ $index }}'
                     state_name: cpqDaLogDrvCondition

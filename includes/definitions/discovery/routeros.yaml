@@ -170,7 +170,7 @@ modules:
                         - { value: 1, generic: 0, graph: 1, descr: 'true' }
                 -
                     oid: mtxrWl60GConnected
-                    num_oid: .1.3.6.1.4.1.14988.1.1.1.8.1.4.
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.1.8.1.4.{{ $index }}'
                     descr: Station Connected
                     index: 'mtxrWl60GConnected.{{ $index ]]'
                     state_name: mtxrWl60GConnected
@@ -179,7 +179,7 @@ modules:
                         - { value: 1, generic: 0, graph: 1, descr: 'connected' }
                 -
                     oid: mtxrWl60GMode
-                    num_oid: .1.3.6.1.4.1.14988.1.1.1.8.1.2.
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.1.8.1.2.{{ $index }}'
                     descr: Mode
                     index: 'mtxrWl60GMode.{{ $index }}'
                     state_name: mtxrWl60GMode
