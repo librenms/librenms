@@ -1,19 +1,16 @@
 #!/usr/bin/env bash
 GH_REPO="@github.com/librenms-docs/librenms-docs.github.io.git"
 FULL_REPO="https://${GH_TOKEN}$GH_REPO"
-THEME_REPO="https://github.com/librenms-docs/theme_v2.git"
-THEME_BRANCH=material
 
 if [ "$EXECUTE_BUILD_DOCS" != "true" ]; then
     echo "Doc build skipped"
     exit 0
 fi
 
-pip install --user 'jinja2<2.9' mkdocs pymdown-extensions
+pip install --user mkdocs mkdocs-material pymdown-extensions
 pip install --user git+git://github.com/aleray/mdx_del_ins.git
 
 mkdir -p out
-
 cd out
 
 git init
@@ -23,12 +20,6 @@ git config user.name "librenms-docs"
 git config user.email "travis@librenms.org"
 git checkout master
 
-cd ../
-
-git clone $THEME_REPO
-git checkout $THEME_BRANCH
-
-cd out
 mkdocs gh-deploy --config-file ../mkdocs.yml --remote-branch master
 build_result=$?
 
