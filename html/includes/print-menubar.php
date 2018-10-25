@@ -691,7 +691,7 @@ if (Auth::user()->hasGlobalAdmin()) {
            <li role="presentation" class="divider"></li> ');
     echo('
            <li class="dropdown-submenu">
-               <a href="#"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a>
+               <a href="pollers"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a>
                <ul class="dropdown-menu scrollable-menu">
                <li><a href="pollers/tab=pollers/"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a></li>');
 
