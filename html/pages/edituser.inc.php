@@ -16,7 +16,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
 } else {
     if ($vars['user_id'] && !$vars['edit']) {
         /** @var User $user */
-        $user = User::all()->where('user_id', $vars['user_id'])->first();
+        $user = User::find($vars['user_id']);
         $user_data = $user->toArray(); // for compatibility with current code
 
         echo '<p><h2>'.$user_data['realname']."</h2><a href='edituser/'>Change...</a></p>";
@@ -268,7 +268,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
                 }
             }
 
-            $users_details = User::all()->where('user_id', $vars['user_id'])->first()->toArray();
+            $users_details = User::find($vars['user_id'])->toArray();
             if (!empty($users_details)) {
                 if (!empty($vars['dashboard']) && $vars['dashboard'] != $users_details['dashboard']) {
                     set_user_pref('dashboard', $vars['dashboard']);
@@ -436,7 +436,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
             }//end if !empty($users_details)
         }//end if
     } else {
-        $userlist = User::all();
+        $userlist = User::thisAuth()->all();
 
         echo '<h3>Select a user to edit</h3>';
 
