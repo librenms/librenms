@@ -77,26 +77,26 @@ modules:
                     state_name: rectifierInstalledRectifiers
                     descr: Rectifiers installed
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: 1 }
-                        - { value: 2, generic: 3, graph: 0, descr: 2 }
-                        - { value: 3, generic: 3, graph: 0, descr: 3 }
-                        - { value: 4, generic: 3, graph: 0, descr: 4 }
-                        - { value: 5, generic: 3, graph: 0, descr: 5 }
-                        - { value: 6, generic: 3, graph: 0, descr: 6 }
-                        - { value: 7, generic: 3, graph: 0, descr: 7 }
-                        - { value: 8, generic: 3, graph: 0, descr: 8 }
-                        - { value: 9, generic: 3, graph: 0, descr: 9 }
-                        - { value: 10, generic: 3, graph: 0, descr: 10 }
-                        - { value: 11, generic: 3, graph: 0, descr: 11 }
-                        - { value: 12, generic: 3, graph: 0, descr: 12 }
-                        - { value: 13, generic: 3, graph: 0, descr: 13 }
-                        - { value: 14, generic: 3, graph: 0, descr: 14 }
-                        - { value: 15, generic: 3, graph: 0, descr: 15 }
-                        - { value: 16, generic: 3, graph: 0, descr: 16 }
-                        - { value: 17, generic: 3, graph: 0, descr: 17 }
-                        - { value: 18, generic: 3, graph: 0, descr: 18 }
-                        - { value: 19, generic: 3, graph: 0, descr: 19 }
-                        - { value: 20, generic: 3, graph: 0, descr: 20 }
+                        - { value: 1, generic: 3, graph: 0, descr: '1' }
+                        - { value: 2, generic: 3, graph: 0, descr: '2' }
+                        - { value: 3, generic: 3, graph: 0, descr: '3' }
+                        - { value: 4, generic: 3, graph: 0, descr: '4' }
+                        - { value: 5, generic: 3, graph: 0, descr: '5' }
+                        - { value: 6, generic: 3, graph: 0, descr: '6' }
+                        - { value: 7, generic: 3, graph: 0, descr: '7' }
+                        - { value: 8, generic: 3, graph: 0, descr: '8' }
+                        - { value: 9, generic: 3, graph: 0, descr: '9' }
+                        - { value: 10, generic: 3, graph: 0, descr: '10' }
+                        - { value: 11, generic: 3, graph: 0, descr: '11' }
+                        - { value: 12, generic: 3, graph: 0, descr: '12' }
+                        - { value: 13, generic: 3, graph: 0, descr: '13' }
+                        - { value: 14, generic: 3, graph: 0, descr: '14' }
+                        - { value: 15, generic: 3, graph: 0, descr: '15' }
+                        - { value: 16, generic: 3, graph: 0, descr: '16' }
+                        - { value: 17, generic: 3, graph: 0, descr: '17' }
+                        - { value: 18, generic: 3, graph: 0, descr: '18' }
+                        - { value: 19, generic: 3, graph: 0, descr: '19' }
+                        - { value: 20, generic: 3, graph: 0, descr: '20' }
                 -
                     oid: rectifierStatusEntry
                     value: rectifierStatusStatus
