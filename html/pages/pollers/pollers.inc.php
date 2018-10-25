@@ -29,7 +29,7 @@ if (count($rows) !== 0) {
     echo '
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">Standard Distributed Pollers</h3>
+        <h3 class="panel-title">Standard Pollers</h3>
     </div>
     <div class="panel-body">
     <div class="table-responsive">
