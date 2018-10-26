@@ -6,7 +6,8 @@ $param = array();
 
 $select = "SELECT `F`.`port_id` AS `port_id`, `F`.`device_id`, `ifInErrors`, `ifOutErrors`, `ifOperStatus`,";
 $select .= " `ifAdminStatus`, `ifAlias`, `ifDescr`, `mac_address`, `V`.`vlan_vlan` AS `vlan`,";
-$select .= " `hostname`, `hostname` AS `device` , group_concat(`M`.`ipv4_address` SEPARATOR ', ') AS `ipv4_address`";
+$select .= " `hostname`, `hostname` AS `device` , group_concat(`M`.`ipv4_address` SEPARATOR ', ') AS `ipv4_address`,";
+$select .= " `P`.`ifDescr` AS `interface`";
 
 $sql  = " FROM `ports_fdb` AS `F`";
 $sql .= " LEFT JOIN `devices` AS `D` USING(`device_id`)";
