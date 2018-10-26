@@ -35,6 +35,7 @@ Currently we have support for the following health metrics along with the values
 | temperature                     | C                           |
 | voltage                         | V                           |
 | waterflow                       | l/m                         |
+| versatile                       |                             |
 
 #### Simple health discovery
 
