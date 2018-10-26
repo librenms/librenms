@@ -82,8 +82,9 @@ class Checks
                 Toastr::error("<a href='notifications/'>$notification->body</a>", $notification->title);
             }
 
-            if (Device::isUp()->where('last_polled', '<=', Carbon::now()->subMinutes(15))->exists()) {
-                Toastr::warning('<a href="pollers/tab=log/filter=unpolled/">It appears as though you have some devices that haven\'t completed polling within the last 15 minutes, you may want to check that out :)</a>', 'Devices unpolled');
+            $rrdstep = Config::get('rrd.step', 300);
+            if (Device::isUp()->where('last_polled', '<=', Carbon::now()->subSeconds($rrdstep * 2))->exists()) {
+                Toastr::warning('<a href="poll-log/filter=unpolled/">It appears as though you have some devices that haven\'t completed polling within the last 15 minutes, you may want to check that out :)</a>', 'Devices unpolled');
             }
 
             // Directory access checks
