@@ -1,4 +1,5 @@
 source: Alerting/Entities.md
+path: blob/master/doc/
 
 # Entities
 

@@ -1,4 +1,5 @@
 ##1.44
+path: blob/master/doc/
 *(2018-10-02)*
 
 A big thank you to the following 27 contributors this last month:

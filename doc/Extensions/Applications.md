@@ -1,4 +1,5 @@
 source: Extensions/Applications.md
+path: blob/master/doc/
 ## Introduction
 
 You can use Application support to graph performance statistics of many applications.

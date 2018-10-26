@@ -7,8 +7,8 @@ if [ "$EXECUTE_BUILD_DOCS" != "true" ]; then
     exit 0
 fi
 
-pip install --user mkdocs mkdocs-material pymdown-extensions
-pip install --user git+git://github.com/aleray/mdx_del_ins.git
+pip3 install --user mkdocs mkdocs-material pymdown-extensions
+pip3 install --user git+git://github.com/aleray/mdx_del_ins.git
 
 mkdir -p out
 cd out

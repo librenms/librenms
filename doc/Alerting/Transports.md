@@ -1,4 +1,5 @@
 source: Alerting/Transports.md
+path: blob/master/doc/
 
 # Transports
 

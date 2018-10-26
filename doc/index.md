@@ -1,3 +1,4 @@
+path: blob/master/doc/
 <div class="home-container">
     <div class="home-box">
         <div class="home-header">
