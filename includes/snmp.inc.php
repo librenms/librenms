@@ -221,12 +221,18 @@ function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir
 function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mibdir = null)
 {
     $time_start = microtime(true);
-
-    if ($device['snmpver'] == 'v1') {
+        $oid_limit = get_device_oid_limit($device);
+    if (!is_array($oids)) {
         $oids = explode(" ", $oids);
+    }
+    $oid_number = count($oids);
+
+    if ($oid_limit < $oid_number) {
         $data = [];
-        foreach ($oids as $oid) {
-            $cmd = gen_snmpget_cmd($device, $oid, $options, $mib, $mibdir);
+        while (!empty($oids)) {
+            $partials = array_splice($oids, 0, $oid_limit);
+            $partial_oids = implode(' ', $partials);
+            $cmd = gen_snmpget_cmd($device, $partial_oids, $options, $mib, $mibdir);
             $query = trim(external_exec($cmd));
             if (!empty($query)) {
                 $data[] = $query;
@@ -234,9 +240,7 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
         }
         $data = implode("\n", $data);
     } else {
-        if (is_array($oids)) {
-            $oids = implode(' ', $oids);
-        }
+        $oids = implode(' ', $oids);
         $cmd = gen_snmpget_cmd($device, $oids, $options, $mib, $mibdir);
         $data = trim(external_exec($cmd));
     }
