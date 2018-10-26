@@ -21,6 +21,11 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         return view('laravel');
     });
 
+    // old route redirects
+    Route::get('poll-log', function () {
+        return redirect('pollers/tab=log/');
+    });
+
     // Two Factor Auth
     Route::get('2fa', 'TwoFactorController@showTwoFactorForm')->name('2fa.form');
     Route::post('2fa', 'TwoFactorController@verifyTwoFactor')->name('2fa.verify');
@@ -61,6 +66,11 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             'uses' => '\Barryvdh\Debugbar\Controllers\OpenController@handler'
         ]);
     }
+
+    // demo helper
+    Route::get('demo', function () {
+        return redirect('/');
+    });
 
     // Legacy routes
     Route::any('/{path?}', 'LegacyController@index')->where('path', '.*');

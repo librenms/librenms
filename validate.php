@@ -95,7 +95,7 @@ if (str_contains(`tail config.php`, '?>')) {
 
 // Composer checks
 if (!file_exists('vendor/autoload.php')) {
-    print_fail('Composer has not been run, dependencies are missing', 'composer install --no-dev');
+    print_fail('Composer has not been run, dependencies are missing', './scripts/composer_wrapper.php install --no-dev');
     exit;
 }
 

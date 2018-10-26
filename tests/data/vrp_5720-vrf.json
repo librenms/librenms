@@ -34287,7 +34287,7 @@
                     "processor_index": "67108873",
                     "processor_type": "vrp",
                     "processor_usage": 18,
-                    "processor_descr": "Assembling Components,S5720-56C-PWR-EI-AC,S5720-56C-PWR-EI-AC,S5",
+                    "processor_descr": "MPU Board 0 Processor",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -34298,7 +34298,7 @@
                     "processor_index": "68157449",
                     "processor_type": "vrp",
                     "processor_usage": 28,
-                    "processor_descr": "Assembling Components,S5720-56C-PWR-EI-AC,S5720-56C-PWR-EI-AC,S5",
+                    "processor_descr": "MPU Board 1 Processor",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -34309,7 +34309,7 @@
                     "processor_index": "69206025",
                     "processor_type": "vrp",
                     "processor_usage": 53,
-                    "processor_descr": "Assembling Components,S5720-56C-PWR-EI-AC,S5720-56C-PWR-EI-AC,S5",
+                    "processor_descr": "MPU Board 2 Processor",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }
@@ -34326,7 +34326,7 @@
                     "hrDeviceIndex": null,
                     "mempool_type": "vrp",
                     "mempool_precision": 1,
-                    "mempool_descr": "Assembling Components,S5720-56C-PWR-EI-AC,S5720-56C-PWR-EI-AC,S5",
+                    "mempool_descr": "MPU Board 0 Memory",
                     "mempool_perc": 0,
                     "mempool_used": 0,
                     "mempool_free": 0,
@@ -34342,7 +34342,7 @@
                     "hrDeviceIndex": null,
                     "mempool_type": "vrp",
                     "mempool_precision": 1,
-                    "mempool_descr": "Assembling Components,S5720-56C-PWR-EI-AC,S5720-56C-PWR-EI-AC,S5",
+                    "mempool_descr": "MPU Board 1 Memory",
                     "mempool_perc": 0,
                     "mempool_used": 0,
                     "mempool_free": 0,
@@ -34358,7 +34358,7 @@
                     "hrDeviceIndex": null,
                     "mempool_type": "vrp",
                     "mempool_precision": 1,
-                    "mempool_descr": "Assembling Components,S5720-56C-PWR-EI-AC,S5720-56C-PWR-EI-AC,S5",
+                    "mempool_descr": "MPU Board 2 Memory",
                     "mempool_perc": 0,
                     "mempool_used": 0,
                     "mempool_free": 0,

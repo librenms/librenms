@@ -852,6 +852,10 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
         if ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.') && !starts_with($oid, '.1.3.6.1.2.1.33.1.3.3.1.3')) {
             return 1;
         }
+    } elseif ($device['os'] == 'apc-mgeups') {
+        if ($sensor_type == 'voltage') {
+            return 10;
+        }
     }
 
     // UPS-MIB Defaults

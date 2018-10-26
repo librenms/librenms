@@ -14,6 +14,8 @@
 
 use LibreNMS\Config;
 
+$pagetitle[] = 'Pollers';
+
 require_once 'includes/modal/delete_poller.inc.php';
 
 ?>
@@ -25,8 +27,11 @@ $rows = dbFetchRows($query);
 
 if (count($rows) !== 0) {
     echo '
-    <h2>Standard Distributed Pollers</h2>
-
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Standard Pollers</h3>
+    </div>
+    <div class="panel-body">
     <div class="table-responsive">
         <table class="table table-striped table-bordered table-hover table-condensed">
             <tr>
@@ -68,7 +73,9 @@ if (count($rows) !== 0) {
 
     echo '
         </table>
-    </div>';
+        </div>
+    </div>
+</div>';
 }
 
 $query = 'SELECT *,UNIX_TIMESTAMP(NOW()) AS `now`, UNIX_TIMESTAMP(`last_report`) AS `then` FROM `poller_cluster` ORDER BY poller_name';
@@ -76,8 +83,11 @@ $rows = dbFetchRows($query);
 
 if (count($rows) !== 0) {
     echo '
-    <h2>Poller Cluster Health</h2>
-
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Poller Cluster Health</h3>
+    </div>
+    <div class="panel-body">
     <div class="table-responsive">
         <table class="table table-striped table-bordered table-condensed">
             <tr>
@@ -157,7 +167,9 @@ if (count($rows) !== 0) {
         <small>
           Worker seconds indicates the maximum polling throughput a node can achieve in perfect conditions. If the consumed is close to the maximum, consider adding more threads, or better tuning your groups.<br>
           If there are devices pending but consumed worker seconds is low, your hardware is not sufficient for the number of devices and the poller cannot reach maximum throughput.
-       </small>
-    </div>';
+        </small>
+        </div>
+    </div>
+</div>';
 }
 ?>

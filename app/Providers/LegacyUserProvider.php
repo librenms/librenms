@@ -171,6 +171,7 @@ class LegacyUserProvider implements UserProvider
      * Fetch user by username from legacy auth, update it or add it to the db then return it.
      *
      * @param string $username
+     * @param string $password
      * @return User|null
      */
     protected function fetchUserByName($username, $password = null)
@@ -179,6 +180,11 @@ class LegacyUserProvider implements UserProvider
 
         $auth = LegacyAuth::get();
         $type = LegacyAuth::getType();
+
+        // ldap based auth we should bind before using, otherwise searches may fail due to anonymous bind
+        if (method_exists($auth, 'bind')) {
+            $auth->bind($username, $password);
+        }
 
         $auth_id = $auth->getUserid($username);
         $new_user = $auth->getUser($auth_id);
