@@ -60,10 +60,12 @@ if (isset($vars['searchPhrase']) && !empty($vars['searchPhrase'])) {
         $where  .= ' AND `F`.`mac_address` LIKE ?';
         $param[] = $mac_search;
     } else {
-        $where  .= ' AND (`V`.`vlan_vlan` = ? OR `F`.`mac_address` LIKE ? OR `P`.`ifAlias` LIKE ?)';
+        $sql .= " LEFT JOIN `ipv4_mac` AS `M` USING (`mac_address`)";
+        $where  .= ' AND (`V`.`vlan_vlan` = ? OR `F`.`mac_address` LIKE ? OR `P`.`ifAlias` LIKE ? OR `M`.`ipv4_address` LIKE ?)';
         $param[] = (int)$search;
         $param[] = $mac_search;
         $param[] = '%' . $search . '%';
+        $param[] = '%' . gethostbyname(trim($vars['searchPhrase'])) . '%';
     }
 }
 
@@ -71,7 +73,7 @@ $total = (int)dbFetchCell("SELECT COUNT(*) $sql $where", $param);
 
 // Don't use ipv4_mac in count it will inflate the rows unless we aggregate it
 // Except for ip search.
-if ($vars['searchby'] != 'ip' && $vars['searchby'] != 'dnsname') {
+if (empty($vars['searchPhrase']) || isset($vars['searchby']) && $vars['searchby'] != 'ip' && $vars['searchby'] != 'dnsname') {
     $sql .= " LEFT JOIN `ipv4_mac` AS `M` USING (`mac_address`)";
 }
 $sql .= $where;

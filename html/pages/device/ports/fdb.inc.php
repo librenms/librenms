@@ -9,6 +9,7 @@ $no_refresh = true;
             <th data-column-id="interface">Port</th>
             <th data-column-id="description">Description</th>
             <th data-column-id="vlan">Vlan</th>
+            <th data-column-id="dnsname" data-visible="false">DNS Name</th>
         </tr>
     </thead>
 </table>
