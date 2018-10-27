@@ -1,4 +1,5 @@
 source: Extensions/Fast-Ping-Check.md
+path: blob/master/doc/
 
 ## Fast up/down checking
 

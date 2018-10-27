@@ -1,4 +1,5 @@
 source: Installation/index.md
+path: blob/master/doc/
 
 # Installing LibreNMS
 

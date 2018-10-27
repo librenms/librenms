@@ -1,4 +1,5 @@
 source: Developing/Code-Structure.md
+path: blob/master/doc/
 # Code structure.
 
 This document will try and provide a good overview of how the code is structured within LibreNMS. We will go through the main directories and provide information on how and when they are used.

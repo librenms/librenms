@@ -1,4 +1,5 @@
 source: Alerting/Templates.md
+path: blob/master/doc/
 
 # Templates
 
