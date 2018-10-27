@@ -1,4 +1,5 @@
 source: Alerting/Macros.md
+path: blob/master/doc/
 
 # Macros
 

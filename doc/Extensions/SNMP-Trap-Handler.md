@@ -1,4 +1,5 @@
 source: Extensions/SNMP-Trap-Handler.md
+path: blob/master/doc/
 # SNMP trap handling
 
 Currently, librenms only supports linkUp/linkDown (port up/down), bgpEstablished/bgpBackwardTransition (BGP Sessions Up/Down) and authenticationFailure SNMP traps.

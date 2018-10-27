@@ -27,7 +27,7 @@ cache:
 
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y snmp fping
+  - sudo apt-get install -y snmp fping python3-pip
   - mysql -e 'CREATE DATABASE librenms_phpunit_78hunjuybybh;'
   - cp tests/config/config.test.php config.php
 

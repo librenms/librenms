@@ -1,4 +1,5 @@
 source: Support/Adding-a-Device.md
+path: blob/master/doc/
 
 # Adding Device
 

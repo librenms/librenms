@@ -1,4 +1,5 @@
 # How to get Help
+path: blob/master/doc/
 
 * Browse through the navigation on the left
 * Search in the upper right

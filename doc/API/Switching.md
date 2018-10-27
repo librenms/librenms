@@ -1,4 +1,5 @@
 source: API/Switching.md
+path: blob/master/doc/
 
 ### `list_vlans`
 

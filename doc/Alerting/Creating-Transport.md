@@ -1,4 +1,5 @@
 source: Alerting/Creating-Transport.md
+path: blob/master/doc/
 
 # Creating a new Transport.
 

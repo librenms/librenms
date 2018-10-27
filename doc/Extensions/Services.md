@@ -1,4 +1,5 @@
 source: Extensions/Services.md
+path: blob/master/doc/
 # Setting up Services
 
 Services within LibreNMS provides the ability to use Nagios plugins to perform additional monitoring outside of SNMP.

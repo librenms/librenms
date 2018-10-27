@@ -1,4 +1,5 @@
 source: API/index.md
+path: blob/master/doc/
 
 ## Versioning
 
