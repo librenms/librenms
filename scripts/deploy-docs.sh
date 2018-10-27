@@ -20,11 +20,13 @@ git config user.name "librenms-docs"
 git config user.email "travis@librenms.org"
 git checkout master
 
+cd ../
 mkdocs build --clean
 build_result=$?
 
 # Only deploy after merging to master
 if [ "$build_result" == "0" -a "$TRAVIS_PULL_REQUEST" == "false" -a "$TRAVIS_BRANCH" == "master" ]; then
+    cd out/
     mkdocs gh-deploy --config-file ../mkdocs.yml --remote-branch master
 #    touch .
 #    git add -A .
