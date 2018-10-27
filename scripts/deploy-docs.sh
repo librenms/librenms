@@ -20,15 +20,16 @@ git config user.name "librenms-docs"
 git config user.email "travis@librenms.org"
 git checkout master
 
-mkdocs gh-deploy --config-file ../mkdocs.yml --remote-branch master
+mkdocs build --clean
 build_result=$?
 
 # Only deploy after merging to master
 if [ "$build_result" == "0" -a "$TRAVIS_PULL_REQUEST" == "false" -a "$TRAVIS_BRANCH" == "master" ]; then
-    touch .
-    git add -A .
-    git commit -m "GH-Pages update by travis after $TRAVIS_COMMIT"
-    git push -q origin master
+    mkdocs gh-deploy --config-file ../mkdocs.yml --remote-branch master
+#    touch .
+#    git add -A .
+#    git commit -m "GH-Pages update by travis after $TRAVIS_COMMIT"
+#    git push -q origin master
 else
     exit ${build_result}  # return doc build result
 fi
