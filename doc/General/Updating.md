@@ -1,4 +1,5 @@
 source: General/Updating.md
+path: blob/master/doc/
 
 By default, LibreNMS is set to automatically update. If you have disabled this feature then you can 
 perform a manual update.

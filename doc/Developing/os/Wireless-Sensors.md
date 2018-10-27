@@ -1,4 +1,5 @@
 source: Developing/os/Wireless-Sensors.md
+path: blob/master/doc/
 
 This document will guide you through adding wireless sensors for your new wireless device.
  
