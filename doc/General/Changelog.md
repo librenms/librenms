@@ -1,3 +1,84 @@
+##1.45
+*(2018-10-28)*
+
+A big thank you to the following 25 contributors this last month:
+
+  - murrant (14)
+  - PipoCanaja (4)
+  - laf (3)
+  - takenalias (3)
+  - JohnSPeach (2)
+  - jozefrebjak (2)
+  - Jellyfrog (2)
+  - TheGreatDoc (2)
+  - brianatlarge (2)
+  - crazy-max (1)
+  - xudonax (1)
+  - alangregory (1)
+  - VirTechSystems (1)
+  - slashdoom (1)
+  - angryp (1)
+  - sippe2 (1)
+  - voxnil (1)
+  - kkrumm1 (1)
+  - Rosiak (1)
+  - sparknsh (1)
+  - andyrosen (1)
+  - tomarch (1)
+  - vitalisator (1)
+  - lucianosds (1)
+  - acl (1)
+
+#### Documentation
+* Updated to use new theme for docs site ([#9320](https://github.com/librenms/librenms/pull/9320)) - [laf](https://github.com/laf)
+* Point out the poller module graph. ([#9378](https://github.com/librenms/librenms/pull/9378)) - [murrant](https://github.com/murrant)
+* Telegram group support ([#9355](https://github.com/librenms/librenms/pull/9355)) - [lucianosds](https://github.com/lucianosds)
+* Added geocode engine configuration information ([#9330](https://github.com/librenms/librenms/pull/9330)) - [brianatlarge](https://github.com/brianatlarge)
+
+#### Device
+* MGE UPS support improvement (incl. traps) ([#9301](https://github.com/librenms/librenms/pull/9301)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added support for 64bits memory pools on CISCO-ENHANCED-MEMPOOL-MIB ([#9353](https://github.com/librenms/librenms/pull/9353)) - [alangregory](https://github.com/alangregory)
+* Improved support for Racom Ray radios ([#9279](https://github.com/librenms/librenms/pull/9279)) - [jozefrebjak](https://github.com/jozefrebjak)
+* Added support for Mirkrotik Wireless Wire (wAP 60G) ([#9318](https://github.com/librenms/librenms/pull/9318)) - [takenalias](https://github.com/takenalias)
+* Added netagent2 3phase support ([#9175](https://github.com/librenms/librenms/pull/9175)) - [sippe2](https://github.com/sippe2)
+* Cyberpower extra sensor values ([#9278](https://github.com/librenms/librenms/pull/9278)) - [takenalias](https://github.com/takenalias)
+* Improved vCenter discovery ([#9344](https://github.com/librenms/librenms/pull/9344)) - [Rosiak](https://github.com/Rosiak)
+* F5 APM current sessions graphing ([#9334](https://github.com/librenms/librenms/pull/9334)) - [JohnSPeach](https://github.com/JohnSPeach)
+* Removed apc-ats os and merge sensors into apc ([#9262](https://github.com/librenms/librenms/pull/9262)) - [tomarch](https://github.com/tomarch)
+* Added support for LLDP on ALCATEL/NOKIA SR OS ([#9298](https://github.com/librenms/librenms/pull/9298)) - [vitalisator](https://github.com/vitalisator)
+* Updated DataDomain MIB, Added DataDomain Storage poller and discovery ([#9270](https://github.com/librenms/librenms/pull/9270)) - [acl](https://github.com/acl)
+* Improved processors and mempools support for VRRP ([#9300](https://github.com/librenms/librenms/pull/9300)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Webui
+* Graph of overall poller performance ([#9381](https://github.com/librenms/librenms/pull/9381)) - [murrant](https://github.com/murrant)
+* Redesign alert template modal ([#9364](https://github.com/librenms/librenms/pull/9364)) - [crazy-max](https://github.com/crazy-max)
+* Show device "features" in correct column ([#9366](https://github.com/librenms/librenms/pull/9366)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Optimize images ([#9369](https://github.com/librenms/librenms/pull/9369)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Reorganise the alert settings page to show what options are deprecated ([#9354](https://github.com/librenms/librenms/pull/9354)) - [laf](https://github.com/laf)
+* Fixed field type for processor_usage and _perc_warn ([#9357](https://github.com/librenms/librenms/pull/9357)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+* Don't check file permissions on every request, handle failures ([#9264](https://github.com/librenms/librenms/pull/9264)) - [murrant](https://github.com/murrant)
+* Attempt to make proxy sub-dir -> app no subdir work ([#9317](https://github.com/librenms/librenms/pull/9317)) - [murrant](https://github.com/murrant)
+* Oxidized rights enforcement ([#9331](https://github.com/librenms/librenms/pull/9331)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Bug
+* Allow F5 APM graphs to display automatically ([#9377](https://github.com/librenms/librenms/pull/9377)) - [JohnSPeach](https://github.com/JohnSPeach)
+* Fixed typo in Raspberry Pi sensor detection ([#9368](https://github.com/librenms/librenms/pull/9368)) - [xudonax](https://github.com/xudonax)
+* Don't overwrite processor warn percentage ([#9380](https://github.com/librenms/librenms/pull/9380)) - [murrant](https://github.com/murrant)
+* Services writing time field to InfluxDB ([#9358](https://github.com/librenms/librenms/pull/9358)) - [slashdoom](https://github.com/slashdoom)
+* Attempt to escape services commands properly. ([#9269](https://github.com/librenms/librenms/pull/9269)) - [murrant](https://github.com/murrant)
+
+#### Feature
+* Validate Database and PHP time match ([#9373](https://github.com/librenms/librenms/pull/9373)) - [murrant](https://github.com/murrant)
+* Add Mapquest API Geocode support ([#9316](https://github.com/librenms/librenms/pull/9316)) - [brianatlarge](https://github.com/brianatlarge)
+
+#### Alerting
+* Fixed field type for processor_usage and _perc_warn ([#9357](https://github.com/librenms/librenms/pull/9357)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+* Telegram group support ([#9355](https://github.com/librenms/librenms/pull/9355)) - [lucianosds](https://github.com/lucianosds)
+* Added Twilio SMS as an Alerting Transport ([#9305](https://github.com/librenms/librenms/pull/9305)) - [andyrosen](https://github.com/andyrosen)
+
+#### Security
+* Attempt to escape services commands properly. ([#9269](https://github.com/librenms/librenms/pull/9269)) - [murrant](https://github.com/murrant)
+
 ##1.44
 *(2018-10-17)*
 
