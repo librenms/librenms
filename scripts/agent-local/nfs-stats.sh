@@ -5,13 +5,13 @@
 # extend nfs-stats /opt/nfs-stats.sh                       #
 ############################################################
 CFG_NFSFILE='/proc/net/rpc/nfsd'
-BIN_CAT='/usr/bin/cat'
-BIN_SED='/usr/bin/sed'
-BIN_AWK='/usr/bin/awk'
-BIN_TR='/usr/bin/tr'
-BIN_PASTE='/usr/bin/paste'
-BIN_RM='/usr/bin/rm'
-BIN_MV='/usr/bin/mv'
+BIN_CAT=`which cat`
+BIN_SED=`which sed`
+BIN_AWK=`which awk`
+BIN_TR=`which tr`
+BIN_PASTE=`which paste`
+BIN_RM=`which rm`
+BIN_MV=`which mv`
 LOG_OLD='/tmp/nfsio_old'
 LOG_NEW='/tmp/nfsio_new'
 LOG_FIX='/tmp/nfsio_fix'
