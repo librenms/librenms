@@ -8,8 +8,8 @@ foreach (explode(',', $vars['id']) as $ifid) {
     if (rrdtool_check_rrd_exists($rrd_file)) {
         $port = cleanPort($port);
         $rrd_list[$i]['filename']  = $rrd_file;
-        $rrd_list[$i]['descr']     = $port['hostname'].' '.$port['ifDescr'];
-        $rrd_list[$i]['descr_in']  = $port['hostname'];
+        $rrd_list[$i]['descr']     = format_hostname($port, $port['hostname']).' '.$port['ifDescr'];
+        $rrd_list[$i]['descr_in']  = format_hostname($port, $port['hostname']);
         $rrd_list[$i]['descr_out'] = makeshortif($port['label']);
         $i++;
     }

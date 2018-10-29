@@ -1,4 +1,5 @@
 source: Extensions/Applications.md
+path: blob/master/doc/
 ## Introduction
 
 You can use Application support to graph performance statistics of many applications.
@@ -1124,6 +1125,7 @@ The application should be auto-discovered as described at the top of the page. I
 ### ZFS
 
 ##### SNMP Extend
+`zfs-linux` requires python3 >=python3.5.
 
 The installation steps are:
 

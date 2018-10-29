@@ -1,4 +1,5 @@
 source: Extensions/metrics/Prometheus.md
+path: blob/master/doc/
 # Enabling support for Prometheus.
 
 Please be aware Prometheus support is alpha at best, It hasn't been extensively tested and is still in development

@@ -1,4 +1,5 @@
 source: Support/SSL-Configuration.md
+path: blob/master/doc/
 
 # Ubuntu 16.04
 
