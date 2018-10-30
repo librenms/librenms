@@ -91,7 +91,6 @@ class Telegram extends Transport
                     'descr' => 'Telegram format',
                     'type' => 'text',
                 ]
-
             ],
             'validation' => [
                 'telegram-chat-id' => 'required|string',
