@@ -12,7 +12,7 @@
  * @copyright  (C) 2013 LibreNMS Group
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 /**
  * Compare $t with the value of $vars[$v], if that exists
@@ -59,6 +59,9 @@ function nicecase($item)
     switch ($item) {
         case 'dbm':
             return 'dBm';
+
+        case 'entropy':
+            return 'Random entropy';
 
         case 'mysql':
             return ' MySQL';
@@ -137,6 +140,9 @@ function nicecase($item)
 
         case 'zfs':
             return 'ZFS';
+
+        case 'asterisk':
+            return 'Asterisk';
 
         default:
             return ucfirst($item);
@@ -446,7 +452,7 @@ function bill_permitted($bill_id)
 {
     global $permissions;
 
-    if ($_SESSION['userlevel'] >= '5') {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $allowed = true;
     } elseif ($permissions['bill'][$bill_id]) {
         $allowed = true;
@@ -466,7 +472,7 @@ function port_permitted($port_id, $device_id = null)
         $device_id = get_device_id_by_port_id($port_id);
     }
 
-    if ($_SESSION['userlevel'] >= '5') {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $allowed = true;
     } elseif (device_permitted($device_id)) {
         $allowed = true;
@@ -489,7 +495,7 @@ function application_permitted($app_id, $device_id = null)
             $device_id = get_device_id_by_app_id($app_id);
         }
 
-        if ($_SESSION['userlevel'] >= '5') {
+        if (LegacyAuth::user()->hasGlobalRead()) {
             $allowed = true;
         } elseif (device_permitted($device_id)) {
             $allowed = true;
@@ -510,7 +516,7 @@ function device_permitted($device_id)
 {
     global $permissions;
 
-    if ($_SESSION['userlevel'] >= '5') {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $allowed = true;
     } elseif ($permissions['device'][$device_id]) {
         $allowed = true;
@@ -570,6 +576,58 @@ function generate_lazy_graph_tag($args)
     }
 }//end generate_lazy_graph_tag()
 
+function generate_dynamic_graph_tag($args)
+{
+    $urlargs = array();
+    $width = 0;
+    foreach ($args as $key => $arg) {
+        switch (strtolower($key)) {
+            case 'width':
+                $width = $arg;
+                $value = "{{width}}";
+                break;
+            case 'from':
+                $value = "{{start}}";
+                break;
+            case 'to':
+                $value = "{{end}}";
+                break;
+            default:
+                $value = $arg;
+                break;
+        }
+        $urlargs[] = $key . "=" . $value;
+    }
+
+    return '<img style="width:'.$width.'px;height:100%" class="graph img-responsive" data-src-template="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
+}//end generate_dynamic_graph_tag()
+
+function generate_dynamic_graph_js($args)
+{
+    $from = (is_numeric($args['from']) ? $args['from'] : '(new Date()).getTime() / 1000 - 24*3600');
+    $range = (is_numeric($args['to']) ? $args['to'] - $args['from'] : '24*3600');
+
+    $output = '<script src="js/RrdGraphJS/q-5.0.2.min.js"></script>
+        <script src="js/RrdGraphJS/moment-timezone-with-data.js"></script>
+        <script src="js/RrdGraphJS/rrdGraphPng.js"></script>
+          <script type="text/javascript">
+              q.ready(function(){
+                  var graphs = [];
+                  q(\'.graph\').forEach(function(item){
+                      graphs.push(
+                          q(item).rrdGraphPng({
+                              canvasPadding: 120,
+                                initialStart: ' . $from . ',
+                                initialRange: ' . $range . '
+                          })
+                      );
+                  });
+              });
+              // needed for dynamic height
+              window.onload = function(){ window.dispatchEvent(new Event(\'resize\')); }
+          </script>';
+    return $output;
+}//end generate_dynamic_graph_js()
 
 function generate_graph_js_state($args)
 {
@@ -825,10 +883,10 @@ function getlocations()
     $locations = array();
 
     // Fetch regular locations
-    if ($_SESSION['userlevel'] >= '5') {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $rows = dbFetchRows('SELECT location FROM devices AS D GROUP BY location ORDER BY location');
     } else {
-        $rows = dbFetchRows('SELECT location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? GROUP BY location ORDER BY location', array($_SESSION['user_id']));
+        $rows = dbFetchRows('SELECT location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? GROUP BY location ORDER BY location', array(LegacyAuth::id()));
     }
 
     foreach ($rows as $row) {
@@ -845,30 +903,30 @@ function getlocations()
 }//end getlocations()
 
 
+/**
+ * Get the recursive file size and count for a directory
+ *
+ * @param string $path
+ * @return array [size, file count]
+ */
 function foldersize($path)
 {
     $total_size = 0;
-    $files = scandir($path);
     $total_files = 0;
 
-    foreach ($files as $t) {
-        if (is_dir(rtrim($path, '/') . '/' . $t)) {
-            if ($t <> '.' && $t <> '..') {
-                $size = foldersize(rtrim($path, '/') . '/' . $t);
-                $total_size += $size;
-            }
+    foreach (glob(rtrim($path, '/').'/*', GLOB_NOSORT) as $item) {
+        if (is_dir($item)) {
+            list($folder_size, $file_count) = foldersize($item);
+            $total_size += $folder_size;
+            $total_files += $file_count;
         } else {
-            $size = filesize(rtrim($path, '/') . '/' . $t);
-            $total_size += $size;
+            $total_size += filesize($item);
             $total_files++;
         }
     }
 
-    return array(
-        $total_size,
-        $total_files,
-    );
-}//end foldersize()
+    return [$total_size, $total_files];
+}
 
 
 function generate_ap_link($args, $text = null, $type = null)
@@ -1001,50 +1059,6 @@ function generate_pagination($count, $limit, $page, $links = 2)
     return ($return);
 }//end generate_pagination()
 
-
-function is_admin()
-{
-    if ($_SESSION['userlevel'] >= '10') {
-        $allowed = true;
-    } else {
-        $allowed = false;
-    }
-
-    return $allowed;
-}//end is_admin()
-
-
-function is_read()
-{
-    if ($_SESSION['userlevel'] == '5') {
-        $allowed = true;
-    } else {
-        $allowed = false;
-    }
-
-    return $allowed;
-}//end is_read()
-
-function is_demo_user()
-{
-
-    if ($_SESSION['userlevel'] == 11) {
-        return true;
-    } else {
-        return false;
-    }
-}// end is_demo_user();
-
-function is_normal_user()
-{
-
-    if (is_admin() === false && is_read() === false && is_demo_user() === false) {
-        return true;
-    } else {
-        return false;
-    }
-}// end is_normal_user()
-
 function demo_account()
 {
     print_error("You are logged in as a demo account, this page isn't accessible to you");
@@ -1110,9 +1124,8 @@ function clean_bootgrid($string)
 
 function get_config_by_group($group)
 {
-    $group = array($group);
     $items = array();
-    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_group` = '?'", array($group)) as $config_item) {
+    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_group` = ?", array($group)) as $config_item) {
         $val = $config_item['config_value'];
         if (filter_var($val, FILTER_VALIDATE_INT)) {
             $val = (int)$val;
@@ -1135,9 +1148,8 @@ function get_config_by_group($group)
 
 function get_config_like_name($name)
 {
-    $name = array($name);
     $items = array();
-    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_name` LIKE '%?%'", array($name)) as $config_item) {
+    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_name` LIKE ?", array("%$name%")) as $config_item) {
         $items[$config_item['config_id']] = $config_item;
     }
 
@@ -1500,11 +1512,19 @@ function get_oxidized_nodes_list()
 
     foreach ($data as $object) {
         $device = device_by_name($object['name']);
+        if (! device_permitted($device['device_id'])) {
+            //user cannot see this device, so let's skip it.
+            continue;
+        }
         $fa_color = $object['status'] == 'success' ? 'success' : 'danger';
         echo "
         <tr>
         <td>
-        " . generate_device_link($device) . "
+        " . generate_device_link($device);
+        if ($device['device_id'] == 0) {
+            echo "(device '" . $object['name'] . "' not in LibreNMS)";
+        }
+        echo "
         </td>
         <td>
         <i class='fa fa-square text-" . $fa_color . "'></i>
@@ -1517,6 +1537,25 @@ function get_oxidized_nodes_list()
         </td>
         <td>
         " . $object['group'] . "
+        </td>
+        <td>
+        ";
+        if (! $device['device_id'] == 0) {
+            echo "
+          <button class='btn btn-default btn-sm' name='btn-refresh-node-devId" . $device['device_id'] . "' id='btn-refresh-node-devId" . $device['device_id'] . "' onclick='refresh_oxidized_node(\"" . $device['hostname'] . "\")'>
+            <i class='fa fa-refresh'></i>
+          </button>
+          <a href='" . generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig')) . "'>
+            <i class='fa fa-align-justify fa-lg icon-theme'></i>
+          </a>
+            ";
+        } else {
+            echo "
+          <button class='btn btn-default btn-sm' disabled name='btn-refresh-node-devId" . $device['device_id'] . "' id='btn-refresh-node-devId" . $device['device_id'] . "'>
+            <i class='fa fa-refresh'></i>
+          </button>";
+        }
+        echo "
         </td>
         </tr>";
     }
@@ -1578,20 +1617,30 @@ function get_postgres_databases($device_id)
     return array();
 }
 
-// takes the device array and app_id
+/**
+ * Get all disks (disk serial numbers) from the collected
+ * rrd files.
+ *
+ * @param array $device device for which we get the rrd's
+ * @param int   $app_id application id on the device
+ * @return array list of disks
+ */
 function get_disks_with_smart($device, $app_id)
 {
-    $all_disks = get_disks($device['device_id']);
     $disks = array();
-    $all_disks_int = 0;
-    while (isset($all_disks[$all_disks_int])) {
-        $disk = $all_disks[$all_disks_int]['diskio_descr'];
-        $rrd_filename = rrd_name($device['hostname'], array('app', 'smart', $app_id, $disk));
-        if (rrdtool_check_rrd_exists($rrd_filename)) {
-            $disks[] = $disk;
+
+    $pattern = sprintf('%s/%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', 'smart', $app_id);
+
+    foreach (glob($pattern) as $rrd) {
+        $filename = basename($rrd, '.rrd');
+
+        list(,,, $disk) = explode("-", $filename, 4);
+
+        if ($disk) {
+            array_push($disks, $disk);
         }
-        $all_disks_int++;
     }
+
     return $disks;
 }
 
@@ -1606,56 +1655,16 @@ function get_disks_with_smart($device, $app_id)
  */
 function get_dashboards($user_id = null)
 {
-    global $authorizer;
+    $user = is_null($user_id) ? Auth::user() : \App\Models\User::find($user_id);
     $default = get_user_pref('dashboard');
-    $dashboards = dbFetchRows(
-        "SELECT * FROM `dashboards` WHERE dashboards.access > 0 || dashboards.user_id = ?",
-        array(is_null($user_id) ? $_SESSION['user_id'] : $user_id)
-    );
 
-    $usernames = array(
-        $_SESSION['user_id'] => $_SESSION['username']
-    );
+    return \App\Models\Dashboard::allAvailable($user)->with('user')->get()->map(function ($dashboard) use ($default) {
+        $dash = $dashboard->toArray();
+        $dash['username'] = $dashboard->user ? $dashboard->user->username : '';
+        $dash['default'] = $default == $dashboard->dashboard_id;
 
-    $result = array();
-    foreach ($dashboards as $dashboard) {
-        $duid = $dashboard['user_id'];
-        if (!isset($usernames[$duid])) {
-            $user = Auth::get()->getUser($duid);
-            $usernames[$duid] = $user['username'];
-        }
-
-        $dashboard['username'] = $usernames[$duid];
-        $dashboard['default'] = $dashboard['dashboard_id'] == $default;
-
-        $result[$dashboard['dashboard_id']] = $dashboard;
-    }
-
-    return $result;
-}
-
-/**
- * Generate javascript to fill in a select box from an ajax list
- *
- * @param string $list_type type of list look in html/includes/list/
- * @param string $selector jquery selector for the target select element
- * @param int $selected the id of the item to mark as selected
- * @return string the javascript (not including <script> tags)
- */
-function generate_fill_select_js($list_type, $selector, $selected = null)
-{
-    return '$(document).ready(function() {
-    $select = $("' . $selector . '")
-    $.getJSON(\'ajax_list.php?id=' . $list_type . '\', function(data){
-        $.each(data, function(index,item) {
-            if (item.id == "' . $selected . '") {
-                $select.append("<option value=" + item.id + " selected>" + item.value + "</option>");
-            } else {
-                $select.append("<option value=" + item.id + ">" + item.value + "</option>");
-            }
-        });
-    });
-});';
+        return $dash;
+    })->keyBy('dashboard_id')->all();
 }
 
 /**
@@ -1705,7 +1714,7 @@ function get_zfs_pools($device_id)
  * Returns the sysname of a device with a html line break prepended.
  * if the device has an empty sysname it will return device's hostname instead
  * And finally if the device has no hostname it will return an empty string
- * @param device array
+ * @param array device
  * @return string
  */
 function get_device_name($device)

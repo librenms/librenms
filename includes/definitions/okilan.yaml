@@ -7,9 +7,8 @@ type: printer
 icon: oki
 discovery:
     - sysDescr:
-        - OKI OkiLAN
+        - 'OKI OkiLAN'
 discovery_modules:
-    toner: 1
+    toner: true
 poller_modules:
-    toner: 1
-
+    toner: true

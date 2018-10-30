@@ -25,13 +25,15 @@
 
 namespace LibreNMS\Validations;
 
+use Carbon\Carbon;
+use Carbon\CarbonInterval;
 use LibreNMS\Config;
-use LibreNMS\Interfaces\ValidationGroup;
+use LibreNMS\DB\Eloquent;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 use Symfony\Component\Yaml\Yaml;
 
-class Database implements ValidationGroup
+class Database extends BaseValidation
 {
     public function validate(Validator $validator)
     {
@@ -40,6 +42,7 @@ class Database implements ValidationGroup
         }
 
         $this->checkMode($validator);
+        $this->checkTime($validator);
 
         // check database schema version
         $current = get_db_schema();
@@ -62,15 +65,25 @@ class Database implements ValidationGroup
         $this->checkSchema($validator);
     }
 
+    private function checkTime(Validator $validator)
+    {
+        $raw_time = Eloquent::DB()->selectOne(Eloquent::DB()->raw('SELECT NOW() as time'))->time;
+        $db_time = new Carbon($raw_time);
+        $php_time = Carbon::now();
+
+        $diff = $db_time->diffAsCarbonInterval($php_time);
+
+        if ($diff->compare(CarbonInterval::minute(1)) > 0) {
+            $message = "Time between this server and the mysql database is off\n";
+            $message .= " Mysql time " . $db_time->toDateTimeString() . PHP_EOL;
+            $message .= " PHP time " . $php_time->toDateTimeString() . PHP_EOL;
+
+            $validator->fail($message);
+        }
+    }
+
     private function checkMode(Validator $validator)
     {
-        // Test for MySQL Strict mode
-        $strict_mode = dbFetchCell("SELECT @@global.sql_mode");
-        if (str_contains($strict_mode, 'STRICT_TRANS_TABLES')) {
-            //FIXME - Come back to this once other MySQL modes are fixed
-            //$valid->fail('You have MySQL STRICT_TRANS_TABLES enabled, please disable this until full support has been added: https://dev.mysql.com/doc/refman/5.0/en/sql-mode.html');
-        }
-
         // Test for lower case table name support
         $lc_mode = dbFetchCell("SELECT @@global.lower_case_table_names");
         if ($lc_mode != 0) {
@@ -79,22 +92,17 @@ class Database implements ValidationGroup
                 'Set lower_case_table_names=0 in your mysql config file in the [mysqld] section.'
             );
         }
-
-        if (empty($strict_mode) === false) {
-            $validator->fail(
-                "You have not set sql_mode='' in your mysql config.",
-                "Set sql-mode='' in your mysql config file in the [mysqld] section."
-            );
-        }
     }
 
     private function checkCollation(Validator $validator)
     {
+        $db_name = dbFetchCell('SELECT DATABASE()');
+
         // Test for correct character set and collation
         $db_collation_sql = "SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME 
             FROM information_schema.SCHEMATA S 
-            WHERE schema_name = '" . Config::get('db_name') .
-            "' AND  ( DEFAULT_CHARACTER_SET_NAME != 'utf8' OR DEFAULT_COLLATION_NAME != 'utf8_unicode_ci')";
+            WHERE schema_name = '$db_name' AND 
+            ( DEFAULT_CHARACTER_SET_NAME != 'utf8' OR DEFAULT_COLLATION_NAME != 'utf8_unicode_ci')";
         $collation = dbFetchRows($db_collation_sql);
         if (empty($collation) !== true) {
             $validator->fail(
@@ -105,8 +113,8 @@ class Database implements ValidationGroup
 
         $table_collation_sql = "SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME 
             FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C 
-            WHERE C.collation_name = T.table_collation AND T.table_schema = '" . Config::get('db_name') .
-            "' AND  ( C.CHARACTER_SET_NAME != 'utf8' OR C.COLLATION_NAME != 'utf8_unicode_ci' );";
+            WHERE C.collation_name = T.table_collation AND T.table_schema = '$db_name' AND
+             ( C.CHARACTER_SET_NAME != 'utf8' OR C.COLLATION_NAME != 'utf8_unicode_ci' );";
         $collation_tables = dbFetchRows($table_collation_sql);
         if (empty($collation_tables) !== true) {
             $result = ValidationResult::fail('MySQL tables collation is wrong: ')
@@ -116,8 +124,8 @@ class Database implements ValidationGroup
         }
 
         $column_collation_sql = "SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME 
-FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . Config::get('db_name') .
-            "'  AND  ( CHARACTER_SET_NAME != 'utf8' OR COLLATION_NAME != 'utf8_unicode_ci' );";
+            FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '$db_name' AND
+            ( CHARACTER_SET_NAME != 'utf8' OR COLLATION_NAME != 'utf8_unicode_ci' );";
         $collation_columns = dbFetchRows($column_collation_sql);
         if (empty($collation_columns) !== true) {
             $result = ValidationResult::fail('MySQL column collation is wrong: ')
@@ -154,7 +162,13 @@ FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . Config::get('db_name'
                     $column = $cdata['Field'];
                     if (empty($current_columns[$column])) {
                         $validator->fail("Database: missing column ($table/$column)");
-                        $schema_update[] = $this->addColumnSql($table, $cdata, $data['Columns'][$index - 1]['Field']);
+                        $primary = false;
+                        if ($data['Indexes']['PRIMARY']['Columns'] == [$column]) {
+                            // include the primary index with the add statement
+                            unset($data['Indexes']['PRIMARY']);
+                            $primary = true;
+                        }
+                        $schema_update[] = $this->addColumnSql($table, $cdata, $data['Columns'][$index - 1]['Field'], $primary);
                     } elseif ($cdata !== $current_columns[$column]) {
                         $validator->fail("Database: incorrect column ($table/$column)");
                         $schema_update[] = $this->updateTableSql($table, $column, $cdata);
@@ -201,7 +215,7 @@ FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . Config::get('db_name'
         if (empty($schema_update)) {
             $validator->ok('Database schema correct');
         } else {
-            $result = ValidationResult::fail("We have detected that your database schema may be wrong, please report the following to us on IRC or the community site (https://t.libren.ms/5gscd):")
+            $result = ValidationResult::fail("We have detected that your database schema may be wrong, please report the following to us on Discord (https://t.libren.ms/discord) or the community site (https://t.libren.ms/5gscd):")
                 ->setFix('Run the following SQL statements to fix.')
                 ->setList('SQL Statements', $schema_update);
             $validator->result($result);
@@ -213,15 +227,21 @@ FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . Config::get('db_name'
         $columns = array_map(array($this, 'columnToSql'), $table_schema['Columns']);
         $indexes = array_map(array($this, 'indexToSql'), $table_schema['Indexes']);
 
-        $def = implode(', ', array_merge(array_values($columns), array_values($indexes)));
+        $def = implode(', ', array_merge(array_values((array)$columns), array_values((array)$indexes)));
+        var_dump($def);
 
         return "CREATE TABLE `$table` ($def);";
     }
 
-    private function addColumnSql($table, $schema, $previous_column)
+    private function addColumnSql($table, $schema, $previous_column, $primary = false)
     {
         $sql = "ALTER TABLE `$table` ADD " . $this->columnToSql($schema);
-        if (!empty($previous_column)) {
+        if ($primary) {
+            $sql .= ' PRIMARY KEY';
+        }
+        if (empty($previous_column)) {
+            $sql .= ' FIRST';
+        } else {
             $sql .= " AFTER `$previous_column`";
         }
         return $sql . ';';
@@ -265,25 +285,27 @@ FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . Config::get('db_name'
      */
     private function columnToSql($column_data)
     {
+        $segments = ["`${column_data['Field']}`", $column_data['Type']];
+
+        $segments[] = $column_data['Null'] ? 'NULL' : 'NOT NULL';
+
+        if (isset($column_data['Default'])) {
+            if ($column_data['Default'] === 'CURRENT_TIMESTAMP') {
+                $segments[] = 'DEFAULT CURRENT_TIMESTAMP';
+            } elseif ($column_data['Default'] == 'NULL') {
+                $segments[] = 'DEFAULT NULL';
+            } else {
+                $segments[] = "DEFAULT '${column_data['Default']}'";
+            }
+        }
+
         if ($column_data['Extra'] == 'on update current_timestamp()') {
-            $extra = 'on update CURRENT_TIMESTAMP';
+            $segments[] = 'on update CURRENT_TIMESTAMP';
         } else {
-            $extra = $column_data['Extra'];
+            $segments[] = $column_data['Extra'];
         }
 
-        $null = $column_data['Null'] ? 'NULL' : 'NOT NULL';
-
-        if (!isset($column_data['Default'])) {
-            $default = '';
-        } elseif ($column_data['Default'] === 'CURRENT_TIMESTAMP') {
-            $default = 'DEFAULT CURRENT_TIMESTAMP';
-        } elseif ($column_data['Default'] == 'NULL') {
-            $default = 'DEFAULT NULL';
-        } else {
-            $default = "DEFAULT '${column_data['Default']}'";
-        }
-
-        return trim("`${column_data['Field']}` ${column_data['Type']} $null $default $extra");
+        return implode(' ', $segments);
     }
 
     /**
@@ -307,15 +329,5 @@ FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . Config::get('db_name'
         }, $index_data['Columns']));
 
         return sprintf($index, $columns);
-    }
-
-    /**
-     * Returns if this test should be run by default or not.
-     *
-     * @return bool
-     */
-    public function isDefault()
-    {
-        return true;
     }
 }

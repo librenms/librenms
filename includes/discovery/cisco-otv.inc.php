@@ -84,7 +84,7 @@ if ($device['os_group'] == 'cisco') {
         // No Error, lets process things.
 
         // Add each overlay to the array.
-        foreach ($tblOverlayEntry['1.3.6.1.4.1.9.9.810.1.2.1.1.2'] as $index => $name) {
+        foreach ((array)$tblOverlayEntry['1.3.6.1.4.1.9.9.810.1.2.1.1.2'] as $index => $name) {
             $result = array();
             $message = false;
             $result['index'] = $index;
@@ -132,7 +132,7 @@ if ($device['os_group'] == 'cisco') {
         }
 
         // Add each adjacency to the array.
-        foreach ($tblAdjacentDevName as $key => $value) {
+        foreach ((array)$tblAdjacentDevName as $key => $value) {
             preg_match('/^1.3.6.1.4.1.9.9.810.1.3.1.1.4.(\d+).1.4.(\d+.\d+.\d+.\d+)$/', $key, $matches);
             $result = array();
             $result['index'] = $matches[1];
@@ -202,7 +202,7 @@ if ($device['os_group'] == 'cisco') {
             $component_key = false;
 
             // Loop over our components to determine if the component exists, or we need to add it.
-            foreach ($components as $compid => $child) {
+            foreach ((array)$components as $compid => $child) {
                 if ($child['UID'] === $array['UID']) {
                     $component_key = $compid;
                 }
@@ -224,7 +224,7 @@ if ($device['os_group'] == 'cisco') {
         /*
          * Loop over the Component data to see if we need to DELETE any components.
          */
-        foreach ($components as $key => $array) {
+        foreach ((array)$components as $key => $array) {
             // Guilty until proven innocent
             $found = false;
 

@@ -11,6 +11,18 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
     $tagoruntag   = snmpwalk_cache_oid($device, 'dot1qVlanCurrentEgressPorts', array(), 'Q-BRIDGE-MIB', null, '-OQUs --hexOutputLength=0');
     $untag        = snmpwalk_cache_oid($device, 'dot1qVlanCurrentUntaggedPorts', array(), 'Q-BRIDGE-MIB', null, '-OQUs --hexOutputLength=0');
 
+    // drop dot1qVlanTimeMark, we don't care about it
+    $tagoruntag = array_reduce(array_keys($tagoruntag), function ($result, $key) use ($tagoruntag) {
+        list(, $new_key) = explode('.', $key);
+        $result[$new_key] = $tagoruntag[$key];
+        return $result;
+    }, []);
+    $untag = array_reduce(array_keys($untag), function ($result, $key) use ($untag) {
+        list(, $new_key) = explode('.', $key);
+        $result[$new_key] = $untag[$key];
+        return $result;
+    }, []);
+
     foreach ($vlans as $vlan_id => $vlan) {
         d_echo(" $vlan_id");
         if (is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
@@ -36,13 +48,14 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
 
         $device['vlans'][$vtpdomain_id][$vlan_id] = $vlan_id;
 
-        $id = "0.$vlan_id";
-        $untagged_ids = q_bridge_bits2indices($untag[$id]['dot1qVlanCurrentUntaggedPorts']);
-        $egress_ids = q_bridge_bits2indices($tagoruntag[$id]['dot1qVlanCurrentEgressPorts']);
+        $untagged_ids = q_bridge_bits2indices($untag[$vlan_id]['dot1qVlanCurrentUntaggedPorts']);
+        $egress_ids = q_bridge_bits2indices($tagoruntag[$vlan_id]['dot1qVlanCurrentEgressPorts']);
 
         foreach ($egress_ids as $port_id) {
-            $ifIndex = $base_to_index[$port_id];
-            $per_vlan_data[$vlan_id][$ifIndex]['untagged'] = (in_array($port_id, $untagged_ids) ? 1 : 0);
+            if (isset($base_to_index[$port_id])) {
+                $ifIndex = $base_to_index[$port_id];
+                $per_vlan_data[$vlan_id][$ifIndex]['untagged'] = (in_array($port_id, $untagged_ids) ? 1 : 0);
+            }
         }
     }
 }

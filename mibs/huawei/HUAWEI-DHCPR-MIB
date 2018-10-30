@@ -1,0 +1,489 @@
+-- =================================================================
+-- Copyright (C) 2014 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: Huawei DHCP Relay MIB
+-- Reference: HUAWEI Enterprise MIB
+-- Version: V2.04
+-- History:
+--         v1.1
+--         modified by huangjun 2009-12-08
+-- =================================================================
+
+HUAWEI-DHCPR-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hwDhcp            
+            FROM HUAWEI-MIB            
+        ifIndex            
+            FROM RFC1213-MIB            
+        OBJECT-GROUP, MODULE-COMPLIANCE           
+            FROM SNMPv2-CONF            
+        IpAddress, Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY          
+            FROM SNMPv2-SMI            
+        RowStatus            
+            FROM SNMPv2-TC
+        EnabledStatus
+            FROM P-BRIDGE-MIB;
+
+    hwDHCPRelayMib MODULE-IDENTITY 
+        LAST-UPDATED "201408120000Z"        -- AUG 12, 2014 at 00:00 GMT
+        ORGANIZATION 
+ "Huawei Technologies Co.,Ltd."
+        CONTACT-INFO 
+"Huawei Industrial Base
+  Bantian, Longgang
+   Shenzhen 518129
+   People's Republic of China
+   Website: http://www.huawei.com
+   Email: support@huawei.com
+ "     
+                     
+        DESCRIPTION 
+            "This MIB describes objects used for managing DHCP relay,
+             including  configuring ip addresses for DHCP relay,
+             selecting allocation mode of dhcp service, and some statistic information."
+
+       REVISION "201408120000Z"        -- AUG 12, 2014 at 00:00 GMT
+       DESCRIPTION 
+            "This version add the hwDHCPRelayReleaseLocalPktNum  node."
+
+		REVISION "201310170000Z"        -- OCT 17, 2013 at 00:00 GMT
+        DESCRIPTION
+            "V2.03 - V2.04 add the hwDHCP6RDUID node."
+        REVISION "200307210000Z"        
+        DESCRIPTION
+            "The initial revision of this MIB module."
+
+        REVISION "201306290000Z"        -- June 29, 2013 at 00:00 GMT
+        DESCRIPTION
+            "Update the descriptions of these nodes: hwDHCPRTxClientPktNum, hwDHCPRTxClientUniPktNum and hwDHCPRTxClientBroPktNum."
+        REVISION "200302120000Z"        -- February 12, 2003 at 00:00 GMT
+        DESCRIPTION
+            "The initial revision of this MIB module."
+        ::= { hwDhcp 1 }
+
+    --
+    -- Node definitions
+    --
+
+    hwDHCPRelayMibObject OBJECT IDENTIFIER ::= { hwDHCPRelayMib 1 }
+    
+    -- =================================================================
+    -- 1st Table of hwDHCPRelayMibObjects: hwDHCPRIPTable
+    -- =================================================================
+    hwDHCPRIPTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwDHCPRIPEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table for configuring ip addresses for DHCP relay, 
+            The ip address means address of DHCP server."
+        ::= { hwDHCPRelayMibObject 1 }
+    
+    hwDHCPRIPEntry OBJECT-TYPE
+        SYNTAX HwDHCPRIPEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry for configuring ip addresses for DHCP 
+            relay."
+        INDEX { ifIndex, hwDHCPRIPAddr }
+        ::= { hwDHCPRIPTable 1 }
+    
+    HwDHCPRIPEntry ::=
+        SEQUENCE { 
+            hwDHCPRIPAddr
+                IpAddress,
+            hwDHCPRIPRowStatus
+                RowStatus
+         }
+
+    hwDHCPRIPAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Ip address for DHCP relay, The ip address means address of DHCP server."
+        ::= { hwDHCPRIPEntry 1 }
+    
+    hwDHCPRIPRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object is used to configuration new rows in this
+                            table, modify existing rows, and to delete
+                            existing rows.Only three actions are used: active(1),
+            createAndGo(4), destroy(6)."
+        ::= { hwDHCPRIPEntry 2 }
+    
+    -- =================================================================
+    -- 2nd Table of hwDHCPRelayMibObjects: hwDHCPRSeletAllocateModeTable
+    -- =================================================================
+    hwDHCPRSeletAllocateModeTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwDHCPRSeletAllocateModeEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table for selecting allocation mode of dhcp 
+            service."
+        ::= { hwDHCPRelayMibObject 2 }
+    
+    hwDHCPRSeletAllocateModeEntry OBJECT-TYPE
+        SYNTAX HwDHCPRSeletAllocateModeEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry for configuring the allocation mode of
+            DHCP service."
+        INDEX { ifIndex }
+        ::= { hwDHCPRSeletAllocateModeTable 1 }
+    
+    HwDHCPRSeletAllocateModeEntry ::=
+        SEQUENCE { 
+            hwDHCPRSelectAllocateMode
+                INTEGER
+         }
+
+    hwDHCPRSelectAllocateMode OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            global(0),
+            interface(1),
+            relay(2),
+            none(3),
+            globalAndRelay(4),
+            interfaceAndRelay(5)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Allocation mode of DHCP service.
+            
+            global(0)   - allocation address from global 
+            interface(1)- allocation address from interface
+            relay(2)    - allocation address from dhcp server, the request is relayed to server
+            none(3)     - no allocation address mode
+            globalAndRelay(4)   - allocation address from global and relay
+            interfaceAndRelay(5)- allocation address from interface and relay.
+            "
+        ::= { hwDHCPRSeletAllocateModeEntry 1 }
+         
+    --
+    -- Non-table objects 
+    --
+    hwDHCPRelayCycleStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            on(0),
+            off(1)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Status of DHCP relay cycle mode,
+             when the value is 0, cycle with the serveral DHCP servers addresses,
+             when the value is 1, use one same DHCP server."
+        ::= { hwDHCPRelayMibObject 3 }
+    
+    hwDHCPRRxBadPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the bad packets received by 
+            DHCP relay."
+        ::= { hwDHCPRelayMibObject 4 }
+    
+    hwDHCPRRxServerPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the packets received from
+            DHCP servers by DHCP relay module."
+        ::= { hwDHCPRelayMibObject 5 }
+    
+    hwDHCPRTxServerPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the packets transmited to
+            DHCP servers by DHCP relay module."
+        ::= { hwDHCPRelayMibObject 6 }
+    
+    hwDHCPRRxClientPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the packets received form DHCP
+            clients by DHCP relay."
+        ::= { hwDHCPRelayMibObject 7 }
+    
+    hwDHCPRTxClientPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the packets transmited
+            to DHCP clients by DHCP relay."
+        ::= { hwDHCPRelayMibObject 8 }
+    
+    hwDHCPRTxClientUniPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the unicast packets transmited
+            to DHCP clients by DHCP relay."
+        ::= { hwDHCPRelayMibObject 9 }
+    
+    hwDHCPRTxClientBroPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the brodcast packets transmited
+            to DHCP clients by DHCP relay."
+        ::= { hwDHCPRelayMibObject 10 }
+    
+    hwDHCPRelayDiscoverPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the DHCP Discover packets handled
+            by DHCP relay."
+        ::= { hwDHCPRelayMibObject 11 }
+    
+    hwDHCPRelayRequestPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the DHCP Request packets handled
+            by DHCP relay."
+        ::= { hwDHCPRelayMibObject 12 }
+    
+    hwDHCPRelayDeclinePktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the DHCP Decline packets handled
+            by DHCP relay."
+        ::= { hwDHCPRelayMibObject 13 }
+    
+    hwDHCPRelayReleasePktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the DHCP Release packets handled
+            by DHCP relay."
+        ::= { hwDHCPRelayMibObject 14 }
+    
+    hwDHCPRelayInformPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the DHCP Inform packets handled
+            by DHCP relay."
+        ::= { hwDHCPRelayMibObject 15 }
+    
+    hwDHCPRelayOfferPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the DHCP Offer packets handled
+            by DHCP server."
+        ::= { hwDHCPRelayMibObject 16 }
+    
+    hwDHCPRelayAckPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the DHCP Ack packets handled
+            by DHCP relay."
+        ::= { hwDHCPRelayMibObject 17 }
+    
+    hwDHCPRelayNakPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the DHCP Nak packets handled
+            by DHCP relay."
+        ::= { hwDHCPRelayMibObject 18 }
+    
+    hwDHCPRelayStatisticsReset OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            invalid(0),
+            reset(1)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Reset the above statictics information of handled
+            packets by DHCP relay.
+            The value 1 means clear the statictics information. 
+            "
+        ::= { hwDHCPRelayMibObject 19 }
+    
+    hwDHCPArpProcessStatus OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "ARP process DHCP status.
+             The value 1 means enable ARP process DHCP status. 
+            "
+        ::= { hwDHCPRelayMibObject 20 }
+        
+    hwDHCPRServerDetectStatus OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object indicates whether detection against the pseudo DHCP server is enabled.
+             The default value is disabled(2)."
+        ::= { hwDHCPRelayMibObject 21 } 
+
+    -- =================================================================
+    -- 3rd Table of hwDHCPRelayMibObjects: hwDHCPRDSCPTable
+    -- =================================================================
+    hwDHCPRDSCPTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwDHCPRDSCPEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table for configuring dhcp reply packet's Dscp value."
+        ::= { hwDHCPRelayMibObject 22 }
+
+     hwDHCPRDSCPEntry OBJECT-TYPE
+        SYNTAX HwDHCPRDSCPEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry for configuring dhcp reply packet's Dscp value."
+        INDEX { ifIndex }
+        ::= { hwDHCPRDSCPTable 1 }
+    
+    HwDHCPRDSCPEntry ::=
+        SEQUENCE { 
+            hwDhcpDscp
+                Integer32
+         }
+         
+    hwDhcpDscp OBJECT-TYPE
+        SYNTAX Integer32 (0..63|255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Dhcp reply packet's dscp value.
+            <0-63>    - Valid dscp value 
+            <255>     - Set dscp value to default.
+            "
+        ::= { hwDHCPRDSCPEntry 1 }
+
+    -- =================================================================
+    -- 4rd Table of hwDHCPRelayMibObjects: hwDhcpRenewReplyTable
+    -- =================================================================
+    hwDhcpRenewReplyTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwDhcpRenewReplyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table for configuring dhcp renew-reply packet local deal."
+        ::= { hwDHCPRelayMibObject 23 }
+    
+    hwDhcpRenewReplyEntry OBJECT-TYPE
+        SYNTAX HwDhcpRenewReplyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry for configuring dhcp renw-reply packet local deal."
+        INDEX { ifIndex, hwDhcpRenewReplyEnable }
+        ::= { hwDhcpRenewReplyTable 1 }
+    
+    HwDhcpRenewReplyEntry ::=
+        SEQUENCE { 
+            hwDhcpRenewReplyEnable   INTEGER,
+            hwDhcpRenewReplyRowStatus        RowStatus
+         }
+          
+    hwDhcpRenewReplyEnable OBJECT-TYPE
+        SYNTAX INTEGER 
+        	{
+            enable(1),
+            disable(0)
+            }
+        MAX-ACCESS read-write
+        STATUS current  
+        DESCRIPTION
+            "Whether to enable dhcp renew-reply packet local-deal on this interface"
+        DEFVAL { disable }
+        ::= { hwDhcpRenewReplyEntry 1 }
+        
+    hwDhcpRenewReplyRowStatus OBJECT-TYPE
+        SYNTAX RowStatus 
+        MAX-ACCESS read-create
+        STATUS current  
+        DESCRIPTION
+            "The dhcp renew-reply object is used to configuration new rows in this
+                            table, modify existing rows, and to delete
+                            existing rows.Only three actions are used: active(1),
+            createAndGo(4), destroy(6)."
+        ::= { hwDhcpRenewReplyEntry 2 }
+
+       hwDHCP6RDUID OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1 | 8..28)) 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Config Dhcpv6 Duid."
+        ::= { hwDHCPRelayMibObject 24} 
+      
+    hwDHCPRelayReleaseLocalPktNum OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the DHCP local release packets handled
+            by DHCP relay."
+        ::= { hwDHCPRelayMibObject 25 }
+      
+    hwDHCPRelayMIBConformance OBJECT IDENTIFIER ::= { hwDHCPRelayMib 2 }
+    
+    hwDHCPRelayMIBCompliances OBJECT IDENTIFIER ::= { hwDHCPRelayMIBConformance 1 }
+    hwDHCPRelayMIBCompliance  MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    { hwDHCPRelayMIBGroup}  
+                                               
+              ::= { hwDHCPRelayMIBCompliances 1 }
+    hwDHCPRelayMIBGroups OBJECT IDENTIFIER ::= { hwDHCPRelayMIBConformance 2 }
+    
+    hwDHCPRelayMIBGroup OBJECT-GROUP
+        OBJECTS { hwDHCPRIPAddr, hwDHCPRIPRowStatus, hwDHCPRSelectAllocateMode, hwDHCPRelayCycleStatus, hwDHCPRRxBadPktNum, 
+            hwDHCPRRxServerPktNum, hwDHCPRTxServerPktNum, hwDHCPRRxClientPktNum, hwDHCPRTxClientPktNum, hwDHCPRTxClientUniPktNum, 
+            hwDHCPRTxClientBroPktNum, hwDHCPRelayDiscoverPktNum, hwDHCPRelayRequestPktNum, hwDHCPRelayDeclinePktNum, hwDHCPRelayReleasePktNum, 
+            hwDHCPRelayInformPktNum, hwDHCPRelayOfferPktNum, hwDHCPRelayAckPktNum, hwDHCPRelayNakPktNum, hwDHCPRelayStatisticsReset, hwDHCPArpProcessStatus, hwDHCPRServerDetectStatus, 
+            hwDhcpDscp, hwDhcpRenewReplyEnable, hwDhcpRenewReplyRowStatus,hwDHCP6RDUID, hwDHCPRelayReleaseLocalPktNum }
+        STATUS current
+        DESCRIPTION 
+            "The basic collection of objects providing management of
+            DHCP realy."
+        ::= { hwDHCPRelayMIBGroups 1 }
+
+END

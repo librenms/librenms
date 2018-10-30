@@ -27,12 +27,15 @@ var grid = $("#mac-search").bootgrid({
                 "<select name=\"device_id\" id=\"device_id\" class=\"form-control input-sm\">"+
                 "<option value=\"\">All Devices</option>"+
 <?php
+
+use LibreNMS\Authentication\LegacyAuth;
+
 $sql = 'SELECT `devices`.`device_id`,`hostname`, `sysName` FROM `devices`';
 
-if (is_admin() === false && is_read() === false) {
+if (!LegacyAuth::user()->hasGlobalRead()) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
     $where  .= ' WHERE `DP`.`user_id`=?';
-    $param[] = $_SESSION['user_id'];
+    $param[] = LegacyAuth::id();
 }
 
 $sql .= " $where ORDER BY `hostname`";

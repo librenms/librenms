@@ -59,8 +59,7 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling
                     0
                 )
             );
-        } elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.674.10895.3024')) {
-            d_echo("Dell Powerconnect 8024F");
+        } elseif (starts_with($device['sysObjectID'], ['.1.3.6.1.4.1.674.10895.3024', '.1.3.6.1.4.1.674.10895.3065'])) {
             return $this->discoverVxworksProcessors('.1.3.6.1.4.1.674.10895.5000.2.6132.1.1.1.1.4.9.0');
         }
 

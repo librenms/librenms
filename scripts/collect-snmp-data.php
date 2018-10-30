@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Snmpsim;
 
@@ -97,6 +98,10 @@ if (isset($options['v'])) {
     $variant = $options['variant'];
 }
 
+if (str_contains($variant, '_')) {
+    exit("Variant name cannot contain an underscore (_).\n");
+}
+
 echo "OS: $target_os\n";
 echo "Module(s): $modules_input\n";
 if ($variant) {
@@ -104,17 +109,22 @@ if ($variant) {
 }
 echo PHP_EOL;
 
-$capture = new ModuleTestHelper($modules, $target_os, $variant);
+try {
+    $capture = new ModuleTestHelper($modules, $target_os, $variant);
 
 
-if (isset($options['f'])) {
-    $capture->setSnmprecSavePath($options['f']);
-} elseif (isset($options['file'])) {
-    $capture->setSnmprecSavePath($options['file']);
+    if (isset($options['f'])) {
+        $capture->setSnmprecSavePath($options['f']);
+    } elseif (isset($options['file'])) {
+        $capture->setSnmprecSavePath($options['file']);
+    }
+
+    $prefer_new_snmprec = isset($options['n']) || isset($options['prefer-new']);
+
+
+    echo "Capturing Data: ";
+    update_os_cache(true); // Force update of OS Cache
+    $capture->captureFromDevice($device['device_id'], true, $prefer_new_snmprec);
+} catch (InvalidModuleException $e) {
+    echo $e->getMessage() . PHP_EOL;
 }
-
-$prefer_new_snmprec = isset($options['n']) || isset($options['prefer-new']);
-
-
-echo "Capturing Data: ";
-$capture->captureFromDevice($device['device_id'], true, $prefer_new_snmprec);

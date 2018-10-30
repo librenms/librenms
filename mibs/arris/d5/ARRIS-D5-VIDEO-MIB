@@ -1,0 +1,4341 @@
+ARRIS-D5-VIDEO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32,
+            Counter32, Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue, RowStatus, DisplayString,
+    TimeStamp, DateAndTime
+        FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    ifIndex, InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    arrisD5UEQam
+        FROM ARRIS-MIB;
+
+    d5MpegVideoMIB  MODULE-IDENTITY
+        LAST-UPDATED "201001050000Z" -- 4th January 2010
+        ORGANIZATION "Arris International"
+        CONTACT-INFO
+            "   Network Management
+                Postal: Arris International.
+                        4300 Cork Airport Business Park
+                        Cork Airport, Kinsale Road
+                        Cork, Ireland.
+                Tel:    +353 21 7305 800
+                Fax:    +353 21 4321 972"
+
+        DESCRIPTION
+            "This MIB manages the MPEG / VIDEO software on the Arris CMTS."
+        ::= { arrisD5UEQam 1 }
+
+    d5VideoObjects OBJECT IDENTIFIER ::= { d5MpegVideoMIB 1 }
+
+    D5TransportStreamIndex ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "An identifier that uniquely identifies an MPEG Transport Stream in
+             the D5 MPEG Manager. This could represent an incoming or outgoing
+             TS, or could represent an SPTS or MPTS."
+        SYNTAX    INTEGER ( 1..65535 )
+
+    D5ElementaryStreamType ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "A convenient type definition for MPEG Elementary Stream Type
+             values."
+        SYNTAX    INTEGER ( 1..255 )
+
+    D5DescriptorTag ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "A convenient type definition for MPEG Descriptor Tags values."
+        SYNTAX    INTEGER ( 1..255 )
+
+    D5DescriptorIndex ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "An identifier that uniquely identifies an MPEG Descriptor within a
+            given Program or Elementary Stream."
+        SYNTAX    INTEGER ( 1..65535 )
+
+    D5DescriptorBuffer ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "A buffer that contains MPEG Descriptor data."
+        SYNTAX    OCTET STRING (SIZE (0..255))
+
+    D5PID ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "A convenient type definition for MPEG PID values."
+        SYNTAX    INTEGER ( 0..8192 )
+
+    D5Program ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "A convenient type definition for MPEG Program Number values."
+        SYNTAX    Unsigned32
+
+    D5MappingType ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "A convenient type definition for mapping rules. These can be as
+             follows
+                static  - configured by the operator to over-ride the default
+                          mapping
+                dynamic - allocated by Q5 on the fly and currently in operation
+                default - representing the default rule but not in operation."
+        SYNTAX    INTEGER {
+                            default(1),
+                            dynamic(2),
+                            static(3)
+                           }
+
+    D5PidType ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "A convenient type definition for PID - whether PSI or ES."
+        SYNTAX    INTEGER {
+                            es(1),
+                            psi(2),
+                            ghost(3)
+                          }
+
+    D5ProgType ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "A convenient type definition for Programs - whether PSI or ES."
+        SYNTAX    INTEGER {
+                            es(1),
+                            psi(2)
+                          }
+
+    D5RemappingRuleSourceType ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "A convenient type definition for the source of rule used to create
+             a dynamic PID/PROG remapping
+                qam         - A Qam remap rule was used to create the remapping
+                udpIp       - A Udp/IP rule was used to create the remapping
+                nsg         - Remapping was made by NSG mode default rules
+                passThrough - Remapping was made by passThrough mode default
+                              rules
+                default - Remapping was made by arris mode default rules"
+
+        SYNTAX    INTEGER {
+                            qam(1),
+                            udpIp(2),
+                            nsg(3),
+                            passThrough(4),
+                            default(5)
+                           }
+
+    D5TransportStreamStatus ::= TEXTUAL-CONVENTION
+        STATUS  current
+        DESCRIPTION
+            "A convenient type definition for MPEG transport stream status
+             states. These can be as follows
+                active     - currently passing video traffic
+                timedOut   - No video passing currently, in transition from
+                             active to inactive states
+                inactive   - not passing ANY traffic - used for statically
+                             configured streams"
+        SYNTAX    INTEGER {
+                            active(1),
+                            timingOut(2),
+                            inactive(3)
+                           }
+
+    D5PidStatus ::= TEXTUAL-CONVENTION
+        STATUS  current
+        DESCRIPTION
+            "A convenient type definition for MPEG PID status states. These can
+             be as follows
+                active     - currently passing video traffic
+                timedOut   - No video passing currently, in transition from
+                             active to inactive states
+                inactive   - not passing ANY traffic - used for statically
+                             configured PIDs"
+        SYNTAX    INTEGER {
+                            active(1),
+                            timingOut(2),
+                            inactive(3)
+                           }
+
+    D5ProgStatus ::= TEXTUAL-CONVENTION
+        STATUS  current
+        DESCRIPTION
+            "A convenient type definition for MPEG Program status states. These
+             can be as follows
+                active     - currently passing video traffic
+                timedOut   - No video passing currently, in transition from
+                             active to inactive states
+                inactive   - not passing ANY traffic - used for statically
+                             configured programs"
+        SYNTAX    INTEGER {
+                            active(1),
+                            timingOut(2),
+                            inactive(3)
+                           }
+
+    D5TransportStreamDirection ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "A convenient type definition for the direction of a Transport
+             Stream
+                incoming - the Transport Stream is being received by the D5,
+                            typically over IP
+                outgoing - the Transport Stream is being generated by the D5 and
+                            sent to a QAM."
+        SYNTAX    INTEGER {
+                            incoming(1),
+                            outgoing(2)
+                           }
+
+    D5VideoChannelContainerNameType ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "A unique name that identifies a particular channel-container."
+        SYNTAX    DisplayString (SIZE (0..16))
+
+    D5VideoDefaultMappingScheme ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "A convenient type definition for the default-mappings that are
+             supported by the D5.  The default-mapping schemes are used to
+             identify which QAM to map an input TS to, where the TS has no
+             static configuration associated with it.
+                udpPortLegacy  - The earlier version of the Arris default UDP-
+                           port mapping scheme may used to map a TS to an output
+                           QAM channel.  Each QAM channel has a pre-defined
+                           associated range of UDP-ports which map to specific
+                           program-numbers on that QAM channel.
+                udpPort  - The Arris default UDP-port mapping scheme is used
+                           to map a TS to an output QAM channel.  Each QAM
+                           channel has a pre-defined associated range of UDP-
+                           ports which map to specific program-numbers on that
+                           QAM channel.
+                disabled - The default mapping schemes are disabled.  Only video
+                           streams that are statically configured can pass
+                           through the D5."
+        SYNTAX    INTEGER {
+                            disabled(1),
+                            udpPort(2),
+                            udpPortLegacy(3)
+                           }
+
+    D5PersistenceType ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "A convenient type definition that defines whether or not a rule
+             should be saved persistently across system reboots."
+        SYNTAX    INTEGER {
+                            nonVolatile(0),
+                            volatile(1)
+                          }
+
+    D5VideoQamLogQamState ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "Defines the status of the log entry:
+                one-shot    Log entry describes a one off event (no START/STOP
+                            attributes)
+                active      Log entry is currently active. This means that the
+                            START event has occured and the STOP event is
+                            pending
+                complete    Both the START and STOP  events for this log entry
+                            have fired"
+        SYNTAX    INTEGER {
+                            one-shot(1),
+                            active(2),
+                            complete(3)
+                           }
+
+    D5VideoProgramOverSubscriptionAction ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "Defines the status of the log entry:
+                none            No action is performed, program monitoring is not
+                                enabled.
+                notification    An event is logged indicating that the program
+                                has exceeded it's bandwidth.
+                recover         Action will be taken to recover the bandwidth in
+                                questions. Typically the program will be removed."
+        SYNTAX    INTEGER {
+                            none(0),
+                            notification(1),
+                            recover(2)
+                           }
+
+    D5GeneratePat ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "Defines the controls on the PAT generation:
+                enable-auto     Enable the auto-generation of the PAT table
+                disable         Disable to local generation of the PAT table
+                force-nit-entry Enable the auto-generation of the PAT table but
+                                force the NIT entry (i.e. program_number '0')
+                                to the value specified by the 'nit-pid'
+                                configuration. This is used for video-si
+                                streams, where the egress NIT PID defaults
+                                to that specified in the ingress PAT."
+        SYNTAX    INTEGER {
+                            enable-auto(1),
+                            disable(2),
+                            force-nit-entry(3)
+                          }
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- Global MPEG Processing configuration settings including defaults for qams
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    d5VideoControlGroup OBJECT IDENTIFIER ::= { d5VideoObjects 1 }
+            d5vControlPatInterval   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Retransmission interval for PAT tables in milliseconds."
+                ::= { d5VideoControlGroup 1 }
+
+            d5vControlPmtInterval   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Retransmission interval for PMT tables in milliseconds."
+                ::= { d5VideoControlGroup 2 }
+
+            d5vControlNitInterval   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Retransmission interval for NIT tables in milliseconds."
+                ::= { d5VideoControlGroup 3 }
+
+            d5vControlSdtInterval   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Retransmission interval for SDT tables in milliseconds."
+                ::= { d5VideoControlGroup 4 }
+
+            d5vControlOriginalNetworkId   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "DVB original-network-id to be used in downstream ."
+                ::= { d5VideoControlGroup 5 }
+
+            d5vControlNetworkId   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "DVB network-id to be used in downstream ."
+                ::= { d5VideoControlGroup 6 }
+
+            d5vControlNetworkName   OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "DVB network-name to be used in downstream ."
+                ::= { d5VideoControlGroup 7 }
+
+            d5vControlTimeoutInterval   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Timeout interval for incoming streams in milliseconds."
+                ::= { d5VideoControlGroup 8 }
+
+            d5vControlNitPID   OBJECT-TYPE
+                SYNTAX      D5PID
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "PID value to use when generating NIT tables."
+                ::= { d5VideoControlGroup 9 }
+
+            d5vControlAutoGeneratePAT   OBJECT-TYPE
+                SYNTAX      D5GeneratePat
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Flag specifying whether or not the auto-generation by the
+                     D5 of PAT tables is enabled"
+                ::= { d5VideoControlGroup 10 }
+
+            d5vControlAutoGenerateCAT   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Flag specifying whether or not the auto-generation by the
+                     D5 of CAT tables is enabled"
+                ::= { d5VideoControlGroup 11 }
+
+            d5vControlAutoGeneratePMT   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Flag specifying whether or not the auto-generation by the
+                     D5 of PMT tables is enabled"
+                ::= { d5VideoControlGroup 12 }
+
+            d5vControlAutoGenerateNIT   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Flag specifying whether or not the auto-generation by the
+                     D5 of NIT tables is enabled(and the associated entry
+                     in the PAT table for the NIT-PID)"
+                ::= { d5VideoControlGroup 13 }
+
+            d5vControlAutoGenerateSDT   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Flag specifying whether or not the auto-generation by the
+                     D5 of SDT tables is enabled"
+                ::= { d5VideoControlGroup 14 }
+
+            d5vControlAutoGenerateTDT   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Flag specifying whether or not the auto-generation by the
+                     D5 of TDT tables is enabled"
+                ::= { d5VideoControlGroup 15 }
+
+            d5vControlAutoGenerateTOT   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Flag specifying whether or not the auto-generation by the
+                     D5 of TOT tables is enabled"
+                ::= { d5VideoControlGroup 16 }
+
+            d5vControlPassThroughType   OBJECT-TYPE
+                SYNTAX    INTEGER {
+                                    on(1),
+                                    off(2),
+                                    mpts(3)
+                                   }
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "This can be used to disable the default Arris prog/pid
+                     remapping scheme, and use pass-through remapping instead.
+                      Can also be used to enable MPTS-pass-through mode.
+                    "
+                ::= { d5VideoControlGroup 17 }
+
+            d5vControlCatInterval   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Retransmission interval for CAT tables in milliseconds."
+                ::= { d5VideoControlGroup 18 }
+
+            d5vControlMaxProgramsPerQamChannel   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..63)
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Maximum number of programs allowed on a Qam channel at any
+                     one time.(Some QAM H/W may restrict to 31)
+                    "
+                ::= { d5VideoControlGroup 19 }
+
+            d5vControlAllowEsDvbPids    OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Flag that determines whether or not DVB-reserved PIDS are
+                     allowed to be used for elementary-streams."
+                ::= { d5VideoControlGroup 20 }
+
+            d5vControlDefaultMappingScheme    OBJECT-TYPE
+                SYNTAX      D5VideoDefaultMappingScheme
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "The mapping scheme to be used for input transport-streams
+                     that have no associated static-configuration."
+                ::= { d5VideoControlGroup 21 }
+
+            d5vControlFastPsiTableUpdates   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "If this is set to TRUE, then PSI table updates are sent
+                     down the RF as soon as the new PSI table has been
+                     calculated.  Otherwise, PSI table updates are made in such
+                     a way that the  repetition interval for that table on the
+                     RF remains constant."
+                ::= { d5VideoControlGroup 22 }
+
+            d5vControlCycleOutputPids   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "If this is set to TRUE, then the D5 cycles through the pool
+                     of unused PIDs when creating new PID remappings. The
+                     purpose of this is to limit the amound of PID reusage E.g.
+                     if a set-top using a buffered PMT table to view a program
+                     where the program may have been deleted and the PIDs may be
+                     in use by a different program now."
+                ::= { d5VideoControlGroup 23 }
+
+            d5vControlOverSubscriptionSafetyMargin OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "The amount of bandwidth in Kbps for the D5 to maintain
+                     as unused bandwidth on each QAM.  Purpose of this being
+                     to help prevent over-subscription from occuring at the
+                     cost of some wasted bandwidth."
+                ::= { d5VideoControlGroup 24 }
+
+            d5vControlOverSubscriptionRecoveryEnabled   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "If this is set to TRUE, then the D5 will attempt to
+                     recover automatically from a QAM-overscribed condition by
+                     shutting down active programs selectively.  It selects
+                     which programs to shut down by order of most recently
+                     activated, checks the new bitrates, then continues to
+                     shutdown more programs as neccessary untill the total
+                     bandwidth fits within the QAM available bandwidth."
+                ::= { d5VideoControlGroup 25 }
+                
+            d5vControlFilterCaDescMode   OBJECT-TYPE
+                SYNTAX    INTEGER {
+                                    cat-and-pmt(1),
+                                    neither(2),
+                                    cat-only(3),
+                                    pmt-only(4)
+                                   }
+
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "If this is configured, then the D5 will remove
+                     CA_Descriptors from incoming streams. This includes
+                     descriptors in CAT and PMT tables, and in the case of
+                     PMT it includes the 1st and 2nd loop. This is set to
+                     'neither' by default."
+                ::= { d5VideoControlGroup 26 }
+
+            d5vControlAllowTsidDuplication  OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "If this is set to TRUE, then the D5 chassis can be
+                     configured with identical TSIDs on multiple QAM channels
+                     .  Duplicate TSIDs should be used with some caution
+                     because the use of such is not currently compatible with
+                     conditional-access encryption, channel-container
+                     replication, or PSIG generation.  This is set to FALSE by
+                     default.
+                    "
+                ::= { d5VideoControlGroup 27 }
+
+            d5vControlPcrDriftCorrection   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      deprecated
+                DESCRIPTION
+                    "If this is set to TRUE, then PCR drift correction of input
+                     MPEG streams is enabled on the resultant output stream.
+                     Otherwise, the functionality is disabled."
+                ::= { d5VideoControlGroup 28 }
+
+            d5vControlProgramOverSubscription   OBJECT-TYPE
+                SYNTAX      D5VideoProgramOverSubscriptionAction
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "If this is set to TRUE, then the D5 will attempt to
+                     recover automatically from a QAM-overscribed condition by
+                     shutting down active programs selectively.  It selects
+                     which programs to shut down by order of most recently
+                     activated, checks the new bitrates, then continues to
+                     shutdown more programs as neccessary untill the total
+                     bandwidth fits within the QAM available bandwidth."
+                ::= { d5VideoControlGroup 29 }
+
+            d5vControlProgramOverSubscriptionPeriod OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      deprecated
+                DESCRIPTION
+                    "The period of time in seconds over which bandwidth
+                     is monitored before an over-subscription action is
+                     triggered."
+                ::= { d5VideoControlGroup 30 }
+
+            d5vControlProgramOverSubscriptionThreshold OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "The amount of bandwidth in percent by which a program
+                     stream may exceed it's configured limit before triggering
+                     the action specified by d5vControlProgramOverSubscription."
+                ::= { d5VideoControlGroup 31 }
+
+            d5vControlPreEncDetect   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "If this is set to TRUE, then the D5 will detect Motorola
+                     pre-encrypted streams, and will avoid re-encrypting the
+                     traffic when forwarding it downstream. If set to TRUE,
+                     the d5vControlFilterCaDesc setting is ignored for any
+                     pre-encrypted streams that match this rule, because the
+                     stream could not otherwise be decrypted."
+                ::= { d5VideoControlGroup 32 }
+
+            d5vControlUtilPercentThresh OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "The percentage utilization threshold of the QAM bandwidth
+                     at which the D5 will generate an alarm. The purpose of this
+                     is to facilitate monitoring of QAM bandwidth where the QAM
+                     might not necessarily be oversubscribed.
+                    "
+                ::= { d5VideoControlGroup 33 }
+
+            d5vControlDefaultPidMappingProgramStart OBJECT-TYPE
+                SYNTAX      Unsigned32 (1..65535)
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "The starting program-number to map to the start of the default
+                     mapping pid range.
+                    "
+                ::= { d5VideoControlGroup 34 }
+
+            d5vControlDefaultPidMappingProgramCount OBJECT-TYPE
+                SYNTAX      Unsigned32 (1..2048)
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "The number of programs to use for the default pid range.
+                    "
+                ::= { d5VideoControlGroup 35 }
+
+            d5vControlDefaultPidMappingPidCount OBJECT-TYPE
+                SYNTAX      Unsigned32 (2..31)
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "The number of PIDs to use per-program.  Determines the
+                     PID offset for each program number in the default range.
+                     There is a legal limit of 4096 on the values of 
+                      d5vControlDefaultPidMappingProgramCount multiplied by
+                      d5vControlDefaultPidMappingPidCount.
+                    "
+                ::= { d5VideoControlGroup 36 }
+
+            d5vControlOnProgramConflictDisconnectOlderStream OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "If enabled, program conflicts trigger the older of the two
+                     streams to be disconnected.  I.E. the newer stream takes
+                     the program number.
+                     NOTE: this only affects streams which have the same
+                     destination udp&IP values, and differ by source-IP.
+                    "
+                ::= { d5VideoControlGroup 37 }
+
+            d5vControlPcrDriftCorrectionGain   OBJECT-TYPE
+                SYNTAX      Unsigned32(0..10000)
+                UNITS           "1/10000"
+                MAX-ACCESS  read-write
+                STATUS      deprecated
+                DESCRIPTION
+                    "Gain-control used in PCR-drift calculation.  In units of
+                     1/10000."
+                ::= { d5VideoControlGroup 38 }
+
+            d5vControlPcrDriftCorrectionUpperThreshold   OBJECT-TYPE
+                SYNTAX      Unsigned32(0..10000)
+                UNITS           "1/10 milliseconds"
+                MAX-ACCESS  read-write
+                STATUS      deprecated
+                DESCRIPTION
+                    "Upper-threshold used in PCR-drift calculation.  In units of
+                     tenths of milliseconds."
+                ::= { d5VideoControlGroup 39 }
+
+            d5vControlPcrDriftCorrectionLowerThreshold   OBJECT-TYPE
+                SYNTAX      Unsigned32(0..1000)
+                UNITS           "1/10 milliseconds"
+                MAX-ACCESS  read-write
+                STATUS      deprecated
+                DESCRIPTION
+                    "Lower-threshold used in PCR-drift calculation.  In units of
+                     tenths of milliseconds."
+                ::= { d5VideoControlGroup 40 }
+
+            d5vControlNullDroppingRate   OBJECT-TYPE
+                SYNTAX      Unsigned32(0..7500)
+                UNITS           "Kbps"
+                MAX-ACCESS  read-write
+                STATUS      deprecated
+                DESCRIPTION
+                    "The rate used when performing NULL packet dropping.
+                     In units of Kbps - setting will be rounded up 
+                     to the nearest 150 Kbps multiple"
+                ::= { d5VideoControlGroup 41 }
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- QAM table (root of outgoing transport-streams in the MIB)
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    d5VideoQamStreamTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoQamStreamEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This table stores MPEG Video related data on a per QAM channel
+                 basis. Ultimately this table will AUGMENT that supported by the
+                 QAM RF Manager but for the moment it is standalone but using
+                 the same index, ifIndex"
+        ::= { d5VideoObjects 2 }
+
+        d5VideoQamStreamEntry OBJECT-TYPE
+            SYNTAX     D5VideoQamStreamEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { ifIndex }
+            ::= { d5VideoQamStreamTable 1 }
+
+            D5VideoQamStreamEntry ::= SEQUENCE {
+                d5vQamNitPID                  D5PID,
+                d5vQamTransportStreamID       Unsigned32,
+                d5vQamTsMibIndex              D5TransportStreamIndex,
+                d5vQamTotalPatsTx             Counter32,
+                d5vQamTotalProgramsTx         Counter32,
+                d5vQamCurrentProgramsTx       Gauge32,
+                d5vQamPatInterval             Unsigned32,
+                d5vQamPmtInterval             Unsigned32,
+                d5vQamNitInterval             Unsigned32,
+                d5vQamSdtInterval             Unsigned32,
+                d5vQamOriginalNetworkId       Unsigned32,
+                d5vQamNetworkId               Unsigned32,
+                d5vQamNetworkName             DisplayString,
+                d5vQamPassThroughType         INTEGER,
+                d5vQamConfVideoSiStreamEnabled TruthValue,
+                d5vQamConfVideoSiStreamUdpDest Unsigned32,
+                d5vQamConfVideoSiStreamIpSrc   IpAddress,
+                d5vQamConfVideoSiStreamIpDest  IpAddress,
+                d5vQamActiveVideoSiStreamEnabled TruthValue,
+                d5vQamActiveVideoSiStreamUdpDest Unsigned32,
+                d5vQamActiveVideoSiStreamIpSrc   IpAddress,
+                d5vQamActiveVideoSiStreamIpDest  IpAddress,
+                d5vQamStreamStatus            D5TransportStreamStatus,
+                d5vQamTimeActivated           TimeStamp,
+                d5vQamTimeActive              Counter32,
+                d5vQamTimeDeactivated         TimeStamp,
+                d5vQamAutoGeneratePAT         D5GeneratePat,
+                d5vQamAutoGenerateCAT         TruthValue,
+                d5vQamAutoGeneratePMT         TruthValue,
+                d5vQamAutoGenerateNIT         TruthValue,
+                d5vQamAutoGenerateSDT         TruthValue,
+                d5vQamAutoGenerateTDT         TruthValue,
+                d5vQamAutoGenerateTOT         TruthValue,
+                d5vQamCatInterval             Unsigned32,
+                d5vQamMaxProgramsPerQamChannel Unsigned32,
+                d5vQamAllowEsDvbPids          TruthValue,
+                d5vQamDefaultMappingScheme    D5VideoDefaultMappingScheme,
+                d5vQamFastPsiTableUpdates     TruthValue,
+                d5vQamCycleOutputPids         TruthValue,
+                d5vQamOverSubscribed          TruthValue,
+                d5vQamOverSubscriptionSafetyMargin    Unsigned32,
+                d5vQamOverSubscriptionRecoveryEnabled TruthValue,
+                d5vQamFilterCaDescMode        INTEGER,
+                d5vQamPcrDriftCorrection      TruthValue,
+                d5vQamPreEncDetect            TruthValue,
+                d5vQamUtilPercentThresh       Unsigned32,
+                d5vQamOnProgramConflictDisconnectOlderStream    TruthValue,
+                d5vQamNullDroppingRate        Unsigned32,
+                d5vQamConfVideoSiStreamTsidRemap TruthValue
+            }
+
+            d5vQamNitPID   OBJECT-TYPE
+                SYNTAX      D5PID
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "The PID value to us when generating NIT tables on this QAM
+                     channel. The default value is 16, the DVB requirement"
+                DEFVAL { 16 }
+                ::= { d5VideoQamStreamEntry 1 }
+
+            d5vQamTransportStreamID   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "The MPEG transport_stream_id used when transmitting PAT
+                     tables on this QAM channel.  The default value is specific
+                     to the slot number where the QAM channel is located."
+                ::= { d5VideoQamStreamEntry 2 }
+
+            d5vQamTsMibIndex   OBJECT-TYPE
+                SYNTAX      D5TransportStreamIndex
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The index of the outgoing Transport Stream on this QAM
+                     channel. A value of 0 means there are no MPEG Programs
+                     being transmitted at present, so there will be no related
+                     entry in the d5vTransportStreamTable."
+                ::= { d5VideoQamStreamEntry 3 }
+
+            d5vQamTotalPatsTx   OBJECT-TYPE
+                SYNTAX      Counter32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The total number of unique PAT Tables that have been
+                     generated for this QAM channel."
+                ::= { d5VideoQamStreamEntry 4 }
+
+            d5vQamTotalProgramsTx   OBJECT-TYPE
+                SYNTAX      Counter32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The accumulated number of Programs transmitted on this QAM
+                     channel."
+                ::= { d5VideoQamStreamEntry 5 }
+
+            d5vQamCurrentProgramsTx   OBJECT-TYPE
+                SYNTAX      Gauge32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The  number of Programs currently being transmitted on this
+                     QAM channel."
+                ::= { d5VideoQamStreamEntry 6 }
+
+            d5vQamPatInterval   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Retransmission interval for PAT tables in milliseconds."
+                ::= { d5VideoQamStreamEntry 7 }
+
+            d5vQamPmtInterval   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Retransmission interval for PMT tables in milliseconds."
+                ::= { d5VideoQamStreamEntry 8 }
+
+            d5vQamNitInterval   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Retransmission interval for NIT tables in milliseconds."
+                ::= { d5VideoQamStreamEntry 9 }
+
+            d5vQamSdtInterval   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Retransmission interval for SDT tables in milliseconds."
+                ::= { d5VideoQamStreamEntry 10 }
+
+            d5vQamOriginalNetworkId   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "DVB original-network-id to be used in downstream ."
+                ::= { d5VideoQamStreamEntry 11 }
+
+            d5vQamNetworkId   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "DVB network-id to be used in downstream ."
+                ::= { d5VideoQamStreamEntry 12 }
+
+            d5vQamNetworkName   OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "DVB network-name to be used in downstream ."
+                ::= { d5VideoQamStreamEntry 13 }
+
+            d5vQamPassThroughType   OBJECT-TYPE
+                SYNTAX    INTEGER {
+                                    on(1),
+                                    off(2),
+                                    mpts(3)
+                                   }
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "This can be used to disable the default Arris prog/pid
+                     remapping scheme, and use pass-through remapping instead.
+                      Can also be used to enable MPTS-pass-through mode.
+                    "
+                ::= { d5VideoQamStreamEntry 14 }
+
+            d5vQamConfVideoSiStreamEnabled   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Used to enable/disable video-si-stream configuration.
+                     At least one of UDP/src-IP/dest-IP must be non-zero for
+                     this video-si-stream rule to be functional."
+                 ::= { d5VideoQamStreamEntry 15 }
+
+            d5vQamConfVideoSiStreamUdpDest   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Video-si-stream UDP destination port.(A value of 0 in
+                     a rule means that the udp-port can be ANY value for
+                     pattern-matching)"
+                 ::= { d5VideoQamStreamEntry 16 }
+
+            d5vQamConfVideoSiStreamIpSrc   OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Video-si-stream IP source address.(A value of 0 in
+                     a rule means that the src-IP can be ANY value for
+                     pattern-matching)"
+                 ::= { d5VideoQamStreamEntry 17 }
+
+            d5vQamConfVideoSiStreamIpDest   OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Video-si-stream IP destination address.(A value of 0 in
+                     a rule means that the dest-IP can be ANY value for
+                     pattern-matching)"
+                 ::= { d5VideoQamStreamEntry 18 }
+
+            d5vQamActiveVideoSiStreamEnabled   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Used to indicate if the QAM is currently passing a
+                     video-si-stream."
+                 ::= { d5VideoQamStreamEntry 19 }
+
+            d5vQamActiveVideoSiStreamUdpDest   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Active video-si-stream UDP destination port."
+                 ::= { d5VideoQamStreamEntry 20 }
+
+            d5vQamActiveVideoSiStreamIpSrc   OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Active video-si-stream IP source address."
+                 ::= { d5VideoQamStreamEntry 21 }
+
+            d5vQamActiveVideoSiStreamIpDest   OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Active video-si-stream IP destination address."
+                 ::= { d5VideoQamStreamEntry 22 }
+
+            d5vQamStreamStatus    OBJECT-TYPE
+                SYNTAX      D5TransportStreamStatus
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Current status of this QAM Transport stream"
+                ::= { d5VideoQamStreamEntry 23 }
+
+            d5vQamTimeActivated  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when this stream was last activated.
+                           Zero if not-applicable."
+                ::= { d5VideoQamStreamEntry 24 }
+
+            d5vQamTimeActive OBJECT-TYPE
+                SYNTAX          Counter32
+                UNITS           "seconds"
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                    "The total time that MPEG stream has been active."
+                ::= { d5VideoQamStreamEntry 25 }
+
+            d5vQamTimeDeactivated  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when this stream was last
+                     deactivated.  Zero if not-known."
+                ::= { d5VideoQamStreamEntry 26 }
+
+            d5vQamAutoGeneratePAT   OBJECT-TYPE
+                SYNTAX      D5GeneratePat
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Flag specifying whether or not the auto-generation by the
+                     D5 of PAT tables is enabled"
+                ::= { d5VideoQamStreamEntry 27 }
+
+            d5vQamAutoGenerateCAT   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Flag specifying whether or not the auto-generation by the
+                     D5 of CAT tables is enabled"
+                ::= { d5VideoQamStreamEntry 28 }
+
+            d5vQamAutoGeneratePMT   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Flag specifying whether or not the auto-generation by the
+                     D5 of PMT tables is enabled"
+                ::= { d5VideoQamStreamEntry 29 }
+
+            d5vQamAutoGenerateNIT   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Flag specifying whether or not the auto-generation by the
+                     D5 of NIT tables is enabled(and the associated entry
+                     in the PAT table for the NIT-PID)"
+                ::= { d5VideoQamStreamEntry 30 }
+
+            d5vQamAutoGenerateSDT   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Flag specifying whether or not the auto-generation by the
+                     D5 of SDT tables is enabled"
+                ::= { d5VideoQamStreamEntry 31 }
+
+            d5vQamAutoGenerateTDT   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Flag specifying whether or not the auto-generation by the
+                     D5 of TDT tables is enabled"
+                ::= { d5VideoQamStreamEntry 32 }
+
+            d5vQamAutoGenerateTOT   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Flag specifying whether or not the auto-generation by the
+                     D5 of TOT tables is enabled"
+                ::= { d5VideoQamStreamEntry 33 }
+
+            d5vQamCatInterval   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Retransmission interval for CAT tables in milliseconds."
+                ::= { d5VideoQamStreamEntry 34 }
+
+            d5vQamMaxProgramsPerQamChannel   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..63)
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Maximum number of programs allowed on a Qam channel at any
+                     one time.(Some QAM H/W may restrict to 31)
+                    "
+                ::= { d5VideoQamStreamEntry 35 }
+
+            d5vQamAllowEsDvbPids    OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Flag that determines whether or not DVB-reserved PIDS are
+                     allowed to be used for elementary-streams."
+                ::= { d5VideoQamStreamEntry 36 }
+
+            d5vQamDefaultMappingScheme    OBJECT-TYPE
+                SYNTAX      D5VideoDefaultMappingScheme
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "The mapping scheme to be used for input transport-streams
+                     that have no associated static-configuration.
+                      NOTE: the udpPortLegacy scheme cannot be configured
+                     against an individual QAM-channel.  If so desired, it may
+                     be turned on globally in the d5vControlDefaultMappingScheme
+                     MIB entry.
+                    "
+                ::= { d5VideoQamStreamEntry 37 }
+
+            d5vQamFastPsiTableUpdates   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "If this is set to TRUE, then PSI table updates are sent
+                     down the RF as soon as the new PSI table has been
+                     calculated.  Otherwise, PSI table updates are made in such
+                     a way that the  repetition interval for that table on the
+                     RF remains constant. (Set to FALSE by default)"
+                ::= { d5VideoQamStreamEntry 38 }
+
+            d5vQamCycleOutputPids   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "If this is set to TRUE, then the D5 cycles through the pool
+                     of unused PIDs when creating new PID remappings. The
+                     purpose of this is to limit the amound of PID reusage E.g.
+                     if a set-top using a buffered PMT table to view a program
+                     where the program may have been deleted and the PIDs may be
+                     in use by a different program now. (Set to FALSE by default
+                     )"
+                ::= { d5VideoQamStreamEntry 39 }
+
+            d5vQamOverSubscribed   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Indicates if the bandwidth of this QAM is currently
+                     over-subscribed.  If the QAM is currently over-subscribed,
+                     some programs will suffer packet-loss.  The affected
+                     programs are identified in the d5QamProgramPcrBufferTable."
+                ::= { d5VideoQamStreamEntry 40 }
+
+            d5vQamOverSubscriptionSafetyMargin OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "The amount of bandwidth in Kbps for the D5 to maintain
+                     as unused bandwidth on each QAM.  Purpose of this being
+                     to help prevent over-subscription from occuring at the
+                     cost of some wasted bandwidth."
+                ::= { d5VideoQamStreamEntry 41 }
+
+            d5vQamOverSubscriptionRecoveryEnabled   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "If this is set to TRUE, then the D5 will attempt to
+                     recover automatically from a QAM-overscribed condition by
+                     shutting down active programs selectively.  It selects
+                     which programs to shut down by order of most recently
+                     activated, checks the new bitrates, then continues to
+                     shutdown more programs as neccessary untill the total
+                     bandwidth fits within the QAM available bandwidth."
+                ::= { d5VideoQamStreamEntry 42 }
+
+            d5vQamFilterCaDescMode   OBJECT-TYPE
+                SYNTAX    INTEGER {
+                                    cat-and-pmt(1),
+                                    neither(2),
+                                    cat-only(3),
+                                    pmt-only(4)
+                                   }
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "If this is configured, then the D5 will remove
+                     CA_Descriptors from incoming streams destined for this QAM.
+                     This includes descriptors in CAT and PMT tables, and in
+                     the case of PMT includes the 1st and 2nd loop. This is
+                     set to 'neither' by default."
+                ::= { d5VideoQamStreamEntry 43 }
+
+           d5vQamPcrDriftCorrection   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      deprecated
+                DESCRIPTION
+                    "If this is set to TRUE, then PCR drift correction of input
+                     MPEG streams is enabled on the resultant output stream.
+                     Otherwise, the functionality is disabled."
+                ::= { d5VideoQamStreamEntry 44 }
+
+           d5vQamPreEncDetect   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "If this is set to TRUE, then the D5 will detect Motorola
+                     pre-encrypted streams, and will avoid re-encrypting the
+                     traffic when forwarding it downstream. If set to TRUE,
+                     the d5vControlFilterCaDesc setting is ignored for any
+                     pre-encrypted streams that match this rule, because the
+                     stream could not otherwise be decrypted."
+                ::= { d5VideoQamStreamEntry 45 }
+
+            d5vQamUtilPercentThresh OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "The percentage utilization threshold of the QAM bandwidth
+                     at which the D5 will generate an alarm. The purpose of this
+                     is to facilitate monitoring of QAM bandwidth where the QAM
+                     might not necessarily be oversubscribed.
+                    "
+                ::= { d5VideoQamStreamEntry 46 }
+
+            d5vQamOnProgramConflictDisconnectOlderStream OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "If enabled, program conflicts trigger the older of the two
+                     streams to be disconnected.  I.E. the newer stream takes
+                     the program number.
+                     NOTE: this only affects streams which have the same
+                     destination udp&IP values, and differ by source-IP.
+                    "
+                ::= { d5VideoQamStreamEntry 47 }
+
+            d5vQamNullDroppingRate   OBJECT-TYPE
+                SYNTAX      Unsigned32(0..7500)
+                UNITS           "Kbps"
+                MAX-ACCESS  read-write
+                STATUS      deprecated
+                DESCRIPTION
+                    "The rate used when performing NULL packet dropping.
+                     In units of Kbps - setting will be rounded up 
+                     to the nearest 150 Kbps multiple"
+                ::= { d5VideoQamStreamEntry 48 }
+
+
+            d5vQamConfVideoSiStreamTsidRemap OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "The default behaviour of video-si streams is not to remap
+                     the ingress Transport_Stream_id so that the TS_ID in the
+                     PAT matches the value in the other SI tables. Enabling
+                     this parameter, overrides the default behaviour and remaps
+                     the TS_ID in the PAT to the value configured on the QAM
+                     channel.
+                     NOTE: this only affects streams which are configured as
+                     video-si-stream.
+                    "
+                ::= { d5VideoQamStreamEntry 49 }
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- UDP/IP table (root of incoming transport-streams in the MIB)
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    d5VideoUdpIpStreamTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoUdpIpStreamEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This table displays the current incoming Transport Streams and
+                 can be configured with specific rules to override the default
+                 Program Number mappings. This table has a higher precedence
+                 than the d5VideoUdpPortPnTable. If the IP Address associated
+                 with an incoming TS matches a configured entry in this table
+                 then the associated mapping will apply, otherwise the default
+                 mapping from d5vUdpPortPnTable will apply and an dynamic entry
+                 will be created in this table.
+                   Active entries contain a reference to either a specific QAM
+                 or a specific channel-container.  When a stream is treated as
+                 a virtual-program, the d5vIpActiveChanContName field is set to
+                 indicate which channel-container this stream is being mapped
+                 to.  For any individual active entry in this table, either 
+                 d5vIpActiveQamIfIndex or d5vIpActiveChanContName is set - not
+                 both.
+                "
+        ::= { d5VideoObjects 3 }
+
+        d5VideoUdpIpStreamEntry OBJECT-TYPE
+            SYNTAX     D5VideoUdpIpStreamEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5vIpUdpIndex, d5vIpSrcIndex, d5vIpDestIndex }
+            ::= { d5VideoUdpIpStreamTable 1 }
+
+            D5VideoUdpIpStreamEntry ::= SEQUENCE {
+                d5vIpUdpIndex             Unsigned32,
+                d5vIpSrcIndex             IpAddress,
+                d5vIpDestIndex            IpAddress,
+                d5vIpRowStatus            RowStatus,
+                d5vIpTsMibIndex           D5TransportStreamIndex,
+                d5vIpMappingType          D5MappingType,
+                d5vIpConfQamIfIndex       InterfaceIndexOrZero,
+                d5vIpStreamStatus         D5TransportStreamStatus,
+                d5vIpActiveQamIfIndex     InterfaceIndexOrZero,
+                d5vIpActiveChanContName   D5VideoChannelContainerNameType,
+                d5vIpTimeActivated        TimeStamp,
+                d5vIpTimeActive           Counter32,
+                d5vIpTimeDeactivated      TimeStamp,
+                d5vIpConfProgPassThroughEnabled     TruthValue,
+                d5vIpActiveProgPassThroughEnabled   TruthValue,
+                d5vIpConfPidPassThroughEnabled      TruthValue,
+                d5vIpActivePidPassThroughEnabled    TruthValue,
+                d5vIpConfRedundantMulticast         TruthValue,
+                d5vIpActiveRedundantMulticast       TruthValue,
+                d5vIpConfPersistence      D5PersistenceType
+                }
+
+           d5vIpUdpIndex    OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The destination UDP Port to be mapped to the specified QAM
+                     Channel and Program Number.(A value of 0 in a rule means
+                     that the udp-port can be ANY value for pattern-matching)"
+                ::= { d5VideoUdpIpStreamEntry 1 }
+
+           d5vIpSrcIndex    OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The SRC IP address of the TS to be mapped to the specified
+                     QAM Channel and Program Number.(A value of 0 in a rule
+                     means that the src-IP can be ANY value for pattern-matching
+                     )"
+                ::= { d5VideoUdpIpStreamEntry 2 }
+
+           d5vIpDestIndex   OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The DEST IP address of the TS to be mapped to the specified
+                     QAM Channel and Program Number.(A value of 0 in a rule
+                     means that the dest-IP can be ANY value for
+                     pattern-matching)"
+                ::= { d5VideoUdpIpStreamEntry 3 }
+
+            d5vIpRowStatus  OBJECT-TYPE
+                SYNTAX      RowStatus
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The RowStatus for controlling entries in this table."
+                ::= { d5VideoUdpIpStreamEntry 4 }
+
+            d5vIpTsMibIndex    OBJECT-TYPE
+                SYNTAX      D5TransportStreamIndex
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The index of the entry in the d5VideoStreamTable
+                     for corresponding to this table entry."
+                ::= { d5VideoUdpIpStreamEntry 5 }
+
+            d5vIpMappingType   OBJECT-TYPE
+                SYNTAX      D5MappingType
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The type of entry, configured or dynamic."
+                ::= { d5VideoUdpIpStreamEntry 6 }
+
+            d5vIpConfQamIfIndex   OBJECT-TYPE
+                SYNTAX      InterfaceIndexOrZero
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The ifIndex of the QAM channel that this IP transport
+                     stream is configured to be mapped to.  A value of 0
+                     indicates that no mapping is configured."
+                DEFVAL { 0 }
+                ::= { d5VideoUdpIpStreamEntry 7 }
+
+            d5vIpStreamStatus    OBJECT-TYPE
+                SYNTAX      D5TransportStreamStatus
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Current status of this IP Transport stream"
+                ::= { d5VideoUdpIpStreamEntry 8 }
+
+            d5vIpActiveQamIfIndex   OBJECT-TYPE
+                SYNTAX      InterfaceIndexOrZero
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The ifIndex of the QAM channel that this stream is
+                     currently mapped to."
+                ::= { d5VideoUdpIpStreamEntry 9 }
+
+            d5vIpActiveChanContName   OBJECT-TYPE
+                SYNTAX      D5VideoChannelContainerNameType
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The name of the channel-container that this stream is
+                     currently mapped to."
+                ::= { d5VideoUdpIpStreamEntry 10 }
+
+            d5vIpTimeActivated  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when this stream was last activated.
+                           Zero if not-applicable."
+                ::= { d5VideoUdpIpStreamEntry 11 }
+
+            d5vIpTimeActive OBJECT-TYPE
+                SYNTAX          Counter32
+                UNITS           "seconds"
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                    "The total time that MPEG stream has been active."
+                ::= { d5VideoUdpIpStreamEntry 12 }
+
+            d5vIpTimeDeactivated  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when this stream was last
+                     deactivated.  Zero if not-known."
+                ::= { d5VideoUdpIpStreamEntry 13 }
+
+            d5vIpConfProgPassThroughEnabled OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This can be used to configure default PROG remapping
+                     for this stream.  If this is set to TRUE, input PROGs are
+                     mapped to identical output PROGs (as if pass-through
+                     mode were enabled on the QAM).
+                    "
+                DEFVAL {FALSE}
+                ::= { d5VideoUdpIpStreamEntry 14 }
+
+            d5vIpActiveProgPassThroughEnabled   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Indicates if default PROG-remapping is currently
+                     enabled for this stream. (May differ from the value of
+                     d5vIpConfProgPassThroughEnabled where a dynamic entry is
+                     created based on static-rules).
+                    "
+                ::= { d5VideoUdpIpStreamEntry 15 }
+
+            d5vIpConfPidPassThroughEnabled OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This can be used to configure default PID remapping
+                     for this stream.  If this is set to TRUE, input PIDs are
+                     mapped to identical output PIDs (as if pass-through
+                     mode were enabled on the QAM).
+                    "
+                DEFVAL {FALSE}
+                 ::= { d5VideoUdpIpStreamEntry 16 }
+
+            d5vIpActivePidPassThroughEnabled   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Indicates if default PID-remapping is currently
+                     enabled for this stream. (May differ from the value of
+                     d5vIpConfPidPassThroughEnabled where a dynamic entry is
+                     created based on static-rules).
+                    "
+                 ::= { d5VideoUdpIpStreamEntry 17 }
+
+            d5vIpConfRedundantMulticast OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This can be used to configure a video stream for redundancy
+                     May be set to TRUE only if the d5vIpSrcIndex is set to 0
+                     and the d5vIpDestIndex is set to a valid multicast address
+                     and the d5vIpUdpIndex is set to a non-zero value.
+                       When this value is set to TRUE, the D5 WAN card doesn't
+                     distinguish between packets with different srcIp values,
+                     where the d5vIpUdpIndex and d5vIpDestIndex match this rule.
+                    "
+                DEFVAL {FALSE}
+                ::= { d5VideoUdpIpStreamEntry 18 }
+
+            d5vIpActiveRedundantMulticast OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "Indicates if redundant-multicast is currently enabled for
+                     this stream. (May differ from the value of
+                     d5vIpConfRedundantMulticast where a dynamic entry is
+                     created based on static-rules).
+                    "
+                DEFVAL {FALSE}
+                ::= { d5VideoUdpIpStreamEntry 19 }
+
+            d5vIpConfPersistence      OBJECT-TYPE
+                SYNTAX      D5PersistenceType
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This is used to toggle the table entry as being volatile or
+                     non-volatile.  If set to volatile, it is not saved across
+                     card resets.
+                     This setting is only meaningful for entries that have
+                     a d5vIpMappingType of static
+                    "
+                DEFVAL { nonVolatile }
+                ::= { d5VideoUdpIpStreamEntry 20 }
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- MPEG Transport Streams, Programs, Elementary Streams and Descriptor Tables
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    d5VideoStreamTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoStreamEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This table stores basic information on all Transport Streams
+                 in the D5. It covers both incoming and outgoing ones. The MPEG
+                 Manager automatically creates any entry in this table when it
+                 detects a new incoming TS or begins to generate a new outgoing
+                 TS."
+        ::= { d5VideoObjects 4 }
+
+        d5VideoStreamEntry OBJECT-TYPE
+            SYNTAX     D5VideoStreamEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5vStreamDirectionIndex, d5vStreamTsMibIndex}
+            ::= { d5VideoStreamTable 1 }
+
+            D5VideoStreamEntry ::= SEQUENCE {
+                d5vStreamDirectionIndex           D5TransportStreamDirection,
+                d5vStreamTsMibIndex               D5TransportStreamIndex,
+                d5vStreamPatVersion               Unsigned32,
+                d5vStreamTsID                       Unsigned32,
+                d5vStreamProgramCount             Gauge32,
+                d5vStreamPatCurrTimeCreated       TimeStamp,
+                d5vStreamPatCurrTimeActive        Counter32,
+                d5vStreamPatPrevTimeCreated       TimeStamp,
+                d5vStreamCatVersion               Unsigned32,
+                d5vStreamCatCurrTimeCreated       TimeStamp,
+                d5vStreamCatCurrTimeActive        Counter32,
+                d5vStreamCatPrevTimeCreated       TimeStamp
+                }
+
+            d5vStreamDirectionIndex   OBJECT-TYPE
+                SYNTAX      D5TransportStreamDirection
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The direction of this Transport Stream."
+                ::= { d5VideoStreamEntry 1 }
+
+            d5vStreamTsMibIndex   OBJECT-TYPE
+                SYNTAX      D5TransportStreamIndex
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The unique index that identifies the Transport Stream
+                     within the D5."
+                ::= { d5VideoStreamEntry 2 }
+
+            d5vStreamPatVersion   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The version number of the current PAT Table for this
+                     Transport Stream."
+                ::= { d5VideoStreamEntry 3 }
+
+            d5vStreamTsID   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The MPEG transport_stream_id in the PAT tables on this
+                     Transport Stream."
+                ::= { d5VideoStreamEntry 4 }
+
+            d5vStreamProgramCount   OBJECT-TYPE
+                SYNTAX      Gauge32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The  number of Programs currently in this Transport
+                     Stream."
+                ::= { d5VideoStreamEntry 5 }
+
+            d5vStreamPatCurrTimeCreated  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when the current PAT was created.
+                           Zero if not-applicable."
+                ::= { d5VideoStreamEntry 6 }
+
+            d5vStreamPatCurrTimeActive OBJECT-TYPE
+                SYNTAX          Counter32
+                UNITS           "seconds"
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION    "The total time the current PAT has been active."
+                ::= { d5VideoStreamEntry 7 }
+
+            d5vStreamPatPrevTimeCreated  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when the predecessor of this PAT was
+                     created.  Zero if not-known."
+                ::= { d5VideoStreamEntry 8 }
+
+            d5vStreamCatVersion   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The version number of the current CAT Table for this
+                     Transport Stream."
+                ::= { d5VideoStreamEntry 9 }
+
+            d5vStreamCatCurrTimeCreated  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when the current CAT was created.
+                           Zero if not-applicable."
+                ::= { d5VideoStreamEntry 10 }
+
+            d5vStreamCatCurrTimeActive OBJECT-TYPE
+                SYNTAX          Counter32
+                UNITS           "seconds"
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION    "The total time the current CAT has been active."
+                ::= { d5VideoStreamEntry 11 }
+
+            d5vStreamCatPrevTimeCreated  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when the predecessor of this CAT was
+                     created.  Zero if not-known."
+                ::= { d5VideoStreamEntry 12 }
+
+    d5VideoStreamProgramTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoStreamProgramEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This table stores basic information for each Program in each
+                 Transport Stream known to the D5. Each entry in
+                 d5VideoStreamTable will have at least one entry in this table."
+        ::= { d5VideoObjects 5 }
+
+        d5VideoStreamProgramEntry OBJECT-TYPE
+            SYNTAX     D5VideoStreamProgramEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5vStreamProgTsMibIndex, d5vStreamProgIndex}
+            ::= { d5VideoStreamProgramTable 1 }
+
+            D5VideoStreamProgramEntry ::= SEQUENCE {
+                d5vStreamProgTsMibIndex       D5TransportStreamIndex,
+                d5vStreamProgIndex            D5Program,
+                d5vStreamProgPmtVersion       Unsigned32,
+                d5vStreamProgPmtPid           D5PID,
+                d5vStreamProgPcrPid           D5PID,
+                d5vStreamProgEsCount          Gauge32,
+                d5vStreamProgDescCount        Gauge32,
+                d5vStreamPmtCurrTimeCreated   TimeStamp,
+                d5vStreamPmtCurrTimeActive    Counter32,
+                d5vStreamPmtPrevTimeCreated   TimeStamp,
+                d5vStreamProgBitrate          Unsigned32
+                }
+
+            d5vStreamProgTsMibIndex   OBJECT-TYPE
+                SYNTAX      D5TransportStreamIndex
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The unique index that identifies the Transport Stream
+                     containing this Program."
+                ::= { d5VideoStreamProgramEntry 1 }
+
+            d5vStreamProgIndex   OBJECT-TYPE
+                SYNTAX      D5Program
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The Program Number for this program within the associated
+                     Transport Stream."
+                ::= { d5VideoStreamProgramEntry 2 }
+
+            d5vStreamProgPmtVersion   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The version number of the current PMT Table for this
+                     Program."
+                ::= { d5VideoStreamProgramEntry 3 }
+
+            d5vStreamProgPmtPid   OBJECT-TYPE
+                SYNTAX      D5PID
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The MPEG PID used for the PMT Table for this Program."
+                ::= { d5VideoStreamProgramEntry 4 }
+
+            d5vStreamProgPcrPid   OBJECT-TYPE
+                SYNTAX      D5PID
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The MPEG PID used to for the PCR for this Program."
+                ::= { d5VideoStreamProgramEntry 5 }
+
+            d5vStreamProgEsCount   OBJECT-TYPE
+                SYNTAX      Gauge32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The  number of Elementary Streams currently in this
+                     Program."
+                ::= { d5VideoStreamProgramEntry 6 }
+
+            d5vStreamProgDescCount   OBJECT-TYPE
+                SYNTAX      Gauge32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The  number of Descriptors in the PMT 'first_loop' for this
+                     Program."
+                ::= { d5VideoStreamProgramEntry 7 }
+
+            d5vStreamPmtCurrTimeCreated  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when the current PMT was created.
+                           Zero if not-applicable."
+                ::= { d5VideoStreamProgramEntry 8 }
+
+            d5vStreamPmtCurrTimeActive OBJECT-TYPE
+                SYNTAX          Counter32
+                UNITS           "seconds"
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION    "The total time the current PMT has been active."
+                ::= { d5VideoStreamProgramEntry 9 }
+
+            d5vStreamPmtPrevTimeCreated  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when the predecessor of this PMT was
+                     created.  Zero if not-known."
+                ::= { d5VideoStreamProgramEntry 10 }
+
+            d5vStreamProgBitrate    OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The bitate in Kbps, of this Program. This may have a value
+                     of 0 if the bitrate is not known."
+                ::= { d5VideoStreamProgramEntry 11 }
+
+    d5VideoStreamEsTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoStreamEsEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This table stores basic information for each Elementary Stream
+                 in each Transport Stream known to the D5. Each entry in
+                 d5VideoProgTable will have at least one entry in this table.
+                 These entries are created automatically as the D5 processes PMT
+                 table entries for each Elementary Stream in a Program"
+        ::= { d5VideoObjects 6 }
+
+        d5VideoStreamEsEntry OBJECT-TYPE
+            SYNTAX     D5VideoStreamEsEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5vStreamEsTsMibIndex, d5vStreamEsProgIndex,
+                    d5vStreamEsPidIndex}
+            ::= { d5VideoStreamEsTable 1 }
+
+            D5VideoStreamEsEntry ::= SEQUENCE {
+                d5vStreamEsTsMibIndex             D5TransportStreamIndex,
+                d5vStreamEsProgIndex              D5Program,
+                d5vStreamEsPidIndex               D5PID,
+                d5vStreamEsType                   D5ElementaryStreamType,
+                d5vStreamEsDescCount              Gauge32
+                }
+
+            d5vStreamEsTsMibIndex   OBJECT-TYPE
+                SYNTAX      D5TransportStreamIndex
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The unique index that identifies the Transport Stream
+                     containing this Program."
+                ::= { d5VideoStreamEsEntry 1 }
+
+            d5vStreamEsProgIndex   OBJECT-TYPE
+                SYNTAX      D5Program
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The Program Number for this program within the associated
+                     Transport Stream."
+                ::= { d5VideoStreamEsEntry 2 }
+
+            d5vStreamEsPidIndex   OBJECT-TYPE
+                SYNTAX      D5PID
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The MPEG PID used for this Elementary Stream."
+                ::= { d5VideoStreamEsEntry 3 }
+
+            d5vStreamEsType   OBJECT-TYPE
+                SYNTAX      D5ElementaryStreamType
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The  type of this Elementary Streams."
+                ::= { d5VideoStreamEsEntry 4 }
+
+            d5vStreamEsDescCount   OBJECT-TYPE
+                SYNTAX      Gauge32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The  number of Descriptors in the PMT 'second_loop' for
+                     this Elementary Stream."
+                ::= { d5VideoStreamEsEntry 5 }
+
+    d5VideoStreamDescTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoStreamDescEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This table stores MPEG Descriptors for each Elementary Stream
+                 and Program known to the D5. The PMT PID is used to index
+                 Program Descriptors while the Elementary Stream PID is used
+                 when indexing ES Descriptors."
+        ::= { d5VideoObjects 7 }
+
+        d5VideoStreamDescEntry OBJECT-TYPE
+            SYNTAX     D5VideoStreamDescEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5vStreamDescTsMibIndex, d5vStreamDescPidIndex,
+                    d5vStreamDescIndex}
+            ::= { d5VideoStreamDescTable 1 }
+
+            D5VideoStreamDescEntry ::= SEQUENCE {
+                d5vStreamDescTsMibIndex           D5TransportStreamIndex,
+                d5vStreamDescPidIndex             D5PID,
+                d5vStreamDescIndex                D5DescriptorIndex,
+                d5vStreamDescTag                  D5DescriptorTag,
+                d5vStreamDescLen                  INTEGER,
+                d5vStreamDescData                 D5DescriptorBuffer
+                }
+
+            d5vStreamDescTsMibIndex   OBJECT-TYPE
+                SYNTAX      D5TransportStreamIndex
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The unique index that identifies the Transport Stream
+                     containing this Descriptor."
+                ::= { d5VideoStreamDescEntry 1 }
+
+            d5vStreamDescPidIndex   OBJECT-TYPE
+                SYNTAX      D5PID
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The MPEG PID used for this Elementary Stream."
+                ::= { d5VideoStreamDescEntry 2 }
+
+            d5vStreamDescIndex   OBJECT-TYPE
+                SYNTAX      D5DescriptorIndex
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The Descriptor index."
+                ::= { d5VideoStreamDescEntry 3 }
+
+           d5vStreamDescTag   OBJECT-TYPE
+                SYNTAX      D5DescriptorTag
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The Descriptor tag."
+                ::= { d5VideoStreamDescEntry 4 }
+
+           d5vStreamDescLen   OBJECT-TYPE
+                SYNTAX      INTEGER ( 1..255)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The Descriptor length."
+                ::= { d5VideoStreamDescEntry 5 }
+
+            d5vStreamDescData   OBJECT-TYPE
+                SYNTAX      D5DescriptorBuffer
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The Descriptor data."
+                ::= { d5VideoStreamDescEntry 6 }
+
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- Index Lookup tables
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    d5VideoLookupTsidToIfIndexTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoLookupTsidToIfIndexEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This table maps the transport_stream_id of a Transport Stream
+                on a QAM channel to the ifIndex for that channel."
+        ::= { d5VideoObjects 8 }
+
+        d5VideoLookupTsidToIfIndexEntry OBJECT-TYPE
+            SYNTAX     D5VideoLookupTsidToIfIndexEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5vQamTransportStreamID}
+            ::= { d5VideoLookupTsidToIfIndexTable 1 }
+
+            D5VideoLookupTsidToIfIndexEntry ::= SEQUENCE {
+                d5vLookupTsidIfIndex          InterfaceIndex
+                }
+
+            d5vLookupTsidIfIndex   OBJECT-TYPE
+                SYNTAX      InterfaceIndex
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The ifIndex for the QAM channel transmitting this
+                     transport_stream_id."
+                ::= { d5VideoLookupTsidToIfIndexEntry 1 }
+
+    d5VideoLookupTsMibIndexToIfIndexTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoLookupTsMibIndexToIfIndexEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This table maps the TsIndex of an outgoing Transport Stream on
+                 a QAM channel to the ifIndex for that channel. The Transport
+                 Stream is assumed to be an 'outgoing' one."
+        ::= { d5VideoObjects 9 }
+
+        d5VideoLookupTsMibIndexToIfIndexEntry OBJECT-TYPE
+            SYNTAX     D5VideoLookupTsMibIndexToIfIndexEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5vQamTsMibIndex}
+            ::= { d5VideoLookupTsMibIndexToIfIndexTable 1 }
+
+            D5VideoLookupTsMibIndexToIfIndexEntry ::= SEQUENCE {
+                d5vLookupTsIndexIfIndex             InterfaceIndex
+                }
+
+            d5vLookupTsIndexIfIndex   OBJECT-TYPE
+                SYNTAX      InterfaceIndex
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The ifIndex for the QAM channel transmitting this
+                     TransportStreamIndex."
+                ::= { d5VideoLookupTsMibIndexToIfIndexEntry 1 }
+
+    d5VideoLookupQamTsMibIndexToInTsMibIndexTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoLookupQamTsMibIndexToInTsMibIndexEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This table maps the TransportStreamIndex of a Transport Stream
+                on a QAM channel to the corresponding incoming
+                TransportStreamIndexes.
+                  d5vTsMibIndex   - an outgoing Transport Stream
+                  d5vInTsMibIndex - the corresponding incoming Transport
+                                    Stream."
+        ::= { d5VideoObjects 10 }
+
+        d5VideoLookupQamTsMibIndexToInTsMibIndexEntry OBJECT-TYPE
+            SYNTAX     D5VideoLookupQamTsMibIndexToInTsMibIndexEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5vQamTsMibIndex, d5vLookupInTsMibIndex}
+            ::= { d5VideoLookupQamTsMibIndexToInTsMibIndexTable 1 }
+
+            D5VideoLookupQamTsMibIndexToInTsMibIndexEntry ::= SEQUENCE {
+                    d5vLookupInTsMibIndex   D5TransportStreamIndex
+                }
+
+            d5vLookupInTsMibIndex   OBJECT-TYPE
+                SYNTAX      D5TransportStreamIndex
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "MIB TsIndex for an incoming transport stream(IP)."
+                ::= { d5VideoLookupQamTsMibIndexToInTsMibIndexEntry 1 }
+
+    d5VideoLookupTsMibIndexToUdpIpTable  OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoLookupTsMibIndexToUdpIpEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This table maps the TransportStreamIndex of an incoming
+                 Transport Stream to the IP address and UDP port for that
+                 Transport Stream."
+        ::= { d5VideoObjects 11 }
+
+        d5VideoLookupTsMibIndexToUdpIpEntry OBJECT-TYPE
+            SYNTAX     D5VideoLookupTsMibIndexToUdpIpEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5vIpTsMibIndex}
+            ::= { d5VideoLookupTsMibIndexToUdpIpTable 1 }
+
+            D5VideoLookupTsMibIndexToUdpIpEntry ::= SEQUENCE {
+                d5vLookupTsMibIndexUdpPort                Unsigned32,
+                d5vLookupTsMibIndexIpAddressSrc           IpAddress,
+                d5vLookupTsMibIndexIpAddressDest          IpAddress
+                }
+
+            d5vLookupTsMibIndexUdpPort   OBJECT-TYPE
+                SYNTAX      Unsigned32 (1..65535)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The UDP receiving the Transport Stream for
+                     TransportStreamIndex."
+                ::= { d5VideoLookupTsMibIndexToUdpIpEntry 1 }
+
+            d5vLookupTsMibIndexIpAddressSrc   OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The SRC IP address receiving the Transport Stream for
+                     TransportStreamIndex."
+                ::= { d5VideoLookupTsMibIndexToUdpIpEntry 2 }
+
+            d5vLookupTsMibIndexIpAddressDest   OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The DEST IP address receiving the Transport Stream for
+                     TransportStreamIndex."
+                ::= { d5VideoLookupTsMibIndexToUdpIpEntry 3 }
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- Tables of per udp/ip PID/PROG remappings to particular QAMs
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    d5VideoUdpIpStreamProgRemapTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoUdpIpStreamProgRemapEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This table displays the active Program mappings for Transport
+                 Streams. It is indexed using udp/ip/ip/inProg/qamIfIndex to
+                 support multiple output programs for each input program."
+        ::= { d5VideoObjects 12 }
+
+        d5VideoUdpIpStreamProgRemapEntry OBJECT-TYPE
+            SYNTAX     D5VideoUdpIpStreamProgRemapEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5vProgRemapUdpIndex, d5vProgRemapIpSrcIndex,
+                    d5vProgRemapIpDestIndex, d5vProgRemapInProgIndex,
+                    d5vProgRemapActiveQamIfIndex, d5vProgRemapOutProg
+                  }
+            ::= { d5VideoUdpIpStreamProgRemapTable 1 }
+
+            D5VideoUdpIpStreamProgRemapEntry ::= SEQUENCE {
+                d5vProgRemapUdpIndex           Unsigned32,
+                d5vProgRemapIpSrcIndex         IpAddress,
+                d5vProgRemapIpDestIndex        IpAddress,
+                d5vProgRemapInProgIndex        D5Program,
+                d5vProgRemapActiveQamIfIndex   InterfaceIndex,
+                d5vProgRemapOutProg            D5Program,
+                d5vProgRemapStatus             D5ProgStatus,
+                d5vProgRemapActiveProgType     D5ProgType,
+                d5vProgRemapTimeActivated      TimeStamp,
+                d5vProgRemapTimeActive         Counter32,
+                d5vProgRemapTimeDeactivated    TimeStamp
+                }
+
+           d5vProgRemapUdpIndex   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The destination UDP Port of the incoming TS."
+                ::= { d5VideoUdpIpStreamProgRemapEntry 1 }
+
+           d5vProgRemapIpSrcIndex   OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The SRC IP address of the incoming TS."
+                ::= { d5VideoUdpIpStreamProgRemapEntry 2 }
+
+           d5vProgRemapIpDestIndex   OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The DEST IP address of the incoming TS."
+                ::= { d5VideoUdpIpStreamProgRemapEntry 3 }
+
+           d5vProgRemapInProgIndex   OBJECT-TYPE
+                SYNTAX      D5Program
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The incoming Program value related to this Program
+                     remapping."
+                ::= { d5VideoUdpIpStreamProgRemapEntry 4 }
+
+           d5vProgRemapActiveQamIfIndex   OBJECT-TYPE
+                SYNTAX      InterfaceIndex
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The ifIndex of the QAM channel that this Program remapping
+                     applies to."
+                ::= { d5VideoUdpIpStreamProgRemapEntry 5 }
+
+           d5vProgRemapOutProg   OBJECT-TYPE
+                SYNTAX      D5Program
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The output Program value related to this Program mapping
+                     rule."
+                ::= { d5VideoUdpIpStreamProgRemapEntry 6 }
+
+           d5vProgRemapStatus    OBJECT-TYPE
+                SYNTAX      D5ProgStatus
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Current status of this Program - whether active or not"
+                ::= { d5VideoUdpIpStreamProgRemapEntry 7 }
+
+           d5vProgRemapActiveProgType  OBJECT-TYPE
+                SYNTAX      D5ProgType
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The type of Program whether PSI or Elementary stream."
+                ::= { d5VideoUdpIpStreamProgRemapEntry 8 }
+
+           d5vProgRemapTimeActivated  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when this Program was last
+                     activated.  Zero if not-applicable."
+                ::= { d5VideoUdpIpStreamProgRemapEntry 9 }
+
+           d5vProgRemapTimeActive OBJECT-TYPE
+                SYNTAX          Counter32
+                UNITS           "seconds"
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                    "The total time that the Program has been active."
+                ::= { d5VideoUdpIpStreamProgRemapEntry 10 }
+
+           d5vProgRemapTimeDeactivated  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when this Program was last
+                     deactivated.  Zero if not-known."
+                ::= { d5VideoUdpIpStreamProgRemapEntry 11 }
+
+    d5VideoUdpIpStreamPidRemapTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoUdpIpStreamPidRemapEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This table displays the active PID mappings for Transport
+                 Streams. It is indexed using udp/ip/ip/inPid/qamIfIndex to
+                 support multiple output programs for each input program."
+        ::= { d5VideoObjects 13 }
+
+        d5VideoUdpIpStreamPidRemapEntry OBJECT-TYPE
+            SYNTAX     D5VideoUdpIpStreamPidRemapEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5vPidRemapUdpIndex, d5vPidRemapIpSrcIndex,
+                    d5vPidRemapIpDestIndex, d5vPidRemapInPidIndex,
+                    d5vPidRemapActiveQamIfIndex, d5vPidRemapOutPid
+                  }
+            ::= { d5VideoUdpIpStreamPidRemapTable 1 }
+
+            D5VideoUdpIpStreamPidRemapEntry ::= SEQUENCE {
+                d5vPidRemapUdpIndex           Unsigned32,
+                d5vPidRemapIpSrcIndex         IpAddress,
+                d5vPidRemapIpDestIndex        IpAddress,
+                d5vPidRemapInPidIndex         D5PID,
+                d5vPidRemapActiveQamIfIndex   InterfaceIndex,
+                d5vPidRemapOutPid             D5PID,
+                d5vPidRemapStatus             D5PidStatus,
+                d5vPidRemapActivePidType      D5PidType,
+                d5vPidRemapTimeActivated      TimeStamp,
+                d5vPidRemapTimeActive         Counter32,
+                d5vPidRemapTimeDeactivated    TimeStamp
+                }
+
+           d5vPidRemapUdpIndex   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The destination UDP Port of the incoming TS."
+                ::= { d5VideoUdpIpStreamPidRemapEntry 1 }
+
+           d5vPidRemapIpSrcIndex   OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The SRC IP address of the incoming TS."
+                ::= { d5VideoUdpIpStreamPidRemapEntry 2 }
+
+           d5vPidRemapIpDestIndex   OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The DEST IP address of the incoming TS."
+                ::= { d5VideoUdpIpStreamPidRemapEntry 3 }
+
+           d5vPidRemapInPidIndex   OBJECT-TYPE
+                SYNTAX      D5PID
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The incoming PID value related to this PID remapping."
+                ::= { d5VideoUdpIpStreamPidRemapEntry 4 }
+
+           d5vPidRemapActiveQamIfIndex   OBJECT-TYPE
+                SYNTAX      InterfaceIndex
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The ifIndex of the QAM channel that this PID remapping
+                     applies to."
+                ::= { d5VideoUdpIpStreamPidRemapEntry 5 }
+
+           d5vPidRemapOutPid   OBJECT-TYPE
+                SYNTAX      D5PID
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The output PID value related to this PID mapping rule."
+                ::= { d5VideoUdpIpStreamPidRemapEntry 6 }
+
+           d5vPidRemapStatus    OBJECT-TYPE
+                SYNTAX      D5PidStatus
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Current status of this PID - whether active or not"
+                ::= { d5VideoUdpIpStreamPidRemapEntry 7 }
+
+           d5vPidRemapActivePidType  OBJECT-TYPE
+                SYNTAX      D5PidType
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The type of PID whether PSI or Elementary stream."
+                ::= { d5VideoUdpIpStreamPidRemapEntry 8 }
+
+           d5vPidRemapTimeActivated  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when this PID was last activated.
+                           Zero if not-applicable."
+                ::= { d5VideoUdpIpStreamPidRemapEntry 9 }
+
+           d5vPidRemapTimeActive OBJECT-TYPE
+                SYNTAX          Counter32
+                UNITS           "seconds"
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION    "The total time that the PID has been active."
+                ::= { d5VideoUdpIpStreamPidRemapEntry 10 }
+
+           d5vPidRemapTimeDeactivated  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when this PID was last deactivated.
+                           Zero if not-known."
+                ::= { d5VideoUdpIpStreamPidRemapEntry 11 }
+
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- Configured remapping/filtering Rules based on QAM port
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    d5VideoRuleQamProgRemapTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoRuleQamProgRemapEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Table contains list of qam-channel based configured program
+                 remapping rules."
+        ::= { d5VideoObjects 14 }
+
+        d5VideoRuleQamProgRemapEntry OBJECT-TYPE
+            SYNTAX     D5VideoRuleQamProgRemapEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { ifIndex, d5vProgRemapInProgIndex }
+            ::= { d5VideoRuleQamProgRemapTable 1 }
+
+            D5VideoRuleQamProgRemapEntry ::= SEQUENCE {
+                d5vRQamProgRowStatus          RowStatus,
+                d5vRQamProgOutProg            D5Program,
+                d5vRQamProgMatchLastTime      TimeStamp,
+                d5vRQamProgMatchCount         Counter32,
+                d5vRQamProgPersistence        D5PersistenceType
+                }
+
+           d5vRQamProgRowStatus   OBJECT-TYPE
+                SYNTAX      RowStatus
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The RowStatus for controlling entries in this table."
+                ::= { d5VideoRuleQamProgRemapEntry 1 }
+
+           d5vRQamProgOutProg   OBJECT-TYPE
+                SYNTAX      D5Program
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The output Program value related to this rule."
+                ::= { d5VideoRuleQamProgRemapEntry 2 }
+
+           d5vRQamProgMatchLastTime  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when this rule was last
+                     matched/used at run-time.  Zero if not-applicable."
+                ::= { d5VideoRuleQamProgRemapEntry 3 }
+
+           d5vRQamProgMatchCount  OBJECT-TYPE
+                SYNTAX      Counter32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The number of times this rule was matched/used at
+                     run-time.  Zero if not-applicable."
+                ::= { d5VideoRuleQamProgRemapEntry 4 }
+
+           d5vRQamProgPersistence      OBJECT-TYPE
+                SYNTAX      D5PersistenceType
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This is used to toggle the table entry as being volatile or
+                     non-volatile.  If set to volatile, it is not saved across
+                     card resets.
+                    "
+                DEFVAL { nonVolatile }
+                ::= { d5VideoRuleQamProgRemapEntry 5 }
+
+    d5VideoRuleQamProgFilterTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoRuleQamProgFilterEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Table contains list of qam-channel based configured program
+                 filter rules."
+        ::= { d5VideoObjects 15 }
+
+        d5VideoRuleQamProgFilterEntry OBJECT-TYPE
+            SYNTAX     D5VideoRuleQamProgFilterEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { ifIndex, d5vProgRemapInProgIndex }
+            ::= { d5VideoRuleQamProgFilterTable 1 }
+
+            D5VideoRuleQamProgFilterEntry ::= SEQUENCE {
+                d5vRQamProgFiltRowStatus          RowStatus,
+                d5vRQamProgFiltMatchLastTime      TimeStamp,
+                d5vRQamProgFiltMatchCount         Counter32,
+                d5vRQamProgFiltPersistence        D5PersistenceType
+                }
+
+           d5vRQamProgFiltRowStatus   OBJECT-TYPE
+                SYNTAX      RowStatus
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The RowStatus for controlling entries in this table."
+                ::= { d5VideoRuleQamProgFilterEntry 1 }
+
+           d5vRQamProgFiltMatchLastTime  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when this rule was last matched/used
+                     at run-time.  Zero if not-applicable."
+                ::= { d5VideoRuleQamProgFilterEntry 2 }
+
+           d5vRQamProgFiltMatchCount  OBJECT-TYPE
+                SYNTAX      Counter32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The number of times this rule was matched/used at run-time.
+                           Zero if not-applicable."
+                ::= { d5VideoRuleQamProgFilterEntry 3 }
+
+           d5vRQamProgFiltPersistence      OBJECT-TYPE
+                SYNTAX      D5PersistenceType
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This is used to toggle the table entry as being volatile or
+                     non-volatile.  If set to volatile, it is not saved across
+                     card resets.
+                    "
+                DEFVAL { nonVolatile }
+                ::= { d5VideoRuleQamProgFilterEntry 4 }
+
+    d5VideoRuleQamPidRemapTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoRuleQamPidRemapEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Table contains list of qam-channel based configured PID
+                 remapping rules."
+        ::= { d5VideoObjects 16 }
+
+        d5VideoRuleQamPidRemapEntry OBJECT-TYPE
+            SYNTAX     D5VideoRuleQamPidRemapEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { ifIndex, d5vPidRemapInPidIndex }
+            ::= { d5VideoRuleQamPidRemapTable 1 }
+
+            D5VideoRuleQamPidRemapEntry ::= SEQUENCE {
+                d5vRQamPidRowStatus         RowStatus,
+                d5vRQamPidOutPid            D5PID,
+                d5vRQamPidLastMatchTime     TimeStamp,
+                d5vRQamPidMatchCount        Counter32,
+                d5vRQamPidPersistence       D5PersistenceType
+                }
+
+           d5vRQamPidRowStatus   OBJECT-TYPE
+                SYNTAX      RowStatus
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The RowStatus for controlling entries in this table."
+                ::= { d5VideoRuleQamPidRemapEntry 1 }
+
+           d5vRQamPidOutPid   OBJECT-TYPE
+                SYNTAX      D5PID
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The output PID value related to this rule."
+                ::= { d5VideoRuleQamPidRemapEntry 2 }
+
+           d5vRQamPidLastMatchTime  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when this rule was last
+                     matched/used at run-time.  Zero if not-applicable."
+                ::= { d5VideoRuleQamPidRemapEntry 3 }
+
+           d5vRQamPidMatchCount  OBJECT-TYPE
+                SYNTAX      Counter32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The number of times this rule was matched/used at
+                     run-time.  Zero if not-applicable."
+                ::= { d5VideoRuleQamPidRemapEntry 4 }
+
+           d5vRQamPidPersistence      OBJECT-TYPE
+                SYNTAX      D5PersistenceType
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This is used to toggle the table entry as being volatile or
+                     non-volatile.  If set to volatile, it is not saved across
+                     card resets.
+                    "
+                DEFVAL { nonVolatile }
+                ::= { d5VideoRuleQamPidRemapEntry 5 }
+
+    d5VideoRuleQamPidFilterTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoRuleQamPidFilterEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Table contains list of qam-channel based configured PID filter
+                 rules."
+        ::= { d5VideoObjects 17 }
+
+        d5VideoRuleQamPidFilterEntry OBJECT-TYPE
+            SYNTAX     D5VideoRuleQamPidFilterEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { ifIndex, d5vPidRemapInPidIndex }
+            ::= { d5VideoRuleQamPidFilterTable 1 }
+
+            D5VideoRuleQamPidFilterEntry ::= SEQUENCE {
+                d5vRQamPidFiltRowStatus         RowStatus,
+                d5vRQamPidFiltLastMatchTime     TimeStamp,
+                d5vRQamPidFiltMatchCount        Counter32,
+                d5vRQamPidFiltPersistence       D5PersistenceType
+                }
+
+           d5vRQamPidFiltRowStatus   OBJECT-TYPE
+                SYNTAX      RowStatus
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The RowStatus for controlling entries in this table."
+                ::= { d5VideoRuleQamPidFilterEntry 1 }
+
+           d5vRQamPidFiltLastMatchTime  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when this rule was last matched/used
+                     at run-time.  Zero if not-applicable."
+                ::= { d5VideoRuleQamPidFilterEntry 2 }
+
+           d5vRQamPidFiltMatchCount  OBJECT-TYPE
+                SYNTAX      Counter32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The number of times this rule was matched/used at run-time.
+                           Zero if not-applicable."
+                ::= { d5VideoRuleQamPidFilterEntry 3 }
+
+           d5vRQamPidFiltPersistence      OBJECT-TYPE
+                SYNTAX      D5PersistenceType
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This is used to toggle the table entry as being volatile or
+                     non-volatile.  If set to volatile, it is not saved across
+                     card resets.
+                    "
+                DEFVAL { nonVolatile }
+                ::= { d5VideoRuleQamPidFilterEntry 4 }
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- Configured remapping/filtering Rules based on UDP/IP identification
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    d5VideoRuleUdpIpProgFilterTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoRuleUdpIpProgFilterEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Table contains list of UDP/IP based configured program filter
+                 rules."
+        ::= { d5VideoObjects 18 }
+
+        d5VideoRuleUdpIpProgFilterEntry OBJECT-TYPE
+            SYNTAX     D5VideoRuleUdpIpProgFilterEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5vProgRemapUdpIndex, d5vProgRemapIpSrcIndex,
+                    d5vProgRemapIpDestIndex, d5vProgRemapInProgIndex }
+            ::= { d5VideoRuleUdpIpProgFilterTable 1 }
+
+            D5VideoRuleUdpIpProgFilterEntry ::= SEQUENCE {
+                d5vRUdpIpProgFiltRowStatus          RowStatus,
+                d5vRUdpIpProgFiltMatchLastTime      TimeStamp,
+                d5vRUdpIpProgFiltMatchCount         Counter32,
+                d5vRUdpIpProgFiltPersistence        D5PersistenceType
+                }
+
+           d5vRUdpIpProgFiltRowStatus   OBJECT-TYPE
+                SYNTAX      RowStatus
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The RowStatus for controlling entries in this table."
+                ::= { d5VideoRuleUdpIpProgFilterEntry 1 }
+
+           d5vRUdpIpProgFiltMatchLastTime  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when this rule was last matched/used
+                     at run-time.  Zero if not-applicable."
+                ::= { d5VideoRuleUdpIpProgFilterEntry 2 }
+
+           d5vRUdpIpProgFiltMatchCount  OBJECT-TYPE
+                SYNTAX      Counter32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The number of times this rule was matched/used at run-time.
+                           Zero if not-applicable."
+                ::= { d5VideoRuleUdpIpProgFilterEntry 3 }
+
+           d5vRUdpIpProgFiltPersistence      OBJECT-TYPE
+                SYNTAX      D5PersistenceType
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This is used to toggle the table entry as being volatile or
+                     non-volatile.  If set to volatile, it is not saved across
+                     card resets.
+                    "
+                DEFVAL { nonVolatile }
+                ::= { d5VideoRuleUdpIpProgFilterEntry 4 }
+
+    d5VideoRuleUdpIpPidFilterTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoRuleUdpIpPidFilterEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Table contains list of UDP/IP based configured PID filter
+                 rules."
+        ::= { d5VideoObjects 19 }
+
+        d5VideoRuleUdpIpPidFilterEntry OBJECT-TYPE
+            SYNTAX     D5VideoRuleUdpIpPidFilterEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5vPidRemapUdpIndex, d5vPidRemapIpSrcIndex,
+                    d5vPidRemapIpDestIndex, d5vPidRemapInPidIndex }
+            ::= { d5VideoRuleUdpIpPidFilterTable 1 }
+
+            D5VideoRuleUdpIpPidFilterEntry ::= SEQUENCE {
+                d5vRUdpIpPidFiltRowStatus         RowStatus,
+                d5vRUdpIpPidFiltLastMatchTime     TimeStamp,
+                d5vRUdpIpPidFiltMatchCount        Counter32,
+                d5vRUdpIpPidFiltPersistence       D5PersistenceType
+                }
+
+           d5vRUdpIpPidFiltRowStatus   OBJECT-TYPE
+                SYNTAX      RowStatus
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The RowStatus for controlling entries in this table."
+                ::= { d5VideoRuleUdpIpPidFilterEntry 1 }
+
+           d5vRUdpIpPidFiltLastMatchTime  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when this rule was last matched/used
+                     at run-time.  Zero if not-applicable."
+                ::= { d5VideoRuleUdpIpPidFilterEntry 2 }
+
+           d5vRUdpIpPidFiltMatchCount  OBJECT-TYPE
+                SYNTAX      Counter32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The number of times this rule was matched/used at run-time.
+                           Zero if not-applicable."
+                ::= { d5VideoRuleUdpIpPidFilterEntry 3 }
+
+           d5vRUdpIpPidFiltPersistence      OBJECT-TYPE
+                SYNTAX      D5PersistenceType
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This is used to toggle the table entry as being volatile or
+                     non-volatile.  If set to volatile, it is not saved across
+                     card resets.
+                    "
+                DEFVAL { nonVolatile }
+                ::= { d5VideoRuleUdpIpPidFilterEntry 4 }
+
+    d5VideoRuleUdpIpProgRemapTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoRuleUdpIpProgRemapEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Table contains list of udp/ip based configured program
+                 remapping rules."
+        ::= { d5VideoObjects 20 }
+
+        d5VideoRuleUdpIpProgRemapEntry OBJECT-TYPE
+            SYNTAX     D5VideoRuleUdpIpProgRemapEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5vRUdpIpProgUdpIndex,    d5vRUdpIpProgIpSrcIndex,
+                    d5vRUdpIpProgIpDestIndex, d5vRUdpIpProgInProgIndex
+                  }
+            ::= { d5VideoRuleUdpIpProgRemapTable 1 }
+
+            D5VideoRuleUdpIpProgRemapEntry ::= SEQUENCE {
+                d5vRUdpIpProgUdpIndex           Unsigned32,
+                d5vRUdpIpProgIpSrcIndex         IpAddress,
+                d5vRUdpIpProgIpDestIndex        IpAddress,
+                d5vRUdpIpProgInProgIndex        D5Program,
+                d5vRUdpIpProgRowStatus          RowStatus,
+                d5vRUdpIpProgOutProg            D5Program,
+                d5vRUdpIpProgMatchLastTime      TimeStamp,
+                d5vRUdpIpProgMatchCount         Counter32,
+                d5vRUdpIpProgPersistence        D5PersistenceType,
+                d5vRUdpIpProgExpectedBitrate    Unsigned32
+                }
+
+           d5vRUdpIpProgUdpIndex   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The destination UDP Port of the incoming TS.(A value of 0
+                     in a rule means that the udp-port can be ANY value for
+                     pattern-matching)"
+                ::= { d5VideoRuleUdpIpProgRemapEntry 1 }
+
+           d5vRUdpIpProgIpSrcIndex   OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The SRC IP address of the incoming TS.(NOTE: a value of
+                     '0' here indicates a don't care value for
+                     pattern-matching)"
+                ::= { d5VideoRuleUdpIpProgRemapEntry 2 }
+
+           d5vRUdpIpProgIpDestIndex   OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The DEST IP address of the incoming TS.(NOTE: a value of
+                     '0' here indicates a don't care value for
+                     pattern-matching)"
+                ::= { d5VideoRuleUdpIpProgRemapEntry 3 }
+
+           d5vRUdpIpProgInProgIndex   OBJECT-TYPE
+                SYNTAX      D5Program
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The incoming Program value related to this Program
+                     remapping."
+                ::= { d5VideoRuleUdpIpProgRemapEntry 4 }
+
+           d5vRUdpIpProgRowStatus   OBJECT-TYPE
+                SYNTAX      RowStatus
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The RowStatus for controlling entries in this table."
+                ::= { d5VideoRuleUdpIpProgRemapEntry 5 }
+
+           d5vRUdpIpProgOutProg   OBJECT-TYPE
+                SYNTAX      D5Program
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The output Program value related to this Program mapping
+                     rule."
+                ::= { d5VideoRuleUdpIpProgRemapEntry 6 }
+
+           d5vRUdpIpProgMatchLastTime  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when this rule was last
+                     matched/used at run-time.  Zero if not-applicable."
+                ::= { d5VideoRuleUdpIpProgRemapEntry 7 }
+
+           d5vRUdpIpProgMatchCount  OBJECT-TYPE
+                SYNTAX      Counter32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The number of times this rule was matched/used at
+                     run-time.  Zero if not-applicable."
+                ::= { d5VideoRuleUdpIpProgRemapEntry 8 }
+
+           d5vRUdpIpProgPersistence      OBJECT-TYPE
+                SYNTAX      D5PersistenceType
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This is used to toggle the table entry as being volatile or
+                     non-volatile.  If set to volatile, it is not saved across
+                     card resets.
+                    "
+                DEFVAL { nonVolatile }
+                ::= { d5VideoRuleUdpIpProgRemapEntry 9 }
+
+           d5vRUdpIpProgExpectedBitrate      OBJECT-TYPE
+                SYNTAX      Unsigned32(0..65535)
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The expected bitate in Kbps, of the video program. If this
+                     is set it is used to calculate the initial jitter-buffer
+                     size to be used for the program when it is activated.
+                    (may be set to 0 to indicated an unknown value)"
+                DEFVAL { 0 }
+                ::= { d5VideoRuleUdpIpProgRemapEntry 10 }
+
+    d5VideoRuleUdpIpPidRemapTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoRuleUdpIpPidRemapEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Table contains list of udp/ip based configured pid
+                 remapping rules."
+        ::= { d5VideoObjects 21 }
+
+        d5VideoRuleUdpIpPidRemapEntry OBJECT-TYPE
+            SYNTAX     D5VideoRuleUdpIpPidRemapEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5vRUdpIpPidUdpIndex, d5vRUdpIpPidIpSrcIndex,
+                    d5vRUdpIpPidIpDestIndex, d5vRUdpIpPidInPidIndex}
+            ::= { d5VideoRuleUdpIpPidRemapTable 1 }
+
+            D5VideoRuleUdpIpPidRemapEntry ::= SEQUENCE {
+                d5vRUdpIpPidUdpIndex           Unsigned32,
+                d5vRUdpIpPidIpSrcIndex         IpAddress,
+                d5vRUdpIpPidIpDestIndex        IpAddress,
+                d5vRUdpIpPidInPidIndex         D5PID,
+                d5vRUdpIpPidRowStatus          RowStatus,
+                d5vRUdpIpPidOutPid             D5PID,
+                d5vRUdpIpPidMatchLastTime      TimeStamp,
+                d5vRUdpIpPidMatchCount         Counter32,
+                d5vRUdpIpPidPersistence        D5PersistenceType
+                }
+
+           d5vRUdpIpPidUdpIndex   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The destination UDP Port of the incoming TS.(A value of 0
+                     in a rule means that the udp-port can be ANY value for
+                     pattern-matching)"
+                ::= { d5VideoRuleUdpIpPidRemapEntry 1 }
+
+           d5vRUdpIpPidIpSrcIndex   OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The SRC IP address of the incoming TS.(NOTE: a value of '0'
+                     here indicates a don't care value for pattern-matching
+                     rules)"
+                ::= { d5VideoRuleUdpIpPidRemapEntry 2 }
+
+           d5vRUdpIpPidIpDestIndex   OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The DEST IP address of the incoming TS.(NOTE: a value of
+                     '0' here indicates a don't care value for pattern-matching
+                     rules)"
+                ::= { d5VideoRuleUdpIpPidRemapEntry 3 }
+
+           d5vRUdpIpPidInPidIndex   OBJECT-TYPE
+                SYNTAX      D5PID
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The incoming PID value related to this PID remapping."
+                ::= { d5VideoRuleUdpIpPidRemapEntry 4 }
+
+           d5vRUdpIpPidRowStatus   OBJECT-TYPE
+                SYNTAX      RowStatus
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The RowStatus for controlling entries in this table."
+                ::= { d5VideoRuleUdpIpPidRemapEntry 5 }
+
+           d5vRUdpIpPidOutPid   OBJECT-TYPE
+                SYNTAX      D5PID
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The output PID value related to this PID mapping rule."
+                ::= { d5VideoRuleUdpIpPidRemapEntry 6 }
+
+           d5vRUdpIpPidMatchLastTime  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when this rule was last
+                     matched/used at run-time.  Zero if not-applicable."
+                ::= { d5VideoRuleUdpIpPidRemapEntry 7 }
+
+           d5vRUdpIpPidMatchCount  OBJECT-TYPE
+                SYNTAX      Counter32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The number of times this rule was matched/used at
+                     run-time.  Zero if not-applicable."
+                ::= { d5VideoRuleUdpIpPidRemapEntry 8 }
+
+           d5vRUdpIpPidPersistence      OBJECT-TYPE
+                SYNTAX      D5PersistenceType
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This is used to toggle the table entry as being volatile or
+                     non-volatile.  If set to volatile, it is not saved across
+                     card resets.
+                    "
+                DEFVAL { nonVolatile }
+                ::= { d5VideoRuleUdpIpPidRemapEntry 9 }
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- SI-STREAM table (For controlling statically allocated streams that provide
+--                  (P)SI tables for the QAM channel out-of-band to the actual
+--                  video and audio streams
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    d5VideoUdpIpSiStreamTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoUdpIpSiStreamEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This table displays the statically allocated SI-streams.
+                 SI-streams are dedicated IP streams that provide SI table for
+                 a particular QAM channel.  The data in an SI stream is sent to
+                 the QAM without any PID remapping and it is assumed that the
+                 SI-stream does not conflict with any elementary-streams, or
+                 auto-generated (P)SI tables.
+                 SI-streams are typically used when (P)SI table auto-generation
+                 is disabled on the D5.
+                   The variables d5vIpSiConfQamIfIndex and
+                 d5vIpSiConfChanContName are mutually exclusive, where a value
+                 of 0 for ifIndex or 0-length for d5vIpSiConfChanContName can be
+                 used to indicate an unspecified value."
+        ::= { d5VideoObjects 22 }
+
+        d5VideoUdpIpSiStreamEntry OBJECT-TYPE
+            SYNTAX     D5VideoUdpIpSiStreamEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5vIpUdpSiIndex, d5vIpSrcSiIndex, d5vIpDestSiIndex }
+            ::= { d5VideoUdpIpSiStreamTable 1 }
+
+            D5VideoUdpIpSiStreamEntry ::= SEQUENCE {
+                d5vIpUdpSiIndex             Unsigned32,
+                d5vIpSrcSiIndex             IpAddress,
+                d5vIpDestSiIndex            IpAddress,
+                d5vIpSiRowStatus            RowStatus,
+                d5vIpSiTsMibIndex           D5TransportStreamIndex,
+                d5vIpSiConfQamIfIndex       InterfaceIndexOrZero,
+                d5vIpSiConfChanContName     D5VideoChannelContainerNameType,
+                d5vIpSiStreamStatus         D5TransportStreamStatus,
+                d5vIpSiTimeActivated        TimeStamp,
+                d5vIpSiTimeActive           Counter32,
+                d5vIpSiTimeDeactivated      TimeStamp,
+                d5vIpSiPersistence          D5PersistenceType,
+                d5vIpSiCopyback             Unsigned32
+                }
+
+           d5vIpUdpSiIndex    OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The destination UDP Port to be mapped to the specified QAM
+                     Channel and Program Number."
+                ::= { d5VideoUdpIpSiStreamEntry 1 }
+
+           d5vIpSrcSiIndex    OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The SRC IP address of the SI TS to be mapped to the
+                     specified QAM Channel and Program Number."
+                ::= { d5VideoUdpIpSiStreamEntry 2 }
+
+           d5vIpDestSiIndex   OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The DEST IP address of the SI TS to be mapped to the
+                     specified QAM Channel and Program Number."
+                ::= { d5VideoUdpIpSiStreamEntry 3 }
+
+            d5vIpSiRowStatus  OBJECT-TYPE
+                SYNTAX      RowStatus
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The RowStatus for controlling entries in this table."
+                ::= { d5VideoUdpIpSiStreamEntry 4 }
+
+            d5vIpSiTsMibIndex    OBJECT-TYPE
+                SYNTAX      D5TransportStreamIndex
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The index of the entry in the d5VideoStreamTable
+                     for corresponding to this table entry."
+                ::= { d5VideoUdpIpSiStreamEntry 5 }
+
+            d5vIpSiConfQamIfIndex   OBJECT-TYPE
+                SYNTAX      InterfaceIndexOrZero
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The ifIndex of the QAM channel that this SI-stream is
+                     configured to be mapped to."
+                ::= { d5VideoUdpIpSiStreamEntry 6 }
+
+            d5vIpSiConfChanContName   OBJECT-TYPE
+                SYNTAX      D5VideoChannelContainerNameType
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The name of the channel-container that this SI-stream
+                     is configured to be mapped to."
+                ::= { d5VideoUdpIpSiStreamEntry 7 }
+
+            d5vIpSiStreamStatus    OBJECT-TYPE
+                SYNTAX      D5TransportStreamStatus
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Current status of this IP SI Transport stream"
+                ::= { d5VideoUdpIpSiStreamEntry 8 }
+
+            d5vIpSiTimeActivated  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when this stream was last activated.
+                           Zero if not-applicable."
+                ::= { d5VideoUdpIpSiStreamEntry 9 }
+
+            d5vIpSiTimeActive OBJECT-TYPE
+                SYNTAX          Counter32
+                UNITS           "seconds"
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                    "The total time that MPEG stream has been active."
+                ::= { d5VideoUdpIpSiStreamEntry 10 }
+
+            d5vIpSiTimeDeactivated  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when this stream was last
+                     deactivated.  Zero if not-known."
+                ::= { d5VideoUdpIpSiStreamEntry 11 }
+
+           d5vIpSiPersistence      OBJECT-TYPE
+                SYNTAX      D5PersistenceType
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This is used to toggle the table entry as being volatile or
+                     non-volatile.  If set to volatile, it is not saved across
+                     card resets.
+                    "
+                DEFVAL { nonVolatile }
+                ::= { d5VideoUdpIpSiStreamEntry 12 }
+
+           d5vIpSiCopyback        OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "This is used to setup the SI stream as an EAS stream.
+                    "
+                DEFVAL { 0 }
+                ::= { d5VideoUdpIpSiStreamEntry 13 }
+
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- Channel-container tables
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    d5VideoChannelContainerTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoChannelContainerEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Table contains list of channel-containers that can be used
+                 to group individual QAM-channels together.  Channel-containers
+                 can serve multiple purposes:
+                   - group qam-channels to which an EMM can be multicast.
+                   - group qam-channels to which an input transport-stream
+                      can be replicated.
+                   - ..."
+        ::= { d5VideoObjects 30 }
+
+        d5VideoChannelContainerEntry OBJECT-TYPE
+            SYNTAX     D5VideoChannelContainerEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5vChanContName }
+            ::= { d5VideoChannelContainerTable 1 }
+
+            D5VideoChannelContainerEntry ::= SEQUENCE {
+                d5vChanContName             D5VideoChannelContainerNameType,
+                d5vChanContRowStatus        RowStatus,
+                d5vChanContServiceId        D5Program,
+                d5vChanContPid              D5PID,
+                d5vChanContPersistence      D5PersistenceType
+                }
+
+            d5vChanContName   OBJECT-TYPE
+                SYNTAX      D5VideoChannelContainerNameType
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "Channel-container identifier."
+                ::= { d5VideoChannelContainerEntry 1 }
+
+            d5vChanContRowStatus   OBJECT-TYPE
+                SYNTAX      RowStatus
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The RowStatus for controlling entries in this table."
+                ::= { d5VideoChannelContainerEntry 2 }
+
+            d5vChanContServiceId   OBJECT-TYPE
+                SYNTAX      D5Program
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "Common program-number used for virtual-programs in this
+                     channel-container.
+                     (may be set to 0 to indicate an unspecified value)"
+                ::= { d5VideoChannelContainerEntry 3 }
+
+            d5vChanContPid   OBJECT-TYPE
+                SYNTAX      D5PID
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "Common PID used for EMM or PDG data in this channel-
+                     container.
+                     (may be set to 0 to indicate an unspecified value)"
+                ::= { d5VideoChannelContainerEntry 4 }
+
+           d5vChanContPersistence      OBJECT-TYPE
+                SYNTAX      D5PersistenceType
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This is used to toggle the table entry as being volatile or
+                     non-volatile.  If set to volatile, it is not saved across
+                     card resets.
+                    "
+                DEFVAL { nonVolatile }
+                ::= { d5VideoChannelContainerEntry 5 }
+
+    d5VideoChannelContainerQamTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoChannelContainerQamEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Table contains list of QAM channel-container group memberships.
+                 A single QAM can be a member of multiple replication groups.
+                 A single QAM can also be a member of the same replication
+                 group multiple times, using different output programs.
+                 The index variables d5vChanContQamIfIndex and
+                 d5vChanContQamTsidIndex must be considered mutually exclusive,
+                 where a value of 0 for either ifIndex or TSID can be used to
+                 indicate an unspecified value. 
+                 One of, but not both of, these must be non-zero in any
+                 particular row, in order to constitute a valid row-index.
+                 "
+        ::= { d5VideoObjects 31 }
+
+        d5VideoChannelContainerQamEntry OBJECT-TYPE
+            SYNTAX     D5VideoChannelContainerQamEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5vChanContName, d5vChanContQamIfIndex,
+                    d5vChanContQamTsidIndex, d5vChanContQamProgIndex
+                  }
+            ::= { d5VideoChannelContainerQamTable 1 }
+
+            D5VideoChannelContainerQamEntry ::= SEQUENCE {
+                d5vChanContQamIfIndex       InterfaceIndexOrZero,
+                d5vChanContQamTsidIndex     Unsigned32,
+                d5vChanContQamProgIndex     D5Program,
+                d5vChanContQamRowStatus     RowStatus,
+                d5vChanContQamPersistence   D5PersistenceType
+                }
+
+            d5vChanContQamIfIndex   OBJECT-TYPE
+                SYNTAX      InterfaceIndexOrZero
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The ifIndex of the QAM channel.
+                    (may be set to 0 to indicated an unspecified value)"
+                ::= { d5VideoChannelContainerQamEntry 1 }
+
+            d5vChanContQamTsidIndex   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "The MPEG transport_stream_id of the QAM-channel.
+                    (may be set to 0 to indicated an unspecified value)"
+                ::= { d5VideoChannelContainerQamEntry 2 }
+
+            d5vChanContQamProgIndex   OBJECT-TYPE
+                SYNTAX      D5Program
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The output program number associated with this membership
+                     rule.
+                    (may be set to 0 to indicated an unspecified value)"
+                ::= { d5VideoChannelContainerQamEntry 3 }
+
+            d5vChanContQamRowStatus   OBJECT-TYPE
+                SYNTAX      RowStatus
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The RowStatus for controlling entries in this table."
+                ::= { d5VideoChannelContainerQamEntry 4 }
+
+           d5vChanContQamPersistence    OBJECT-TYPE
+                SYNTAX      D5PersistenceType
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This is used to toggle the table entry as being volatile or
+                     non-volatile.  If set to volatile, it is not saved across
+                     card resets.
+                    "
+                DEFVAL { nonVolatile }
+                ::= { d5VideoChannelContainerQamEntry 5 }
+
+
+    d5VideoChannelContainerVirtProgTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoChannelContainerVirtProgEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Table contains list of virtual programs with their associated
+                 channel-container names.  Virtual programs are used for
+                 creating replications where individual input streams are
+                 copied to to multiple concurrent output QAMs/Programs.
+                 (NOTE: a virtual-program can belong to no more than 1
+                  channel-containers)"
+        ::= { d5VideoObjects 32 }
+
+        d5VideoChannelContainerVirtProgEntry OBJECT-TYPE
+            SYNTAX     D5VideoChannelContainerVirtProgEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5vChanContVProgUdpIndex, d5vChanContVProgSrcIpIndex,
+                    d5vChanContVProgDestIpIndex }
+            ::= { d5VideoChannelContainerVirtProgTable 1 }
+
+            D5VideoChannelContainerVirtProgEntry ::= SEQUENCE {
+                d5vChanContVProgUdpIndex        Unsigned32,
+                d5vChanContVProgSrcIpIndex      IpAddress,
+                d5vChanContVProgDestIpIndex     IpAddress,
+                d5vChanContVProgRowStatus       RowStatus,
+                d5vChanContVProgName            D5VideoChannelContainerNameType,
+                d5vChanContVProgConfProgPassThroughEnabled  TruthValue,
+                d5vChanContVProgConfPidPassThroughEnabled   TruthValue,
+                d5vChanContVProgConfRedundantMulticast      TruthValue,
+                d5vChanContVProgPersistence     D5PersistenceType,
+                d5vChanContVProgExpectedBitrate Unsigned32,
+                d5vChanContVProgConfVideoSiStreamEnabled TruthValue
+                }
+
+           d5vChanContVProgUdpIndex   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The destination UDP Port of the incoming TS.(A value of 0
+                     in a rule means that the udp-port can be ANY value for
+                     pattern-matching)"
+                ::= { d5VideoChannelContainerVirtProgEntry 1 }
+
+           d5vChanContVProgSrcIpIndex   OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The SRC IP address of the incoming TS.(NOTE: a value of '0'
+                     here indicates a don't care value for pattern-matching
+                     rules)"
+                ::= { d5VideoChannelContainerVirtProgEntry 2 }
+
+           d5vChanContVProgDestIpIndex   OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The DEST IP address of the incoming TS.(NOTE: a value of
+                     '0' here indicates a don't care value for pattern-matching
+                     rules)"
+                ::= { d5VideoChannelContainerVirtProgEntry 3 }
+
+           d5vChanContVProgRowStatus   OBJECT-TYPE
+                SYNTAX      RowStatus
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The RowStatus for controlling entries in this table."
+                ::= { d5VideoChannelContainerVirtProgEntry 4 }
+
+            d5vChanContVProgName    OBJECT-TYPE
+                SYNTAX      D5VideoChannelContainerNameType
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "Channel-container identifier. Must match an entry in
+                     the d5VideoChannelContainerTable table."
+                ::= { d5VideoChannelContainerVirtProgEntry 5 }
+
+            d5vChanContVProgConfProgPassThroughEnabled OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This can be used to configure default PROG remapping
+                     for this stream.  If this is set to TRUE, input PROGs are
+                     mapped to identical output PIDs (as if pass-through
+                     mode were enabled on the QAM).
+                    "
+                DEFVAL {FALSE}
+                ::= { d5VideoChannelContainerVirtProgEntry 6 }
+
+            d5vChanContVProgConfPidPassThroughEnabled OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This can be used to configure default PID remapping
+                     for this stream.  If this is set to TRUE, input PIDs are
+                     mapped to identical output PIDs (as if pass-through
+                     mode were enabled on the QAM).
+                    "
+                DEFVAL {FALSE}
+                ::= { d5VideoChannelContainerVirtProgEntry 7 }
+
+            d5vChanContVProgConfRedundantMulticast OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This can be used to configure a video stream for redundancy
+                     May be set to TRUE only if the d5vIpSrcIndex is set to 0
+                     and the d5vIpDestIndex is set to a valid multicast address
+                     and the d5vIpUdpIndex is set to a non-zero value.
+                       When this value is set to TRUE, the D5 WAN card doesn't
+                     distinguish between packets with different srcIp values,
+                     where the d5vIpUdpIndex and d5vIpDestIndex match this rule.
+                    "
+                DEFVAL {FALSE}
+                ::= { d5VideoChannelContainerVirtProgEntry 8 }
+
+           d5vChanContVProgPersistence    OBJECT-TYPE
+                SYNTAX      D5PersistenceType
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This is used to toggle the table entry as being volatile or
+                     non-volatile.  If set to volatile, it is not saved across
+                     card resets.
+                    "
+                DEFVAL { nonVolatile }
+                ::= { d5VideoChannelContainerVirtProgEntry 9 }
+
+           d5vChanContVProgExpectedBitrate      OBJECT-TYPE
+                SYNTAX      Unsigned32(0..65535)
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The expected bitate in Kbps, of the video program. If this
+                     is set it is used to calculate the initial jitter-buffer
+                     size to be used for the program when it is activated.
+                    (may be set to 0 to indicated an unknown value)"
+                DEFVAL { 0 }
+                ::= { d5VideoChannelContainerVirtProgEntry 10 }
+
+           d5vChanContVProgConfVideoSiStreamEnabled   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "Used to configure this virtual-program to be treated as a
+                     video-si-stream."
+                DEFVAL {FALSE}
+                 ::= { d5VideoChannelContainerVirtProgEntry 11 }
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- QAM jitter-buffering tables
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    d5VideoQamJitterTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoQamJitterEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This Table contains list of rules that regulate the amount of
+                 jitter buffering in milliseconds that is used used for video
+                 programs.
+                    Can be used to increase jitter buffering so that the D5 will
+                 smooth out video programs that may have a lot of jitter, or 
+                 alternatively to decrease jitter buffering so that the latency
+                 through the D5 is reduced.
+                    The low and high bitrate thresholds are not allowed to
+                 overlap between rules that share the same ifIndex and serviceId
+                 ."
+        ::= { d5VideoObjects 33 }
+
+        d5VideoQamJitterEntry OBJECT-TYPE
+            SYNTAX     D5VideoQamJitterEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5vQamJitterIfIndex, d5vQamJitterServiceId,
+                    d5vQamJitterThreshBitrateLow, d5vQamJitterThreshBitrateHigh
+                  }
+            ::= { d5VideoQamJitterTable 1 }
+
+            D5VideoQamJitterEntry ::= SEQUENCE {
+                d5vQamJitterIfIndex             InterfaceIndexOrZero,
+                d5vQamJitterServiceId           D5Program,
+                d5vQamJitterThreshBitrateLow    Unsigned32,
+                d5vQamJitterThreshBitrateHigh   Unsigned32,
+                d5vQamJitterMilliseconds        Unsigned32,
+                d5vQamJitterRowStatus           RowStatus,
+                d5vQamJitterPersistence         D5PersistenceType
+                }
+
+            d5vQamJitterIfIndex   OBJECT-TYPE
+                SYNTAX      InterfaceIndexOrZero
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The ifIndex of the QAM channel associated with this rule.
+                    (may be set to 0 to indicated an unspecified value)"
+                ::= { d5VideoQamJitterEntry 1 }
+
+            d5vQamJitterServiceId   OBJECT-TYPE
+                SYNTAX      D5Program
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The output program number associated with this rule.
+                    (may be set to 0 to indicated an unspecified value)"
+                ::= { d5VideoQamJitterEntry 2 }
+
+            d5vQamJitterThreshBitrateLow   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "The lower bitate threshold in Kbps, of the video stream(s)
+                     for which this jitter setting is to be used.
+                    (may be set to 0 to indicated an unspecified lower value)"
+                ::= { d5VideoQamJitterEntry 3 }
+
+            d5vQamJitterThreshBitrateHigh   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "The upper bitate threshold in Kbps, of the video stream(s)
+                     for which this jitter setting is to be used.
+                    (may be set to 0 to indicated an unspecified upper value)"
+                ::= { d5VideoQamJitterEntry 4 }
+
+            d5vQamJitterMilliseconds   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..500)
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "The setting for jitter-buffer length in milliseconds for
+                     video programs matching this rule.
+                     Can be set to a small value to reduce latency through the
+                     box, or set to a higher value to compensate for more
+                     jitter in the input video stream."
+                ::= { d5VideoQamJitterEntry 5 }
+
+            d5vQamJitterRowStatus   OBJECT-TYPE
+                SYNTAX      RowStatus
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The RowStatus for controlling entries in this table."
+                ::= { d5VideoQamJitterEntry 6 }
+
+           d5vQamJitterPersistence    OBJECT-TYPE
+                SYNTAX      D5PersistenceType
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This is used to toggle the table entry as being volatile or
+                     non-volatile.  If set to volatile, it is not saved across
+                     card resets.
+                    "
+                DEFVAL { nonVolatile }
+                ::= { d5VideoQamJitterEntry 7 }
+
+
+    d5VideoQamJitterStatusTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoQamJitterStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This Table contains status information about the QAM dejitter
+                 buffers on a per-program basis. Entries in this table only
+                 persist for the life-time of the active programs, and are
+                 created & deleted on the fly as programs are shutdown &
+                 restarted. The counters are reset when the program is shutdown,
+                 or when the jitter-buffer is reset.
+                "
+        ::= { d5VideoObjects 34 }
+
+        d5VideoQamJitterStatusEntry OBJECT-TYPE
+            SYNTAX     D5VideoQamJitterStatusEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5QamJitterStatusIfIndex, d5QamJitterStatusServiceId }
+            ::= { d5VideoQamJitterStatusTable 1 }
+
+            D5VideoQamJitterStatusEntry ::= SEQUENCE {
+                    d5QamJitterStatusIfIndex        InterfaceIndex,
+                    d5QamJitterStatusServiceId      D5Program,
+                    d5QamJitterStatusCurrStatus     INTEGER,
+                    d5QamJitterStatusUnderflowCount Unsigned32,
+                    d5QamJitterStatusOverflowCount  Unsigned32,
+                    d5QamJitterStatusBufferLengthInBytes    Unsigned32,
+                    d5QamJitterStatusFixedBufferLength      TruthValue,
+                    d5QamJitterStatusBufferLengthInMs       Unsigned32,
+                    d5vQamJitterStatusBitrate       Unsigned32,
+                    d5QamJitterStatusResetQueue     TruthValue,
+                    d5QamJitterStatusBufferSizeInBytes      Unsigned32
+                }
+
+            d5QamJitterStatusIfIndex   OBJECT-TYPE
+                SYNTAX      InterfaceIndex
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The ifIndex of the QAM channel associated with this entry."
+                ::= { d5VideoQamJitterStatusEntry 1 }
+
+            d5QamJitterStatusServiceId   OBJECT-TYPE
+                SYNTAX      D5Program
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The output program number associated with this entry."
+                ::= { d5VideoQamJitterStatusEntry 2 }
+
+            d5QamJitterStatusCurrStatus   OBJECT-TYPE
+                SYNTAX      INTEGER {
+                                      idle(1),
+                                      fillingBuffer(2),
+                                      active(3),
+                                      underflow(4),
+                                      overflow(5)
+                                    }
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The status of the jitter buffer for this program.
+                        idle          - waiting for input TS packets
+                        fillingBuffer - waiting for the dejitter buffer to fill
+                                        up for normal operation.
+                        active        - operating normally, passing traffic.
+                        underflow     - not receiving enough traffic, buffer has
+                                        been reset.
+                        overflow      - receiving too much traffic, buffer has
+                                        been reset.
+                    "
+                ::= { d5VideoQamJitterStatusEntry 3 }
+
+            d5QamJitterStatusUnderflowCount   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Number of times the jitter buffer has underflowed during
+                     the lifetime of this program."
+                ::= { d5VideoQamJitterStatusEntry 4 }
+
+            d5QamJitterStatusOverflowCount   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Number of times the jitter buffer has overflowed during
+                     the lifetime of this program."
+                ::= { d5VideoQamJitterStatusEntry 5 }
+
+            d5QamJitterStatusBufferLengthInBytes   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The number of bytes in-use for the jitter buffer of this
+                     program."
+                ::= { d5VideoQamJitterStatusEntry 6 }
+
+            d5QamJitterStatusFixedBufferLength   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Indicates if the jitter buffer for this program consists
+                     of a fixed number of bytes, or if the QAM-FPGA is
+                     configured to reallocate memory dynamically
+                     as the program-bitrate fluctuates."
+                ::= { d5VideoQamJitterStatusEntry 7 }
+
+            d5QamJitterStatusBufferLengthInMs   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The size of the jitter buffer for this program in
+                     milliseconds."
+                ::= { d5VideoQamJitterStatusEntry 8 }
+
+            d5vQamJitterStatusBitrate       OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The bitate in Kbps, of this Program. This may have a value
+                     of 0 if the bitrate is not known."
+                ::= { d5VideoQamJitterStatusEntry 9 }
+
+            d5QamJitterStatusResetQueue   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Write a value of TRUE to empty the jitter buffer,
+                     (re)initialize the active buffer-length to the configured
+                     value in the d5VideoQamJitterTable, and reset the jitter
+                     buffer state back to the initial idle state.
+                       NOTE: resetting the buffer results in a temporary loss
+                     of MPEG output for the affected program since the buffer
+                     is wiped and refilled."
+                ::= { d5VideoQamJitterStatusEntry 10 }
+
+            d5QamJitterStatusBufferSizeInBytes   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The number of bytes allocated for the jitter buffer of
+                     this program."
+                ::= { d5VideoQamJitterStatusEntry 11 }
+
+
+-- -----------------------------------------
+-- d5VideoQamLogTable
+-- -----------------------------------------
+
+d5VideoQamLogTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF D5VideoQamLogEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the router's PIM interfaces.
+            IGMP and PIM are enabled on all interfaces listed in this
+            table."
+    ::= { d5VideoObjects 40 }
+
+d5VideoQamLogEntry OBJECT-TYPE
+    SYNTAX     D5VideoQamLogEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the d5QamLogTable."
+    INDEX      { d5vQamLogDateTimeIndex,d5vQamLogSubIndex }
+    ::= { d5VideoQamLogTable 1 }
+
+D5VideoQamLogEntry ::= SEQUENCE {
+    d5vQamLogDateTimeIndex          DateAndTime,
+    d5vQamLogSubIndex               Unsigned32,
+    d5vQamLogSlotNum                Unsigned32,
+    d5vQamLogPortNum                Unsigned32,
+    d5vQamLogQamNum                 Unsigned32,
+    d5vQamLogState                  D5VideoQamLogQamState,
+    d5vQamLogDuration               Unsigned32,
+    d5vQamLogDescription            DisplayString
+}
+
+d5vQamLogDateTimeIndex OBJECT-TYPE
+    SYNTAX     DateAndTime
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The Date/Time of event occurance."
+    ::= { d5VideoQamLogEntry 1 }
+
+d5vQamLogSubIndex OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Index used to address QAM event logs which occur at the same time."
+    ::= { d5VideoQamLogEntry 2 }
+
+d5vQamLogSlotNum OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "QAM card associated with a particular event."
+    ::= { d5VideoQamLogEntry 3 }
+
+d5vQamLogPortNum OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "QAM card port number associated with a particular event."
+    ::= { d5VideoQamLogEntry 4 }
+
+d5vQamLogQamNum OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "QAM card QAM number associated with a particular event."
+    ::= { d5VideoQamLogEntry 5 }
+
+d5vQamLogState OBJECT-TYPE
+    SYNTAX     D5VideoQamLogQamState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Current state of the Event Log"
+    ::= { d5VideoQamLogEntry 6 }
+
+d5vQamLogDuration OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Event Log duration in mSecs (only valid for START/STOP type entries)"
+    ::= { d5VideoQamLogEntry 7 }
+
+d5vQamLogDescription OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "QAM event description."
+    ::= { d5VideoQamLogEntry 8 }
+
+-- -----------------------------------------
+-- video-si-stream Ghost PID tables
+-- -----------------------------------------
+
+d5VideoRuleSiStreamGhostPidFilterTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF D5VideoRuleSiStreamGhostPidFilterEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Table contains list of configured ghost PID filter rules.
+              .  Ghost PIDs can only be used for video-si-streams.  The reason
+             for this being that it's not reasonable to map multiple copies of
+             the same input PID to a single output PID.  Tying ghost-pids to
+             video-si-stream ensures that only one copy of a particular
+             ghost-pid will be mapped to any particular QAM-channel at any one
+             time, since only one video-si-stream can be active on a QAM-channel
+             at a time.
+            "
+    ::= { d5VideoObjects 42 }
+
+    d5VideoRuleSiStreamGhostPidFilterEntry OBJECT-TYPE
+        SYNTAX     D5VideoRuleSiStreamGhostPidFilterEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                ""
+        INDEX { d5vPidRemapInPidIndex }
+        ::= { d5VideoRuleSiStreamGhostPidFilterTable 1 }
+
+        D5VideoRuleSiStreamGhostPidFilterEntry ::= SEQUENCE {
+            d5vRSiStreamGhostPidFiltRowStatus         RowStatus,
+            d5vRSiStreamGhostPidFiltLastMatchTime     TimeStamp,
+            d5vRSiStreamGhostPidFiltMatchCount        Counter32,
+            d5vRSiStreamGhostPidFiltPersistence       D5PersistenceType
+            }
+
+       d5vRSiStreamGhostPidFiltRowStatus   OBJECT-TYPE
+            SYNTAX      RowStatus
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "The RowStatus for controlling entries in this table."
+            ::= { d5VideoRuleSiStreamGhostPidFilterEntry 1 }
+
+       d5vRSiStreamGhostPidFiltLastMatchTime  OBJECT-TYPE
+            SYNTAX      TimeStamp
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "The value of sysUpTime when this rule was last matched/used
+                 at run-time.  Zero if not-applicable."
+            ::= { d5VideoRuleSiStreamGhostPidFilterEntry 2 }
+
+       d5vRSiStreamGhostPidFiltMatchCount  OBJECT-TYPE
+            SYNTAX      Counter32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "The number of times this rule was matched/used at run-time.
+                       Zero if not-applicable."
+            ::= { d5VideoRuleSiStreamGhostPidFilterEntry 3 }
+
+       d5vRSiStreamGhostPidFiltPersistence      OBJECT-TYPE
+            SYNTAX      D5PersistenceType
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "This is used to toggle the table entry as being volatile or
+                 non-volatile.  If set to volatile, it is not saved across
+                 card resets.
+                "
+            DEFVAL { nonVolatile }
+            ::= { d5VideoRuleSiStreamGhostPidFilterEntry 4 }
+
+d5VideoRuleQamSiStreamGhostPidFilterTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF D5VideoRuleQamSiStreamGhostPidFilterEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Table contains list of qam-channel based configured ghost PID rules
+              .  Ghost PIDs can only be used for video-si-streams.  The reason
+             for this being that it's not reasonable to map multiple copies of
+             the same input PID to a single output PID.  Tying ghost-pids to
+             video-si-stream ensures that only one copy of a particular
+             ghost-pid will be mapped to any particular QAM-channel at any one
+             time, since only one video-si-stream can be active on a QAM-channel
+             at a time.
+            "
+    ::= { d5VideoObjects 41 }
+
+    d5VideoRuleQamSiStreamGhostPidFilterEntry OBJECT-TYPE
+        SYNTAX     D5VideoRuleQamSiStreamGhostPidFilterEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                ""
+        INDEX { ifIndex, d5vPidRemapInPidIndex }
+        ::= { d5VideoRuleQamSiStreamGhostPidFilterTable 1 }
+
+        D5VideoRuleQamSiStreamGhostPidFilterEntry ::= SEQUENCE {
+            d5vRQamSiStreamGhostPidFiltRowStatus         RowStatus,
+            d5vRQamSiStreamGhostPidFiltLastMatchTime     TimeStamp,
+            d5vRQamSiStreamGhostPidFiltMatchCount        Counter32,
+            d5vRQamSiStreamGhostPidFiltPersistence       D5PersistenceType
+            }
+
+       d5vRQamSiStreamGhostPidFiltRowStatus   OBJECT-TYPE
+            SYNTAX      RowStatus
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "The RowStatus for controlling entries in this table."
+            ::= { d5VideoRuleQamSiStreamGhostPidFilterEntry 1 }
+
+       d5vRQamSiStreamGhostPidFiltLastMatchTime  OBJECT-TYPE
+            SYNTAX      TimeStamp
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "The value of sysUpTime when this rule was last matched/used
+                 at run-time.  Zero if not-applicable."
+            ::= { d5VideoRuleQamSiStreamGhostPidFilterEntry 2 }
+
+       d5vRQamSiStreamGhostPidFiltMatchCount  OBJECT-TYPE
+            SYNTAX      Counter32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "The number of times this rule was matched/used at run-time.
+                       Zero if not-applicable."
+            ::= { d5VideoRuleQamSiStreamGhostPidFilterEntry 3 }
+
+       d5vRQamSiStreamGhostPidFiltPersistence      OBJECT-TYPE
+            SYNTAX      D5PersistenceType
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "This is used to toggle the table entry as being volatile or
+                 non-volatile.  If set to volatile, it is not saved across
+                 card resets.
+                "
+            DEFVAL { nonVolatile }
+            ::= { d5VideoRuleQamSiStreamGhostPidFilterEntry 4 }
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- QAM ca-system-id descriptor filter tables
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+d5VideoQamCaDescFiltTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF D5VideoQamCaDescFiltEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "This Table contains a list of rules that regulate the filtering
+             of ca-descriptors from input CAT and PMT tables based on
+             specific ca-system-id values.
+             ."
+    ::= { d5VideoObjects 43 }
+
+    d5VideoQamCaDescFiltEntry OBJECT-TYPE
+        SYNTAX     D5VideoQamCaDescFiltEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                ""
+        INDEX { d5vQamCaDescFiltIfIndex,
+                d5vQamCaDescFiltSysId
+              }
+        ::= { d5VideoQamCaDescFiltTable 1 }
+
+        D5VideoQamCaDescFiltEntry ::= SEQUENCE {
+            d5vQamCaDescFiltIfIndex         InterfaceIndexOrZero,
+            d5vQamCaDescFiltSysId           Unsigned32,
+            d5vQamCaDescFiltCaDesc          INTEGER,
+            d5vQamCaDescFiltRowStatus       RowStatus,
+            d5vQamCaDescFiltPersistence     D5PersistenceType
+            }
+
+        d5vQamCaDescFiltIfIndex   OBJECT-TYPE
+            SYNTAX      InterfaceIndexOrZero
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "The ifIndex of the QAM channel associated with this rule.
+                (may be set to 0 to indicated an unspecified value)"
+            ::= { d5VideoQamCaDescFiltEntry 1 }
+
+        d5vQamCaDescFiltSysId   OBJECT-TYPE
+            SYNTAX      Unsigned32 (0..65535)
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "The CA-system-ID value associated with this rule."
+            ::= { d5VideoQamCaDescFiltEntry 2 }
+
+        d5vQamCaDescFiltCaDesc   OBJECT-TYPE
+            SYNTAX    INTEGER {
+                                cat-and-pmt(1),
+                                neither(2),
+                                cat-only(3),
+                                pmt-only(4)
+                               }
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "Controls the filtering of descriptors from the CAT table."
+            DEFVAL { neither }
+            ::= { d5VideoQamCaDescFiltEntry 3 }
+
+        d5vQamCaDescFiltRowStatus   OBJECT-TYPE
+            SYNTAX      RowStatus
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "The RowStatus for controlling entries in this table."
+            ::= { d5VideoQamCaDescFiltEntry 4 }
+
+       d5vQamCaDescFiltPersistence    OBJECT-TYPE
+            SYNTAX      D5PersistenceType
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "This is used to toggle the table entry as being volatile or
+                 non-volatile.  If set to volatile, it is not saved across
+                 card resets.
+                "
+            DEFVAL { nonVolatile }
+            ::= { d5VideoQamCaDescFiltEntry 5 }
+
+-- -----------------------------------------
+-- video-stream Ghost PID tables
+-- -----------------------------------------
+
+    d5VideoRuleStreamGhostPidTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoRuleStreamGhostPidFilterEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Table contains list of configured ghost PID filter rules. 
+             Ghost PIDs may only be used for video-streams and
+             can be in the range 1 to 8190. 
+             Care must be taken not to map multiple copies of
+             the same input PID to a single output PID.
+            "
+        ::= { d5VideoObjects 45 }
+
+        d5VideoRuleStreamGhostPidFilterEntry OBJECT-TYPE
+            SYNTAX     D5VideoRuleStreamGhostPidFilterEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { d5vRStreamGhostPidFiltUdpIndex, d5vRStreamGhostPidFiltIpSrcIndex,
+                    d5vRStreamGhostPidFiltIpDestIndex, d5vRStreamGhostPidFiltInPidIndex}
+            ::= { d5VideoRuleStreamGhostPidTable 1 }
+
+            D5VideoRuleStreamGhostPidFilterEntry ::= SEQUENCE {
+                d5vRStreamGhostPidFiltUdpIndex           Unsigned32,
+                d5vRStreamGhostPidFiltIpSrcIndex         IpAddress,
+                d5vRStreamGhostPidFiltIpDestIndex        IpAddress,
+                d5vRStreamGhostPidFiltInPidIndex         D5PID,
+                d5vRStreamGhostPidFiltRowStatus          RowStatus,
+                d5vRStreamGhostPidFiltMatchLastTime      TimeStamp,
+                d5vRStreamGhostPidFiltMatchCount         Counter32,
+                d5vRStreamGhostPidFiltPersistence        D5PersistenceType
+                }
+
+           d5vRStreamGhostPidFiltUdpIndex   OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..65535)
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The destination UDP Port of the incoming TS.(A value of 0
+                     in a rule means that the udp-port can be ANY value for
+                     pattern-matching)"
+                ::= { d5VideoRuleStreamGhostPidFilterEntry 1 }
+
+           d5vRStreamGhostPidFiltIpSrcIndex   OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The SRC IP address of the incoming TS.(NOTE: a value of '0'
+                     here indicates a don't care value for pattern-matching
+                     rules)"
+                ::= { d5VideoRuleStreamGhostPidFilterEntry 2 }
+
+           d5vRStreamGhostPidFiltIpDestIndex   OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The DEST IP address of the incoming TS.(NOTE: a value of
+                     '0' here indicates a don't care value for pattern-matching
+                     rules)"
+                ::= { d5VideoRuleStreamGhostPidFilterEntry 3 }
+
+           d5vRStreamGhostPidFiltInPidIndex   OBJECT-TYPE
+                SYNTAX      D5PID
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The incoming ghost PID value related to this rule."
+                ::= { d5VideoRuleStreamGhostPidFilterEntry 4 }
+
+           d5vRStreamGhostPidFiltRowStatus   OBJECT-TYPE
+                SYNTAX      RowStatus
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The RowStatus for controlling entries in this table."
+                ::= { d5VideoRuleStreamGhostPidFilterEntry 5 }
+
+           d5vRStreamGhostPidFiltMatchLastTime  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when this rule was last
+                     matched/used at run-time.  Zero if not-applicable."
+                ::= { d5VideoRuleStreamGhostPidFilterEntry 6 }
+
+           d5vRStreamGhostPidFiltMatchCount  OBJECT-TYPE
+                SYNTAX      Counter32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The number of times this rule was matched/used at
+                     run-time.  Zero if not-applicable."
+                ::= { d5VideoRuleStreamGhostPidFilterEntry 7 }
+
+           d5vRStreamGhostPidFiltPersistence      OBJECT-TYPE
+                SYNTAX      D5PersistenceType
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This is used to toggle the table entry as being volatile or
+                     non-volatile.  If set to volatile, it is not saved across
+                     card resets.
+                    "
+                DEFVAL { nonVolatile }
+                ::= { d5VideoRuleStreamGhostPidFilterEntry 8 }
+
+
+    d5VideoRuleQamStreamGhostPidTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF D5VideoRuleQamStreamGhostPidFilterEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Table contains list of qam-channel based configured ghost PID rules. 
+             Ghost PIDs may only be used for video-streams and
+             can be in the range 1 to 8190. 
+             Care must be taken not to map multiple copies of
+             the same input PID to a single output PID.
+             "
+        ::= { d5VideoObjects 44 }
+
+        d5VideoRuleQamStreamGhostPidFilterEntry OBJECT-TYPE
+            SYNTAX     D5VideoRuleQamStreamGhostPidFilterEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    ""
+            INDEX { ifIndex, d5vRStreamGhostPidFiltInPidIndex }
+            ::= { d5VideoRuleQamStreamGhostPidTable 1 }
+
+            D5VideoRuleQamStreamGhostPidFilterEntry ::= SEQUENCE {
+                d5vRQamStreamGhostPidFiltRowStatus         RowStatus,
+                d5vRQamStreamGhostPidFiltOutPid            D5PID,
+                d5vRQamStreamGhostPidFiltLastMatchTime     TimeStamp,
+                d5vRQamStreamGhostPidFiltMatchCount        Counter32,
+                d5vRQamStreamGhostPidFiltPersistence       D5PersistenceType
+                }
+
+           d5vRQamStreamGhostPidFiltRowStatus   OBJECT-TYPE
+                SYNTAX      RowStatus
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The RowStatus for controlling entries in this table."
+                ::= { d5VideoRuleQamStreamGhostPidFilterEntry 1 }
+
+           d5vRQamStreamGhostPidFiltOutPid   OBJECT-TYPE
+                SYNTAX      D5PID
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "The output PID value related to this rule."
+                ::= { d5VideoRuleQamStreamGhostPidFilterEntry 2 }
+
+           d5vRQamStreamGhostPidFiltLastMatchTime  OBJECT-TYPE
+                SYNTAX      TimeStamp
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The value of sysUpTime when this rule was last
+                     matched/used at run-time.  Zero if not-applicable."
+                ::= { d5VideoRuleQamStreamGhostPidFilterEntry 3 }
+
+           d5vRQamStreamGhostPidFiltMatchCount  OBJECT-TYPE
+                SYNTAX      Counter32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The number of times this rule was matched/used at
+                     run-time.  Zero if not-applicable."
+                ::= { d5VideoRuleQamStreamGhostPidFilterEntry 4 }
+
+           d5vRQamStreamGhostPidFiltPersistence      OBJECT-TYPE
+                SYNTAX      D5PersistenceType
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "This is used to toggle the table entry as being volatile or
+                     non-volatile.  If set to volatile, it is not saved across
+                     card resets.
+                    "
+                DEFVAL { nonVolatile }
+                ::= { d5VideoRuleQamStreamGhostPidFilterEntry 5 }
+
+END

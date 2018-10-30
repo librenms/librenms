@@ -1,0 +1,387 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-LLF-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+             DisplayString, RowStatus, TruthValue
+        FROM SNMPv2-TC
+             InterfaceIndex
+        FROM IF-MIB
+             siaeMib
+        FROM SIAE-TREE-MIB
+             AlarmStatus, AlarmSeverityCode
+        FROM SIAE-ALARM-MIB;
+
+    llf MODULE-IDENTITY
+        LAST-UPDATED "201409020000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: tbd@siaemic.com
+            "
+        DESCRIPTION
+            "SIAE's Link Loss Forwarding MIB.
+            "
+      ::= { siaeMib 85 }
+
+--------------------------------------------------------------------------------
+--  llf GROUP
+--------------------------------------------------------------------------------
+--
+-- This group is used for Link Loss Forwarding configuration and alarm reporting
+--
+-- Each physical interface (LAN) can be assigned to a LLF circuit in order to
+-- propagate its LOS alarm through a radio link.
+--
+-- For each radio link, there are several circuits.
+-- Each interface can insert into a circuit its LOS alarm to be propagate to the
+-- other endpoint of a radio link.
+-- In each directions, the circuit has an signal failure if at least the
+-- operative status of one LAN connected to the circuit is down (LOS).
+-- In the local terminal, a LAN interface uses the signal failure of the circuit
+-- to propagate the LOS alarm by turning off physical level.
+--
+-- In order to propagate in both direction a LOS to an interface, a SNMP manager
+-- must (in both link terminals):
+-- 1) Create an entry in llfTable with index equal to the ifIndex of interface.
+-- 2) Attach this entry to a circuit creating an entry in llfMapTable.
+-- 3) Insert the LOS alarm in the circuit setting llfMapLosInsertion to
+--    enable.
+--
+--------------------------------------------------------------------------------
+
+------ Beginning --------------------------------------------------------------
+
+    llfMibVersion  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+        DEFVAL {1}
+    ::= {llf 1}
+
+-------  Begin of llfTable
+--
+    llfTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     LlfInterface
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with SIAE's LLF entries."
+    ::= {llf 2}
+
+    llfEntry  OBJECT-TYPE
+        SYNTAX      LlfInterface
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "SIAE's LLF entry."
+        INDEX {llfIndex}
+    ::= {llfTable 1}
+
+    LlfInterface  ::=
+        SEQUENCE {
+            llfIndex               InterfaceIndex,
+            llfEnable              INTEGER,
+            llfUnidirectionalFault INTEGER,
+            llfDelayTime           INTEGER,
+            llfProtectionMode      INTEGER,
+            llfAlarm               AlarmStatus,
+            llfRowStatus           RowStatus
+         }
+
+    llfIndex  OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A unique value, greater than zero, for each
+             interface supporting LLF. This object is identical to the ifIndex
+             of the standard MIB-2 ifTable."
+    ::= {llfEntry 1}
+
+    llfEnable  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       disable (1),
+                       enable  (2)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "On interfaces supporting LLF, this object is used to disable
+             or enable LLF towards local LAN interfaces."
+        DEFVAL {disable}
+    ::= {llfEntry 2}
+
+    llfUnidirectionalFault  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       disable (1),
+                       enable  (2)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "When enable is set, a local link fault causes LLF on both local
+             and remote interfaces."
+        DEFVAL {disable}
+    ::= {llfEntry 3}
+
+    llfDelayTime OBJECT-TYPE
+        SYNTAX      INTEGER   (0..10)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The LLF delay time specifies the time interval (in seconds)
+             to wait for to actuate or to remove the Link Loss Forwarding
+             condition.
+            "
+        DEFVAL {0}
+    ::= {llfEntry 4}
+
+    llfProtectionMode  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       disable (1),
+                       enable  (2)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "When protection mode is enabled, LLF alarm is issued only when
+             all radio links or circuits connected to interface are alarmed.
+            "
+        DEFVAL {disable}
+    ::= {llfEntry 5}
+
+    llfAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Interface Link Loss Forwarding alarm status."
+    ::= {llfEntry 6}
+
+    llfRowStatus   OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this row of llfTable.
+             This object may not be set to destroy until at least a circuit
+             belong to this LLF interface. In other words, circuits must be
+             deleted before a LLF interface.
+            "
+    ::= {llfEntry 7}
+
+--
+-------  End of llfTable
+
+-------  Begin of llfMapTable
+--
+    llfMapTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     LlfMap
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table map llf interface on llf circuits."
+    ::= {llf 3}
+
+    llfMapEntry  OBJECT-TYPE
+        SYNTAX      LlfMap
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "SIAE's llf cross-connection entry."
+        INDEX {llfIndex, llfMapLinkIndex, llfMapPolIndex, llfMapCircuitIndex}
+    ::= {llfMapTable 1}
+
+    LlfMap  ::=
+        SEQUENCE {
+            llfMapLinkIndex     INTEGER,
+            llfMapPolIndex      INTEGER,
+            llfMapCircuitIndex  INTEGER,
+            llfMapLosInsertion  INTEGER,
+            llfMapInsertionMode INTEGER,
+            llfMapSignalFail    TruthValue,
+            llfMapRowStatus     RowStatus
+         }
+
+    llfMapLinkIndex  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Radio link identifier. With llfMapPolIndex and llfMapCircuitIndex it points to a
+             specific instance of llfCircuitTable."
+    ::= {llfMapEntry 1}
+
+    llfMapPolIndex  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Radio polarization identifier. With llfMapLinkIndex and llfMapCircuitIndex it points to a
+             specific instance of llfCircuitTable."
+    ::= {llfMapEntry 2}
+
+    llfMapCircuitIndex  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "LLF circuit identifier. With llfMapLinkIndex and llfMapPolIndex it points to a
+             specific instance of llfCircuitTable."
+    ::= {llfMapEntry 3}
+
+    llfMapLosInsertion  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       disable (1),
+                       enable  (2)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Enable or disable insertion of interface LOS into a specified
+             circuit. The inserted LOS is transported through the radio link."
+        DEFVAL { enable }
+    ::= {llfMapEntry 4}
+
+    llfMapInsertionMode  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       single (1),
+                       group  (2)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "In single mode, LOS is inserted in the circuit if the relative
+             interface has a LOS alarm. 
+             In group mode, LOS is inserted when all (grouped) interfaces 
+             mapped to the same circuit have a LOS alarm."
+        DEFVAL { single }
+    ::= {llfMapEntry 5}
+
+    llfMapSignalFail  OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Alarm condition detected on specified circuit."
+    ::= {llfMapEntry 6}
+
+    llfMapRowStatus   OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this row of llfMapTable"
+    ::= {llfMapEntry 7}
+
+--
+-------  End of llfMapTable
+
+-------  Begin of llfCircuitTable
+--
+    llfCircuitTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     LlfCircuit
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table describing llf circuits available over each link.
+             This circuits can be connected to available interfaces via
+             llfMapTable."
+    ::= {llf 4}
+
+    llfCircuitEntry  OBJECT-TYPE
+        SYNTAX      LlfCircuit
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "SIAE's llf circuit entry."
+        INDEX {llfCircuitLinkIndex, llfCircuitPolIndex, llfCircuitIndex}
+    ::= {llfCircuitTable 1}
+
+    LlfCircuit  ::=
+        SEQUENCE {
+            llfCircuitLinkIndex INTEGER,
+            llfCircuitPolIndex  INTEGER,
+            llfCircuitIndex     INTEGER,
+            llfCircuitLinkLabel DisplayString,
+            llfCircuitRowStatus RowStatus
+         }
+
+    llfCircuitLinkIndex  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Radio link identifier."
+    ::= {llfCircuitEntry 1}
+
+    llfCircuitPolIndex  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Radio polarization identifier."
+    ::= {llfCircuitEntry 2}
+
+    llfCircuitIndex  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "LLF circuit identifier."
+    ::= {llfCircuitEntry 3}
+
+    llfCircuitLinkLabel OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ASCII string used to assign a name to the radio link and polarization."
+    ::= {llfCircuitEntry 4}
+
+    llfCircuitRowStatus   OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this row of llfCircuitTable"
+    ::= {llfCircuitEntry 5}
+
+--
+-------  End of llfCircuitTable
+
+    llfAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the llfAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {llf 5}
+
+END

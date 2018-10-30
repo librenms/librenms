@@ -148,7 +148,7 @@ function submitCustomRange(frmdata) {
 
 function updateResolution(refresh)
 {
-    $.post('ajax_setresolution.php',
+    $.post('ajax/set_resolution',
         {
             width: $(window).width(),
             height:$(window).height()
@@ -270,14 +270,23 @@ $(document).ready(function() {
     });
 });
 
-$(document).ajaxComplete(function(){
-    if($('.alert-status').length !== 0) {
-        $('.alert-status').each(function() {
-            if ($(this).parent().height() < 27) {
-                $(this).height('27px');
+function refresh_oxidized_node(device_hostname){
+    $.ajax({
+        type: 'POST',
+        url: 'ajax_form.php',
+        data: {
+            type: "refresh-oxidized-node",
+            device_hostname: device_hostname
+        },
+        success: function (data) {
+            if(data['status'] == 'ok') {
+                toastr.success(data['message']);
             } else {
-                $(this).height($(this).parent().height());
+                toastr.error(data['message']);
             }
-        })
-    }
-});
+        },
+        error:function(){
+            toastr.error('An error occured while queuing refresh for an oxidized node (hostname: ' + device_hostname + ')');
+        }
+    });
+}

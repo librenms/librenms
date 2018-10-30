@@ -23,7 +23,10 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-if (!is_admin()) {
+use LibreNMS\Alerting\QueryBuilderParser;
+use LibreNMS\Authentication\LegacyAuth;
+
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     echo("Insufficient Privileges");
     exit();
 }
@@ -41,7 +44,7 @@ switch ($type) {
         $results = array();
         foreach ($rules as $rule) {
             if (empty($rule['query'])) {
-                $rule['query'] = GenSQL($rule['rule']);
+                $rule['query'] = GenSQL($rule['rule'], $rule['builder']);
             }
             $sql = $rule['query'];
             $qry = dbFetchRow($sql, array($device_id));
@@ -51,8 +54,22 @@ switch ($type) {
             } else {
                 $response = 'no match';
             }
+
+            $extra = json_decode($rule['extra'], true);
+            if ($extra['options']['override_query'] === 'on') {
+                $qb = $extra['options']['override_query'];
+            } elseif ($rule['builder']) {
+                $qb = QueryBuilderParser::fromJson($rule['builder']);
+            } else {
+                $qb = QueryBuilderParser::fromOld($rule['rule']);
+            }
+
             $output .= 'Rule name: ' . $rule['name'] . PHP_EOL;
-            $output .= 'Alert rule: ' . $rule['rule'] . PHP_EOL;
+            if ($qb instanceof QueryBuilderParser) {
+                $output .= 'Alert rule: ' . $qb->toSql(false) . PHP_EOL;
+            } else {
+                $output .= 'Alert rule: Custom SQL Query' . PHP_EOL;
+            }
             $output .= 'Alert query: ' . $rule['query'] . PHP_EOL;
             $output .= 'Rule match: ' . $response . PHP_EOL . PHP_EOL;
         }

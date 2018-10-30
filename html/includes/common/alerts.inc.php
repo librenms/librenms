@@ -39,10 +39,12 @@ $alert_severities = array(
 //if( defined('SHOW_SETTINGS') || empty($widget_settings) ) {
 if (defined('SHOW_SETTINGS')) {
     $current_acknowledged = isset($widget_settings['acknowledged']) ? $widget_settings['acknowledged'] : '';
+    $current_fired =  isset($widget_settings['fired']) ? $widget_settings['fired'] : '';
     $current_severity = isset($widget_settings['severity']) ? $widget_settings['severity'] : '';
     $current_state = isset($widget_settings['state']) ? $widget_settings['state'] : '';
     $current_group = isset($widget_settings['group']) ? $widget_settings['group'] : '';
     $current_proc = isset($widget_settings['proc']) ? $widget_settings['proc'] : '';
+    $current_sorting = isset($widget_settings['sort']) ? $widget_settings['sort'] : '';
 
     $common_output[] = '
 <form class="form" onsubmit="widget_settings(this); return false;">
@@ -56,6 +58,20 @@ if (defined('SHOW_SETTINGS')) {
     $common_output[] = '<option value=""' . ($current_acknowledged == '' ? ' selected' : ' ') . '>not filtered</option>';
     $common_output[] = '<option value="1"' . ($current_acknowledged == '1' ? ' selected' : ' ') . '>show only acknowledged</option>';
     $common_output[] = '<option value="0"' . ($current_acknowledged == '0' ? ' selected' : ' ') . '>hide acknowledged</option>';
+
+    $common_output[] = '
+      </select>
+    </div>
+  </div>
+  <div class="form-group row">
+    <div class="col-sm-4">
+      <label for="fired" class="control-label">Show only Fired alerts: </label>
+    </div>
+    <div class="col-sm-8">
+      <select class="form-control" name="fired">';
+
+    $common_output[] = '<option value=""' . ($current_fired == '' ? ' selected' : ' ') . '>not filtered</option>';
+    $common_output[] = '<option value="1"' . ($current_fired == '1' ? ' selected' : ' ') . '>show only Fired alerts</option>';
 
     $common_output[] = '
       </select>
@@ -125,6 +141,21 @@ if (defined('SHOW_SETTINGS')) {
       </select>
     </div>
   </div>
+  <div class="form-group row">
+    <div class="col-sm-4">
+      <label for="sort" class="control-label">Sort alerts by: </label>
+    </div>
+    <div class="col-sm-8">
+      <select class="form-control" name="sort">';
+    $common_output[] = '<option value=""' . ($current_sorting == '' ? ' selected' : '')
+                       . '>timestamp, descending</option>';
+    $common_output[] = '<option value="severity"' . ($current_sorting == 'severity' ? ' selected' : ' ')
+                       . '>severity, descending</option>';
+
+    $common_output[] = '
+      </select>
+    </div>
+  </div>
 
   <div class="form-group">
     <div class="col-sm-12">
@@ -136,10 +167,12 @@ if (defined('SHOW_SETTINGS')) {
 } else {
     $device_id = $device['device_id'];
     $acknowledged = $widget_settings['acknowledged'];
+    $fired = $widget_settings['fired'];
     $state = $widget_settings['state'];
     $min_severity = $widget_settings['min_severity'];
     $group = $widget_settings['group'];
     $proc = $widget_settings['proc'];
+    $sort = $widget_settings['sort'];
 
     $title = "Alerts";
 
@@ -159,6 +192,10 @@ if (defined('SHOW_SETTINGS')) {
         }
     }
 
+    if (is_numeric($fired)) {
+        $title = "Fired $title";
+    }
+
     if (is_numeric($group)) {
         $group_row = dbFetchRow("SELECT * FROM device_groups WHERE id = ?", array($group));
         if ($group_row) {
@@ -172,6 +209,10 @@ if (defined('SHOW_SETTINGS')) {
             $sev_name = array_search($min_severity, $alert_severities);
             $title = "$title " . ($min_severity > 3 ? "" : ">") . "=$sev_name";
         }
+    }
+
+    if (!empty($sort)) {
+        $title = "$title " . "sorted by severity (higher first)";
     }
 
     $widget_settings['title'] = $title;
@@ -193,7 +234,8 @@ if (defined('SHOW_SETTINGS')) {
                 <th data-column-id="rule">Rule</th>
                 <th data-column-id="details" data-sortable="false"></th>
                 <th data-column-id="hostname">Hostname</th>
-                <th data-column-id="ack_ico" data-sortable="false">ACK</th>';
+                <th data-column-id="ack_ico" data-sortable="false">ACK</th>
+                <th data-column-id="notes" data-sortable="false">Notes</th>';
 
     if ($proc == '1') {
         $common_output[] = '<th data-column-id="proc" data-sortable="false">URL</th>';
@@ -216,6 +258,9 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
     if (is_numeric($acknowledged)) {
         $common_output[] = "acknowledged: '$acknowledged',\n";
     }
+    if (is_numeric($fired)) {
+        $common_output[] = "fired: '$fired',\n";
+    }
     if (isset($state) && $state != '') {
         $common_output[] = "state: '$state',\n";
     }
@@ -228,6 +273,10 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
     }
     if (is_numeric($proc)) {
         $common_output[] = "proc: '$proc',\n";
+    }
+
+    if (isset($sort) && sort != '') {
+        $common_output[] = "sort: '$sort',\n";
     }
 
     $common_output[] = '
@@ -252,36 +301,22 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
         $(this).find(".incident-toggle").fadeIn(200);
       }).on("mouseleave", function() {
         $(this).find(".incident-toggle").fadeOut(200);
-      }).on("click", "td:not(.incident-toggle-td)", function() {
-        var target = $(this).parent().find(".incident-toggle").data("target");
-        if( $(this).parent().find(".incident-toggle").hasClass(\'fa-plus\') ) {
-          $(this).parent().find(".incident-toggle").toggleClass(\'fa-plus fa-minus\');
-          $(target).collapse(\'toggle\');
-        }
       });
     });
     alerts_grid.find(".command-ack-alert").on("click", function(e) {
         e.preventDefault();
-        var alert_id = $(this).data("alert_id");
-        var state = $(this).data("state");
-        $.ajax({
-            type: "POST",
-            url: "ajax_form.php",
-            data: { type: "ack-alert", alert_id: alert_id, state: state },
-            success: function(msg){
-                toastr.success(msg);
-                if(msg.indexOf("ERROR:") <= -1) {
-                    $(".alerts").each(function(index) {
-                        var $sortDictionary = $(this).bootgrid("getSortDictionary");
-                        $(this).reload;
-                        $(this).bootgrid("sort", $sortDictionary);
-                    });
-                }
-            },
-            error: function(){
-                 toastr.error("An error occurred acking this alert");
-            }
-        });
+        var alert_state = $(this).data("alert_state");
+        var alert_id = $(this).data(\'alert_id\');
+        $(\'#ack_alert_id\').val(alert_id);
+        $(\'#ack_alert_state\').val(alert_state);
+        $(\'#ack_msg\').val(\'\');
+        $("#alert_ack_modal").modal(\'show\');
+    });
+    alerts_grid.find(".command-alert-note").on("click", function(e) {
+        e.preventDefault();
+        var alert_id = $(this).data(\'alert_id\');
+        $(\'#alert_id\').val(alert_id);
+        $("#alert_notes_modal").modal(\'show\');
     });
 });
 </script>';

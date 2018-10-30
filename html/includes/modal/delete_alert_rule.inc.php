@@ -11,7 +11,9 @@
  * the source code distribution for details.
  */
 
-if (is_admin() === false) {
+use LibreNMS\Authentication\LegacyAuth;
+
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 

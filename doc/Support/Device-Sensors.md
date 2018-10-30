@@ -1,4 +1,5 @@
 source: Support/Device-Sensors.md
+path: blob/master/doc/
 
 ## Device Sensors 
 

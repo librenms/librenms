@@ -72,6 +72,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
         <option disabled>Port Aggregators:</option>
         <option value="transit"'.($widget_settings['graph_type'] == 'transit' ? ' selected' : '').'>&nbsp;&nbsp;&nbsp;Transit</option>
         <option value="peering"'.($widget_settings['graph_type'] == 'peering' ? ' selected' : '').'>&nbsp;&nbsp;&nbsp;Peering</option>
+        <option value="transpeer"'.($widget_settings['graph_type'] == 'transpeer' ? ' selected' : '').'>&nbsp;&nbsp;&nbsp;Transit + Peering</option>
         <option value="core"'.($widget_settings['graph_type'] == 'core' ? ' selected' : '').'>&nbsp;&nbsp;&nbsp;Core</option>
         <option value="custom"'.($widget_settings['graph_type'] == 'custom' ? ' selected' : '').'>&nbsp;&nbsp;&nbsp;Custom Descr</option>
         <option value="manual"'.($widget_settings['graph_type'] == 'manual' ? ' selected' : '').'>&nbsp;&nbsp;&nbsp;Manual Descr</option>
@@ -398,10 +399,13 @@ $(function() {
         $param                        = 'id='.$widget_settings['graph_'.$type]['app_id'];
     } elseif ($type == 'munin') {
         $param                        = 'device='.$widget_settings['graph_'.$type]['device_id'].'&plugin='.$widget_settings['graph_'.$type]['name'];
-    } elseif ($type == 'transit' || $type == 'peering' || $type == 'core' || $type == 'custom' || $type == 'manual') {
+    } elseif ($type == 'transit' || $type == 'peering' || $type == 'core' || $type == 'custom' || $type == 'manual' || $type == 'transpeer') {
         if ($type == 'custom' || $type == 'manual') {
             $type = $widget_settings['graph_'.$type];
             $type = explode(',', $type);
+        }
+        if ($type == 'transpeer') {
+            $type = array('transit','peering');
         }
 
         $ports = get_ports_from_type($type);

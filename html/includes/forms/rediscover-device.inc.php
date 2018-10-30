@@ -12,7 +12,9 @@
  * the source code distribution for details.
  */
 
-if (is_admin() === false) {
+use LibreNMS\Authentication\LegacyAuth;
+
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     $response = array(
         'status'  => 'error',
         'message' => 'Need to be admin',

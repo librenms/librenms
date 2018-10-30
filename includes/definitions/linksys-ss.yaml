@@ -1,6 +1,6 @@
 os: linksys-ss
 text: 'Linksys Smart Switch'
-ifname: 1
+ifname: true
 type: network
 icon: linksys
 over:

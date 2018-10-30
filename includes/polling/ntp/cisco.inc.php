@@ -26,7 +26,7 @@ $components = $component->getComponents($device['device_id'], $options);
 $components = $components[$device['device_id']];
 
 // Only collect SNMP data if we have enabled components
-if (count($components > 0)) {
+if (is_array($components) && count($components) > 0) {
     // Let's gather the stats..
     $cntpPeersVarEntry = snmpwalk_array_num($device, '.1.3.6.1.4.1.9.9.168.1.2.1.1', 2);
 

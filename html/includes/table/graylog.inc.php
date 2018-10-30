@@ -13,12 +13,12 @@
  * @package    LibreNMS
  * @subpackage webui
  * @link       http://librenms.org
- * @copyright  2017 LibreNMS
+ * @copyright  2018 LibreNMS
  * @author     LibreNMS Contributors
 */
 
-$filter_hostname = mres($_POST['hostname']);
-$filter_range = mres($_POST['range']);
+$filter_hostname = mres($vars['hostname']);
+$filter_range = mres($vars['range']);
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
     $query = 'message:"'.$searchPhrase.'"';

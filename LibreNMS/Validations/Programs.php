@@ -26,10 +26,9 @@
 namespace LibreNMS\Validations;
 
 use LibreNMS\Config;
-use LibreNMS\Interfaces\ValidationGroup;
 use LibreNMS\Validator;
 
-class Programs implements ValidationGroup
+class Programs extends BaseValidation
 {
     /**
      * Validate this module.
@@ -69,7 +68,7 @@ class Programs implements ValidationGroup
             return;
         }
 
-        if (str_contains($output, '::1 is unreachable')) {
+        if (str_contains($output, '::1 is unreachable') || str_contains($output, 'Address family not supported')) {
             $validator->warn("IPv6 is disabled on your server, you will not be able to add IPv6 devices.");
             return;
         }
@@ -99,16 +98,11 @@ class Programs implements ValidationGroup
             return Config::get($bin);
         }
 
-        return is_executable(locate_binary($bin));
-    }
+        $located = Config::locateBinary($bin);
+        if (is_executable($located)) {
+            return $located;
+        }
 
-    /**
-     * Returns if this test should be run by default or not.
-     *
-     * @return bool
-     */
-    public function isDefault()
-    {
-        return true;
+        return false;
     }
 }

@@ -1,5 +1,5 @@
 os: ciena-sds
-text: Ciena Service Delivery Switch
+text: 'Ciena Service Delivery Switch'
 icon: ciena
 over:
     - { graph: device_bits, text: Traffic }
@@ -9,3 +9,4 @@ mib_dir:
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.6141.1.
+        - .1.3.6.1.4.1.1271.1.

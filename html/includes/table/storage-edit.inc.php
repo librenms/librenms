@@ -1,12 +1,12 @@
 <?php
 
-$device_id = mres($_POST['device_id']);
+$device_id = mres($vars['device_id']);
 
 $sql = " FROM `storage` AS `S` LEFT JOIN `devices` AS `D` ON `S`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `S`.`storage_deleted`=0";
 $param[] = $device_id;
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `S`.`storage_descr` LIKE '%$searchPhrase%' OR `S.`storage_perc` LIKE '%$searchPhrase%' OR `S`.`storage_perc_warn` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `S`.`storage_descr` LIKE '%$searchPhrase%' OR `S`.`storage_perc` LIKE '%$searchPhrase%' OR `S`.`storage_perc_warn` LIKE '%$searchPhrase%')";
 }
 
 $count_sql = "SELECT COUNT(`storage_id`) $sql";

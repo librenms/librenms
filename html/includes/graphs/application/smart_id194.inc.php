@@ -1,8 +1,8 @@
 <?php
 $unit_text     = 'Temp (C)';
 $unitlen       = 10;
-$bigdescrlen   = 10;
-$smalldescrlen = 10;
+$bigdescrlen   = 15;
+$smalldescrlen = 15;
 
 $rrdVar='id194';
 

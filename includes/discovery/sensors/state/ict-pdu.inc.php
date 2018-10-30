@@ -23,7 +23,7 @@
  * @author     Lorenzo Zafra<zafra@ualberta.ca>
  */
 
-$oids = snmpwalk_cache_oid($device, 'outputEntry', array(), 'ICT-MIB');
+$oids = snmpwalk_cache_oid($device, 'outputEntry', array(), 'ICT-DISTRIBUTION-PANEL-MIB');
 
 if (is_array($oids)) {
     $state_name = 'outputFuseStatus';
@@ -54,7 +54,7 @@ if (is_array($oids)) {
         $current_value_string = $entry[$state_name];
         if ($current_value_string == 'OK') {
             $current_value = 1;
-        } else if ($current_value_string == 'OPEN') {
+        } elseif ($current_value_string == 'OPEN') {
             $current_value = 2;
         }
 

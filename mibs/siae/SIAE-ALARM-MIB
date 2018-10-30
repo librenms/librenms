@@ -1,0 +1,777 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-ALARM-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE,
+             Integer32, Unsigned32, IpAddress
+        FROM SNMPv2-SMI
+             DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+             siaeMicroelettronicaSpa, siaeMib
+        FROM SIAE-TREE-MIB
+             accessControlLoginIpAddress
+        FROM SIAE-USER-MIB;
+
+    smalarm MODULE-IDENTITY
+        LAST-UPDATED "201610040000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: help@siaemic.com
+            "
+        DESCRIPTION
+            "Logger of the transitions of NE alarms and active alarm table.
+            "
+        REVISION "201610040000Z"
+        DESCRIPTION
+            "Fixed alarmIpSnmpAgentAddress type.
+            "
+        REVISION "201507170000Z"
+        DESCRIPTION
+            "Fixed alarmTrap OID.
+            "
+        REVISION "201503230000Z"
+        DESCRIPTION
+            "Removed alarmTrapNumber from alarmLogFTPStatusTrap.
+            "
+        REVISION "201503160000Z"
+        DESCRIPTION
+            "MAX-ACCESS clause of alarmTrapNumber is back to read-only 
+             value in order to allow a manager to synchronize alarms.
+            "
+        REVISION "201406230000Z"
+        DESCRIPTION
+            "Removed circular dependence from SIAE-EQUIP-MIB in IMPORTS.
+             Added alarmIpSnmpAgentAddress.
+             Changed MAX-ACCESS clause of alarmObjectId, alarmObjectVal,
+             alarmTrapDescription and alarmTrapNumber from read-only to 
+             accessible-for-notify.
+            "
+        REVISION "201403030000Z"
+        DESCRIPTION
+            "MIB version 01.00.01
+             Added alarmTable
+            "
+        REVISION "201402030000Z"
+        DESCRIPTION
+            "Improved description of alarmMibVersion
+            "
+        REVISION "201304160000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00
+            "
+    ::= { siaeMib 4 }
+
+----------------------------------------------------------------------------------
+--  TEXTUAL CONVENTIONS
+----------------------------------------------------------------------------------
+
+     AlarmStatus ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+         "This textual convenion defines the status of an alarm. The active 
+          status is related to the perceived severity.
+         "
+        SYNTAX       INTEGER {
+                              cleared                  (1),
+                              activeReportableStatus   (2),
+                              activeReportableWarning  (3),
+                              activeReportableMinor    (4),
+                              activeReportableMajor    (5),
+                              activeReportableCritical (6)
+                             }
+
+     AlarmSeverityCode ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+         "This textual convention defines the perceived severity associated
+          to an alarm.
+         "
+        SYNTAX      INTEGER {
+                             disable              (1),
+                             statusTrapEnable     (2),
+                             warningTrapEnable    (3),
+                             minorTrapEnable      (4),
+                             majorTrapEnable      (5),
+                             criticalTrapEnable   (6),
+                             statusTrapDisable    (18),
+                             warningTrapDisable   (19),
+                             minorTrapDisable     (20),
+                             majorTrapDisable     (21),
+                             criticalTrapDisable  (22)
+                            }
+
+----------------------------------------------------------------------------------
+--  object identifier inside the module
+----------------------------------------------------------------------------------
+
+    siaeNotificationEntry    OBJECT IDENTIFIER ::= { smalarm  2 }
+    alarmTrap                OBJECT IDENTIFIER ::= { siaeMib  0 }
+
+----------------------------------------------------------------------------------
+--  alarm GROUP
+----------------------------------------------------------------------------------
+--
+--  This group is used to manage the alarm log and active alarms.
+--
+----------------------------------------------------------------------------------
+
+------ Beginning --------------------------------------------------------------
+
+
+-------  Begin of alarmLogTable
+--
+    alarmMibVersion  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+        DEFVAL {1}
+    ::= {smalarm 1}
+
+    alarmLogTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     AlarmLogRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with Alarm records of the logger."
+    ::= {smalarm 3}
+
+    alarmLogRecord  OBJECT-TYPE
+        SYNTAX      AlarmLogRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Alarm record of the logger."
+        INDEX {alarmLogRecordId}
+    ::= {alarmLogTable 1}
+
+    AlarmLogRecord  ::=
+        SEQUENCE {
+            alarmLogRecordId               Integer32,
+            alarmLogObjectId               OBJECT IDENTIFIER,
+            alarmLogObjectVal              AlarmStatus,
+            alarmLogObjectSev              AlarmSeverityCode,
+            alarmLogDescription            DisplayString,
+            alarmLogEventTime              Unsigned32
+        }
+
+    alarmLogRecordId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is used as Index of alarmLogTable."
+    ::= {alarmLogRecord 1}
+
+    alarmLogObjectId  OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Object Identifier of the Managed Object with
+             Alarms or Controls active (not cleared Alarm Status)."
+    ::= {alarmLogRecord 2}
+
+    alarmLogObjectVal  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Alarm Status with associated severity."
+    ::= {alarmLogRecord 3}
+
+    alarmLogObjectSev  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Severity associated to the Alarm "
+    ::= {alarmLogRecord 4}
+
+    alarmLogDescription  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE(0..127))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ASCII string used to describe the event."
+    ::= {alarmLogRecord 5}
+
+    alarmLogEventTime  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "The time (in secs) when the event was registered in the Log since
+             01-Gen-1970."
+   ::= {alarmLogRecord 6}
+
+--
+-------  End of alarmLogTable
+
+--
+------- The following objects are used to map the "action"
+------- (delete record, transfer the log using NFS ...):
+--
+
+    alarmLogActionRequest  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             notActive  (0),
+                             delete     (1),
+                             read       (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to delete or to read the LOG using Ftp (file transfer)."
+    ::= {smalarm 4}
+
+    alarmLogFTPfile  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE(0..255))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Path and file name used when the log is transferred using Ftp (action = read)."
+    ::= {smalarm 5}
+
+--
+-------   The following objects are used to enable/disable the event
+-------   record write in the Log.
+--
+
+    alarmLogAlarmSeverityEnable  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object enables the event record write in the log according to
+             the severity:
+             Bit0 = Status
+             Bit1 = Warning
+             Bit2 = Minor
+             Bit3 = Major
+             Bit4 = Critical."
+        DEFVAL {'1f'h}
+    ::= {smalarm 6}
+
+    alarmLogStartHourEnable  OBJECT-TYPE
+        SYNTAX      INTEGER    (0..23)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object defines whit AlarmLogEndHourEnable the period during
+             a day when the alarm records must be written in the log."
+        DEFVAL {0}
+    ::= {smalarm 7}
+
+    alarmLogEndHourEnable  OBJECT-TYPE
+        SYNTAX      INTEGER    (0..23)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object defines whit AlarmLogStartHourEnable the period during
+             a day when the alarm records must be written in the log."
+        DEFVAL {23}
+    ::= {smalarm 8}
+
+--
+-------  The following objects are used as filters when the manager reads or
+-------  deletes the events in the LOG.
+--
+
+    alarmLogStartTimeFilter  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The events with EventTime greater than this object are read/delete
+             from the log. Null value means no filter."
+        DEFVAL {0}
+    ::= {smalarm 9}
+
+    alarmLogEndTimeFilter  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The events with EventTime less than this object are read/delete
+             from the log. Null value means no filter."
+        DEFVAL {0}
+    ::= {smalarm 10}
+
+    alarmLogManagedObjectFilter  OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The Object Identifier of the Managed Object that has to be
+             read/delete from the log. Null value means no filter."
+        DEFVAL {siaeMicroelettronicaSpa}
+    ::= {smalarm 11}
+
+    alarmLogAlarmSeverityFilter  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object defines the alarm severity of the records that must
+             be read/delete from the log.
+             Bit0 = Status
+             Bit1 = Warning
+             Bit2 = Minor
+             Bit3 = Major
+             Bit4 = Critical."
+        DEFVAL {'1f'h}
+    ::= {smalarm 12}
+
+--
+-------  The following objects are used as status indicator of FTP transfer
+--
+
+    alarmLogFTPStatus  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             transferring  (1),
+                             completed     (2),
+                             interrupted   (3),
+                             empty         (4)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Status of alarm logger Ftp transfer operation."
+        DEFVAL {completed}
+    ::= {smalarm 14}
+
+    alarmLogFTPStatusTrapNotification  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             trapDisable        (1),
+                             trapEnable         (2),
+                             trapEnableWithACK  (34)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enables/disables the trap generation on FTP tranfer operation."
+        DEFVAL {trapEnable}
+    ::= {smalarm 15}
+
+    alarmLogLastEventTime  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It is the Event time of the last alarm inserted into the alarm log."
+    ::= {smalarm 16}
+
+-------  Begin of alarmActiveTable
+--
+    alarmActiveTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF    AlarmActiveRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with one record for each Alarms&Controls that is active in
+             the NE."
+    ::= {smalarm 17}
+
+    alarmActiveRecord  OBJECT-TYPE
+        SYNTAX      AlarmActiveRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Alarms&Controls record."
+        INDEX {alarmActiveObjectId}
+    ::= {alarmActiveTable 1}
+
+    AlarmActiveRecord  ::=
+        SEQUENCE {
+            alarmActiveObjectId       OBJECT IDENTIFIER,
+            alarmActiveObjectVal      AlarmStatus,
+            alarmActiveDescription    DisplayString,
+            alarmActiveEventTime      Unsigned32,
+            alarmActiveFloodingStatus INTEGER
+        }
+
+    alarmActiveObjectId  OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Object Identifier of the Managed Object with
+             Alarms or Controls active (not cleared Alarm Status)."
+    ::= {alarmActiveRecord 1}
+
+    alarmActiveObjectVal  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Alarm Status with associated severity."
+    ::= {alarmActiveRecord 2}
+
+    alarmActiveDescription  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE(0..127))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ASCII string used to describe the event."
+    ::= {alarmActiveRecord 3}
+
+    alarmActiveEventTime  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The time when the Alarm became active.
+             In seconds since 01/01/70."
+    ::= {alarmActiveRecord 4}
+
+    alarmActiveFloodingStatus  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             off        (1),
+                             on         (2)
+                            }        
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the 'flooding' status."
+    ::= {alarmActiveRecord 5}
+
+--
+-------  End of alarmActiveTable
+
+    alarmSyntesysCritical  OBJECT-TYPE
+       SYNTAX      INTEGER {
+                            cleared                   (1),
+                            activeReportableCritical  (6)
+                           }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "OR of all Critical Alarms."
+    ::= {smalarm 18}
+
+    alarmSyntesysCriticalSeverityCode  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disable                    (1),
+                             criticalTrapEnable         (6),
+                             criticalTrapDisable        (22)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the alarmSyntesysCritical
+             and enables/disables the trap generation on status change event."
+        DEFVAL {criticalTrapEnable}
+    ::= {smalarm 19}
+
+    alarmSyntesysMajor  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             cleared                (1),
+                             activeReportableMajor  (5)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "OR of all Major Alarms."
+    ::= {smalarm 20}
+
+    alarmSyntesysMajorSeverityCode  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disable                 (1),
+                             majorTrapEnable         (5),
+                             majorTrapDisable        (21)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to alarmSyntesysMajor
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {smalarm 21}
+
+    alarmSyntesysMinor  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             cleared                (1),
+                             activeReportableMinor  (4)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "OR of all Minor Alarms."
+    ::= {smalarm 22}
+
+    alarmSyntesysMinorSeverityCode  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disable                 (1),
+                             minorTrapEnable         (4),
+                             minorTrapDisable        (20)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to alarmSyntesysMinor
+             and enables/disables the trap generation on status change event."
+        DEFVAL {minorTrapEnable}
+    ::= {smalarm 23}
+
+    alarmSyntesysWarning  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             cleared                  (1),
+                             activeReportableWarning  (3)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "OR of all Warning Alarms."
+    ::= {smalarm 24}
+
+    alarmSyntesysWarningSeverityCode  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disable                   (1),
+                             warningTrapEnable         (3),
+                             warningTrapDisable        (19)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to alarmSyntesysStatus
+             and enables/disables the trap generation on status change event."
+        DEFVAL {warningTrapEnable}
+    ::= {smalarm 25}
+
+   alarmSyntesysStatus  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             cleared                  (1),
+                             activeReportableStatus   (2)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "OR of all Warning Alarms."
+    ::= {smalarm 26}
+
+    alarmSyntesysStatusSeverityCode  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disable                   (1),
+                             statusTrapEnable          (2),
+                             statusTrapDisable         (18)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to alarmSyntesysStatus
+             and enables/disables the trap generation on status change event."
+        DEFVAL {statusTrapEnable}
+    ::= {smalarm 27}
+
+    alarmAntiFlooding  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disable                   (1),
+                             enable                    (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enables or disables the alarm anti-flooding (filtering)
+             algorithm. According to such algorithm if the number of
+             event notifications that an alarm receives within a
+             specified time period, namely the observation period, exceeds
+             a given high threshold value, the alarm enters a 'flooding'
+             state. Once an alarm has entered such flooding state,
+             its status is forced to active, according to its related
+             severity, and no further event notifications are processed
+             (neither trapped nor logged).
+             An alarm exits the flooding state when the number of event
+             notifications, received within a subsequent observation
+             period, drops below a given low thresold value. On exiting
+             the flooding state, the trap and log status of an alarm get
+             aligned to the last notified event."               
+        DEFVAL {disable}
+    ::= {smalarm 28}
+
+    alarmAntiFloodingWindow  OBJECT-TYPE
+        SYNTAX      INTEGER  (10..120)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the time duration in seconds of the observation
+             period, during which the number of event notifications
+             of any alarm is checked to determine the alarm flooding
+             state."
+        DEFVAL {60}
+    ::= {smalarm 29}
+
+    alarmAntiFloodingHighWater  OBJECT-TYPE
+        SYNTAX      INTEGER  (3..10)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the threshold value of the number of event
+             notifications, occurring during the observation period,
+             beyond which an alarm enters the flooding state."
+        DEFVAL {3}
+    ::= {smalarm 30}
+
+    alarmAntiFloodingLowWater  OBJECT-TYPE
+        SYNTAX      INTEGER  (1..8)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the threshold value of the number of event
+             notifications, occurring during the observation period,
+             below which an alarm exits the flooding state. The value
+             being assigned to this leaf must be strictly lower than 
+             the current value of leaf alarmAntiFloodingHighWater."
+        DEFVAL {1}
+    ::= {smalarm 31}
+
+-------  Begin of alarmItemTable
+--
+
+    alarmItemTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     AlarmRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with record of available alarms in the NE.
+             This table reports every created alarm in the NE.
+            "
+    ::= {smalarm 32}
+
+    alarmRecord  OBJECT-TYPE
+        SYNTAX      AlarmRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Alarm record."
+        INDEX {alarmOid}
+    ::= {alarmItemTable 1}
+
+    AlarmRecord  ::=
+        SEQUENCE {
+            alarmOid         OBJECT IDENTIFIER,
+            alarmDescription DisplayString
+        }
+
+    alarmOid  OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Object Identifier of the Managed Object with
+             Alarms or Controls active (not cleared Alarm Status)."
+    ::= {alarmRecord 1}
+
+    alarmDescription  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE(0..127))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ASCII string used to describe the alarm."
+    ::= {alarmRecord 2}
+
+--
+-------  End of alarmTable
+
+------------------------------------------------------------------------------
+--
+--  The alarm TRAP description
+--
+------------------------------------------------------------------------------
+
+    alarmObjectId OBJECT-TYPE
+        SYNTAX OBJECT IDENTIFIER
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+             "OID of the status changed alarm
+             "
+    ::= { siaeNotificationEntry 1 }
+
+    alarmObjectVal OBJECT-TYPE
+        SYNTAX AlarmStatus 
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+             "INTEGER value of the status changed alarm
+             "
+    ::= { siaeNotificationEntry 2 }
+                
+    alarmTrapDescription OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..127))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+             "Optional Description of the notification
+             "
+    ::= { siaeNotificationEntry 3 }
+
+    alarmTrapNumber OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+             "Sequential number of trap sent from NE
+             "
+    ::= { siaeNotificationEntry 4 }
+
+    alarmIpSnmpAgentAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+             "Reflects the value of equipIpSnmpAgentAddress.
+             "
+    ::= { siaeNotificationEntry 5 }
+
+    alarmTrapObject NOTIFICATION-TYPE
+            OBJECTS { alarmIpSnmpAgentAddress, alarmObjectId, alarmObjectVal, alarmTrapDescription, alarmTrapNumber }
+        STATUS current
+        DESCRIPTION
+             "This event is generated for every changed alarm status. 
+             "
+    ::= { alarmTrap 3373 }
+
+-----------------------
+--
+--  The alarm Group generates the following TRAP:
+--
+-----------------------
+
+    alarmLogFTPStatusTrap  NOTIFICATION-TYPE
+        OBJECTS  {alarmIpSnmpAgentAddress, alarmLogFTPStatus, accessControlLoginIpAddress}
+        STATUS current
+        DESCRIPTION
+            "This event is generated when the status of FTP transfer is changed.
+             The data passed with the event are:
+                1) alarmIpSnmpAgentAddress
+                2) alarmLogFTPStatus
+                3) accessControlLoginIpAddress"
+    ::= {alarmTrap 401}
+
+------ End group -------------------------------------------------------------
+
+END
+

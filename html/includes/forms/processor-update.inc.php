@@ -11,9 +11,12 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+
+use LibreNMS\Authentication\LegacyAuth;
+
 header('Content-type: application/json');
 
-if (is_admin() === false) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     $response = array(
         'status'  => 'error',
         'message' => 'Need to be admin',

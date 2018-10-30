@@ -2,7 +2,7 @@ os: edgeswitch
 text: EdgeSwitch
 type: network
 icon: ubiquiti
-ifname: 1
+ifname: true
 bad_snmpEngineTime: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }

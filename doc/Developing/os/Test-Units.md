@@ -1,4 +1,5 @@
 source: Developing/os/Test-Units.md
+path: blob/master/doc/
 
 # Tests
 
@@ -11,7 +12,7 @@ consistent manner.
 
 > We utilise [snmpsim](http://snmpsim.sourceforge.net/) to do unit testing. For OS discovery, we can mock snmpsim, but
 > for other tests you will need it installed and functioning.  We run snmpsim during our integration tests, but not by
-> default when running `./scripts/pre-commit.php`.
+> default when running `./scripts/pre-commit.php`.  You can install snmpsim with the command `pip3 install snmpsim`.
 
 ## Capturing test data
 
@@ -20,7 +21,7 @@ consistent manner.
  Make sure to re-run the script if you add additional support. Check the command-line help for more options.
 
 After you have collected snmp data, run `./scripts/save-test-data.php` with the --os (-o) option to dump the post discovery
-and post poll database entries to json files.
+and post poll database entries to json files. This step requires snmpsim, if you are having issues, the maintainers may help you generate it from the snmprec you created in the previous step.
 
 Generally, you will only need to capture data once.  After you have the data you need in the snmprec file, you can
 just use save-test-data.php to update the database dump (json) after that.
@@ -32,6 +33,8 @@ specify a different variant of the os, this will be tested completely separate f
 one variant, please do not specify one.
 
 ## Running tests
+
+**Note:** To run tests, ensure you have executed `./scripts/composer_wrapper.php install` from your LibreNMS root directory. This will read composer.json and install any dependencies required. 
 
 After you have saved your test data, you should run `./scripts/pre-commit.php -p -u` verify they pass.
 
@@ -101,12 +104,12 @@ data, you must use a variant to store your test data (-v).
 
 ### Add initial detection
 1. Add device to LibreNMS. It is generic and device_id = 42
-2. Run `./scripts/collect-snmp-data.php -h 42 -m os`, initial snmprec will be created
+2. Run `./scripts/collect-snmp-data.php -h 42`, initial snmprec will be created
 3. [Add initial detection](Initial-Detection.md) for `example-os`
 4. Run discovery to make sure it detects properly `./discovery.php -h 42`
 5. Add any additional os items like version, hardware, features, or serial.
-6. If there is additional snmp data required, run `./scripts/collect-snmp-data.php -h 42 -m os`
-7. Run `./scripts/save-test-data.php -o example-os -m os` to update the dumped database data.
+6. If there is additional snmp data required, run `./scripts/collect-snmp-data.php -h 42`
+7. Run `./scripts/save-test-data.php -o example-os` to update the dumped database data.
 7. Review data. If you modified the snmprec or code (don't modify json manually) run `./scripts/save-test-data.php -o example-os -m os`
 8. Run `./scripts/pre-commit.php --db --snmpsim`
 9. If the tests succeed submit a pull request

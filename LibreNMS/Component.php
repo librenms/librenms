@@ -159,8 +159,12 @@ class Component
             }
 
             // Sort each component array so the attributes are in order.
-            ksort($RESULT[$RESULT[$COMPONENT['device_id']][$COMPONENT['id']]]);
-            ksort($RESULT[$RESULT[$COMPONENT['device_id']]]);
+            if (is_array($RESULT[$RESULT[$COMPONENT['device_id']][$COMPONENT['id']]])) {
+                ksort($RESULT[$RESULT[$COMPONENT['device_id']][$COMPONENT['id']]]);
+            }
+            if (is_array($RESULT[$RESULT[$COMPONENT['device_id']]])) {
+                ksort($RESULT[$RESULT[$COMPONENT['device_id']]]);
+            }
         }
 
         // limit    array(start,count)
@@ -294,7 +298,7 @@ class Component
 
         $OLD = $this->getComponents($device_id);
         // Loop over each component.
-        foreach ($ARRAY as $COMPONENT => $AVP) {
+        foreach ((array)$ARRAY as $COMPONENT => $AVP) {
             // Make sure the component already exists.
             if (!isset($OLD[$device_id][$COMPONENT])) {
                 // Error. Component doesn't exist in the database.

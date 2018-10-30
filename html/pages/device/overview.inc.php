@@ -2,10 +2,10 @@
 
 $overview = 1;
 
-$ports['total']    = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ?", array($device['device_id']));
-$ports['up']       = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifOperStatus` = 'up' AND `ifAdminStatus` = 'up'", array($device['device_id']));
-$ports['down']     = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up'", array($device['device_id']));
-$ports['disabled'] = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifAdminStatus` = 'down'", array($device['device_id']));
+$ports['total']    = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `disabled` = 0", array($device['device_id']));
+$ports['up']       = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifOperStatus` = 'up' AND `ifAdminStatus` = 'up' AND `disabled` = 0", array($device['device_id']));
+$ports['down']     = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `disabled` = 0", array($device['device_id']));
+$ports['disabled'] = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifAdminStatus` = 'down' AND `disabled` = 0", array($device['device_id']));
 
 $services = get_service_status($device['device_id']);
 $services['total'] = array_sum($services);

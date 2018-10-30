@@ -6,9 +6,8 @@ if (Config::get('enable_inventory')) {
     // Legacy entPhysical - junos/timos/cisco
     include 'includes/discovery/entity-physical/entity-physical.inc.php';
 
-    // Cisco CIMC
-    if ($device['os'] == 'cimc') {
-        include 'includes/discovery/entity-physical/cimc.inc.php';
+    if (file_exists(Config::get('install_dir') . "/includes/discovery/entity-physical/{$device['os']}.inc.php")) {
+        include Config::get('install_dir') . "/includes/discovery/entity-physical/{$device['os']}.inc.php";
     }
 
     // Delete any entries that have not bee accounted for.

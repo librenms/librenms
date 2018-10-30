@@ -19,7 +19,7 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Tony Murray
+ * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
@@ -27,5 +27,24 @@ namespace LibreNMS\Exceptions;
 
 class DatabaseConnectException extends \Exception
 {
-
+    /**
+     * Render the exception into an HTTP or JSON response.
+     *
+     * @param  \Illuminate\Http\Request
+     * @return \Illuminate\Http\Response
+     */
+    public function render(\Illuminate\Http\Request $request)
+    {
+        if ($request->wantsJson()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error connecting to database: ' . $this->getMessage(),
+            ]);
+        } else {
+            return response()->view('errors.generic', [
+                'title' => 'Error connecting to database.',
+                'content' => $this->getMessage(),
+            ]);
+        }
+    }
 }

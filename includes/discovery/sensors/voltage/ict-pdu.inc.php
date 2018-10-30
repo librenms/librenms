@@ -24,7 +24,7 @@
  */
 
 // System Voltage
-$systemVoltage = trim(snmp_get($device, 'systemVoltage.0', '-Oqv', 'ICT-MIB'), '" ');
+$systemVoltage = trim(snmp_get($device, 'systemVoltage.0', '-Oqv', 'ICT-DISTRIBUTION-PANEL-MIB'), '" ');
 
 if (!empty($systemVoltage)) {
     $divisor = 1;

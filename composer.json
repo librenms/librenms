@@ -12,12 +12,23 @@
         "issues": "https://github.com/librenms/librenms/issues/",
         "irc": "irc://irc.freenode.org/#librenms"
     },
-    "config": {
-        "optimize-autoloader": true,
-        "platform": {"php": "5.6.4"}
-    },
+    "repositories":
+    [
+      {
+        "type": "vcs",
+        "url": "https://github.com/librenms/StringBladeCompiler"
+      }
+    ],
     "require": {
         "php": ">=5.6.4",
+        "ext-pdo": "*",
+        "ext-pcre": "*",
+        "ext-curl": "*",
+        "ext-session": "*",
+        "ext-xml": "*",
+        "ext-gd": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
         "ezyang/htmlpurifier": "^4.8",
         "phpmailer/phpmailer": "^5.2.21",
         "slim/slim": "^2.6",
@@ -32,23 +43,52 @@
         "symfony/yaml": "^2.8",
         "rmccue/requests": "^1.7",
         "palanik/corsslim": "^1.1",
-        "influxdb/influxdb-php": "^1.14"
+        "influxdb/influxdb-php": "^1.14",
+        "laravel/laravel": "5.4.*",
+        "oriceon/toastr-5-laravel": "dev-master",
+        "wpb/string-blade-compiler": "3.4.x-dev",
+        "fico7489/laravel-pivot": "*",
+        "fideloper/proxy": "^4.0"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.9.1",
         "phpunit/phpunit": "5.*",
         "jakub-onderka/php-parallel-lint": "*",
         "jakub-onderka/php-console-highlighter": "*",
-        "fojuth/readmegen": "1.*"
+        "fojuth/readmegen": "1.*",
+        "barryvdh/laravel-ide-helper": "^2.4",
+        "barryvdh/laravel-debugbar": "~2.4",
+        "justinrainbow/json-schema": "^5.2",
+        "fzaninotto/faker": "^1.8"
+    },
+    "suggest": {
+        "ext-memcached": "Required if you utilize distributed polling",
+        "ext-posix": "Allows for additional validation tests",
+        "ext-mysqlnd": "*"
     },
     "autoload": {
         "psr-4": {
+            "App\\": "app",
             "LibreNMS\\": "LibreNMS",
+            "LibreNMS\\Plugins\\" : "html/plugins",
             "LibreNMS\\Tests\\": "tests"
         }
     },
     "scripts": {
         "pre-update-cmd": "LibreNMS\\ComposerHelper::preUpdate",
-        "pre-install-cmd": "LibreNMS\\ComposerHelper::preInstall"
+        "pre-install-cmd": "LibreNMS\\ComposerHelper::preInstall",
+        "post-root-package-install": "LibreNMS\\ComposerHelper::postRootPackageInstall",
+        "post-create-project-cmd": [
+            "php artisan key:generate"
+        ],
+        "post-install-cmd": [
+            "LibreNMS\\ComposerHelper::postInstall",
+            "Illuminate\\Foundation\\ComposerScripts::postInstall",
+            "php artisan optimize"
+        ],
+        "post-update-cmd": [
+            "Illuminate\\Foundation\\ComposerScripts::postUpdate",
+            "php artisan optimize"
+        ]
     }
 }

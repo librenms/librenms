@@ -2,12 +2,12 @@ os: ict-pdu
 text: 'ICT Distribution Series'
 type: power
 icon: ict
-nobulk: 1
+nobulk: true
 mib_dir:
     - ict
 over:
-    - { graph: device_current, text: 'Current' }
-    - { graph: device_voltage, text: 'Voltage' }
+    - { graph: device_current, text: Current }
+    - { graph: device_voltage, text: Voltage }
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.39145.10

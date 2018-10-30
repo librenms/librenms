@@ -1,6 +1,13 @@
 <?php
 
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Exceptions\JsonAppException;
+use LibreNMS\Exceptions\JsonAppPollingFailedException;
+use LibreNMS\Exceptions\JsonAppParsingFailedException;
+use LibreNMS\Exceptions\JsonAppBlankJsonException;
+use LibreNMS\Exceptions\JsonAppMissingKeysException;
+use LibreNMS\Exceptions\JsonAppWrongVersionException;
+use LibreNMS\Exceptions\JsonAppExtendErroredException;
 
 function bulk_sensor_snmpget($device, $sensors)
 {
@@ -64,10 +71,6 @@ function poll_sensor($device, $class)
 
             if (file_exists('includes/polling/sensors/'. $class .'/'. $device['os'] .'.inc.php')) {
                 require 'includes/polling/sensors/'. $class .'/'. $device['os'] .'.inc.php';
-            }
-
-            if (isset($sensor['user_func']) && function_exists($sensor['user_func'])) {
-                $sensor_value = $sensor['user_func']($sensor_value);
             }
 
             if ($class == 'temperature') {
@@ -165,6 +168,10 @@ function record_sensor_data($device, $all_sensors)
             $sensor_value = ($sensor_value * $sensor['sensor_multiplier']);
         }
 
+        if (isset($sensor['user_func']) && function_exists($sensor['user_func'])) {
+            $sensor_value = $sensor['user_func']($sensor_value);
+        }
+
         $rrd_name = get_sensor_rrd_name($device, $sensor);
 
         $rrd_def = RrdDefinition::make()->addDataset('sensor', 'GAUGE');
@@ -196,8 +203,8 @@ function record_sensor_data($device, $all_sensors)
         if ($sensor['sensor_class'] == 'state' && $prev_sensor_value != $sensor_value) {
             $trans = array_column(
                 dbFetchRows(
-                    "SELECT `state_translations`.`state_value`, `state_translations`.`state_descr` FROM `sensors_to_state_indexes` LEFT JOIN `state_translations` USING (`state_index_id`) WHERE `sensors_to_state_indexes`.`sensor_id`=? AND `state_translations`.`state_value` IN ($sensor_value,$prev_sensor_value)",
-                    array($sensor['sensor_id'])
+                    "SELECT `state_translations`.`state_value`, `state_translations`.`state_descr` FROM `sensors_to_state_indexes` LEFT JOIN `state_translations` USING (`state_index_id`) WHERE `sensors_to_state_indexes`.`sensor_id`=? AND `state_translations`.`state_value` IN (?,?)",
+                    [$sensor['sensor_id'], $sensor_value, $prev_sensor_value]
                 ),
                 'state_descr',
                 'state_value'
@@ -211,9 +218,16 @@ function record_sensor_data($device, $all_sensors)
     }
 }
 
-function poll_device($device, $options)
+/**
+ * @param array $device The device to poll
+ * @param bool $force_module Ignore device module overrides
+ * @return bool
+ */
+function poll_device($device, $force_module = false)
 {
     global $config, $device;
+
+    $device_start = microtime(true);
 
     $attribs = get_dev_attribs($device['device_id']);
     $device['attribs'] = $attribs;
@@ -224,13 +238,14 @@ function poll_device($device, $options)
     $device['snmp_max_oid'] = $attribs['snmp_max_oid'];
 
     unset($array);
-    $device_start = microtime(true);
+
     // Start counting device poll time
     echo 'Hostname: ' . $device['hostname'] . PHP_EOL;
     echo 'Device ID: ' . $device['device_id'] . PHP_EOL;
     echo 'OS: ' . $device['os'];
     $ip = dnslookup($device);
-    $db_ip = inet_pton($ip);
+
+    $db_ip = isset($ip) ? inet_pton($ip) : null;
 
     if (!empty($db_ip) && inet6_ntop($db_ip) != inet6_ntop($device['ip'])) {
         log_event('Device IP changed to ' . $ip, $device, 'system', 3);
@@ -262,20 +277,9 @@ function poll_device($device, $options)
         $graphs    = array();
         $oldgraphs = array();
 
-        $force_module = false;
         if ($device['snmp_disable']) {
             $config['poller_modules'] = array();
         } else {
-            if ($options['m']) {
-                $config['poller_modules'] = array();
-                foreach (explode(',', $options['m']) as $module) {
-                    if (is_file('includes/polling/' . $module . '.inc.php')) {
-                        $config['poller_modules'][$module] = 1;
-                        $force_module = true;
-                    }
-                }
-            }
-
             // we always want the core module to be included, prepend it
             $config['poller_modules'] = array('core' => true) + $config['poller_modules'];
         }
@@ -293,7 +297,16 @@ function poll_device($device, $options)
                 $start_memory = memory_get_usage();
                 $module_start = microtime(true);
                 echo "\n#### Load poller module $module ####\n";
-                include "includes/polling/$module.inc.php";
+
+                try {
+                    include "includes/polling/$module.inc.php";
+                } catch (Exception $e) {
+                    // isolate module exceptions so they don't disrupt the polling process
+                    echo $e->getTraceAsString() .PHP_EOL;
+                    c_echo("%rError in $module module.%n " . $e->getMessage() . PHP_EOL);
+                    logfile("Error in $module module. " . $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL);
+                }
+
                 $module_time = microtime(true) - $module_start;
                 $module_mem  = (memory_get_usage() - $start_memory);
                 printf("\n>> Runtime for poller module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
@@ -329,7 +342,8 @@ function poll_device($device, $options)
         // Update device_groups
         UpdateGroupsForDevice($device['device_id']);
 
-        if (!isset($options['m'])) {
+        if (!$force_module && !empty($graphs)) {
+            echo "Enabling graphs: ";
             // FIXME EVENTLOGGING -- MAKE IT SO WE DO THIS PER-MODULE?
             // This code cycles through the graphs already known in the database and the ones we've defined as being polled here
             // If there any don't match, they're added/deleted from the database.
@@ -383,11 +397,18 @@ function poll_device($device, $options)
             data_update($device, 'poller-perf', $tags, $fields);
         }
 
-        $update_array['last_polled']           = array('NOW()');
-        $update_array['last_polled_timetaken'] = $device_time;
+        if (!$force_module) {
+            // don't update last_polled time if we are forcing a specific module to be polled
+            $update_array['last_polled']           = array('NOW()');
+            $update_array['last_polled_timetaken'] = $device_time;
+        }
 
-        // echo("$device_end - $device_start; $device_time $device_run");
-        echo "Polled in $device_time seconds\n";
+        $updated = dbUpdate($update_array, 'devices', '`device_id` = ?', array($device['device_id']));
+        if ($updated) {
+            d_echo('Updating ' . $device['hostname'] . PHP_EOL);
+        }
+
+        echo "\nPolled in $device_time seconds\n";
 
         // check if the poll took to long and log an event
         if ($device_time > $config['rrd']['step']) {
@@ -395,18 +416,15 @@ function poll_device($device, $options)
                 ' minutes!  This will cause gaps in graphs.', $device, 'system', 5);
         }
 
-        d_echo('Updating '.$device['hostname']."\n");
-
-        $updated = dbUpdate($update_array, 'devices', '`device_id` = ?', array($device['device_id']));
-        if ($updated) {
-            echo "UPDATED!\n";
-        }
-
         unset($storage_cache);
         // Clear cache of hrStorage ** MAYBE FIXME? **
         unset($cache);
         // Clear cache (unify all things here?)
-    }//end if
+
+        return true; // device was polled
+    }
+
+    return false; // device not polled
 }//end poll_device()
 
 /**
@@ -538,6 +556,16 @@ function location_to_latlng($device)
                         $api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=$new_device_location";
                     }
                     break;
+                case "mapquest":
+                    d_echo("Mapquest geocode engine being used\n");
+                    $api_key = ($config['geoloc']['api_key']);
+                    if (!empty($api_key)) {
+                        d_echo("Use Mapquest API key: $api_key\n");
+                        $api_url = "http://open.mapquestapi.com/geocoding/v1/address?key=$api_key&location=$new_device_location&thumbMaps=false";
+                    } else {
+                        d_echo("No geocode API key set\n");
+                    }
+                    break;
             }
             $curl_init = curl_init($api_url);
             set_curl_proxy($curl_init);
@@ -556,6 +584,13 @@ function location_to_latlng($device)
                         $bad_loc = true;
                     }
                     break;
+                case "mapquest":
+                    if ($data['info']['statuscode'] == 0) {
+                        $loc['lat'] = $data['results'][0]['locations'][0]['latLng']['lat'];
+                        $loc['lng'] = $data['results'][0]['locations'][0]['latLng']['lng'];
+                    } else {
+                        $bad_loc = true;
+                    }
             }
             if ($bad_loc === true) {
                 d_echo("Bad lat / lng received\n");
@@ -648,15 +683,15 @@ function update_application($app, $response, $metrics = array(), $status = '')
                     array(
                         'app_id' => $app['app_id'],
                         'metric' => $metric_name,
-                        'value' => (int)$value,
+                        'value' => $value,
                     ),
                     'application_metrics'
                 );
                 echo '+';
-            } elseif ((int)$value != (int)$db_metrics[$metric_name]['value']) {
+            } elseif ($value != $db_metrics[$metric_name]['value']) {
                 dbUpdate(
                     array(
-                        'value' => (int)$value,
+                        'value' => $value,
                         'value_prev' => $db_metrics[$metric_name]['value'],
                     ),
                     'application_metrics',
@@ -689,4 +724,91 @@ function convert_to_celsius($value)
 {
     $value = ($value - 32) / 1.8;
     return sprintf('%.02f', $value);
+}
+
+
+/**
+ * This is to make it easier polling apps. Also to help standardize around JSON.
+ *
+ * The required keys for the returned JSON are as below.
+ *  version     - The version of the snmp extend script. Should be numeric and at least 1.
+ *  error       - Error code from the snmp extend script. Should be > 0 (0 will be ignored and negatives are reserved)
+ *  errorString - Text to describe the error.
+ *  data        - An key with an array with the data to be used.
+ *
+ * If the app returns an error, an exception will be raised.
+ * Positive numbers will be errors returned by the extend script.
+ *
+ * Possible parsing related errors:
+ * -2 : Failed to fetch data from the device
+ * -3 : Could not decode the JSON.
+ * -4 : Empty JSON parsed, meaning blank JSON was returned.
+ * -5 : Valid json, but missing required keys
+ * -6 : Returned version is less than the min version.
+ *
+ * Error checking may also be done via checking the exceptions listed below.
+ *   JsonAppPollingFailedException, -2 : Empty return from SNMP.
+ *   JsonAppParsingFailedException, -3 : Could not parse the JSON.
+ *   JsonAppBlankJsonException, -4     : Blank JSON.
+ *   JsonAppMissingKeysException, -5   : Missing required keys.
+ *   JsonAppWrongVersionException , -6 : Older version than supported.
+ *   JsonAppExtendErroredException     : Polling and parsing was good, but the returned data has an error set.
+ *                                       This may be checked via $e->getParsedJson() and then checking the
+ *                                       keys error and errorString.
+ * The error value can be accessed via $e->getCode()
+ * The output can be accessed via $->getOutput() Only returned for code -3 or lower.
+ * The parsed JSON can be access via $e->getParsedJson()
+ *
+ * All of the exceptions extend JsonAppException.
+ *
+ * If the error is less than -1, you can assume it is a legacy snmp extend script.
+ *
+ * @param array $device
+ * @param string $extend the extend name. For example, if 'zfs' is passed it will be converted to 'nsExtendOutputFull.3.122.102.115'.
+ * @param integer $min_version the minimum version to accept for the returned JSON. default: 1
+ *
+ * @return array The json output data parsed into an array
+ * @throws JsonAppBlankJsonException
+ * @throws JsonAppExtendErroredException
+ * @throws JsonAppMissingKeysException
+ * @throws JsonAppParsingFailedException
+ * @throws JsonAppPollingFailedException
+ * @throws JsonAppWrongVersionException
+ */
+function json_app_get($device, $extend, $min_version = 1)
+{
+    $output = snmp_get($device, 'nsExtendOutputFull.'.string_to_oid($extend), '-Oqv', 'NET-SNMP-EXTEND-MIB');
+
+    // make sure we actually get something back
+    if (empty($output)) {
+        throw new JsonAppPollingFailedException("Empty return from snmp_get.", -2);
+    }
+
+    //  turn the JSON into a array
+    $parsed_json = json_decode(stripslashes($output), true);
+
+    // improper JSON or something else was returned. Populate the variable with an error.
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        throw new JsonAppParsingFailedException("Invalid JSON", $output, -3);
+    }
+
+    // There no keys in the array, meaning '{}' was was returned
+    if (empty($parsed_json)) {
+        throw new JsonAppBlankJsonException("Blank JSON returned.", $output, -4);
+    }
+
+    // It is a legacy JSON app extend, meaning these are not set
+    if (!isset($parsed_json['error'], $parsed_json['data'], $parsed_json['errorString'], $parsed_json['version'])) {
+        throw new JsonAppMissingKeysException("Legacy script or extend error, missing one or more required keys.", $output, $parsed_json, -5);
+    }
+
+    if ($parsed_json['version'] < $min_version) {
+        throw new JsonAppWrongVersionException("Script,'".$parsed_json['version']."', older than required version of '$min_version'", $output, $parsed_json, -6);
+    }
+
+    if ($parsed_json['error'] != 0) {
+        throw new JsonAppExtendErroredException("Script returned exception: {$parsed_json['errorString']}", $output, $parsed_json, $parsed_json['error']);
+    }
+
+    return $parsed_json;
 }

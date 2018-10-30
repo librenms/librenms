@@ -12,7 +12,9 @@
  * the source code distribution for details.
  */
 
-if (is_admin() === false) {
+use LibreNMS\Authentication\LegacyAuth;
+
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
@@ -49,7 +51,7 @@ if ($sub_type == 'new-maintenance') {
     if (!in_array($recurring, array(0,1))) {
         $message .= 'Missing recurring choice<br />';
     }
-    
+
     // check values if recurring is set to yes
     if ($recurring == 1) {
         if (empty($start_recurring_dt)) {
@@ -70,21 +72,21 @@ if ($sub_type == 'new-maintenance') {
         } else {
             $end_recurring_dt = null;
         }
-        
+
         if (empty($start_recurring_hr)) {
             $message .= 'Missing start recurring hour<br />';
         }
-                
+
         if (empty($end_recurring_hr)) {
             $message .= 'Missing end recurring hour<br />';
         }
-        
+
         if (isset($_POST['recurring_day']) && is_array($_POST['recurring_day']) && !empty($_POST['recurring_day'])) {
             $recurring_day = implode(',', $_POST['recurring_day']);
         } else {
             $recurring_day = null;
         }
-        
+
         // recurring = 1 => empty no reccurency values to be sure.
         $start = '0000-00-00 00:00:00';
         $end = '0000-00-00 00:00:00';
@@ -92,14 +94,14 @@ if ($sub_type == 'new-maintenance') {
         if (empty($start)) {
             $message .= 'Missing start date<br />';
         }
-    
+
         if (empty($end)) {
             $message .= 'Missing end date<br />';
         }
-        
+
         // recurring = 0 => empty no reccurency values to be sure.
-        $start_recurring_dt = '0000-00-00';
-        $end_recurring_dt = null;
+        $start_recurring_dt = '1970-01-02';
+        $end_recurring_dt = '1970-01-02';
         $start_recurring_hr = '00:00:00';
         $end_recurring_hr = '00:00:00';
         $recurring_day = null;

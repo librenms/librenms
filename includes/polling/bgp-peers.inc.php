@@ -338,8 +338,6 @@ if ($config['enable_bgp']) {
                         $safis['multicast'] = 2;
                         $afis['ipv4']       = 1;
                         $afis['ipv6']       = 2;
-                        $type['ipv4']       = 4;
-                        $type['ipv6']       = 16;
                         if (preg_match('/:/', $peer['bgpPeerIdentifier'])) {
                             $tmp_peer = str_replace(':', '', $peer['bgpPeerIdentifier']);
                             $tmp_peer = preg_replace('/([\w\d]{2})/', '\1:', $tmp_peer);

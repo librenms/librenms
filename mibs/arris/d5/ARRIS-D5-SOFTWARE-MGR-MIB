@@ -1,0 +1,530 @@
+ARRIS-D5-SOFTWARE-MGR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises, MODULE-IDENTITY, OBJECT-TYPE, 
+    Unsigned32, Integer32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    arrisD5UEQam
+        FROM ARRIS-MIB;
+
+    softwareManagerMIB  MODULE-IDENTITY
+        LAST-UPDATED "200804100000Z" -- 10 Apr 2008
+        ORGANIZATION "Arris Group"
+        CONTACT-INFO
+            "           Software Development
+                Postal: ARRIS Group
+                        3871 Lakefield Drive
+                        Suwanee, GA 30024
+                        USA
+                Tel:    800-469-6569
+                Fax:    678-473-8770"
+
+        DESCRIPTION
+            "This MIB manages the software on the
+             ARRIS EdgeQAM products"
+        ::= { arrisD5UEQam 10 }
+
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- Control Group
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+
+    smControlGroup OBJECT IDENTIFIER ::= { softwareManagerMIB 1 }
+
+    smReloadAction OBJECT-TYPE 
+        SYNTAX INTEGER{
+            nil(1),
+            reloadConfigSave(2),
+            reloadNoConfigSave(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Force a reload of the ARRIS product. The command is applied to both WANs
+             when equipped. The load marked as boot in the Software Table will be loaded.
+
+            nil(1) - Do nothing
+            reloadConfigSave(2)   - Saves the current configuration before reloading
+            reloadNoConfigSave(3) - Reloads without saving configuration"
+
+        ::= { smControlGroup 1 }
+    
+    smConfigFileAction OBJECT-TYPE 
+        SYNTAX INTEGER{
+            nil(1),
+            saveRunningConfig(2),
+            eraseStartupConfig(3),
+            uploadStartupConfigToServer(4)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Perform various actions on the configuration file, as directed
+            below.
+
+            nil(1) - Do nothing
+
+            saveRunningConfig(2)  - Copies the running configuration to the
+            startup configuration.
+
+            eraseStartupConfig(3) - Erases the startup configuration.  You
+            may want to do this before a reboot (without config file save)
+            to get a default configured system.
+
+            uploadStartupConfigToServer(4) - Using the server information
+            in the configFileTransfer group, this will upload the current
+            startup-configuration to the default directory on the server.
+            If you need upload directory control, use the
+            configFileTransfer"
+
+        ::= { smControlGroup 2 }
+    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- System Software Group
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+
+    smSoftwareListGroup OBJECT IDENTIFIER ::= { softwareManagerMIB 2 }
+
+    smSoftwareListTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SmSoftwareListEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Table of images installed on the flash disk"
+        ::= { smSoftwareListGroup 1 }
+
+    smSoftwareListEntry OBJECT-TYPE
+        SYNTAX SmSoftwareListEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "."
+        INDEX   { smSoftwareEntryIndex }
+        ::= { smSoftwareListTable 1 }
+
+    SmSoftwareListEntry ::= SEQUENCE {
+        smSoftwareEntryIndex Unsigned32,
+        smSoftwareEntryFilename OCTET STRING,
+        smSoftwareEntryVersion OCTET STRING,
+        smSoftwareEntryDate DateAndTime,
+        smSoftwareEntryState INTEGER,
+        smSoftwareEntrySize Integer32,
+        smSoftwareEntryStatus INTEGER,
+        smSoftwareEntryAction INTEGER }
+
+    smSoftwareEntryIndex OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..30)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "image index"
+        ::= { smSoftwareListEntry 1 }     
+        
+    smSoftwareEntryFilename   OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..256))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Name of the image file"
+        ::= { smSoftwareListEntry 2 }
+        
+    smSoftwareEntryVersion  OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..32))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "image version"
+        ::= { smSoftwareListEntry 3 }     
+        
+    smSoftwareEntryDate   OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Date image created"
+        ::= { smSoftwareListEntry 4 }     
+        
+    smSoftwareEntryState   OBJECT-TYPE
+        SYNTAX          INTEGER { valid(1), corrupt(2), unknown(3)  }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "State of the load file.
+
+            valid means the software load has been properly downloaded
+            and can be loaded onto the system.
+
+            corrupt means there was a problem tranferring the load and
+            it cannot be loaded onto the system.
+
+            unknown means that the software load has not yet been validated
+            by the system, and may or may not be valid."
+        ::= { smSoftwareListEntry 5 }     
+        
+    smSoftwareEntrySize   OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "file size"
+        ::= { smSoftwareListEntry 6 }    
+        
+    smSoftwareEntryStatus OBJECT-TYPE
+        SYNTAX          INTEGER { running-boot(1), running(2), boot(3), inactive(4) }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Status of software may be running-boot, running, boot or inactive
+
+            running-boot(1) indicates that the load is running AND is the boot load.
+
+            running(2) means the software is currently running on the box, but
+            is not the boot load.
+
+            boot(3) means that the selected load will boot on next restart.
+            Confirm by checking ksSMBootFileName.
+
+            inactive(4) indicates the load is neither running nor set to boot."
+        ::= { smSoftwareListEntry 7 }     
+
+    smSoftwareEntryAction   OBJECT-TYPE
+        SYNTAX          INTEGER { nil(1), makeBoot(2), upload(3), delete(4) }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Perform an action on this software load entry.
+
+            To make the current software load the boot load, select
+            makeBoot(2).
+
+            When set to upload(3), this software load will be sent
+            to the server using the settings specified in the 
+            softwareDownloadGroup MIB objects.  
+
+            This method cannot specify an upload path on the server
+            for the software load.  The load will appear in the default
+            directory on the server for the specified transfer protocol.
+
+            For control over the upload path, please use the 
+            smSoftwareDownloadGroup directly.
+
+            Selecting delete(4) will delete the load from the system."
+        ::= { smSoftwareListEntry 8 }     
+    
+    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- Config File Group
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+
+    smConfigFileListGroup OBJECT IDENTIFIER ::= { softwareManagerMIB 3 }
+
+    smConfigFileListTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SmConfigFileListEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Table of configuration files or scripts on flash disk"
+        ::= { smConfigFileListGroup 1 }
+
+    smConfigFileListEntry OBJECT-TYPE
+        SYNTAX SmConfigFileListEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "."
+        INDEX   { smConfigFileEntryIndex }
+        ::= { smConfigFileListTable 1 }
+
+    SmConfigFileListEntry ::= SEQUENCE {
+        smConfigFileEntryIndex Unsigned32,
+        smConfigFileEntryName OCTET STRING,
+        smConfigFileTimestamp DateAndTime,
+        smConfigFileEntryAction INTEGER }
+
+    smConfigFileEntryIndex OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..30)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "image index"
+        ::= { smConfigFileListEntry 1 }     
+        
+    smConfigFileEntryName   OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..256))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Name of the file"
+        ::= { smConfigFileListEntry 2 }
+        
+    smConfigFileTimestamp   OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Timestamp of the configuration file"
+        ::= { smConfigFileListEntry 3 }     
+        
+    smConfigFileEntryAction    OBJECT-TYPE
+        SYNTAX          INTEGER { 
+            nil(1), 
+            makeStartupConfig(2),
+            copyIntoRunningConfig(3),
+            upload(4),
+            delete(5)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Actions to perform on the current configuration file.
+
+            To make this configuration file the startup configuration file,
+            select makeStartupConfig(2).  Be sure not to overwrite the new
+            startup-configuration when reloading the system.
+
+            To copy the current configuration file into the running
+            configuration, select copyIntoRunningConfig(3).  Don't forget
+            to save the new running configuration if necessary.
+            
+            When set to upload(4), this software load will be sent
+            to the server using the settings specified in the 
+            smConfigFileDownloadGroup MIB objects.  
+
+            This method cannot specify an upload path on the server
+            for the software load.  The load will appear in the default
+            directory on the server for the specified transfer protocol.
+
+            For control over the upload path, please use the 
+            smConfigFileDownloadGroup directly.
+
+            Finally, to delete the configuration file, select delete(5)."
+        ::= { smConfigFileListEntry 4 }     
+    
+
+
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- Software Transfer Group
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    
+    smSoftwareTransferGroup OBJECT IDENTIFIER ::= { softwareManagerMIB 4 }
+            
+    smSoftwareTransferDevice OBJECT-TYPE
+        SYNTAX INTEGER {
+            nfs (1),
+            tftp (2),
+            ftp (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Specify protocol to use for software load transfers"
+        ::= { smSoftwareTransferGroup 1 } 
+
+    smSoftwareTransferHostname OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..256))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "Server ip address or hostname"
+        ::= { smSoftwareTransferGroup 2 }      
+
+    smSoftwareTransferUsername OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..32))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "Server user name"
+        ::= { smSoftwareTransferGroup 3 }      
+        
+    smSoftwareTransferPassword OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..32))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "Server user password"
+        ::= { smSoftwareTransferGroup 4 }      
+
+    smSoftwareTransferPath OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..256))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "Path and filename for image file on tftp, ftp or nfs"
+        ::= { smSoftwareTransferGroup 5 }      
+        
+    smSoftwareTransferControl OBJECT-TYPE
+        SYNTAX INTEGER { 
+            abort(1), 
+            download(2),
+            upload(3),
+            downloadAsBoot(4)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Control the transfer as follows:
+
+            abort(1)    - Will abort the transfer in progress.
+            download(2) - Starts a transfer to the ARRIS device
+            upload(3)   - Transfer specified load to the server
+            downloadAsBoot(4) will download the software image to the
+                          ARRIS device and make it the next boot image"
+
+        ::= { smSoftwareTransferGroup 6 }      
+        
+    smSoftwareTransferStatus OBJECT-TYPE
+        SYNTAX INTEGER { 
+            none(1), 
+            inprogress(2), 
+            finished(3),
+            filenameError(4),
+            hostnameError(5),
+            tooManyImages(6)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indication of the last transfer attempt as follows:
+
+            none(1) indicates no images have been transferred since 
+            the system rebooted.
+            
+            inprogress(2) - Indicates there is an active transfer
+            occurring.
+
+            finished(3) - Indicates the transfer is complete.
+
+            filenameError(4) - Indicates there was a problem with either
+            the path and/or filename, or the wrong server was specified and
+            the file was not found.
+
+            hostnameError(5) - Indicates a problem where the hostname could
+            not be resolved, or an incorrectly formatted IP address was specified."
+
+        ::= { smSoftwareTransferGroup 7 }      
+        
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- Config File Transfer
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+
+    smConfigFileTransferGroup OBJECT IDENTIFIER ::= { softwareManagerMIB 5 }
+            
+    smConfigFileTransferDevice OBJECT-TYPE
+        SYNTAX INTEGER {
+            nfs (1),
+            tftp (2),
+            ftp (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Specify protocol to use for file transfers"
+        ::= { smConfigFileTransferGroup 1 }
+
+    smConfigFileTransferHostname OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..256))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "Server ip address or hostname"
+        ::= { smConfigFileTransferGroup 2 }      
+
+    smConfigFileTransferUsername OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..32))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "Server user name"
+        ::= { smConfigFileTransferGroup 3 }      
+        
+    smConfigFileTransferPassword OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..32))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "Server user password"
+        ::= { smConfigFileTransferGroup 4 }      
+
+    smConfigFileTransferPath OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..256))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "Path and filename of the configuration file
+             on the source device."
+        ::= { smConfigFileTransferGroup 5 }      
+        
+    smConfigFileTransferTargetPath OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..256))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "Path and filename of the configuration file
+             on the target device."
+        ::= { smConfigFileTransferGroup 6 }      
+
+    smConfigFileTransferControl OBJECT-TYPE
+        SYNTAX INTEGER { 
+            abort(1), 
+            download(2),
+            upload(3),
+            downloadAsStartup(4),
+            downloadIntoRunning(5)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Control the transfer as follows:
+
+            abort(1)    - Will abort the transfer in progress.
+            download(2) - Starts a transfer to the ARRIS device
+            upload(3)   - Transfer specified file to the server
+            downloadAsStartup(4) Transfer the config file and make it the
+                          startup configuration"
+
+        ::= { smConfigFileTransferGroup 7 }      
+        
+    smConfigFileTransferStatus OBJECT-TYPE
+        SYNTAX INTEGER { 
+            none(1), 
+            inprogress(2),
+            finished(3),
+            filenameError(4),
+            hostnameError(5),
+            tooManyFiles(6)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indication of the last transfer attempt as follows:
+
+            none(1) indicates no files have been transferred since 
+            the system rebooted.
+            
+            inprogress(2) - Indicates there is an active transfer
+            occurring.
+
+            finished(3) - Indicates the transfer is complete.
+
+            filenameError(4) - Indicates there was a problem with either
+            the path and/or filename, or the wrong server was specified and
+            the file was not found.
+
+            hostnameError(5) - Indicates a problem where the hostname could
+            not be resolved, or an incorrectly formatted IP address was specified."
+
+        ::= { smConfigFileTransferGroup 8 }      
+        
+END

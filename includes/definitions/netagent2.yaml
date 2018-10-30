@@ -1,9 +1,11 @@
 os: netagent2
-text: 'NET Agent II UPS'
+text: 'MegaTec NetAgent II'
 group: ups
 type: power
 over:
     - { graph: device_load, text: Load }
 discovery:
-    - sysDescr_regex:
-        - '/^NET Agent II/'
+    - sysObjectID:
+        - .1.3.6.1.4.1.935
+      sysObjectID_except:
+        - .1.3.6.1.4.1.935.10

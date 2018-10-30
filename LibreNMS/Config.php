@@ -25,61 +25,69 @@
 
 namespace LibreNMS;
 
+use App\Models\GraphType;
+use Illuminate\Database\QueryException;
+use LibreNMS\DB\Eloquent;
+
 class Config
 {
     /**
-     * Load the user config from config.php
+     * Load the config, if the database connected, pull in database settings.
      *
-     * @param string $install_dir
-     * @return array
+     * return &array
      */
-    public static function &load($install_dir = null)
+    public static function &load()
     {
         global $config;
 
-        if (empty($install_dir)) {
-            $install_dir = __DIR__ . '/../';
+        self::loadFiles();
+
+        // Make sure the database is connected
+        if (Eloquent::isConnected() || (function_exists('dbIsConnected') && dbIsConnected())) {
+            // pull in the database config settings
+            self::mergeDb();
+
+            // load graph types from the database
+            self::loadGraphsFromDb();
+
+            // process $config to tidy up
+            self::processConfig(true);
+        } else {
+            // just process $config
+            self::processConfig(false);
         }
-        $install_dir = realpath($install_dir);
+
+        return $config;
+    }
+
+    /**
+     * Load the user config from config.php, defaults.inc.php and definitions.inc.php, etc.
+     * Erases existing config.
+     *
+     * @return array
+     */
+    private static function &loadFiles()
+    {
+        global $config;
+
+        $config = []; // start fresh
+
+        $install_dir = realpath(__DIR__ . '/../');
         $config['install_dir'] = $install_dir;
 
         // load defaults
         require $install_dir . '/includes/defaults.inc.php';
         require $install_dir . '/includes/definitions.inc.php';
 
+        // import standard settings
+        $macros = json_decode(file_get_contents($install_dir . '/misc/macros.json'), true);
+        self::set('alert.macros.rule', $macros);
+
         // variable definitions (remove me)
         require $install_dir . '/includes/vmware_guestid.inc.php';
 
         // Load user config
-        include $install_dir . '/config.php';
-
-        return $config;
-    }
-
-    /**
-     * Load Config from the database
-     *
-     * @throws Exceptions\DatabaseConnectException
-     */
-    public static function &loadFromDatabase()
-    {
-        global $config;
-
-        if (empty($config)) {
-            self::load();
-        }
-
-        // Make sure the database is connected
-        dbConnect();
-
-        // pull in the database config settings
-        self::mergeDb();
-
-        // load graph types from the database
-        self::loadGraphsFromDb();
-
-        // Process $config to tidy up
-        self::processConfig();
+        @include $install_dir . '/config.php';
 
         return $config;
     }
@@ -221,22 +229,45 @@ class Config
      * @param string $group webui group (only set when initially created)
      * @param string $sub_group webui subgroup (only set when initially created)
      */
-    public static function set($key, $value, $persist = false, $default = '', $descr = '', $group = '', $sub_group = '')
+    public static function set($key, $value, $persist = false, $default = null, $descr = null, $group = null, $sub_group = null)
     {
         global $config;
 
         if ($persist) {
-            $res = dbUpdate(array('config_value' => $value), 'config', '`config_name`=?', array($key));
-            if (!$res && !dbFetchCell('SELECT 1 FROM `config` WHERE `config_name`=?', array($key))) {
-                $insert = array(
-                    'config_name' => $key,
-                    'config_value' => $value,
-                    'config_default' => $default,
-                    'config_descr' => $descr,
-                    'config_group' => $group,
-                    'config_sub_group' => $sub_group,
-                );
-                dbInsert($insert, 'config');
+            if (Eloquent::isConnected()) {
+                try {
+                    $config_array = collect([
+                        'config_name' => $key,
+                        'config_value' => $value,
+                        'config_default' => $default,
+                        'config_descr' => $descr,
+                        'config_group' => $group,
+                        'config_sub_group' => $sub_group,
+                    ])->filter(function ($value) {
+                        return !is_null($value);
+                    })->toArray();
+
+                    \App\Models\Config::updateOrCreate(['config_name' => $key], $config_array);
+                } catch (QueryException $e) {
+                    // possibly table config doesn't exist yet
+                    global $debug;
+                    if ($debug) {
+                        echo $e;
+                    }
+                }
+            } else {
+                $res = dbUpdate(array('config_value' => $value), 'config', '`config_name`=?', array($key));
+                if (!$res && !dbFetchCell('SELECT 1 FROM `config` WHERE `config_name`=?', array($key))) {
+                    $insert = array(
+                        'config_name' => $key,
+                        'config_value' => $value,
+                        'config_default' => $default,
+                        'config_descr' => $descr,
+                        'config_group' => $group,
+                        'config_sub_group' => $sub_group,
+                    );
+                    dbInsert($insert, 'config');
+                }
             }
         }
 
@@ -284,6 +315,18 @@ class Config
     }
 
     /**
+     * Serialise the whole configuration to json for use in external processes.
+     *
+     * @return string
+     */
+    public static function json_encode()
+    {
+        global $config;
+
+        return json_encode($config);
+    }
+
+    /**
      * merge the database config with the global config
      * Global config overrides db
      */
@@ -291,10 +334,24 @@ class Config
     {
         global $config;
 
-        $db_config = array();
-        foreach (dbFetchRows('SELECT `config_name`,`config_value` FROM `config`') as $obj) {
-            self::assignArrayByPath($db_config, $obj['config_name'], $obj['config_value']);
+        $db_config = [];
+
+        if (Eloquent::isConnected()) {
+            try {
+                \App\Models\Config::get(['config_name', 'config_value'])
+                    ->each(function ($item) use (&$db_config) {
+                        array_set($db_config, $item->config_name, $item->config_value);
+                    });
+            } catch (QueryException $e) {
+                // possibly table config doesn't exist yet
+            }
+
+        } else {
+            foreach (dbFetchRows('SELECT `config_name`,`config_value` FROM `config`') as $obj) {
+                self::assignArrayByPath($db_config, $obj['config_name'], $obj['config_value']);
+            }
         }
+
         $config = array_replace_recursive($db_config, $config);
     }
 
@@ -311,9 +368,9 @@ class Config
     {
         // type cast value. Is this needed here?
         if (filter_var($value, FILTER_VALIDATE_INT)) {
-            $value = (int) $value;
+            $value = (int)$value;
         } elseif (filter_var($value, FILTER_VALIDATE_FLOAT)) {
-            $value = (float) $value;
+            $value = (float)$value;
         } elseif (filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null) {
             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
         }
@@ -332,8 +389,20 @@ class Config
     {
         global $config;
 
+        if (Eloquent::isConnected()) {
+            try {
+                $graph_types = GraphType::all()->toArray();
+            } catch (QueryException $e) {
+                // possibly table config doesn't exist yet
+                $graph_types = [];
+            }
+        } else {
+            $graph_types = dbFetchRows('SELECT * FROM graph_types');
+        }
+
         // load graph types from the database
-        foreach (dbFetchRows('SELECT * FROM graph_types') as $graph) {
+        foreach ($graph_types as $graph) {
+            $g = [];
             foreach ($graph as $k => $v) {
                 if (strpos($k, 'graph_') == 0) {
                     // remove leading 'graph_' from column name
@@ -352,9 +421,9 @@ class Config
      * Proces the config after it has been loaded.
      * Make sure certain variables have been set properly and
      *
-     *
+     * @param bool $persist Save binary locations and other settings to the database.
      */
-    private static function processConfig()
+    private static function processConfig($persist = true)
     {
         if (!self::get('email_from')) {
             self::set('email_from', '"' . self::get('project_name') . '" <' . self::get('email_user') . '@' . php_uname('n') . '>');
@@ -364,24 +433,126 @@ class Config
             ini_set('session.cookie_secure', 1);
         }
 
+        // If we're on SSL, let's properly detect it
+        if (isset($_SERVER['HTTPS'])) {
+            self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
+        }
+
+        // Define some variables if they aren't set by user definition in config.php
+        self::setDefault('html_dir', '%s/html', ['install_dir']);
+        self::setDefault('rrd_dir', '%s/rrd', ['install_dir']);
+        self::setDefault('mib_dir', '%s/mibs', ['install_dir']);
+        self::setDefault('log_dir', '%s/logs', ['install_dir']);
+        self::setDefault('log_file', '%s/%s.log', ['log_dir', 'project_id']);
+        self::setDefault('plugin_dir', '%s/plugins', ['html_dir']);
+//        self::setDefault('email_from', '"%s" <%s@' . php_uname('n') . '>', ['project_name', 'email_user']);  // FIXME email_from set because alerting config
+
         // deprecated variables
-        if (self::has('rrdgraph_real_95th')) {
-            self::set('rrdgraph_real_percentile', self::get('rrdgraph_real_95th'));
-        }
-
-        if (self::has('fping_options.millisec')) {
-            self::set('fping_options.interval', self::get('fping_options.millisec'));
-        }
-
-        if (self::has('discovery_modules.cisco-vrf')) {
-            self::set('discovery_modules.vrf', self::get('discovery_modules.cisco-vrf'));
-        }
+        self::deprecatedVariable('rrdgraph_real_95th', 'rrdgraph_real_percentile');
+        self::deprecatedVariable('fping_options.millisec', 'fping_options.interval');
+        self::deprecatedVariable('discovery_modules.cisco-vrf', 'discovery_modules.vrf');
+        self::deprecatedVariable('oxidized.group', 'oxidized.maps.group');
 
         // make sure we have full path to binaries in case PATH isn't set
         foreach (array('fping', 'fping6', 'snmpgetnext', 'rrdtool') as $bin) {
             if (!is_executable(self::get($bin))) {
-                self::set($bin, locate_binary($bin), true, $bin, "Path to $bin", 'external', 'paths');
+                self::set($bin, self::locateBinary($bin), $persist, $bin, "Path to $bin", 'external', 'paths');
             }
         }
+    }
+
+    /**
+     * Set default values for defaults that depend on other settings, if they are not already loaded
+     *
+     * @param string $key
+     * @param string $value value to set to key or vsprintf() format string for values below
+     * @param array $format_values array of keys to send to vsprintf()
+     */
+    private static function setDefault($key, $value, $format_values = [])
+    {
+        if (!self::has($key)) {
+            if (is_string($value)) {
+                $format_values = array_map('self::get', $format_values);
+                self::set($key, vsprintf($value, $format_values));
+            } else {
+                self::set($key, $value);
+            }
+        }
+    }
+
+    /**
+     * Copy data from old variables to new ones.
+     *
+     * @param $old
+     * @param $new
+     */
+    private static function deprecatedVariable($old, $new)
+    {
+        if (self::has($old)) {
+            global $debug;
+            if ($debug) {
+                echo "Copied deprecated config $old to $new\n";
+            }
+            self::set($new, self::get($old));
+        }
+    }
+
+    /**
+     * Get just the database connection settings from config.php
+     *
+     * @return array (keys: db_host, db_port, db_name, db_user, db_pass, db_socket)
+     */
+    public static function getDatabaseSettings()
+    {
+        // Do not access global $config in this function!
+
+        $keys = $config = [
+            'db_host' => '',
+            'db_port' => '',
+            'db_name' => '',
+            'db_user' => '',
+            'db_pass' => '',
+            'db_socket' => '',
+        ];
+
+        if (is_file(__DIR__ . '/../config.php')) {
+            include __DIR__ . '/../config.php';
+        }
+
+        // Check for testing database
+        if (getenv('DBTEST')) {
+            if (isset($config['test_db_name'])) {
+                $config['db_name'] = $config['test_db_name'];
+            }
+            if (isset($config['test_db_user'])) {
+                $config['db_user'] = $config['test_db_user'];
+            }
+            if (isset($config['test_db_pass'])) {
+                $config['db_pass'] = $config['test_db_pass'];
+            }
+        }
+
+        return array_intersect_key($config, $keys); // return only the db settings
+    }
+
+    /**
+     * Locate the actual path of a binary
+     *
+     * @param $binary
+     * @return mixed
+     */
+    public static function locateBinary($binary)
+    {
+        if (!str_contains($binary, '/')) {
+            $output = `whereis -b $binary`;
+            $list = trim(substr($output, strpos($output, ':') + 1));
+            $targets = explode(' ', $list);
+            foreach ($targets as $target) {
+                if (is_executable($target)) {
+                    return $target;
+                }
+            }
+        }
+        return $binary;
     }
 }

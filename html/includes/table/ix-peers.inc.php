@@ -18,13 +18,13 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Neil Lathwood
+ * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$asn    = clean($_POST['asn']);
-$ixid   = clean($_POST['ixid']);
-$status = clean($_POST['status']);
+$asn    = clean($vars['asn']);
+$ixid   = clean($vars['ixid']);
+$status = clean($vars['status']);
 
 $sql    = " FROM `pdb_ix_peers` AS `P` LEFT JOIN `pdb_ix` ON `P`.`ix_id` = `pdb_ix`.`ix_id` LEFT JOIN `bgpPeers` ON `P`.`remote_ipaddr4` = `bgpPeers`.`bgpPeerIdentifier` WHERE `P`.`ix_id` = ? AND `remote_ipaddr4` IS NOT NULL";
 $params = array($ixid);

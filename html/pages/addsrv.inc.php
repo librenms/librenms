@@ -1,12 +1,14 @@
 <?php
 
+use LibreNMS\Authentication\LegacyAuth;
+
 $no_refresh = true;
 
-if ($_SESSION['userlevel'] < '10') {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     include 'includes/error-no-perm.inc.php';
 } else {
     if ($vars['addsrv']) {
-        if ($_SESSION['userlevel'] >= '10') {
+        if (LegacyAuth::user()->hasGlobalAdmin()) {
             $updated = '1';
 
             $service_id = add_service($vars['device'], $vars['type'], $vars['descr'], $vars['ip'], $vars['params'], 0);

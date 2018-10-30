@@ -2,7 +2,7 @@ os: ict-psu
 text: 'ICT Digital Series Power Supply'
 type: power
 icon: ict
-nobulk: 1
+nobulk: true
 mib_dir:
     - ict
 over:

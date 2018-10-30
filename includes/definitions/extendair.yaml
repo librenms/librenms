@@ -1,11 +1,11 @@
 os: extendair
-text: Exalt ExtendAir
+text: 'Exalt ExtendAir'
 type: wireless
 icon: exalt
 over:
     - { graph: device_bits, text: 'Device Traffic' }
-    - { graph: device_temperature, text: 'Temperatures' }
-    - { graph: device_state, text: 'States' }
+    - { graph: device_temperature, text: Temperatures }
+    - { graph: device_state, text: States }
 mib_dir:
     - exalt
 discovery:

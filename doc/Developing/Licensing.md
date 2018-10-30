@@ -1,4 +1,5 @@
 ## Contributor Agreement
+path: blob/master/doc/
 
 By contributing code to LibreNMS (whether by a GitHub pull request, or by
 any other means), you assert that:
@@ -17,12 +18,6 @@ any other means), you assert that:
   production of contributed code.  This includes all Observium code after
   Subversion revision 3250 and any patches or other code covered by that
   license after Tue May 29 13:08:01 2012 +0000 (the date of Observium r3250).
-
-- You are not running a copy of non-GPLed Observium, whether as part of your
-  work duties, or personally, or in any other capacity, and you have removed
-  any copies of non-GPLed Observium source code from your personal and work
-  systems.
-
 
 To agree with these assertions, when you submit your first pull request you 
 will be asked after submitting to sign the CLA, you do this by following the 
@@ -78,12 +73,11 @@ project.
     - Include its name, source URL, copyright notice, and license in `doc/General/Credits.md`
 
 - To add a php dependency, please use composer
-    - Add the dependency `composer require --update-no-dev slim/slim`
-    - Add the files and commit `composer commit` or `git add -f vendor/ composer.json; git commit`
+    - Add the dependency `composer require slim/slim`
 
     - Updating php dependencies
-        - Update dependencies `composer update --no-dev`
-        - Add the files and commit `composer commit` or `git add -f vendor/; git commit`
+        - Update dependencies `FORCE=1 php56 ./scripts/composer_wrapper.php update`
+        - Commit the updated composer.lock file
 
 - To add a javascript dependency
     - Where possible please include minimized libraries in the html/js/ folder.

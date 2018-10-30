@@ -55,13 +55,14 @@ class CollectdColor
                             $value,
                             $matches
                         )) {
-                            $this->r = (('0x' . $matches[1]) / 255.0);
-                            $this->g = (('0x' . $matches[2]) / 255.0);
-                            $this->b = (('0x' . $matches[3]) / 255.0);
+                            $this->r = (hexdec('0x' . $matches[1]) / 255.0);
+                            $this->g = (hexdec('0x' . $matches[2]) / 255.0);
+                            $this->b = (hexdec('0x' . $matches[3]) / 255.0);
                         }
                     }
                 } else {
-                    if (is_a($value, 'CollectdColor')) {
+                    if (is_a($value, 'CollectdColor') ||
+                        is_a($value, 'LibreNMS\CollectdColor')) {
                         $this->r = $value->r;
                         $this->g = $value->g;
                         $this->b = $value->b;

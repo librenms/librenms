@@ -4,21 +4,16 @@ $valid_toner = array();
 
 if ($device['os_group'] == 'printer') {
     echo 'Toner: ';
-    $oids = snmpwalk_cache_oid($device, 'prtMarkerColorantMarkerIndex', array(), 'Printer-MIB');
-    if (empty($oids)) {
-        $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesMarkerIndex', $oids, 'Printer-MIB');
-    }
 
+    $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesLevel', [], 'Printer-MIB');
     if (!empty($oids)) {
-        $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesLevel', $oids, 'Printer-MIB');
         $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesMaxCapacity', $oids, 'Printer-MIB');
         $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesDescription', $oids, 'Printer-MIB', null, '-OQUsa');
-        $oids = snmpwalk_cache_oid($device, 'prtMarkerColorantValue', $oids, 'Printer-MIB', null, '-OQUsa');
     }
 
     foreach ($oids as $index => $data) {
         $last_index = substr($index, strrpos($index, '.') + 1);
-        
+
         $raw_toner     = $data['prtMarkerSuppliesLevel'];
         $descr         = $data['prtMarkerSuppliesDescription'];
         $raw_capacity  = $data['prtMarkerSuppliesMaxCapacity'];
@@ -31,17 +26,18 @@ if ($device['os_group'] == 'printer') {
             $raw_toner = snmp_get($device, $toner_oid, '-Oqv');
         }
 
+        if (empty($raw_toner)) {
+            $raw_toner = snmp_get($device, $toner_oid, '-Oqv');
+        }
+
         if (empty($descr)) {
             $descr_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.3.$last_index";
             $descr = snmp_get($device, $descr_oid, '-Oqva');
         }
 
-        if (empty($raw_toner)) {
-            $raw_toner = snmp_get($device, $toner_oid, '-Oqv');
-        }
-
-        if (!empty($data['prtMarkerColorantValue'])) {
-            $descr = ucfirst($data['prtMarkerColorantValue']);
+        // trim part & serial number from devices that include it
+        if (str_contains($descr, ', PN')) {
+            $descr = explode(', PN', $descr)[0];
         }
 
         $type = 'jetdirect';

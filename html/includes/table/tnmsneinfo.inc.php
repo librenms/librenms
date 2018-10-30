@@ -24,9 +24,9 @@ $columns = array(
     'neOpState',
 );
 
-if (isset($_POST['device_id'])) {
+if (isset($vars['device_id'])) {
     $params = array(
-        $_POST['device_id'],
+        $vars['device_id'],
     );
     $sql = 'SELECT `neName`,`neLocation`,`neType`,`neOpMode`,`neAlarm`,`neOpState` FROM `tnmsneinfo`';
     $wheresql = ' WHERE `device_id` = ?';

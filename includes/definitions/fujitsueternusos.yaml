@@ -1,5 +1,5 @@
 os: fujitsueternusos
-text: Fujitsu ETERNUS
+text: 'Fujitsu ETERNUS'
 type: storage
 icon: fujitsu
 mib_dir:

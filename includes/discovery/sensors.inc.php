@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Config;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\OS;
 
@@ -33,6 +34,10 @@ if (strstr($device['hardware'], 'ProLiant')) {
     include 'includes/discovery/sensors/state/hp.inc.php';
 }
 
+if ($device['os'] == 'gw-eydfa') {
+    include 'includes/discovery/sensors/gw-eydfa.inc.php';
+}
+
 $run_sensors = array(
     'airflow',
     'current',
@@ -58,6 +63,10 @@ $run_sensors = array(
     'eer',
     'waterflow',
 );
+
+// filter submodules
+$run_sensors = array_intersect($run_sensors, Config::get('discovery_submodules.sensors', $run_sensors));
+
 sensors($run_sensors, $device, $valid, $pre_cache);
 unset(
     $pre_cache,

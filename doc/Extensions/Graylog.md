@@ -1,4 +1,5 @@
 source: Extensions/Graylog.md
+path: blob/master/doc/
 # Graylog integration
 
 We have simple integration for Graylog, you will be able to view any logs from within LibreNMS that have been parsed by the syslog input from within
@@ -9,19 +10,19 @@ Currently, LibreNMS does not associate shortnames from Graylog with full FQDNS. 
 
 `$PreserveFQDN on`
 
-to your rsyslog config to send the full FQDN so device logs will be associated correctly in LibreNMS
+to your rsyslog config to send the full FQDN so device logs will be associated correctly in LibreNMS. Also see near the bottom of this document for tips on how to enable/suppress the domain part of hostnames in syslog-messages for some platforms.
 
 Graylog itself isn't included within LibreNMS, you will need to install this separately either on the same infrastructure as LibreNMS or as a totally
 standalone appliance.
 
-Config is simple, here's an example:
+Config is simple, here's an example based on Graylog 2.4:
 
 ```php
 $config['graylog']['server']   = 'http://127.0.0.1';
-$config['graylog']['port']     = 12900;
+$config['graylog']['port']     = 9000;
 $config['graylog']['username'] = 'admin';
 $config['graylog']['password'] = 'admin';
-$config['graylog']['version']  = '2.1';
+$config['graylog']['version']  = '2.4';
 ```
 
 Graylog messages are stored using GMT timezone. You can display graylog messages in LibreNMS webui using your desired timezone by setting following option in config.php:
@@ -31,10 +32,8 @@ $config['graylog']['timezone'] = 'Europe/Bucharest';
 ```
 > Timezone must be PHP supported timezones, available at: <a href="http://php.net/manual/en/timezones.php">http://php.net/manual/en/timezones.php</a>
 
-> Since Graylog 2.1, the default API path is /api/
-
 If you are running a version earlier than Graylog then please set `$config['graylog']['version']` to the version 
-number of your Graylog install.
+number of your Graylog install. Earlier versions than 2.1 use the default port `12900` 
 
 If you have altered the default uri for your Graylog setup then you can override the default of `/api/` using 
 `$config['graylog']['base_uri'] = '/somepath/';`
@@ -43,3 +42,32 @@ If you choose to use another user besides the admin user, please note that curre
 
 If you have enabled TLS for the Graylog API and you are using a self-signed certificate, please make sure that the certificate is trusted by your LibreNMS host, otherwise the connection will fail.
 Additionally, the certificate's Common Name (CN) has to match the FQDN or IP address specified in `$config['graylog']['server']`.
+
+## Suppressing/enabling the domain part of a hostname for specific platforms
+You should see if what you get in syslog/Graylog matches up with your configured hosts first. If you need to modify the syslog messages from specific platforms, this may be of assistance:
+
+### IOS (Cisco)
+```
+router(config)# logging origin-id hostname
+```
+or
+```
+router(config)# logging origin-id string
+```
+
+### JunOS (Juniper Networks)
+```
+set system syslog host yourlogserver.corp log-prefix YOUR_PREFERRED_STRING
+```
+
+### PanOS (Palo Alto Networks)
+```
+set deviceconfig setting management hostname-type-in-syslog hostname
+```
+or
+
+```
+set deviceconfig setting management hostname-type-in-syslog FQDN
+```
+
+

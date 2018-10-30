@@ -25,12 +25,15 @@
 
 namespace LibreNMS\Tests;
 
-class DBTestCase extends TestCase
+abstract class DBTestCase extends TestCase
 {
+    protected $db_name;
+
     public function setUp()
     {
         parent::setUp();
         $this->dbSetUp();
+        $this->db_name = dbFetchCell('SELECT DATABASE()');
     }
 
     public function tearDown()

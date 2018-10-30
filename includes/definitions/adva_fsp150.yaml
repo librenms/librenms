@@ -1,5 +1,5 @@
 os: adva_fsp150
-text: ADVA FSP150CC
+text: 'ADVA FSP150CC'
 type: network
 icon: adva
 group: ADVA

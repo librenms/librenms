@@ -46,12 +46,6 @@ class MoxaEtherdevice extends OS implements ProcessorDiscovery
         // .1.3.6.1.4.1.8691.7.69.1.54.0 = MOXA-EDSG508E-MIB::cpuLoading30s.0
         $oid = $device['sysObjectID'] . '.1.54.0';
 
-        if ($device['sysDescr'] == 'IKS-6726A-2GTXSFP-T') {
-            $oid = '.1.3.6.1.4.1.8691.7.116.1.54.0'; // MOXA-IKS6726A-MIB::cpuLoading30s.0
-        } else if ($device['sysDescr'] == 'EDS-G508E-T') {
-            $oid = '.1.3.6.1.4.1.8691.7.69.1.54.0'; // MOXA-EDSG508E-MIB::cpuLoading30s.0
-        }
-
         return array(
             Processor::discover(
                 $this->getName(),

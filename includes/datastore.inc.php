@@ -66,6 +66,7 @@ function data_update($device, $measurement, $tags, $fields)
     // However, influxdb saves all tags, so we filter out the ones beginning with 'rrd_'.
 
     rrdtool_data_update($device, $measurement, $tags, $fields);
+    prometheus_push($device, $measurement, rrd_array_filter($tags), $fields);
     influx_update($device, $measurement, rrd_array_filter($tags), $fields);
     opentsdb_update($device, $measurement, rrd_array_filter($tags), $fields);
     graphite_update($device, $measurement, $tags, $fields);

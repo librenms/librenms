@@ -37,15 +37,14 @@ var syslog_grid = $("#syslog").bootgrid({
     post: function ()
     {
         return {
-            id: "syslog",
-            device: "'.mres($vars['device']) .'",
-            program: "'.mres($vars['program']).'",
-            priority: "'.mres($vars['priority']).'",
-            to: "'.mres($vars['to']).'",
-            from: "'.mres($vars['from']).'",
+            device: "' . addcslashes($vars['device'], '"') . '",
+            program: "' . addcslashes($vars['program'], '"') . '",
+            priority: "' . addcslashes($vars['priority'], '"') . '",
+            to: "' . addcslashes($vars['to'], '"') . '",
+            from: "' . addcslashes($vars['from'], '"') . '",
         };
     },
-    url: "ajax_table.php"
+    url: "ajax/table/syslog"
 });
 
 </script>

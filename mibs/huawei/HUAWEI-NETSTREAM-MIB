@@ -1,0 +1,180 @@
+--  =================================================================
+-- Copyright (C) 2015 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: Huawei NETSTREAM MIB File for environment
+-- Reference:   
+-- Version:     V2.01
+-- History:
+-- 
+--  2005-10-26  V1.00   Zhang Xiaomeng(ht09867), Initial Version 
+--  2015-08-01  V2.00   d00296290
+--  2015-08-06  V2.01   d00296290, add node for template refresh
+-- =================================================================
+
+HUAWEI-NETSTREAM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hwDatacomm
+            FROM HUAWEI-MIB
+        MODULE-COMPLIANCE, OBJECT-GROUP,NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        BITS, OBJECT-TYPE, MODULE-IDENTITY,NOTIFICATION-TYPE,Integer32
+            FROM SNMPv2-SMI
+        DateAndTime
+            FROM SNMPv2-TC;
+
+
+    --  Oct 25, 2005 at 19:00 GMT
+    hwNetStreamMIB MODULE-IDENTITY 
+        LAST-UPDATED "201507250000Z"
+        ORGANIZATION 
+            "Huawei Technologies Co.,Ltd."
+        CONTACT-INFO 
+            "Huawei Industrial Base
+              Bantian, Longgang
+               Shenzhen 518129
+               People's Republic of China
+               Website: http://www.huawei.com
+               Email: support@huawei.com
+             "
+        DESCRIPTION 
+            "The private mib file includes the general extent information of 
+             the device.hwDatacomm(25).htNetStream(110)"
+        REVISION "201507250000Z" 
+        DESCRIPTION "Initial version"
+        ::= { hwDatacomm 110 }
+
+
+-- Top-level structure of the MIB
+--1 , 3 , 6 , 1 , 4 , 1 , 2011 , 5 , 25 , 110 , 1
+hwNetStreamObjects             OBJECT IDENTIFIER ::= { hwNetStreamMIB 1 }
+--1 , 3 , 6 , 1 , 4 , 1 , 2011 , 5 , 25 , 110 , 2
+hwNetStreamNotifications       OBJECT IDENTIFIER ::= { hwNetStreamMIB 2 }
+
+-- OBJECT IDENTIFIER definitions
+    
+    -- 1 , 3 , 6 , 1 , 4 , 1 , 2011 , 5 , 25 , 110 , 1 , 1
+    hwNetStreamlastchangedtime OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object is the time stamp, which describes the last time that
+             the netStreamIfIndex table has been changed. "
+        ::= { hwNetStreamObjects 1 }
+    
+    -- 1 , 3 , 6 , 1 , 4 , 1 , 2011 , 5 , 25 , 110 , 1 , 2
+    hwNetStreamIfIndexTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwNetStreamIfIndexEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains tow rows, one of the two elements indicates 
+             the interface index which is distributed by VRP, named 
+             netStream32BitIndex and occupies 32 bits.Another indicates the
+             interface index of netstream character, which named 
+             netStream16BitIndex and occupies 16 bits."
+        ::= { hwNetStreamObjects 2 }
+    
+    -- 1 , 3 , 6 , 1 , 4 , 1 , 2011 , 5 , 25 , 110 , 1 , 2 , 1
+    hwNetStreamIfIndexEntry OBJECT-TYPE
+        SYNTAX HwNetStreamIfIndexEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Information about a replaceable unit physical entity. Each entry 
+             provides objects of a replaceable unit to help an NMS identify 
+             and characterize the entry in this table."
+        INDEX { hwNetStream16BitIndex }
+        ::= { hwNetStreamIfIndexTable 1 }
+        
+    HwNetStreamIfIndexEntry ::=
+        SEQUENCE { 
+            hwNetStream16BitIndex
+                Integer32,
+            hwifNet32BitIndex
+                Integer32
+         }
+
+    -- 1 , 3 , 6 , 1 , 4 , 1 , 2011 , 5 , 25 , 110 , 1 , 2 , 1 , 1
+     hwNetStream16BitIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "NetStream16BitIndex indicates the interface index of netstream character."
+        ::= { hwNetStreamIfIndexEntry 1 }
+    
+    -- 1 , 3 , 6 , 1 , 4 , 1 , 2011 , 5 , 25 , 110 , 1 , 2 , 1 , 2
+   hwifNet32BitIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "NetStream32BitIndex indicates the interface index which is distributed by VRP."
+        ::= { hwNetStreamIfIndexEntry 2 }
+        
+    -- 1 , 3 , 6 , 1 , 4 , 1 , 2011 , 5 , 25 , 110 , 1 , 3
+    hwNetStreamTemplateRefresh OBJECT-TYPE
+	SYNTAX Integer32 (1)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"The object used to trigger netstream resend all templates."
+	::= { hwNetStreamObjects 3 }
+-- Type definitions
+--1 , 3 , 6 , 1 , 4 , 1 , 2011 , 5 , 25 , 110 , 2 , 0
+hwNetStreamTrapPrefix        OBJECT IDENTIFIER ::= { hwNetStreamNotifications 0 }
+
+--1 , 3 , 6 , 1 , 4 , 1 , 2011 , 5 , 25 , 110 , 2 , 0 , 1
+    hwNetStreamIndexStatusChanged NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION
+            "The object indicates if the hwNetStreamIfIndexTable has been changed 
+             when interface is deleted,created and board is inserted and drawed."
+    ::= { hwNetStreamTrapPrefix 1 }
+--1 , 3 , 6 , 1 , 4 , 1 , 2011 , 5 , 25 , 110 , 2 , 0 , 2
+    hwNetStreamIndexUsedUp NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION
+            "The object indicates if there is enough index to be distributed,
+             which is on the managed object."
+
+    ::= { hwNetStreamTrapPrefix 2 }
+--1 , 3 , 6 , 1 , 4 , 1 , 2011 , 5 , 25 , 110 , 2 , 0 , 3
+    hwNetStreamSessionFull NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION
+            "The object indicates if the session is full."
+
+    ::= { hwNetStreamTrapPrefix 3 }
+    
+-- conformance information 
+
+   hwNetstreamConformance OBJECT IDENTIFIER ::= { hwNetStreamMIB 3 } 
+   hwNetstreamGroups      OBJECT IDENTIFIER ::= { hwNetstreamConformance 1 }
+   hwNetstreamCompliances  OBJECT IDENTIFIER ::= { hwNetstreamConformance 2 }
+-- compliance statements
+
+   hwNetstreamCompliance MODULE-COMPLIANCE
+   STATUS  current
+   DESCRIPTION
+       "The compliance statement for SNMPv2 entities which implement the HUAWEI 
+        Netstream extension MIB."
+   MODULE  -- this module
+   MANDATORY-GROUPS { hwNetstreamExtGroup ,hwNotificationExtGroup}
+   ::= { hwNetstreamCompliances 1 }
+-- units of conformance
+hwNetstreamExtGroup OBJECT-GROUP
+    OBJECTS {hwNetStreamlastchangedtime,hwNetStream16BitIndex, hwifNet32BitIndex,hwNetStreamTemplateRefresh}
+    STATUS  current
+    DESCRIPTION
+       "The HUAWEI Netstream extension Table."
+    ::= { hwNetstreamGroups 2 } 
+hwNotificationExtGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { hwNetStreamIndexUsedUp, hwNetStreamIndexStatusChanged, hwNetStreamSessionFull }
+    STATUS  current
+    DESCRIPTION
+        "The HUAWEI Netstream trap info."
+    ::= { hwNetstreamGroups 3 }
+END

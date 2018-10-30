@@ -1,4 +1,5 @@
 source: General/Updating.md
+path: blob/master/doc/
 
 By default, LibreNMS is set to automatically update. If you have disabled this feature then you can 
 perform a manual update.
@@ -23,7 +24,7 @@ composer install --no-dev
 ./validate.php
 ```
 
-Not using daily.sh means that you will also lose a lot of automatic database clean up, you will need to do this manually.
+You should continue to run daily.sh.  This does database cleanup and other processes in addition to updating. You can disable the daily.sh update process as described below.
 
 ## Disabling automatic updates ##
 LibreNMS by default performs updates on a daily basis. This can be disabled by setting:

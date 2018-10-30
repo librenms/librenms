@@ -29,11 +29,10 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use LibreNMS\Config;
-use LibreNMS\Interfaces\ValidationGroup;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
-class Updates implements ValidationGroup
+class Updates extends BaseValidation
 {
     public function validate(Validator $validator)
     {
@@ -89,15 +88,5 @@ class Updates implements ValidationGroup
             $result->setList('Modified Files', $cmdoutput);
             $validator->result($result);
         }
-    }
-
-    /**
-     * Returns if this test should be run by default or not.
-     *
-     * @return bool
-     */
-    public function isDefault()
-    {
-        return true;
     }
 }

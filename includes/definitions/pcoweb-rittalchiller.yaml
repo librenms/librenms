@@ -4,7 +4,7 @@ type: environment
 icon: rittal
 over:
     - { graph: device_cooling, text: 'Cooling Capacity' }
-    - { graph: device_temperature, text: 'Temperatures' }
+    - { graph: device_temperature, text: Temperatures }
     - { graph: device_power, text: 'Power Consumption' }
 mib_dir:
     - carel

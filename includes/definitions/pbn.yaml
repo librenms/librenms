@@ -1,7 +1,7 @@
 os: pbn
 text: PBN
 type: network
-ifXmcbc: 1
+ifXmcbc: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

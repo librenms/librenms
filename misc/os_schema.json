@@ -1,0 +1,500 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+        "os": {
+            "type": "string"
+        },
+        "text": {
+            "type": "string"
+        },
+        "over": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "graph": {
+                        "type": "string"
+                    },
+                    "text": {
+                        "type": "string"
+                    }
+                },
+                "required": ["graph", "text"],
+                "additionalProperties": false
+            }
+        },
+        "type": {
+            "type": "string"
+        },
+        "discovery": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "sysObjectID": {"$ref": "#/definitions/oid_group"},
+                    "sysObjectID_except":  {"$ref": "#/definitions/oid_group"},
+                    "sysObjectID_regex": {"$ref": "#/definitions/regex_group"},
+                    "sysObjectID_regex_except": {"$ref": "#/definitions/regex_group"},
+                    "sysDescr": {"$ref": "#/definitions/string_group"},
+                    "sysDescr_except":  {"$ref": "#/definitions/string_group"},
+                    "sysDescr_regex": {"$ref": "#/definitions/regex_group"},
+                    "sysDescr_regex_except": {"$ref": "#/definitions/regex_group"},
+                    "snmpget": {"$ref": "#/definitions/snmpget"},
+                    "snmpget_except": {"$ref": "#/definitions/snmpget"}
+                },
+                "minProperties": 1,
+                "additionalProperties": false
+            }
+        },
+        "group": {
+            "type": "string"
+        },
+        "icon": {
+            "type": "string"
+        },
+        "poller_modules": {
+            "type": "object",
+            "properties": {
+                "cisco-cbqos": {
+                    "type": "boolean"
+                },
+                "cisco-cef": {
+                    "type": "boolean"
+                },
+                "cisco-mac-accounting": {
+                    "type": "boolean"
+                },
+                "cisco-voice": {
+                    "type": "boolean"
+                },
+                "cisco-remote-access-monitor": {
+                    "type": "boolean"
+                },
+                "cisco-sla": {
+                    "type": "boolean"
+                },
+                "cisco-ipsec-flow-monitor": {
+                    "type": "boolean"
+                },
+                "cipsec-tunnels": {
+                    "type": "boolean"
+                },
+                "cisco-otv": {
+                    "type": "boolean"
+                },
+                "cisco-ace-serverfarms": {
+                    "type": "boolean"
+                },
+                "cisco-ace-loadbalancer": {
+                    "type": "boolean"
+                },
+                "wifi": {
+                    "type": "boolean"
+                },
+                "ipmi": {
+                    "type": "boolean"
+                },
+                "entity-physical": {
+                    "type": "boolean"
+                },
+                "processors": {
+                    "type": "boolean"
+                },
+                "mempools": {
+                    "type": "boolean"
+                },
+                "storage": {
+                    "type": "boolean"
+                },
+                "netstats": {
+                    "type": "boolean"
+                },
+                "hr-mib": {
+                    "type": "boolean"
+                },
+                "ucd-mib": {
+                    "type": "boolean"
+                },
+                "ipSystemStats": {
+                    "type": "boolean"
+                },
+                "ports": {
+                    "type": "boolean"
+                },
+                "bgp-peers": {
+                    "type": "boolean"
+                },
+                "ospf": {
+                    "type": "boolean"
+                },
+                "ucd-diskio": {
+                    "type": "boolean"
+                },
+                "services": {
+                    "type": "boolean"
+                },
+                "stp": {
+                    "type": "boolean"
+                },
+                "ntp": {
+                    "type": "boolean"
+                },
+                "wireless": {
+                    "type": "boolean"
+                },
+                "fdb-table": {
+                    "type": "boolean"
+                },
+                "applications": {
+                    "type": "boolean"
+                },
+                "aruba-controller": {
+                    "type": "boolean"
+                },
+                "cisco-asa-firewall": {
+                    "type": "boolean"
+                },
+                "mib": {
+                    "type": "boolean"
+                },
+                "toner": {
+                    "type": "boolean"
+                },
+                "cisco-vpdn": {
+                    "type": "boolean"
+                },
+                "libvirt-vminfo": {
+                    "type": "boolean"
+                },
+                "vmware-vminfo": {
+                    "type": "boolean"
+                },
+                "vlans": {
+                    "type": "boolean"
+                },
+                "arp-table": {
+                    "type": "boolean"
+                },
+                "mef": {
+                    "type": "boolean"
+                },
+                "cisco-vrf-lite": {
+                    "type": "boolean"
+                },
+                "tnms-nbi": {
+                    "type": "boolean"
+                },
+                "loadbalancers": {
+                    "type": "boolean"
+                },
+                "junose-atm-vp": {
+                    "type": "boolean"
+                },
+                "netscaler-vsvr": {
+                    "type": "boolean"
+                }
+            },
+            "additionalProperties": false
+        },
+        "discovery_modules": {
+            "type": "object",
+            "properties": {
+                "cisco-cef": {
+                    "type": "boolean"
+                },
+                "cisco-sla": {
+                    "type": "boolean"
+                },
+                "cisco-mac-accounting": {
+                    "type": "boolean"
+                },
+                "cisco-otv": {
+                    "type": "boolean"
+                },
+                "cisco-pw": {
+                    "type": "boolean"
+                },
+                "vrf": {
+                    "type": "boolean"
+                },
+                "cisco-vrf-lite": {
+                    "type": "boolean"
+                },
+                "ports": {
+                    "type": "boolean"
+                },
+                "ports-stack": {
+                    "type": "boolean"
+                },
+                "entity-physical": {
+                    "type": "boolean"
+                },
+                "processors": {
+                    "type": "boolean"
+                },
+                "mempools": {
+                    "type": "boolean"
+                },
+                "storage": {
+                    "type": "boolean"
+                },
+                "hr-device": {
+                    "type": "boolean"
+                },
+                "discovery-protocols": {
+                    "type": "boolean"
+                },
+                "bgp-peers": {
+                    "type": "boolean"
+                },
+                "vlans": {
+                    "type": "boolean"
+                },
+                "ucd-diskio": {
+                    "type": "boolean"
+                },
+                "services": {
+                    "type": "boolean"
+                },
+                "stp": {
+                    "type": "boolean"
+                },
+                "ntp": {
+                    "type": "boolean"
+                },
+                "wireless": {
+                    "type": "boolean"
+                },
+                "fdb-table": {
+                    "type": "boolean"
+                },
+                "arp-table": {
+                    "type": "boolean"
+                },
+                "toner": {
+                    "type": "boolean"
+                },
+                "ipv4-addresses": {
+                    "type": "boolean"
+                },
+                "ipv6-addresses": {
+                    "type": "boolean"
+                },
+                "charge": {
+                    "type": "boolean"
+                },
+                "ospf": {
+                    "type": "boolean"
+                },
+                "ucd-mib": {
+                    "type": "boolean"
+                },
+                "ipmi": {
+                    "type": "boolean"
+                },
+                "mef": {
+                    "type": "boolean"
+                },
+                "ipv6-address": {
+                    "type": "boolean"
+                },
+                "loadbalancers": {
+                    "type": "boolean"
+                },
+                "applications": {
+                    "type": "boolean"
+                },
+                "sensors": {
+                    "type": "boolean"
+                },
+                "diskio": {
+                    "type": "boolean"
+                },
+                "junose-atm-vp": {
+                    "type": "boolean"
+                },
+                "vmware-vminfo": {
+                    "type": "boolean"
+                },
+                "libvirt-vminfo": {
+                    "type": "boolean"
+                },
+                "ip6-addresses": {
+                    "type": "boolean"
+                }
+            },
+            "additionalProperties": false
+        },
+        "ifname": {
+            "type": "boolean"
+        },
+        "mib_dir": {"$ref": "#/definitions/string_group"},
+        "good_if": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "nobulk": {
+            "type": "boolean"
+        },
+        "ifXmcbc": {
+            "type": "boolean"
+        },
+        "rfc1628_compat": {
+            "type": "boolean"
+        },
+        "empty_ifdescr": {
+            "type": "boolean"
+        },
+        "register_mibs": {
+            "type": "object"
+        },
+        "bad_if": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "bad_ifXEntry": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "processor_stacked": {
+            "type": "boolean"
+        },
+        "bad_if_regexp": {"$ref": "#/definitions/regex_group"},
+        "bad_snmpEngineTime": {
+            "type": "boolean"
+        },
+        "bad_uptime": {
+            "type": "boolean"
+        },
+        "ignore_mount_string": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "bad_hrSystemUptime": {
+            "type": "boolean"
+        },
+        "icons": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "os",
+        "text",
+        "type"
+    ],
+    "definitions": {
+        "string_group": {
+            "oneOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            ]
+        },
+        "oid_group": {
+            "oneOf": [
+                {
+                    "type": "string",
+                    "pattern": "^(\\.\\d+)+\\.?$"
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "pattern": "^(\\.\\d+)+\\.?$"
+                    }
+                }
+            ]
+        },
+        "regex_group": {
+            "oneOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            ]
+        },
+        "snmpget": {
+            "type": "object",
+            "properties": {
+                "oid": {
+                    "type": "string"
+                },
+                "op": {
+                    "$ref": "#/definitions/comparison"
+                },
+                "value": {
+                    "anyOf": [
+                        {
+                            "type": [
+                                "boolean",
+                                "string"
+                            ]
+                        },
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ]
+                },
+                "mib": {
+                    "type": "string"
+                },
+                "mib_dir": {
+                    "type": "string"
+                },
+                "options": {
+                    "type": "string",
+                    "pattern": "^-"
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "oid",
+                "value"
+            ]
+        },
+        "comparison": {
+            "type": "string",
+            "enum": [
+                "=",
+                "!=",
+                "==",
+                "!==",
+                "<=",
+                ">=",
+                "<",
+                ">",
+                "starts",
+                "ends",
+                "contains",
+                "regex"
+            ]
+        }
+    }
+}

@@ -26,11 +26,11 @@
 namespace LibreNMS\Validations;
 
 use LibreNMS\Config;
-use LibreNMS\Interfaces\ValidationGroup;
 use LibreNMS\Validator;
 
-class Mail implements ValidationGroup
+class Mail extends BaseValidation
 {
+    protected static $RUN_BY_DEFAULT = false;
 
     /**
      * Validate this module.
@@ -78,15 +78,5 @@ class Mail implements ValidationGroup
                 }
             }
         }//end if
-    }
-
-    /**
-     * Returns if this test should be run by default or not.
-     *
-     * @return bool
-     */
-    public function isDefault()
-    {
-        return false;
     }
 }

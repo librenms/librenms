@@ -7,10 +7,11 @@
  *
  */
 
+use LibreNMS\Config;
+
 $init_modules = array();
 require __DIR__ . '/includes/init.php';
 
 if (isCli()) {
-    global $config;
-    echo json_encode($config);
+    echo Config::json_encode();
 }

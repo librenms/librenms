@@ -1,6 +1,6 @@
 os: radlan
 text: Radlan
-ifname: 1
+ifname: true
 type: network
 icon: alliedtelesis
 group: alliedtelesis
@@ -10,11 +10,10 @@ over:
 discovery:
     - sysDescr:
         - AT-8000
-    - sysObjectID: 
+    - sysObjectID:
       - .1.3.6.1.4.1.207.1.4.127
       - .1.3.6.1.4.1.207.1.4.128
       - .1.3.6.1.4.1.207.1.4.145
       - .1.3.6.1.4.1.207.1.4.144
-
 mib_dir:
     - radlan

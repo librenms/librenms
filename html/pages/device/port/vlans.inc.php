@@ -18,7 +18,7 @@ foreach ($vlans as $vlan) {
     echo '<tr bgcolor="'.$row_colour.'">';
 
     echo '<td width=100 class=list-large> Vlan '.$vlan['vlan'].'</td>';
-    echo '<td width=200 class=box-desc>'.$vlan['vlan_descr'].'</td>';
+    echo '<td width=200 class=box-desc>'.$vlan['vlan_name'].'</td>';
 
     if ($vlan['state'] == 'blocking') {
         $class = 'red';
@@ -37,7 +37,7 @@ foreach ($vlans as $vlan) {
         if ($otherport['untagged']) {
             $traverse_ifvlan = false;
         }
-        $vlan_ports[$otherport[ifIndex]] = $otherport;
+        $vlan_ports[$otherport['ifIndex']] = $otherport;
     }
 
     if ($traverse_ifvlan) {
@@ -46,7 +46,7 @@ foreach ($vlans as $vlan) {
             array($device['device_id'], $vlan['vlan'])
         );
         foreach ($otherports as $otherport) {
-            $vlan_ports[$otherport[ifIndex]] = array_merge($otherport, array('untagged' => '1'));
+            $vlan_ports[$otherport['ifIndex']] = array_merge($otherport, array('untagged' => '1'));
         }
     }
 

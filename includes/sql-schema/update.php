@@ -13,15 +13,14 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\Exceptions\DatabaseConnectException;
 use LibreNMS\Exceptions\LockException;
 use LibreNMS\Util\FileLock;
 use LibreNMS\Util\MemcacheLock;
 
-global $database_link;
-
 if (!isset($init_modules) && php_sapi_name() == 'cli') {
     // Not called from within discovery, let's load up the necessary stuff.
-    $init_modules = array();
+    $init_modules = [];
     require realpath(__DIR__ . '/../..') . '/includes/init.php';
 }
 
@@ -37,7 +36,8 @@ try {
     }
 
     // only import build.sql to an empty database
-    $tables = dbFetchRows("SHOW TABLES FROM " . Config::get('db_name'));
+    $tables = dbFetchRows("SHOW TABLES");
+
     if (empty($tables)) {
         echo "-- Creating base database structure\n";
         $step = 0;
@@ -52,9 +52,7 @@ try {
             echo 'Step #' . $step++ . ' ...' . PHP_EOL;
 
             if (!empty($line)) {
-                $creation = dbQuery($line);
-                if (!$creation) {
-                    echo 'WARNING: Cannot execute query (' . $line . '): ' . mysqli_error($database_link) . "\n";
+                if (!dbQuery($line)) {
                     $return = 1;
                 }
             }
@@ -70,7 +68,7 @@ try {
         d_echo("DB Schema already up to date.\n");
     } else {
         // Set Database Character set and Collation
-        dbQuery('ALTER DATABASE ? CHARACTER SET utf8 COLLATE utf8_unicode_ci;', array(array(Config::get('db_name'))));
+        dbQuery('ALTER DATABASE CHARACTER SET utf8 COLLATE utf8_unicode_ci;');
 
         $db_rev = get_db_schema();
         $insert = ($db_rev == 0); // if $db_rev == 0, insert the first update
@@ -91,10 +89,9 @@ try {
                             d_echo("$line \n");
 
                             if ($line[0] != '#') {
-                                if (!mysqli_query($database_link, $line)) {
+                                if (!dbQuery($line)) {
                                     $return = 2;
                                     $err++;
-                                    d_echo(mysqli_error($database_link) . PHP_EOL);
                                 }
                             }
                         }

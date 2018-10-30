@@ -1,7 +1,7 @@
 os: drac
 text: 'Dell DRAC'
 icon: dell
-type: server
+type: appliance
 mib_dir:
     - dell
 discovery:

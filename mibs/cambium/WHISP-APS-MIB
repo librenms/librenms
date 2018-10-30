@@ -52,6 +52,7 @@ whispGPSEvent		OBJECT IDENTIFIER ::= {whispApsEvent 2}
 whispApsDfsEvent		OBJECT IDENTIFIER ::= {whispApsEvent 3}
 whispApRegulatoryEvent		OBJECT IDENTIFIER ::= {whispApsEvent 4}
 whispApRFOverloadEvent		OBJECT IDENTIFIER ::= {whispApsEvent 5}
+whispApsMumimoTrialEvent		OBJECT IDENTIFIER ::= {whispApsEvent 6}
 whispApsGroups		OBJECT IDENTIFIER ::= {whispAps 6}
 whispApsFrUtlStats		OBJECT IDENTIFIER ::= {whispAps 12}
 whispApsFrUtlStatsIntervalLow		OBJECT IDENTIFIER ::= {whispApsFrUtlStats 1}
@@ -60,6 +61,7 @@ whispApsFrUtlStatsIntervalHigh		OBJECT IDENTIFIER ::= {whispApsFrUtlStats 3}
 whispApsStatus		OBJECT IDENTIFIER ::= {whispAps 7}
 whispApsDNS		OBJECT IDENTIFIER ::= {whispAps 9}
 whispApsControls		OBJECT IDENTIFIER ::= {whispAps 11}
+whispApsLQI		OBJECT IDENTIFIER ::= {whispAps 13}
 whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 
 -- -------------------------------------------------------------------------
@@ -781,24 +783,25 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 			"EtherType for QinQ (802.1ad) outer tag (S-Tag). 0x88a8 by default."
 		::={whispApsConfig 71}
 
-	fskSMTxPwrCntl	OBJECT-TYPE
+	sMTxPowerControl	OBJECT-TYPE
 		SYNTAX		INTEGER {
-					disabled(0),
-					enabled(1)}
+					disable(0),
+					enable(1)}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"Enable/Disable AP control of SM TX power.  For FSK AP radios capable of Transmit Power
-                            Control."
+			"Enable/Disable AP control of SM TX power.
+                            Engineering use only."
 		::={whispApsConfig 72}
 
 	fskSMRcvTargetLvl	OBJECT-TYPE
 		SYNTAX		INTEGER (-80..-40)
 		UNITS		"dBm"
 		MAX-ACCESS	read-write
-		STATUS		current
+		STATUS		obsolete
 		DESCRIPTION		
-			"Desired SM Receive Level at AP (dBm, Range -40dBm to -80 dBm)."
+			"Desired SM Receive Level at AP (dBm, Range -40dBm to -80 dBm).
+                        FSK only."
 		::={whispApsConfig 73}
 
 	authSharedSecret1	OBJECT-TYPE
@@ -877,9 +880,10 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		SYNTAX		INTEGER {
 					md5(0)}
 		MAX-ACCESS	read-write
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
-			"Select method for User Authentication"
+			"Select method for User Authentication. This is deprecated.
+            				Please use whispUsrAuth."
 		::={whispApsConfig 85}
 
 	whispWebUseAuthServer	OBJECT-TYPE
@@ -1015,7 +1019,6 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
              95 : (UTC+07) THA - Thailand Standard Time
              96 : (UTC+08) ACT - ASEAN Common Time
              97 : (UTC+08) AWST - Australian Western Standard Time
-
              98 : (UTC+08) BDT - Brunei Time
              99 : (UTC+08) CST - China Standard Time
              100 : (UTC+08) HKT - Hong Kong Time
@@ -1225,6 +1228,39 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 			"Displays the timestamp of last removal of Idle SMs from AP's Session list"
 		::={whispApsConfig 109}
 
+	userAuthSharedSecret1	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"User Authentication Server 1 Shared Secret."
+		::={whispApsConfig 110}
+
+	userAuthSharedSecret2	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"User Authentication Server 2 Shared Secret."
+		::={whispApsConfig 111}
+
+	userAuthSharedSecret3	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"User Authentication Server 3 Shared Secret."
+		::={whispApsConfig 112}
+
+	trapDelayAfterBootup	OBJECT-TYPE
+		SYNTAX		INTEGER (0..120)
+		UNITS		"seconds"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Delays sending of SNMP traps after radio boots up for this many number of seconds."
+		::={whispApsConfig 113}
+
 	radioMode	OBJECT-TYPE
 		SYNTAX		INTEGER {
 					mimoOnly(2)}
@@ -1296,7 +1332,6 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 			"Length of the network mask to apply to the AllowedIPAddress when assessing if access is allowed"
 		::={whispApsConfig 213}
 
-
 	bridgeFloodUnknownsEnable	OBJECT-TYPE
 		SYNTAX		INTEGER {
 					disable(0),
@@ -1325,7 +1360,9 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		SYNTAX		INTEGER {
 					bandwidth5MHz(0),
 					bandwidth10MHz(1),
-					bandwidth20MHz(2)}
+					bandwidth15MHz(3),
+					bandwidth20MHz(2),
+					bandwidth30MHz(4)}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
@@ -1346,8 +1383,10 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"The data rate that is used for the Multicast VC.
-                            8X and MIMO-A are currently for engineering only."
+			"Enables and selects the data rate of the Multicast VC.
+                            If disabled, multicast messages are sent using the broadcast VC.
+                            This VC does not automatically rate adapt.
+                            Note: SMs that cannot receive at the selected rate will receive no multicast messages."
 		::={whispApsConfig 217}
 
 	dlnkMcastCIR	OBJECT-TYPE
@@ -1373,7 +1412,13 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"Used to enable or disable adjacent channel support."
+			"Used to enable or disable adjacent channel support.
+                        This could be needed when there is no guard band between co-located APs.
+                        Only available for APs in 3 GHz, 4.9 GHz and all 5 GHz frequency bands. 
+                        For 3 GHz, this caps SMs to max transmit power of 23 dBm.
+                        When disabled, allows 3 GHz SMs to max out transmit power at 25 dBm.
+                        For 4.9-5.9 GHz, this caps 450b SMs to max transmit power of 25 dBm.
+                        When disabled, allows 4.9-5.9 GHz 450b SMs to max out transmit power at 27 dBm."
 		::={whispApsConfig 220}
 
 	pmp430InteropMode	OBJECT-TYPE
@@ -1424,9 +1469,8 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"Option to allow/disallow 430 SMs to register to this AP.
-                        	When disabled 430 SMs registrations will be rejected.
-                        	This option applies only to PMP 450i/450 5 GHz APs."
+			"Option to allow/disallow PMP 430 SMs to register to this AP.
+                        	When disabled PMP 430 SMs registrations will be rejected."
 		::={whispApsConfig 225}
 
 	disableAuthForICCSM	OBJECT-TYPE
@@ -1460,9 +1504,9 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"Option to put the PMP 450i into a Legacy mode for communicating with PMP 450 SMs running SW older than 13.3 and PMP 430 SMs running SW older than 13.4.1.
+			"Option to put the PMP 450b/450i/450m into a Legacy mode for communicating with PMP 450 SMs running SW older than 13.3 and PMP 430 SMs running SW older than 13.4.1.
                         	Enabling this option will have an impact on sector throughput performance so should only be enabled to allow upgrading of the mixed sector.
-                        	This option only applies to PMP 450i AP devices."
+                        	450m will operate in SU-MIMO Mode."
 		::={whispApsConfig 229}
 
 	pagerRejectFilterSelect	OBJECT-TYPE
@@ -1507,8 +1551,43 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		STATUS		current
 		DESCRIPTION		
 			"Option to adjust the frame alignment for compatibility with different GPS sync sources and software versions.
-                        	Please see user guide for more information.  Not applicable to 3 GHz radios running with 5ms frame."
+                        	Please see user guide for more information.
+                        	Not applicable to 3 GHz radios running with 5ms frame, nor PMP 450m."
 		::={whispApsConfig 233}
+
+	noRebootFreqChange	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					default(0),
+					noreboot(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enable/Disable option to change frequency without rebooting.
+                            Engineering use only."
+		::={whispApsConfig 234}
+
+	mumimoTrialMode	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					enable(1),
+					disable(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enable MU-MIMO, Trial Mode units will decrement until units are exhausted or Trial Mode is disabled.
+                            Disable MU-MIMO, radio is still functional with SU-MIMO operation. Trial Mode units will not decrement.                   
+                            450m only."
+		::={whispApsConfig 236}
+
+	prioritizeMgmtData	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					low(0),
+					high(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"0 - Management data will use low priority VC.
+                           1 - If high priority VC is configured will use that, otherwise will use low priority VC"
+		::={whispApsConfig 247}
 
 	whispRegStatus	OBJECT-TYPE
 		SYNTAX		DisplayString
@@ -1562,7 +1641,8 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 
 	linkTestMode	OBJECT-TYPE
 		SYNTAX		INTEGER {
-					rflinktest(0),
+					linktestwithmultipleVCs(4),
+					linktestwithoutbridging(0),
 					linktestwithbridging(1),
 					linktestwithbridgingandmir(2),
 					extrapolatedlinktest(3)}
@@ -1570,13 +1650,14 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		STATUS		deprecated
 		DESCRIPTION		
 			"Link Test Mode
-                            0 = RF Link Test (traffic doesn't go through bridge, highest throughput)
+                            0 = Link Test without Bridging
                             1 = Link Test with Bridging
                             2 = Link Test with Bridging and MIR
                             3 = Extrapolated Link Test (send only a few packets measuring their quality and extrapolate out the throughput)
                             This is an estimation of the throughput based upon the modulation, efficiency, and data slots available.
                             It intended to provide a basic link test test without impacting service for the sector.
                             Extrapolated Link Test is not available for FSK radios.
+                            4 = Link Test with Multiple VCs (traffic sent to all registered VCs, or specified VCs) - 450m only
                             [This Variable is deprecated. Please refer whispBoxLink OIDs]"
 		::={whispApsLinkTestConfig 5}
 
@@ -2383,7 +2464,11 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 					powrPortSync(4),
 					onBoardGPSAndPowrPortSync(5),
 					timingPortUGPSAndPowrPortSync(6),
-					onBoardGPSAndTimingPortUGPSAndPowrPortSync(7)}
+					onBoardGPSAndTimingPortUGPSAndPowrPortSync(7),
+					cambiumSync(8),
+					timingPortUGPSSyncAndCambiumSync(10),
+					powrPortSyncAndCambiumSync(12),
+					timingPortUGPSAndPowrPortSyncAndCambiumSync(14)}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
@@ -2393,10 +2478,14 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 						(1) On-board GPS Sync
 						(2) Timing Port/UGPS Sync
 						(3) On-board GPS and Timing Port/UGPS Sync
-						(4) Power Port Sync
-						(5) On-board GPS and Power Port Sync
-						(6) Timing Port/UGPS and Power Port Sync
-						(7) On-board GPS, Timing Port/UGPS and Power Port Sync"
+						(4) Canopy Sync Over Power Port
+						(5) On-board GPS and Canopy Sync Over Power
+						(6) Timing Port/UGPS and Canopy Sync Over Power
+						(7) On-board GPS, Timing Port/UGPS and Canopy Sync Over Power
+						(8) Cambium Sync Over Power
+						(10) Timing Port/UGPS and Cambium Sync Over Power
+						(12) Canopy Sync and Cambium Sync Over Power
+						(14) Timing Port/UGPS, Canopy Sync Over Power, and Cambium Sync Over Power"
 		::={whispApsGPS 18}
 
 	gpsSatellitesTrackedInt	OBJECT-TYPE
@@ -2543,6 +2632,18 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
                             physAddress - the MAC address of the unit."
 		::={whispApRFOverloadEvent 1}
 
+-- MU-MIMO Trial Event Notification.
+
+	mumimoTrialEvent	NOTIFICATION-TYPE
+		OBJECTS {
+					mumimoTrialPercentageRemaining,
+					whispBoxEsn}
+		STATUS		current
+		DESCRIPTION		
+			"MU-MIMO Trial Event Notification.
+                            Value indicates percentage of trial licenses remaining."
+		::={whispApsMumimoTrialEvent 1}
+
 	whispLinkTestGroup	OBJECT-GROUP
 			OBJECTS {
 					linkTestLUID,
@@ -2687,6 +2788,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 					dlnkBcastCIR,
 					dlnkMcastCIR,
 					verifyGPSChecksum,
+					mumimoTrialMode,
 					qinqEthType,
 					useAPManagementVIDForICCSM,
 					multicastVCDataRate,
@@ -2696,7 +2798,6 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 					pmp430SMRegistration,
 					colorCodeRescanTimer,
 					colorCodeRescanIdleTimer,
-					fskSMTxPwrCntl,
 					fskSMRcvTargetLvl,
 					berModSelect,
 					lastSesStatsReset,
@@ -2709,7 +2810,10 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 					freeRunGPSSyncBypass,
 					uGPSPower,
 					gpsOutputEn,
+					prioritizeMgmtData,
 					radioMode,
+					noRebootFreqChange,
+					trapDelayAfterBootup,
 					pagerRejectFilterSelect,
 					authSharedSecret1,
 					authSharedSecret2,
@@ -2723,6 +2827,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 					remoteSpectrumAnalyzerScanBandwidth,
 					apConfigAdjacentChanSupport,
 					ofdmSMRcvTargetLvl,
+					sMTxPowerControl,
 					pmp430InteropMode,
 					apRxDelay,
 					apVlanOverride,
@@ -2742,6 +2847,9 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 					dropSession,
 					removeIdleSMs,
 					lastTimeIdleSMsRemoved,
+					userAuthSharedSecret1,
+					userAuthSharedSecret2,
+					userAuthSharedSecret3,
 					timeZone,
 					actionListFilename,
 					enableAutoupdate}
@@ -2805,6 +2913,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 					sessionCount,
 					softwareVersion,
 					linkSwVersion,
+					spatialFrequency,
 					softwareBootVersion,
 					fpgaVersion,
 					linkSiteName,
@@ -2864,7 +2973,8 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 					regulatoryApCheckInvalidChanFailed,
 					regulatoryCheckFailedNoRegionAp,
 					regulatoryApCheckInvalidChBwFailed,
-					rfLinkOverloadCondition}
+					rfLinkOverloadCondition,
+					mumimoTrialEvent}
 		STATUS		current
 		DESCRIPTION
 			"WHiSP APs notification group."
@@ -2901,7 +3011,22 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 					frUtlLowEthInDiscards,
 					frUtlLowEthOutDiscards,
 					frUtlLowRFInDiscards,
-					frUtlLowRFOutDiscards}
+					frUtlLowRFOutDiscards,
+					frUtlLowIntervalBwReqPercentage,
+					frUtlLowIntervalBwReqRx,
+					frUtlLowIntervalBwReqMissed,
+					frUtlLowContentionSlots,
+					frUtlLowAvgDownlinkSlots,
+					frUtlLowAvgUplinkSlots,
+					frUtlLowAvgContentionSlots,
+					frUtlLowMaxContentionSlots,
+					frUtlLowDownlinkAckUtilization,
+					frUtlLowDownlinkBcastMcastUtilization,
+					frUtlLowMumimoDownlinkSectorUtilization,
+					frUtlLowMumimoDownlinkMumimoUtilization,
+					frUtlLowMumimoDownlinkSumimoUtilization,
+					frUtlLowMumimoDownlinkMultiplexingGain,
+					frUtlLowMumimoDownlinkAvgGroupSize}
 		STATUS		current
 		DESCRIPTION
 			"WHiSP APs Frame Utilization Statistics group for interval of 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
@@ -2926,7 +3051,22 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 					frUtlMedEthInDiscards,
 					frUtlMedEthOutDiscards,
 					frUtlMedRFInDiscards,
-					frUtlMedRFOutDiscards}
+					frUtlMedRFOutDiscards,
+					frUtlMediumIntervalBwReqPercentage,
+					frUtlMediumIntervalBwReqRx,
+					frUtlMediumIntervalBwReqMissed,
+					frUtlMediumContentionSlots,
+					frUtlMediumAvgDownlinkSlots,
+					frUtlMediumAvgUplinkSlots,
+					frUtlMediumAvgContentionSlots,
+					frUtlMediumMaxContentionSlots,
+					frUtlMedDownlinkAckUtilization,
+					frUtlMedDownlinkBcastMcastUtilization,
+					frUtlMedMumimoDownlinkSectorUtilization,
+					frUtlMedMumimoDownlinkMumimoUtilization,
+					frUtlMedMumimoDownlinkSumimoUtilization,
+					frUtlMedMumimoDownlinkMultiplexingGain,
+					frUtlMedMumimoDownlinkAvgGroupSize}
 		STATUS		current
 		DESCRIPTION
 			"WHiSP APs Frame Utilization Statistics group for interval of 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
@@ -2951,7 +3091,22 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 					frUtlHighEthInDiscards,
 					frUtlHighEthOutDiscards,
 					frUtlHighRFInDiscards,
-					frUtlHighRFOutDiscards}
+					frUtlHighRFOutDiscards,
+					frUtlHighIntervalBwReqPercentage,
+					frUtlHighIntervalBwReqRx,
+					frUtlHighIntervalBwReqMissed,
+					frUtlHighContentionSlots,
+					frUtlHighAvgDownlinkSlots,
+					frUtlHighAvgUplinkSlots,
+					frUtlHighAvgContentionSlots,
+					frUtlHighMaxContentionSlots,
+					frUtlHighDownlinkAckUtilization,
+					frUtlHighDownlinkBcastMcastUtilization,
+					frUtlHighMumimoDownlinkSectorUtilization,
+					frUtlHighMumimoDownlinkMumimoUtilization,
+					frUtlHighMumimoDownlinkSumimoUtilization,
+					frUtlHighMumimoDownlinkMultiplexingGain,
+					frUtlHighMumimoDownlinkAvgGroupSize}
 		STATUS		current
 		DESCRIPTION
 			"WHiSP APs Frame Utilization Statistics group for interval of 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
@@ -2970,7 +3125,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Percentage of total uplink utilization in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+			"Percentage of total uplink utilization in the last 1 minute. Only supported for PMP 450 AP platform."
 		::={whispApsFrUtlStatsIntervalLow 2}
 
 	frUtlLowTotalDownlinkSlots	OBJECT-TYPE
@@ -3026,7 +3181,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Total uplink data slots in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+			"Total uplink data slots in the last 1 minute. Only supported for PMP 450 AP platform."
 		::={whispApsFrUtlStatsIntervalLow 9}
 
 	frUtlLowUplinkLowPrioSlots	OBJECT-TYPE
@@ -3034,7 +3189,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of data slots used for uplink low priority traffic in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+			"Number of data slots used for uplink low priority traffic in the last 1 minute. Only supported for PMP 450 AP platform."
 		::={whispApsFrUtlStatsIntervalLow 10}
 
 	frUtlLowUplinkHiPrioSlots	OBJECT-TYPE
@@ -3042,7 +3197,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of data slots used for uplink high priority traffic in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+			"Number of data slots used for uplink high priority traffic in the last 1 minute. Only supported for PMP 450 AP platform."
 		::={whispApsFrUtlStatsIntervalLow 11}
 
 	frUtlLowUplinkAckSlots	OBJECT-TYPE
@@ -3050,7 +3205,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of data slots used for Uplink Canopy MAC Acknowledgements in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+			"Number of data slots used for Uplink Canopy MAC Acknowledgements in the last 1 minute. Only supported for PMP 450 AP platform."
 		::={whispApsFrUtlStatsIntervalLow 12}
 
 	frUtlLowMaxDownlinkSlots	OBJECT-TYPE
@@ -3074,7 +3229,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
                         This is calculated as ((Uplink slots in a frame) * (Number of frames in a second) * 60). 
                         Uplink slots in a frame depends on the frame configuration. 
                         Number of frames in a second depends on the configured frame period of 5 ms (200 frames) or 2.5 ms (400 frames).  
-                        Only supported for PMP and PTP 450 AP and Backhauls."
+                        Only supported for PMP 450 AP platform."
 		::={whispApsFrUtlStatsIntervalLow 14}
 
 	frUtlLowEthInDiscards	OBJECT-TYPE
@@ -3109,6 +3264,145 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 			"Number of outgoing radio packets discarded in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
 		::={whispApsFrUtlStatsIntervalLow 18}
 
+	frUtlLowIntervalBwReqPercentage	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of bandwidth request received in the last 1 minute.
+                        	Only supported for PMP 450 platform.
+                        	PMP 430 SMs will not be included in this statistic."
+		::={whispApsFrUtlStatsIntervalLow 19}
+
+	frUtlLowIntervalBwReqRx	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of bandwidth request received in the last 1 minute.
+                        	Only supported for PMP 450 platform.
+                        	PMP 430 SMs will not be included in this statistic."
+		::={whispApsFrUtlStatsIntervalLow 20}
+
+	frUtlLowIntervalBwReqMissed	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of bandwidth request missed in the last 1 minute.
+                            Only supported for PMP 450 platform.
+                            PMP 430 SMs will not be included in this statistic."
+		::={whispApsFrUtlStatsIntervalLow 21}
+
+	frUtlLowContentionSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of scheduled contention slots available in the last 1 minute. 
+                        	Only supported for PMP 450 AP platform."
+		::={whispApsFrUtlStatsIntervalLow 22}
+
+	frUtlLowAvgDownlinkSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Average downlink data slots per frame in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalLow 23}
+
+	frUtlLowAvgUplinkSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Average uplink data slots per frame in the last 1 minute. Only supported for PMP 450 AP platform."
+		::={whispApsFrUtlStatsIntervalLow 24}
+
+	frUtlLowAvgContentionSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Average contention slots per frame in the last 1 minute. 
+                        	Only supported for PMP 450 AP platform."
+		::={whispApsFrUtlStatsIntervalLow 25}
+
+	frUtlLowMaxContentionSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Maximum possible contention slots for 1 minute. 
+                        This is calculated as (((Uplink slots in a frame) + (Contention slots in a frame)) * (Number of frames in a second) * 60(seconds)). 
+                        Uplink slots and contention slots in a frame depend on the frame configuration. 
+                        Number of frames in a second depends on the configured frame period of 5 ms (200 frames) or 2.5 ms (400 frames). 
+                        Only supported for PMP 450 AP platform."
+		::={whispApsFrUtlStatsIntervalLow 26}
+
+	frUtlLowDownlinkAckUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of downlink Canopy MAC Acknowledgment utilization in the last 1 minute."
+		::={whispApsFrUtlStatsIntervalLow 27}
+
+	frUtlLowDownlinkBcastMcastUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of downlink Broadcast/Multicast utilization in the last 1 minute."
+		::={whispApsFrUtlStatsIntervalLow 28}
+
+	frUtlLowMumimoDownlinkSectorUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of MU-MIMO downlink Sector utilization in the last 1 minute.
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsIntervalLow 29}
+
+	frUtlLowMumimoDownlinkMumimoUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of MU-MIMO downlink utilization in the last 1 minute.
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsIntervalLow 30}
+
+	frUtlLowMumimoDownlinkSumimoUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of SU-MIMO downlink utilization in the last 1 minute.
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsIntervalLow 31}
+
+	frUtlLowMumimoDownlinkMultiplexingGain	OBJECT-TYPE
+		SYNTAX		INTEGER (0..700)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"MU-MIMO Multiplexing Gain in the last 1 minute.
+                        	This value is scaled up by 100 (ie. 269 = 2.69).
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsIntervalLow 32}
+
+	frUtlLowMumimoDownlinkAvgGroupSize	OBJECT-TYPE
+		SYNTAX		INTEGER (0..700)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Average MU-MIMO Group Size in the last 1 minute.
+                        	This value is scaled up by 100 (ie. 269 = 2.69).
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsIntervalLow 33}
+
 	frUtlMedTotalDownlinkUtilization	OBJECT-TYPE
 		SYNTAX		INTEGER
 		MAX-ACCESS	read-only
@@ -3122,7 +3416,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Percentage of total uplink utilization in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+			"Percentage of total uplink utilization in the last 5 minutes. Only supported for PMP 450 AP platform."
 		::={whispApsFrUtlStatsIntervalMedium 2}
 
 	frUtlMedTotalDownlinkSlots	OBJECT-TYPE
@@ -3178,7 +3472,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Total uplink data slots in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+			"Total uplink data slots in the last 5 minutes. Only supported for PMP 450 AP platform."
 		::={whispApsFrUtlStatsIntervalMedium 9}
 
 	frUtlMedUplinkLowPrioSlots	OBJECT-TYPE
@@ -3186,7 +3480,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of data slots used for uplink low priority traffic in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+			"Number of data slots used for uplink low priority traffic in the last 5 minutes. Only supported for PMP 450 AP platform."
 		::={whispApsFrUtlStatsIntervalMedium 10}
 
 	frUtlMedUplinkHiPrioSlots	OBJECT-TYPE
@@ -3194,7 +3488,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of data slots used for uplink high priority traffic in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+			"Number of data slots used for uplink high priority traffic in the last 5 minutes. Only supported for PMP 450 AP platform."
 		::={whispApsFrUtlStatsIntervalMedium 11}
 
 	frUtlMedUplinkAckSlots	OBJECT-TYPE
@@ -3202,7 +3496,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of data slots used for Uplink Canopy MAC Acknowledgements in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+			"Number of data slots used for Uplink Canopy MAC Acknowledgements in the last 5 minutes. Only supported for PMP 450 AP platform."
 		::={whispApsFrUtlStatsIntervalMedium 12}
 
 	frUtlMedMaxDownlinkSlots	OBJECT-TYPE
@@ -3226,7 +3520,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
                         This is calculated as ((Uplink slots in a frame) * (Number of frames in a second) * 5 * 60(seconds)). 
                         Uplink slots in a frame depends on the frame configuration. 
                         Number of frames in a second depends on the configured frame period of 5 ms (200 frames) or 2.5 ms (400 frames). 
-                        Only supported for PMP and PTP 450 AP and Backhauls."
+                        Only supported for PMP 450 AP platform."
 		::={whispApsFrUtlStatsIntervalMedium 14}
 
 	frUtlMedEthInDiscards	OBJECT-TYPE
@@ -3261,6 +3555,145 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 			"Number of outgoing radio packets discarded in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
 		::={whispApsFrUtlStatsIntervalMedium 18}
 
+	frUtlMediumIntervalBwReqPercentage	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of bandwidth request received in the last 5 minutes.
+                        	Only supported for PMP 450 platform.
+							PMP 430 SMs will not be included in this statistic."
+		::={whispApsFrUtlStatsIntervalMedium 19}
+
+	frUtlMediumIntervalBwReqRx	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of bandwidth request received in the last 5 minutes.
+                        	Only supported for PMP 450 platform.
+                        	PMP 430 SMs will not be included in this statistic."
+		::={whispApsFrUtlStatsIntervalMedium 20}
+
+	frUtlMediumIntervalBwReqMissed	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of bandwidth request missed in the last 5 minutes.
+                            Only supported for PMP 450 platform.
+                            PMP 430 SMs will not be included in this statistic."
+		::={whispApsFrUtlStatsIntervalMedium 21}
+
+	frUtlMediumContentionSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of scheduled contention slots available in the last 5 minutes. 
+                        	Only supported for PMP 450 AP platform."
+		::={whispApsFrUtlStatsIntervalMedium 22}
+
+	frUtlMediumAvgDownlinkSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Average downlink data slots per frame in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalMedium 23}
+
+	frUtlMediumAvgUplinkSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Average uplink data slots per frame in the last 5 minutes. Only supported for PMP 450 AP platform."
+		::={whispApsFrUtlStatsIntervalMedium 24}
+
+	frUtlMediumAvgContentionSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Average contention slots per frame in the last 5 minutes. 
+                        	Only supported for PMP 450 AP platform."
+		::={whispApsFrUtlStatsIntervalMedium 25}
+
+	frUtlMediumMaxContentionSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Maximum possible contention slots for 5 minutes. 
+                        This is calculated as (((Uplink slots in a frame) + (Contention slots in a frame)) * (Number of frames in a second) * 5 * 60(seconds)). 
+                        Uplink slots and contention slots in a frame depend on the frame configuration. 
+                        Number of frames in a second depends on the configured frame period of 5 ms (200 frames) or 2.5 ms (400 frames). 
+                        Only supported for PMP 450 AP platform."
+		::={whispApsFrUtlStatsIntervalMedium 26}
+
+	frUtlMedDownlinkAckUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of downlink Canopy MAC Acknowledgment utilization in the last 5 minutes."
+		::={whispApsFrUtlStatsIntervalMedium 27}
+
+	frUtlMedDownlinkBcastMcastUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of downlink Broadcast/Multicast utilization in the last 5 minutes."
+		::={whispApsFrUtlStatsIntervalMedium 28}
+
+	frUtlMedMumimoDownlinkSectorUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of MU-MIMO downlink Sector utilization in the last 5 minutes.
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsIntervalMedium 29}
+
+	frUtlMedMumimoDownlinkMumimoUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of MU-MIMO downlink utilization in the last 5 minutes.
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsIntervalMedium 30}
+
+	frUtlMedMumimoDownlinkSumimoUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of SU-MIMO downlink utilization in the last 5 minutes.
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsIntervalMedium 31}
+
+	frUtlMedMumimoDownlinkMultiplexingGain	OBJECT-TYPE
+		SYNTAX		INTEGER (0..700)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"MU-MIMO Multiplexing Gain in the last 5 minutes.
+                        	This value is scaled up by 100 (ie. 269 = 2.69).
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsIntervalMedium 32}
+
+	frUtlMedMumimoDownlinkAvgGroupSize	OBJECT-TYPE
+		SYNTAX		INTEGER (0..700)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Average MU-MIMO Group Size in the last 5 minutes.
+                        	This value is scaled up by 100 (ie. 269 = 2.69).
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsIntervalMedium 33}
+
 	frUtlHighTotalDownlinkUtilization	OBJECT-TYPE
 		SYNTAX		INTEGER
 		MAX-ACCESS	read-only
@@ -3274,7 +3707,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Percentage of total uplink utilization in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+			"Percentage of total uplink utilization in the last 15 minutes. Only supported for PMP 450 AP platform."
 		::={whispApsFrUtlStatsIntervalHigh 2}
 
 	frUtlHighTotalDownlinkSlots	OBJECT-TYPE
@@ -3330,7 +3763,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Total uplink data slots in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+			"Total uplink data slots in the last 15 minutes. Only supported for PMP 450 AP platform."
 		::={whispApsFrUtlStatsIntervalHigh 9}
 
 	frUtlHighUplinkLowPrioSlots	OBJECT-TYPE
@@ -3338,7 +3771,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of data slots used for uplink low priority traffic in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+			"Number of data slots used for uplink low priority traffic in the last 15 minutes. Only supported for PMP 450 AP platform."
 		::={whispApsFrUtlStatsIntervalHigh 10}
 
 	frUtlHighUplinkHiPrioSlots	OBJECT-TYPE
@@ -3346,7 +3779,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of data slots used for uplink high priority traffic in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+			"Number of data slots used for uplink high priority traffic in the last 15 minutes. Only supported for PMP 450 AP platform."
 		::={whispApsFrUtlStatsIntervalHigh 11}
 
 	frUtlHighUplinkAckSlots	OBJECT-TYPE
@@ -3354,7 +3787,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of data slots used for Uplink Canopy MAC Acknowledgements in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+			"Number of data slots used for Uplink Canopy MAC Acknowledgements in the last 15 minutes. Only supported for PMP 450 AP platform."
 		::={whispApsFrUtlStatsIntervalHigh 12}
 
 	frUtlHighMaxDownlinkSlots	OBJECT-TYPE
@@ -3378,7 +3811,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
                         This is calculated as ((Uplink slots in a frame) * (Number of frames in a second) * 15 * 60(seconds)). 
                         Uplink slots in a frame depends on the frame configuration. 
                         Number of frames in a second depends on the configured frame period of 5 ms (200 frames) or 2.5 ms (400 frames). 
-                        Only supported for PMP and PTP 450 AP and Backhauls."
+                        Only supported for PMP 450 AP platform."
 		::={whispApsFrUtlStatsIntervalHigh 14}
 
 	frUtlHighEthInDiscards	OBJECT-TYPE
@@ -3412,6 +3845,366 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		DESCRIPTION		
 			"Number of outgoing radio packets discarded in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
 		::={whispApsFrUtlStatsIntervalHigh 18}
+
+	frUtlHighIntervalBwReqPercentage	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of bandwidth request received in the last 15 minutes.
+                        	Only supported for PMP 450 platform.
+                        	PMP 430 SMs will not be included in this statistic."
+		::={whispApsFrUtlStatsIntervalHigh 19}
+
+	frUtlHighIntervalBwReqRx	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of bandwidth request received in the last 15 minutes.
+                        	Only supported for PMP 450 platform.
+                        	PMP 430 SMs will not be included in this statistic."
+		::={whispApsFrUtlStatsIntervalHigh 20}
+
+	frUtlHighIntervalBwReqMissed	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of bandwidth request missed in the last 15 minutes.
+                            Only supported for PMP 450 platform.
+                            PMP 430 SMs will not be included in this statistic."
+		::={whispApsFrUtlStatsIntervalHigh 21}
+
+	frUtlHighContentionSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of scheduled contention slots available in the last 15 minutes. 
+                        	Only supported for PMP 450 AP platform."
+		::={whispApsFrUtlStatsIntervalHigh 22}
+
+	frUtlHighAvgDownlinkSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Average downlink data slots per frame in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalHigh 23}
+
+	frUtlHighAvgUplinkSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Average uplink data slots per frame in the last 15 minutes. Only supported for PMP 450 AP platform."
+		::={whispApsFrUtlStatsIntervalHigh 24}
+
+	frUtlHighAvgContentionSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Average contention slots per frame in the last 15 minutes. 
+                        	Only supported for PMP 450 AP platform."
+		::={whispApsFrUtlStatsIntervalHigh 25}
+
+	frUtlHighMaxContentionSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Maximum possible contention slots for 15 minutes. 
+                        This is calculated as (((Uplink slots in a frame) + (Contention slots in a frame)) * (Number of frames in a second) * 15 * 60(seconds)). 
+                        Uplink slots and contention slots in a frame depend on the frame configuration. 
+                        Number of frames in a second depends on the configured frame period of 5 ms (200 frames) or 2.5 ms (400 frames). 
+                        Only supported for PMP 450 AP platform."
+		::={whispApsFrUtlStatsIntervalHigh 26}
+
+	frUtlHighDownlinkAckUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of downlink Canopy MAC Acknowledgment utilization in the last 15 minutes.
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsIntervalHigh 27}
+
+	frUtlHighDownlinkBcastMcastUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of downlink Broadcast/Multicast utilization in the last 15 minutes."
+		::={whispApsFrUtlStatsIntervalHigh 28}
+
+	frUtlHighMumimoDownlinkSectorUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of MU-MIMO downlink Sector utilization in the last 15 minutes.
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsIntervalHigh 29}
+
+	frUtlHighMumimoDownlinkMumimoUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of MU-MIMO downlink utilization in the last 15 minutes.
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsIntervalHigh 30}
+
+	frUtlHighMumimoDownlinkSumimoUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of SU-MIMO downlink utilization in the last 15 minutes.
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsIntervalHigh 31}
+
+	frUtlHighMumimoDownlinkMultiplexingGain	OBJECT-TYPE
+		SYNTAX		INTEGER (0..700)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"MU-MIMO Multiplexing Gain in the last 15 minutes.
+                        	This value is scaled up by 100 (ie. 269 = 2.69).
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsIntervalHigh 32}
+
+	frUtlHighMumimoDownlinkAvgGroupSize	OBJECT-TYPE
+		SYNTAX		INTEGER (0..700)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Average MU-MIMO Group Size in the last 15 minutes.
+                        	This value is scaled up by 100 (ie. 269 = 2.69).
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsIntervalHigh 33}
+
+	whispApsFrUtlStatsMumimoSpatialTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF WhispApsFrUtlStatsMumimoSpatialEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"MU-MIMO Spatial Utilization Metrics."
+		::= {whispApsFrUtlStats 4}
+
+	whispApsFrUtlStatsMumimoSpatialEntry OBJECT-TYPE
+		SYNTAX		WhispApsFrUtlStatsMumimoSpatialEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"MU-MIMO Spatial Utilization Metrics."
+		INDEX		{frUtlMumimoDownlinkUtilizationSfBin}
+		::= {whispApsFrUtlStatsMumimoSpatialTable 1}
+
+		WhispApsFrUtlStatsMumimoSpatialEntry ::= SEQUENCE{
+			frUtlMumimoDownlinkUtilizationSfBin		INTEGER,
+			frUtlMumimoDownlinkUtilizationSfRange		DisplayString,
+			frUtlMumimoDownlinkUtilizationAzimuth		DisplayString,
+			frUtlMumimoDownlinkUtilizationVcRange		DisplayString,
+			frUtlMumimoDownlinkInstantaneousUtilization		INTEGER,
+			frUtlLowTotalMumimoDownlinkUtilization		INTEGER,
+			frUtlMedTotalMumimoDownlinkUtilization		INTEGER,
+			frUtlHighTotalMumimoDownlinkUtilization		INTEGER,
+			frUtlLowMaxMumimoDownlinkUtilization		INTEGER,
+			frUtlMedMaxMumimoDownlinkUtilization		INTEGER,
+			frUtlHighMaxMumimoDownlinkUtilization		INTEGER,
+			frUtlLowMinMumimoDownlinkUtilization		INTEGER,
+			frUtlMedMinMumimoDownlinkUtilization		INTEGER,
+			frUtlHighMinMumimoDownlinkUtilization	INTEGER
+			}
+
+	frUtlMumimoDownlinkUtilizationSfBin	OBJECT-TYPE
+		SYNTAX		INTEGER (0..32)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Spatial Frequency Bin.
+							MU-MIMO only."
+		::={whispApsFrUtlStatsMumimoSpatialEntry 1}
+
+	frUtlMumimoDownlinkUtilizationSfRange	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Spatial Frequency Range.
+							MU-MIMO only."
+		::={whispApsFrUtlStatsMumimoSpatialEntry 2}
+
+	frUtlMumimoDownlinkUtilizationAzimuth	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Azimuth Ranges per Spatial Frequency bin.
+							MU-MIMO only."
+		::={whispApsFrUtlStatsMumimoSpatialEntry 3}
+
+	frUtlMumimoDownlinkUtilizationVcRange	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"VCs in Spatial Frequency Range.
+							MU-MIMO only."
+		::={whispApsFrUtlStatsMumimoSpatialEntry 4}
+
+	frUtlMumimoDownlinkInstantaneousUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Instantanous MU-MIMO downlink utilization. This updates every 500ms.
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsMumimoSpatialEntry 5}
+
+	frUtlLowTotalMumimoDownlinkUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of total MU-MIMO downlink utilization in the last 1 minute.
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsMumimoSpatialEntry 6}
+
+	frUtlMedTotalMumimoDownlinkUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of total MU-MIMO downlink utilization in the last 5 minutes.
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsMumimoSpatialEntry 7}
+
+	frUtlHighTotalMumimoDownlinkUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of total MU-MIMO downlink utilization in the last 15 minutes.
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsMumimoSpatialEntry 8}
+
+	frUtlLowMaxMumimoDownlinkUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Maximum MU-MIMO downlink utilization in the last 1 minute.
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsMumimoSpatialEntry 9}
+
+	frUtlMedMaxMumimoDownlinkUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Maximum MU-MIMO downlink utilization in the last 5 minutes.
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsMumimoSpatialEntry 10}
+
+	frUtlHighMaxMumimoDownlinkUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Maximum MU-MIMO downlink utilization in the last 15 minutes.
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsMumimoSpatialEntry 11}
+
+	frUtlLowMinMumimoDownlinkUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Minimum MU-MIMO downlink utilization in the last 1 minute.
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsMumimoSpatialEntry 12}
+
+	frUtlMedMinMumimoDownlinkUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Minimum MU-MIMO downlink utilization in the last 5 minutes.
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsMumimoSpatialEntry 13}
+
+	frUtlHighMinMumimoDownlinkUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Minimum MU-MIMO downlink utilization in the last 15 minutes.
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsMumimoSpatialEntry 14}
+
+	whispApsFrUtlStatsMumimoDistributionTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF WhispApsFrUtlStatsMumimoDistributionEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"MU-MIMO Distribution Metrics."
+		::= {whispApsFrUtlStats 5}
+
+	whispApsFrUtlStatsMumimoDistributionEntry OBJECT-TYPE
+		SYNTAX		WhispApsFrUtlStatsMumimoDistributionEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"MU-MIMO Distribution Metrics."
+		INDEX		{frUtlMumimoDownlinkDistributionIndex}
+		::= {whispApsFrUtlStatsMumimoDistributionTable 1}
+
+		WhispApsFrUtlStatsMumimoDistributionEntry ::= SEQUENCE{
+			frUtlMumimoDownlinkDistributionIndex		INTEGER,
+			frUtlMumimoDownlinkDistributionGroup		DisplayString,
+			frUtlMumimoDownlinkDistributionVc		DisplayString,
+			frUtlMumimoDownlinkDistributionMedianSlotCount	INTEGER
+			}
+
+	frUtlMumimoDownlinkDistributionIndex	OBJECT-TYPE
+		SYNTAX		INTEGER (0..9)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"MU-MIMO downlink Distribution Table Index.
+							MU-MIMO only."
+		::={whispApsFrUtlStatsMumimoDistributionEntry 1}
+
+	frUtlMumimoDownlinkDistributionGroup	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"MU-MIMO downlink Distribution Group.
+							MU-MIMO only."
+		::={whispApsFrUtlStatsMumimoDistributionEntry 2}
+
+	frUtlMumimoDownlinkDistributionVc	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"MU-MIMO downlink VC Distribution.
+							MU-MIMO only."
+		::={whispApsFrUtlStatsMumimoDistributionEntry 3}
+
+	frUtlMumimoDownlinkDistributionMedianSlotCount	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"MU-MIMO downlink Median Slot Count Distribution.
+                        	MU-MIMO only."
+		::={whispApsFrUtlStatsMumimoDistributionEntry 4}
 
 -- Access Point status page
 
@@ -3715,6 +4508,33 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 						    OFDM: OID returns 10's of KHz"
 		::={whispApsStatus 37}
 
+	mumimoMode	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Returns the current operating mode of MU-MIMO.
+                          PMP 450m only."
+		::={whispApsStatus 38}
+
+-- Access Point status page
+
+	vcCount	OBJECT-TYPE
+		SYNTAX		Unsigned32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of VCs allocated across all registered SMs."
+		::={whispApsStatus 39}
+
+	mumimoTrialPercentageRemaining	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of remaining MU-MIMO Trial Licenses"
+		::={whispApsStatus 40}
+
 	ntpDomainNameAppend	OBJECT-TYPE
 		SYNTAX		INTEGER {
 					disableDomain(0),
@@ -3847,6 +4667,46 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 			"Obsoleted.  Use whispApsDNS.authDomainNameAppend."
 		::={whispApsDNS 13}
 
+	userAuthServer1	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"User Authentication Server 1.
+            Format is either an IP address or DNS name."
+		::={whispApsDNS 14}
+
+	userAuthServer2	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"User Authentication Server 2.
+            Format is either an IP address or DNS name."
+		::={whispApsDNS 15}
+
+	userAuthServer3	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"User Authentication Server 3.
+            Format is either an IP address or DNS name."
+		::={whispApsDNS 16}
+
+	userAuthDomainNameAppend	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disableDNSDomain(0),
+					enableDNSDomain(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Select whether to append the configured management domain name to
+            the configured user authentication server names.  For example, if dnsMgmtDomainName is
+			set to 'example.com', authServer1 is set to 'auth1', and userAuthDomainNameAppend
+            is set to enableDNSDomain, the authServer1 name used would be 'auth1.example.com'."
+		::={whispApsDNS 17}
+
 	clearLinkTableStats	OBJECT-TYPE
 		SYNTAX		INTEGER
 		MAX-ACCESS	read-write
@@ -3854,6 +4714,401 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		DESCRIPTION		
 			"Setting this to a nonzero value will clear the link table stats."
 		::={whispApsControls 1}
+
+	whispApsLQILowInterval OBJECT-TYPE
+		SYNTAX		SEQUENCE OF WhispApsLQILowIntervalEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Link Quality Indicator one minute interval table."
+		::= {whispApsLQI 1}
+
+	whispApsLQILowIntervalEntry OBJECT-TYPE
+		SYNTAX		WhispApsLQILowIntervalEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Link Quality Indicator for one minute Interval entry."
+		INDEX		{lqiLowLinkLUID}
+		::= {whispApsLQILowInterval 1}
+
+		WhispApsLQILowIntervalEntry ::= SEQUENCE{
+			lqiLowLinkLUID		INTEGER,
+			lqiLowLQI		INTEGER,
+			lqiLowDownlinkQualityIndex		INTEGER,
+			lqiLowDownlinkAverageActualRate		INTEGER,
+			lqiLowDownlinkExpectedRate		INTEGER,
+			lqiLowUplinkQualityIndex		INTEGER,
+			lqiLowUplinkAverageActualRate		INTEGER,
+			lqiLowUplinkExpectedRate		INTEGER,
+			lqiLowBeaconQualityIndex		INTEGER,
+			lqiLowBeaconPercent		INTEGER,
+			lqiLowReRegQualityIndex		INTEGER,
+			lqiLowReRegCount	INTEGER
+			}
+
+	lqiLowLinkLUID	OBJECT-TYPE
+		SYNTAX		INTEGER (2..239)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Logical User Identfication (LUID) number"
+		::={whispApsLQILowIntervalEntry 1}
+
+	lqiLowLQI	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Link Quality Indicator for one minute interval. 
+                            Ranges from 0 to 100 where 100 is the best.
+                            It's calculated based on receive power, modulation rate, re-registrations and beacon percentage."
+		::={whispApsLQILowIntervalEntry 2}
+
+	lqiLowDownlinkQualityIndex	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Downlink Quality Index for one minute interval in percentage. 100% is best quality"
+		::={whispApsLQILowIntervalEntry 3}
+
+	lqiLowDownlinkAverageActualRate	OBJECT-TYPE
+		SYNTAX		INTEGER (0..80)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Downlink Actual average transmit modulation rate in tenths for one minute interval. eg: 73 is 7.3X"
+		::={whispApsLQILowIntervalEntry 4}
+
+	lqiLowDownlinkExpectedRate	OBJECT-TYPE
+		SYNTAX		INTEGER (0..80)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Downlink Expected Rate in tenths for one minute interval. eg: 80 is 8X
+                            This is based upon the uplink receive power and does not take into account interference."
+		::={whispApsLQILowIntervalEntry 5}
+
+	lqiLowUplinkQualityIndex	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink Quality Index for one minute interval in percentage. 100% is best quality"
+		::={whispApsLQILowIntervalEntry 6}
+
+	lqiLowUplinkAverageActualRate	OBJECT-TYPE
+		SYNTAX		INTEGER (0..80)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink Actual average transmit modulation rate in tenths for one minute interval. eg: 73 is 7.3X"
+		::={whispApsLQILowIntervalEntry 7}
+
+	lqiLowUplinkExpectedRate	OBJECT-TYPE
+		SYNTAX		INTEGER (0..80)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink Expected Rate in tenths for one minute interval. eg: 80 is 8X
+                            This is based upon the uplink receive power and does not take into account interference."
+		::={whispApsLQILowIntervalEntry 8}
+
+	lqiLowBeaconQualityIndex	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Beacon Quality Index for one minute interval in percentage. 100% is best quality"
+		::={whispApsLQILowIntervalEntry 9}
+
+	lqiLowBeaconPercent	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Received beacon percentage for one minute interval"
+		::={whispApsLQILowIntervalEntry 10}
+
+	lqiLowReRegQualityIndex	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Beacon Quality Index for one minute interval in percentage. 100% is best quality"
+		::={whispApsLQILowIntervalEntry 11}
+
+	lqiLowReRegCount	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Re Registration count for one minute interval"
+		::={whispApsLQILowIntervalEntry 12}
+
+	whispApsLQIMidInterval OBJECT-TYPE
+		SYNTAX		SEQUENCE OF WhispApsLQIMidIntervalEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Link Quality Indicator five minutes interval table."
+		::= {whispApsLQI 2}
+
+	whispApsLQIMidIntervalEntry OBJECT-TYPE
+		SYNTAX		WhispApsLQIMidIntervalEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Link Quality Indicator for five minutes interval entry."
+		INDEX		{lqiMidLinkLUID}
+		::= {whispApsLQIMidInterval 1}
+
+		WhispApsLQIMidIntervalEntry ::= SEQUENCE{
+			lqiMidLinkLUID		INTEGER,
+			lqiMidLQI		INTEGER,
+			lqiMidDownlinkQualityIndex		INTEGER,
+			lqiMidDownlinkAverageActualRate		INTEGER,
+			lqiMidDownlinkExpectedRate		INTEGER,
+			lqiMidUplinkQualityIndex		INTEGER,
+			lqiMidUplinkAverageActualRate		INTEGER,
+			lqiMidUplinkExpectedRate		INTEGER,
+			lqiMidBeaconQualityIndex		INTEGER,
+			lqiMidBeaconPercent		INTEGER,
+			lqiMidReRegQualityIndex		INTEGER,
+			lqiMidReRegCount	INTEGER
+			}
+
+	lqiMidLinkLUID	OBJECT-TYPE
+		SYNTAX		INTEGER (2..239)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Logical User Identfication (LUID) number"
+		::={whispApsLQIMidIntervalEntry 1}
+
+	lqiMidLQI	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Link Quality Indicator for five minutes interval. 
+                            Ranges from 0 to 100 where 100 is the best.
+                            It's calculated based on receive power, modulation rate, re-registrations and beacon percentage."
+		::={whispApsLQIMidIntervalEntry 2}
+
+	lqiMidDownlinkQualityIndex	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Downlink Quality Index for five minute interval in percentage. 100% is best quality"
+		::={whispApsLQIMidIntervalEntry 3}
+
+	lqiMidDownlinkAverageActualRate	OBJECT-TYPE
+		SYNTAX		INTEGER (0..80)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Downlink Actual average transmit modulation rate in tenths for five minute interval. eg: 73 is 7.3X"
+		::={whispApsLQIMidIntervalEntry 4}
+
+	lqiMidDownlinkExpectedRate	OBJECT-TYPE
+		SYNTAX		INTEGER (0..80)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Downlink Expected Rate in tenths for five minute interval. eg: 80 is 8X"
+		::={whispApsLQIMidIntervalEntry 5}
+
+	lqiMidUplinkQualityIndex	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink Quality Index for five minute interval in percentage. 100% is best quality"
+		::={whispApsLQIMidIntervalEntry 6}
+
+	lqiMidUplinkAverageActualRate	OBJECT-TYPE
+		SYNTAX		INTEGER (0..80)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink Actual average transmit modulation rate in tenths for five minute interval. eg: 73 is 7.3X"
+		::={whispApsLQIMidIntervalEntry 7}
+
+	lqiMidUplinkExpectedRate	OBJECT-TYPE
+		SYNTAX		INTEGER (0..80)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink Expected Rate in tenths for five minute interval. eg: 80 is 8X
+                            This is based upon the uplink receive power and does not take into account interference."
+		::={whispApsLQIMidIntervalEntry 8}
+
+	lqiMidBeaconPercent	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Received beacon percent for five minute interval"
+		::={whispApsLQIMidIntervalEntry 9}
+
+	lqiMidBeaconQualityIndex	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Beacon Quality Index for five minute interval in percentage. 100% is best quality"
+		::={whispApsLQIMidIntervalEntry 10}
+
+	lqiMidReRegCount	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Re Registration count for five minute interval"
+		::={whispApsLQIMidIntervalEntry 11}
+
+	lqiMidReRegQualityIndex	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Beacon Quality Index for five minute interval in percentage. 100% is best quality"
+		::={whispApsLQIMidIntervalEntry 12}
+
+	whispApsLQIHighInterval OBJECT-TYPE
+		SYNTAX		SEQUENCE OF WhispApsLQIHighIntervalEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Link Quality Indicator fifteen minutes interval table."
+		::= {whispApsLQI 3}
+
+	whispApsLQIHighIntervalEntry OBJECT-TYPE
+		SYNTAX		WhispApsLQIHighIntervalEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Link Quality Indicator for fifteen minutes interval entry."
+		INDEX		{lqiHighLinkLUID}
+		::= {whispApsLQIHighInterval 1}
+
+		WhispApsLQIHighIntervalEntry ::= SEQUENCE{
+			lqiHighLinkLUID		INTEGER,
+			lqiHighLQI		INTEGER,
+			lqiHighDownlinkQualityIndex		INTEGER,
+			lqiHighDownlinkAverageActualRate		INTEGER,
+			lqiHighDownlinkExpectedRate		INTEGER,
+			lqiHighUplinkQualityIndex		INTEGER,
+			lqiHighUplinkAverageActualRate		INTEGER,
+			lqiHighUplinkExpectedRate		INTEGER,
+			lqiHighBeaconQualityIndex		INTEGER,
+			lqiHighBeaconPercent		INTEGER,
+			lqiHighReRegQualityIndex		INTEGER,
+			lqiHighReRegCount	INTEGER
+			}
+
+	lqiHighLinkLUID	OBJECT-TYPE
+		SYNTAX		INTEGER (2..239)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Logical User Identfication (LUID) number"
+		::={whispApsLQIHighIntervalEntry 1}
+
+	lqiHighLQI	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Link Quality Indicator for fifteen minutes interval. 
+                            Ranges from 0 to 100 where 100 is the best.
+                            It's calculated based on receive power, modulation rate, re-registrations and beacon percentage."
+		::={whispApsLQIHighIntervalEntry 2}
+
+	lqiHighDownlinkQualityIndex	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Downlink Quality Index for fifteen minute interval in percentage. 100% is best quality"
+		::={whispApsLQIHighIntervalEntry 3}
+
+	lqiHighDownlinkAverageActualRate	OBJECT-TYPE
+		SYNTAX		INTEGER (0..80)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Downlink Actual average transmit modulation rate in tenths for fifteen minute interval. eg: 73 is 7.3X"
+		::={whispApsLQIHighIntervalEntry 4}
+
+	lqiHighDownlinkExpectedRate	OBJECT-TYPE
+		SYNTAX		INTEGER (0..80)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Downlink Expected Rate in tenths for fifteen minute interval. eg: 80 is 8X
+                            This is based upon the uplink receive power and does not take into account interference."
+		::={whispApsLQIHighIntervalEntry 5}
+
+	lqiHighUplinkQualityIndex	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink Quality Index for fifteen minute interval in percentage. 100% is best quality"
+		::={whispApsLQIHighIntervalEntry 6}
+
+	lqiHighUplinkAverageActualRate	OBJECT-TYPE
+		SYNTAX		INTEGER (0..80)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink Actual average transmit modulation rate in tenths for fifteen minute interval. eg: 73 is 7.3X"
+		::={whispApsLQIHighIntervalEntry 7}
+
+	lqiHighUplinkExpectedRate	OBJECT-TYPE
+		SYNTAX		INTEGER (0..80)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink Expected Rate in tenths for fifteen minute interval. eg: 80 is 8X
+                            This is based upon the uplink receive power and does not take into account interference."
+		::={whispApsLQIHighIntervalEntry 8}
+
+	lqiHighBeaconQualityIndex	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Beacon Quality Index for fifteen minute interval in percentage. 100% is best quality"
+		::={whispApsLQIHighIntervalEntry 9}
+
+	lqiHighBeaconPercent	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Received beacon percent for fifteen minute interval"
+		::={whispApsLQIHighIntervalEntry 10}
+
+	lqiHighReRegQualityIndex	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Beacon Quality Index for fifteen minute interval in percentage. 100% is best quality"
+		::={whispApsLQIHighIntervalEntry 11}
+
+	lqiHighReRegCount	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Re Registration count for fifteen minute interval"
+		::={whispApsLQIHighIntervalEntry 12}
 
 	whispApsRFConfigRadios OBJECT-TYPE
 		SYNTAX		SEQUENCE OF WhispApsRFConfigRadioEntry
@@ -3944,7 +5199,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		MAX-ACCESS	not-accessible
 		STATUS		current
 		DESCRIPTION
-			"List of link test results"
+			"Link Status Table"
 		::= {whispAps 4}
 
 	whispLinkEntry OBJECT-TYPE
@@ -3952,7 +5207,7 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		MAX-ACCESS	not-accessible
 		STATUS		current
 		DESCRIPTION
-			"List of link test results"
+			"Link Status"
 		INDEX		{linkLUID}
 		::= {whispLinkTable 1}
 
@@ -4050,7 +5305,8 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 			avgPowerLevelInt		INTEGER,
 			mimoPowerLevelVertical		INTEGER,
 			mimoPowerLevelHorizontal		INTEGER,
-			linkSwVersion	DisplayString
+			linkSwVersion		DisplayString,
+			spatialFrequency	INTEGER
 			}
 
 	linkLUID	OBJECT-TYPE
@@ -4342,7 +5598,6 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		::={whispLinkEntry 29}
 
 	softwareVersion	OBJECT-TYPE
-
 		SYNTAX		DisplayString
 		MAX-ACCESS	read-only
 		STATUS		current
@@ -4889,12 +6144,14 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 					pmp450SISOOFDM(3),
 					ptp450(4),
 					pmp450i(5),
-					ptp450i(6)}
+					ptp450i(6),
+					pmp450b(7),
+					ptp450b(8)}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Returns which type of product the SM is.
-                            PMP 450 APs only."
+			"Returns which type of product the SM/BHS is.
+                            450 platform only."
 		::={whispLinkEntry 90}
 
 	linkAdaptRateLowPri	OBJECT-TYPE
@@ -4979,6 +6236,19 @@ whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
 		DESCRIPTION		
 			"The swversion of registered SM, to be used internally."
 		::={whispLinkEntry 96}
+
+	spatialFrequency	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The spatial frequency of registered SM.
+                        	Spatial Frequency is the phase advance of the wavefront from one antenna column
+                        	to the next caused by the angle at which the wavefront impinges on the array.  
+                        	It is represented in integer units, with 1024 equating to 360 degrees per column.  
+                        	A value of 2048 is used to signify a spatial frequency that is not yet known or otherwise invalid. 
+                        	PMP 450m only."
+		::={whispLinkEntry 97}
 
 	whispFailedRegTable OBJECT-TYPE
 		SYNTAX		SEQUENCE OF WhispFailedRegEntry

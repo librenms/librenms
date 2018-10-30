@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Snmpsim;
 
@@ -102,25 +103,31 @@ $snmpsim_port = $snmpsim->getPort();
 
 if (!$snmpsim->isRunning()) {
     echo "Failed to start snmpsim, make sure it is installed, working, and there are no bad snmprec files.\n";
-    exit;
+    echo "Run ./scripts/save-test-data.php --snmpsim to see the log output\n";
+    exit(1);
 }
 
 
-$no_save = isset($options['n']) || isset($options['no-save']);
-foreach ($os_list as $full_os_name => $parts) {
-    list($target_os, $target_variant) = $parts;
-    echo "OS: $target_os\n";
-    echo "Module: $modules_input\n";
-    if ($target_variant) {
-        echo "Variant: $target_variant\n";
+try {
+    $no_save = isset($options['n']) || isset($options['no-save']);
+    foreach ($os_list as $full_os_name => $parts) {
+        list($target_os, $target_variant) = $parts;
+        echo "OS: $target_os\n";
+        echo "Module: $modules_input\n";
+        if ($target_variant) {
+            echo "Variant: $target_variant\n";
+        }
+        echo PHP_EOL;
+
+        update_os_cache(true); // Force update of OS Cache
+        $tester = new ModuleTestHelper($modules, $target_os, $target_variant);
+
+        $test_data = $tester->generateTestData($snmpsim, $no_save);
+
+        if ($no_save) {
+            print_r($test_data);
+        }
     }
-    echo PHP_EOL;
-
-    $tester = new ModuleTestHelper($modules, $target_os, $target_variant);
-
-    $test_data = $tester->generateTestData($snmpsim, $no_save);
-
-    if ($no_save) {
-        print_r($test_data);
-    }
+} catch (InvalidModuleException $e) {
+    echo $e->getMessage() . PHP_EOL;
 }

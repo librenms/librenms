@@ -1,4 +1,5 @@
 source: Extensions/RRDCached.md
+path: blob/master/doc/
 # Setting up RRDCached
 
 This document will explain how to setup RRDCached for LibreNMS.
@@ -124,6 +125,54 @@ OPTS="$OPTS -w 1800 -z 1800 -f 3600 -t 4"
 ```php
 $config['rrdcached'] = "unix:/var/run/rrdcached.sock";
 ```
+### RRDCached installation Debian Stretch (rrdcached 1.6.0)
+
+1. Install rrdcached
+```bash
+sudo apt-get install rrdcached
+```
+
+2. Edit /etc/default/rrdcached to include:
+```bash
+DAEMON=/usr/bin/rrdcached
+WRITE_TIMEOUT=1800
+WRITE_JITTER=1800
+WRITE_THREADS=4
+BASE_PATH=/opt/librenms/rrd/
+JOURNAL_PATH=/var/lib/rrdcached/journal/
+PIDFILE=/var/run/rrdcached.pid
+SOCKFILE=/var/run/rrdcached.sock
+SOCKGROUP=librenms
+DAEMON_GROUP=librenms
+DAEMON_USER=librenms
+BASE_OPTIONS="-B -F -R"
+```
+
+3. Fix permissions
+```bash
+chown librenms:librenms /var/lib/rrdcached/journal/
+```
+
+4. Restart the rrdcached service
+```bash
+    systemctl restart rrdcached.service
+```
+
+5. Edit /opt/librenms/config.php to include:
+
+For local RRDCached server
+```php
+$config['rrdcached'] = "unix:/var/run/rrdcached.sock";
+```
+For remote RRDCached server 
+Make sure you have network option in /var/default/rrdcached
+```bash
+NETWORK_OPTIONS="-L" 
+```
+```php
+$config['rrdcached'] = "IPADDRESS:42217";
+```
+NOTE: change IPADDRESS to the ip the rrdcached server is listening on. 
 
 ### RRDCached installation CentOS 6
 This example is based on a fresh LibreNMS install, on a minimal CentOS 6 installation.

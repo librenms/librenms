@@ -3,7 +3,7 @@ text: 'Dragonwave Horizon Compact'
 type: wireless
 icon: dragonwave
 over:
-    - { graph: device_wireless_snr, text: 'SNR' }
+    - { graph: device_wireless_snr, text: SNR }
     - { graph: device_wireless_power, text: 'Tx Power' }
 discovery:
     - sysObjectID:

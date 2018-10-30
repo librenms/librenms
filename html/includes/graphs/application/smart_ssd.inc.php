@@ -3,8 +3,8 @@ $name = 'smart';
 $app_id = $app['app_id'];
 $unit_text     = '';
 $unitlen       = 10;
-$bigdescrlen   = 10;
-$smalldescrlen = 10;
+$bigdescrlen   = 25;
+$smalldescrlen = 25;
 $colours       = 'mega';
 $dostack       = 0;
 $printtotal    = 0;
@@ -16,17 +16,22 @@ $rrd_filename = rrd_name($device['hostname'], array('app', $name, $app_id, $vars
 if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_list[]=array(
         'filename' => $rrd_filename,
-        'descr'    => 'ID# 173',
+        'descr'    => 'Worst_Case_Erase_Count',
         'ds'       => 'id173',
     );
     $rrd_list[]=array(
         'filename' => $rrd_filename,
-        'descr'    => 'ID# 231',
+        'descr'    => 'Wear_Leveling_Count',
+        'ds'       => 'id177',
+    );
+    $rrd_list[]=array(
+        'filename' => $rrd_filename,
+        'descr'    => 'SSD_Life_Left',
         'ds'       => 'id231',
     );
     $rrd_list[]=array(
         'filename' => $rrd_filename,
-        'descr'    => 'ID# 233',
+        'descr'    => 'Media_Wearout_Indicator',
         'ds'       => 'id233',
     );
 }

@@ -21,6 +21,10 @@
  * @package LibreNMS
  * @subpackage Frontpage
  */
+
+use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
+
 require_once $config['install_dir'] . '/includes/alerts.inc.php';
 require_once $config['install_dir'] . '/includes/device-groups.inc.php';
 
@@ -122,13 +126,13 @@ if ($config['map']['engine'] == 'leaflet') {
         if (!empty($widget_settings['group_radius'])) {
             $group_radius = $widget_settings['group_radius'];
         } else {
-            $group_radius = 80;
+            $group_radius = Config::get('leaflet.group_radius', 80);
         }
         if (empty($widget_settings['status']) && $widget_settings['status'] != '0') {
             $widget_settings['status'] = '0,1';
         }
-        $map_init = "[" . $init_lat . ", " . $init_lng . "], " . sprintf("%01.0f", $init_zoom);
-        $temp_output .= 'var map = L.map(\'leaflet-map\').setView('.$map_init.');
+        $map_init = "[" . $init_lat . ", " . $init_lng . "], " . sprintf("%01.1f", $init_zoom);
+        $temp_output .= 'var map = L.map(\'leaflet-map\', { zoomSnap: 0.1 } ).setView('.$map_init.');
 L.tileLayer(\'//'.$config['leaflet']['tile_url'].'/{z}/{x}/{y}.png\', {
     attribution: \'&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors\'
 }).addTo(map);
@@ -164,14 +168,17 @@ var greenMarker = L.AwesomeMarkers.icon({
     markerColor: \'green\', prefix: \'fa\', iconColor: \'white\'
   });
         ';
+        $status_select = explode(',', $widget_settings['status']);
+
         // Checking user permissions
-        if (is_admin() || is_read()) {
+        if (LegacyAuth::user()->hasGlobalRead()) {
         // Admin or global read-only - show all devices
             $sql = "SELECT DISTINCT(`device_id`),`devices`.`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng` FROM `devices`
                     LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
                     WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`devices`.`location` REGEXP '\[[0-9\.\, ]+\]'))
-                      AND `status` IN (".$widget_settings['status'].")
-                    ORDER BY `status` ASC, `hostname`";
+                    AND `status` IN " . dbGenPlaceholders(count($status_select)) .
+                    " ORDER BY `status` ASC, `hostname`";
+            $param = $status_select;
         } else {
         // Normal user - grab devices that user has permissions to
             $sql = "SELECT DISTINCT(`devices`.`device_id`) as `device_id`,`devices`.`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng`
@@ -179,10 +186,11 @@ var greenMarker = L.AwesomeMarkers.icon({
                     LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
                     WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`devices`.`location` REGEXP '\[[0-9\.\, ]+\]'))
                     AND `devices`.`device_id` = `devices_perms`.`device_id`
-                    AND `devices_perms`.`user_id` = ? AND `status` IN (".$widget_settings['status'].")
-                    ORDER BY `status` ASC, `hostname`";
-            $param[] = $_SESSION['user_id'];
+                    AND `devices_perms`.`user_id` = ? AND `status` IN " . dbGenPlaceholders(count($status_select)) .
+                    " ORDER BY `status` ASC, `hostname`";
+            $param = array_merge([LegacyAuth::id()], $status_select);
         }
+
         foreach (dbFetchRows($sql, $param) as $map_devices) {
             $icon = 'greenMarker';
             $z_offset = 0;

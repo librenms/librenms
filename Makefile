@@ -38,9 +38,6 @@ datetime-subtree:
 font-awesome:
 	$(GIT_SUBTREE) --prefix=lib/Font-Awesome https://github.com/FortAwesome/Font-Awesome.git master
 
-typeahead:
-	$(GIT_SUBTREE) --prefix=lib/typeahead https://github.com/corejavascript/typeahead.js.git master
-
 gridster:
 	$(GIT_SUBTREE) --prefix=lib/gridster https://github.com/dsmorse/gridster.js.git master
 

@@ -7,7 +7,7 @@ use Amenadiel\JpGraph\Plot\LinePlot;
 
 if (is_numeric($vars['bill_hist_id'])) {
     $graph_data = getBillingBandwidthGraphData($vars['id'], $vars['bill_hist_id'], null, null, $vars['imgtype']);
-} else if (is_numeric($vars['from'])) {
+} elseif (is_numeric($vars['from'])) {
     $graph_data = getBillingBandwidthGraphData($vars['id'], null, $vars['from'], $vars['to'], $vars['imgtype']);
 } else {
     $graph_data = getHistoricTransferGraphData($vars['id']);
@@ -18,7 +18,7 @@ if (is_numeric($vars['bill_hist_id'])) {
 for ($i = 0; $i < count($graph_data['ticklabels']); $i++) {
     if ($graph_data['ticklabels'][$i]) {
         $date = strtotime($graph_data['ticklabels'][$i]);
-        
+
         if ($vars['imgtype'] === 'day') {
             $graph_data['ticklabels'][$i] = strftime("%e\n%b", $date);
         }

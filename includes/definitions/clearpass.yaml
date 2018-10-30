@@ -4,7 +4,7 @@ type: appliance
 icon: aruba
 over:
     - { graph: device_bits, text: 'Device Traffic' }
-    - { graph: device_storage, text: 'Storage' }
+    - { graph: device_storage, text: Storage }
 discovery:
     -
         sysObjectID:

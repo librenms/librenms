@@ -12,7 +12,9 @@
  * the source code distribution for details.
  */
 
-if (is_admin() !== false) {
+use LibreNMS\Authentication\LegacyAuth;
+
+if (LegacyAuth::user()->hasGlobalAdmin()) {
 ?>
 
 <div class="modal fade bs-example-modal-sm" id="delete-maintenance" tabindex="-1" role="dialog" aria-labelledby="delete" aria-hidden="true">

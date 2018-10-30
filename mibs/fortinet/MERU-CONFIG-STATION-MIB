@@ -1,0 +1,389 @@
+-- *****************************************************************
+-- Meru Networks Enterprise Specific MIB
+--
+-- Copyright (c) 2005 by Meru Networks
+-- All rights reserved
+--
+-- *****************************************************************
+
+MERU-CONFIG-STATION-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE, 
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY,
+    enterprises, 
+    Counter32, 
+    Counter64, 
+    Gauge32, 
+    TimeTicks, 
+    IpAddress, 
+    Integer32
+        FROM SNMPv2-SMI
+    Ipv6Address
+        FROM IPV6-TC
+    TEXTUAL-CONVENTION, 
+    TimeInterval, 
+    TimeStamp,
+    DateAndTime, 
+    TruthValue, 
+    DisplayString, 
+    MacAddress, 
+    RowStatus
+        FROM SNMPv2-TC
+    mwConfiguration
+        FROM MERU-SMI
+    MwlL2SecurityMode,
+    MwlVpnStatus,
+    MwlApIfModeType,
+    MwlIpMode,
+    MwlDeviceType,
+    MwlIpv6AddrType,
+    MwlAddressAssignmentType
+        FROM MERU-TC;
+
+  mwConfigStation  MODULE-IDENTITY
+    LAST-UPDATED "200506050000Z"
+    ORGANIZATION "Meru Networks"
+    CONTACT-INFO "support@merunetworks.com"
+    DESCRIPTION
+        "This MIB defines all the managed objects used to manage the Meru WLAN 
+         Station Configuration infrastructure"
+    ::= { mwConfiguration 4 } 
+  
+    
+  
+  mwStationTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwStationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station Table "
+    ::= { mwConfigStation 1 }
+
+  mwStationEntry  OBJECT-TYPE
+    SYNTAX MwStationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station Table "
+    INDEX {  mwStationTableIndex  }
+    ::= { mwStationTable 1 }
+
+  MwStationEntry  ::=  SEQUENCE { 
+       mwStationTableIndex                                         Integer32, 
+       mwStationMacAddress                                         MacAddress,
+       mwStationIpv6Address                                        Ipv6Address,
+       mwStationAp                                                 Integer32,
+       mwStationIpMode                                             MwlIpMode,
+       mwStationApName                                             DisplayString,
+       mwStationL3State                                            MwlVpnStatus,
+       mwStationVlanTag                                            Unsigned32,
+       mwStationAuthUser                                           DisplayString,
+       mwStationVlanName                                           DisplayString(SIZE (0..32)),
+       mwStationFilterId                                           DisplayString(SIZE (0..16)),
+       mwStationFpOsType                                           DisplayString,
+       mwStationRadioType                                          MwlApIfModeType,
+       mwStationDeviceType                                         MwlDeviceType,
+       mwStationL2ModeState                                        MwlL2SecurityMode,
+       mwStationCurrentRssi                                        Integer32,
+       mwStationVirtualPort                                        MacAddress,
+       mwStationTxThroughput                                       Unsigned32,
+       mwStationRxThroughput                                       Unsigned32,
+       mwStationFpDeviceType                                       DisplayString,
+       mwStationVlanPoolName                                       DisplayString(SIZE (0..64)),
+       mwStationLossPercentage                                     Integer32,
+       mwStationAddrAssignmentType                                 MwlAddressAssignmentType,
+       mwStationChannelUtilization                                 Counter64,
+       mwStationRowStatus                                          RowStatus 
+  }
+   
+   
+  mwStationTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwStationEntry 1 }
+
+  mwStationMacAddress  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes MAC Address"
+    ::= { mwStationEntry    2 }
+
+  mwStationIpv6Address  OBJECT-TYPE
+    SYNTAX Ipv6Address
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Client IP"
+    ::= { mwStationEntry    3 }
+
+  mwStationAp  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwStationEntry    4 }
+
+  mwStationApName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwStationEntry    5 }
+
+  mwStationL3State  OBJECT-TYPE
+    SYNTAX MwlVpnStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes L3 Security State"
+    ::= { mwStationEntry    6 }
+
+  mwStationVlanTag  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tag/ID"
+    ::= { mwStationEntry    7 }
+
+  mwStationAuthUser  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Authenticated User Name"
+    ::= { mwStationEntry    8 }
+
+  mwStationVlanName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..32))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Name"
+    ::= { mwStationEntry    9 }
+
+  mwStationRadioType  OBJECT-TYPE
+    SYNTAX MwlApIfModeType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes RF Band"
+    ::= { mwStationEntry   10 }
+
+  mwStationL2ModeState  OBJECT-TYPE
+    SYNTAX MwlL2SecurityMode
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes L2 Security State"
+    ::= { mwStationEntry   11 }
+
+  mwStationCurrentRssi  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Current RSSI"
+    ::= { mwStationEntry   12 }
+
+  mwStationTxThroughput  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmitted Throughput"
+    ::= { mwStationEntry   13 }
+
+  mwStationRxThroughput  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Received Throughput"
+    ::= { mwStationEntry   14 }
+
+  mwStationLossPercentage  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Retry Percentage"
+    ::= { mwStationEntry   15 }
+
+  mwStationAddrAssignmentType  OBJECT-TYPE
+    SYNTAX MwlAddressAssignmentType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes IP Address Type"
+    ::= { mwStationEntry   16 }
+
+  mwStationChannelUtilization  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Channel Utilization"
+    ::= { mwStationEntry   17 }
+
+  mwStationVirtualPort  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Virtual Port"
+    ::= { mwStationEntry   18 }
+
+  mwStationDeviceType  OBJECT-TYPE
+    SYNTAX MwlDeviceType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station Type"
+    ::= { mwStationEntry   20 }
+
+  mwStationFilterId  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..16))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Firewall Filter ID"
+    ::= { mwStationEntry   21 }
+
+  mwStationFpDeviceType  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Device Type"
+    ::= { mwStationEntry   22 }
+
+  mwStationFpOsType  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes OS Type"
+    ::= { mwStationEntry   23 }
+
+  mwStationIpMode  OBJECT-TYPE
+    SYNTAX MwlIpMode
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes IP Mode"
+    ::= { mwStationEntry   24 }
+
+  mwStationVlanPoolName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes VLAN Pool Name"
+    ::= { mwStationEntry   25 }
+
+  mwStationRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwStationEntry 34 }
+
+  mwStationIpaddressTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwStationIpaddressEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Multiple IP per Station Table "
+    ::= { mwConfigStation 2 }
+
+  mwStationIpaddressEntry  OBJECT-TYPE
+    SYNTAX MwStationIpaddressEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Multiple IP per Station Table "
+    INDEX {  mwStationIpaddressTableIndex  }
+    ::= { mwStationIpaddressTable 1 }
+
+  MwStationIpaddressEntry  ::=  SEQUENCE { 
+       mwStationIpaddressTableIndex                                Integer32, 
+       mwStationIpaddressIpAddress                                 Ipv6Address,
+       mwStationIpaddressMacAddress                                MacAddress,
+       mwStationIpaddressVirtualAddress                            MacAddress,
+       mwStationIpaddressAddrAssignmentType                        MwlAddressAssignmentType,
+       mwStationIpaddressIpv6AddrType                              MwlIpv6AddrType,
+       mwStationIpaddressRowStatus                                 RowStatus 
+  }
+   
+   
+  mwStationIpaddressTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwStationIpaddressEntry 1 }
+
+  mwStationIpaddressMacAddress  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Client MAC Address"
+    ::= { mwStationIpaddressEntry    2 }
+
+  mwStationIpaddressIpAddress  OBJECT-TYPE
+    SYNTAX Ipv6Address
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Client IP"
+    ::= { mwStationIpaddressEntry    3 }
+
+  mwStationIpaddressAddrAssignmentType  OBJECT-TYPE
+    SYNTAX MwlAddressAssignmentType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes IP Assignment Type"
+    ::= { mwStationIpaddressEntry    4 }
+
+  mwStationIpaddressVirtualAddress  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Client Virtual MAC Address"
+    ::= { mwStationIpaddressEntry    5 }
+
+  mwStationIpaddressIpv6AddrType  OBJECT-TYPE
+    SYNTAX MwlIpv6AddrType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes IPv6 Address Type"
+    ::= { mwStationIpaddressEntry    6 }
+
+  mwStationIpaddressRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwStationIpaddressEntry 7 }
+
+  
+END
+   

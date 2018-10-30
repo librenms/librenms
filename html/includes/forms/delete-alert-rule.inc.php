@@ -11,23 +11,24 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+
+use LibreNMS\Authentication\LegacyAuth;
+
 header('Content-type: text/plain');
 
-if (is_admin() === false) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
-if (!is_numeric($_POST['alert_id'])) {
+if (!is_numeric($vars['alert_id'])) {
     echo 'ERROR: No alert selected';
     exit;
 } else {
-    if (dbDelete('alert_rules', '`id` =  ?', array($_POST['alert_id']))) {
-        if (dbDelete('alert_map', 'rule = ?', array($_POST['alert_id'])) || dbFetchCell('SELECT COUNT(*) FROM alert_map WHERE rule = ?', array($_POST['alert_id'])) == 0) {
-            echo 'Maps has been deleted.';
-        } else {
-            echo 'WARNING: Maps could not be deleted.';
-        }
-
+    if (dbDelete('alert_rules', '`id` =  ?', array($vars['alert_id']))) {
+        dbDelete('alert_device_map', 'rule_id=?', [$vars['alert_id']]);
+        dbDelete('alert_group_map', 'rule_id=?', [$vars['alert_id']]);
+        dbDelete('alert_transport_map', 'rule_id=?', [$vars['alert_id']]);
+        dbDelete('alert_template_map', 'alert_rule_id=?', [$vars['alert_id']]);
         echo 'Alert rule has been deleted.';
         exit;
     } else {

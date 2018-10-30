@@ -23,7 +23,9 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-if (!is_admin()) {
+use LibreNMS\Authentication\LegacyAuth;
+
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     echo("Insufficient Privileges");
     exit();
 }

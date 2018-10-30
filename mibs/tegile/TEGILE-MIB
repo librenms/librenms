@@ -1,0 +1,5353 @@
+TEGILE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Unsigned32, enterprises, IpAddress
+        FROM SNMPv2-SMI
+    DisplayString, TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF;
+
+tegile MODULE-IDENTITY
+    LAST-UPDATED    "201604061010Z"
+    ORGANIZATION    "Tegile Storage, Inc."
+    CONTACT-INFO    "support@tegile.com"
+    DESCRIPTION     "Tegile SNMP Definition"
+
+    REVISION        "201509231010Z"
+    DESCRIPTION     "Tegile Storage 1.0.0.0 MIB"
+    REVISION        "201604061010Z"
+    DESCRIPTION     "Tegile Storage 1.0.0.1 MIB. Added traps for Disk Slow IO and Login failures"
+    REVISION        "201609101010Z"
+    DESCRIPTION     "Tegile Storage 1.0.0.2 MIB. Added NVDIMM specific notifications"
+    REVISION        "201703211010Z"
+    DESCRIPTION     "Tegile Storage 1.0.1.0 MIB. Changed indexing for disk object. Made entries READ-ONLY"
+
+    ::= { enterprises 43906 }
+
+--
+-- Tegile Objects (variables and tables)
+--
+
+tegileArray                         OBJECT IDENTIFIER ::= { tegile 1 }
+tegileArray-notifications           OBJECT IDENTIFIER ::= { tegile 2 }
+
+properties                          OBJECT IDENTIFIER ::= { tegileArray 1 }
+globalStatistics                    OBJECT IDENTIFIER ::= { tegileArray 2 }
+disks                               OBJECT IDENTIFIER ::= { tegileArray 3 }
+pools                               OBJECT IDENTIFIER ::= { tegileArray 4 }
+network                             OBJECT IDENTIFIER ::= { tegileArray 5 }
+sanProperties                       OBJECT IDENTIFIER ::= { tegileArray 6 }
+vmwareNFSDatastores                 OBJECT IDENTIFIER ::= { tegileArray 7 }
+haResources                         OBJECT IDENTIFIER ::= { tegileArray 8 }
+
+poolProjects                        OBJECT IDENTIFIER ::= { pools 3 }
+
+projectLUNs                         OBJECT IDENTIFIER ::= { poolProjects 2 }
+projectShares                       OBJECT IDENTIFIER ::= { poolProjects 3 }
+
+iscsiProperties                     OBJECT IDENTIFIER ::= { sanProperties 1 }
+fcProperties                        OBJECT IDENTIFIER ::= { sanProperties 2 }
+
+iscsiTargets                        OBJECT IDENTIFIER ::= { iscsiProperties 1 }
+iscsiInitiators                     OBJECT IDENTIFIER ::= { iscsiProperties 2 }
+
+fcTargets                           OBJECT IDENTIFIER ::= { fcProperties 1 }
+fcInitiators                        OBJECT IDENTIFIER ::= { fcProperties 2 }
+
+--
+-- Properties
+--
+haControllerA-Name OBJECT-TYPE
+    SYNTAX         OCTET STRING
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "HA Controller A Name"
+    ::= { properties 1 }
+
+haControllerA-IPAddr OBJECT-TYPE
+    SYNTAX         IpAddress
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "HA Controller A IP address"
+    ::= { properties 2 }
+
+haControllerA-SoftwareVersion OBJECT-TYPE
+    SYNTAX         OCTET STRING
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "HA Controller A Software version"
+    ::= { properties 3 }
+
+haControllerA-Uptime OBJECT-TYPE
+    SYNTAX         OCTET STRING
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "HA Controller A uptime"
+    ::= { properties 4 }
+
+haControllerB-Name OBJECT-TYPE
+    SYNTAX         OCTET STRING
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "HA Controller B Name"
+    ::= { properties 5 }
+
+haControllerB-IPAddr OBJECT-TYPE
+    SYNTAX         IpAddress
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "HA Controller B IP address"
+    ::= { properties 6 }
+
+haControllerB-SoftwareVersion OBJECT-TYPE
+    SYNTAX         OCTET STRING
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "HA Controller B Software version"
+    ::= { properties 7 }
+
+haControllerB-Uptime OBJECT-TYPE
+    SYNTAX         OCTET STRING
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "HA Controller B uptime"
+    ::= { properties 8 }
+    
+controllerHardwareModel OBJECT-TYPE
+    SYNTAX         OCTET STRING
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "HA Controller B Hardware model number"
+    ::= { properties 9 }
+
+snmpAgentVersion OBJECT-TYPE
+    SYNTAX         OCTET STRING
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Tegile SNMP agent version"
+    ::= { properties 10 }
+
+--
+-- Global Statistics
+--
+-- CPU  Stats
+--
+cpuTotalUsage OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Total CPU usage"
+    ::= { globalStatistics 1 }
+
+cpuSystemCalls OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Number of system calls"
+    ::= { globalStatistics 2 }
+
+cpuInterrupts OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Number of CPU interrupts"
+    ::= { globalStatistics 3 }
+
+--
+-- Cache  Stats
+--
+cacheTotalWriteMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Cache writes, MBs per second"
+    ::= { globalStatistics 4 }
+
+cacheTotalReadMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Cache reads, MBs per second"
+    ::= { globalStatistics 5 }
+
+cacheTotalWriteIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Cache reads, IOs per second"
+    ::= { globalStatistics 6 }
+
+cacheTotalReadIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Cache reads, IOs per second"
+    ::= { globalStatistics 7 }
+
+cacheRAMReads OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Cache RAM reads"
+    ::= { globalStatistics 8 }
+
+cacheSSDReads OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Cache SSD reads"
+    ::= { globalStatistics 9 }
+
+--
+-- Disk  Stats
+--
+diskTotalWriteMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Disk writes, MBs per second"
+    ::= { globalStatistics 10 }
+
+diskTotalReadMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Disk reads, MBs per second"
+    ::= { globalStatistics 11 }
+
+diskTotalWriteIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Disk writes, IOs per second"
+    ::= { globalStatistics 12 }
+
+diskTotalReadIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Disk reads, IOs per second"
+    ::= { globalStatistics 13 }
+
+diskDataWriteMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Disk data writes, MBs per second"
+    ::= { globalStatistics 14 }
+
+diskDataReadMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Disk data reads, MBs per second"
+    ::= { globalStatistics 15 }
+    
+diskDataWriteIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Disk data writes, IOs per second"
+    ::= { globalStatistics 16 }
+
+diskDataReadIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Disk data reads, IOs per second"
+    ::= { globalStatistics 17 }
+
+diskAvgWriteLatency OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Disk average write latency"
+    ::= { globalStatistics 18 }
+
+diskAvgReadLatency OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Disk average read latency"
+    ::= { globalStatistics 19 }
+
+diskIOCount OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Disk total io count"
+    ::= { globalStatistics 20 }
+
+diskRandomIOCount OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Disk random io count"
+    ::= { globalStatistics 21 }
+
+diskSequentialIOCount OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Disk sequential io count"
+    ::= { globalStatistics 22 }
+
+--
+-- Pool Stats
+--
+poolTotalWriteMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Pool writes, MBs per second"
+    ::= { globalStatistics 23 }
+
+poolTotalReadMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Pool reads, MBs per second"
+    ::= { globalStatistics 24 }
+
+poolTotalWriteIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Pool reads, IOs per second"
+    ::= { globalStatistics 25 }
+
+poolTotalReadIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Pool reads, IOs per second"
+    ::= { globalStatistics 26 }
+
+poolAvgWriteLatency OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Pool average write latency"
+    ::= { globalStatistics 27 }
+
+poolAvgReadLatency OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Pool average read latency"
+    ::= { globalStatistics 28 }
+
+--
+-- CIFS Stats
+--
+cifsTotalWriteMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "CIFS writes, MBs per second"
+    ::= { globalStatistics 29 }
+
+cifsTotalReadMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "CIFS reads, MBs per second"
+    ::= { globalStatistics 30 }
+
+cifsTotalWriteIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "CIFS reads, IOs per second"
+    ::= { globalStatistics 31 }
+
+cifsTotalReadIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "CIFS reads, IOs per second"
+    ::= { globalStatistics 32 }
+
+cifsAvgWriteLatency OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "CIFS average write latency"
+    ::= { globalStatistics 33 }
+
+cifsAvgReadLatency OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "CIFS average read latency"
+    ::= { globalStatistics 34 }
+
+--
+-- NFS Stats
+--
+nfsTotalWriteMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "NFS writes, MBs per second"
+    ::= { globalStatistics 35 }
+
+nfsTotalReadMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "NFS reads, MBs per second"
+    ::= { globalStatistics 36 }
+
+nfsTotalWriteIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "NFS reads, IOs per second"
+    ::= { globalStatistics 37 }
+
+nfsTotalReadIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "NFS reads, IOs per second"
+    ::= { globalStatistics 38 }
+
+nfsAvgWriteLatency OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "NFS average write latency"
+    ::= { globalStatistics 39 }
+
+nfsAvgReadLatency OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "NFS average read latency"
+    ::= { globalStatistics 40 }
+
+--
+-- iscsi Stats
+--
+iscsiTotalWriteMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "iSCSI writes, MBs per second"
+    ::= { globalStatistics 41 }
+
+iscsiTotalReadMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "iSCSI reads, MBs per second"
+    ::= { globalStatistics 42 }
+
+iscsiWriteIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "iSCSI reads, IOs per second"
+    ::= { globalStatistics 43 }
+
+iscsiTotalReadIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "iSCSI reads, IOs per second"
+    ::= { globalStatistics 44 }
+
+iscsiAvgWriteLatency OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "iSCSI average write latency"
+    ::= { globalStatistics 45 }
+
+iscsiAvgReadLatency OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "iSCSI average read latency"
+    ::= { globalStatistics 46 }
+
+--
+-- FC Stats
+--
+fcTotalWriteMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "FC writes, MBs per second"
+    ::= { globalStatistics 47 }
+
+fcTotalReadMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "FC reads, MBs per second"
+    ::= { globalStatistics 48 }
+
+fcTotalWriteIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "FC reads, IOs per second"
+    ::= { globalStatistics 49 }
+
+fcTotalReadIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "FC reads, IOs per second"
+    ::= { globalStatistics 50 }
+
+fcAvgWriteLatency OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "FC average write latency"
+    ::= { globalStatistics 51 }
+
+fcAvgReadLatency OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "FC average read latency"
+    ::= { globalStatistics 52 }
+
+--
+-- VMWare NFS Datastores stats
+--
+vmwareNFSDatastoresTotalWriteMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "VMWare NFS Datastores total writes, MBs per second"
+    ::= { globalStatistics 53 }
+
+vmwareNFSDatastoresTotalReadMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "VMWare NFS Datastores total reads, MBs per second"
+    ::= { globalStatistics 54 }
+
+vmwareNFSDatastoresTotalWriteIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "VMWare NFS Datastores total reads, IOs per second"
+    ::= { globalStatistics 55 }
+
+vmwareNFSDatastoresTotalReadIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "VMWare NFS Datastores total reads, IOs per second"
+    ::= { globalStatistics 56 }
+
+vmwareNFSDatastoresAvgWriteLatency OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "VMWare NFS Datastores average write latency"
+    ::= { globalStatistics 57 }
+
+vmwareNFSDatastoresAvgReadLatency OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "VMWare NFS Datastores average read latency"
+    ::= { globalStatistics 58 }
+
+--
+-- Network Stats
+--
+networkTotalReceiveMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Network received MB per second"
+    ::= { globalStatistics 59 }
+
+networkTotalTransmitMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Network transmitted MB per second"
+    ::= { globalStatistics 60 }
+
+--
+-- End of Global Statistics
+--
+
+--
+-- Disks
+--
+diskCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "disks count"
+    ::= { disks 1 }
+
+diskTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF DiskEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+    "Disk information table"
+    ::= { disks 2 }
+
+diskEntry OBJECT-TYPE
+    SYNTAX          DiskEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "A row of disk information"
+    INDEX { diskChassisIdx,
+            diskIndex }
+    ::= { diskTable 1 }
+
+DiskEntry ::= SEQUENCE {
+    diskChassisIdx          Unsigned32,
+    diskIndex               Unsigned32,
+    diskAlias               DisplayString,
+    diskSizeLow             Unsigned32,
+    diskSizeHigh            Unsigned32,
+    diskState               DisplayString,
+    diskType                DisplayString,
+    diskPoolName            DisplayString
+}
+
+diskChassisIdx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Disk chassis index"
+    ::= { diskEntry 1 }
+
+diskIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Disk Index."
+    ::= { diskEntry 2 }
+
+diskAlias OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Disk alias"
+    ::= { diskEntry 3 }
+
+diskSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Disk size in bytes - low order bytes"
+    ::= { diskEntry 4 }
+
+diskSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Disk size in bytes - high order bytes"
+    ::= { diskEntry 5 }
+
+diskState OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Disk state"
+    ::= { diskEntry 6 }
+
+diskType OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Disk type"
+    ::= { diskEntry 7 }
+
+diskPoolName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Name of the pool disk belongs to"
+    ::= { diskEntry 8 }
+
+--
+-- End of diskTable
+--
+
+--
+-- poolTable
+--
+poolCount OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "Pool count"
+    ::= { pools 1 }
+
+poolTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF PoolEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+    "Pool information table"
+    ::= { pools 2 }
+
+poolEntry OBJECT-TYPE
+    SYNTAX          PoolEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "A row of Pool information"
+    INDEX { poolIndex }
+    ::= { poolTable 1 }
+
+PoolEntry ::= SEQUENCE {
+    poolIndex                           Unsigned32,
+    poolName                            DisplayString,
+    poolState                           DisplayString,
+    poolHealth                          DisplayString,
+    poolOwnerController                 DisplayString,
+    poolProjectCount                    Unsigned32,
+    poolSizeLow                         Unsigned32,
+    poolSizeHigh                        Unsigned32,
+    poolUsedSizeLow                     Unsigned32,
+    poolUsedSizeHigh                    Unsigned32,
+    poolFreeSizeLow                     Unsigned32,
+    poolFreeSizeHigh                    Unsigned32,
+    poolDataSizeLow                     Unsigned32,
+    poolDataSizeHigh                    Unsigned32,
+    poolPostDedupDataSizeLow            Unsigned32,
+    poolPostDedupDataSizeHigh           Unsigned32,
+    poolPostCompressionDataSizeLow      Unsigned32,
+    poolPostCompressionDataSizeHigh     Unsigned32,
+    poolUnusedReservedSizeLow           Unsigned32,
+    poolUnusedReservedSizeHigh          Unsigned32,
+    poolTotalSaving                     DisplayString,
+    poolDataWriteMbps                   Unsigned32,
+    poolDataReadMbps                    Unsigned32,
+    poolDataWriteIops                   Unsigned32,
+    poolDataReadIops                    Unsigned32,
+    poolDataWriteLatency                Unsigned32,
+    poolDataReadLatency                 Unsigned32,
+    poolMetaWriteMbps                   Unsigned32,
+    poolMetaReadMbps                    Unsigned32,
+    poolMetaWriteIops                   Unsigned32,
+    poolMetaReadIops                    Unsigned32,
+    poolMetaWriteLatency                Unsigned32,
+    poolMetaReadLatency                 Unsigned32,
+    poolReadCacheWriteMbps              Unsigned32,
+    poolReadCacheReadMbps               Unsigned32,
+    poolReadCacheWriteIops              Unsigned32,
+    poolReadCacheReadIops               Unsigned32,
+    poolReadCacheWriteLatency           Unsigned32,
+    poolReadCacheReadLatency            Unsigned32,
+    poolWriteCacheWriteMbps             Unsigned32,
+    poolWriteCacheWriteIops             Unsigned32,
+    poolWriteCacheWriteLatency          Unsigned32
+}
+
+poolIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Pool Index."
+    ::= { poolEntry 1 }
+
+poolName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Pool Name"
+    ::= { poolEntry 2 }
+
+poolState OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Pool current state"
+    ::= { poolEntry 3 }
+
+poolHealth OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Pool health status"
+    ::= { poolEntry 4 }
+
+poolOwnerController OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Pool current owner node"
+    ::= { poolEntry 5}
+
+poolProjectCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Count of projects in the Pool"
+    ::= { poolEntry 6 }
+
+poolSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of the Pool in bytes - low order bytes"
+    ::= { poolEntry 7 }
+
+poolSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of the Pool in bytes - high order bytes"
+    ::= { poolEntry 8 }
+
+poolUsedSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of used space on Pool in bytes - low order bytes"
+    ::= { poolEntry 9 }
+
+poolUsedSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of used space on Pool in bytes - high order bytes"
+    ::= { poolEntry 10 }
+
+poolFreeSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of free space on Pool in bytes - low order bytes"
+    ::= { poolEntry 11 }
+
+poolFreeSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of free space on Pool in bytes - high order bytes"
+    ::= { poolEntry 12 }
+
+poolDataSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of data on Pool in bytes - low order bytes"
+    ::= { poolEntry 13 }
+
+poolDataSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of data on Pool in bytes - high order bytes"
+    ::= { poolEntry 14 }
+
+poolPostDedupDataSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of data after deduplication applied, in bytes - low order bytes"
+    ::= { poolEntry 15 }
+
+poolPostDedupDataSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of data after deduplication applied, in bytes - high order bytes"
+    ::= { poolEntry 16 }
+
+poolPostCompressionDataSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of data after compression, in bytes - low order bytes"
+    ::= { poolEntry 17 }
+
+poolPostCompressionDataSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of data after compression, in bytes - high order bytes"
+    ::= { poolEntry 18 }
+
+poolUnusedReservedSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of unused/reserved space in bytes - low order bytes"
+    ::= { poolEntry 19 }
+
+poolUnusedReservedSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of unused/reserved space in bytes - high order bytes"
+    ::= { poolEntry 20 }
+
+poolTotalSaving OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total savings percentage after deduplication and compression"
+    ::= { poolEntry 21 }
+
+poolDataWriteMbps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Pool data writes, MB per second"
+    ::= { poolEntry 22 }
+
+poolDataReadMbps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Pool data reads, MB per second"
+    ::= { poolEntry 23 }
+
+poolDataWriteIops OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Pool data writes, IOs per second"
+    ::= { poolEntry 24 }
+
+poolDataReadIops OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Pool data reads, IOs per second"
+    ::= { poolEntry 25 }
+
+poolDataWriteLatency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Average pool data write latency"
+    ::= { poolEntry 26 }
+
+poolDataReadLatency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Average pool data read latency"
+    ::= { poolEntry 27 }
+
+poolMetaWriteMbps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Pool meta-data writes, MB per second"
+    ::= { poolEntry 28 }
+
+poolMetaReadMbps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Pool meta-data reads, MB per second"
+    ::= { poolEntry 29 }
+
+poolMetaWriteIops OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Pool meta-data writes, IOs per second"
+    ::= { poolEntry 30 }
+
+poolMetaReadIops OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Pool meta-data reads, IOs per second"
+    ::= { poolEntry 31 }
+
+poolMetaWriteLatency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Average pool meta-data write latency"
+    ::= { poolEntry 32 }
+
+poolMetaReadLatency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Average pool meta-data read latency"
+    ::= { poolEntry 33 }
+
+poolReadCacheWriteMbps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Pool read cache writes, MB per second"
+    ::= { poolEntry 34 }
+
+poolReadCacheReadMbps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Pool read cache reads, MB per second"
+    ::= { poolEntry 35 }
+
+poolReadCacheWriteIops OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Pool read cache writes, IOs per second"
+    ::= { poolEntry 36 }
+
+poolReadCacheReadIops OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Pool read cache reads, IOs per second"
+    ::= { poolEntry 37 }
+
+poolReadCacheWriteLatency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Average pool read cache write latency"
+    ::= { poolEntry 38 }
+
+poolReadCacheReadLatency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Average pool read cache read latency"
+    ::= { poolEntry 39 }
+
+poolWriteCacheWriteMbps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Pool write cache writes, MB per second"
+    ::= { poolEntry 40 }
+
+poolWriteCacheWriteIops OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Pool write cache writes, IOs per second"
+    ::= { poolEntry 41 }
+
+poolWriteCacheWriteLatency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Average pool write cache write latency"
+    ::= { poolEntry 42 }
+
+--
+-- End of poolTable
+--
+
+--
+-- projectTable
+--
+projectTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF ProjectEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+    "Project information table"
+    ::= { poolProjects 1 }
+
+projectEntry OBJECT-TYPE
+    SYNTAX          ProjectEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "A row of Project information"
+    INDEX { poolIndex,
+            projectIndex }
+    ::= { projectTable 1 }
+
+ProjectEntry ::= SEQUENCE {
+    projectIndex                            Unsigned32,
+    projectName                             DisplayString,
+    projectPoolName                         DisplayString,
+    projectDedupEnabled                     DisplayString,
+    projectCompressionEnabled               DisplayString,
+    projectQuotaSizeLow                     Unsigned32,
+    projectQuotaSizeHigh                    Unsigned32,
+    projectDataSizeLow                      Unsigned32,
+    projectDataSizeHigh                     Unsigned32,
+    projectFreeSizeLow                      Unsigned32,
+    projectFreeSizeHigh                     Unsigned32,
+    projectSnapshotSizeLow                  Unsigned32,
+    projectSnapshotSizeHigh                 Unsigned32,
+    projectPostCompressionDataSizeLow       Unsigned32,
+    projectPostCompressionDataSizeHigh      Unsigned32,
+    projectUnusedReservedSizeLow            Unsigned32,
+    projectUnusedReservedSizeHigh           Unsigned32,
+    projectTotalSaving                      DisplayString,
+    projectLunCount                         Unsigned32,
+    projectShareCount                       Unsigned32
+}
+
+projectIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Project Index."
+    ::= { projectEntry 1 }
+
+projectName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Project Name"
+    ::= { projectEntry 2 }
+
+projectPoolName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Project's pool Name"
+    ::= { projectEntry 3 }
+
+projectDedupEnabled OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Flag indicating if Dedup is enabled for the Project or not"
+    ::= { projectEntry 4 }
+
+projectCompressionEnabled OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Flag indicating if Compression is enabled for the Project or not"
+    ::= { projectEntry 5 }
+
+projectQuotaSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Project quota size in bytes - low order bytes"
+    ::= { projectEntry 6 }
+
+projectQuotaSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Project quota size in bytes - high order bytes"
+    ::= { projectEntry 7 }
+
+projectDataSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of data in Project in bytes - low order bytes"
+    ::= { projectEntry 8 }
+
+projectDataSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of data in Project in bytes - high order bytes"
+    ::= { projectEntry 9 }
+
+projectFreeSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of free space in Project in bytes - low order bytes"
+    ::= { projectEntry 10 }
+
+projectFreeSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of free space in Project in bytes - high order bytes"
+    ::= { projectEntry 11 }
+
+projectSnapshotSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of snapshots in bytes - low order bytes"
+    ::= { projectEntry 12 }
+
+projectSnapshotSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of snapshots in bytes - high order bytes"
+    ::= { projectEntry 13 }
+
+projectPostCompressionDataSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of data after compression, in bytes - low order bytes"
+    ::= { projectEntry 14 }
+
+projectPostCompressionDataSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of data after compression, in bytes - high order bytes"
+    ::= { projectEntry 15 }
+
+projectUnusedReservedSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of unused/reserved space in bytes - low order bytes"
+    ::= { projectEntry 16 }
+
+projectUnusedReservedSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of unused/reserved space in bytes - high order bytes"
+    ::= { projectEntry 17 }
+
+projectTotalSaving OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total savings percentage after deduplication and compression"
+    ::= { projectEntry 18 }
+
+projectLunCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Project LUN Count"
+    ::= { projectEntry 19 }
+
+projectShareCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Project Share count"
+    ::= { projectEntry 20}
+
+--
+-- End of projectTable
+--
+
+--
+-- lunTable
+--
+lunTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF LUNEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+    "LUN information table"
+    ::= { projectLUNs 3 }
+
+lunEntry OBJECT-TYPE
+    SYNTAX          LUNEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "A row of LUN information"
+    INDEX { poolIndex,
+            projectIndex,
+            lunIndex }
+    ::= { lunTable 1 }
+
+LUNEntry ::= SEQUENCE {
+    lunIndex                    Unsigned32,
+    lunName                     DisplayString,
+    lunProjectName              DisplayString,
+    lunPoolName                 DisplayString,
+    lunGUID                     DisplayString,
+    lunBlockSize                DisplayString,
+    lunDedupEnabled             DisplayString,
+    lunCompressionEnabled       DisplayString,
+    lunSizeLow                  Unsigned32,
+    lunSizeHigh                 Unsigned32,
+    lunDataSizeLow              Unsigned32,
+    lunDataSizeHigh             Unsigned32,
+    lunSnapshotSizeLow          Unsigned32,
+    lunSnapshotSizeHigh         Unsigned32,
+    lunFreeSizeLow              Unsigned32,
+    lunFreeSizeHigh             Unsigned32,
+    lunReservedSizeLow          Unsigned32,
+    lunReservedSizeHigh         Unsigned32,
+    lunCompressedRatio          Unsigned32,
+    lunProtocol                 DisplayString,
+    lunTargetGroup              DisplayString,
+    lunInitiatorGroup           DisplayString,
+    lunWriteMbps                Unsigned32,
+    lunReadMbps                 Unsigned32,
+    lunWriteIops                Unsigned32,
+    lunReadIops                 Unsigned32,
+    lunWriteLatency             Unsigned32,
+    lunReadLatency              Unsigned32
+}
+
+lunIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "LUN Index."
+    ::= { lunEntry 1 }
+
+lunName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "LUN Name"
+    ::= { lunEntry 2 }
+
+lunProjectName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "LUN Project Name"
+    ::= { lunEntry 3 }
+
+lunPoolName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "LUN Pool Name"
+    ::= { lunEntry 4 }
+
+lunGUID OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "LUN GUID"
+    ::= { lunEntry 5 }
+
+lunBlockSize OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "LUN block size string"
+    ::= { lunEntry 6 }
+
+lunDedupEnabled OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Flag indicating if Dedup is enabled for the LUN or not"
+    ::= { lunEntry 7 }
+
+lunCompressionEnabled OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Flag indicating if Compression is enabled for the LUN or not"
+    ::= { lunEntry 8 }
+
+lunSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "LUN size in bytes - low order bytes"
+    ::= { lunEntry 9 }
+
+lunSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "LUN size in bytes - high order bytes"
+    ::= { lunEntry 10 }
+
+lunDataSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of Data on LUN in bytes - low order bytes"
+    ::= { lunEntry 11 }
+
+lunDataSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of Data on LUN in bytes - high order bytes"
+    ::= { lunEntry 12 }
+
+lunSnapshotSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of Snapshots of LUN in bytes - low order bytes"
+    ::= { lunEntry 13 }
+
+lunSnapshotSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of Snapshots of LUN in bytes - high order bytes"
+    ::= { lunEntry 14 }
+
+lunFreeSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Free space available on LUN in bytes - low order bytes"
+    ::= { lunEntry 15 }
+
+lunFreeSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Free space available on LUN in bytes - high order bytes"
+    ::= { lunEntry 16 }
+
+lunReservedSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of the space reserved on LUN in bytes - low order bytes"
+    ::= { lunEntry 17 }
+
+lunReservedSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of the space reserved on LUN in bytes - high order bytes"
+    ::= { lunEntry 18 }
+
+lunCompressedRatio OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Percentage of data compressed on LUN"
+    ::= { lunEntry 19 }
+
+lunProtocol OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "LUN access protocol"
+    ::= { lunEntry 20 }
+
+lunTargetGroup OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Name of the LUN Target group"
+    ::= { lunEntry 21 }
+
+lunInitiatorGroup OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Name of the LUN Initiator group"
+    ::= { lunEntry 22 }
+
+lunWriteMbps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Lun writes, MB per second"
+    ::= { lunEntry 23 }
+
+lunReadMbps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Lun reads, MB per second"
+    ::= { lunEntry 24 }
+
+lunWriteIops OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Lun writes, IOs per second"
+    ::= { lunEntry 25 }
+
+lunReadIops OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Lun reads, IOs per second"
+    ::= { lunEntry 26 }
+
+lunWriteLatency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Average lun write latency"
+    ::= { lunEntry 27 }
+
+lunReadLatency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Average lun read latency"
+    ::= { lunEntry 28 }
+--
+-- End of lunTable
+--
+
+--
+-- shareTable
+--
+shareTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF ShareEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+    "Project Shares information table"
+    ::= { projectShares 1 }
+
+shareEntry OBJECT-TYPE
+    SYNTAX          ShareEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "A row of Shares information"
+    INDEX { poolIndex,
+            projectIndex,
+            shareIndex }
+    ::= { shareTable 1 }
+
+ShareEntry ::= SEQUENCE {
+    shareIndex                  Unsigned32,
+    shareName                   DisplayString,
+    shareMountPoint             DisplayString,
+    shareProjectName            DisplayString,
+    sharePoolName               DisplayString,
+    shareQuotaLow               Unsigned32,
+    shareQuotaHigh              Unsigned32,
+    shareNFSEnabled             DisplayString,
+    shareCIFSEnabled            DisplayString,
+    shareDedupEnabled           DisplayString,
+    shareCompressionEnabled     DisplayString,
+    shareDataSizeLow            Unsigned32,
+    shareDataSizeHigh           Unsigned32,
+    shareSnapshotSizeLow        Unsigned32,
+    shareSnapshotSizeHigh       Unsigned32,
+    shareReservedSizeLow        Unsigned32,
+    shareReservedSizeHigh       Unsigned32,
+    shareCompressedRatio        Unsigned32,
+    shareCIFSWriteMbps          Unsigned32,
+    shareCIFSReadMbps           Unsigned32,
+    shareCIFSWriteIops          Unsigned32,
+    shareCIFSReadIops           Unsigned32,
+    shareCIFSWriteLatency       Unsigned32,
+    shareCIFSReadLatency        Unsigned32,
+    shareNFSWriteMbps           Unsigned32,
+    shareNFSReadMbps            Unsigned32,
+    shareNFSWriteIops           Unsigned32,
+    shareNFSReadIops            Unsigned32,
+    shareNFSWriteLatency        Unsigned32,
+    shareNFSReadLatency         Unsigned32
+}
+
+shareIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Share Index."
+    ::= { shareEntry 1 }
+
+shareName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Share name"
+    ::= { shareEntry 2 }
+
+shareMountPoint OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Share mount point"
+    ::= { shareEntry 3 }
+
+shareProjectName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Share Project name"
+    ::= { shareEntry 4 }
+
+sharePoolName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Share Pool name"
+    ::= { shareEntry 5 }
+
+shareQuotaLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Share quota size in bytes"
+    ::= { shareEntry 6 }
+
+shareQuotaHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Share quota size in bytes"
+    ::= { shareEntry 7 }
+
+shareNFSEnabled OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Flag indicating if NFS access is enabled for this share or not"
+    ::= { shareEntry 8 }
+
+shareCIFSEnabled OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Flag indicating if CIFS access is enabled for this share or not"
+    ::= { shareEntry 9 }
+
+shareDedupEnabled OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Flag indicating if Dedup is enabled for the LUN or not"
+    ::= { shareEntry 10 }
+
+shareCompressionEnabled OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Flag indicating if Compression is enabled for the LUN or not"
+    ::= { shareEntry 11 }
+
+shareDataSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of Data on the share in bytes - low order bytes"
+    ::= { shareEntry 12 }
+
+shareDataSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of Data on the share in bytes - high order bytes"
+    ::= { shareEntry 13 }
+
+shareSnapshotSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of Snapshots of the share in bytes - low order bytes"
+    ::= { shareEntry 14 }
+
+shareSnapshotSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Size of Snapshots of the share in bytes - high order bytes"
+    ::= { shareEntry 15 }
+
+shareReservedSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Reserved space on the share in bytes - low order bytes"
+    ::= { shareEntry 16 }
+
+shareReservedSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Reserved space on the share in bytes - high order bytes"
+    ::= { shareEntry 17 }
+
+shareCompressedRatio OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Percentage of data compressed on the Share"
+    ::= { shareEntry 18 }
+
+shareCIFSWriteMbps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Share CIFS writes, MB per second"
+    ::= { shareEntry 19 }
+
+shareCIFSReadMbps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Share CIFS reads, MB per second"
+    ::= { shareEntry 20 }
+
+shareCIFSWriteIops OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Share CIFS write IOs per second"
+    ::= { shareEntry 21 }
+
+shareCIFSReadIops OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Share CIFS read IOs per second"
+    ::= { shareEntry 22 }
+
+shareCIFSWriteLatency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Share CIFS write latency"
+    ::= { shareEntry 23 }
+
+shareCIFSReadLatency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Share CIFS read latency"
+    ::= { shareEntry 24 }
+
+shareNFSWriteMbps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Share NFS writes, MB per second"
+    ::= { shareEntry 25 }
+
+shareNFSReadMbps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Share NFS reads, MB per second"
+    ::= { shareEntry 26 }
+
+shareNFSWriteIops OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Share NFS write IOs per second"
+    ::= { shareEntry 27 }
+
+shareNFSReadIops OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Share NFS read IOs per second"
+    ::= { shareEntry 28 }
+
+shareNFSWriteLatency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Share NFS write latency"
+    ::= { shareEntry 29 }
+
+shareNFSReadLatency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Share NFS read latency"
+    ::= { shareEntry 30 }
+
+--
+-- End of shareTable
+--
+
+--
+-- iscsiTargetsTable
+--
+iscsiTargetsTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF ISCSITargetEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+    "iSCSI Targets information table"
+    ::= { iscsiTargets 1 }
+
+iscsiTargetEntry OBJECT-TYPE
+    SYNTAX          ISCSITargetEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "A row of iSCSI Targets information"
+    INDEX { iscsiTargetIndex }
+    ::= { iscsiTargetsTable 1 }
+
+ISCSITargetEntry ::= SEQUENCE {
+    iscsiTargetIndex            Unsigned32,
+    iscsiTargetName             DisplayString,
+    iscsiTargetAlias            DisplayString,
+    iscsiTargetGroup            DisplayString,
+    iscsiTargetAuth             DisplayString,
+    iscsiTargetWriteMbps        Unsigned32,
+    iscsiTargetReadMbps         Unsigned32,
+    iscsiTargetWriteIops        Unsigned32,
+    iscsiTargetReadIops         Unsigned32,
+    iscsiTargetWriteLatency     Unsigned32,
+    iscsiTargetReadLatency      Unsigned32
+}
+
+iscsiTargetIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "iSCSI Target Index."
+    ::= { iscsiTargetEntry 1 }
+
+iscsiTargetName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "iSCSI Target name"
+    ::= { iscsiTargetEntry 2 }
+
+iscsiTargetAlias OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "iSCSI Target alias"
+    ::= { iscsiTargetEntry 3 }
+
+iscsiTargetGroup OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "iSCSI Target alias"
+    ::= { iscsiTargetEntry 4 }
+
+iscsiTargetAuth OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "iSCSI Target authentication"
+    ::= { iscsiTargetEntry 5 }
+
+iscsiTargetWriteMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "iSCSI Target writes, MBs per second"
+    ::= { iscsiTargetEntry 6 }
+
+iscsiTargetReadMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "iSCSI Target reads, MBs per second"
+    ::= { iscsiTargetEntry 7 }
+
+iscsiTargetWriteIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "iSCSI Target writes, IOs per second"
+    ::= { iscsiTargetEntry 8 }
+
+iscsiTargetReadIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "iSCSI Target reads, IOs per second"
+    ::= { iscsiTargetEntry 9 }
+
+iscsiTargetWriteLatency OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "iSCSI Target average write latency"
+    ::= { iscsiTargetEntry 10 }
+
+iscsiTargetReadLatency OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "iSCSI Target average read latency"
+    ::= { iscsiTargetEntry 11 }
+
+--
+-- End of iscsiTargetTable
+--
+
+--
+-- iscsiInitiatorsTable
+--
+iscsiInitiatorsTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF ISCSIInitiatorEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+    "iSCSI Initiators information table"
+    ::= { iscsiInitiators 1 }
+
+iscsiInitiatorEntry OBJECT-TYPE
+    SYNTAX          ISCSIInitiatorEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "A row of iSCSI Initiators information"
+    INDEX { iscsiInitiatorIndex }
+    ::= { iscsiInitiatorsTable 1 }
+
+ISCSIInitiatorEntry ::= SEQUENCE {
+    iscsiInitiatorIndex            Unsigned32,
+    iscsiInitiatorName             DisplayString,
+    iscsiInitiatorChapUser         DisplayString,
+    iscsiInitiatorGroup            DisplayString
+}
+
+iscsiInitiatorIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "iSCSI Initiator Index."
+    ::= { iscsiInitiatorEntry 1 }
+
+iscsiInitiatorName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "iSCSI Initiator name"
+    ::= { iscsiInitiatorEntry 2 }
+
+iscsiInitiatorChapUser OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "iSCSI Initiator CHAP user"
+    ::= { iscsiInitiatorEntry 3 }
+
+iscsiInitiatorGroup OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "iSCSI Initiator group"
+    ::= { iscsiInitiatorEntry 4 }
+
+--
+-- End of iscsiInitiatorTable
+--
+
+--
+-- fcTargetsTable
+--
+fcTargetsTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF FCTargetEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+    "FC Targets information table"
+    ::= { fcTargets 1 }
+
+fcTargetEntry OBJECT-TYPE
+    SYNTAX          FCTargetEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "A row of FC Targets information"
+    INDEX { fcTargetIndex }
+    ::= { fcTargetsTable 1 }
+
+FCTargetEntry ::= SEQUENCE {
+    fcTargetIndex           Unsigned32,
+    fcTargetName            DisplayString,
+    fcTargetStatus          DisplayString,
+    fcTargetGroup           DisplayString,
+    fcTargetWriteMbps       Unsigned32,
+    fcTargetReadMbps        Unsigned32,
+    fcTargetWriteIops       Unsigned32,
+    fcTargetReadIops        Unsigned32,
+    fcTargetWriteLatency    Unsigned32,
+    fcTargetReadLatency     Unsigned32
+}
+
+fcTargetIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "FC Target Index."
+    ::= { fcTargetEntry 1 }
+
+fcTargetName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "FC Target name"
+    ::= { fcTargetEntry 2 }
+
+fcTargetStatus OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "FC Target status"
+    ::= { fcTargetEntry 3 }
+
+fcTargetGroup OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "FC Target group"
+    ::= { fcTargetEntry 4 }
+
+fcTargetWriteMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "FC Target writes, MBs per second"
+    ::= { fcTargetEntry 5 }
+
+fcTargetReadMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "FC Target reads, MBs per second"
+    ::= { fcTargetEntry 6 }
+
+fcTargetWriteIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "FC Target writes, IOs per second"
+    ::= { fcTargetEntry 7 }
+
+fcTargetReadIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "FC Target reads, IOs per second"
+    ::= { fcTargetEntry 8 }
+
+fcTargetWriteLatency OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "FC Target average write latency"
+    ::= { fcTargetEntry 9 }
+
+fcTargetReadLatency OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "FC Target average read latency"
+    ::= { fcTargetEntry 10 }
+
+--
+-- End of fcTargetTable
+--
+
+--
+-- fcInitiatorsTable
+--
+fcInitiatorsTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF FCInitiatorEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+    "FC Initiators information table"
+    ::= { fcInitiators 1 }
+
+fcInitiatorEntry OBJECT-TYPE
+    SYNTAX          FCInitiatorEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "A row of FC Initiators information"
+    INDEX { fcInitiatorIndex }
+    ::= { fcInitiatorsTable 1 }
+
+FCInitiatorEntry ::= SEQUENCE {
+    fcInitiatorIndex            Unsigned32,
+    fcInitiatorName             DisplayString,
+    fcInitiatorGroup            DisplayString
+}
+
+fcInitiatorIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "FC Initiator Index."
+    ::= { fcInitiatorEntry 1 }
+
+fcInitiatorName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "FC Initiator name"
+    ::= { fcInitiatorEntry 2 }
+
+fcInitiatorGroup OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "FC Initiator group"
+    ::= { fcInitiatorEntry 3 }
+
+--
+-- End of fcInitiatorTable
+--
+
+--
+-- vmware NFS Datastores Table
+--
+vmwareNFSDatastoresTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF VMWareNFSDatastoreEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+    "VMWare NFS Datastores information table"
+    ::= { vmwareNFSDatastores 1 }
+
+vmwareNFSDatastoreEntry OBJECT-TYPE
+    SYNTAX          VMWareNFSDatastoreEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "A row of VMWare NFS Datastores information"
+    INDEX { vmwareNFSDatastoreIndex }
+    ::= { vmwareNFSDatastoresTable 1 }
+
+VMWareNFSDatastoreEntry ::= SEQUENCE {
+    vmwareNFSDatastoreIndex             Unsigned32,
+    vmwareNFSDatastoreVMName            DisplayString,
+    vmwareNFSDatastoreESXName           DisplayString,
+    vmwareNFSDatastoreWriteMbps         Unsigned32,
+    vmwareNFSDatastoreReadMbps          Unsigned32,
+    vmwareNFSDatastoreWriteIops         Unsigned32,
+    vmwareNFSDatastoreReadIops          Unsigned32,
+    vmwareNFSDatastoreWriteLatency      Unsigned32,
+    vmwareNFSDatastoreReadLatency       Unsigned32
+}
+
+vmwareNFSDatastoreIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "VMWare NFS Datastore Index."
+    ::= { vmwareNFSDatastoreEntry 1 }
+
+vmwareNFSDatastoreVMName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "VMWare NFS Datastore VM name"
+    ::= { vmwareNFSDatastoreEntry 2 }
+
+vmwareNFSDatastoreESXName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "VMWare NFS Datastore ESX server name"
+    ::= { vmwareNFSDatastoreEntry 3 }
+
+vmwareNFSDatastoreWriteMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "VMWare NFS Datastore writes, MBs per second"
+    ::= { vmwareNFSDatastoreEntry 4 }
+
+vmwareNFSDatastoreReadMbps OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "VMWare NFS Datastore reads, MBs per second"
+    ::= { vmwareNFSDatastoreEntry 5 }
+
+vmwareNFSDatastoreWriteIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "VMWare NFS Datastore reads, IOs per second"
+    ::= { vmwareNFSDatastoreEntry 6 }
+
+vmwareNFSDatastoreReadIops OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "VMWare NFS Datastore reads, IOs per second"
+    ::= { vmwareNFSDatastoreEntry 7 }
+
+vmwareNFSDatastoreWriteLatency OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "VMWare NFS Datastore write latency"
+    ::= { vmwareNFSDatastoreEntry 8 }
+
+vmwareNFSDatastoreReadLatency OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+    "VMWare NFS Datastore read latency"
+    ::= { vmwareNFSDatastoreEntry 9 }
+
+--
+-- End of vmwareNFSDatastoreTable
+--
+
+--
+-- haResourcesTable
+--
+haResourcesTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF HAResourceEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+    "HA Resource information table"
+    ::= { haResources 1 }
+
+haResourceEntry OBJECT-TYPE
+    SYNTAX          HAResourceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "A row of HA Resource information"
+    INDEX { haResourceIndex }
+    ::= { haResourcesTable 1 }
+
+HAResourceEntry ::= SEQUENCE {
+    haResourceIndex             Unsigned32,
+    haResourceName              DisplayString,
+    haResourceDescription       DisplayString,
+    haResourceStatus            DisplayString,
+    haResourceGroup             DisplayString,
+    haResourceActiveNode        DisplayString
+}
+
+haResourceIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "HA Resource Index."
+    ::= { haResourceEntry 1 }
+
+haResourceName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "HA Resource name"
+    ::= { haResourceEntry 2 }
+
+haResourceDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "HA Resource description"
+    ::= { haResourceEntry 3 }
+
+haResourceStatus OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "HA Resource status"
+    ::= { haResourceEntry 4 }
+
+haResourceGroup OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "HA Resource group"
+    ::= { haResourceEntry 5 }
+
+haResourceActiveNode OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "HA Resource active node"
+    ::= { haResourceEntry 6 }
+
+--
+-- End of haResourcesTable
+--
+
+--
+-- NIC Table
+--
+nicTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF NICEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+    "NIC information table"
+    ::= { network 1 }
+
+nicEntry OBJECT-TYPE
+    SYNTAX          NICEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "A row of NIC information"
+    INDEX { nicIndex }
+    ::= { nicTable 1 }
+
+NICEntry ::= SEQUENCE {
+    nicIndex                    Unsigned32,
+    nicName                     DisplayString,
+    nicState                    DisplayString,
+    nicGroup                    DisplayString,
+    nicMTU                      Unsigned32,
+    nicReceiveMbps              Unsigned32,
+    nicTransmitMbps             Unsigned32
+}
+
+nicIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "NIC Index."
+    ::= { nicEntry 1 }
+
+nicName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "NIC name"
+    ::= { nicEntry 2 }
+
+nicState OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "NIC state"
+    ::= { nicEntry 3 }
+
+nicGroup OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "NIC group"
+    ::= { nicEntry 4 }
+
+nicMTU OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "NIC maximum transmission unit"
+    ::= { nicEntry 5 }
+
+nicReceiveMbps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "NIC bytes received in MBs per second"
+    ::= { nicEntry 6 }
+
+nicTransmitMbps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "NIC bytes received in MBs per second"
+    ::= { nicEntry 7 }
+
+--
+-- End of nicTable
+--
+
+
+--
+-- Notifications
+--
+
+notificationObjects OBJECT IDENTIFIER ::= { tegileArray-notifications 1 }
+
+notificationProps OBJECT IDENTIFIER ::= { notificationObjects 1 }
+
+notificationDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Description of the notification."
+::= { notificationProps 1 }
+
+notificationTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Time of the notification generated"
+::= { notificationProps 2 }
+
+notificationSeverity OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The severity level of the notification (informational, warning, error, critical)."
+::= { notificationProps 3 }
+
+notificationComponentName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Name of the component that originated the notification."
+::= { notificationProps 4 }
+
+notificationTargetEntityName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Name of the Target entity."
+::= { notificationProps 5 }
+
+notificationEventCode OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Description of the notification."
+::= { notificationProps 6 }
+
+notificationSensorAction OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "IPMI Sensor action."
+::= { notificationProps 7 }
+
+notificationSensorNumber OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "IPMI Sensor number."
+::= { notificationProps 8 }
+
+notificationSensorSuspect OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "IPMI Sensor suspect"
+::= { notificationProps 9 }
+
+notificationReadingTriggerValue OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Reading trigger value."
+::= { notificationProps 10 }
+
+notificationThresholdTriggerValue OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Threshold trigger value."
+::= { notificationProps 11 }
+
+notificationReadingUnit OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Reading unit of the value."
+::= { notificationProps 12 }
+
+
+notifications OBJECT IDENTIFIER ::= { notificationObjects 2 }
+
+-- Test notification
+testNotification NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Test notification/trap"
+::= { notifications 10 }
+
+-- Disk related events
+diskIsOnline NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Disk came back online"
+::= { notifications 101 }
+
+diskGoneOffline NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Disk went offline"
+::= { notifications 102 }
+
+diskError NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Disk error encountered"
+::= { notifications 103 }
+
+spareDiskReplaced NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Spare disk replaced"
+::= { notifications 104 }
+
+diskSlowIo NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Slow I/O operations observed on Disk"
+::= { notifications 105 }
+
+
+-- Pool related events
+
+poolCreated NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Pool is created"
+::= { notifications 201 }
+
+poolDeleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Pool is deleted"
+::= { notifications 202 }
+
+poolDeletionFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Pool deletion attempt failed"
+::= { notifications 203 }
+
+poolExpanded NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Pool is expanded"
+::= { notifications 204 }
+
+poolExported NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Pool is exported"
+::= { notifications 205 }
+
+poolImported NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Pool is imported"
+::= { notifications 206 }
+
+poolUpgraded NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Pool is upgraded"
+::= { notifications 207 }
+
+poolQuotaExceedThresholdWarning NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Pool quota exceeded the threshold limit"
+::= { notifications 208 }
+
+poolMetaDataQuotaExceedThresholdWarning NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Pool meta-data quota exceeded the threshold limit"
+::= { notifications 209 }
+
+poolAvailableMetaToDataRatioBelowThresholdWarning NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Pool available meta-data to data ratio below threshold limit"
+::= { notifications 210 }
+
+poolQuotaFinished NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Pool quota finished"
+::= { notifications 211 }
+
+poolDegraded NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Pool has degraded"
+::= { notifications 212 }
+
+-- Project related events
+projectCreatedSuccessfully NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Project created successfully"
+::= { notifications 301 }
+
+projectDeletionFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Project deleted failed"
+::= { notifications 302 }
+
+projectDeleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Project is deleted"
+::= { notifications 303 }
+
+projectModified NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Project is modified"
+::= { notifications 304 }
+
+projectThresholdExceedWarning NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Project usage has exceeded threshold."
+::= { notifications 305 }
+
+projectQuotaFinished NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Project quota is finished."
+::= { notifications 306 }
+
+projectCreatedWithNonOptimalBlockSize NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Project created with non optimal block size"
+::= { notifications 307 }
+
+-- Volume related events
+volumeCreatedSuccessfully NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Volume created successfully"
+::= { notifications 401 }
+
+volumeModifyCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Volume is modified"
+::= { notifications 402 }
+
+volumeDeleteCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Volume is deleted"
+::= { notifications 403 }
+
+volumeDeleteFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Volume deletion failed"
+::= { notifications 404 }
+
+volumeExceedsThresholdWarning NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Volume Quota has exceeded the configured Limit"
+::= { notifications 405 }
+
+volumeQuotaFinished NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Volume Quota has Finished"
+::= { notifications 406}
+
+volumeCreatedWithNonOptimalBlockSize NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Volume created with non optimal block size"
+::= { notifications 407 }
+
+-- Share related events
+shareCreatedSuccessfully NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Share created successfully"
+::= { notifications 501 }
+
+shareDeletionFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Share deletion failed"
+::= { notifications 502 }
+
+shareDeleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Share is deleted"
+::= { notifications 503 }
+
+shareExceedThresholdWarning NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Share exceeds the threshold limit"
+::= { notifications 504 }
+
+shareQuotaFinished NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Share quota is finished"
+::= { notifications 505 }
+
+shareCreatedWithNonOptimalBlockSize NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Share created with non optimal block size"
+::= { notifications 506 }
+
+-- ACL events
+aclMigrationStarted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "ACL migration started"
+::= { notifications 601 }
+
+aclMigrationCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "ACL migration completed"
+::= { notifications 602 }
+
+-- Folder related events
+deleteFolderCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Folder deleted"
+::= { notifications 701 }
+
+deleteFolderFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Folder deletion failed"
+::= { notifications 702 }
+
+-- Snapshot related events
+snapshotCreatedSuccessfully NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Snapshot created successfully"
+::= { notifications 801 }
+
+snapshotCreationFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Snapshot creation failed"
+::= { notifications 802 }
+
+snapshotDeletedSuccessfully NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Snapshot deleted successfully"
+::= { notifications 803 }
+
+snapshotDeleteFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Snapshot deletion failed"
+::= { notifications 804 }
+
+snapshotCloningFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Snapshot cloning failed"
+::= { notifications 805 }
+
+snapshotCloneCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Snapshot clone completed"
+::= { notifications 806 }
+
+snapshotRollbackFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Snapshot rollback failed"
+::= { notifications 807 }
+
+snapshotRollbackCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Snapshot rollback completed"
+::= { notifications 808 }
+
+-- HA related events
+haResourceGroupTakeBackCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "HA resource group taken back"
+::= { notifications 901 }
+
+haResourceGroupTakeOverCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "HA resource group taken over"
+::= { notifications 902 }
+
+-- Peer events
+controllerUp NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Controller is now up"
+::= { notifications 1001 }
+
+controllerDown NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Controller went down"
+::= { notifications 1002 }
+
+intelliFlashSoftwareUp NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "IntelliFlash is now up on controller"
+::= { notifications 1003 }
+
+intelliFlashSoftwareDown NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "IntelliFlash went down on controller"
+::= { notifications 1004 }
+
+controllerTimeDrift NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Controllers Time drift detected"
+::= { notifications 1005 }
+
+-- FC related events
+fcInitiatorCreateCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "FC initiator created"
+::= { notifications 1101 }
+
+fcInitiatorCreateFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "FC initiator creation failed"
+::= { notifications 1102 }
+
+fcInitiatorModifyCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "FC initiator properties modified"
+::= { notifications 1103 }
+
+fcTargetResetHbaPortCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "FC Target HBA Port reset successfully"
+::= { notifications 1104 }
+
+fcTargetResetHbaPortFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "FC Target HBA Port reset failed"
+::= { notifications 1105 }
+
+fcTargetModifyCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "FC target properties modified"
+::= { notifications 1106 }
+
+fcPortOnline NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "FC Port is online"
+::= { notifications 1107 }
+
+fcPortOffline NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "FC Port is offline"
+::= { notifications 1108 }
+
+-- Host group related events
+initiatorGroupCreateCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Initiator Group created"
+::= { notifications 1201 }
+
+initiatorGroupMemberAdded NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Member added to the Initiator Group"
+::= { notifications 1202 }
+
+initiatorGroupMemberRemoved NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Member removed from the Initiator Group"
+::= { notifications 1203 }
+
+initiatorGroupDeleteCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Initiator Group deleted"
+::= { notifications 1204 }
+
+-- iSCSI related events
+iscsiInitiatorCreateCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "iSCSI initiator created"
+::= { notifications 1301 }
+
+iscsiInitiatorCreateFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "iSCSI initiator creation failed"
+::= { notifications 1302 }
+
+iscsiInitiatorModifyCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "iSCSI initiator properties modified"
+::= { notifications 1303 }
+
+iscsiInitiatorDeleteCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "iSCSI initiator deleted"
+::= { notifications 1304 }
+
+iscsiTargetCreateCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "iSCSI target created"
+::= { notifications 1305 }
+
+iscsiTargetModifyCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "iSCSI target properties modified"
+::= { notifications 1306 }
+
+iscsiTargetDeleteCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "iSCSI Target deleted"
+::= { notifications 1307 }
+
+iscsiTargetError NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "iSCSI target error"
+::= { notifications 1308 }
+
+iscsiTargetGroupError NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "iSCSI target group error"
+::= { notifications 1309 }
+
+iscsiImproperTargetGroup NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "iSCSI improper target group error"
+::= { notifications 1310 }
+
+-- Target group related events
+targetGroupCreateCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Target group created"
+::= { notifications 1401 }
+
+targetGroupMemberAdded NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Member added to the Target group"
+::= { notifications 1402 }
+
+targetGroupMemberRemoved NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Member removed from the Target group"
+::= { notifications 1403 }
+
+targetGroupDeleteCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Target group deleted"
+::= { notifications 1404 }
+
+-- Array events
+adServerTimeDrift NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "AD server time drift detected"
+::= { notifications 1501 }
+
+maintenanceModeEnabled NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Maintenance mode enabled"
+::= { notifications 1502 }
+
+maintenanceModeDisabled NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Maintenance mode disabled"
+::= { notifications 1503 }
+
+diagnosticDataUploaded NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Diagnostics data uploaded"
+::= { notifications 1504 }
+
+diagnosticDataUploadingFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Diagnostics data upload failed"
+::= { notifications 1505 }
+
+alertsCleanupCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Alerts clean-up completed"
+::= { notifications 1506 }
+
+userLoginFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "User login attempt failed."
+::= { notifications 1507 }
+
+ntpServerTimeDrift NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Time drift detected between NTP Server and Controller."
+::= { notifications 1508 }
+
+-- SMB related events
+smbSocketFailure NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "SMB socket failure detected"
+::= { notifications 1601 }
+
+netbiosSocketFailure NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "NetBIOS socket failure detected"
+::= { notifications 1602 }
+
+-- Upgrade related events
+upgradeStarted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Software upgrade started"
+::= { notifications 1701 }
+
+upgradeCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Software upgrade completed"
+::= { notifications 1702 }
+
+upgradeFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Software upgrade failed"
+::= { notifications 1703 }
+
+upgradeTimeout NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Software upgrade timed out"
+::= { notifications 1704 }
+
+upgradeCantProcessFilesManually NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Software upgrade cannot process files manually"
+::= { notifications 1705 }
+
+upgradeDownloadStarted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Software download started"
+::= { notifications 1706 }
+
+upgradeDownloadCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Software download complete"
+::= { notifications 1707 }
+
+upgradeDownloadFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Software download failed"
+::= { notifications 1708 }
+
+tdpsUpgradeCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "TDPS upgrade completed"
+::= { notifications 1709 }
+
+tdpsUpgradeFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "TDPS upgrade failed"
+::= { notifications 1710 }
+
+tdpsUpgradeTimeout NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "TDPS upgrade timed out"
+::= { notifications 1711 }
+
+tdpsUpgradeDownloadStarted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "TDPS download started"
+::= { notifications 1712 }
+
+tdpsUpgradeDownloadCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "TDPS download completed"
+::= { notifications 1713 }
+
+tdpsUpgradeDownloadFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "TDPS download failed"
+::= { notifications 1714 }
+
+webdocsUpgradeDownloadStarted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Webdocs upgrade download started"
+::= { notifications 1715 }
+
+webdocsUpgradeDownloadCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Webdocs upgrade download completed"
+::= { notifications 1716 }
+
+webdocsUpgradeDownloadFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Webdocs upgrade download failed"
+::= { notifications 1717 }
+
+webdocsUpgradeCompleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Webdocs upgrade completed"
+::= { notifications 1718 }
+
+webdocsUpgradeFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Webdocs upgrade failed"
+::= { notifications 1719 }
+
+
+-- Replication events
+replicationTargetDeleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Replication target deleted"
+::= { notifications 1801 }
+
+replicationComplete NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Replication completed"
+::= { notifications 1802 }
+
+replicationAborted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Replication aborted"
+::= { notifications 1803 }
+
+replicationAbandoned NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Replication abandoned"
+::= { notifications 1804 }
+
+replicationResumed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Replication resumed"
+::= { notifications 1805 }
+
+replicationStarted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Replication started"
+::= { notifications 1806 }
+
+replicationFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Replication failed"
+::= { notifications 1807 }
+
+replicationSourceRegistered NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Replication source registered"
+::= { notifications 1808 }
+
+replicationPaused NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Replication paused"
+::= { notifications 1809 }
+
+-- System services events
+snmpServiceStarted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "SNMP Service started"
+::= { notifications 1901 }
+
+snmpServiceStartFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "SNMP Service failed to start"
+::= { notifications 1902 }
+
+snmpServiceStopped NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "SNMP Service stopped"
+::= { notifications 1903 }
+
+snmpServiceStopFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "SNMP Service failed to stop"
+::= { notifications 1904 }
+
+smisServiceStarted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "SMIS service started"
+::= { notifications 1905 }
+
+smisServiceStartFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "SMIS Service failed to start"
+::= { notifications 1906 }
+
+smisServiceStopped NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "SMIS Service stopped"
+::= { notifications 1907 }
+
+smisServiceStopFailed NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "SMIS Service failed to stop"
+::= { notifications 1908 }
+
+-- IPMI notifications
+ipmiTemperature NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationEventCode,
+        notificationSensorAction,
+        notificationSensorNumber,
+        notificationSensorSuspect,
+        notificationReadingTriggerValue,
+        notificationThresholdTriggerValue,
+        notificationReadingUnit
+    }
+    STATUS current
+    DESCRIPTION
+        "An IPMI event was raised related to array's Temperature."
+::= { notifications 2001}
+
+ipmiVoltage NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationEventCode,
+        notificationSensorAction,
+        notificationSensorNumber,
+        notificationSensorSuspect,
+        notificationReadingTriggerValue,
+        notificationThresholdTriggerValue,
+        notificationReadingUnit
+    }
+    STATUS current
+    DESCRIPTION
+        "An IPMI event was raised related to array's Voltage."
+::= { notifications 2002}
+
+ipmiCurrent NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationEventCode,
+        notificationSensorAction,
+        notificationSensorNumber,
+        notificationSensorSuspect,
+        notificationReadingTriggerValue,
+        notificationThresholdTriggerValue,
+        notificationReadingUnit
+    }
+    STATUS current
+    DESCRIPTION
+        "An IPMI event was raised related to array's Current."
+::= { notifications 2003}
+
+ipmiFan NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationEventCode,
+        notificationSensorAction,
+        notificationSensorNumber,
+        notificationSensorSuspect,
+        notificationReadingTriggerValue,
+        notificationThresholdTriggerValue,
+        notificationReadingUnit
+    }
+    STATUS current
+    DESCRIPTION
+        "An IPMI event was raised related to array's Fans."
+::= { notifications 2004}
+
+ipmiPowerSupply NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationEventCode,
+        notificationSensorAction,
+        notificationSensorNumber,
+        notificationSensorSuspect
+    }
+    STATUS current
+    DESCRIPTION
+        "An IPMI event was raised related to array's Power Supply."
+::= { notifications 2005}
+
+ipmiMemory NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationEventCode,
+        notificationSensorAction,
+        notificationSensorNumber,
+        notificationSensorSuspect
+    }
+    STATUS current
+    DESCRIPTION
+        "A IPMI Memory error was detected."
+::= { notifications 2006}
+
+ipmiCriticalInterrupt NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationEventCode,
+        notificationSensorAction,
+        notificationSensorNumber,
+        notificationSensorSuspect
+    }
+    STATUS current
+    DESCRIPTION
+        "An IPMI Critical Interrupt was received."
+::= { notifications 2007}
+
+ipmiThreshold NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationEventCode,
+        notificationSensorAction,
+        notificationSensorNumber,
+        notificationSensorSuspect,
+        notificationReadingTriggerValue,
+        notificationThresholdTriggerValue,
+        notificationReadingUnit
+    }
+    STATUS current
+    DESCRIPTION
+        "An IPMI Threshold event was generated."
+::= { notifications 2008}
+
+ipmiOther NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationEventCode,
+        notificationSensorAction,
+        notificationSensorNumber,
+        notificationSensorSuspect
+    }
+    STATUS current
+    DESCRIPTION
+        "An IPMI event was received."
+::= { notifications 2009}
+
+-- FM/Sensor events
+memoryFailure NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Memory failure"
+::= { notifications 2051 }
+
+sensorFailureEvent NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Sensor failure"
+::= { notifications 2052 }
+
+unknownSensorEvent NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Unknown sensor event"
+::= { notifications 2053 }
+
+-- Networking notifications
+networkIpmpGroupUp NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "IPMP group is up."
+::= { notifications 2201 }
+
+networkIpmpGroupDown NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "IPMP group is down."
+::= { notifications 2202 }
+
+networkIpmpMemberInterfaceAdded NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Network interface added to IPMP group."
+::= { notifications 2203 }
+
+networkIpmpMemberInterfaceRemoved NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Network interface removed from IPMP group."
+::= { notifications 2204 }
+
+networkInterfaceUp NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Network interface is up."
+::= { notifications 2205 }
+
+networkInterfaceDown NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Network interface is down."
+::= { notifications 2206 }
+
+-- VMWare notifications
+vmwareNFSDatastoreCreated NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "VMWare NFS Datastore has been created."
+::= { notifications 2301 }
+
+vmwareNFSDatastoreDeleted NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "VMWare NFS Datastore has been deleted."
+::= { notifications 2302 }
+
+-- NVDIMM notifications
+nvdimmFailDeviceError NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "NVDIMM Device is not detectable."
+::= { notifications 2401 }
+
+nvdimmFailSoftError NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "NVDIMM Device has encountered some errors."
+::= { notifications 2402 }
+
+nvdimmFailInitializationError NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "Failed to initialize NVDIMM Device."
+::= { notifications 2403 }
+
+nvdimmFailUnknownError NOTIFICATION-TYPE
+    OBJECTS{
+        notificationDescription,
+        notificationTime,
+        notificationSeverity,
+        notificationComponentName,
+        notificationTargetEntityName,
+        notificationEventCode
+    }
+    STATUS current
+    DESCRIPTION
+       "NVDIMM failure encountered. Please see the IntelliFlash UI event details."
+::= { notifications 2404 }
+
+--
+-- End of  notifications
+--
+
+tegileConformance OBJECT IDENTIFIER ::= { tegile 3 }
+
+tegileGroups OBJECT IDENTIFIER ::= { tegileConformance 1 }
+
+currentObjectGroup OBJECT-GROUP
+    OBJECTS {
+            haControllerA-Name,
+            haControllerA-IPAddr,
+            haControllerA-SoftwareVersion,
+            haControllerA-Uptime,
+            haControllerB-Name,
+            haControllerB-IPAddr,
+            haControllerB-SoftwareVersion,
+            haControllerB-Uptime,
+            controllerHardwareModel,
+            snmpAgentVersion,
+            cpuTotalUsage,
+            cpuSystemCalls,
+            cpuInterrupts,
+            cacheTotalWriteMbps,
+            cacheTotalReadMbps,
+            cacheTotalWriteIops,
+            cacheTotalReadIops,
+            cacheRAMReads,
+            cacheSSDReads,
+            diskTotalWriteMbps,
+            diskTotalReadMbps,
+            diskTotalWriteIops,
+            diskTotalReadIops,
+            diskDataWriteMbps,
+            diskDataReadMbps,
+            diskDataWriteIops,
+            diskDataReadIops,
+            diskAvgWriteLatency,
+            diskAvgReadLatency,
+            diskIOCount,
+            diskRandomIOCount,
+            diskSequentialIOCount,
+            poolTotalWriteMbps,
+            poolTotalReadMbps,
+            poolTotalWriteIops,
+            poolTotalReadIops,
+            poolAvgWriteLatency,
+            poolAvgReadLatency,
+            cifsTotalWriteMbps,
+            cifsTotalReadMbps,
+            cifsTotalWriteIops,
+            cifsTotalReadIops,
+            cifsAvgWriteLatency,
+            cifsAvgReadLatency,
+            nfsTotalWriteMbps,
+            nfsTotalReadMbps,
+            nfsTotalWriteIops,
+            nfsTotalReadIops,
+            nfsAvgWriteLatency,
+            nfsAvgReadLatency,
+            iscsiTotalWriteMbps,
+            iscsiTotalReadMbps,
+            iscsiWriteIops,
+            iscsiTotalReadIops,
+            iscsiAvgWriteLatency,
+            iscsiAvgReadLatency,
+            fcTotalWriteMbps,
+            fcTotalReadMbps,
+            fcTotalWriteIops,
+            fcTotalReadIops,
+            fcAvgWriteLatency,
+            fcAvgReadLatency,
+            vmwareNFSDatastoresTotalWriteMbps,
+            vmwareNFSDatastoresTotalReadMbps,
+            vmwareNFSDatastoresTotalWriteIops,
+            vmwareNFSDatastoresTotalReadIops,
+            vmwareNFSDatastoresAvgWriteLatency,
+            vmwareNFSDatastoresAvgReadLatency,
+            networkTotalReceiveMbps,
+            networkTotalTransmitMbps,
+            diskCount,
+            diskAlias,
+            diskSizeLow,
+            diskSizeHigh,
+            diskState,
+            diskType,
+            diskPoolName,
+            poolCount,
+            poolName,
+            poolState,
+            poolHealth,
+            poolOwnerController,
+            poolProjectCount,
+            poolSizeLow,
+            poolSizeHigh,
+            poolUsedSizeLow,
+            poolUsedSizeHigh,
+            poolFreeSizeLow,
+            poolFreeSizeHigh,
+            poolDataSizeLow,
+            poolDataSizeHigh,
+            poolPostDedupDataSizeLow,
+            poolPostDedupDataSizeHigh,
+            poolPostCompressionDataSizeLow,
+            poolPostCompressionDataSizeHigh,
+            poolUnusedReservedSizeLow,
+            poolUnusedReservedSizeHigh,
+            poolTotalSaving,
+            poolDataWriteMbps,
+            poolDataReadMbps,
+            poolDataWriteIops,
+            poolDataReadIops,
+            poolDataWriteLatency,
+            poolDataReadLatency,
+            poolMetaWriteMbps,
+            poolMetaReadMbps,
+            poolMetaWriteIops,
+            poolMetaReadIops,
+            poolMetaWriteLatency,
+            poolMetaReadLatency,
+            poolReadCacheWriteMbps,
+            poolReadCacheReadMbps,
+            poolReadCacheWriteIops,
+            poolReadCacheReadIops,
+            poolReadCacheWriteLatency,
+            poolReadCacheReadLatency,
+            poolWriteCacheWriteMbps,
+            poolWriteCacheWriteIops,
+            poolWriteCacheWriteLatency,
+            projectName,
+            projectPoolName,
+            projectDedupEnabled,
+            projectCompressionEnabled,
+            projectQuotaSizeLow,
+            projectQuotaSizeHigh,
+            projectDataSizeLow,
+            projectDataSizeHigh,
+            projectFreeSizeLow,
+            projectFreeSizeHigh,
+            projectSnapshotSizeLow,
+            projectSnapshotSizeHigh,
+            projectPostCompressionDataSizeLow,
+            projectPostCompressionDataSizeHigh,
+            projectUnusedReservedSizeLow,
+            projectUnusedReservedSizeHigh,
+            projectTotalSaving,
+            projectLunCount,
+            projectShareCount,
+            lunName,
+            lunProjectName,
+            lunPoolName,
+            lunGUID,
+            lunBlockSize,
+            lunDedupEnabled,
+            lunCompressionEnabled,
+            lunSizeLow,
+            lunSizeHigh,
+            lunDataSizeLow,
+            lunDataSizeHigh,
+            lunSnapshotSizeLow,
+            lunSnapshotSizeHigh,
+            lunFreeSizeLow,
+            lunFreeSizeHigh,
+            lunReservedSizeLow,
+            lunReservedSizeHigh,
+            lunCompressedRatio,
+            lunProtocol,
+            lunTargetGroup,
+            lunInitiatorGroup,
+            lunWriteMbps,
+            lunReadMbps,
+            lunWriteIops,
+            lunReadIops,
+            lunWriteLatency,
+            lunReadLatency,
+            shareName,
+            shareMountPoint,
+            shareProjectName,
+            sharePoolName,
+            shareQuotaLow,
+            shareQuotaHigh,
+            shareNFSEnabled,
+            shareCIFSEnabled,
+            shareDedupEnabled,
+            shareCompressionEnabled,
+            shareDataSizeLow,
+            shareDataSizeHigh,
+            shareSnapshotSizeLow,
+            shareSnapshotSizeHigh,
+            shareReservedSizeLow,
+            shareReservedSizeHigh,
+            shareCompressedRatio,
+            shareCIFSWriteMbps,
+            shareCIFSReadMbps,
+            shareCIFSWriteIops,
+            shareCIFSReadIops,
+            shareCIFSWriteLatency,
+            shareCIFSReadLatency,
+            shareNFSWriteMbps,
+            shareNFSReadMbps,
+            shareNFSWriteIops,
+            shareNFSReadIops,
+            shareNFSWriteLatency,
+            shareNFSReadLatency,
+            iscsiTargetName,
+            iscsiTargetAlias,
+            iscsiTargetGroup,
+            iscsiTargetAuth,
+            iscsiTargetWriteMbps,
+            iscsiTargetReadMbps,
+            iscsiTargetWriteIops,
+            iscsiTargetReadIops,
+            iscsiTargetWriteLatency,
+            iscsiTargetReadLatency,
+            iscsiInitiatorName,
+            iscsiInitiatorChapUser,
+            iscsiInitiatorGroup,
+            fcTargetName,
+            fcTargetStatus,
+            fcTargetGroup,
+            fcTargetWriteMbps,
+            fcTargetReadMbps,
+            fcTargetWriteIops,
+            fcTargetReadIops,
+            fcTargetWriteLatency,
+            fcTargetReadLatency,
+            fcInitiatorName,
+            fcInitiatorGroup,
+            vmwareNFSDatastoreVMName,
+            vmwareNFSDatastoreESXName,
+            vmwareNFSDatastoreWriteMbps,
+            vmwareNFSDatastoreReadMbps,
+            vmwareNFSDatastoreWriteIops,
+            vmwareNFSDatastoreReadIops,
+            vmwareNFSDatastoreWriteLatency,
+            vmwareNFSDatastoreReadLatency,
+            haResourceName,
+            haResourceDescription,
+            haResourceStatus,
+            haResourceGroup,
+            haResourceActiveNode,
+            nicName,
+            nicState,
+            nicGroup,
+            nicMTU,
+            nicReceiveMbps,
+            nicTransmitMbps,
+            notificationDescription,
+            notificationTime,
+            notificationSeverity,
+            notificationComponentName,
+            notificationTargetEntityName,
+            notificationEventCode,
+            notificationSensorAction,
+            notificationSensorNumber,
+            notificationSensorSuspect,
+            notificationReadingTriggerValue,
+            notificationThresholdTriggerValue,
+            notificationReadingUnit
+    }
+    STATUS current
+    DESCRIPTION
+        "TEGILE-MIB OBJECT-GROUP."
+    ::= { tegileGroups 1 }
+
+currentNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+            testNotification,
+            diskIsOnline,
+            diskGoneOffline,
+            diskError,
+            spareDiskReplaced,
+            diskSlowIo,
+            poolCreated,
+            poolDeleted,
+            poolDeletionFailed,
+            poolExpanded,
+            poolExported,
+            poolImported,
+            poolUpgraded,
+            poolQuotaExceedThresholdWarning,
+            poolMetaDataQuotaExceedThresholdWarning,
+            poolAvailableMetaToDataRatioBelowThresholdWarning,
+            poolQuotaFinished,
+            poolDegraded,
+            projectCreatedSuccessfully,
+            projectDeletionFailed,
+            projectDeleted,
+            projectModified,
+            projectThresholdExceedWarning,
+            projectQuotaFinished,
+            projectCreatedWithNonOptimalBlockSize,
+            volumeCreatedSuccessfully,
+            volumeModifyCompleted,
+            volumeDeleteCompleted,
+            volumeDeleteFailed,
+            volumeExceedsThresholdWarning,
+            volumeQuotaFinished,
+            volumeCreatedWithNonOptimalBlockSize,
+            shareCreatedSuccessfully,
+            shareDeletionFailed,
+            shareDeleted,
+            shareExceedThresholdWarning,
+            shareQuotaFinished,
+            shareCreatedWithNonOptimalBlockSize,
+            aclMigrationStarted,
+            aclMigrationCompleted,
+            deleteFolderCompleted,
+            deleteFolderFailed,
+            snapshotCreatedSuccessfully,
+            snapshotCreationFailed,
+            snapshotDeletedSuccessfully,
+            snapshotDeleteFailed,
+            snapshotCloningFailed,
+            snapshotCloneCompleted,
+            snapshotRollbackFailed,
+            snapshotRollbackCompleted,
+            haResourceGroupTakeBackCompleted,
+            haResourceGroupTakeOverCompleted,
+            controllerUp,
+            controllerDown,
+            intelliFlashSoftwareUp,
+            intelliFlashSoftwareDown,
+            controllerTimeDrift,
+            fcInitiatorCreateCompleted,
+            fcInitiatorCreateFailed,
+            fcInitiatorModifyCompleted,
+            fcTargetResetHbaPortCompleted,
+            fcTargetResetHbaPortFailed,
+            fcTargetModifyCompleted,
+            fcPortOnline,
+            fcPortOffline,
+            initiatorGroupCreateCompleted,
+            initiatorGroupMemberAdded,
+            initiatorGroupMemberRemoved,
+            initiatorGroupDeleteCompleted,
+            iscsiInitiatorCreateCompleted,
+            iscsiInitiatorCreateFailed,
+            iscsiInitiatorModifyCompleted,
+            iscsiInitiatorDeleteCompleted,
+            iscsiTargetCreateCompleted,
+            iscsiTargetModifyCompleted,
+            iscsiTargetDeleteCompleted,
+            iscsiTargetError,
+            iscsiTargetGroupError,
+            iscsiImproperTargetGroup,
+            targetGroupCreateCompleted,
+            targetGroupMemberAdded,
+            targetGroupMemberRemoved,
+            targetGroupDeleteCompleted,
+            adServerTimeDrift,
+            maintenanceModeEnabled,
+            maintenanceModeDisabled,
+            diagnosticDataUploaded,
+            diagnosticDataUploadingFailed,
+            alertsCleanupCompleted,
+            userLoginFailed,
+            ntpServerTimeDrift,
+            smbSocketFailure,
+            netbiosSocketFailure,
+            upgradeStarted,
+            upgradeCompleted,
+            upgradeFailed,
+            upgradeTimeout,
+            upgradeCantProcessFilesManually,
+            upgradeDownloadStarted,
+            upgradeDownloadCompleted,
+            upgradeDownloadFailed,
+            tdpsUpgradeCompleted,
+            tdpsUpgradeFailed,
+            tdpsUpgradeTimeout,
+            tdpsUpgradeDownloadStarted,
+            tdpsUpgradeDownloadCompleted,
+            tdpsUpgradeDownloadFailed,
+            webdocsUpgradeDownloadStarted,
+            webdocsUpgradeDownloadCompleted,
+            webdocsUpgradeDownloadFailed,
+            webdocsUpgradeCompleted,
+            webdocsUpgradeFailed,
+            replicationTargetDeleted,
+            replicationComplete,
+            replicationAborted,
+            replicationAbandoned,
+            replicationResumed,
+            replicationStarted,
+            replicationFailed,
+            replicationSourceRegistered,
+            replicationPaused,
+            snmpServiceStarted,
+            snmpServiceStartFailed,
+            snmpServiceStopped,
+            snmpServiceStopFailed,
+            smisServiceStarted,
+            smisServiceStartFailed,
+            smisServiceStopped,
+            smisServiceStopFailed,
+            ipmiTemperature,
+            ipmiVoltage,
+            ipmiCurrent,
+            ipmiFan,
+            ipmiPowerSupply,
+            ipmiMemory,
+            ipmiCriticalInterrupt,
+            ipmiThreshold,
+            ipmiOther,
+            memoryFailure,
+            sensorFailureEvent,
+            unknownSensorEvent,
+            networkIpmpGroupUp,
+            networkIpmpGroupDown,
+            networkIpmpMemberInterfaceAdded,
+            networkIpmpMemberInterfaceRemoved,
+            networkInterfaceUp,
+            networkInterfaceDown,
+            vmwareNFSDatastoreCreated,
+            vmwareNFSDatastoreDeleted,
+            nvdimmFailDeviceError,
+            nvdimmFailSoftError,
+            nvdimmFailInitializationError,
+            nvdimmFailUnknownError
+    }
+    STATUS current
+    DESCRIPTION
+        "TEGILE-MIB NOTIFICATION-GROUP."
+    ::= { tegileGroups 2 }
+
+tegileCompliances OBJECT IDENTIFIER ::= { tegileConformance 2 }
+
+basicCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "TEGILE-MIB MODULE-COMPLIANCE."
+    MODULE -- this module
+        MANDATORY-GROUPS { currentObjectGroup }
+    ::= { tegileCompliances 1 }
+
+
+END

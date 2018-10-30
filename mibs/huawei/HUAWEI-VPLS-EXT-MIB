@@ -1,0 +1,3715 @@
+-- ==================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI VPLS Management Extended MIB
+-- Reference:
+-- Version:     V2.46
+-- History:
+--              V1.0 PanJun, 2006-05-08, publish
+-- ==================================================================
+
+    HUAWEI-VPLS-EXT-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            InterfaceIndex,InterfaceIndexOrZero,ifName
+                FROM IF-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            sysUpTime            
+                FROM SNMPv2-MIB            
+            IpAddress,TimeTicks,Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY, 
+            NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            DisplayString, RowStatus, TruthValue, TEXTUAL-CONVENTION,DateAndTime            
+                FROM SNMPv2-TC            
+            VrId            
+                FROM VRRP-MIB
+            EnabledStatus
+                FROM P-BRIDGE-MIB
+            hwL2VpnVcLimitClass, hwL2VpnVsiVcNumber, hwVplsVcNumberUpperThreshold,
+            hwVplsVcNumberMaxNum    
+                FROM HUAWEI-L2VPN-MIB;
+
+
+        hwL2VpnVplsExt MODULE-IDENTITY 
+            LAST-UPDATED "201708171644Z"           --Aug 17, 2017 at 16:44 GMT"
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
+            DESCRIPTION 
+                "The HUAWEI-VPLS-EXT-MIB contains objects to
+                manage VPLS."
+             REVISION "201708171644Z"           --Aug 17, 2017 at 16:44 GMT 
+             DESCRIPTION "add change reason
+                Add Leaf Node to HWVplsPwSuppStatisticsEntry, HWVplsAcSuppStatisticsEntry"
+
+             REVISION "201708081000Z"           --Aug 08, 2017 at 10:00 GMT 
+             DESCRIPTION "add change reason
+                Modify description of  hwVplsAcIfIndex"
+
+             REVISION "201707171000Z"           --Jul 17, 2017 at 10:00 GMT 
+             DESCRIPTION "add change reason
+                Add Leaf Node to hwVplsHardPipeStatisticsEntry"
+
+             REVISION "201611281000Z"           --Nov 28, 2016 at 10:00 GMT 
+             DESCRIPTION               
+             "Add OBJECTS(hwVplsBLabelNotEnough, hwVplsBLabelNotEnoughClear)." 
+
+             REVISION "201611181000Z"           --Nov 18, 2016 at 10:00 GMT 
+             DESCRIPTION               
+             "Add hwVplsNotificationGroup(hwVplsBLabelNotEnough, hwVplsBLabelNotEnoughClear)." 
+
+              REVISION "201610311000Z"           --Oct 31, 2016 at 10:00 GMT 
+             DESCRIPTION               
+             "Add VPLS MIB Trap(hwVplsBLabelNotEnough)." 
+
+              REVISION "201610311000Z"           --Oct 31, 2016 at 10:00 GMT 
+             DESCRIPTION               
+             "Add VPLS MIB Trap(hwVplsBLabelNotEnoughClear)."
+
+             REVISION "201609271000Z"           --Sep 27, 2016 at 10:00 GMT 
+             DESCRIPTION "modify hwVplsDiffServMode range"  
+
+             REVISION "201607111000Z"           --July 11, 2016 at 10:00 GMT 
+             DESCRIPTION "add change reason
+                Add Leaf Node to hwVplsLdpStatisticsEntry"  
+
+             REVISION "201511171000Z"           --Nov 17, 2015 at 10:00 GMT 
+             DESCRIPTION "add change reason
+                TDM Bit Rate Matched(93),
+                TDM Bit Rate Unmatched(94)"  
+
+              REVISION "201501071000Z"           --Jan 7, 2015 at 10:00 GMT 
+             DESCRIPTION "add change reason
+                Aging(91)
+                Verification(92)"  
+
+              REVISION "201412081000Z"           --Dec 8, 2014 at 10:00 GMT 
+             DESCRIPTION               
+             "Add OBJECT(hwVplsVsiProtectGroupMode) to VPLS MIB Trap(hwVplsPwRedundancyDegraded)." 
+
+              REVISION "201412081000Z"           --Dec 8, 2014 at 10:00 GMT 
+             DESCRIPTION               
+             "Add OBJECT(hwVplsVsiProtectGroupMode) to VPLS MIB Trap(hwVplsPwRedundancyDegradedClear)." 
+
+              REVISION "201412081000Z"           --Dec 8, 2014 at 10:00 GMT 
+             DESCRIPTION               
+             "Add Leaf Node(hwVplsVsiProtectGroupMode) to hwVplsVsiProtectGroupEntry" 
+
+             REVISION "201410271600Z"           --Oct 27, 2014 at 16:00 GMT 
+             DESCRIPTION               
+             "Add VPLS protect group table(hwVplsVsiProtectGroupTable)." 
+			 
+             REVISION "201410271600Z"           --Oct 27, 2014 at 16:00 GMT 
+             DESCRIPTION               
+             "Add VPLS MIB Trap(hwVplsPwRedundancyDegraded)." 
+			 
+             REVISION "201410271600Z"           --Oct 27, 2014 at 16:00 GMT 
+             DESCRIPTION               
+             "Add VPLS MIB Trap(hwVplsPwRedundancyDegradedClear)." 
+
+             REVISION "201402111600Z"           -- Feb 11, 2014 at 16:00 GMT 
+             DESCRIPTION  
+             "The max length of hwVplsLdpPeerQosProfileName,hwVplsVsiQosProfileName changed
+              from 31 to 63." 
+
+
+             REVISION "201307131100Z"           -- July 13, 2013 at 11:00 GMT 
+             DESCRIPTION  
+             "Add Leaf Nodes(hwL2vpnTnlType, hwL2vpnTunnelIndex) to hwVplsMIBObjects;  
+              Add OBJECT(hwL2vpnTnlType, hwL2vpnTunnelIndex) to VPLS MIB Trap(hwVplsVcDown)." 
+
+           REVISION  "201306250950Z"             --Jun 25,2013 at 09:51 GMT
+           DESCRIPTION "add change reason
+                Route Unreachable(89)
+                Route Reachable(90)"  
+
+           REVISION  "200704122100Z"
+           DESCRIPTION "20130126 "  
+           
+           REVISION "201406181000Z"              -- June 18, 2014 at 10:00 GMT
+           DESCRIPTION
+                "Add trap nodes about VPLS VC limit alarm."
+                                
+            ::= { hwL2Vpn 1 }
+
+        
+    
+--
+-- Textual conventions
+--
+
+        HWL2VpnVcEncapsType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "An indication of the L2Vpn's VC encapsulation type:
+                Frame Relay DLCI ( Martini Mode ) (1)
+                ATM AAL5 SDU VCC transport (2)
+                ATM transparent cell transport (3)
+                Vlan (4)
+                Ethernet (5)
+                HDLC (6)
+                PPP (7)
+                SONET/SDH Circuit Emulation Service Over MPLS (CEM) (8)
+                ATM n-to-one VCC cell transport (9)
+                ATM n-to-one VPC cell transport (10)
+                IP Layer2 Transport (11)
+                ATM one-to-one VCC Cell Mode (12)
+                ATM one-to-one VPC Cell Mode (13)
+                ATM AAL5 PDU VCC transport (14)
+                Frame-Relay Port mode (15)
+                SONET/SDH Circuit Emulation over Packet (CEP) (16)
+                Structure-agnostic E1 over Packet (SAE1oP)  (17)
+                Structure-agnostic T1 (DS1) over Packet (SAT1oP)  (18)
+                Structure-agnostic E3 over Packet (SAE3oP) (19)
+                Structure-agnostic T3 (DS3) over Packet (SAT3oP) (20)
+                CESoPSN basic mode (21)
+                TDMoIP basic mode (22)
+                CESoPSN TDM with CAS (23)
+                TDMoIP TDM with CAS (24)
+                Frame Relay DLCI (25)
+                IP-interworking (64)
+                unknown (255)
+                "
+            SYNTAX INTEGER
+                {
+                frameRelayDlciMartini(1),
+                atmAal5SduVccTransport(2),
+                atmTransparentCellTransport(3),
+                vlan(4),
+                ethernet(5),
+                hdlc(6),
+                ppp(7),
+                cem(8),
+                atmN2OneVccCellTransport(9),
+                atmN2OneVpcCellTransport(10),
+                ipLayer2Transport(11),
+                atmOne2OneVccCellMode(12),
+                atmOne2OneVpcCellMode(13),
+                atmAal5PduVccTransport(14),
+                frameRelayPortMode(15),
+                cep(16),
+                saE1oP(17),
+                saT1oP(18),
+                saE3oP(19),
+                saT3oP(20),
+                cESoPsnBasicMode(21),
+                tDMoIPbasicMode(22),
+                l2VpnCESoPSNTDMwithCAS(23),
+                l2VpnTDMoIPTDMwithCAS(24),
+                frameRelayDlci(25),
+                ipInterworking(64),
+                unknown(255)
+                }
+
+        HWEnableValue ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Represents a boolean value."
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+
+        HWL2VpnStateChangeReason ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "The type indicates the reason of VC's or VSI's status change:
+                Invalid reason type (1) 
+                VC Created (2) 
+                VC Deleted (3) 
+                LDP Session Down (4)
+                LDP Session Up (5)
+                LDP Same Mapping Received with different label or MTU (6)
+                LDP Same Mapping Received Interface Parameter matching (7)
+                LDP Mapping Received Inteface Parameter UnMatched(8)
+                LDP Mapping Received UnPass CBit Check(9)
+                LDP Mapping Received UnPass PW Loop Check(10)
+                LDP New Mapping Received (11)  
+                LDP New Mapping Received but Remote VC Down(12)
+                LDP Withdrawn Received (13)
+                LDP Release Received (14)
+                LDP Request Received (15)
+                LDP GR End processing (16)
+                RSVP message received (17)
+                Interface Up (18)
+                Interface Down (19)
+                Interface encapsulation changed (20)
+                Refresh (21)
+                Download Again (22)
+                Tunnel Up (23)
+                Tunnel Down (24)
+                VC state change when New RLB Received (25)
+                RLB Deleted (26)
+                VC created or turned to another remote CE (27)
+                Out Interface in Invalid state (28)
+                Out Interface in Valid now (29)
+                LDP Notification Forwarding (30)
+                LDP Notification Not-Forwarding (31)
+                PW Restart (32)   
+                Download FTN&ILM for EthernetTrunk(33)
+                   AC OAM Fault Detect Disable(34)
+                   Remote AC Fault(35)
+                   Remote AC Fault Resume(36)
+                   Local AC Fault(37)
+                   Local AC Fault Resume(38)
+                   Remote PSN Fault(39)
+                   Remote PSN Fault Resume(40)
+                   Local PSN Fault(41)
+                   Local PSN Fault Resume(42)
+                   BFD for PW State Change to:Down(43)
+                   BFD for PW State Change to:Up(44)
+                   BFD for PW State Change to:Admin Down(45)
+                   BFD for PW Disable(46)
+                   Manual Set Enable(47)
+                   Manual Set Disable(48)
+                   Delay Time Out(49)
+                   Resume Time Out(50)
+                VRRP Master(51)
+                VRRP Backup(52)
+                VRRP Init(53)
+                VRRP Delete(54)
+                Track VRRP(55)
+                Undo track VRRP(56)
+                Lsp Ping Time Out(57)
+                VC State Down when New RLB was Received(58)
+                MTU Matched(59)
+                MTU Unmatched(60)
+                VSI was shuted(61)
+                VSI was resumed(62)
+                Set Admin VSI(63)
+                Undo set Admin VSI(64)
+                BVSI Bind AC(65)
+                BVSI Unbind AC(66)
+                IVSI Bind BVSI(67)
+                IVSI Unbind BVSI(68)
+                Deleted VSI(69)
+                Reconstruct FWD Table(70)
+                MCLAG Master(71)
+                MCLAG Backup(72)
+                Admin PW Up(73)
+                Admin PW Down(74)
+                VCCV OK(75)
+                VCCV Failed(76)
+                Localifnet OK(77)
+                Invclabel OK(78)
+                Localifnet Release(79)
+                Invclabel Release(80)
+                Switchover Enable(81)
+                Switchover Disable(82)
+                Set BVSI(83)
+                undo Set BVSI(84)
+                Shutdown BVSI(85)
+                Undo Shutdown BVSI(86)
+                Notification Received(87)
+                PW APS Switch(88) 
+                Route Unreachable(89)
+                Route Reachable(90)
+                Aging(91)
+                Verification(92)
+                TDM Bit Rate Matched(93)
+                TDM Bit Rate Unmatched(94)
+                "
+            SYNTAX INTEGER
+                {
+                invalidReason(1),
+                vcCreated(2),
+                vcDeleted(3),
+                ldpSessionDown(4),
+                ldpSessionUp(5),
+                receivedDifLabelOrMtu(6),
+                receivedIntfParaMatching(7),
+                receivedIntfParaUnMatched(8),
+                receivedUnPassCbitCheck(9),
+                receivedUnPassPwLoopCheck(10),
+                receivedNewMapping(11),
+                receivedNewMappingButRemoteVcDown(12),
+                receivedWithdrawn(13),
+                receivedLdpRelease(14),
+                receivedLdpRequest(15),
+                ldpGrEndProcessing(16),
+                receivedRsvpMessage(17),
+                interfaceUp(18),
+                interfaceDown(19),
+                interfaceEncapChanged(20),
+                refresh(21),
+                downloadAgain(22),
+                tunnelUp(23),
+                tunnelDown(24),
+                receivedNewRlb(25),
+                deletedRlb(26),
+                vcCreatedOrTurnedToAnother(27),
+                outInterInInvalidState(28),
+                outInterInValidNow(29),
+                ldpNotifiForward(30),
+                ldpNotifiNotForward(31),
+                pwRestart(32),
+                downloadFtnAndIlmForEthTrunk(33),
+                acOamFaultDetectDisable(34),
+                remoteAcFault(35),
+                remoteAcFaultResume(36),
+                localAcFault(37),
+                localAcFaultResume(38),
+                remotePsnFault(39),
+                remotePsnFaultResume(40),
+                localPsnFault(41),
+                localPsnFaultResume(42),
+                bfdForPwStateChangeToDown(43),
+                bfdForPwStateChangeToUp(44),
+                bfdForPwStateChangeToAdminDown(45),
+                bfdForPwDisable(46),
+                manualSetEnable(47),
+                manualSetDisable(48),
+                delayTimeOut(49),
+                resumeTimeOut(50),
+                vrrpMaster(51),
+                vrrpBackup(52),
+                vrrpInit(53),
+                vrrpDelete(54),
+                vrrpTrack(55),
+                undoVrrpTrack(56),
+                lspPingTimeOut(57),
+                vcDownWhenReceivedNewRLB(58),
+                mtuMatched(59),
+                mtuUnmatched(60),
+                vsiShut(61),
+                vsiResume(62),
+                setAdminVSI(63),
+                undosetAdminVSI(64),  
+                bvsiBindAc(65),
+                bvsiUnbindAc(66),
+                ivsiBindBVSI(67),
+                ivsiUnbindBVSI(68),
+                deletedVSI(69),
+                reconstructFwdTable(70),
+                mclagMaster(71),
+                mclagBackup(72),
+                adminPwUp(73),
+                adminPwDown(74),
+                vccvOk(75),
+                vccvFailed(76),
+                localIfnetOk(77),
+                inVcLabelOk(78),
+                localIfnetRelease(79),
+                inVcLabelRelease(80),
+                switchOverEnable(81),
+                switchOverDisable(82),
+                setBVSI(83),
+                undoSetBVSI(84),
+                shutdownBVSI(85),
+                undoShutdownBVSI(86),
+                notificationReceived(87),
+                pwApsSwitch(88),                   
+                routeUnreachable(89),
+                routeReachable(90),
+                aging(91),
+                verification(92),
+                tdmBitRateMatched(93),
+                tdmBitRateUnmatched(94)
+                }
+
+    
+--
+-- Node definitions
+--
+
+        hwL2Vpn OBJECT IDENTIFIER ::= { hwDatacomm 119 }
+
+        
+--           
+-- The VPLS Attribute Group
+-- 
+        hwVplsMIBObjects OBJECT IDENTIFIER ::= { hwL2VpnVplsExt 1 }
+
+        
+--           
+-- The VPLS Table
+-- 
+        hwVplsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVplsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is the VPLS's configuration table. Users can 
+                create or delete the VSI by it."
+            ::= { hwVplsMIBObjects 1 }
+
+        
+        hwVplsEntry OBJECT-TYPE
+            SYNTAX HWVplsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of a VPLS entry."
+            INDEX { hwVplsVsiName }
+            ::= { hwVplsTable 1 }
+
+        
+        HWVplsEntry ::=
+            SEQUENCE { 
+                hwVplsVsiName
+                    DisplayString,
+                hwVplsSignal
+                    INTEGER,
+                hwVplsRD
+                    DisplayString,
+                hwVplsVsiID
+                    Unsigned32,
+                hwVplsVcType
+                    HWL2VpnVcEncapsType,
+                hwVplsStatus
+                    INTEGER,
+                hwVplsMtu
+                    Unsigned32,
+                hwVplsTunnelPolicy
+                    DisplayString,
+                hwVplsDescription
+                    DisplayString,
+                hwVplsLearnStyle
+                    INTEGER,
+                hwVplsMacLearnEnable
+                    HWEnableValue,
+                hwVplsMacLimitEnable
+                    HWEnableValue,
+                hwVplsStatisticsEnable
+                    HWEnableValue,
+                hwVplsUnknowMulticast
+                    INTEGER,
+                hwVplsUnknowUnicast
+                    INTEGER,
+                hwVplsPreference
+                    Unsigned32,
+                hwVplsVsiType
+                    INTEGER,
+                hwVplsAdminVsiName
+                    DisplayString,
+                hwVplsAcIsolateFlag
+                    HWEnableValue,
+                hwVplsDiffServMode
+                    INTEGER,
+                hwVplsDiffServServiceClass
+                    INTEGER,
+                hwVplsDiffServColor
+                    INTEGER,
+                hwVplsDiffServDSName
+                    OCTET STRING,
+                hwVplsInterfaceWithdraw    
+                    HWEnableValue,
+                hwVplsUpe2NpeWithdraw    
+                    HWEnableValue,                    
+                hwVplsUpe2UpeWithdraw    
+                    HWEnableValue,       
+                hwVplsNpe2UpeWithdraw    
+                    HWEnableValue,                           
+                hwVplsDiscovery
+                    INTEGER,
+                hwVplsMacWithdrawEnable
+                    EnabledStatus,
+                hwVplsVsiCir
+                    Unsigned32,
+                hwVplsVsiPir
+                    Unsigned32,
+                hwVplsVsiQosProfileName
+                    DisplayString,
+                hwVplsAdminStatus
+                    INTEGER,
+                hwVplsIgnoreAcState
+                    EnabledStatus,
+                hwVplsEnableStatistic
+                    EnabledStatus,
+                hwVplsResetStatistic
+                    INTEGER,
+                hwVplsResetStatisticTime
+                    DateAndTime,
+                hwVplsAgingTime
+                    Unsigned32,  
+                hwVplsUnknowUnicastMacLearning
+                    EnabledStatus,  
+                hwVplsFlowLabel
+                    EnabledStatus,     
+                hwVplsServiceName
+                    OCTET STRING,                                          
+                hwVplsRowStatus
+                    RowStatus
+             }
+
+        hwVplsVsiName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..31))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VSI's name."
+            ::= { hwVplsEntry 1 }
+
+        
+        hwVplsSignal OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                ldp(1),
+                bgp(2),
+                unknown(255)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the signal type.
+                If the signal type is LDP, VSI-ID must be designated.
+                If the signal type is BGP, RD must be designated.
+                The default value is unknown(255)."
+            ::= { hwVplsEntry 2 }
+
+        
+        hwVplsRD OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0 | 3..21))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the Route Distinguisher."
+            ::= { hwVplsEntry 3 }
+
+        
+        hwVplsVsiID OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VSI id.
+                The default value is 0."
+            ::= { hwVplsEntry 4 }
+
+        
+        hwVplsVcType OBJECT-TYPE
+            SYNTAX HWL2VpnVcEncapsType
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VC's encapsulation type."
+            ::= { hwVplsEntry 5 }
+
+        
+        hwVplsStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                up(1),
+                down(2),
+                admindown(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VPLS's status."
+            ::= { hwVplsEntry 6 }
+
+        
+        hwVplsMtu OBJECT-TYPE
+            SYNTAX Unsigned32 (328..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VPLS's MTU.The default value is 1500."
+            ::= { hwVplsEntry 7 }
+
+        
+        hwVplsTunnelPolicy OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..39))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the tunnel policy."
+            ::= { hwVplsEntry 8 }
+
+        
+        hwVplsDescription OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..64))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the description information."
+            ::= { hwVplsEntry 9 }
+
+        
+        hwVplsLearnStyle OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                qualify(1),
+                unqualify(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the style of learning the MAC
+                address."
+            ::= { hwVplsEntry 10 }
+
+        
+        hwVplsMacLearnEnable OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the enable sign of learning the MAC
+                address."
+            ::= { hwVplsEntry 11 }
+
+        
+        hwVplsMacLimitEnable OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the enable sign of the MAC addresses
+                number limit."
+            ::= { hwVplsEntry 12 }
+
+        
+        hwVplsStatisticsEnable OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the enable sign of statistics."
+            ::= { hwVplsEntry 13 }
+
+        
+        hwVplsUnknowMulticast OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                broadcast(1),
+                drop(2),
+                localHandle(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the processing mode when the
+                multicast MAC entry not found in FDB."
+            ::= { hwVplsEntry 14 }
+
+        
+        hwVplsUnknowUnicast OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                broadcast(1),
+                drop(2),
+                localHandle(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the processing mode when the
+                unicast MAC entry not found in FDB."
+            ::= { hwVplsEntry 15 }
+
+        
+        hwVplsPreference OBJECT-TYPE
+            SYNTAX Unsigned32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the preference.The default value is 0."
+            ::= { hwVplsEntry 16 }
+
+        
+        hwVplsVsiType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                operationVsi(1),
+                adminVsi(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VSI's type."
+            ::= { hwVplsEntry 17 }
+
+        
+        hwVplsAdminVsiName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the AdminVsi's name this VSI binding to"
+            ::= { hwVplsEntry 18 }
+
+        
+        hwVplsAcIsolateFlag OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether the AC in the VSI is isolated"
+            ::= { hwVplsEntry 19 }
+
+        
+        hwVplsDiffServMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                pipe(1),
+                shortpipe(2),
+                uniform(3),
+                egressPipe(4),
+                egressShortpipe(5),
+                egressShortpipeTrustInnerVlan8021p(6),
+                egressShortpipeTrustIpDscp(7) 
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Different service mode of the interface binding of vsi , 
+                default is uniform."
+            ::= { hwVplsEntry 20 }
+
+        
+        hwVplsDiffServServiceClass OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                be(1),
+                af1(2),
+                af2(3),
+                af3(4),
+                af4(5),
+                ef(6),
+                cs6(7),
+                cs7(8),
+                invalidClass(255)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "PHB in the ingress PE, the value must be 
+                be,f1,af2,af3,af4,ef,cs6,cs7.The default value is invalidClass(255)."
+            ::= { hwVplsEntry 21 }
+
+        
+        hwVplsDiffServColor OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                green(1),
+                yellow(2),
+                red(3),  
+                invalidColor(255)  
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Remarked color of packet in the ingress 
+                PE, the value must be green,yellow,red.The default value is invalidColor(255)."
+            ::= { hwVplsEntry 22 }
+
+        
+        hwVplsDiffServDSName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..8))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Name of different service domain"
+            ::= { hwVplsEntry 23 }
+
+        hwVplsInterfaceWithdraw OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Enable VSI send LDP mac-withdraw when VSI receive interface status changes event."
+            ::= { hwVplsEntry 24 }
+        
+        hwVplsUpe2NpeWithdraw OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "VSI forward message to all the NPE when VSI receive message from UPE."
+            ::= { hwVplsEntry 25 }           
+            
+        hwVplsUpe2UpeWithdraw OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "VSI forward message to all the other UPE when VSI receive message from UPE."
+            ::= { hwVplsEntry 26 }    
+            
+        hwVplsNpe2UpeWithdraw OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "VSI forward message to all the UPE when VSI receive message from NPE."
+            ::= { hwVplsEntry 27 }   
+
+        hwVplsDiscovery OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                static(1),
+                auto(2),
+                none(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the discovery type.
+                If the discovery type is static, the signal must be LDP.
+                If the discovery type is auto, the signal must be BGP."
+            ::= { hwVplsEntry 28 }
+
+        hwVplsMacWithdrawEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the enable sign of the MAC address withdraw."
+            ::= { hwVplsEntry 29 }
+
+        hwVplsVsiCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the committed information rate, based on VSI."
+            ::= { hwVplsEntry 30 }
+
+        hwVplsVsiPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the peak information rate, based on VSI."
+            ::= { hwVplsEntry 31 }
+
+        hwVplsVsiQosProfileName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..63))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the QoS profile's name, based on VSI."
+            ::= { hwVplsEntry 32 }
+
+        hwVplsAdminStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                up(1),
+                down(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VSI's admin status."
+            ::= { hwVplsEntry 33 }
+
+
+        hwVplsIgnoreAcState OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the enable sign of the ignorer of AC state."
+            ::= { hwVplsEntry 34 }
+
+
+        hwVplsEnableStatistic OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The enable sign of VSI's traffic statistics."
+            ::= { hwVplsEntry 35 }
+
+
+        hwVplsResetStatistic OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                resetStatistic(1),
+                unknownStatus(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Reset traffic statistics of VSI."
+            ::= { hwVplsEntry 36 }
+
+
+        hwVplsResetStatisticTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Last time of clean out."
+            ::= { hwVplsEntry 37 }
+
+        hwVplsAgingTime OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The aging time of the VSI MAC address."
+            ::= { hwVplsEntry 38 }
+
+        hwVplsUnknowUnicastMacLearning OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies 
+                whether the MAC address learning function for the discarded unknown unicast packets is enabled."
+            ::= { hwVplsEntry 39 }
+
+        hwVplsFlowLabel OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies whether the PW FlowLabel is enabled."
+            ::= { hwVplsEntry 40 }
+               
+        hwVplsServiceName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..100))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The service name of the VSI"
+            ::= { hwVplsEntry 41 }
+               
+        hwVplsRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus for this Table.
+                Restriction:
+                  After the signal type, VSI ID and RD are configured, 
+                  the configuration can not be modify or delete."
+            ::= { hwVplsEntry 51 }
+
+        
+--           
+-- The VPLS's RT Table
+-- 
+        hwVplsRtTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVplsRtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is the configuration table of VPN Target.
+                Users can create or delete the VPN Target of a VSI."
+            ::= { hwVplsMIBObjects 2 }
+
+        
+        hwVplsRtEntry OBJECT-TYPE
+            SYNTAX HWVplsRtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of a RT entry."
+            INDEX { hwVplsVsiName, hwVplsRtType, hwVplsRtName }
+            ::= { hwVplsRtTable 1 }
+
+        
+        HWVplsRtEntry ::=
+            SEQUENCE { 
+                hwVplsRtType
+                    INTEGER,
+                hwVplsRtName
+                    DisplayString,
+                hwVplsRtRowStatus
+                    RowStatus
+             }
+
+        hwVplsRtType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                import(1),
+                export(2)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VC's encapsulation type."
+            ::= { hwVplsRtEntry 1 }
+
+        
+        hwVplsRtName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (3..21))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the RT."
+            ::= { hwVplsRtEntry 2 }
+
+        
+        hwVplsRtRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus for this Table.
+                The max number of entries supported is 16.
+                Not support modifying configuration."
+            ::= { hwVplsRtEntry 51 }
+
+        
+--           
+-- The VPLS's AC Table
+-- 
+        hwVplsAcTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVplsAcEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is the configuration table of AC.
+                Users can create or delete the AC of a VSI."
+            ::= { hwVplsMIBObjects 3 }
+
+        
+        hwVplsAcEntry OBJECT-TYPE
+            SYNTAX HWVplsAcEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of a AC entry."
+            INDEX { hwVplsVsiName, hwVplsAcIfIndex }
+            ::= { hwVplsAcTable 1 }
+
+        
+        HWVplsAcEntry ::=
+            SEQUENCE { 
+                hwVplsAcIfIndex
+                    InterfaceIndex,
+                hwVplsAcStatus
+                    INTEGER,
+                hwVplsAcUpStartTime
+                    DisplayString,
+                hwVplsAcUpSumTime 
+                    Unsigned32,
+                hwVplsAcRowStatus
+                    RowStatus
+             }
+
+        hwVplsAcIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the interface index. There is only one VSI that can be created in one interface."
+            ::= { hwVplsAcEntry 1 }
+
+        
+        hwVplsAcStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                up(1),
+                down(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the AC's status."
+            ::= { hwVplsAcEntry 2 }
+ 
+        hwVplsAcUpStartTime OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..63))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Specifies the time this AC status has been Up(1)."
+            ::= { hwVplsAcEntry 3 }
+                        
+        hwVplsAcUpSumTime OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Specifies the cumulate time this AC status has been Up(1)."
+            ::= { hwVplsAcEntry 4 }
+        
+        hwVplsAcRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus for this Table.
+                Not support modifying configuration."
+            ::= { hwVplsAcEntry 51 }
+
+        
+--           
+-- The VPLS's BgpInfo Table
+-- 
+        hwVplsBgpInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVplsBgpInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is the configuration table of BGP information.
+                Users can create or delete the BgpInfo entry."
+            ::= { hwVplsMIBObjects 4 }
+
+        
+        hwVplsBgpInfoEntry OBJECT-TYPE
+            SYNTAX HWVplsBgpInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of a BgpInfo entry."
+            INDEX { hwVplsVsiName, hwVplsBgpInfoSiteID }
+            ::= { hwVplsBgpInfoTable 1 }
+
+        
+        HWVplsBgpInfoEntry ::=
+            SEQUENCE { 
+                hwVplsBgpInfoSiteID
+                    Unsigned32,
+                hwVplsBgpInfoRange
+                    Unsigned32,
+                hwVplsBgpInfoOffset
+                    Unsigned32,
+                hwVplsBgpInfoRowStatus
+                    RowStatus
+             }
+
+        hwVplsBgpInfoSiteID OBJECT-TYPE
+            SYNTAX Unsigned32 (0..65534)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the site ID."
+            ::= { hwVplsBgpInfoEntry 1 }
+
+        
+        hwVplsBgpInfoRange OBJECT-TYPE
+            SYNTAX Unsigned32 (1..65534)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the range."
+            ::= { hwVplsBgpInfoEntry 2 }
+
+        
+        hwVplsBgpInfoOffset OBJECT-TYPE
+            SYNTAX Unsigned32 (0..1)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Default original CE offset, default value is 0, calculate the VC in/out label."
+            ::= { hwVplsBgpInfoEntry 3 }
+
+        
+        hwVplsBgpInfoRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus for this Table.
+                Restriction:
+                  Support creating only one entry currently.
+                  Before creating, the corresponding VSI's RD and signal
+                  type must be designated.
+                  The signal type must be BGP.
+                  Site can not be modified.
+                  Range can increase, but can't decrease."
+            ::= { hwVplsBgpInfoEntry 51 }
+
+        
+--           
+-- The VPLS's PW Table
+-- 
+        hwVplsPwTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVplsPwEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is the configuration table of PW.
+                Users can create or delete the PW entry."
+            ::= { hwVplsMIBObjects 5 }
+
+        
+        hwVplsPwEntry OBJECT-TYPE
+            SYNTAX HWVplsPwEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of a PW entry."
+            INDEX { hwVplsVsiName, hwVplsPwID, hwVplsPwRemoteIp }
+            ::= { hwVplsPwTable 1 }
+
+        
+        HWVplsPwEntry ::=
+            SEQUENCE { 
+                hwVplsPwID
+                    Unsigned32,
+                hwVplsPwRemoteIp
+                    IpAddress,
+                hwVplsPwTnlPolicy
+                    DisplayString,
+                hwVplsPwType
+                    INTEGER,
+                hwVplsPwIsUpe
+                    TruthValue,
+                hwVplsPwInboundLabel
+                    Unsigned32,
+                hwVplsPwOutboundLabel
+                    Unsigned32,
+                hwVplsPwStatus
+                    INTEGER,
+                hwVplsPwVrIfIndex
+                    InterfaceIndexOrZero,
+                hwVplsPwVrID
+                    Unsigned32,
+                hwVplsPwUpStartTime 
+                    DisplayString,
+                hwVplsPwUpSumTime
+                    Unsigned32,
+                hwVplsPwRowStatus
+                    RowStatus,
+                hwVplsPwState
+                    INTEGER,
+                hwVplsPwWorkingState
+                    INTEGER
+             }
+
+        hwVplsPwID OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the PW ID."
+            ::= { hwVplsPwEntry 1 }
+
+        
+        hwVplsPwRemoteIp OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP address of the remote end."
+            ::= { hwVplsPwEntry 2 }
+
+        
+        hwVplsPwTnlPolicy OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..19))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the tunnel policy."
+            ::= { hwVplsPwEntry 3 }
+
+        
+        hwVplsPwType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                normal(1),
+                other(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the PW type."
+            ::= { hwVplsPwEntry 4 }
+
+        
+        hwVplsPwIsUpe OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VPLS is UPE or not."
+            ::= { hwVplsPwEntry 5 }
+
+        
+        hwVplsPwInboundLabel OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the inbound label."
+            ::= { hwVplsPwEntry 6 }
+
+        
+        hwVplsPwOutboundLabel OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the outbound label."
+            ::= { hwVplsPwEntry 7 }
+
+        
+        hwVplsPwStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                down(1),
+                up(2),
+                plugout(3),
+                backup(4)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the PW's status."
+            ::= { hwVplsPwEntry 8 }
+
+        
+        hwVplsPwVrIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VRRP interface this PW binding to."
+            ::= { hwVplsPwEntry 9 }
+
+        
+        hwVplsPwVrID OBJECT-TYPE
+            SYNTAX Unsigned32 (0..255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VrID this PW binding to."
+            ::= { hwVplsPwEntry 10 }
+
+        hwVplsPwUpStartTime OBJECT-TYPE                                             
+            SYNTAX DisplayString (SIZE (0..63))                                                  
+            MAX-ACCESS read-only                                               
+            STATUS current                                                     
+            DESCRIPTION                                                        
+                "Specifies the time this PW status was Up(1)."                 
+            ::= { hwVplsPwEntry 11 }                                       
+                                                                           
+        hwVplsPwUpSumTime OBJECT-TYPE                                          
+            SYNTAX Unsigned32                                                  
+            MAX-ACCESS read-only                                               
+            STATUS current                                                     
+            DESCRIPTION                                                        
+                "Specifies the cumulate time this PW status has been Up(1)."   
+            ::= { hwVplsPwEntry 12 }                                       
+ 
+         hwVplsPwState OBJECT-TYPE                                          
+            SYNTAX INTEGER
+                {
+                down(1),
+                up(2)
+                }                                                  
+            MAX-ACCESS read-only                                               
+            STATUS current                                                     
+            DESCRIPTION                                                        
+                "This object indicates the PW's state."   
+            ::= { hwVplsPwEntry 13 }
+        hwVplsPwWorkingState OBJECT-TYPE                                          
+            SYNTAX INTEGER
+                {
+                master(1),
+                backup(2)
+                }                                                  
+            MAX-ACCESS read-only                                               
+            STATUS current                                                     
+            DESCRIPTION                                                        
+                "This object indicates the PW's working state."   
+            ::= { hwVplsPwEntry 14 }
+                        
+        hwVplsPwRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus for this Table.
+                Restriction:
+                  Not support creating or modifying entry currently.
+                  If the signal type is LDP, we can delete PW by deleting Peer.
+                  If the signal type is BGP, we can delete PW by configuring RD.
+                  If the signal type is LDP, we need import PW ID value.
+                  If the signal type is BGP, we can import 0 as PW ID value."
+            ::= { hwVplsPwEntry 51 }
+        
+        
+--           
+-- The VPLS's Statistic Table
+-- 
+        hwVplsStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVplsStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the VPLS's packets Statistic."
+            ::= { hwVplsMIBObjects 6 }
+
+        
+        hwVplsStatisticsEntry OBJECT-TYPE
+            SYNTAX HWVplsStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the VPLS's packets statistic."
+            INDEX { hwVplsVsiName }
+            ::= { hwVplsStatisticsTable 1 }
+
+        
+        HWVplsStatisticsEntry ::=
+            SEQUENCE { 
+                hwVplsOutFrames
+                    Counter64,
+                hwVplsInFrames
+                    Counter64,
+                hwVplsOutBytes
+                    Counter64,
+                hwVplsInBytes
+                    Counter64,
+                hwVplsInDiscardFrames
+                    Counter64
+             }
+
+        hwVplsOutFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of frames transmitted out of the VSI."
+            ::= { hwVplsStatisticsEntry 1 }
+
+        
+        hwVplsInFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of frames received on the VSI."
+            ::= { hwVplsStatisticsEntry 2 }
+
+        
+        hwVplsOutBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of bytes transmitted out of the VSI."
+            ::= { hwVplsStatisticsEntry 3 }
+
+        
+        hwVplsInBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of bytes received on the VSI."
+            ::= { hwVplsStatisticsEntry 4 }
+
+        
+        hwVplsInDiscardFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of frames received and then discarded on the VSI."
+            ::= { hwVplsStatisticsEntry 5 }
+
+        
+--           
+-- The Leaf Nodes of hwVplsMIBObjects
+-- 
+        hwVplsUpDownNotifEnable OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-write
+            STATUS obsolete
+            DESCRIPTION
+                "This object indicates the enable sign of VPLS notification.
+                The default value is disable (2)."
+            ::= { hwVplsMIBObjects 7 }
+        
+        hwVplsStateChangeReason OBJECT-TYPE
+            SYNTAX HWL2VpnStateChangeReason
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the reason of VC state change."
+            ::= { hwVplsMIBObjects 8 }
+        
+
+--          
+-- The VPLS LDP's Statistic Table
+-- 
+        hwVplsLdpStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVplsLdpStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the VPLS-PW's Traffic Statistic."
+            ::= { hwVplsMIBObjects 9 }
+
+        
+        hwVplsLdpStatisticsEntry OBJECT-TYPE
+            SYNTAX HWVplsLdpStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the VPLS-PW's Traffic Statistic."
+            INDEX { hwVplsVsiName, hwVplsLdpStatPwID, hwVplsLdpStatRemoteIpAddr }
+            ::= { hwVplsLdpStatisticsTable 1 }
+
+        
+        HWVplsLdpStatisticsEntry ::=
+            SEQUENCE { 
+                hwVplsLdpStatPwID
+                    Unsigned32,
+                hwVplsLdpStatRemoteIpAddr
+                    IpAddress,     
+                hwVplsLdpStatEnable
+                    HWEnableValue,
+                hwVplsLdpStatInTrafficRate
+                    Counter64,
+                hwVplsLdpStatOutTrafficRate
+                    Counter64,
+                hwVplsLdpStatInFrameRate
+                    Counter64,
+                hwVplsLdpStatOutFrameRate
+                    Counter64,
+                hwVplsLdpStatInBytes
+                    Counter64,
+                hwVplsLdpStatOutBytes
+                    Counter64,
+                hwVplsLdpStatInFrames
+                    Counter64,
+                hwVplsLdpStatOutFrames
+                    Counter64,
+                hwVplsLdpStatInUnicastFrames
+                    Counter64,
+                hwVplsLdpStatOutUnicastFrames
+                    Counter64,
+                hwVplsLdpStatInMulticastFrames
+                    Counter64,
+                hwVplsLdpStatOutMulticastFrames
+                    Counter64,
+                hwVplsLdpStatInBroadcastFrames
+                    Counter64,
+                hwVplsLdpStatOutBroadcastFrames
+                    Counter64,
+                hwVplsLdpStatInDiscardFrames
+                    Counter64,
+                hwVplsLdpStatOutDiscardFrames
+                    Counter64,
+                hwVplsLdpStatInErrorFrames
+                    Counter64,
+                hwVplsLdpStatOutErrorFrames
+                    Counter64,
+                hwVplsLdpStatInUnknowFrames
+                    Counter64,
+                hwVplsLdpStatResetTime
+                    DateAndTime,
+                hwVplsLdpStatResetStatistic
+                    INTEGER,
+                hwVplsLdpStatInUnicastBytes
+                    Counter64,
+                hwVplsLdpStatOutUnicastBytes
+                    Counter64,
+                hwVplsLdpStatInMulticastBytes
+                    Counter64,
+                hwVplsLdpStatOutMulticastBytes
+                    Counter64,
+                hwVplsLdpStatInBroadcastBytes
+                    Counter64,
+                hwVplsLdpStatOutBroadcastBytes
+                    Counter64	
+             }
+
+        hwVplsLdpStatPwID OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the PW ID."
+            ::= { hwVplsLdpStatisticsEntry 1 }
+
+        
+        hwVplsLdpStatRemoteIpAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP address of the remote end."
+            ::= { hwVplsLdpStatisticsEntry 2 }   
+            
+        hwVplsLdpStatEnable OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the enable sign of LDP VPLS-PW's traffic statistics."
+            ::= { hwVplsLdpStatisticsEntry 3 }
+        
+        
+        hwVplsLdpStatInTrafficRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The traffic rate received on the PW."
+            ::= { hwVplsLdpStatisticsEntry 4 }
+
+        
+        hwVplsLdpStatOutTrafficRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The traffic rate transmitted out of the PW."
+            ::= { hwVplsLdpStatisticsEntry 5 }
+
+        
+        hwVplsLdpStatInFrameRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of Frames received on the PW."
+            ::= { hwVplsLdpStatisticsEntry 6 }
+
+        
+        hwVplsLdpStatOutFrameRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of Frames transmitted out of the PW."
+            ::= { hwVplsLdpStatisticsEntry 7 }
+
+        
+        hwVplsLdpStatInBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of bytes received on the PW."
+            ::= { hwVplsLdpStatisticsEntry 8 }
+
+        
+        hwVplsLdpStatOutBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of bytes transmitted out of the PW."
+            ::= { hwVplsLdpStatisticsEntry 9 }
+
+        
+        hwVplsLdpStatInFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of frames received on the PW."
+            ::= { hwVplsLdpStatisticsEntry 10 }
+
+        
+        hwVplsLdpStatOutFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of frames transmitted out of the PW."
+            ::= { hwVplsLdpStatisticsEntry 11 }
+
+        
+        hwVplsLdpStatInUnicastFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unicast frames received on the PW."
+            ::= { hwVplsLdpStatisticsEntry 12 }
+
+        
+        hwVplsLdpStatOutUnicastFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unicast frames transmitted out of the PW."
+            ::= { hwVplsLdpStatisticsEntry 13 }
+
+        
+        hwVplsLdpStatInMulticastFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast frames received on the PW."
+            ::= { hwVplsLdpStatisticsEntry 14 }
+
+        
+        hwVplsLdpStatOutMulticastFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast frames transmitted out of the PW."
+            ::= { hwVplsLdpStatisticsEntry 15 }
+
+        
+        hwVplsLdpStatInBroadcastFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of broadcast frames received on the PW."
+            ::= { hwVplsLdpStatisticsEntry 16 }
+
+        
+        hwVplsLdpStatOutBroadcastFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of broadcast frames transmitted out of the PW."
+            ::= { hwVplsLdpStatisticsEntry 17 }
+
+        
+        hwVplsLdpStatInDiscardFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of frames received and then discarded on the PW."
+            ::= { hwVplsLdpStatisticsEntry 18 }
+
+        
+        hwVplsLdpStatOutDiscardFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of frames transmitted out and then discarded on the PW."
+            ::= { hwVplsLdpStatisticsEntry 19 }
+
+        
+        hwVplsLdpStatInErrorFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of error frames received on the PW."
+            ::= { hwVplsLdpStatisticsEntry 20 }
+
+        
+        hwVplsLdpStatOutErrorFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of error frames transmitted out of the PW."
+            ::= { hwVplsLdpStatisticsEntry 21 }
+
+        
+        hwVplsLdpStatInUnknowFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unknown frames received on the PW."
+            ::= { hwVplsLdpStatisticsEntry 22 }
+
+        
+        hwVplsLdpStatResetTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Last time of clean out."
+            ::= { hwVplsLdpStatisticsEntry 23 }
+
+
+        hwVplsLdpStatResetStatistic OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                resetStatistic(1)                           
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Reset traffic statistics of VSI's LDP peer."
+            ::= { hwVplsLdpStatisticsEntry 24 }
+
+
+        hwVplsLdpStatInUnicastBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unicast bytes received on the PW."
+            ::= { hwVplsLdpStatisticsEntry 25 }
+
+        
+        hwVplsLdpStatOutUnicastBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unicast bytes transmitted out of the PW."
+            ::= { hwVplsLdpStatisticsEntry 26 }
+
+        
+        hwVplsLdpStatInMulticastBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast bytes received on the PW."
+            ::= { hwVplsLdpStatisticsEntry 27 }
+
+        
+        hwVplsLdpStatOutMulticastBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast bytes transmitted out of the PW."
+            ::= { hwVplsLdpStatisticsEntry 28 }
+
+        
+        hwVplsLdpStatInBroadcastBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of broadcast bytes received on the PW."
+            ::= { hwVplsLdpStatisticsEntry 29 }
+
+        
+        hwVplsLdpStatOutBroadcastBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of broadcast bytes transmitted out of the PW."
+            ::= { hwVplsLdpStatisticsEntry 30 }
+
+--          
+-- The VPLS BGP's Statistic Table
+-- 
+        hwVplsBgpStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVplsBgpStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the VPLS-PW's Traffic Statistic."
+            ::= { hwVplsMIBObjects 10 }
+
+        
+        hwVplsBgpStatisticsEntry OBJECT-TYPE
+            SYNTAX HWVplsBgpStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the VPLS-PW's Traffic Statistic."
+            INDEX { hwVplsVsiName, hwVplsBgpStatSiteID, hwVplsBgpStatRemoteIpAddr }
+            ::= { hwVplsBgpStatisticsTable 1 }
+
+        
+        HWVplsBgpStatisticsEntry ::=
+            SEQUENCE { 
+                hwVplsBgpStatSiteID
+                    Unsigned32,
+                hwVplsBgpStatRemoteIpAddr
+                    IpAddress,     
+                hwVplsBgpStatEnable
+                    HWEnableValue,
+                hwVplsBgpStatInTrafficRate
+                    Counter64,
+                hwVplsBgpStatOutTrafficRate
+                    Counter64,
+                hwVplsBgpStatInFrameRate
+                    Counter64,
+                hwVplsBgpStatOutFrameRate
+                    Counter64,
+                hwVplsBgpStatInBytes
+                    Counter64,
+                hwVplsBgpStatOutBytes
+                    Counter64,
+                hwVplsBgpStatInFrames
+                    Counter64,
+                hwVplsBgpStatOutFrames
+                    Counter64,
+                hwVplsBgpStatInUnicastFrames
+                    Counter64,
+                hwVplsBgpStatOutUnicastFrames
+                    Counter64,
+                hwVplsBgpStatInMulticastFrames
+                    Counter64,
+                hwVplsBgpStatOutMulticastFrames
+                    Counter64,
+                hwVplsBgpStatInBroadcastFrames
+                    Counter64,
+                hwVplsBgpStatOutBroadcastFrames
+                    Counter64,
+                hwVplsBgpStatInDiscardFrames
+                    Counter64,
+                hwVplsBgpStatOutDiscardFrames
+                    Counter64,
+                hwVplsBgpStatInErrorFrames
+                    Counter64,
+                hwVplsBgpStatOutErrorFrames
+                    Counter64,
+                hwVplsBgpStatInUnknowFrames
+                    Counter64,
+                hwVplsBgpStatResetTime
+                    DateAndTime
+             }
+
+        hwVplsBgpStatSiteID OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the Site ID."
+            ::= { hwVplsBgpStatisticsEntry 1 }
+
+        
+        hwVplsBgpStatRemoteIpAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP address of the remote end."
+            ::= { hwVplsBgpStatisticsEntry 2 } 
+            
+          hwVplsBgpStatEnable OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the enable sign of BGP VPLS-PW's traffic statistics."
+            ::= { hwVplsBgpStatisticsEntry 3 }
+            
+
+        
+        hwVplsBgpStatInTrafficRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The traffic rate received on the PW."
+            ::= { hwVplsBgpStatisticsEntry 4 }
+
+        
+        hwVplsBgpStatOutTrafficRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The traffic rate transmitted out of the PW."
+            ::= { hwVplsBgpStatisticsEntry 5 }
+
+        
+        hwVplsBgpStatInFrameRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of Frames received on the PW."
+            ::= { hwVplsBgpStatisticsEntry 6 }
+
+        
+        hwVplsBgpStatOutFrameRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of Frames transmitted out of the PW."
+            ::= { hwVplsBgpStatisticsEntry 7 }
+
+        
+        hwVplsBgpStatInBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of bytes received on the PW."
+            ::= { hwVplsBgpStatisticsEntry 8 }
+
+        
+        hwVplsBgpStatOutBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of bytes transmitted out of the PW."
+            ::= { hwVplsBgpStatisticsEntry 9 }
+
+        
+        hwVplsBgpStatInFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of frames received on the PW."
+            ::= { hwVplsBgpStatisticsEntry 10 }
+
+        
+        hwVplsBgpStatOutFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of frames transmitted out of the PW."
+            ::= { hwVplsBgpStatisticsEntry 11 }
+
+        
+        hwVplsBgpStatInUnicastFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unicast frames received on the PW."
+            ::= { hwVplsBgpStatisticsEntry 12 }
+
+        
+        hwVplsBgpStatOutUnicastFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unicast frames transmitted out of the PW."
+            ::= { hwVplsBgpStatisticsEntry 13 }
+
+        
+        hwVplsBgpStatInMulticastFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast frames received on the PW."
+            ::= { hwVplsBgpStatisticsEntry 14 }
+
+        
+        hwVplsBgpStatOutMulticastFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast frames transmitted out of the PW."
+            ::= { hwVplsBgpStatisticsEntry 15 }
+
+        
+        hwVplsBgpStatInBroadcastFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of broadcast frames received on the PW."
+            ::= { hwVplsBgpStatisticsEntry 16 }
+
+        
+        hwVplsBgpStatOutBroadcastFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of broadcast frames transmitted out of the PW."
+            ::= { hwVplsBgpStatisticsEntry 17 }
+
+        
+        hwVplsBgpStatInDiscardFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of frames received and then discarded on the PW."
+            ::= { hwVplsBgpStatisticsEntry 18 }
+
+        
+        hwVplsBgpStatOutDiscardFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of frames transmitted out and then discarded on the PW."
+            ::= { hwVplsBgpStatisticsEntry 19 }
+
+        
+        hwVplsBgpStatInErrorFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of error frames received on the PW."
+            ::= { hwVplsBgpStatisticsEntry 20 }
+
+        
+        hwVplsBgpStatOutErrorFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of error frames transmitted out of the PW."
+            ::= { hwVplsBgpStatisticsEntry 21 }
+
+        
+        hwVplsBgpStatInUnknowFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unknown frames received on the PW."
+            ::= { hwVplsBgpStatisticsEntry 22 }
+
+        
+        hwVplsBgpStatResetTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Last time of clean out."
+            ::= { hwVplsBgpStatisticsEntry 23 }
+
+
+--          
+-- The VPLS's LDP peer Table
+-- 
+        hwVplsLdpPeerTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVplsLdpPeerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is the configuration table of VPLS's LDP peer.
+                Users can create or delete the LDP peer entry."
+            ::= { hwVplsMIBObjects 11 }
+
+
+        hwVplsLdpPeerEntry OBJECT-TYPE
+            SYNTAX HwVplsLdpPeerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of a LDP peer entry."
+            INDEX { hwVplsVsiName, hwVplsLdpPeerRouterID, hwVplsLdpPeerPwId }
+            ::= { hwVplsLdpPeerTable 1 }
+
+
+        HwVplsLdpPeerEntry ::=
+            SEQUENCE { 
+                hwVplsLdpPeerRouterID
+                    IpAddress,
+                hwVplsLdpPeerPwId
+                    Unsigned32,
+                hwVplsLdpPeerTnlPolicyName
+                    DisplayString,
+                hwVplsLdpPeerUpeType
+                    INTEGER,
+                hwVplsLdpPeerTransLable
+                    Unsigned32,
+                hwVplsLdpPeerRecvLable
+                    Unsigned32,
+                hwVplsLdpPeerVrrpIfIndex
+                    InterfaceIndexOrZero,
+                hwVplsLdpPeerVirtualRouterId
+                    Unsigned32,
+                hwVplsLdpPeerCir
+                    Unsigned32,
+                hwVplsLdpPeerPir
+                    Unsigned32,
+                hwVplsLdpPeerQosProfileName
+                    DisplayString,
+                hwVplsLdpPeerStatus
+                    INTEGER,
+                hwVplsLdpPeerPwName
+                    DisplayString,
+                hwVplsLdpPeerIgnoreStpLoopCheck
+                    EnabledStatus,
+                hwVplsLdpPeerRowStatus
+                    RowStatus
+            }
+
+
+        hwVplsLdpPeerRouterID OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP address of the LDP peer."
+            ::= { hwVplsLdpPeerEntry 1 }
+
+
+        hwVplsLdpPeerPwId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the PW ID."
+            ::= { hwVplsLdpPeerEntry 2 }
+
+
+        hwVplsLdpPeerTnlPolicyName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..19))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the name of tunnel policy."
+            ::= { hwVplsLdpPeerEntry 3 }
+
+
+        hwVplsLdpPeerUpeType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                upe(1),
+                staticupe(2),
+                unknown(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VPLS is UPE , static UPE or not."
+            ::= { hwVplsLdpPeerEntry 4 }
+
+
+        hwVplsLdpPeerTransLable OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the transmitted label."
+            ::= { hwVplsLdpPeerEntry 5 }
+
+
+        hwVplsLdpPeerRecvLable OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the received label."
+            ::= { hwVplsLdpPeerEntry 6 }
+
+
+        hwVplsLdpPeerVrrpIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VRRP interface this PW binding to."
+            ::= { hwVplsLdpPeerEntry 7 }
+
+
+        hwVplsLdpPeerVirtualRouterId OBJECT-TYPE
+            SYNTAX Unsigned32 (0..255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the virtual router ID this PW binding to."
+            ::= { hwVplsLdpPeerEntry 8 }
+
+
+        hwVplsLdpPeerCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the committed information rate, based on the LDP peer."
+            ::= { hwVplsLdpPeerEntry 9 }
+
+
+        hwVplsLdpPeerPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the peak information rate, based on the LDP peer."
+            ::= { hwVplsLdpPeerEntry 10 }
+
+
+        hwVplsLdpPeerQosProfileName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..63))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the QoS profile's name, based on the LDP peer."
+            ::= { hwVplsLdpPeerEntry 11 }
+
+        
+        hwVplsLdpPeerStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                down(1),
+                up(2),
+                plugout(3),
+                backup(4)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the LDP peer's status."
+            ::= { hwVplsLdpPeerEntry 12 }
+
+
+        hwVplsLdpPeerPwName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..15))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the name of PW."
+            ::= { hwVplsLdpPeerEntry 13 }
+
+
+        hwVplsLdpPeerIgnoreStpLoopCheck OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the enable sign of the ignorer of 
+                STP loop check."
+            ::= { hwVplsLdpPeerEntry 14 }
+
+
+        hwVplsLdpPeerRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row status for this Table."
+            ::= { hwVplsLdpPeerEntry 51 }
+
+
+--
+-- The VPLS LDP's QoS Statistic Table
+--
+        hwVplsLdpQosStatisticTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVplsLdpQosStatisticEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the VPLS LDP's traffic statistic, 
+                based on VSI LDP's peer and QoS."
+            ::= { hwVplsMIBObjects 12 }
+
+
+        hwVplsLdpQosStatisticEntry OBJECT-TYPE
+            SYNTAX HWVplsLdpQosStatisticEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the VPLS LDP's traffic statistic."
+            INDEX { hwVplsVsiName, hwVplsLdpQosStatPwId, hwVplsLdpQosStatRemoteIpAddr, hwVplsLdpQosStatQueueId }
+            ::= { hwVplsLdpQosStatisticTable 1 }
+
+
+        HWVplsLdpQosStatisticEntry ::=
+            SEQUENCE { 
+                hwVplsLdpQosStatPwId
+                    Unsigned32,
+                hwVplsLdpQosStatRemoteIpAddr
+                    IpAddress,
+                hwVplsLdpQosStatQueueId
+                    INTEGER,
+                hwVplsLdpQosStatTotalPassPacket
+                    Counter64,
+                hwVplsLdpQosStatTotalPassByte
+                    Counter64,
+                hwVplsLdpQosStatTotalDiscardPacket
+                    Counter64,
+                hwVplsLdpQosStatTotalDiscardByte
+                    Counter64,
+                hwVplsLdpQosStatPassPacketRate
+                    Counter64,
+                hwVplsLdpQosStatPassByteRate
+                    Counter64,
+                hwVplsLdpQosStatDiscardPacketRate
+                    Counter64,
+                hwVplsLdpQosStatDiscardByteRate
+                    Counter64
+            }
+
+
+        hwVplsLdpQosStatPwId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The PW ID."
+            ::= { hwVplsLdpQosStatisticEntry 1 }
+
+        
+        hwVplsLdpQosStatRemoteIpAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The IP address of the remote end."
+            ::= { hwVplsLdpQosStatisticEntry 2 }   
+
+
+        hwVplsLdpQosStatQueueId OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                be(1),
+                af1(2),
+                af2(3),
+                af3(4),
+                af4(5),
+                ef(6),
+                cs6(7),
+                cs7(8)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The queue's ID. The value must be 
+                be,af1,af2,af3,af4,ef,cs6,cs7."
+            ::= { hwVplsLdpQosStatisticEntry 3 }
+
+
+        hwVplsLdpQosStatTotalPassPacket OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of total passed packets, based on LDP peer and QoS."
+            ::= { hwVplsLdpQosStatisticEntry 4 }
+
+
+        hwVplsLdpQosStatTotalPassByte OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of total passed bytes, based on LDP peer and QoS."
+            ::= { hwVplsLdpQosStatisticEntry 5 }
+
+
+        hwVplsLdpQosStatTotalDiscardPacket OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of total discarded packets, based on LDP peer and QoS."
+            ::= { hwVplsLdpQosStatisticEntry 6 }
+
+
+        hwVplsLdpQosStatTotalDiscardByte OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of total discarded bytes, based on LDP peer and QoS."
+            ::= { hwVplsLdpQosStatisticEntry 7 }
+
+
+        hwVplsLdpQosStatPassPacketRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of passed packets for the last 30 seconds, 
+                based on LDP peer and QoS. Unit: pps"
+            ::= { hwVplsLdpQosStatisticEntry 8 }
+
+
+        hwVplsLdpQosStatPassByteRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of passed bytes for the last 30 seconds, 
+                based on LDP peer and QoS. Unit: bps"
+            ::= { hwVplsLdpQosStatisticEntry 9 }
+
+
+        hwVplsLdpQosStatDiscardPacketRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of discarded packets for the last 30 seconds, 
+                based on LDP peer and QoS. Unit: pps"
+            ::= { hwVplsLdpQosStatisticEntry 10 }
+
+
+        hwVplsLdpQosStatDiscardByteRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of discarded bytes for the last 30 seconds, 
+                based on LDP peer and QoS. Unit: bps"
+            ::= { hwVplsLdpQosStatisticEntry 11 }
+
+
+--
+-- The VPLS's Statistic Table
+--
+        hwVplsStatisticTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVplsStatisticEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the VPLS's traffic statistic, based on VSI."
+            ::= { hwVplsMIBObjects 13 }
+
+
+        hwVplsStatisticEntry OBJECT-TYPE
+            SYNTAX HWVplsStatisticEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the VPLS's traffic statistic."
+            INDEX { hwVplsVsiName }
+            ::= { hwVplsStatisticTable 1 }
+
+
+        HWVplsStatisticEntry ::=
+            SEQUENCE { 
+                hwVplsStatEnable
+                    EnabledStatus,
+                hwVplsStatResetStatistic
+                    INTEGER,
+                hwVplsStatResetTime
+                    DateAndTime,
+                hwVplsStatQosPacketRate
+                    Counter64,
+                hwVplsStatQosByteRate
+                    Counter64,
+                hwVplsStatQosPacket
+                    Counter64,
+                hwVplsStatQosByte
+                    Counter64
+            }
+
+
+        hwVplsStatEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the enable sign of VSI's traffic statistics."
+            ::= { hwVplsStatisticEntry 1 }
+
+
+        hwVplsStatResetStatistic OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                resetStatistic(1)                           
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Reset traffic statistics of VSI."
+            ::= { hwVplsStatisticEntry 2 }
+
+
+        hwVplsStatResetTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Last time of clean out."
+            ::= { hwVplsStatisticEntry 3 }
+
+
+        hwVplsStatQosPacketRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of packets received on the VSI."
+            ::= { hwVplsStatisticEntry 4 }
+
+        
+        hwVplsStatQosByteRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of bytes received on the VSI."
+            ::= { hwVplsStatisticEntry 5 }
+
+
+        hwVplsStatQosPacket OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets received on the VSI."
+            ::= { hwVplsStatisticEntry 6 }
+
+        
+        hwVplsStatQosByte OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of bytes received on the VSI."
+            ::= { hwVplsStatisticEntry 7 }
+
+
+--
+-- The VPLS's QoS Statistic Table
+--
+        hwVplsQosStatisticTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVplsQosStatisticEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the VPLS's traffic statistic, based on VSI and QoS."
+            ::= { hwVplsMIBObjects 14 }
+
+
+        hwVplsQosStatisticEntry OBJECT-TYPE
+            SYNTAX HWVplsQosStatisticEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the VPLS's traffic statistics."
+            INDEX { hwVplsVsiName, hwVplsQosStatQueueId }
+            ::= { hwVplsQosStatisticTable 1 }
+
+
+        HWVplsQosStatisticEntry ::=
+            SEQUENCE { 
+                hwVplsQosStatQueueId
+                    INTEGER,
+                hwVplsQosStatTotalPassPacket
+                    Counter64,
+                hwVplsQosStatTotalPassByte
+                    Counter64,
+                hwVplsQosStatTotalDiscardPacket
+                    Counter64,
+                hwVplsQosStatTotalDiscardByte
+                    Counter64,
+                hwVplsQosStatPassPacketRate
+                    Counter64,
+                hwVplsQosStatPassByteRate
+                    Counter64,
+                hwVplsQosStatDiscardPacketRate
+                    Counter64,
+                hwVplsQosStatDiscardByteRate
+                    Counter64
+            }
+
+
+        hwVplsQosStatQueueId OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                be(1),
+                af1(2),
+                af2(3),
+                af3(4),
+                af4(5),
+                ef(6),
+                cs6(7),
+                cs7(8)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The queue's ID. The value must be 
+                be,af1,af2,af3,af4,ef,cs6,cs7."
+            ::= { hwVplsQosStatisticEntry 1 }
+
+
+        hwVplsQosStatTotalPassPacket OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of total passed packets, based on VSI and QoS."
+            ::= { hwVplsQosStatisticEntry 2 }
+
+
+        hwVplsQosStatTotalPassByte OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of total passed bytes, based on VSI and QoS."
+            ::= { hwVplsQosStatisticEntry 3 }
+
+
+        hwVplsQosStatTotalDiscardPacket OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of total discarded packets, based on VSI and QoS."
+            ::= { hwVplsQosStatisticEntry 4 }
+
+
+        hwVplsQosStatTotalDiscardByte OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of total discarded bytes, based on VSI and QoS."
+            ::= { hwVplsQosStatisticEntry 5 }
+
+
+        hwVplsQosStatPassPacketRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of passed packets for the last 30 seconds, 
+                based on VSI and QoS. Unit: pps"
+            ::= { hwVplsQosStatisticEntry 6 }
+
+
+        hwVplsQosStatPassByteRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of passed bytes for the last 30 seconds, 
+                based on VSI and QoS. Unit: bps"
+            ::= { hwVplsQosStatisticEntry 7 }
+
+
+        hwVplsQosStatDiscardPacketRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of discarded packets for the last 30 seconds, 
+                based on VSI and QoS. Unit: pps"
+            ::= { hwVplsQosStatisticEntry 8 }
+
+
+        hwVplsQosStatDiscardByteRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of discarded bytes for the last 30 seconds, 
+                based on VSI and QoS. Unit: bps"
+            ::= { hwVplsQosStatisticEntry 9 }
+
+--           
+-- The Leaf Nodes of hwVplsMIBObjects
+-- 
+        hwL2vpnTnlType OBJECT-TYPE
+           SYNTAX INTEGER
+           {
+                lsp(1),
+                crlsp(2),
+                other(3)
+           }
+           MAX-ACCESS accessible-for-notify
+           STATUS current
+           DESCRIPTION
+                "This object indicates the tunnel type."
+           ::= { hwVplsMIBObjects 15 }
+
+        hwL2vpnTunnelIndex OBJECT-TYPE
+           SYNTAX Unsigned32 (0..65535)
+           MAX-ACCESS accessible-for-notify
+           STATUS current
+           DESCRIPTION
+                "This object indicates the mplsTunnelIndex.
+                It contains an unused value for
+                mplsTunnelIndex, or a zero to indicate
+                that none exist. Negative values are not allowed,
+                as they do not correspond to valid values of
+                mplsTunnelIndex.
+
+                Note that this object offers an unused value
+                for an mplsTunnelIndex value at the ingress
+                side of a tunnel. At other LSRs the value
+                of mplsTunnelIndex SHOULD be taken from the
+                value signaled by the MPLS signaling protocol.
+            "
+           ::= { hwVplsMIBObjects 16 }      
+
+--
+-- The VPLS's protect group Table
+--
+        hwVplsVsiProtectGroupTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVplsVsiProtectGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is the VPLS protect group's configuration table. Users can create or delete the VPLS protect group by it."
+            ::= { hwVplsMIBObjects 17 }
+
+
+        hwVplsVsiProtectGroupEntry OBJECT-TYPE
+            SYNTAX HWVplsVsiProtectGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of a VPLS protect group entry."
+            INDEX { hwVplsVsiName, hwVplsVsiProtectGroupName }
+            ::= { hwVplsVsiProtectGroupTable 1 }
+
+
+        HWVplsVsiProtectGroupEntry ::=
+            SEQUENCE { 
+                hwVplsVsiProtectGroupName
+                    DisplayString,
+                hwVplsVsiProtectGroupMode
+                    INTEGER
+            }
+
+        hwVplsVsiProtectGroupName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..15))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VPLS protect group's name."
+            ::= { hwVplsVsiProtectGroupEntry 1 }
+
+        hwVplsVsiProtectGroupMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(0),
+                frr(1),
+                master(2),
+                independent(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VPLS protect group's mode."
+            ::= { hwVplsVsiProtectGroupEntry 2 }
+
+--
+-- The VPLS HARD-PIPE's Statistic Table
+--
+        hwVplsHardPipeStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVplsHardPipeStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the VPLS-PW's hard-pipe Traffic Statistic."
+            ::= { hwVplsMIBObjects 18 }
+
+        
+        hwVplsHardPipeStatisticsEntry OBJECT-TYPE
+            SYNTAX HWVplsHardPipeStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the VPLS-PW's hard-pipe Traffic Statistic."
+            INDEX { hwVplsVsiName, hwVplsHardPipeStatPwID, hwVplsHardPipeStatRemoteIpAddr }
+            ::= { hwVplsHardPipeStatisticsTable 1 }
+
+        
+        HWVplsHardPipeStatisticsEntry ::=
+            SEQUENCE { 
+                hwVplsHardPipeStatPwID
+                    Unsigned32,
+                hwVplsHardPipeStatRemoteIpAddr
+                    IpAddress,     
+                hwVplsHardPipeStatEnable
+                    HWEnableValue,
+                hwVplsHardPipeStatPassFrameRate
+                    Counter64,
+                hwVplsHardPipeStatPassBytesRate
+                    Counter64,
+                hwVplsHardPipeStatDropFrameRate
+                    Counter64,
+                hwVplsHardPipeStatDropBytesRate
+                    Counter64,  
+                hwVplsHardPipeStatPassFrames
+                    Counter64,
+                hwVplsHardPipeStatPassBytes
+                    Counter64,
+                hwVplsHardPipeStatDropFrame
+                    Counter64,
+                hwVplsHardPipeStatDropBytes
+                    Counter64, 					
+                hwVplsHardPipeStatResetTime
+                    DateAndTime,
+                hwVplsHardPipeStatResetStatistic
+                    INTEGER				
+             }
+
+        hwVplsHardPipeStatPwID OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the PW ID."
+            ::= { hwVplsHardPipeStatisticsEntry 1 }
+
+        
+        hwVplsHardPipeStatRemoteIpAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP address of the remote end."
+            ::= { hwVplsHardPipeStatisticsEntry 2 }   
+            
+        hwVplsHardPipeStatEnable OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the enable sign of LDP VPLS-PW's hard-pipe traffic statistics."
+            ::= { hwVplsHardPipeStatisticsEntry 3 }
+        
+        
+        hwVplsHardPipeStatPassFrameRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of Frames received on the PW."
+            ::= { hwVplsHardPipeStatisticsEntry 4 }
+
+        
+        hwVplsHardPipeStatPassBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "TThe rate of bytes received on the PW."
+            ::= { hwVplsHardPipeStatisticsEntry 5 }
+
+        
+        hwVplsHardPipeStatDropFrameRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "he rate of Frames transmitted out of the PW."
+            ::= { hwVplsHardPipeStatisticsEntry 6 }
+
+        
+        hwVplsHardPipeStatDropBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of bytes transmitted out of the PW."
+            ::= { hwVplsHardPipeStatisticsEntry 7 }
+
+        
+        hwVplsHardPipeStatPassFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of frames received on the PW."
+            ::= { hwVplsHardPipeStatisticsEntry 8 }
+
+        
+        hwVplsHardPipeStatPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of bytes received on the PW."
+            ::= { hwVplsHardPipeStatisticsEntry 9 }
+
+        
+        hwVplsHardPipeStatDropFrame OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of frames dropped on the PW."
+            ::= { hwVplsHardPipeStatisticsEntry 10 }
+
+        
+        hwVplsHardPipeStatDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of bytes dropped on the PW."
+            ::= { hwVplsHardPipeStatisticsEntry 11 }
+			
+        
+        hwVplsHardPipeStatResetTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Last time of clean out."
+            ::= { hwVplsHardPipeStatisticsEntry 12 }
+
+			
+        hwVplsHardPipeStatResetStatistic OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                resetStatistic(1)                           
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Reset traffic statistics of VSI's LDP peer."
+            ::= { hwVplsHardPipeStatisticsEntry 13 }
+
+--          
+-- The VPLS PW Suppression's Statistic Table
+-- 
+        hwVplsPwSuppStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVplsPwSuppStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the VPLS-PW's suppresssion Traffic Statistic."
+            ::= { hwVplsMIBObjects 19 }
+
+        
+        hwVplsPwSuppStatisticsEntry OBJECT-TYPE
+            SYNTAX HWVplsPwSuppStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the VPLS-PW's suppresssion Traffic Statistic."
+            INDEX { hwVplsVsiName}
+            ::= { hwVplsPwSuppStatisticsTable 1 }
+
+        
+        HWVplsPwSuppStatisticsEntry::=
+            SEQUENCE { 
+                hwVplsPwSuppStatCir
+                    Counter64,
+                hwVplsPwSuppStatPir
+                    Counter64,
+                hwVplsPwSuppStatCbs
+                    Counter64,
+                hwVplsPwSuppStatPbs
+                    Counter64,  
+                hwVplsPwSuppStatPassFrames
+                    Counter64,
+                hwVplsPwSuppStatPassBytes
+                    Counter64,
+                hwVplsPwSuppStatDropFrames
+                    Counter64,
+                hwVplsPwSuppStatDropBytes
+                    Counter64, 	
+                hwVplsPwSuppStatPassBbsRate
+                    Counter64,
+                hwVplsPwSuppStatPassPbsRate
+                    Counter64,
+                hwVplsPwSuppStatDropBbsRate
+                    Counter64,
+                hwVplsPwSuppStatDropPbsRate
+                    Counter64, 				
+                hwVplsPwSuppStatResetTime
+                    DateAndTime,
+                hwVplsPwSuppStatResetStatistic
+                    INTEGER				
+             }
+	     
+        hwVplsPwSuppStatCir OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the committed information rate, based on VSI."
+            ::= { hwVplsPwSuppStatisticsEntry 1 }
+
+        
+        hwVplsPwSuppStatPir OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the peak information rate, based on VSI."
+            ::= { hwVplsPwSuppStatisticsEntry 2 }
+
+        
+        hwVplsPwSuppStatCbs OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the CBS limitation, based on VSI."
+            ::= { hwVplsPwSuppStatisticsEntry 3 }
+
+        hwVplsPwSuppStatPbs OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the PBS limitation, based on VSI."
+            ::= { hwVplsPwSuppStatisticsEntry 4 } 
+        
+        hwVplsPwSuppStatPassFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of frames passed from PW."
+            ::= { hwVplsPwSuppStatisticsEntry 5 }
+        
+        hwVplsPwSuppStatPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bytes passed from PW."
+            ::= { hwVplsPwSuppStatisticsEntry 6 }
+
+        
+        hwVplsPwSuppStatDropFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of frames dropped from PW."
+            ::= { hwVplsPwSuppStatisticsEntry 7 }
+
+        
+        hwVplsPwSuppStatDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bytes dropped from PW."
+            ::= { hwVplsPwSuppStatisticsEntry 8 }
+
+        
+        hwVplsPwSuppStatPassBbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of bps passed from PW."
+            ::= { hwVplsPwSuppStatisticsEntry 9 }
+
+        
+        hwVplsPwSuppStatPassPbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of pbs passed from PW."
+            ::= { hwVplsPwSuppStatisticsEntry 10 }
+
+        
+        hwVplsPwSuppStatDropBbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of bps dropped from PW."
+            ::= { hwVplsPwSuppStatisticsEntry 11 }
+
+        
+        hwVplsPwSuppStatDropPbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of pbs dropped from PW."
+            ::= { hwVplsPwSuppStatisticsEntry 12 }						
+        
+        hwVplsPwSuppStatResetTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Last time of clean out."
+            ::= { hwVplsPwSuppStatisticsEntry 13 }
+			
+        hwVplsPwSuppStatResetStatistic OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                resetStatistic(1)                           
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Reset suppression traffic statistics of VSI."
+            ::= { hwVplsPwSuppStatisticsEntry 14 }
+
+--          
+-- The VPLS AC Suppression's Statistic Table
+-- 
+        hwVplsAcSuppStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVplsAcSuppStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the VPLS-AC's suppresssion Traffic Statistic."
+            ::= { hwVplsMIBObjects 20 }
+
+        
+        hwVplsAcSuppStatisticsEntry OBJECT-TYPE
+            SYNTAX HWVplsAcSuppStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the VPLS-AC's suppresssion Traffic Statistic."
+            INDEX { hwVplsVsiName}
+            ::= { hwVplsAcSuppStatisticsTable 1 }
+
+        
+        HWVplsAcSuppStatisticsEntry::=
+            SEQUENCE { 
+                hwVplsAcSuppStatCir
+                    Counter64,
+                hwVplsAcSuppStatPir
+                    Counter64,
+                hwVplsAcSuppStatCbs
+                    Counter64,
+                hwVplsAcSuppStatPbs
+                    Counter64,  
+                hwVplsAcSuppStatPassFrames
+                    Counter64,
+                hwVplsAcSuppStatPassBytes
+                    Counter64,
+                hwVplsAcSuppStatDropFrame
+                    Counter64,
+                hwVplsAcSuppStatDropBytes
+                    Counter64, 	
+                hwVplsAcSuppStatPassBbsRate
+                    Counter64,
+                hwVplsAcSuppStatPassPbsRate
+                    Counter64,
+                hwVplsAcSuppStatDropBbsRate
+                    Counter64,
+                hwVplsAcSuppStatDropPbsRate
+                    Counter64, 				
+                hwVplsAcSuppStatResetTime 
+                    DateAndTime,
+                hwVplsAcSuppStatResetStatistic
+                    INTEGER				
+             }
+	     
+        hwVplsAcSuppStatCir OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the committed information rate, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 1 }
+
+        
+        hwVplsAcSuppStatPir OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the peak information rate, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 2 }
+
+        
+        hwVplsAcSuppStatCbs OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the CBS limitation, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 3 }
+
+        hwVplsAcSuppStatPbs OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the PBS limitation, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 4 } 
+        
+        hwVplsAcSuppStatPassFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of frames passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 5 }
+        
+        hwVplsAcSuppStatPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bytes passed from PW."
+            ::= { hwVplsAcSuppStatisticsEntry 6 }
+
+        
+        hwVplsAcSuppStatDropFrame OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of frames dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 7 }
+
+        
+        hwVplsAcSuppStatDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bytes dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 8 }
+
+        
+        hwVplsAcSuppStatPassBbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of bps passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 9 }
+
+        
+        hwVplsAcSuppStatPassPbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of pbs passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 10 }
+
+        
+        hwVplsAcSuppStatDropBbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of bps dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 11 }
+
+        
+        hwVplsAcSuppStatDropPbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of pbs dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 12 }						
+        
+        hwVplsAcSuppStatResetTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Last time of clean out."
+            ::= { hwVplsAcSuppStatisticsEntry 13 }
+			
+        hwVplsAcSuppStatResetStatistic OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                resetStatistic(1)                           
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Reset suppression traffic statistics of VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 14 }
+
+--           
+-- VPLS MIB Trap Definitions
+-- 
+        hwVplsMIBTraps OBJECT IDENTIFIER ::= { hwL2VpnVplsExt 2 }
+
+        
+        hwVplsVcDown NOTIFICATION-TYPE
+            OBJECTS { hwVplsPwType, hwVplsStateChangeReason, sysUpTime, hwVplsPwTnlPolicy, hwL2vpnTnlType, hwL2vpnTunnelIndex }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the VC's state changes to down."
+            ::= { hwVplsMIBTraps 1 }
+
+        
+        hwVplsVcUp NOTIFICATION-TYPE
+            OBJECTS { hwVplsPwType, hwVplsStateChangeReason, sysUpTime, hwVplsPwTnlPolicy }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the VC's state changes to up."
+            ::= { hwVplsMIBTraps 2 }
+
+        
+        hwVplsVsiDown NOTIFICATION-TYPE
+            OBJECTS { hwVplsVsiID, hwVplsStateChangeReason, hwVplsStatus, ifName }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the VSI's state changes to down."
+            ::= { hwVplsMIBTraps 3 }
+
+        
+        hwVplsVsiUp NOTIFICATION-TYPE
+            OBJECTS { hwVplsVsiID, hwVplsStateChangeReason, hwVplsStatus, ifName }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the VSI's state changes to up."
+            ::= { hwVplsMIBTraps 4 }
+
+        
+        hwVplsVcBackup NOTIFICATION-TYPE
+            OBJECTS { hwVplsPwType, hwVplsStateChangeReason, sysUpTime }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the VC's state changes to backup."
+            ::= { hwVplsMIBTraps 5 }
+        
+        
+        hwVplsVsiDeleted NOTIFICATION-TYPE
+            OBJECTS { hwVplsVsiID }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the VSI is deleted."
+            ::= { hwVplsMIBTraps 6 }
+
+
+        hwVplsVcDeleted NOTIFICATION-TYPE
+            OBJECTS { hwVplsPwType }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the VC is deleted."
+            ::= { hwVplsMIBTraps 7 }
+            
+            
+        hwVplsVcStatusChange NOTIFICATION-TYPE
+            OBJECTS { hwVplsStateChangeReason, hwVplsPwState, hwVplsPwWorkingState, sysUpTime }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the VC is deleted."
+            ::= { hwVplsMIBTraps 8 }
+            
+            
+        hwVplsVcNumberThresholdExceed NOTIFICATION-TYPE
+            OBJECTS { hwL2VpnVcLimitClass, hwL2VpnVsiVcNumber, hwVplsVcNumberUpperThreshold, hwVplsVcNumberMaxNum }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates that the number of VPLS VCs reaches the upper threshold."
+            ::= { hwVplsMIBTraps 9 }
+
+
+        hwVplsVcNumberThresholdClear NOTIFICATION-TYPE
+            OBJECTS { hwL2VpnVcLimitClass, hwL2VpnVsiVcNumber }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates that the number of VPLS VCs falls below the lower threshold."
+            ::= { hwVplsMIBTraps 10 }
+
+
+        hwVplsVcNumberMaxExceed NOTIFICATION-TYPE
+            OBJECTS { hwL2VpnVcLimitClass, hwVplsVcNumberMaxNum }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates that the number of VPLS VCs reaches the maximum limit."
+            ::= { hwVplsMIBTraps 11 }
+
+
+        hwVplsVcNumberMaxClear NOTIFICATION-TYPE
+            OBJECTS { hwL2VpnVcLimitClass, hwVplsVcNumberMaxNum }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates that the number of VPLS VCs is less than 95% of the maximum limit."
+            ::= { hwVplsMIBTraps 12 }
+
+        hwVplsPwRedundancyDegraded NOTIFICATION-TYPE
+            OBJECTS { hwVplsVsiProtectGroupMode }
+            STATUS current
+            DESCRIPTION 
+                "VPLS PW redundancy reported a protect degraded alarm."
+            ::= { hwVplsMIBTraps 13 }
+			
+        hwVplsPwRedundancyDegradedClear NOTIFICATION-TYPE
+            OBJECTS { hwVplsVsiProtectGroupMode }
+            STATUS current
+            DESCRIPTION 
+                "VPLS PW redundancy reported the clearing of the protect degraded alarm."
+            ::= { hwVplsMIBTraps 14 }
+
+        hwVplsBLabelNotEnough NOTIFICATION-TYPE
+            OBJECTS { hwVplsVsiName }
+            STATUS current
+            DESCRIPTION 
+                "The block labels of VPLS are not enough."
+            ::= { hwVplsMIBTraps 15 }
+            
+        hwVplsBLabelNotEnoughClear NOTIFICATION-TYPE
+            OBJECTS { hwVplsVsiName }
+            STATUS current
+            DESCRIPTION 
+                "The block labels of VPLS are enough."
+            ::= { hwVplsMIBTraps 16 }            
+                                            
+--    Conformance information
+-- 
+        hwVplsMIBConformance OBJECT IDENTIFIER ::= { hwL2VpnVplsExt 3 }
+
+        
+        hwVplsMIBCompliances OBJECT IDENTIFIER ::= { hwVplsMIBConformance 1 }
+
+        
+--  this module
+        hwVplsMIBCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for systems supporting 
+                the HUAWEI-VPLS-EXT-MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwVplsGroup, hwVplsRtGroup, hwVplsAcGroup, hwVplsBgpInfoGroup, hwVplsPwGroup, 
+                    hwVplsStatisticsGroup, hwVplsNotificationControlGroup, hwVplsStateReasonGroup, hwVplsNotificationGroup, 
+                    hwVplsLdpStatisticsGroup, hwVplsBgpStatisticsGroup, hwVplsLdpPeerGroup, hwVplsLdpQosStatisticGroup,
+                    hwVplsStatisticGroup, hwVplsQosStatisticGroup,hwVplsTunnelInfoGroup
+                     }
+            ::= { hwVplsMIBCompliances 1 }
+
+        
+        hwVplsMIBGroups OBJECT IDENTIFIER ::= { hwVplsMIBConformance 2 }
+
+        
+        hwVplsGroup OBJECT-GROUP
+            OBJECTS { hwVplsSignal, hwVplsRD, hwVplsVsiID, hwVplsVcType, hwVplsStatus, 
+                hwVplsMtu, hwVplsTunnelPolicy, hwVplsDescription, hwVplsLearnStyle, hwVplsMacLearnEnable, 
+                hwVplsMacLimitEnable, hwVplsStatisticsEnable, hwVplsUnknowMulticast, hwVplsUnknowUnicast, hwVplsPreference, 
+                hwVplsVsiType, hwVplsAdminVsiName, hwVplsAcIsolateFlag, hwVplsDiffServMode, hwVplsDiffServServiceClass, 
+                hwVplsDiffServColor, hwVplsDiffServDSName,hwVplsInterfaceWithdraw,hwVplsUpe2NpeWithdraw,hwVplsUpe2UpeWithdraw,
+                hwVplsNpe2UpeWithdraw, hwVplsDiscovery, hwVplsMacWithdrawEnable, hwVplsVsiCir, hwVplsVsiPir, hwVplsVsiQosProfileName, 
+                hwVplsAdminStatus, hwVplsIgnoreAcState, hwVplsEnableStatistic, hwVplsResetStatistic, hwVplsResetStatisticTime,hwVplsAgingTime, hwVplsUnknowUnicastMacLearning, hwVplsFlowLabel, 
+                hwVplsServiceName, hwVplsRowStatus
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The VPLS group."
+            ::= { hwVplsMIBGroups 1 }
+
+        
+        hwVplsRtGroup OBJECT-GROUP
+            OBJECTS { hwVplsRtRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "The VPLS's RT group."
+            ::= { hwVplsMIBGroups 2 }
+
+        
+        hwVplsAcGroup OBJECT-GROUP
+            OBJECTS { hwVplsAcStatus, hwVplsAcUpStartTime, hwVplsAcUpSumTime, hwVplsAcRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "The VPLS's AC group."
+            ::= { hwVplsMIBGroups 3 }
+
+        
+        hwVplsBgpInfoGroup OBJECT-GROUP
+            OBJECTS { hwVplsBgpInfoRange, hwVplsBgpInfoOffset, hwVplsBgpInfoRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "The VPLS's BGP information group."
+            ::= { hwVplsMIBGroups 4 }
+
+        
+        hwVplsPwGroup OBJECT-GROUP
+            OBJECTS { hwVplsPwTnlPolicy, hwVplsPwType, hwVplsPwIsUpe, hwVplsPwInboundLabel, hwVplsPwOutboundLabel, 
+                hwVplsPwStatus, hwVplsPwVrIfIndex, hwVplsPwVrID, hwVplsPwUpStartTime, hwVplsPwUpSumTime, 
+                hwVplsPwState, hwVplsPwWorkingState, hwVplsPwRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "The VPLS's PW group."
+            ::= { hwVplsMIBGroups 5 }
+
+        
+        hwVplsStatisticsGroup OBJECT-GROUP
+            OBJECTS { hwVplsOutFrames, hwVplsInFrames, hwVplsOutBytes, hwVplsInBytes, hwVplsInDiscardFrames
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The VPLS's Statistic group."
+            ::= { hwVplsMIBGroups 6 }
+
+        
+        hwVplsNotificationControlGroup OBJECT-GROUP
+            OBJECTS { hwVplsUpDownNotifEnable }
+            STATUS current
+            DESCRIPTION 
+                "The VPLS's Notification Control group."
+            ::= { hwVplsMIBGroups 7 }
+
+        
+        hwVplsStateReasonGroup OBJECT-GROUP
+            OBJECTS { hwVplsStateChangeReason }
+            STATUS current
+            DESCRIPTION 
+                "The VPLS's VC and VSI State Change Reason group."
+            ::= { hwVplsMIBGroups 8 }
+
+        
+        hwVplsNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwVplsVcDown, hwVplsVcUp, hwVplsVsiDown, hwVplsVsiUp, hwVplsVcBackup, hwVplsVsiDeleted, hwVplsVcDeleted, hwVplsVcStatusChange,
+                 hwVplsVcNumberThresholdExceed, hwVplsVcNumberThresholdClear, hwVplsVcNumberMaxExceed, hwVplsVcNumberMaxClear, hwVplsPwRedundancyDegraded,
+                 hwVplsPwRedundancyDegradedClear, hwVplsBLabelNotEnough, hwVplsBLabelNotEnoughClear }
+            STATUS current
+            DESCRIPTION 
+                "The VPLS Notification group."
+            ::= { hwVplsMIBGroups 9 }
+
+        
+
+        
+        hwVplsLdpStatisticsGroup OBJECT-GROUP
+            OBJECTS {hwVplsLdpStatEnable,hwVplsLdpStatInTrafficRate, hwVplsLdpStatOutTrafficRate, hwVplsLdpStatInFrameRate, hwVplsLdpStatOutFrameRate, hwVplsLdpStatInBytes, 
+                hwVplsLdpStatOutBytes, hwVplsLdpStatInFrames, hwVplsLdpStatOutFrames, hwVplsLdpStatInUnicastFrames, hwVplsLdpStatOutUnicastFrames, 
+                hwVplsLdpStatInMulticastFrames, hwVplsLdpStatOutMulticastFrames, hwVplsLdpStatInBroadcastFrames, hwVplsLdpStatOutBroadcastFrames, hwVplsLdpStatInDiscardFrames, 
+                hwVplsLdpStatOutDiscardFrames, hwVplsLdpStatInErrorFrames, hwVplsLdpStatOutErrorFrames, hwVplsLdpStatInUnknowFrames, hwVplsLdpStatResetTime, hwVplsLdpStatResetStatistic
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The VPLS Ldp's Statistic group."
+            ::= { hwVplsMIBGroups 10 }
+
+        
+        hwVplsBgpStatisticsGroup OBJECT-GROUP
+            OBJECTS {hwVplsBgpStatEnable,hwVplsBgpStatInTrafficRate, hwVplsBgpStatOutTrafficRate, hwVplsBgpStatInFrameRate, hwVplsBgpStatOutFrameRate, hwVplsBgpStatInBytes, 
+                hwVplsBgpStatOutBytes, hwVplsBgpStatInFrames, hwVplsBgpStatOutFrames, hwVplsBgpStatInUnicastFrames, hwVplsBgpStatOutUnicastFrames, 
+                hwVplsBgpStatInMulticastFrames, hwVplsBgpStatOutMulticastFrames, hwVplsBgpStatInBroadcastFrames, hwVplsBgpStatOutBroadcastFrames, hwVplsBgpStatInDiscardFrames, 
+                hwVplsBgpStatOutDiscardFrames, hwVplsBgpStatInErrorFrames, hwVplsBgpStatOutErrorFrames, hwVplsBgpStatInUnknowFrames, hwVplsBgpStatResetTime
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The VPLS Bgp's Statistic group."
+            ::= { hwVplsMIBGroups 11 }
+
+
+        hwVplsLdpPeerGroup OBJECT-GROUP
+            OBJECTS { hwVplsLdpPeerTnlPolicyName, hwVplsLdpPeerUpeType, hwVplsLdpPeerTransLable, hwVplsLdpPeerRecvLable, hwVplsLdpPeerVrrpIfIndex, 
+                hwVplsLdpPeerVirtualRouterId, hwVplsLdpPeerCir, hwVplsLdpPeerPir, hwVplsLdpPeerQosProfileName, hwVplsLdpPeerStatus, hwVplsLdpPeerPwName, 
+                hwVplsLdpPeerIgnoreStpLoopCheck, hwVplsLdpPeerRowStatus
+                }
+            STATUS current
+            DESCRIPTION 
+                "The VPLS LDP's peer group."
+            ::= { hwVplsMIBGroups 12 }
+
+
+        hwVplsLdpQosStatisticGroup OBJECT-GROUP
+            OBJECTS { hwVplsLdpQosStatTotalPassPacket, hwVplsLdpQosStatTotalPassByte, hwVplsLdpQosStatTotalDiscardPacket, hwVplsLdpQosStatTotalDiscardByte, 
+                hwVplsLdpQosStatPassPacketRate, hwVplsLdpQosStatPassByteRate, hwVplsLdpQosStatDiscardPacketRate, hwVplsLdpQosStatDiscardByteRate
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The VPLS's QoS statistic group."
+            ::= { hwVplsMIBGroups 13 }
+
+
+        hwVplsStatisticGroup OBJECT-GROUP
+            OBJECTS { hwVplsStatEnable, hwVplsStatResetStatistic, hwVplsStatResetTime, hwVplsStatQosPacketRate, hwVplsStatQosByteRate, 
+                hwVplsStatQosPacket, hwVplsStatQosByte
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The VPLS's QoS statistic group."
+            ::= { hwVplsMIBGroups 14 }
+
+
+        hwVplsQosStatisticGroup OBJECT-GROUP
+            OBJECTS { hwVplsQosStatTotalPassPacket, hwVplsQosStatTotalPassByte, hwVplsQosStatTotalDiscardPacket, hwVplsQosStatTotalDiscardByte, 
+                hwVplsQosStatPassPacketRate, hwVplsQosStatPassByteRate, hwVplsQosStatDiscardPacketRate, hwVplsQosStatDiscardByteRate
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The VPLS's QoS statistic group."
+            ::= { hwVplsMIBGroups 15 }
+        hwVplsTunnelInfoGroup OBJECT-GROUP
+            OBJECTS { hwL2vpnTnlType, hwL2vpnTunnelIndex
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The VPLS's tunnel information group."
+            ::= { hwVplsMIBGroups 16 }
+
+    END
+
+--
+-- HUAWEI-VPLS-EXT-MIB.mib
+--

@@ -1,8 +1,8 @@
 os: windows
 type: server
 text: 'Microsoft Windows'
-ifname: 1
-processor_stacked: 1
+ifname: true
+processor_stacked: true
 bad_hrSystemUptime: true
 mib_dir:
     - dell
