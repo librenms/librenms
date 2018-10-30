@@ -435,6 +435,7 @@ Click on 'Add Telegram config' and put your chat id and token into the relevant 
 | ------ | ------- |
 | Chat ID | 34243432 |
 | Token | 3ed32wwf235234 |
+| Format | [Markdown|HTML] |
 
 ## Twilio SMS
 
