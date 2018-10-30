@@ -1,0 +1,14 @@
+os: firebrick
+text: 'Firebrick'
+type: network
+icon: firebrick
+group: firebrick
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysDescr_regex:
+        - '/^FB2900/'
+        - '/^FB2700/'
+
