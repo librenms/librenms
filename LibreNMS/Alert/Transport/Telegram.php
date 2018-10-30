@@ -89,13 +89,18 @@ class Telegram extends Transport
                     'title' => 'Format',
                     'name' => 'telegram-format',
                     'descr' => 'Telegram format',
-                    'type' => 'text',
+                    'type' => 'select',
+                    'options' => [
+                        'Markdown' => 'Markdown',
+                        'HTML' => 'HTML'
+                    ]                    
                 ]
             ],
             'validation' => [
                 'telegram-chat-id' => 'required|string',
                 'telegram-token' => 'required|string',
-                'telegram-format' => 'required|string',
+                'telegram-format' => 'string',
+
             ]
         ];
     }
