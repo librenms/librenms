@@ -70,6 +70,7 @@ A big thank you to the following 25 contributors this last month:
 #### Feature
 * Validate Database and PHP time match ([#9373](https://github.com/librenms/librenms/pull/9373)) - [murrant](https://github.com/murrant)
 * Add Mapquest API Geocode support ([#9316](https://github.com/librenms/librenms/pull/9316)) - [brianatlarge](https://github.com/brianatlarge)
+* Add format field to Telegram Messages ([#9404](https://github.com/librenms/librenms/pull/9404)) - [paulocoimbrati](https://github.com/paulocoimbrati)
 
 #### Alerting
 * Fixed field type for processor_usage and _perc_warn ([#9357](https://github.com/librenms/librenms/pull/9357)) - [TheGreatDoc](https://github.com/TheGreatDoc)
