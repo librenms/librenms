@@ -35,7 +35,7 @@ class Telegram extends Transport
         }
         $telegram_opts['chat_id'] = $this->config['telegram-chat-id'];
         $telegram_opts['token'] = $this->config['telegram-token'];
-        $telegram_opts['format'] = $this->config['telegram-format'];        
+        $telegram_opts['format'] = $this->config['telegram-format'];
         return $this->contactTelegram($obj, $telegram_opts);
     }
 
