@@ -1,4 +1,5 @@
 source: Extensions/Auto-Discovery.md
+path: blob/master/doc/
 # Auto Discovery Support
 
 ### Getting Started

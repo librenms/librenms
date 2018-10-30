@@ -1,4 +1,5 @@
 source: Installation/Ubuntu-image.md
+path: blob/master/doc/
 > NOTE: We highly advise that you change all passwords on this image when you deploy it!!
 
 > NOTE: Read the above note again!

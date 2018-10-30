@@ -1,4 +1,5 @@
 source: Extensions/Weathermap.md
+path: blob/master/doc/
 
 # Network-WeatherMap with LibreNMS
 Integrating LibreNMS with Network-Weathermap, allows you to build network maps to help visulaize network traffic flow rates.

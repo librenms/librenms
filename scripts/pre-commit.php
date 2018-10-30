@@ -188,6 +188,9 @@ function os_from_file($file)
             }
             return os_from_php(str_replace('-', '_', $osname));
         }
+    } elseif (starts_with($file, ['tests/snmpsim/', 'tests/data/'])) {
+        list($os,) = explode('_', basename(basename($file, '.json'), '.snmprec'), 2);
+        return $os;
     }
 
     return null;

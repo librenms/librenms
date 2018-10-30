@@ -1,4 +1,5 @@
 source: API/Devices.md
+path: blob/master/doc/
 
 ### `get_all_ports`
 

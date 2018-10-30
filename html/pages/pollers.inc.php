@@ -14,33 +14,42 @@
 
 $no_refresh = true;
 
+
 echo '<ul class="nav nav-tabs">';
 
-$poll_tabs = array(
-    array(
+$poll_tabs = [
+    [
         'name' => 'Pollers',
         'icon' => 'fa-th-large',
-    ),
-);
+    ],
+];
 
-if ($config['distributed_poller'] === true) {
+if (\LibreNMS\Config::get('distributed_poller')) {
     $poll_tabs[] = array(
         'name' => 'Groups',
         'icon' => 'fa-th',
     );
 }
 
+$poll_tabs[] = [
+    'name' => 'Performance',
+    'icon' => 'fa-line-chart',
+];
+$poll_tabs[] = [
+    'name' => 'Log',
+    'icon' => 'fa-file-text',
+];
+
+$current_tab = isset($vars['tab']) ? str_replace('/', '', $vars['tab']) : 'pollers';
+
 foreach ($poll_tabs as $tab) {
-    echo '
-            <li>
-                <a href="' . generate_url(array('page'=>'pollers','tab'=>lcfirst($tab['name']))) . '">
-                <i class="fa '.$tab['icon'].' fa-lg icon-theme" aria-hidden="true"></i>'.$tab['name'].'
-                </a>
-            </li>';
+    $taburl = strtolower($tab['name']);
+    echo '<li role="presentation" ' . ($current_tab == $taburl ? ' class="active"' : '') . '><a href="';
+    echo generate_url(['page' => 'pollers', 'tab' => $taburl]);
+    echo '"><i class="fa ' . $tab['icon'] . ' fa-lg icon-theme" aria-hidden="true"></i> ' . $tab['name'];
+    echo '</a></li>';
 }
 
 echo '</ul>';
 
-if (isset($vars['tab'])) {
-    include_once 'pages/pollers/'.mres($vars['tab']).'.inc.php';
-}
+include_once 'pages/pollers/'.$current_tab.'.inc.php';

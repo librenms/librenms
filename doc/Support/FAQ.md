@@ -1,4 +1,5 @@
 source: Support/FAQ.md
+path: blob/master/doc/
 ### Getting started
  - [How do I install LibreNMS?](#faq1)
  - [How do I add a device?](#faq2)

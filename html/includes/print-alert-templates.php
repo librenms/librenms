@@ -6,7 +6,6 @@ $no_refresh = true;
 
 require_once 'includes/modal/alert_template.inc.php';
 require_once 'includes/modal/delete_alert_template.inc.php';
-require_once 'includes/modal/attach_alert_template.inc.php';
 ?>
 <div class="table-responsive">
     <table id="templatetable" class="table table-hover table-condensed" width="100%">
@@ -64,9 +63,9 @@ $(document).ready(function() {
             "commands": function(column, row) {
                 var response = '';
                 if(row.id == 0) {
-                    response = "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> " + "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" disabled=\"disabled\"><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button> " + "<button type='button' class='btn btn-warning btn-xs command-attach' disabled=\"disabled\"><i class='fa fa-th-list' aria-hidden='true'></i></button>";
+                    response = "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> " + "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" disabled=\"disabled\"><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button>";
                 } else {
-                    response = "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> " + "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-toggle=\"modal\" data-target='#confirm-delete-alert-template' data-template_id=\"" + row.id + "\" name='delete-alert-template'><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button> " + "<button type='button' class='btn btn-warning btn-xs command-attach' data-toggle='modal' data-target='#attach-alert-template' data-template_id='" + row.id + "' name='attach-alert-template'><i class='fa fa-th-list' aria-hidden='true'></i></button>";
+                    response = "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> " + "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-toggle=\"modal\" data-target='#confirm-delete-alert-template' data-template_id=\"" + row.id + "\" name='delete-alert-template'><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button>";
                 }
                 return response;
             }
@@ -86,9 +85,6 @@ $(document).ready(function() {
         }).end().find(".command-delete").on("click", function(e) {
             $('#template_id').val($(this).data("template_id"));
             $('#confirm-delete-alert-template').modal('show');
-        }).end().find(".command-attach").on("click", function(e) {
-            $('#template_id').val($(this).data("template_id"));
-            $('#attach-alert-template').modal('show');
         });
     });
 });
